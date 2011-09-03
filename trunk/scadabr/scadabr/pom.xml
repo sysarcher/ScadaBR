@@ -14,6 +14,11 @@
             <name>Atlassian Repository</name>
             <url>http://repository.atlassian.com/maven2</url>
         </repository>
+        <repository>
+            <id>mbus4jSnapshot</id>
+            <name>mbus4j snapshot repository</name>
+            <url>http://mbus4j.sourceforge.net/snapshot-repository</url>
+        </repository>
     </repositories>
         
     <dependencies>
