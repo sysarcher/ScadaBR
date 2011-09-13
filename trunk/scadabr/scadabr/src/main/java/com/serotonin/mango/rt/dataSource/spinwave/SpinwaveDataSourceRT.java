@@ -101,6 +101,7 @@ public class SpinwaveDataSourceRT extends EventDataSource implements SwListener 
     // / SwListener
     // /
     //
+    @Override
     public void receivedException(Exception e) {
         log.error("Exception from spinwave receiver", e);
     }
@@ -113,6 +114,7 @@ public class SpinwaveDataSourceRT extends EventDataSource implements SwListener 
         log.error("Exception from spinwave receiver", e);
     }
 
+    @Override
     public void receivedHeartbeat(long sensorAddress, boolean active) {
         // We don't use the given information because if two sensors are currently in timeout and one comes back,
         // the timeout on the other will be lost unless we maintain a list of sensors in timeout in this class.
@@ -126,12 +128,13 @@ public class SpinwaveDataSourceRT extends EventDataSource implements SwListener 
             returnToNormal(SENSOR_HEARTBEAT_EVENT, System.currentTimeMillis());
     }
 
+    @Override
     public void receivedMessage(SwMessage message) {
         // Find points that are interested in this sensor.
         BaseSpinwavePointLocatorVO locator;
         boolean found = false;
         synchronized (pointListChangeLock) {
-            for (DataPointRT dp : dataPoints) {
+            for (DataPointRT dp : addedChangedPoints) {
                 locator = ((SpinwavePointLocatorRT) dp.getPointLocator()).getPointLocatorVO();
 
                 if (locator.getSensorAddress() == message.getSensorAddress()) {

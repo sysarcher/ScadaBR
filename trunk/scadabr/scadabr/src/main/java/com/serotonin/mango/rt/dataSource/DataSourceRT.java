@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource;
 
+import com.serotonin.mango.vo.DataPointVO;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 
@@ -112,6 +113,9 @@ abstract public class DataSourceRT implements ILifecycle {
         new DataSourceDao().savePersistentData(vo.getId(), persistentData);
     }
 
+    /*
+     * add active DataPoints at enabling the datasource
+     */
     public void addDataPoint(DataPointRT dataPoint) {
         synchronized (pointListChangeLock) {
             addedChangedPoints.remove(dataPoint);
@@ -195,4 +199,19 @@ abstract public class DataSourceRT implements ILifecycle {
     public void beginPolling() {
         // no op
     }
+
+    /**
+     * let the runtime know of all disabled DataSources
+     * @param vo 
+     */
+    public void addDisabledDataPoint(DataPointVO vo) {  
+    }
+
+    /**
+     * called if the datapoint is deleted
+     * @param point 
+     */
+    public void deleteDataPoint(DataPointVO point) {
+    }
+   
 }

@@ -194,7 +194,7 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
         long time = System.currentTimeMillis();
 
         synchronized (pointListChangeLock) {
-            for (DataPointRT dp : dataPoints) {
+            for (DataPointRT dp : addedChangedPoints) {
                 VMStatPointLocatorVO locator = ((VMStatPointLocatorRT) dp.getPointLocator()).getPointLocatorVO();
 
                 Integer position = attributePositions.get(locator.getAttributeId());

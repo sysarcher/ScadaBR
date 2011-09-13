@@ -66,22 +66,26 @@ public class HttpReceiverDataSourceRT extends EventDataSource implements HttpMul
     // / HttpMulticastListener
     // /
     //
+    @Override
     public String[] getDeviceIdWhiteList() {
         return vo.getDeviceIdWhiteList();
     }
 
+    @Override
     public String[] getIpWhiteList() {
         return vo.getIpWhiteList();
     }
 
+    @Override
     public void ipWhiteListError(String message) {
         log.warn("Error checking white list: " + message);
     }
 
+    @Override
     public void data(HttpReceiverData data) {
         // Match data points in the received set with point locators.
         synchronized (pointListChangeLock) {
-            for (DataPointRT dp : dataPoints) {
+            for (DataPointRT dp : addedChangedPoints) {
                 HttpReceiverPointLocatorVO locator = ((HttpReceiverPointLocatorRT) dp.getPointLocator())
                         .getPointLocatorVO();
                 String paramName = locator.getParameterName();

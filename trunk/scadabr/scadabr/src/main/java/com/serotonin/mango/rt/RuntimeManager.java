@@ -316,10 +316,12 @@ public class RuntimeManager {
 			List<DataPointVO> dataSourcePoints = new DataPointDao()
 					.getDataPoints(vo.getId(), null);
 			for (DataPointVO dataPoint : dataSourcePoints) {
-				if (dataPoint.isEnabled())
+				if (dataPoint.isEnabled()) {
 					startDataPoint(dataPoint);
-			}
-
+                                } else {
+                                        addDisabledDataPointToRT(dataPoint);
+			        }
+                        }
 			LOG.info("Data source '" + vo.getName() + "' initialized");
 
 			return true;
@@ -395,13 +397,19 @@ public class RuntimeManager {
 		if (point.isEnabled()) {
 			return startDataPoint(point);
                 } else {
+                    addDisabledDataPointToRT(point);
                     return null;
                 }
 	}
 
 	public void deleteDataPoint(DataPointVO point) {
-		if (point.isEnabled())
+		if (point.isEnabled()) {
 			stopDataPoint(point.getId());
+                }
+        	DataSourceRT ds = getRunningDataSource(point.getDataSourceId());
+                	if (ds != null) {
+				ds.deleteDataPoint(point);
+			}
 		new DataPointDao().deleteDataPoint(point.getId());
 		Common.ctx.getEventManager().cancelEventsForDataPoint(point.getId());
 	}
@@ -434,15 +442,35 @@ public class RuntimeManager {
                 return null;
 	}
 
-	private void stopDataPoint(int dataPointId) {
+        /**
+         * add a disabled datapoint to a running datasource
+         * @param vo
+         * @return 
+         */
+	private void addDisabledDataPointToRT(DataPointVO vo) {
+		synchronized (dataPoints) {
+			Assert.isTrue(!vo.isEnabled());
+
+			// Only add the data point if its data source is enabled.
+			DataSourceRT ds = getRunningDataSource(vo.getDataSourceId());
+			if (ds != null) {
+				ds.addDisabledDataPoint(vo);
+			}
+		}
+                return;
+	}
+
+        private void stopDataPoint(int dataPointId) {
 		synchronized (dataPoints) {
 			// Remove this point from the data image if it is there. If not,
 			// just quit.
 			DataPointRT p = dataPoints.remove(dataPointId);
+                        
 
 			// Remove it from the data source, and terminate it.
 			if (p != null) {
-				getRunningDataSource(p.getDataSourceId()).removeDataPoint(p);
+				DataSourceRT dsRT = getRunningDataSource(p.getDataSourceId());
+                                dsRT.removeDataPoint(p);
 				DataPointListener l = getDataPointListeners(dataPointId);
 				if (l != null)
 					l.pointTerminated();
