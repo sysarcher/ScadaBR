@@ -159,20 +159,20 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
         }
         removeDisabledDataPoint(dataPoint.getVO());
     }
-    
-        /**
+
+    /**
      * let the runtime know of all disabled DataSources
      * @param vo 
      */
     @Override
-    public void addDisabledDataPoint(DataPointVO vo) {  
+    public void addDisabledDataPoint(DataPointVO vo) {
         LOG.error("Disabled add:" + vo.getXid());
         synchronized (pointListChangeLock) {
             super.addDisabledDataPoint(vo);
             final Fhz4JPointLocatorVO locator = (Fhz4JPointLocatorVO) vo.getPointLocator();
             switch (locator.getFhzProtocol()) {
                 case FHT:
-                    FhtPointLocator fhtLocator = (FhtPointLocator)locator;
+                    FhtPointLocator fhtLocator = (FhtPointLocator) locator;
                     Map<FhtProperty, DataPointVO> fhzPropertyMap = fhtDisabledPoints.get(fhtLocator.getHousecode());
                     if (fhzPropertyMap == null) {
                         fhzPropertyMap = new EnumMap<FhtProperty, DataPointVO>(FhtProperty.class);
@@ -194,7 +194,7 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
             }
         }
     }
-   
+
     @Override
     public void removeDataPoint(DataPointRT dataPoint) {
         LOG.error("REMOVE:" + dataPoint.getVO().getXid());
@@ -285,9 +285,9 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
                     updateValue(dataPoint, fhtMessage, fhtMessage.getCommand());
                 } else {
                     if (getFhtDisabledPoint(fhtMessage) == null) {
-                    LOG.error("NEW Fht property detected, wil add: " + fhtMessage);
-                    addFoundFhtMessage(fhtMessage);
-                }
+                        LOG.error("NEW Fht property detected, wil add: " + fhtMessage);
+                        addFoundFhtMessage(fhtMessage);
+                    }
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -434,6 +434,9 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
                     case FHT:
                         FhtPointLocator fhtLocator = (FhtPointLocator) locator;
                         Map<FhtProperty, DataPointVO> fhtPropertyMap = fhtDisabledPoints.get(fhtLocator.getHousecode());
+                        if (fhtPropertyMap == null) {
+                            return;
+                        }
                         fhtPropertyMap.remove(fhtLocator.getProperty());
                         if (fhtPropertyMap.isEmpty()) {
                             fhtDisabledPoints.remove(fhtLocator.getHousecode());
@@ -442,6 +445,9 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
                     case HMS:
                         HmsPointLocator hmsLocator = (HmsPointLocator) locator;
                         Map<HmsProperty, DataPointVO> hmsPropertyMap = hmsDisabledPoints.get(hmsLocator.getHousecode());
+                        if (hmsPropertyMap == null) {
+                            return;
+                        }
                         hmsPropertyMap.remove(hmsLocator.getProperty());
                         if (hmsPropertyMap.isEmpty()) {
                             hmsDisabledPoints.remove(hmsLocator.getHousecode());
@@ -464,10 +470,9 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
         final DataPointVO dp = hmsPropertyMap.get(hmsProperty);
         return dp;
     }
-    
+
     @Override
     public void deleteDataPoint(DataPointVO point) {
         removeDisabledDataPoint(point);
     }
-
 }
