@@ -12,6 +12,13 @@
     <properties>
         <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <db.type>derby</db.type>
+        <db.url></db.url>
+        <db.username></db.username>
+        <db.password></db.password>
+        <db.pool.maxIdle></db.pool.maxIdle>
+        <db.pool.maxActive></db.pool.maxActive>
+        <scadabr.branding>ScadaBR</scadabr.branding>
     </properties>
 
     <repositories>
@@ -34,17 +41,17 @@
         
     <dependencies>
 
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>1.6.2</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>log4j</artifactId>
-                        <groupId>log4j</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.6.2</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>log4j</artifactId>
+                    <groupId>log4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <dependency>
             <groupId>com.atlassian.crowd</groupId>
@@ -365,7 +372,7 @@
                 <configuration>
                     <generateReports>${site.generateReports}</generateReports>
                     <port>${site.run.port}</port>
-                    <stagingDirectory>${java.io.tmpdir}/killerapp</stagingDirectory>
+                    <stagingDirectory>${java.io.tmpdir}/${scadabr.branding}</stagingDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -384,7 +391,7 @@
             </resource>
         </resources>
 
-        <finalName>scada-br</finalName>
+        <finalName>${scadabr.branding}</finalName>
 
     </build>
     <reporting>
@@ -399,6 +406,26 @@
             </plugin>
         </plugins>
     </reporting>
+    
+    <profiles>
+        <profile>
+            <id>mysqlLocal</id>
+            <properties>
+                <db.type>mysql</db.type>
+                <db.url>jdbc:mysql://localhost/${scadabr.branding}</db.url>
+                <db.username>${scadabr.branding}</db.username>
+                <db.password>${scadabr.branding}</db.password>
+                <db.pool.maxIdle>10</db.pool.maxIdle>
+                <db.pool.maxActive>10</db.pool.maxActive>
+            </properties>
+        </profile>
+        <profile>
+            <id>mango</id>
+            <properties>
+                <scadabr.branding>mango</scadabr.branding>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
 
