@@ -27,7 +27,7 @@
   </appender>
   
   <appender name="logfile" class="org.apache.log4j.DailyRollingFileAppender">
-    <param name="File" value="${catalina.base}/logs/mango.log"/>
+    <param name="File" value="${catalina.base}/logs/${scadabr.branding}.log"/>
 <!--    <param name="MaxFileSize" value="100KB"/> -->
     <param name="DatePattern" value="yyyy-MM-dd"/>
     <layout class="org.apache.log4j.PatternLayout">
