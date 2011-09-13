@@ -41,14 +41,6 @@ public class Fhz4JPointLocatorRT extends PointLocatorRT {
         return vo.isSettable();
     }
 
-    public short getFhtHousecode() {
-        return ((FhtPointLocator)vo).getHousecode();
-    }
-
-    public short getHmsHousecode() {
-        return ((HmsPointLocator)vo).getHousecode();
-    }
-    
     public FhzProtocol getFhzProtocol() {
         return vo.getFhzProtocol();
     }

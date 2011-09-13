@@ -170,8 +170,8 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
     //
     public void viconicsNetworkStatus(boolean online) {
         // Mark all points as unreliable.
-        synchronized (dataPoints) {
-            for (DataPointRT rt : dataPoints)
+        synchronized (pointListChangeLock) {
+            for (DataPointRT rt : addedChangedPoints)
                 rt.setAttribute(ATTR_UNRELIABLE_KEY, true);
         }
 
@@ -363,8 +363,8 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
             returnToNormal(DEVICE_OFFLINE_EVENT, System.currentTimeMillis());
         else {
             // Mark all points for the device as unreliable.
-            synchronized (dataPoints) {
-                for (DataPointRT rt : dataPoints) {
+            synchronized (pointListChangeLock) {
+                for (DataPointRT rt : addedChangedPoints) {
                     ViconicsPointLocatorVO locator = rt.getVO().getPointLocator();
                     if (Arrays.equals(locator.getDeviceIeee(), device.getIeee()))
                         rt.setAttribute(ATTR_UNRELIABLE_KEY, true);

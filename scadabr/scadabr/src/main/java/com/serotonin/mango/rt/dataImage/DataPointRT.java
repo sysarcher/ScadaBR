@@ -82,10 +82,12 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         valueCache = new PointValueCache(vo.getId(), vo.getDefaultCacheSize());
     }
 
+    @Override
     public List<PointValueTime> getLatestPointValues(int limit) {
         return valueCache.getLatestPointValues(limit);
     }
 
+    @Override
     public PointValueTime getPointValueBefore(long time) {
         for (PointValueTime pvt : valueCache.getCacheContents()) {
             if (pvt.getTime() < time)
@@ -104,6 +106,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         return new PointValueDao().getPointValueAt(vo.getId(), time);
     }
 
+    @Override
     public List<PointValueTime> getPointValues(long since) {
         List<PointValueTime> result = new PointValueDao().getPointValues(vo.getId(), since);
 
@@ -118,6 +121,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         return result;
     }
 
+    @Override
     public List<PointValueTime> getPointValuesBetween(long from, long to) {
         List<PointValueTime> result = new PointValueDao().getPointValuesBetween(vo.getId(), from, to);
 
@@ -157,6 +161,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
      *            the source of the set. This can be a user object if the point was set from the UI, or could be a
      *            program run by schedule or on event.
      */
+    @Override
     public void setPointValue(PointValueTime newValue, SetPointSource source) {
         if (source == null)
             savePointValue(newValue, source, true);
@@ -313,6 +318,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         }
     }
 
+    @Override
     public void scheduleTimeout(long fireTime) {
         synchronized (intervalLoggingLock) {
             MangoValue value;
@@ -358,6 +364,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         return vo.getId();
     }
 
+    @Override
     public PointValueTime getPointValue() {
         return pointValue;
     }
@@ -375,6 +382,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         return vo;
     }
 
+    @Override
     public int getDataTypeId() {
         return vo.getPointLocator().getDataTypeId();
     }

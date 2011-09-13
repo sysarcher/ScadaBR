@@ -44,6 +44,7 @@ import net.sf.fhz4j.FhzDataListener;
 import net.sf.fhz4j.FhzParser;
 import net.sf.fhz4j.FhzWriter;
 import com.serotonin.mango.vo.dataSource.fhz4j.Fhz4JDataSourceVO;
+import com.serotonin.mango.vo.dataSource.fhz4j.Fhz4JPointLocatorVO;
 import com.serotonin.mango.vo.dataSource.fhz4j.HmsPointLocator;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import java.util.ArrayList;
@@ -76,6 +77,8 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
     private Fhz4JDataSourceVO vo;
     private Map<Short, Map<HmsProperty, DataPointRT>> hmsPoints = new HashMap<Short, Map<HmsProperty, DataPointRT>>();
     private Map<Short, Map<FhtProperty, DataPointRT>> fhtPoints = new HashMap<Short, Map<FhtProperty, DataPointRT>>();
+    private Map<Short, Map<HmsProperty, DataPointVO>> hmsDisabledPoints = new HashMap<Short, Map<HmsProperty, DataPointVO>>();
+    private Map<Short, Map<FhtProperty, DataPointVO>> fhtDisabledPoints = new HashMap<Short, Map<FhtProperty, DataPointVO>>();
 
     public Fhz4JDataSourceRT(Fhz4JDataSourceVO vo) {
         super(vo);
@@ -127,12 +130,14 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
 
     @Override
     public void addDataPoint(DataPointRT dataPoint) {
+        LOG.error("ADD:" + dataPoint.getVO().getXid());
         synchronized (pointListChangeLock) {
+            super.addDataPoint(dataPoint);
             final Fhz4JPointLocatorRT locator = (Fhz4JPointLocatorRT) dataPoint.getPointLocator();
             switch (locator.getFhzProtocol()) {
                 case FHT:
                     FhtPointLocator fhtLocator = (FhtPointLocator) locator.getVo();
-                    Map<FhtProperty, DataPointRT> fhzPropertyMap = fhtPoints.get(locator.getFhtHousecode());
+                    Map<FhtProperty, DataPointRT> fhzPropertyMap = fhtPoints.get(fhtLocator.getHousecode());
                     if (fhzPropertyMap == null) {
                         fhzPropertyMap = new EnumMap<FhtProperty, DataPointRT>(FhtProperty.class);
                         fhtPoints.put(fhtLocator.getHousecode(), fhzPropertyMap);
@@ -141,7 +146,7 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
                     break;
                 case HMS:
                     HmsPointLocator hmsLocator = (HmsPointLocator) locator.getVo();
-                    Map<HmsProperty, DataPointRT> hmsPropertyMap = hmsPoints.get(locator.getHmsHousecode());
+                    Map<HmsProperty, DataPointRT> hmsPropertyMap = hmsPoints.get(hmsLocator.getHousecode());
                     if (hmsPropertyMap == null) {
                         hmsPropertyMap = new EnumMap<HmsProperty, DataPointRT>(HmsProperty.class);
                         hmsPoints.put(hmsLocator.getHousecode(), hmsPropertyMap);
@@ -152,31 +157,74 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
                     throw new RuntimeException("Unknown fhz protocol");
             }
         }
+        removeDisabledDataPoint(dataPoint.getVO());
     }
-
+    
+        /**
+     * let the runtime know of all disabled DataSources
+     * @param vo 
+     */
     @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
+    public void addDisabledDataPoint(DataPointVO vo) {  
+        LOG.error("Disabled add:" + vo.getXid());
         synchronized (pointListChangeLock) {
-            final Fhz4JPointLocatorRT locator = (Fhz4JPointLocatorRT) dataPoint.getPointLocator();
+            super.addDisabledDataPoint(vo);
+            final Fhz4JPointLocatorVO locator = (Fhz4JPointLocatorVO) vo.getPointLocator();
             switch (locator.getFhzProtocol()) {
                 case FHT:
-                    FhtPointLocator fhtLocator = (FhtPointLocator) locator.getVo();
-                    Map<FhtProperty, DataPointRT> fhtPropertyMap = fhtPoints.get(locator.getFhtHousecode());
-                    fhtPropertyMap.remove(fhtLocator.getProperty());
-                    if (fhtPropertyMap.isEmpty()) {
-                        fhtPoints.remove(fhtLocator.getHousecode());
+                    FhtPointLocator fhtLocator = (FhtPointLocator)locator;
+                    Map<FhtProperty, DataPointVO> fhzPropertyMap = fhtDisabledPoints.get(fhtLocator.getHousecode());
+                    if (fhzPropertyMap == null) {
+                        fhzPropertyMap = new EnumMap<FhtProperty, DataPointVO>(FhtProperty.class);
+                        fhtDisabledPoints.put(fhtLocator.getHousecode(), fhzPropertyMap);
                     }
+                    fhzPropertyMap.put(fhtLocator.getProperty(), vo);
                     break;
                 case HMS:
-                    HmsPointLocator hmsLocator = (HmsPointLocator) locator.getVo();
-                    Map<HmsProperty, DataPointRT> hmsPropertyMap = hmsPoints.get(locator.getHmsHousecode());
-                    hmsPropertyMap.remove(hmsLocator.getProperty());
-                    if (hmsPropertyMap.isEmpty()) {
-                        hmsPoints.remove(hmsLocator.getHousecode());
+                    HmsPointLocator hmsLocator = (HmsPointLocator) locator;
+                    Map<HmsProperty, DataPointVO> hmsPropertyMap = hmsDisabledPoints.get(hmsLocator.getHousecode());
+                    if (hmsPropertyMap == null) {
+                        hmsPropertyMap = new EnumMap<HmsProperty, DataPointVO>(HmsProperty.class);
+                        hmsDisabledPoints.put(hmsLocator.getHousecode(), hmsPropertyMap);
                     }
+                    hmsPropertyMap.put(hmsLocator.getProperty(), vo);
                     break;
                 default:
                     throw new RuntimeException("Unknown fhz protocol");
+            }
+        }
+    }
+   
+    @Override
+    public void removeDataPoint(DataPointRT dataPoint) {
+        LOG.error("REMOVE:" + dataPoint.getVO().getXid());
+        addDisabledDataPoint(dataPoint.getVO());
+        synchronized (pointListChangeLock) {
+            super.removeDataPoint(dataPoint);
+            try {
+                final Fhz4JPointLocatorRT locator = (Fhz4JPointLocatorRT) dataPoint.getPointLocator();
+                switch (locator.getFhzProtocol()) {
+                    case FHT:
+                        FhtPointLocator fhtLocator = (FhtPointLocator) locator.getVo();
+                        Map<FhtProperty, DataPointRT> fhtPropertyMap = fhtPoints.get(fhtLocator.getHousecode());
+                        fhtPropertyMap.remove(fhtLocator.getProperty());
+                        if (fhtPropertyMap.isEmpty()) {
+                            fhtPoints.remove(fhtLocator.getHousecode());
+                        }
+                        break;
+                    case HMS:
+                        HmsPointLocator hmsLocator = (HmsPointLocator) locator.getVo();
+                        Map<HmsProperty, DataPointRT> hmsPropertyMap = hmsPoints.get(hmsLocator.getHousecode());
+                        hmsPropertyMap.remove(hmsLocator.getProperty());
+                        if (hmsPropertyMap.isEmpty()) {
+                            hmsPoints.remove(hmsLocator.getHousecode());
+                        }
+                        break;
+                    default:
+                        throw new RuntimeException("Unknown fhz protocol");
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
     }
@@ -210,7 +258,7 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
         }
 
         DataPointRT dataPointRT = Common.ctx.getRuntimeManager().saveDataPoint(dp);
-        Common.ctx.getRuntimeManager().addPointToHierarchy(dp, vo.getName(), Fhz1000.houseCodeToString(fhtMessage.getHousecode()) + " FHT" );
+        Common.ctx.getRuntimeManager().addPointToHierarchy(dp, vo.getName(), Fhz1000.houseCodeToString(fhtMessage.getHousecode()) + " FHT");
 
         if (dataPointRT != null) {
             updateValue(dataPointRT, fhtMessage, fhtMessage.getCommand());
@@ -230,41 +278,51 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
 
     @Override
     public void fhtDataParsed(FhtMessage fhtMessage) {
-        try {
-            DataPointRT dataPoint = getFhtPoint(fhtMessage);
-            if (dataPoint != null) {
-                updateValue(dataPoint, fhtMessage, fhtMessage.getCommand());
-            } else {
-                LOG.error("NEW Fht property detected, wil add: " + fhtMessage);
-                addFoundFhtMessage(fhtMessage);
+        synchronized (pointListChangeLock) {
+            try {
+                DataPointRT dataPoint = getFhtPoint(fhtMessage);
+                if (dataPoint != null) {
+                    updateValue(dataPoint, fhtMessage, fhtMessage.getCommand());
+                } else {
+                    if (getFhtDisabledPoint(fhtMessage) == null) {
+                    LOG.error("NEW Fht property detected, wil add: " + fhtMessage);
+                    addFoundFhtMessage(fhtMessage);
+                }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                LOG.error("Unknown exception in fhtDataParsed", ex);
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            LOG.error("Unknown exception in fhtDataParsed", ex);
         }
     }
 
     @Override
     public void fhtMeasuredTempData(FhtMeasuredTempMessage temp) {
+        synchronized (pointListChangeLock) {
 //TODO        throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
 
     @Override
     public void hmsDataParsed(HmsMessage hmsMessage) {
-        try {
-            Map<HmsProperty, DataPointRT> dataPoints = getHmsPoints(hmsMessage);
-            for (HmsProperty prop : hmsMessage.getDeviceType().getProperties()) {
-                DataPointRT dataPoint = dataPoints == null ? null : dataPoints.get(prop);
-                if (dataPoint == null) {
-                    addFoundHmsDataPoint(hmsMessage, prop);
-                } else {
-                    updateValue(dataPoint, hmsMessage, prop);
+        synchronized (pointListChangeLock) {
+            try {
+                Map<HmsProperty, DataPointRT> hmsDataPoints = getHmsPoints(hmsMessage);
+                for (HmsProperty prop : hmsMessage.getDeviceType().getProperties()) {
+                    DataPointRT dataPoint = hmsDataPoints == null ? null : hmsDataPoints.get(prop);
+                    if (dataPoint == null) {
+                        if (getHmsDisabledPoint(hmsMessage, prop) == null) {
+                            addFoundHmsDataPoint(hmsMessage, prop);
+                        }
+                    } else {
+                        updateValue(dataPoint, hmsMessage, prop);
+                    }
                 }
+            } catch (Exception ex) {
+                System.err.print("Unknown exception in hmsDataParsed");
+                ex.printStackTrace();
+                LOG.error("Unknown exception in hmsDataParsed", ex);
             }
-        } catch (Exception ex) {
-            System.err.print("Unknown exception in hmsDataParsed");
-            ex.printStackTrace();
-            LOG.error("Unknown exception in hmsDataParsed", ex);
         }
     }
 
@@ -309,7 +367,7 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
                 break;
             default:
                 throw new RuntimeException();
-                
+
         }
     }
 
@@ -338,7 +396,7 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
 
         DataPointRT dataPointRT = Common.ctx.getRuntimeManager().saveDataPoint(dp);
         Common.ctx.getRuntimeManager().addPointToHierarchy(dp, vo.getName(), Fhz1000.houseCodeToString(hmsMessage.getHousecode()) + " " + hmsMessage.getDeviceType().getLabel());
-        
+
         if (dataPointRT != null) {
             updateValue(dataPointRT, hmsMessage, prop);
         }
@@ -350,10 +408,66 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
         if (fhtPropertyMap == null) {
             return null;
         }
-        return fhtPropertyMap.get(fhtMessage.getCommand());
+        final DataPointRT dp = fhtPropertyMap.get(fhtMessage.getCommand());
+        return dp;
+    }
+
+    private DataPointVO getFhtDisabledPoint(FhtMessage fhtMessage) {
+        Map<FhtProperty, DataPointVO> fhtPropertyMap = fhtDisabledPoints.get(fhtMessage.getHousecode());
+        if (fhtPropertyMap == null) {
+            return null;
+        }
+        final DataPointVO dp = fhtPropertyMap.get(fhtMessage.getCommand());
+        return dp;
     }
 
     private Map<HmsProperty, DataPointRT> getHmsPoints(HmsMessage hmsMessage) {
         return hmsPoints.get(hmsMessage.getHousecode());
     }
+
+    private void removeDisabledDataPoint(DataPointVO vo) {
+        LOG.error("REMOVE disabled:" + vo.getXid());
+        synchronized (pointListChangeLock) {
+            try {
+                final Fhz4JPointLocatorVO locator = (Fhz4JPointLocatorVO) vo.getPointLocator();
+                switch (locator.getFhzProtocol()) {
+                    case FHT:
+                        FhtPointLocator fhtLocator = (FhtPointLocator) locator;
+                        Map<FhtProperty, DataPointVO> fhtPropertyMap = fhtDisabledPoints.get(fhtLocator.getHousecode());
+                        fhtPropertyMap.remove(fhtLocator.getProperty());
+                        if (fhtPropertyMap.isEmpty()) {
+                            fhtDisabledPoints.remove(fhtLocator.getHousecode());
+                        }
+                        break;
+                    case HMS:
+                        HmsPointLocator hmsLocator = (HmsPointLocator) locator;
+                        Map<HmsProperty, DataPointVO> hmsPropertyMap = hmsDisabledPoints.get(hmsLocator.getHousecode());
+                        hmsPropertyMap.remove(hmsLocator.getProperty());
+                        if (hmsPropertyMap.isEmpty()) {
+                            hmsDisabledPoints.remove(hmsLocator.getHousecode());
+                        }
+                        break;
+                    default:
+                        throw new RuntimeException("Unknown fhz protocol");
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private Object getHmsDisabledPoint(HmsMessage hmsMessage, HmsProperty hmsProperty) {
+        Map<HmsProperty, DataPointVO> hmsPropertyMap = hmsDisabledPoints.get(hmsMessage.getHousecode());
+        if (hmsPropertyMap == null) {
+            return null;
+        }
+        final DataPointVO dp = hmsPropertyMap.get(hmsProperty);
+        return dp;
+    }
+    
+    @Override
+    public void deleteDataPoint(DataPointVO point) {
+        removeDisabledDataPoint(point);
+    }
+
 }

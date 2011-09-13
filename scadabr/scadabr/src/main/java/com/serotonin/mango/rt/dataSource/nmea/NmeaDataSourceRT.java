@@ -105,10 +105,12 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
     // / MessagingConnectionListener
     // /
     //
+    @Override
     public void receivedException(Exception e) {
         log.error("Exception from nmea receiver", e);
     }
 
+    @Override
     public void receivedMessage(NmeaMessage message) {
         long time = System.currentTimeMillis();
 
@@ -118,7 +120,7 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
         LocalizableMessage parseError = null;
 
         synchronized (pointListChangeLock) {
-            for (DataPointRT dp : dataPoints) {
+            for (DataPointRT dp : addedChangedPoints) {
                 try {
                     receivedMessageImpl(dp, message, time);
                 }
