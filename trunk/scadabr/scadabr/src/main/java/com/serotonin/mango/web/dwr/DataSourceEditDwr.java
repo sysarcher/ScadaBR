@@ -123,6 +123,7 @@ import com.serotonin.mango.vo.dataSource.bacnet.BACnetIPDataSourceVO;
 import com.serotonin.mango.vo.dataSource.bacnet.BACnetIPPointLocatorVO;
 import com.serotonin.mango.vo.dataSource.ebro.EBI25DataSourceVO;
 import com.serotonin.mango.vo.dataSource.ebro.EBI25PointLocatorVO;
+import com.serotonin.mango.vo.dataSource.fhz4j.FhtPointLocator;
 import com.serotonin.mango.vo.dataSource.galil.GalilDataSourceVO;
 import com.serotonin.mango.vo.dataSource.galil.GalilPointLocatorVO;
 import com.serotonin.mango.vo.dataSource.http.HttpImageDataSourceVO;
@@ -211,8 +212,7 @@ import com.serotonin.web.dwr.MethodFilter;
 import com.serotonin.web.i18n.LocalizableException;
 import com.serotonin.web.i18n.LocalizableMessage;
 import com.serotonin.web.taglib.DateFunctions;
-import net.sf.fhz4j.FhzDeviceTypes;
-import net.sf.fhz4j.FhzProperty;
+import net.sf.fhz4j.fht.FhtDeviceTypes;
 import com.serotonin.mango.vo.dataSource.fhz4j.Fhz4JDataSourceVO;
 import com.serotonin.mango.vo.dataSource.fhz4j.Fhz4JPointLocatorVO;
 import net.sf.mbus4j.Connection;
@@ -221,6 +221,7 @@ import net.sf.mbus4j.TcpIpConnection;
 import com.serotonin.mango.vo.dataSource.mbus.MBusDataSourceVO;
 import com.serotonin.mango.vo.dataSource.mbus.MBusPointLocatorVO;
 import com.serotonin.mango.vo.dataSource.mbus.MBusSearchByAddressing;
+import net.sf.fhz4j.fht.FhtProperty;
 
 /**
  * @author Matthew Lohbihler
@@ -2005,22 +2006,22 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     }
 
     @MethodFilter
-    public DataPointVO addFhz4JPoint(String deviceHousecode, String deviceLocation, String deviceTypeLabel, String propertyLabel) {
+    public DataPointVO addFhz4JFhtPoint(String deviceHousecode, String deviceLocation, String deviceTypeLabel, String propertyLabel) {
         //TODO what happends, if user edits 2 Datasources???
         DataPointVO result = getPoint(Common.NEW_ID, null);
-        Fhz4JPointLocatorVO locator = (Fhz4JPointLocatorVO) result.getPointLocator();
-
-        result.setName(String.format("%s %s", deviceLocation, propertyLabel));
+        FhtPointLocator locator = (FhtPointLocator) result.getPointLocator();
         locator.setDeviceHousecodeStr(deviceHousecode);
-        locator.setFhzDeviceTypeLabel(deviceTypeLabel);
-        locator.setFhzPropertyLabel(propertyLabel);
+        locator.setFhtDeviceTypeLabel(deviceTypeLabel);
+        locator.setPropertyLabel(propertyLabel);
+        
+        result.setName(locator.defaultName());
 
         return result;
     }
 
     @MethodFilter
-    public String[] getFhz4JProperties(String deviceTypeLabel) {
-        return FhzProperty.Util.getFhzPropertyLabelsOf(FhzDeviceTypes.fromLabel(deviceTypeLabel));
+    public String[] getFht4JProperties(String deviceTypeLabel) {
+        return FhtProperty.getFhtPropertyLabelsOf(FhtDeviceTypes.fromLabel(deviceTypeLabel));
     }
 
     public DwrResponseI18n saveFhz4JPointLocator(int id, String xid, String name, Fhz4JPointLocatorVO locator) {

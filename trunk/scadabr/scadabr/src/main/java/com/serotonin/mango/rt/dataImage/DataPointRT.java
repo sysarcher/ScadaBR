@@ -138,10 +138,12 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
      * 
      * @param newValue
      */
+    @Override
     public void updatePointValue(PointValueTime newValue) {
         savePointValue(newValue, null, true);
     }
 
+    @Override
     public void updatePointValue(PointValueTime newValue, boolean async) {
         savePointValue(newValue, null, async);
     }
@@ -472,6 +474,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
     //
     // Lifecycle
     //
+    @Override
     public void initialize() {
         rm = Common.ctx.getRuntimeManager();
 

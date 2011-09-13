@@ -494,7 +494,7 @@ public class DataPointDao extends BaseDao {
 
             // Create the folder hierarchy.
             PointHierarchy ph = new PointHierarchy();
-            addFoldersToHeirarchy(ph, 0, folders);
+            addFoldersToHierarchy(ph, 0, folders);
 
             // Add data points.
             List<DataPointVO> points = getDataPoints(DataPointExtendedNameComparator.instance, false);
@@ -507,14 +507,14 @@ public class DataPointDao extends BaseDao {
         return cachedPointHierarchy;
     }
 
-    private void addFoldersToHeirarchy(PointHierarchy ph, int parentId, Map<Integer, List<PointFolder>> folders) {
+    private void addFoldersToHierarchy(PointHierarchy ph, int parentId, Map<Integer, List<PointFolder>> folders) {
         List<PointFolder> folderList = folders.remove(parentId);
         if (folderList == null)
             return;
 
         for (PointFolder f : folderList) {
             ph.addPointFolder(f, parentId);
-            addFoldersToHeirarchy(ph, f.getId(), folders);
+            addFoldersToHierarchy(ph, f.getId(), folders);
         }
     }
 
@@ -596,5 +596,30 @@ public class DataPointDao extends BaseDao {
         }
 
         return counts;
+    }
+    
+    public void addPointToHierarchy(DataPointVO dp, String... pathToPoint) {
+        PointHierarchy ph = getPointHierarchy();
+        PointFolder pf = ph.getRoot();
+        for (String folderName: pathToPoint) {
+            boolean folderFound = false;
+            for (PointFolder subFolder : pf.getSubfolders()) {
+                if (subFolder.getName().equals(folderName)) {
+                    pf = subFolder;
+                    folderFound = true;
+                    break;
+                }
+            }
+            if (!folderFound) {
+                PointFolder newFolder = new PointFolder(Common.NEW_ID, folderName);
+                pf.addSubfolder(newFolder);
+                pf = newFolder;
+//                savePointFolder(newFolder, pf.getId());
+            }
+        }
+        pf.addDataPoint(new IntValuePair(dp.getId(), dp.getName()));
+        ph.getRoot().removeDataPoint(dp.getId());
+//        savePointsInFolder(pf);
+        savePointHierarchy(ph.getRoot());
     }
 }

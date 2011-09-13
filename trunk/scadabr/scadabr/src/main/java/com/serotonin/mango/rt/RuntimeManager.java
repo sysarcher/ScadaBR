@@ -352,11 +352,15 @@ public class RuntimeManager {
 		}
 	}
 
-	//
-	//
-	// Data points
-	//
-	public void saveDataPoint(DataPointVO point) {
+         public void addPointToHierarchy(DataPointVO dp, String... pathToPoint) {
+             new DataPointDao().addPointToHierarchy(dp, pathToPoint);
+         }
+
+	/**
+         * returns the started DataPoiuntRT if ists enabled...
+         * 
+         */
+	public DataPointRT saveDataPoint(DataPointVO point) {
 		stopDataPoint(point.getId());
 
 		// Since the point's data type may have changed, we must ensure that the
@@ -388,8 +392,11 @@ public class RuntimeManager {
 
 		new DataPointDao().saveDataPoint(point);
 
-		if (point.isEnabled())
-			startDataPoint(point);
+		if (point.isEnabled()) {
+			return startDataPoint(point);
+                } else {
+                    return null;
+                }
 	}
 
 	public void deleteDataPoint(DataPointVO point) {
@@ -399,7 +406,7 @@ public class RuntimeManager {
 		Common.ctx.getEventManager().cancelEventsForDataPoint(point.getId());
 	}
 
-	private void startDataPoint(DataPointVO vo) {
+	private DataPointRT startDataPoint(DataPointVO vo) {
 		synchronized (dataPoints) {
 			Assert.isTrue(vo.isEnabled());
 
@@ -421,8 +428,10 @@ public class RuntimeManager {
 
 				// Add/update it in the data source.
 				ds.addDataPoint(dataPoint);
+                                return dataPoint;
 			}
 		}
+                return null;
 	}
 
 	private void stopDataPoint(int dataPointId) {

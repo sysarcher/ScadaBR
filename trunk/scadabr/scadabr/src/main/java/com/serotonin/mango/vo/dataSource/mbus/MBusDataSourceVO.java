@@ -31,7 +31,6 @@ import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.mbus.MBusDataSourceRT;
@@ -67,9 +66,9 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
         EVENT_CODES.addElement(MBusDataSourceRT.POINT_READ_EXCEPTION_EVENT, "POINT_READ_EXCEPTION");
         EVENT_CODES.addElement(MBusDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, "POINT_WRITE_EXCEPTION");
     }
-    @JsonRemoteProperty
+    //@aJsonRemoteProperty
     private int updatePeriodType = Common.TimePeriods.DAYS;
-    @JsonRemoteProperty
+    //@aJsonRemoteProperty
     private int updatePeriods = 1;
     // TODO JSON manually
     private Connection connection;

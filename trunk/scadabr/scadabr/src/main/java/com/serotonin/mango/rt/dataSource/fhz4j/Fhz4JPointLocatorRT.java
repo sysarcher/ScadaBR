@@ -19,8 +19,12 @@
 package com.serotonin.mango.rt.dataSource.fhz4j;
 
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
+import com.serotonin.mango.vo.dataSource.fhz4j.FhtPointLocator;
 import net.sf.fhz4j.fht.FhtMessage;
 import com.serotonin.mango.vo.dataSource.fhz4j.Fhz4JPointLocatorVO;
+import com.serotonin.mango.vo.dataSource.fhz4j.HmsPointLocator;
+import net.sf.fhz4j.FhzProtocol;
+import net.sf.fhz4j.hms.HmsMessage;
 
 // No need to encapsulate as string like vo
 public class Fhz4JPointLocatorRT extends PointLocatorRT {
@@ -31,17 +35,25 @@ public class Fhz4JPointLocatorRT extends PointLocatorRT {
         super();
         this.vo = vo;
     }
-
+    
     @Override
     public boolean isSettable() {
         return vo.isSettable();
     }
 
-    boolean isMyFhtMessage(FhtMessage fhtMessage) {
-        return (vo.getDeviceHousecode() == fhtMessage.getHousecode()) && (vo.getFhzProperty().equals(fhtMessage.getCommand()));
+    public short getFhtHousecode() {
+        return ((FhtPointLocator)vo).getHousecode();
     }
 
-    public short getHousecode() {
-        return vo.getDeviceHousecode();
+    public short getHmsHousecode() {
+        return ((HmsPointLocator)vo).getHousecode();
+    }
+    
+    public FhzProtocol getFhzProtocol() {
+        return vo.getFhzProtocol();
+    }
+    
+    Fhz4JPointLocatorVO getVo() {
+        return vo;
     }
 }
