@@ -43,7 +43,8 @@ import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
 import net.sf.fhz4j.Fhz1000;
-import net.sf.fhz4j.FhzDeviceTypes;
+import net.sf.fhz4j.FhzProtocol;
+import net.sf.fhz4j.fht.FhtDeviceTypes;
 
 @JsonRemoteEntity
 public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
@@ -88,9 +89,23 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
     public PointLocatorVO createPointLocator() {
         return new Fhz4JPointLocatorVO();
     }
+    
+    public Fhz4JPointLocatorVO createPontLocator(FhzProtocol fhzProtocol) {
+        switch (fhzProtocol) {
+            case FHT:
+                return new FhtPointLocator();
+            case HMS:
+                return new HmsPointLocator();
+            default:
+                throw new RuntimeException("Unknown protocol");
+        }
+    }
+    
+
 
     @Override
     public DataSourceRT createDataSourceRT() {
+        LOG.error("FHZ DS RT created");
         return new Fhz4JDataSourceRT(this);
     }
 
@@ -206,8 +221,8 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
         this.fhzMaster = fhzMaster;
     }
 
-    public FhzDeviceTypes[] getDeviceTypes() {
-        return FhzDeviceTypes.values();
+    public FhtDeviceTypes[] getDeviceTypes() {
+        return FhtDeviceTypes.values();
     }
 
     public void setFhzHousecode(String fhzHousecode) {

@@ -103,6 +103,7 @@ public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements Json
         return new LocalizableMessage("common.unknown");
     }
 
+    @Override
     public int getDataTypeId() {
         return DataTypes.NUMERIC;
     }
@@ -115,6 +116,7 @@ public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements Json
         this.attributeId = attributeId;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
         if (!ATTRIBUTE_CODES.isValidId(attributeId))
             response.addContextualMessage("attributeId", "validate.invalidValue");

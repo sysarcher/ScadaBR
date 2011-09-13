@@ -311,6 +311,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
 		private final String key;
 		private final boolean display;
 
+                @Deprecated
 		public int getId() {
 			return id;
 		}

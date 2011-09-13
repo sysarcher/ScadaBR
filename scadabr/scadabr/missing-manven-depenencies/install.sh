@@ -1,8 +1,11 @@
 #!/bin/sh
 
+mvn install:install-file -DgroupId=org.directwebremoting -DartifactId=dwr -Dversion=2.0.7 -Dpackaging=jar -Dfile=dwr-2.0.7.jar
+
+
 mvn install:install-file -DgroupId=com.dalsemi -DartifactId=onewire -Dversion=1.10 -Dpackaging=jar -Dfile=onewire-1.10.jar
 
-
+mvn install:install-file -DgroupId=org.rxtx -DartifactId=rxtx -Dversion=2.2 -Dpackaging=jar -Dfile=RXTX-2.2pre2.jar
 
 mvn install:install-file -DgroupId=com.serotonin.mango -DartifactId=seroUtils-mango -Dversion=1.12.4 -Dpackaging=jar -Dfile=seroUtils-mango-1.12.4.jar
 mvn install:install-file -DgroupId=com.serotonin.mango -DartifactId=spinwave-mango -Dversion=1.12.4 -Dpackaging=jar -Dfile=spinwave-mango-1.12.4.jar
@@ -21,7 +24,6 @@ mvn install:install-file -DgroupId=com.serotonin.mango -DartifactId=viconics-man
 
 
 mvn install:install-file -DgroupId=net.sf.openv4j -DartifactId=openv4j-core -Dversion=0.1.4-SNAPSHOT -Dpackaging=jar -Dfile=openv4j-core-0.1.4-SNAPSHOT.jar
-mvn install:install-file -DgroupId=net.sf.fhz4j -DartifactId=fhz4j-core -Dversion=0.1.4-SNAPSHOT -Dpackaging=jar -Dfile=fhz4j-core-0.1.4-SNAPSHOT.jar
 
 
 

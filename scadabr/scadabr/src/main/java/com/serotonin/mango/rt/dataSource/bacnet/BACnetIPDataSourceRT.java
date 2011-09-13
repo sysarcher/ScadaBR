@@ -446,7 +446,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
         }
     }
 
-    Boolean getPointListChangeLock() {
+    Object getPointListChangeLock() {
         return pointListChangeLock;
     }
 

@@ -29,7 +29,7 @@
 
     function assembleDevice() {
         dwr.util.removeAllRows("fhz4jValues");
-        DataSourceEditDwr.getFhz4JProperties($get("deviceType"), assembleDeviceCB);
+        DataSourceEditDwr.getFht4JProperties($get("deviceType"), assembleDeviceCB);
     }
 
     function assembleDeviceCB(propertyLabels) {

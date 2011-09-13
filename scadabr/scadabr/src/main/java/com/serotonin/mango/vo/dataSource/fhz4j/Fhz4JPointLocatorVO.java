@@ -24,13 +24,12 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import net.sf.fhz4j.FhzProtocol;
+import org.slf4j.Logger;
 
 import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
@@ -38,88 +37,58 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
-import net.sf.fhz4j.Fhz1000;
-import net.sf.fhz4j.FhzDeviceTypes;
-import net.sf.fhz4j.FhzProperty;
-import net.sf.fhz4j.fht.FhtProperty;
 import com.serotonin.mango.rt.dataSource.fhz4j.Fhz4JPointLocatorRT;
+import java.util.LinkedHashMap;
+import net.sf.fhz4j.scada.ScadaProperty;
+import org.slf4j.LoggerFactory;
 
 // Container to move data with json and ajax so ony basic datatypes
 @JsonRemoteEntity
-public class Fhz4JPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+public class Fhz4JPointLocatorVO<T extends ScadaProperty> extends AbstractPointLocatorVO implements JsonSerializable {
 
-    private final static Log LOG = LogFactory.getLog(Fhz4JPointLocatorVO.class);
-    @JsonRemoteProperty
-    private short deviceHousecode;
-    @JsonRemoteProperty
-    private FhzDeviceTypes fhzDeviceType;
-    @JsonRemoteProperty
-    private FhzProperty fhzProperty;
-    @JsonRemoteProperty
+    private final static Logger LOG = LoggerFactory.getLogger(Fhz4JPointLocatorVO.class);
+    private T property;
+
+    Fhz4JPointLocatorVO() {
+        super();
+    }
     private boolean settable = false;
-    private String fhzDeviceTypeLabel;
-    private String fhzPropertyLabel;
+
+    public String defaultName() {
+        return property == null ? "Fhz4J dataPoint" : getProperty().getLabel();
+    }
+
 
     @Override
     public int getDataTypeId() {
-        switch (fhzDeviceType) {
-            case FHT_8:
-            case FHT_80B:
-                return getDataTypeOfFhtProperty((FhtProperty) fhzProperty);
-            default:
-                return DataTypes.UNKNOWN;
+        if (property == null) {
+            return DataTypes.UNKNOWN;
         }
-    }
-
-    public int getDataTypeOfFhtProperty(FhtProperty fhtProperty) {
-        switch (fhtProperty) {
-            case VALVE:
-            case VALVE_1:
-            case VALVE_2:
-            case VALVE_3:
-            case VALVE_4:
-            case VALVE_5:
-            case VALVE_6:
-            case VALVE_7:
-            case VALVE_8:
+        switch (property.getDataType()) {
+            case BOOLEAN:
+                return DataTypes.BINARY;
+            case BYTE:
+                return DataTypes.MULTISTATE;
+            case CHAR:
+                return DataTypes.ALPHANUMERIC;
+            case DOUBLE:
                 return DataTypes.NUMERIC;
-            case DESIRED_TEMP:
+            case FLOAT:
                 return DataTypes.NUMERIC;
-            case MEASURED_LOW:
-            case MEASURED_HIGH:
-                return DataTypes.NUMERIC;
-            case MO_FROM_1:
-            case MO_TO_1:
-            case MO_FROM_2:
-            case MO_TO_2:
-            case TUE_FROM_1:
-            case TUE_TO_1:
-            case TUE_FROM_2:
-            case TUE_TO_2:
-            case WED_FROM_1:
-            case WED_TO_1:
-            case WED_FROM_2:
-            case WED_TO_2:
-            case THU_FROM_1:
-            case THU_TO_1:
-            case THU_FROM_2:
-            case THU_TO_2:
-            case FRI_FROM_1:
-            case FRI_TO_1:
-            case FRI_FROM_2:
-            case FRI_TO_2:
-            case SAT_FROM_1:
-            case SAT_TO_1:
-            case SAT_FROM_2:
-            case SAT_TO_2:
-            case SUN_FROM_1:
-            case SUN_TO_1:
-            case SUN_FROM_2:
-            case SUN_TO_2:
+            case LONG:
+                return DataTypes.MULTISTATE;
+            case INT:
+                return DataTypes.MULTISTATE;
+            case SHORT:
+                return DataTypes.MULTISTATE;
+            case STRING:
+                return DataTypes.ALPHANUMERIC;
+            case TIME:
                 return DataTypes.ALPHANUMERIC;
             default:
-                return DataTypes.NUMERIC;
+                throw new RuntimeException("Cant find datatype of " + property);
         }
+
     }
 
     @Override
@@ -148,19 +117,15 @@ public class Fhz4JPointLocatorVO extends AbstractPointLocatorVO implements JsonS
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addPropertyMessage(list, "dsEdit.hfz4j.dataPoint", deviceHousecode);
-        AuditEventType.addPropertyMessage(list, "dsEdit.hfz4j.dataPoint", fhzDeviceType);
-        AuditEventType.addPropertyMessage(list, "dsEdit.hfz4j.dataPoint", fhzProperty);
         AuditEventType.addPropertyMessage(list, "dsEdit.hfz4j.dataPoint", settable);
+        AuditEventType.addPropertyMessage(list, "dsEdit.hfz4j.dataPoint", property);
     }
 
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         Fhz4JPointLocatorVO from = (Fhz4JPointLocatorVO) o;
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.deviceHousecode, deviceHousecode);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.fhzDeviceType, fhzDeviceType);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.fhzProperty, fhzProperty);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.settable, settable);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.property, property);
     }
     //
     // /
@@ -172,10 +137,8 @@ public class Fhz4JPointLocatorVO extends AbstractPointLocatorVO implements JsonS
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(serialVersion);
-        out.writeShort(deviceHousecode);
-        out.writeObject(fhzDeviceType);
-        out.writeObject(fhzProperty);
         out.writeBoolean(settable);
+        out.writeObject(property);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -184,10 +147,8 @@ public class Fhz4JPointLocatorVO extends AbstractPointLocatorVO implements JsonS
         // Switch on the version of the class so that version changes can be elegantly handled.
         switch (ver) {
             case 1:
-                deviceHousecode = in.readShort();
-                fhzDeviceType = (FhzDeviceTypes) in.readObject();
-                fhzProperty = (FhzProperty) in.readObject();
                 settable = in.readBoolean();
+                property = (T)in.readObject();
                 break;
             default:
                 throw new RuntimeException("Cant handle version");
@@ -196,86 +157,33 @@ public class Fhz4JPointLocatorVO extends AbstractPointLocatorVO implements JsonS
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) {
+        //TODO
     }
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
+        map.put("settable", settable);
+        Map<String, Object> locatorMap = new LinkedHashMap<String, Object>();
+        map.put("fhzProtocol", getFhzProtocol());
+        map.put("fhzProperty", property);
+ }
+
+    public FhzProtocol getFhzProtocol() {
+        return FhzProtocol.UNKNOWN;
     }
 
     /**
-     * @return the deviceHousecode
+     * @return the property
      */
-    public short getDeviceHousecode() {
-        return deviceHousecode;
+    public T getProperty() {
+        return property;
     }
 
     /**
-     * @param deviceHousecode the deviceHousecode to set
+     * @param property the property to set
      */
-    public void setDeviceHousecode(short deviceHousecode) {
-        this.deviceHousecode = deviceHousecode;
+    public void setProperty(T property) {
+        this.property = property;
     }
 
-    /**
-     * @return the fhzDeviceType
-     */
-    public FhzDeviceTypes getFhzDeviceType() {
-        return fhzDeviceType;
-    }
-
-    /**
-     * @param fhzDeviceType the fhzDeviceType to set
-     */
-    public void setFhzDeviceType(FhzDeviceTypes fhzDeviceType) {
-        this.fhzDeviceType = fhzDeviceType;
-    }
-
-    /**
-     * @return the fhzProperty
-     */
-    public FhzProperty getFhzProperty() {
-        return fhzProperty;
-    }
-
-    /**
-     * @param fhzProperty the fhzProperty to set
-     */
-    public void setFhzProperty(FhzProperty fhzProperty) {
-        this.fhzProperty = fhzProperty;
-    }
-
-    public void setDeviceHousecodeStr(String deviceHousecode) {
-        this.deviceHousecode = Fhz1000.parseHouseCode(deviceHousecode);
-    }
-
-    public String getDeviceHousecodeStr() {
-        return Fhz1000.houseCodeToString(deviceHousecode);
-    }
-
-    public String getFhzDeviceTypeLabel() {
-        return fhzDeviceType.getLabel();
-    }
-
-    public void setFhzDeviceTypeLabel(String label) {
-        fhzDeviceTypeLabel = label;
-        tryFromDwr();
-    }
-
-    public void setFhzPropertyLabel(String label) {
-        fhzPropertyLabel = label;
-        tryFromDwr();
-    }
-
-    public String getFhzPropertyLabel() {
-        return fhzProperty.getLabel();
-    }
-
-    private void tryFromDwr() {
-        if ((fhzPropertyLabel != null) && (fhzDeviceTypeLabel != null)) {
-            fhzDeviceType = fhzDeviceType.fromLabel(fhzDeviceTypeLabel);
-            fhzProperty = FhzProperty.Util.fromLabel(fhzDeviceType, fhzPropertyLabel);
-            fhzDeviceTypeLabel = null;
-            fhzPropertyLabel = null;
-        }
-    }
 }
