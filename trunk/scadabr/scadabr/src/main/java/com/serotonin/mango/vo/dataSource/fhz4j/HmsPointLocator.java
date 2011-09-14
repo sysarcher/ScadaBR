@@ -4,21 +4,21 @@
  */
 package com.serotonin.mango.vo.dataSource.fhz4j;
 
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.mango.DataTypes;
-import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.web.i18n.LocalizableMessage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
 import java.util.List;
 import java.util.Map;
+
 import net.sf.fhz4j.Fhz1000;
 import net.sf.fhz4j.FhzProtocol;
 import net.sf.fhz4j.hms.HmsDeviceType;
 import net.sf.fhz4j.hms.HmsProperty;
+
+import com.serotonin.json.JsonObject;
+import com.serotonin.json.JsonReader;
+import com.serotonin.mango.rt.event.type.AuditEventType;
+import com.serotonin.web.i18n.LocalizableMessage;
 
 /**
  *
@@ -121,4 +121,41 @@ public class HmsPointLocator extends Fhz4JPointLocatorVO<HmsProperty> {
     public void setHmsDeviceType(HmsDeviceType hmsDeviceType) {
         this.hmsDeviceType = hmsDeviceType;
     }
+
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final HmsPointLocator other = (HmsPointLocator) obj;
+        if (this.housecode != other.housecode) {
+            return false;
+        }
+        if (this.hmsDeviceType != other.hmsDeviceType) {
+            return false;
+        }
+        if (this.getProperty() != other.getProperty()) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 43 * hash + this.housecode;
+        hash = 43 * hash + (this.hmsDeviceType != null ? this.hmsDeviceType.hashCode() : 0);
+        hash = 43 * hash + (this.getProperty() != null ? this.getProperty().hashCode() : 0);
+        return hash;
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("%s [housecode: %x, devicetype: property %s]", getClass().getName(), housecode, hmsDeviceType, getProperty());
+    }
+
 }
