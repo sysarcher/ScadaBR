@@ -53,13 +53,13 @@ public class Pop3DataSourceRT extends PollingDataSource {
     private final Pop3DataSourceVO vo;
 
     public Pop3DataSourceRT(Pop3DataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
         this.vo = vo;
     }
 
     @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
+    public void dataPointEnabled(DataPointRT dataPoint) {
         returnToNormal(PARSE_EXCEPTION_EVENT, System.currentTimeMillis());
     }
 
@@ -188,7 +188,7 @@ public class Pop3DataSourceRT extends PollingDataSource {
     }
 
     private void processMessage(Pop3Email pop3Email, long time) throws LocalizableException {
-        for (DataPointRT dp : dataPoints) {
+        for (DataPointRT dp : enabledDataPoints) {
             Pop3PointLocatorRT locator = dp.getPointLocator();
 
             // Get the value

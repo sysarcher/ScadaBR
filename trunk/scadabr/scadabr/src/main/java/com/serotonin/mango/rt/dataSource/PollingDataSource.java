@@ -39,16 +39,14 @@ abstract public class PollingDataSource extends DataSourceRT implements TimeoutC
     private final Log LOG = LogFactory.getLog(PollingDataSource.class);
 
     private final DataSourceVO<?> vo;
-    protected List<DataPointRT> dataPoints = new ArrayList<DataPointRT>();
-    protected boolean pointListChanged = false;
     private long pollingPeriodMillis = 300000; // Default to 5 minutes just to have something here
     private boolean quantize;
     private TimerTask timerTask;
     private volatile Thread jobThread;
     private long jobThreadStartTime;
 
-    public PollingDataSource(DataSourceVO<?> vo) {
-        super(vo);
+    public PollingDataSource(DataSourceVO<?> vo, boolean doCache) {
+        super(vo, doCache);
         this.vo = vo;
     }
 
@@ -57,6 +55,7 @@ abstract public class PollingDataSource extends DataSourceRT implements TimeoutC
         this.quantize = quantize;
     }
 
+    @Override
     public void scheduleTimeout(long fireTime) {
         if (jobThread != null) {
             // There is another poll still running, so abort this one.
@@ -71,8 +70,8 @@ abstract public class PollingDataSource extends DataSourceRT implements TimeoutC
             jobThreadStartTime = fireTime;
 
             // Check if there were changes to the data points list.
-            synchronized (pointListChangeLock) {
-                updateChangedPoints();
+            updateChangedPoints();
+            synchronized (enabledDataPoints) {
                 doPoll(fireTime);
             }
         }
@@ -81,24 +80,14 @@ abstract public class PollingDataSource extends DataSourceRT implements TimeoutC
         }
     }
 
+    /**
+     * A call to this is synchronized with #enabledDataPoints when called in #sheduleTimeout
+     * 
+     * 
+     * @param time 
+     */
     abstract protected void doPoll(long time);
 
-    protected void updateChangedPoints() {
-        synchronized (pointListChangeLock) {
-            if (addedChangedPoints.size() > 0) {
-                // Remove any existing instances of the points.
-                dataPoints.removeAll(addedChangedPoints);
-                dataPoints.addAll(addedChangedPoints);
-                addedChangedPoints.clear();
-                pointListChanged = true;
-            }
-            if (removedPoints.size() > 0) {
-                dataPoints.removeAll(removedPoints);
-                removedPoints.clear();
-                pointListChanged = true;
-            }
-        }
-    }
 
     //
     //
@@ -138,4 +127,6 @@ abstract public class PollingDataSource extends DataSourceRT implements TimeoutC
             }
         }
     }
+    
+
 }

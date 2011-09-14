@@ -72,7 +72,7 @@ public class PachubeDataSourceRT extends PollingDataSource {
     final SimpleDateFormat sdf;
 
     public PachubeDataSourceRT(PachubeDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
         this.vo = vo;
 
@@ -90,15 +90,15 @@ public class PachubeDataSourceRT extends PollingDataSource {
     }
 
     @Override
-    public void addDataPoint(DataPointRT dataPoint) {
-        super.addDataPoint(dataPoint);
+    public void dataPointEnabled(DataPointRT dataPoint) {
+        super.dataPointEnabled(dataPoint);
         dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
     }
 
     @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
+    public void dataPointDisabled(DataPointRT dataPoint) {
         returnToNormal(PARSE_EXCEPTION_EVENT, System.currentTimeMillis());
-        super.removeDataPoint(dataPoint);
+        super.dataPointDisabled(dataPoint);
     }
 
     @Override
@@ -113,8 +113,7 @@ public class PachubeDataSourceRT extends PollingDataSource {
     protected void doPoll(long time) {
         Map<Integer, List<DataPointRT>> devicePoints = new HashMap<Integer, List<DataPointRT>>();
 
-        synchronized (pointListChangeLock) {
-            for (DataPointRT dp : dataPoints) {
+            for (DataPointRT dp : enabledDataPoints) {
                 PachubePointLocatorRT locator = dp.getPointLocator();
 
                 List<DataPointRT> points = devicePoints.get(locator.getFeedId());
@@ -124,7 +123,6 @@ public class PachubeDataSourceRT extends PollingDataSource {
                 }
 
                 points.add(dp);
-            }
         }
 
         for (Map.Entry<Integer, List<DataPointRT>> entry : devicePoints.entrySet())

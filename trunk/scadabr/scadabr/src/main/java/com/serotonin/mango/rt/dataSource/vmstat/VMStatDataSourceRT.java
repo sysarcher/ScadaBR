@@ -49,7 +49,7 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
     private boolean terminated;
 
     public VMStatDataSourceRT(VMStatDataSourceVO vo) {
-        super(vo);
+        super(vo, false);
         this.vo = vo;
     }
 
@@ -193,8 +193,8 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
         LocalizableMessage error = null;
         long time = System.currentTimeMillis();
 
-        synchronized (pointListChangeLock) {
-            for (DataPointRT dp : addedChangedPoints) {
+        synchronized (enabledDataPoints) {
+            for (DataPointRT dp : enabledDataPoints) {
                 VMStatPointLocatorVO locator = ((VMStatPointLocatorRT) dp.getPointLocator()).getPointLocatorVO();
 
                 Integer position = attributePositions.get(locator.getAttributeId());

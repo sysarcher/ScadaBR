@@ -66,14 +66,14 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
     private final Map<Integer, DataPointRT> slaveMonitors = new HashMap<Integer, DataPointRT>();
 
     public ModbusDataSource(ModbusDataSourceVO<?> vo) {
-        super(vo);
+        super(vo, true);
         this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), vo.isQuantize());
     }
 
     @Override
-    public void addDataPoint(DataPointRT dataPoint) {
-        super.addDataPoint(dataPoint);
+    public void dataPointEnabled(DataPointRT dataPoint) {
+        super.dataPointEnabled(dataPoint);
 
         // Mark the point as unreliable.
         ModbusPointLocatorVO locatorVO = dataPoint.getVO().getPointLocator();
@@ -127,9 +127,9 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
     }
 
     @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
-        synchronized (pointListChangeLock) {
-            super.removeDataPoint(dataPoint);
+    public void dataPointDisabled(DataPointRT dataPoint) {
+        synchronized (slaveMonitors) {
+            super.dataPointDisabled(dataPoint);
 
             // If this is a slave monitor point being removed, also remove it from the map.
             ModbusPointLocatorVO locatorVO = dataPoint.getVO().getPointLocator();
@@ -159,14 +159,14 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
         BaseLocator<?> modbusLocator;
         Object result;
 
-        if (batchRead == null || pointListChanged) {
-            pointListChanged = false;
+        if (batchRead == null || enabledDataPointsChanged) {
+            enabledDataPointsChanged = false;
             batchRead = new BatchRead<ModbusPointLocatorRT>();
             batchRead.setContiguousRequests(vo.isContiguousBatches());
             batchRead.setErrorsInResults(true);
             batchRead.setExceptionsInResults(true);
 
-            for (DataPointRT dataPoint : dataPoints) {
+            for (DataPointRT dataPoint : enabledDataPoints) {
                 locator = dataPoint.getPointLocator();
                 if (!locator.getVO().isSlaveMonitor()) {
                     modbusLocator = createModbusLocator(locator.getVO());
@@ -181,7 +181,7 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
             Map<Integer, Boolean> slaveStatuses = new HashMap<Integer, Boolean>();
             boolean dataSourceExceptions = false;
 
-            for (DataPointRT dataPoint : dataPoints) {
+            for (DataPointRT dataPoint : enabledDataPoints) {
                 locator = dataPoint.getPointLocator();
                 if (locator.getVO().isSlaveMonitor())
                     continue;
@@ -292,7 +292,7 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
         BaseLocator<?> ml = createModbusLocator(pl.getVO());
         long time = System.currentTimeMillis();
 
-        synchronized (pointListChangeLock) {
+        synchronized (enabledDataPoints) {
             try {
                 Object value = modbusMaster.getValue(ml);
 

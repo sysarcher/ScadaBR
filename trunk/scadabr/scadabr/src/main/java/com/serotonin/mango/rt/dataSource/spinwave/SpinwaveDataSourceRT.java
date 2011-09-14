@@ -51,7 +51,7 @@ public class SpinwaveDataSourceRT extends EventDataSource implements SwListener 
     private SpinwaveReceiver spinwaveReceiver;
 
     public SpinwaveDataSourceRT(SpinwaveDataSourceVO vo) {
-        super(vo);
+        super(vo, false);
         this.vo = vo;
     }
 
@@ -133,8 +133,8 @@ public class SpinwaveDataSourceRT extends EventDataSource implements SwListener 
         // Find points that are interested in this sensor.
         BaseSpinwavePointLocatorVO locator;
         boolean found = false;
-        synchronized (pointListChangeLock) {
-            for (DataPointRT dp : addedChangedPoints) {
+        synchronized (enabledDataPoints) {
+            for (DataPointRT dp : enabledDataPoints) {
                 locator = ((SpinwavePointLocatorRT) dp.getPointLocator()).getPointLocatorVO();
 
                 if (locator.getSensorAddress() == message.getSensorAddress()) {

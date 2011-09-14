@@ -65,7 +65,7 @@ public class SqlDataSourceRT extends PollingDataSource {
     private Connection conn;
 
     public SqlDataSourceRT(SqlDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
         this.vo = vo;
     }
@@ -162,7 +162,7 @@ public class SqlDataSourceRT extends PollingDataSource {
 
         if (rs.next()) {
 
-            for (DataPointRT dp : dataPoints) {
+            for (DataPointRT dp : enabledDataPoints) {
                 SqlPointLocatorRT locatorRT = dp.getPointLocator();
                 SqlPointLocatorVO locatorVO = locatorRT.getVO();
 
@@ -229,7 +229,7 @@ public class SqlDataSourceRT extends PollingDataSource {
 
             // Find the vo in question.
             boolean found = false;
-            for (DataPointRT dp : dataPoints) {
+            for (DataPointRT dp : enabledDataPoints) {
                 SqlPointLocatorRT locatorRT = dp.getPointLocator();
                 SqlPointLocatorVO locatorVO = locatorRT.getVO();
                 String fieldName = locatorVO.getFieldName();

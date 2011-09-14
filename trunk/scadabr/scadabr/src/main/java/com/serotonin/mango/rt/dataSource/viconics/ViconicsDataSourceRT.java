@@ -93,7 +93,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
     private final Map<PointKey, DataPointRT> pointLookup = new ConcurrentHashMap<PointKey, DataPointRT>();
 
     public ViconicsDataSourceRT(ViconicsDataSourceVO vo) {
-        super(vo);
+        super(vo,false);
         this.vo = vo;
     }
 
@@ -136,8 +136,8 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
     }
 
     @Override
-    public void addDataPoint(DataPointRT dataPoint) {
-        super.addDataPoint(dataPoint);
+    public void dataPointEnabled(DataPointRT dataPoint) {
+        super.dataPointEnabled(dataPoint);
 
         // Mark the point as unreliable.
         dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
@@ -147,8 +147,8 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
     }
 
     @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
-        super.removeDataPoint(dataPoint);
+    public void dataPointDisabled(DataPointRT dataPoint) {
+        super.dataPointDisabled(dataPoint);
 
         // Remove the point from the lookup map.
         pointLookup.remove(new PointKey(dataPoint));
@@ -168,10 +168,11 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
     //
     // / ViconicsNetworkListener
     //
+    @Override
     public void viconicsNetworkStatus(boolean online) {
         // Mark all points as unreliable.
-        synchronized (pointListChangeLock) {
-            for (DataPointRT rt : addedChangedPoints)
+        synchronized (enabledDataPoints) {
+            for (DataPointRT rt : enabledDataPoints)
                 rt.setAttribute(ATTR_UNRELIABLE_KEY, true);
         }
 
@@ -182,6 +183,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
                     "event.viconics.networkOffline"));
     }
 
+    @Override
     public void viconicsDeviceAdded(ViconicsDevice device) {
         log.info("Device added: " + device.getIeeeString());
 
@@ -358,13 +360,14 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
         }
     }
 
+    @Override
     public void viconicsDeviceStatus(ViconicsDevice device, boolean online) {
         if (online)
             returnToNormal(DEVICE_OFFLINE_EVENT, System.currentTimeMillis());
         else {
             // Mark all points for the device as unreliable.
-            synchronized (pointListChangeLock) {
-                for (DataPointRT rt : addedChangedPoints) {
+            synchronized (enabledDataPoints) {
+                for (DataPointRT rt : enabledDataPoints) {
                     ViconicsPointLocatorVO locator = rt.getVO().getPointLocator();
                     if (Arrays.equals(locator.getDeviceIeee(), device.getIeee()))
                         rt.setAttribute(ATTR_UNRELIABLE_KEY, true);
@@ -376,6 +379,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
         }
     }
 
+    @Override
     public void viconicsDeviceRemoved(ViconicsDevice device) {
         log.info("Device removed: " + device.getIeeeString());
 
@@ -395,11 +399,13 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
         // }
     }
 
+    @Override
     public void viconicsReceivedException(Exception e) {
         raiseEvent(MESSAGE_EXCEPTION_EVENT, System.currentTimeMillis(), false, new LocalizableMessage(
                 "event.viconics.messagingException", e.getMessage()));
     }
 
+    @Override
     public void viconicsDevicePointUpdated(ViconicsDevice device, StatPoint point, int deviceValue, long time) {
         DataPointRT rt = pointLookup.get(new PointKey(device.getIeee(), point.getAddress()));
         if (rt == null)
@@ -440,6 +446,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
         rt.updatePointValue(new PointValueTime(mangoValue, time));
     }
 
+    @Override
     public void viconicsDuplicateCommAddressDetected(int commAddress) {
         raiseEvent(DUPLICATE_COMM_ADDRESS_EVENT, System.currentTimeMillis(), false, new LocalizableMessage(
                 "event.viconics.messagingException", commAddress));

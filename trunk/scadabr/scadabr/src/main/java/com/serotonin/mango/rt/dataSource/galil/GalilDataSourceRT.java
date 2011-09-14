@@ -55,7 +55,7 @@ public class GalilDataSourceRT extends PollingDataSource implements MessagingExc
     private MessageControl conn;
 
     public GalilDataSourceRT(GalilDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
@@ -74,7 +74,7 @@ public class GalilDataSourceRT extends PollingDataSource implements MessagingExc
         Exception messageException = null;
         LocalizableMessage pointError = null;
 
-        for (DataPointRT dataPoint : dataPoints) {
+        for (DataPointRT dataPoint : enabledDataPoints) {
             GalilPointLocatorRT locator = dataPoint.getPointLocator();
 
             GalilRequest request = locator.getPollRequest();

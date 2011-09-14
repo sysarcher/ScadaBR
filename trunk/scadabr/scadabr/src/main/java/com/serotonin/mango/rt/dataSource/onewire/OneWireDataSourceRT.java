@@ -51,6 +51,9 @@ import com.serotonin.mango.vo.dataSource.onewire.OneWireDataSourceVO;
 import com.serotonin.mango.vo.dataSource.onewire.OneWirePointLocatorVO;
 import com.serotonin.web.i18n.LocalizableException;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Matthew Lohbihler
@@ -67,7 +70,7 @@ public class OneWireDataSourceRT extends PollingDataSource {
     private long nextRescan = 0;
 
     public OneWireDataSourceRT(OneWireDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
@@ -102,7 +105,7 @@ public class OneWireDataSourceRT extends PollingDataSource {
         }
 
         // Create a local list of points so that we can remove those that we're done with.
-        List<DataPointRT> points = new ArrayList<DataPointRT>(dataPoints);
+        Set<DataPointRT> points = new HashSet<DataPointRT> (enabledDataPoints);
 
         LocalizableMessage exceptionMessage = null;
         try {
@@ -154,7 +157,7 @@ public class OneWireDataSourceRT extends PollingDataSource {
 
         if (exceptionMessage == null && points.size() > 0)
             // If any points are left in the list, they count as exceptions.
-            exceptionMessage = new LocalizableMessage("event.1wire.noPointData", points.get(0).getVO().getName());
+            exceptionMessage = new LocalizableMessage("event.1wire.noPointData", points.toArray(new DataPointRT[1])[0].getVO().getName());
 
         // Event handling.
         if (exceptionMessage != null)
@@ -163,7 +166,7 @@ public class OneWireDataSourceRT extends PollingDataSource {
             returnToNormal(POINT_READ_EXCEPTION_EVENT, time);
     }
 
-    private LocalizableMessage tryRead(List<DataPointRT> points, long time, boolean throwToReload)
+    private LocalizableMessage tryRead(Collection<DataPointRT> points, long time, boolean throwToReload)
             throws NetworkReloadException {
         LocalizableMessage exceptionMessage = null;
 
@@ -235,7 +238,7 @@ public class OneWireDataSourceRT extends PollingDataSource {
         return exceptionMessage;
     }
 
-    private boolean arePointsThatNeedAddress(Long address, List<DataPointRT> points) {
+    private boolean arePointsThatNeedAddress(Long address, Collection<DataPointRT> points) {
         for (DataPointRT point : points) {
             OneWirePointLocatorRT locator = point.getPointLocator();
             if (locator.getAddress().equals(address))
@@ -244,7 +247,7 @@ public class OneWireDataSourceRT extends PollingDataSource {
         return false;
     }
 
-    private void readSensor(OneWireContainer owc, List<DataPointRT> points, Long address, long time)
+    private void readSensor(OneWireContainer owc, Collection<DataPointRT> points, Long address, long time)
             throws OneWireIOException, OneWireException {
         byte[] state = null;
         if (owc instanceof OneWireSensor)
@@ -320,7 +323,7 @@ public class OneWireDataSourceRT extends PollingDataSource {
             return;
 
         // Ensure that the write doesn't conflict with a read.
-        synchronized (pointListChangeLock) {
+        synchronized (enabledDataPoints) {
             OneWirePointLocatorRT locator = dataPoint.getPointLocator();
 
             NetworkPath path = null;

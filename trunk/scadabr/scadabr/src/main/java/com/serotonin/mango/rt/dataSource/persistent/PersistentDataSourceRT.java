@@ -55,7 +55,7 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
     final List<ConnectionHandler> connectionHandlers = new CopyOnWriteArrayList<ConnectionHandler>();
 
     public PersistentDataSourceRT(PersistentDataSourceVO vo) {
-        super(vo);
+        super(vo, false);
         this.vo = vo;
     }
 
@@ -148,14 +148,14 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
     }
 
     @Override
-    public void addDataPoint(DataPointRT dataPoint) {
-        super.addDataPoint(dataPoint);
+    public void dataPointEnabled(DataPointRT dataPoint) {
+        super.dataPointEnabled(dataPoint);
         pointXids.put(dataPoint.getVO().getXid(), dataPoint);
     }
 
     @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
-        super.removeDataPoint(dataPoint);
+    public void dataPointDisabled(DataPointRT dataPoint) {
+        super.dataPointDisabled(dataPoint);
         pointXids.remove(dataPoint.getVO().getXid());
     }
 

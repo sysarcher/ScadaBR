@@ -62,7 +62,7 @@ public class SnmpDataSourceRT extends PollingDataSource {
     private Snmp snmp;
 
     public SnmpDataSourceRT(SnmpDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
         this.vo = vo;
         version = Version.getVersion(vo.getSnmpVersion(), vo.getCommunity(), vo.getSecurityName(),
@@ -110,7 +110,7 @@ public class SnmpDataSourceRT extends PollingDataSource {
         List<DataPointRT> requestPoints = new ArrayList<DataPointRT>();
 
         // Add OID to send in the PDU.
-        for (DataPointRT dp : dataPoints) {
+        for (DataPointRT dp : enabledDataPoints) {
             if (!getLocatorVO(dp).isTrapOnly()) {
                 request.add(new VariableBinding(getOid(dp)));
                 requestPoints.add(dp);
@@ -224,7 +224,7 @@ public class SnmpDataSourceRT extends PollingDataSource {
         if (message != null)
             raiseEvent(PDU_EXCEPTION_EVENT, time, false, message);
         else {
-            synchronized (pointListChangeLock) {
+            synchronized (enabledDataPoints) {
                 updateChangedPoints();
 
                 for (int i = 0; i < trap.size(); i++) {
@@ -232,7 +232,7 @@ public class SnmpDataSourceRT extends PollingDataSource {
                     boolean found = false;
 
                     // Find the command for this binding.
-                    for (DataPointRT dp : dataPoints) {
+                    for (DataPointRT dp : enabledDataPoints) {
                         if (getOid(dp).equals(vb.getOid())) {
                             updatePoint(dp, vb.getVariable(), time);
                             found = true;

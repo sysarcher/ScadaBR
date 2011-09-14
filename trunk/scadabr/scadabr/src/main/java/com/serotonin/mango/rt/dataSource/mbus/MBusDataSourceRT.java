@@ -54,7 +54,7 @@ public class MBusDataSourceRT extends PollingDataSource {
     private final MBusMaster master = new MBusMaster();
 
     public MBusDataSourceRT(MBusDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
@@ -82,7 +82,7 @@ public class MBusDataSourceRT extends PollingDataSource {
         boolean dsError = false;
 
         ValueRequest<DataPointRT> request = new ValueRequest<DataPointRT>();
-        for (DataPointRT point : dataPoints) {
+        for (DataPointRT point : enabledDataPoints) {
             final MBusPointLocatorRT locator = point.getPointLocator();
             request.add(locator.createValueRequestPointLocator(point));
         }

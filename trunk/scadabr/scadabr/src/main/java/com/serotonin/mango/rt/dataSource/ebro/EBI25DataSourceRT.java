@@ -55,7 +55,7 @@ public class EBI25DataSourceRT extends PollingDataSource implements MessagingExc
     private final EBI25DataSourceVO vo;
 
     public EBI25DataSourceRT(EBI25DataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
@@ -68,7 +68,7 @@ public class EBI25DataSourceRT extends PollingDataSource implements MessagingExc
         // Get a list of logger indices. The list of points does not include disabled points, so completely disabled
         // loggers will not be in the index list.
         List<Integer> loggerIndices = new ArrayList<Integer>();
-        for (DataPointRT dp : dataPoints) {
+        for (DataPointRT dp : enabledDataPoints) {
             int index = ((EBI25PointLocatorRT) dp.getPointLocator()).getVO().getIndex();
             if (!loggerIndices.contains(index))
                 loggerIndices.add(index);
@@ -152,7 +152,7 @@ public class EBI25DataSourceRT extends PollingDataSource implements MessagingExc
     }
 
     private DataPointRT getLoggerPoint(int index, int type) {
-        for (DataPointRT dp : dataPoints) {
+        for (DataPointRT dp : enabledDataPoints) {
             EBI25PointLocatorRT locator = dp.getPointLocator();
             if (locator.getVO().getIndex() == index && locator.getVO().getType() == type)
                 return dp;
