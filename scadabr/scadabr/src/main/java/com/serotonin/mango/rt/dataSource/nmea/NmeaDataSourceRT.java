@@ -48,7 +48,7 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
     private TimerTask resetTask;
 
     public NmeaDataSourceRT(NmeaDataSourceVO vo) {
-        super(vo);
+        super(vo, false);
         this.vo = vo;
     }
 
@@ -119,8 +119,8 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
 
         LocalizableMessage parseError = null;
 
-        synchronized (pointListChangeLock) {
-            for (DataPointRT dp : addedChangedPoints) {
+        synchronized (enabledDataPoints) {
+            for (DataPointRT dp : enabledDataPoints) {
                 try {
                     receivedMessageImpl(dp, message, time);
                 }

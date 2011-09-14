@@ -28,7 +28,7 @@ public class NodaveS7DataSource extends PollingDataSource {
 	private final NodaveS7DataSourceVO<?> vo;
 
 	public NodaveS7DataSource(NodaveS7DataSourceVO<?> vo) {
-		super(vo);
+		super(vo, true);
 		this.vo = vo;
 		setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(),
 				vo.isQuantize());
@@ -53,7 +53,7 @@ public class NodaveS7DataSource extends PollingDataSource {
 		} else {
 			String arquivo = readFile(file);
 
-			for (DataPointRT dataPoint : dataPoints) {
+			for (DataPointRT dataPoint : enabledDataPoints) {
 				try {
 					NodaveS7PointLocatorVO dataPointVO = dataPoint.getVO()
 							.getPointLocator();

@@ -408,7 +408,7 @@ public class RuntimeManager {
                 }
         	DataSourceRT ds = getRunningDataSource(point.getDataSourceId());
                 	if (ds != null) {
-				ds.deleteDataPoint(point);
+				ds.dataPointDeleted(point);
 			}
 		new DataPointDao().deleteDataPoint(point.getId());
 		Common.ctx.getEventManager().cancelEventsForDataPoint(point.getId());
@@ -435,7 +435,7 @@ public class RuntimeManager {
 					l.pointInitialized();
 
 				// Add/update it in the data source.
-				ds.addDataPoint(dataPoint);
+				ds.dataPointEnabled(dataPoint);
                                 return dataPoint;
 			}
 		}
@@ -470,7 +470,7 @@ public class RuntimeManager {
 			// Remove it from the data source, and terminate it.
 			if (p != null) {
 				DataSourceRT dsRT = getRunningDataSource(p.getDataSourceId());
-                                dsRT.removeDataPoint(p);
+                                dsRT.dataPointDisabled(p);
 				DataPointListener l = getDataPointListeners(dataPointId);
 				if (l != null)
 					l.pointTerminated();

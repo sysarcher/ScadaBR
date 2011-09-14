@@ -31,7 +31,7 @@ public class OPCDataSource extends PollingDataSource {
 	private final OPCDataSourceVO<?> vo;
 
 	public OPCDataSource(OPCDataSourceVO<?> vo) {
-		super(vo);
+		super(vo, true);
 		this.vo = vo;
 		setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(),
 				vo.isQuantize());
@@ -44,7 +44,7 @@ public class OPCDataSource extends PollingDataSource {
 	@Override
 	protected void doPoll(long time) {
 		ArrayList<String> enabledTags = new ArrayList<String>();
-		for (DataPointRT dataPoint : dataPoints) {
+		for (DataPointRT dataPoint : enabledDataPoints) {
 			OPCPointLocatorVO dataPointVO = dataPoint.getVO().getPointLocator();
 			enabledTags.add(dataPointVO.getTag());
 		}
@@ -73,7 +73,7 @@ public class OPCDataSource extends PollingDataSource {
 							.getMessage()));
 		}
 
-		for (DataPointRT dataPoint : dataPoints) {
+		for (DataPointRT dataPoint : enabledDataPoints) {
 			OPCPointLocatorVO dataPointVO = dataPoint.getVO().getPointLocator();
 			MangoValue mangoValue = null;
 			String value = "0";

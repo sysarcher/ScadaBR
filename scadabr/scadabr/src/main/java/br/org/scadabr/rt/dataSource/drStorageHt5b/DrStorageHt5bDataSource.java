@@ -35,7 +35,7 @@ public class DrStorageHt5bDataSource extends PollingDataSource {
 
 	public DrStorageHt5bDataSource(DrStorageHt5bDataSourceVO<?> vo) {
 
-		super(vo);
+		super(vo, true);
 		this.vo = vo;
 		setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), vo
 				.isQuantize());
@@ -73,7 +73,7 @@ public class DrStorageHt5bDataSource extends PollingDataSource {
 					String temp = getTemperature(getValuesHt5b());
 					String hum = getHumidity(getValuesHt5b());
 
-					for (DataPointRT dataPoint : dataPoints) {
+					for (DataPointRT dataPoint : enabledDataPoints) {
 
 						try {
 							DrStorageHt5bPointLocatorVO dataPointVO = dataPoint

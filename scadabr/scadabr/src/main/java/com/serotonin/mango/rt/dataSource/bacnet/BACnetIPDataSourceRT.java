@@ -104,7 +104,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
     private CovResubscriptionTask covResubscriptionTask;
 
     public BACnetIPDataSourceRT(BACnetIPDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
@@ -204,7 +204,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
     }
 
     @Override
-    public void addDataPoint(DataPointRT dataPoint) {
+    public void dataPointEnabled(DataPointRT dataPoint) {
         if (!initialized)
             return;
 
@@ -270,13 +270,13 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
                     return;
             }
 
-            super.addDataPoint(dataPoint);
+            super.dataPointEnabled(dataPoint);
         }
     }
 
     @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
-        super.removeDataPoint(dataPoint);
+    public void dataPointDisabled(DataPointRT dataPoint) {
+        super.dataPointDisabled(dataPoint);
 
         if (!initialized)
             return;
@@ -295,8 +295,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
     protected void doPoll(long time) {
         Map<RemoteDevice, List<DataPointRT>> devicePoints = new HashMap<RemoteDevice, List<DataPointRT>>();
 
-        synchronized (pointListChangeLock) {
-            for (DataPointRT dp : dataPoints) {
+            for (DataPointRT dp : enabledDataPoints) {
                 BACnetIPPointLocatorRT locator = dp.getPointLocator();
                 if (locator.isUseCovSubscription() && dp.getPointValue() != null)
                     continue;
@@ -309,7 +308,6 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
 
                 points.add(dp);
             }
-        }
 
         for (RemoteDevice d : devicePoints.keySet())
             Common.ctx.getBackgroundProcessing().addWorkItem(new DevicePoller(d, devicePoints.get(d), time));
@@ -446,14 +444,6 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
         }
     }
 
-    Object getPointListChangeLock() {
-        return pointListChangeLock;
-    }
-
-    List<DataPointRT> getDataPoints() {
-        return dataPoints;
-    }
-
     //
     // COV subscriptions
     class CovResubscriptionTask extends TimerTask {
@@ -463,8 +453,8 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
 
         @Override
         public void run(long fireTime) {
-            synchronized (getPointListChangeLock()) {
-                for (DataPointRT dp : getDataPoints()) {
+            synchronized (enabledDataPoints) {
+                for (DataPointRT dp : enabledDataPoints) {
                     BACnetIPPointLocatorRT locator = dp.getPointLocator();
                     if (locator.isUseCovSubscription())
                         sendCovSubscription(dp, false);
@@ -478,14 +468,17 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
     // / DeviceEventListener
     // /
     //
+    @Override
     public void listenerException(Throwable e) {
         fireMessageExceptionEvent(e);
     }
 
+    @Override
     public boolean allowPropertyWrite(BACnetObject obj, PropertyValue pv) {
         return true;
     }
 
+    @Override
     public void iAmReceived(RemoteDevice d) {
         try {
             localDevice.getExtendedDeviceInformation(d);
@@ -496,14 +489,17 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
         }
     }
 
+    @Override
     public void propertyWritten(BACnetObject obj, PropertyValue pv) {
         // no op
     }
 
+    @Override
     public void iHaveReceived(RemoteDevice d, RemoteObject o) {
         // no op
     }
 
+    @Override
     public void covNotificationReceived(UnsignedInteger subscriberProcessIdentifier, RemoteDevice initiatingDevice,
             ObjectIdentifier monitoredObjectIdentifier, UnsignedInteger timeRemaining,
             SequenceOf<PropertyValue> listOfValues) {
@@ -515,8 +511,8 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
             // Find the point that cares.
             DataPointRT dataPoint = null;
             BACnetIPPointLocatorRT locator = null;
-            synchronized (pointListChangeLock) {
-                for (DataPointRT dp : dataPoints) {
+            synchronized (enabledDataPoints) {
+                for (DataPointRT dp : enabledDataPoints) {
                     locator = dp.getPointLocator();
                     if (locator.getCovId() == covId) {
                         dataPoint = dp;
@@ -542,6 +538,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
         }
     }
 
+    @Override
     public void eventNotificationReceived(UnsignedInteger processIdentifier, RemoteDevice initiatingDevice,
             ObjectIdentifier eventObjectIdentifier, TimeStamp timeStamp, UnsignedInteger notificationClass,
             UnsignedInteger priority, com.serotonin.bacnet4j.type.enumerated.EventType eventType,
@@ -551,11 +548,13 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
         // no op
     }
 
+    @Override
     public void textMessageReceived(RemoteDevice textMessageSourceDevice, Choice messageClass,
             MessagePriority messagePriority, CharacterString message) {
         // no op
     }
 
+    @Override
     public void privateTransferReceived(UnsignedInteger vendorId, UnsignedInteger serviceNumber,
             Encodable serviceParameters) {
         // no op
@@ -576,14 +575,17 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
     // / ExceptionListener
     // /
     //
+    @Override
     public void receivedException(Exception e) {
         fireMessageExceptionEvent(e);
     }
 
+    @Override
     public void receivedThrowable(Throwable t) {
         fireMessageExceptionEvent(t);
     }
 
+    @Override
     public void unimplementedVendorService(UnsignedInteger vendorId, UnsignedInteger serviceNumber, ByteQueue queue) {
         log.warn("Received unimplemented vendor service: vendor id=" + vendorId + ", service number=" + serviceNumber
                 + ", bytes (with context id)=" + queue);

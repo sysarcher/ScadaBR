@@ -32,7 +32,7 @@ public class Dnp3DataSource extends PollingDataSource {
 	private final Dnp3DataSourceVO<?> vo;
 
 	public Dnp3DataSource(Dnp3DataSourceVO<?> vo) {
-		super(vo);
+		super(vo, true);
 		this.vo = vo;
 		setPollingPeriod(vo.getRbePeriodType(), vo.getRbePollPeriods(), vo
 				.isQuantize());
@@ -51,7 +51,7 @@ public class Dnp3DataSource extends PollingDataSource {
 							.getMessage()));
 		}
 
-		for (DataPointRT dataPoint : dataPoints) {
+		for (DataPointRT dataPoint : enabledDataPoints) {
 			Dnp3PointLocatorVO pointLocator = ((Dnp3PointLocatorVO) dataPoint
 					.getVO().getPointLocator());
 			List<DataElement> pointValues = dnp3Master.read(pointLocator

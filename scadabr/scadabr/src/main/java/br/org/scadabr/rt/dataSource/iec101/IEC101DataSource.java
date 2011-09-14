@@ -29,7 +29,7 @@ public class IEC101DataSource extends PollingDataSource {
 	private final IEC101DataSourceVO<?> vo;
 
 	public IEC101DataSource(IEC101DataSourceVO<?> vo) {
-		super(vo);
+		super(vo, true);
 		this.vo = vo;
 		setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), vo
 				.isQuantize());
@@ -46,7 +46,7 @@ public class IEC101DataSource extends PollingDataSource {
 			e.printStackTrace();
 		}
 
-		for (DataPointRT dataPoint : dataPoints) {
+		for (DataPointRT dataPoint : enabledDataPoints) {
 			IEC101PointLocatorVO pointLocator = dataPoint.getVO()
 					.getPointLocator();
 

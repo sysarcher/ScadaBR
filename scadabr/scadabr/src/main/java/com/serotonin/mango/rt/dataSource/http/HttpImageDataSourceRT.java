@@ -57,7 +57,7 @@ public class HttpImageDataSourceRT extends PollingDataSource {
     public static final int FILE_SAVE_EXCEPTION_EVENT = 2;
 
     public HttpImageDataSourceRT(HttpImageDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 
@@ -71,7 +71,7 @@ public class HttpImageDataSourceRT extends PollingDataSource {
         ImageRetrieverMonitor monitor = new ImageRetrieverMonitor();
 
         // Add all of the retrievers to the monitor.
-        for (DataPointRT dp : dataPoints) {
+        for (DataPointRT dp : enabledDataPoints) {
             ImageRetriever retriever = new ImageRetriever(monitor, dp, time);
             monitor.addRetriever(retriever);
         }

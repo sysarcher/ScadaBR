@@ -36,7 +36,7 @@ public class ASCIISerialDataSource extends PollingDataSource {
 	private SerialPort sPort;
 
 	public ASCIISerialDataSource(ASCIISerialDataSourceVO<?> vo) {
-		super(vo);
+		super(vo, true);
 		this.vo = vo;
 		setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(),
 				vo.isQuantize());
@@ -54,10 +54,10 @@ public class ASCIISerialDataSource extends PollingDataSource {
 			// nao tem dados
 			if (getInSerialStream().available() == 0) {
 
-				for (DataPointRT dataPoint : dataPoints) {
+				for (DataPointRT dataPoint : enabledDataPoints) {
 					ASCIISerialPointLocatorVO dataPointVO = dataPoint.getVO()
 							.getPointLocator();
-					if (!dataPointVO.getCommand().equals(null)) {
+					if (dataPointVO.getCommand() != null) {
 						getOutSerialStream().write(
 								dataPointVO.getCommand().getBytes());
 					}
@@ -128,11 +128,11 @@ public class ASCIISerialDataSource extends PollingDataSource {
 					// System.out.println("IMPRIMIUUUU");
 					// }
 
-					for (DataPointRT dataPoint : dataPoints) {
+					for (DataPointRT dataPoint : enabledDataPoints) {
 						try {
 							ASCIISerialPointLocatorVO dataPointVO = dataPoint
 									.getVO().getPointLocator();
-							if (!dataPointVO.getCommand().equals(null)) {
+							if (dataPointVO.getCommand() != null) {
 								getOutSerialStream().write(
 										dataPointVO.getCommand().getBytes());
 							}

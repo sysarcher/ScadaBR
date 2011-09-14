@@ -26,13 +26,13 @@ import com.serotonin.mango.vo.dataSource.virtual.VirtualDataSourceVO;
 
 public class VirtualDataSourceRT extends PollingDataSource {
     public VirtualDataSourceRT(VirtualDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 
     @Override
     public void doPoll(long time) {
-        for (DataPointRT dataPoint : dataPoints) {
+        for (DataPointRT dataPoint : enabledDataPoints) {
             VirtualPointLocatorRT locator = dataPoint.getPointLocator();
 
             // Change the point values according to their definitions.
@@ -51,12 +51,12 @@ public class VirtualDataSourceRT extends PollingDataSource {
     }
 
     @Override
-    public void addDataPoint(DataPointRT dataPoint) {
+    public void dataPointEnabled(DataPointRT dataPoint) {
         if (dataPoint.getPointValue() != null) {
             VirtualPointLocatorRT locator = dataPoint.getPointLocator();
             locator.setCurrentValue(dataPoint.getPointValue().getValue());
         }
 
-        super.addDataPoint(dataPoint);
+        super.dataPointEnabled(dataPoint);
     }
 }

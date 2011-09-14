@@ -40,7 +40,7 @@ public class HttpReceiverDataSourceRT extends EventDataSource implements HttpMul
     private final HttpReceiverDataSourceVO vo;
 
     public HttpReceiverDataSourceRT(HttpReceiverDataSourceVO vo) {
-        super(vo);
+        super(vo, false);
         this.vo = vo;
     }
 
@@ -84,8 +84,8 @@ public class HttpReceiverDataSourceRT extends EventDataSource implements HttpMul
     @Override
     public void data(HttpReceiverData data) {
         // Match data points in the received set with point locators.
-        synchronized (pointListChangeLock) {
-            for (DataPointRT dp : addedChangedPoints) {
+        synchronized (enabledDataPoints) {
+            for (DataPointRT dp : enabledDataPoints) {
                 HttpReceiverPointLocatorVO locator = ((HttpReceiverPointLocatorRT) dp.getPointLocator())
                         .getPointLocatorVO();
                 String paramName = locator.getParameterName();

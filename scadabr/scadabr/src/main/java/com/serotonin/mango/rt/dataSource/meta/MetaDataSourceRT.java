@@ -32,16 +32,16 @@ import com.serotonin.web.i18n.LocalizableMessage;
 /**
  * @author Matthew Lohbihler
  */
+//TODO apl I dont know why there is a CopyOnWriteArrayList ??
 public class MetaDataSourceRT extends DataSourceRT {
     public static final int EVENT_TYPE_CONTEXT_POINT_DISABLED = 1;
     public static final int EVENT_TYPE_SCRIPT_ERROR = 2;
     public static final int EVENT_TYPE_RESULT_TYPE_ERROR = 3;
 
-    private final List<DataPointRT> points = new CopyOnWriteArrayList<DataPointRT>();
     private boolean contextPointDisabledEventActive;
 
     public MetaDataSourceRT(MetaDataSourceVO vo) {
-        super(vo);
+        super(vo, false);
     }
 
     @Override
@@ -50,35 +50,23 @@ public class MetaDataSourceRT extends DataSourceRT {
     }
 
     @Override
-    public void addDataPoint(DataPointRT dataPoint) {
-        synchronized (pointListChangeLock) {
-            remove(dataPoint);
-
-            MetaPointLocatorRT locator = dataPoint.getPointLocator();
-            points.add(dataPoint);
+    public void dataPointEnabled(DataPointRT dataPoint) {
+        super.dataPointEnabled(dataPoint);    
+        MetaPointLocatorRT locator = dataPoint.getPointLocator();
             locator.initialize(Common.timer, this, dataPoint);
             checkForDisabledPoints();
-        }
     }
 
     @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
-        synchronized (pointListChangeLock) {
-            remove(dataPoint);
-            checkForDisabledPoints();
-        }
-    }
-
-    private void remove(DataPointRT dataPoint) {
-        MetaPointLocatorRT locator = dataPoint.getPointLocator();
-        locator.terminate();
-        points.remove(dataPoint);
+    public void dataPointDisabled(DataPointRT dataPoint) {
+        dataPointDisabled(dataPoint);
+        checkForDisabledPoints();
     }
 
     synchronized void checkForDisabledPoints() {
         DataPointRT problemPoint = null;
 
-        for (DataPointRT dp : points) {
+        for (DataPointRT dp : enabledDataPoints) {
             MetaPointLocatorRT locator = dp.getPointLocator();
             if (!locator.isContextCreated()) {
                 problemPoint = dp;

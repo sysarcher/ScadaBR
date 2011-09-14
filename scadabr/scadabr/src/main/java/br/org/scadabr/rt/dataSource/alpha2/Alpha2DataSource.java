@@ -34,7 +34,7 @@ public class Alpha2DataSource extends PollingDataSource {
 	private Alpha2Master master;
 
 	public Alpha2DataSource(Alpha2DataSourceVO<?> vo) {
-		super(vo);
+		super(vo, true);
 		this.vo = vo;
 		setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
 	}
@@ -45,7 +45,7 @@ public class Alpha2DataSource extends PollingDataSource {
 
 		Map<DeviceLocator, DataPointRT> map = new HashMap<DeviceLocator, DataPointRT>();
 
-		for (DataPointRT pointRT : dataPoints) {
+		for (DataPointRT pointRT : enabledDataPoints) {
 			Alpha2PointLocatorVO dp = pointRT.getVO().getPointLocator();
 
 			if (dp.isReadable()) {
