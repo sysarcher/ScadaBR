@@ -39,12 +39,8 @@ public class HmsPointLocator extends ProtocolLocator<HmsProperty> {
         return housecode;
     }
     
-    public String getHousecodeAsStr() {
-        return String.format("%04x", housecode); 
-    }
-    
     public String defaultName() {
-        return getProperty() == null ? "HMS dataPoint" : String.format("%04x %s", housecode, getProperty().getLabel());
+        return getProperty() == null ? "HMS dataPoint" : String.format("%s %s", getHousecodeStr(), getProperty().getLabel());
     }
 
     /**
@@ -54,8 +50,12 @@ public class HmsPointLocator extends ProtocolLocator<HmsProperty> {
         this.housecode = housecode;
     }
 
-    public void setDeviceHousecodeStr(String deviceHousecode) {
-        this.housecode = Fhz1000.parseHouseCode(deviceHousecode);
+    public void setHousecodeStr(String deviceHousecode) {
+        this.housecode = (short)Integer.parseInt(deviceHousecode, 16);
+    }
+    
+    public String getHousecodeStr() {
+        return String.format("%04X", housecode);
     }
 
     public String getDeviceHousecodeStr() {

@@ -64,7 +64,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
 public class Fhz4JDataSourceRT extends DataSourceRT implements FhzDataListener {
 
     private final static Logger LOG = LoggerFactory.getLogger(Fhz4JDataSourceRT.class);
-    public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
+    public static final int SERIAL_PORT_EXCEPTION_EVENT = 1;
     public static final int POINT_READ_EXCEPTION_EVENT = 2;
     public static final int POINT_WRITE_EXCEPTION_EVENT = 3;
     // private final long nextRescan = 0;
@@ -94,9 +94,9 @@ public class Fhz4JDataSourceRT extends DataSourceRT implements FhzDataListener {
             if (vo.isFhzMaster()) {
                 writer.initFhtReporting(getFhtDeviceHousecodes());
             }
-            returnToNormal(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis());
+            returnToNormal(SERIAL_PORT_EXCEPTION_EVENT, System.currentTimeMillis());
         } catch (Exception ex) {
-            raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true,
+            raiseEvent(SERIAL_PORT_EXCEPTION_EVENT, System.currentTimeMillis(), true,
                     new LocalizableMessage("event.exception", vo.getName(), ex.getMessage()));
         }
         super.initialize();
@@ -110,7 +110,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT implements FhzDataListener {
                 sPort.close();
             }
         } catch (InterruptedException ex) {
-            raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true,
+            raiseEvent(SERIAL_PORT_EXCEPTION_EVENT, System.currentTimeMillis(), true,
                     new LocalizableMessage("event.exception", vo.getName(), ex.getMessage()));
             LOG.error(String.format("FHZ serialport: %s unexpected closed", sPort.getName()), ex);
         }
@@ -135,7 +135,6 @@ public class Fhz4JDataSourceRT extends DataSourceRT implements FhzDataListener {
     }
 
     private void addToEnabledDataPoint(DataPointRT dataPoint) {
-        LOG.error("ADD:" + dataPoint.getVO().getXid());
         final Fhz4JPointLocatorRT locator = (Fhz4JPointLocatorRT) dataPoint.getPointLocator();
         switch (locator.getFhzProtocol()) {
             case FHT:
@@ -170,7 +169,6 @@ public class Fhz4JDataSourceRT extends DataSourceRT implements FhzDataListener {
      * @param vo
      */
     public void addToDisabledDataPoint(DataPointVO vo) {
-        LOG.error("Disabled add:" + vo.getXid());
         super.addDisabledDataPoint(vo);
         final Fhz4JPointLocatorVO locator = (Fhz4JPointLocatorVO) vo.getPointLocator();
         switch (locator.getFhzProtocol()) {
@@ -202,9 +200,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT implements FhzDataListener {
     }
 
     public void removeFromEnabledDataPoint(DataPointRT dataPoint) {
-        LOG.error("REMOVE:" + dataPoint.getVO().getXid());
         addDisabledDataPoint(dataPoint.getVO());
-        try {
             final Fhz4JPointLocatorRT locator = (Fhz4JPointLocatorRT) dataPoint.getPointLocator();
             switch (locator.getFhzProtocol()) {
                 case FHT:
@@ -230,9 +226,6 @@ public class Fhz4JDataSourceRT extends DataSourceRT implements FhzDataListener {
                 default:
                     throw new RuntimeException("Unknown fhz protocol");
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 
     @Override
@@ -270,7 +263,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT implements FhzDataListener {
         if (dataPointRT != null) {
             updateValue(dataPointRT, fhtMessage, fhtMessage.getCommand());
         }
-        LOG.error("FHT point added: " + dp.getXid());
+        LOG.info("FHT point added: " + dp.getXid());
     }
 
     private short[] getFhtDeviceHousecodes() {
@@ -297,9 +290,10 @@ public class Fhz4JDataSourceRT extends DataSourceRT implements FhzDataListener {
                             addFoundFhtMessage(fhtMessage);
                         }
                     }
+                    returnToNormal(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis());
                 } catch (Exception ex) {
-                    ex.printStackTrace();
-                    LOG.error("Unknown exception in fhtDataParsed", ex);
+            raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true,
+                    new LocalizableMessage("event.exception", vo.getName(), ex.getMessage()));
                 }
             }
         }
@@ -328,10 +322,10 @@ public class Fhz4JDataSourceRT extends DataSourceRT implements FhzDataListener {
                             updateValue(dataPoint, hmsMessage, prop);
                         }
                     }
+                    returnToNormal(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis());
                 } catch (Exception ex) {
-                    System.err.print("Unknown exception in hmsDataParsed");
-                    ex.printStackTrace();
-                    LOG.error("Unknown exception in hmsDataParsed", ex);
+            raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true,
+                    new LocalizableMessage("event.exception", vo.getName(), ex.getMessage()));
                 }
             }
         }
@@ -407,7 +401,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT implements FhzDataListener {
         }
 
         DataPointRT dataPointRT = Common.ctx.getRuntimeManager().saveDataPoint(dp);
-        Common.ctx.getRuntimeManager().addPointToHierarchy(dp, vo.getName(), hmsMessage.getHousecode() + " " + hmsMessage.getDeviceType().getLabel());
+        Common.ctx.getRuntimeManager().addPointToHierarchy(dp, vo.getName(), hmsLocator.getHousecodeStr() + " " + hmsMessage.getDeviceType().getLabel());
 
         if (dataPointRT != null) {
             updateValue(dataPointRT, hmsMessage, prop);
