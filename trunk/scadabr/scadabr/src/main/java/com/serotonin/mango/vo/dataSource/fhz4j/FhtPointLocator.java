@@ -6,29 +6,35 @@ package com.serotonin.mango.vo.dataSource.fhz4j;
 
 import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
+import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.web.i18n.LocalizableMessage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import net.sf.fhz4j.Fhz1000;
 import net.sf.fhz4j.FhzProtocol;
-import net.sf.fhz4j.fht.FhtProperty;
 
 import net.sf.fhz4j.fht.FhtDeviceTypes;
+import net.sf.fhz4j.fht.FhtProperty;
+import net.sf.fhz4j.scada.ScadaProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author aploese
  */
-public class FhtPointLocator extends Fhz4JPointLocatorVO<FhtProperty> {
+@JsonRemoteEntity
+public class FhtPointLocator extends ProtocolLocator<FhtProperty> {
 
+    private final static Logger LOG = LoggerFactory.getLogger(FhtPointLocator.class);
+    @JsonRemoteProperty
     private FhtDeviceTypes fhtDeviceType;
+    @JsonRemoteProperty
     private short housecode;
     private String fhtDeviceTypeLabel;
     private String propertyLabel;
@@ -40,6 +46,10 @@ public class FhtPointLocator extends Fhz4JPointLocatorVO<FhtProperty> {
         return housecode;
     }
 
+    public String defaultName() {
+        return getProperty() == null ? "FHZ dataPoint" : String.format("%s %s", Fhz1000.houseCodeToString(housecode), getProperty().getLabel());
+    }
+    
     /**
      * @param housecode the housecode to set
      */
@@ -102,8 +112,8 @@ public class FhtPointLocator extends Fhz4JPointLocatorVO<FhtProperty> {
     }
 
     @Override
-    public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
-        FhtPointLocator from = (FhtPointLocator) o;
+    public void addPropertyChanges(List<LocalizableMessage> list, ProtocolLocator o) {
+        FhtPointLocator from = (FhtPointLocator)o;
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.housecode, housecode);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.fhtDeviceType, fhtDeviceType);
     }
@@ -129,7 +139,7 @@ public class FhtPointLocator extends Fhz4JPointLocatorVO<FhtProperty> {
             case 1:
                 housecode = in.readShort();
                 fhtDeviceType = (FhtDeviceTypes) in.readObject();
-                break;
+         break;
             default:
                 throw new RuntimeException("Cant handle version");
         }
@@ -141,8 +151,6 @@ public class FhtPointLocator extends Fhz4JPointLocatorVO<FhtProperty> {
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        map.put("deviceHousecode", housecode);
-        map.put("fhtDeviceType", fhtDeviceType);
     }
 
     @Override

@@ -38,6 +38,7 @@ import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
 import com.serotonin.mango.rt.dataSource.fhz4j.Fhz4JPointLocatorRT;
+import com.serotonin.util.SerializationHelper;
 import java.util.LinkedHashMap;
 import net.sf.fhz4j.scada.ScadaProperty;
 import org.slf4j.LoggerFactory;
@@ -47,24 +48,26 @@ import org.slf4j.LoggerFactory;
 public class Fhz4JPointLocatorVO<T extends ScadaProperty> extends AbstractPointLocatorVO implements JsonSerializable {
 
     private final static Logger LOG = LoggerFactory.getLogger(Fhz4JPointLocatorVO.class);
-    private T property;
+    private ProtocolLocator<T> protocolLocator;
 
     Fhz4JPointLocatorVO() {
         super();
     }
-    private boolean settable = false;
 
-    public String defaultName() {
-        return property == null ? "Fhz4J dataPoint" : getProperty().getLabel();
+    Fhz4JPointLocatorVO(ProtocolLocator<T> protocolLocator) {
+        this.protocolLocator = protocolLocator;
     }
 
+    public String defaultName() {
+        return getProperty() == null ? "Fhz4J dataPoint" : getProperty().getLabel();
+    }
 
     @Override
     public int getDataTypeId() {
-        if (property == null) {
+        if (getProperty() == null) {
             return DataTypes.UNKNOWN;
         }
-        switch (property.getDataType()) {
+        switch (getProperty().getDataType()) {
             case BOOLEAN:
                 return DataTypes.BINARY;
             case BYTE:
@@ -86,7 +89,7 @@ public class Fhz4JPointLocatorVO<T extends ScadaProperty> extends AbstractPointL
             case TIME:
                 return DataTypes.ALPHANUMERIC;
             default:
-                throw new RuntimeException("Cant find datatype of " + property);
+                throw new RuntimeException("Cant find datatype of " + getProperty());
         }
 
     }
@@ -96,13 +99,9 @@ public class Fhz4JPointLocatorVO<T extends ScadaProperty> extends AbstractPointL
         return new LocalizableMessage("dsEdit.openv4j", "Something", "I dont know");
     }
 
-    public void setSettable(boolean settable) {
-        this.settable = settable;
-    }
-
     @Override
     public boolean isSettable() {
-        return settable;
+        return protocolLocator.isSettable();
     }
 
     @Override
@@ -117,15 +116,12 @@ public class Fhz4JPointLocatorVO<T extends ScadaProperty> extends AbstractPointL
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addPropertyMessage(list, "dsEdit.hfz4j.dataPoint", settable);
-        AuditEventType.addPropertyMessage(list, "dsEdit.hfz4j.dataPoint", property);
+        protocolLocator.addProperties(list);
     }
 
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
-        Fhz4JPointLocatorVO from = (Fhz4JPointLocatorVO) o;
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.settable, settable);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.property, property);
+        protocolLocator.addPropertyChanges(list, ((Fhz4JPointLocatorVO) o).protocolLocator);
     }
     //
     // /
@@ -137,8 +133,7 @@ public class Fhz4JPointLocatorVO<T extends ScadaProperty> extends AbstractPointL
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(serialVersion);
-        out.writeBoolean(settable);
-        out.writeObject(property);
+        out.writeObject(protocolLocator);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -147,8 +142,7 @@ public class Fhz4JPointLocatorVO<T extends ScadaProperty> extends AbstractPointL
         // Switch on the version of the class so that version changes can be elegantly handled.
         switch (ver) {
             case 1:
-                settable = in.readBoolean();
-                property = (T)in.readObject();
+                protocolLocator = (ProtocolLocator<T>) in.readObject();
                 break;
             default:
                 throw new RuntimeException("Cant handle version");
@@ -162,28 +156,26 @@ public class Fhz4JPointLocatorVO<T extends ScadaProperty> extends AbstractPointL
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        map.put("settable", settable);
         Map<String, Object> locatorMap = new LinkedHashMap<String, Object>();
-        map.put("fhzProtocol", getFhzProtocol());
-        map.put("fhzProperty", property);
- }
+        protocolLocator.jsonSerialize(locatorMap);
+        map.put("protocolLocator", locatorMap);
+    }
 
     public FhzProtocol getFhzProtocol() {
-        return FhzProtocol.UNKNOWN;
+        return protocolLocator.getFhzProtocol();
     }
 
     /**
      * @return the property
      */
     public T getProperty() {
-        return property;
+        return protocolLocator.getProperty();
     }
 
     /**
-     * @param property the property to set
+     * @return the protocolLocator
      */
-    public void setProperty(T property) {
-        this.property = property;
+    public ProtocolLocator<T> getProtocolLocator() {
+        return protocolLocator;
     }
-
 }

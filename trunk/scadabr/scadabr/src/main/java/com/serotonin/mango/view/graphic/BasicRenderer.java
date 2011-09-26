@@ -29,7 +29,7 @@ import com.serotonin.mango.view.ImplDefinition;
 // Use ViewComponent instead
 public class BasicRenderer extends BaseGraphicRenderer {
     private static ImplDefinition definition = new ImplDefinition("graphicRendererBasic", "BASIC", "graphic.basic",
-            new int[] { DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC, });
+            new int[] { DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC, });//TODO apl lat , typo??? I would expect a compiler error????? 
 
     public static ImplDefinition getDefinition() {
         return definition;
