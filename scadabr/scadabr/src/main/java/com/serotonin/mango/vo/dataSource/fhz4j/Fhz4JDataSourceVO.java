@@ -18,12 +18,15 @@
  */
 package com.serotonin.mango.vo.dataSource.fhz4j;
 
+import com.serotonin.ShouldNeverHappenException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -58,12 +61,14 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
         EVENT_CODES.addElement(Fhz4JDataSourceRT.POINT_READ_EXCEPTION_EVENT, "POINT_READ_EXCEPTION");
         EVENT_CODES.addElement(Fhz4JDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, "POINT_WRITE_EXCEPTION");
     }
+    
     @JsonRemoteProperty
     private String commPortId;
     @JsonRemoteProperty
     private short fhzHousecode;
     @JsonRemoteProperty
     private boolean fhzMaster;
+    
 
     @Override
     public Type getType() {
@@ -93,9 +98,9 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
     public Fhz4JPointLocatorVO createPontLocator(FhzProtocol fhzProtocol) {
         switch (fhzProtocol) {
             case FHT:
-                return new FhtPointLocator();
+                return new Fhz4JPointLocatorVO(new FhtPointLocator());
             case HMS:
-                return new HmsPointLocator();
+                return new Fhz4JPointLocatorVO(new HmsPointLocator());
             default:
                 throw new RuntimeException("Unknown protocol");
         }

@@ -4,10 +4,14 @@
  */
 package com.serotonin.mango.vo.dataSource.fhz4j;
 
+import com.serotonin.json.JsonRemoteEntity;
+import net.sf.fhz4j.scada.ScadaProperty;
+
 /**
  *
  * @author aploese
  */
-public class FhtMeasuredTempPointLocator extends Fhz4JPointLocatorVO {
+@JsonRemoteEntity
+public class FhtMeasuredTempPointLocator extends ProtocolLocator<ScadaProperty> {
 
 }

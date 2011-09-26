@@ -17,6 +17,7 @@ import net.sf.fhz4j.hms.HmsProperty;
 
 import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
+import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.web.i18n.LocalizableMessage;
 
@@ -24,7 +25,8 @@ import com.serotonin.web.i18n.LocalizableMessage;
  *
  * @author aploese
  */
-public class HmsPointLocator extends Fhz4JPointLocatorVO<HmsProperty> {
+@JsonRemoteEntity
+public class HmsPointLocator extends ProtocolLocator<HmsProperty> {
 
     private short housecode;
     private HmsDeviceType hmsDeviceType;
@@ -35,6 +37,14 @@ public class HmsPointLocator extends Fhz4JPointLocatorVO<HmsProperty> {
      */
     public short getHousecode() {
         return housecode;
+    }
+    
+    public String getHousecodeAsStr() {
+        return String.format("%04x", housecode); 
+    }
+    
+    public String defaultName() {
+        return getProperty() == null ? "HMS dataPoint" : String.format("%04x %s", housecode, getProperty().getLabel());
     }
 
     /**
@@ -59,8 +69,9 @@ public class HmsPointLocator extends Fhz4JPointLocatorVO<HmsProperty> {
     }
 
     @Override
-    public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
-        HmsPointLocator from = (HmsPointLocator)o;
+    public void addPropertyChanges(List<LocalizableMessage> list, ProtocolLocator o) {
+        super.addPropertyChanges(list, o);
+        final HmsPointLocator from = (HmsPointLocator)o;
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.housecode, housecode);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.hmsDeviceType, hmsDeviceType);
     }
@@ -158,4 +169,4 @@ public class HmsPointLocator extends Fhz4JPointLocatorVO<HmsProperty> {
         return String.format("%s [housecode: %x, devicetype: property %s]", getClass().getName(), housecode, hmsDeviceType, getProperty());
     }
 
-}
+ }

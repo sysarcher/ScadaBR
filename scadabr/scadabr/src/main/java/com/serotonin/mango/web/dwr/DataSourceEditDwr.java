@@ -2014,7 +2014,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         locator.setFhtDeviceTypeLabel(deviceTypeLabel);
         locator.setPropertyLabel(propertyLabel);
         
-        result.setName(locator.defaultName());
+      //  result.setName(locator.defaultName());
 
         return result;
     }
