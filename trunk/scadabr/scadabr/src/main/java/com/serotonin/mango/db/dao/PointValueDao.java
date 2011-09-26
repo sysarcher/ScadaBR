@@ -252,7 +252,7 @@ public class PointValueDao extends BaseDao {
 	private long savePointValueImpl(int pointId, MangoDataType dataType, double dvalue,
 			long time, String svalue, SetPointSource source) {
 		long id = doInsertLong(POINT_VALUE_INSERT, new Object[] { pointId,
-				dataType, dvalue, time });
+				dataType.mangoId, dvalue, time });
 
 		if (svalue == null && dataType == MangoDataType.IMAGE)
 			svalue = Long.toString(id);

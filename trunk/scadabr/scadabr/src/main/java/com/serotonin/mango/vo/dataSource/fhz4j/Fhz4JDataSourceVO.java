@@ -58,7 +58,7 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
     private static final ExportCodes EVENT_CODES = new ExportCodes();
 
     static {
-        EVENT_CODES.addElement(Fhz4JDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, "DATA_SOURCE_EXCEPTION");
+        EVENT_CODES.addElement(Fhz4JDataSourceRT.SERIAL_PORT_EXCEPTION_EVENT, "SERIAL_PORT_EXCEPTION_EVENT");
         EVENT_CODES.addElement(Fhz4JDataSourceRT.POINT_READ_EXCEPTION_EVENT, "POINT_READ_EXCEPTION");
         EVENT_CODES.addElement(Fhz4JDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, "POINT_WRITE_EXCEPTION");
     }
