@@ -31,14 +31,15 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonSerializable;
 import com.serotonin.json.JsonValue;
 import com.serotonin.json.TypeFactory;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 abstract public class BaseChartRenderer implements ChartRenderer, JsonSerializable {
     private static ImplDefinition noneDefinition = new ImplDefinition("chartRendererNone", "NONE",
-            "chartRenderer.none", new int[] { DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE,
-                    DataTypes.NUMERIC, DataTypes.IMAGE });
+            "chartRenderer.none", EnumSet.of(MangoDataType.ALPHANUMERIC, MangoDataType.BINARY, MangoDataType.MULTISTATE,
+                    MangoDataType.NUMERIC, MangoDataType.IMAGE ));
 
     static List<ImplDefinition> definitions;
 
@@ -54,7 +55,7 @@ abstract public class BaseChartRenderer implements ChartRenderer, JsonSerializab
         }
     }
 
-    public static List<ImplDefinition> getImplementations(int dataType) {
+    public static List<ImplDefinition> getImplementations(MangoDataType dataType) {
         ensureDefinitions();
         List<ImplDefinition> impls = new ArrayList<ImplDefinition>();
         for (ImplDefinition def : definitions) {

@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.serotonin.bacnet4j.type.enumerated.LifeSafetyState;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
+import com.serotonin.mango.MangoDataType;
 
 /**
  * @author Matthew Lohbihler
@@ -36,7 +37,7 @@ public class BACnetObjectBean {
     private boolean cov;
 
     // Default values for points
-    private int dataTypeId;
+    private MangoDataType mangoDataType = MangoDataType.UNKNOWN;
     private List<String> unitsDescription = new ArrayList<String>();
 
     public String getPrettyPresentValue() {
@@ -107,12 +108,12 @@ public class BACnetObjectBean {
         this.objectName = objectName;
     }
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setMangoDataType(MangoDataType mangoDataType) {
+        this.mangoDataType = mangoDataType;
     }
 
     public List<String> getUnitsDescription() {

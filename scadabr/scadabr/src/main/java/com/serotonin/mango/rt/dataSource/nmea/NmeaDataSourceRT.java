@@ -153,7 +153,7 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
                 String valueStr = message.getField(locator.getFieldIndex());
 
                 // Convert the value
-                MangoValue value = DataSourceUtils.getValue(valueStr, locator.getDataTypeId(),
+                MangoValue value = DataSourceUtils.getValue(valueStr, locator.getMangoDataType(),
                         locator.getBinary0Value(), dp.getVO().getTextRenderer(), null, dp.getVO().getName());
 
                 // Save the new value

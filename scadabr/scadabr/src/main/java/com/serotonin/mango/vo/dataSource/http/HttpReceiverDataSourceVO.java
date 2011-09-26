@@ -30,6 +30,7 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.util.ArrayUtils;
@@ -43,7 +44,6 @@ import com.serotonin.web.i18n.LocalizableMessage;
  */
 @JsonRemoteEntity
 public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourceVO> {
-    public static final Type TYPE = Type.HTTP_RECEIVER;
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
@@ -56,8 +56,8 @@ public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourc
     }
 
     @Override
-    public Type getType() {
-        return TYPE;
+    public DataSourceRegistry getType() {
+        return DataSourceRegistry.HTTP_RECEIVER;
     }
 
     @Override

@@ -30,7 +30,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.jmx.JmxPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -51,7 +51,8 @@ public class JmxPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
     private String attributeName;
     @JsonRemoteProperty
     private String compositeItemName;
-    private int dataTypeId;
+    @JsonRemoteProperty(alias=MangoDataType.ALIAS_DATA_TYPE)
+    private MangoDataType mangoDataType = MangoDataType.UNKNOWN;
     @JsonRemoteProperty
     private boolean settable;
 
@@ -95,12 +96,13 @@ public class JmxPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
         this.compositeItemName = compositeItemName;
     }
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    @Override
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setMangoDataType(MangoDataType mangoDataType) {
+        this.mangoDataType = mangoDataType;
     }
 
     public void setSettable(boolean settable) {
@@ -112,8 +114,6 @@ public class JmxPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
             response.addContextualMessage("objectName", "validate.required");
         if (StringUtils.isEmpty(attributeName))
             response.addContextualMessage("attributeName", "validate.required");
-        if (!DataTypes.CODES.isValidId(dataTypeId))
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
     }
 
     @Override
@@ -121,7 +121,7 @@ public class JmxPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
         AuditEventType.addPropertyMessage(list, "dsEdit.jmx.objectName", objectName);
         AuditEventType.addPropertyMessage(list, "dsEdit.jmx.attributeName", attributeName);
         AuditEventType.addPropertyMessage(list, "dsEdit.jmx.compositeItemName", compositeItemName);
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", mangoDataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.settable", settable);
     }
 
@@ -133,7 +133,7 @@ public class JmxPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
                 attributeName);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.jmx.compositeItemName", from.compositeItemName,
                 compositeItemName);
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.mangoDataType, mangoDataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.settable", from.settable, settable);
     }
 
@@ -149,7 +149,7 @@ public class JmxPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
         SerializationHelper.writeSafeUTF(out, objectName);
         SerializationHelper.writeSafeUTF(out, attributeName);
         SerializationHelper.writeSafeUTF(out, compositeItemName);
-        out.writeInt(dataTypeId);
+        out.writeInt(mangoDataType.mangoId);
         out.writeBoolean(settable);
     }
 
@@ -161,20 +161,16 @@ public class JmxPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
             objectName = SerializationHelper.readSafeUTF(in);
             attributeName = SerializationHelper.readSafeUTF(in);
             compositeItemName = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            mangoDataType = MangoDataType.fromMangoId(in.readInt());
             settable = in.readBoolean();
         }
     }
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        Integer value = deserializeDataType(json, DataTypes.IMAGE);
-        if (value != null)
-            dataTypeId = value;
     }
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        serializeDataType(map);
     }
 }

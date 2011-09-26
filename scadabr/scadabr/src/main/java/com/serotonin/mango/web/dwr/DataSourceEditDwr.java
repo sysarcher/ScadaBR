@@ -89,7 +89,7 @@ import com.serotonin.db.IntValuePair;
 import com.serotonin.io.StreamUtils;
 import com.serotonin.io.serial.SerialParameters;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.rt.RuntimeManager;
@@ -418,8 +418,8 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 	}
 
 	@MethodFilter
-	public IntMessagePair[] getChangeTypes(int dataTypeId) {
-		return ChangeTypeVO.getChangeTypes(dataTypeId);
+	public IntMessagePair[] getChangeTypes(MangoDataType mangoDataType) {
+		return ChangeTypeVO.getChangeTypes(mangoDataType);
 	}
 
 	@MethodFilter
@@ -1117,7 +1117,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
 	@MethodFilter
 	public DwrResponseI18n validateScript(String script,
-			List<IntValuePair> context, int dataTypeId) {
+			List<IntValuePair> context, MangoDataType mangoDataType) {
 		DwrResponseI18n response = new DwrResponseI18n();
 
 		ScriptExecutor executor = new ScriptExecutor();
@@ -1125,7 +1125,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 			Map<String, IDataPoint> convertedContext = executor
 					.convertContext(context);
 			PointValueTime pvt = executor.execute(script, convertedContext,
-					System.currentTimeMillis(), dataTypeId, -1);
+					System.currentTimeMillis(), mangoDataType, -1);
 			if (pvt.getTime() == -1)
 				response.addContextualMessage("script",
 						"dsEdit.meta.test.success", pvt.getValue());
@@ -1300,7 +1300,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 		locator.setObjectInstanceNumber(bean.getInstanceNumber());
 		locator.setPropertyIdentifierId(PropertyIdentifier.presentValue
 				.intValue());
-		locator.setDataTypeId(bean.getDataTypeId());
+		locator.setMangoDataType(bean.getMangoDataType());
 		locator.setUseCovSubscription(bean.isCov());
 
 		// We would like to default text renderer values too, but it's rather
@@ -1339,18 +1339,18 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
 	@MethodFilter
 	public String testHttpRetrieverValueParams(String url, int timeoutSeconds,
-			int retries, String valueRegex, int dataTypeId, String valueFormat) {
+			int retries, String valueRegex, MangoDataType mangoDataType, String valueFormat) {
 		try {
 			String data = HttpRetrieverDataSourceRT.getData(url,
 					timeoutSeconds, retries);
 
 			Pattern valuePattern = Pattern.compile(valueRegex);
 			DecimalFormat decimalFormat = null;
-			if (dataTypeId == DataTypes.NUMERIC
+			if (mangoDataType == MangoDataType.NUMERIC
 					&& !StringUtils.isEmpty(valueFormat))
 				decimalFormat = new DecimalFormat(valueFormat);
 			MangoValue value = DataSourceUtils.getValue(valuePattern, data,
-					dataTypeId, valueFormat, null, decimalFormat, null);
+					mangoDataType, valueFormat, null, decimalFormat, null);
 			return getMessage("common.result") + ": " + value.toString();
 		} catch (LocalizableException e) {
 			return getMessage(e.getLocalizableMessage());
@@ -1439,15 +1439,15 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
 	@MethodFilter
 	public String testPop3ValueParams(String testData, String valueRegex,
-			int dataTypeId, String valueFormat) {
+			MangoDataType mangoDataType, String valueFormat) {
 		try {
 			Pattern valuePattern = Pattern.compile(valueRegex);
 			DecimalFormat decimalFormat = null;
-			if (dataTypeId == DataTypes.NUMERIC
+			if (mangoDataType == MangoDataType.NUMERIC
 					&& !StringUtils.isEmpty(valueFormat))
 				decimalFormat = new DecimalFormat(valueFormat);
 			MangoValue value = DataSourceUtils.getValue(valuePattern, testData,
-					dataTypeId, valueFormat, null, decimalFormat, null);
+					mangoDataType, valueFormat, null, decimalFormat, null);
 			return getMessage("common.result") + ": " + value.toString();
 		} catch (LocalizableException e) {
 			return getMessage(e.getLocalizableMessage());
@@ -2268,15 +2268,15 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 	// }
 
 	public DwrResponseI18n saveMultipleOPCPointLocator(String[] tags,
-			int[] dataTypes, boolean[] settables, OPCPointLocatorVO[] locators,
+			MangoDataType[] mangoDataTypes, boolean[] settables, OPCPointLocatorVO[] locators,
 			String context) {
 
-		return validateMultipleOPCPoints(tags, dataTypes, settables, locators,
+		return validateMultipleOPCPoints(tags, mangoDataTypes, settables, locators,
 				context, null);
 	}
 
 	private DwrResponseI18n validateMultipleOPCPoints(String[] tags,
-			int[] dataTypes, boolean[] settables, OPCPointLocatorVO[] locators,
+			MangoDataType[] mangoDataTypes, boolean[] settables, OPCPointLocatorVO[] locators,
 			String context, DataPointDefaulter defaulter) {
 		DwrResponseI18n response = new DwrResponseI18n();
 		OPCDataSourceVO<?> ds = (OPCDataSourceVO<?>) Common.getUser()
@@ -2290,7 +2290,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 			DataPointVO dp = getPoint(Common.NEW_ID, defaulter);
 			dp.setName(tags[i]);
 			locators[i].setTag(tags[i]);
-			locators[i].setDataTypeId(dataTypes[i]);
+			locators[i].setMangoDataType(mangoDataTypes[i]);
 			locators[i].setSettable(settables[i]);
 			dp.setPointLocator(locators[i]);
 
@@ -2536,7 +2536,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
 	@MethodFilter
 	public String testPachubeValueParams(String apiKey, int timeoutSeconds,
-			int retries, int feedId, String dataStreamId, int dataTypeId,
+			int retries, int feedId, String dataStreamId, MangoDataType mangoDataType,
 			String binary0Value) {
 		try {
 			Map<String, PachubeValue> data = PachubeDataSourceRT.getData(
@@ -2550,7 +2550,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 						feedId));
 
 			MangoValue value = DataSourceUtils.getValue(
-					pachubeValue.getValue(), dataTypeId, binary0Value, null,
+					pachubeValue.getValue(), mangoDataType, binary0Value, null,
 					null, null);
 			return getMessage("common.result") + ": " + value.toString();
 		} catch (LocalizableException e) {

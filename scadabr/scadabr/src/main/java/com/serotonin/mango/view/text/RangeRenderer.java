@@ -27,16 +27,17 @@ import java.util.List;
 
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.util.SerializationHelper;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class RangeRenderer extends BaseTextRenderer {
     private static ImplDefinition definition = new ImplDefinition("textRendererRange", "RANGE", "textRenderer.range",
-            new int[] { DataTypes.NUMERIC });
+            EnumSet.of( MangoDataType.NUMERIC ));
 
     public static ImplDefinition getDefinition() {
         return definition;

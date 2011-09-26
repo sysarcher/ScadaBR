@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.db.IntValuePair;
 import com.serotonin.mango.Common;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -464,10 +465,10 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
 
             if (dprt != null) {
                 // Already exists. Check that the data types match.
-                if (dprt.getVO().getPointLocator().getDataTypeId() != newDpvo.getPointLocator().getDataTypeId()) {
+                if (dprt.getVO().getMangoDataType() != newDpvo.getMangoDataType()) {
                     // Data type mismatch. Abort
                     LocalizableMessage lm = new LocalizableMessage("event.persistent.dataTypeMismatch", xid,
-                            newDpvo.getDataTypeMessage(), dprt.getVO().getDataTypeMessage());
+                            newDpvo.getMangoDataType().getLocalizableMessage(), dprt.getVO().getMangoDataType().getLocalizableMessage());
                     throw new DoAbortException(lm);
                 }
 
@@ -501,7 +502,7 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
                 newDpvo.setEventDetectors(new ArrayList<PointEventDetectorVO>());
                 newDpvo.setLoggingType(DataPointVO.LoggingTypes.ALL);
                 PersistentPointLocatorVO locator = new PersistentPointLocatorVO();
-                locator.setDataTypeId(newDpvo.getPointLocator().getDataTypeId());
+                locator.setMangoDataType(newDpvo.getMangoDataType());
                 newDpvo.setPointLocator(locator);
                 Common.ctx.getRuntimeManager().saveDataPoint(newDpvo);
             }

@@ -160,7 +160,7 @@ public class VersionCheck extends TimerTask {
 
                 if (datasourceTypes.length() > 0)
                     datasourceTypes.append(',');
-                datasourceTypes.append(config.getType().getId()).append(':').append(points);
+                datasourceTypes.append(config.getType().name()).append(':').append(points);
             }
         }
         postMethod.addParameter("datasourceTypes", datasourceTypes.toString());

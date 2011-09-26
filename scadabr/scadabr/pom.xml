@@ -3,10 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>br.org.scadabr</groupId>
-    <artifactId>scadabr</artifactId>
+    <artifactId>papaya</artifactId>
     <packaging>war</packaging>
-    <version>0.9.2-SNAPSHOT</version>
-    <name>ScadaBR</name>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>Papaya</name>
     <url>http://www.scadabr.org.br</url>
     
     <properties>
@@ -18,7 +18,7 @@
         <db.password></db.password>
         <db.pool.maxIdle></db.pool.maxIdle>
         <db.pool.maxActive></db.pool.maxActive>
-        <scadabr.branding>ScadaBR</scadabr.branding>
+        <scadabr.branding>Papaya</scadabr.branding>
     </properties>
 
     <repositories>

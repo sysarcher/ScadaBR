@@ -26,14 +26,15 @@ import java.util.List;
 
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class MultistateRenderer extends BaseTextRenderer {
     private static ImplDefinition definition = new ImplDefinition("textRendererMultistate", "MULTISTATE",
-            "textRenderer.multistate", new int[] { DataTypes.MULTISTATE });
+            "textRenderer.multistate", EnumSet.of( MangoDataType.MULTISTATE ));
 
     public static ImplDefinition getDefinition() {
         return definition;

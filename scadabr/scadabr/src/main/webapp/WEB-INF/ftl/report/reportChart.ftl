@@ -123,7 +123,7 @@
         <table>
           <tr><td colspan="2" class="pointName">${point.name}</td></tr>
           <tr>
-            <td class="label"><@fmt key="reports.dataType"/></td>
+            <td class="label"><@fmt key="reports.mangoDataType"/></td>
             <td>${point.dataTypeDescription}</td>
           </tr>
           <#if point.startValue??>
@@ -132,7 +132,7 @@
               <td>${point.startValue}</td>
             </tr>
           </#if>
-          <#if point.dataType == NUMERIC>
+          <#if point.mangoDataType == NUMERIC>
             <tr>
               <td class="label"><@fmt key="common.stats.min"/></td>
               <td>${point.analogMinimum} @ ${point.analogMinTime}</td>
@@ -153,7 +153,7 @@
               <td class="label"><@fmt key="common.stats.count"/></td>
               <td>${point.analogCount}</td>
             </tr>
-          <#elseif point.dataType == BINARY || point.dataType == MULTISTATE>
+          <#elseif point.mangoDataType == BINARY || point.mangoDataType == MULTISTATE>
             <tr>
               <td colspan="2">
                 <table>
@@ -173,7 +173,7 @@
                 </table>
               </td>
             </tr>
-          <#elseif point.dataType == ALPHANUMERIC || point.dataType == IMAGE>
+          <#elseif point.mangoDataType == ALPHANUMERIC || point.mangoDataType == IMAGE>
             <tr>
               <td class="label"><@fmt key="common.stats.count"/></td>
               <td>${point.valueChangeCount}</td>

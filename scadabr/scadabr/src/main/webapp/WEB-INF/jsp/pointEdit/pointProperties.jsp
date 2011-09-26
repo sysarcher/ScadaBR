@@ -17,11 +17,11 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
-<%@page import="com.serotonin.mango.DataTypes"%>
+<%@page import="com.serotonin.mango.MangoDataType"%>
 
 <script type="text/javascript">
   dojo.addOnLoad(function() {
-      if (dataTypeId == <%= DataTypes.NUMERIC %>)
+      if (mangoDataType == "<%= MangoDataType.NUMERIC.name() %>")
           show("engineeringUnitsSection");
   });
 </script>

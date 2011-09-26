@@ -30,13 +30,14 @@ import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonValue;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.DynamicImage;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.util.SerializationHelper;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -44,7 +45,7 @@ import com.serotonin.util.SerializationHelper;
 @JsonRemoteEntity
 public class DynamicGraphicComponent extends PointComponent {
     public static ImplDefinition DEFINITION = new ImplDefinition("dynamicGraphic", "DYNAMIC_GRAPHIC",
-            "graphic.dynamicGraphic", new int[] { DataTypes.NUMERIC });
+            "graphic.dynamicGraphic", EnumSet.of( MangoDataType.NUMERIC ));
 
     private DynamicImage dynamicImage;
     @JsonRemoteProperty

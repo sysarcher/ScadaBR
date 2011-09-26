@@ -47,7 +47,7 @@ public class Upgrade0_9_2 extends DBUpgrade {
         // Clean up mismatched point values.
         PointValueDao pointValueDao = new PointValueDao();
         for (DataPointVO dp : new DataPointDao().getDataPoints(null, false))
-            pointValueDao.deletePointValuesWithMismatchedType(dp.getId(), dp.getDataSourceTypeId());
+            pointValueDao.deletePointValuesWithMismatchedType(dp.getId(), dp.getMangoDataType()); //TODO Bug ex: dataSourceTypeId()
     }
 
     @Override

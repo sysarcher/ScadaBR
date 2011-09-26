@@ -45,8 +45,8 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.dataSource.DataSourceVO.Type;
 import com.serotonin.mango.vo.dataSource.modbus.ModbusIpDataSourceVO;
 import com.serotonin.mango.vo.dataSource.modbus.ModbusIpDataSourceVO.TransportType;
 import com.serotonin.mango.vo.dataSource.modbus.ModbusPointLocatorVO;
@@ -252,7 +252,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 			checkValidWriteCommand(dp, itemValue);
 			checkValidWritableDataPoint(dp);
 			MangoValue value = MangoValue.stringToValue(itemValue.getValue()
-					.toString(), dp.getPointLocator().getDataTypeId());
+					.toString(), dp.getPointLocator().getMangoDataType());
 			Common.ctx.getRuntimeManager().setDataPointValue(dp.getId(), value,
 					null);
 			flag = true;
@@ -273,7 +273,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 
 					MangoValue value = MangoValue.stringToValue(itemValue
 							.getValue().toString(), dataPointVO
-							.getPointLocator().getDataTypeId());
+							.getPointLocator().getMangoDataType());
 					Common.ctx.getRuntimeManager().setDataPointValue(
 							dataPointVO.getId(), value, null);
 
@@ -387,7 +387,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 			checkValidWritableDataPoint(dp);
 
 			MangoValue value = MangoValue.stringToValue(itemValue.getValue(),
-					dp.getPointLocator().getDataTypeId());
+					dp.getPointLocator().getMangoDataType());
 			Common.ctx.getRuntimeManager().setDataPointValue(dp.getId(), value,
 					null);
 
@@ -410,7 +410,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 
 					MangoValue value = MangoValue.stringToValue(itemValue
 							.getValue(), dataPointVO.getPointLocator()
-							.getDataTypeId());
+							.getMangoDataType());
 					Common.ctx.getRuntimeManager().setDataPointValue(
 							dataPointVO.getId(), value, null);
 
@@ -466,8 +466,8 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 						}
 
 						itemInfo.setDataType(APIUtils.toDataType(dataPointVO
-								.getPointLocator().getDataTypeId()));
-						dataPointVO.getPointLocator().getDataTypeId();
+								.getPointLocator().getMangoDataType()));
+						dataPointVO.getPointLocator().getMangoDataType();
 						itemInfoList.add(itemInfo);
 					}
 				}
@@ -760,7 +760,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 	public List<Object> getDataSources(DataSourceType dataSourceType)
 			throws ScadaBRAPIException {
 		checkUser();
-		Type dsType = getDataSourceType(dataSourceType);
+		DataSourceRegistry dsType = getDataSourceType(dataSourceType);
 
 		List<DataSourceVO<?>> allDataSources = new DataSourceDao()
 				.getDataSources();
@@ -788,7 +788,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 
 	private Object getDataSourceConfig(DataSourceVO<?> dataSourceVO)
 			throws ScadaBRAPIException {
-		if (dataSourceVO.getType() == Type.MODBUS_IP) {
+		if (dataSourceVO.getType() == DataSourceRegistry.MODBUS_IP) {
 			ModbusIpDataSourceVO modbusDS = (ModbusIpDataSourceVO) dataSourceVO;
 
 			ModbusIPConfig dataSource = new ModbusIPConfig();
@@ -806,7 +806,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 			dataSource.setTimeout(modbusDS.getTimeout());
 
 			return dataSource;
-		} else if (dataSourceVO.getType() == Type.MODBUS_SERIAL) {
+		} else if (dataSourceVO.getType() == DataSourceRegistry.MODBUS_SERIAL) {
 			ModbusSerialDataSourceVO modbusDS = (ModbusSerialDataSourceVO) dataSourceVO;
 			ModbusSerialConfig dataSource = new ModbusSerialConfig();
 			dataSource.setId(modbusDS.getId());
@@ -851,12 +851,12 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 		return periodInMillis;
 	}
 
-	private Type getDataSourceType(DataSourceType dsType)
+	private DataSourceRegistry getDataSourceType(DataSourceType dsType)
 			throws ScadaBRAPIException {
 		if (dsType == DataSourceType.MODBUS_IP)
-			return Type.MODBUS_IP;
+			return DataSourceRegistry.MODBUS_IP;
 		else if (dsType == DataSourceType.MODBUS_SERIAL)
-			return Type.MODBUS_SERIAL;
+			return DataSourceRegistry.MODBUS_SERIAL;
 		throw new ScadaBRAPIException(new APIError(ErrorCode.INVALID_PARAMETER,
 				"DS type not supported yet"));
 	}
@@ -1198,8 +1198,8 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 		if (ds == null)
 			throw new ScadaBRAPIException(new APIError(ErrorCode.INVALID_ID,
 					"Data Source inexistent"));
-		else if (ds.getType() != Type.MODBUS_IP
-				&& ds.getType() != Type.MODBUS_SERIAL)
+		else if (ds.getType() != DataSourceRegistry.MODBUS_IP
+				&& ds.getType() != DataSourceRegistry.MODBUS_SERIAL)
 			throw new ScadaBRAPIException(new APIError(ErrorCode.INVALID_ID,
 					"Data Points not supported!"));
 	}

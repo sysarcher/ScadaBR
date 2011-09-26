@@ -47,7 +47,7 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.PropertyReferences;
 import com.serotonin.bacnet4j.util.PropertyValues;
 import com.serotonin.db.IntValuePair;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.util.queue.ByteQueue;
 import com.serotonin.web.i18n.I18NUtils;
 
@@ -253,7 +253,7 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
             if (ObjectType.binaryInput.equals(oid.getObjectType())
                     || ObjectType.binaryOutput.equals(oid.getObjectType())
                     || ObjectType.binaryValue.equals(oid.getObjectType())) {
-                bean.setDataTypeId(DataTypes.BINARY);
+                bean.setMangoDataType(MangoDataType.BINARY);
                 bean.getUnitsDescription().add("");
                 bean.getUnitsDescription().add("");
             }
@@ -262,10 +262,10 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
                     || ObjectType.multiStateValue.equals(oid.getObjectType())
                     || ObjectType.lifeSafetyPoint.equals(oid.getObjectType())
                     || ObjectType.lifeSafetyZone.equals(oid.getObjectType())) {
-                bean.setDataTypeId(DataTypes.MULTISTATE);
+                bean.setMangoDataType(MangoDataType.MULTISTATE);
             }
             else
-                bean.setDataTypeId(DataTypes.NUMERIC);
+                bean.setMangoDataType(MangoDataType.NUMERIC);
 
             objectProperties.put(oid, bean);
         }

@@ -22,8 +22,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -32,7 +33,7 @@ import com.serotonin.mango.view.ImplDefinition;
 // Use ViewComponent instead
 public class BasicImageRenderer extends BaseGraphicRenderer {
     private static ImplDefinition definition = new ImplDefinition("graphicRendererBasicImage", "BASIC_IMAGE",
-            "graphic.basicImage", new int[] { DataTypes.IMAGE });
+            "graphic.basicImage", EnumSet.of( MangoDataType.IMAGE ));
 
     public static ImplDefinition getDefinition() {
         return definition;

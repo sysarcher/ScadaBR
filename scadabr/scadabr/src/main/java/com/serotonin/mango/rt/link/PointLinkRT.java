@@ -24,7 +24,7 @@ import java.util.Map;
 import javax.script.ScriptException;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.DataPointListener;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
@@ -102,7 +102,7 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
             return;
         }
 
-        int targetDataType = targetPoint.getVO().getPointLocator().getDataTypeId();
+        final MangoDataType targetDataType = targetPoint.getVO().getPointLocator().getMangoDataType();
 
         if (!StringUtils.isEmpty(vo.getScript())) {
             ScriptExecutor scriptExecutor = new ScriptExecutor();
@@ -129,7 +129,7 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
             }
         }
 
-        if (DataTypes.getDataType(newValue.getValue()) != targetDataType) {
+        if (newValue.getValue().getMangoDataType() != targetDataType) {
             raiseFailureEvent(newValue.getTime(), new LocalizableMessage("event.pointLink.convertError"));
             return;
         }

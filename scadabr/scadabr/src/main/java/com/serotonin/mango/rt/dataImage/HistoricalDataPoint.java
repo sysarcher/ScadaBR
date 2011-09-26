@@ -3,18 +3,19 @@ package com.serotonin.mango.rt.dataImage;
 import java.util.List;
 
 import com.serotonin.NotImplementedException;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.timer.SimulationTimer;
 
 public class HistoricalDataPoint implements IDataPoint {
     private final int id;
-    private final int dataTypeId;
+    private final MangoDataType mangoDataType;
     private final PointValueDao pointValueDao;
     private final SimulationTimer timer;
 
-    public HistoricalDataPoint(int id, int dataTypeId, SimulationTimer timer, PointValueDao pointValueDao) {
+    public HistoricalDataPoint(int id, MangoDataType mangoDataType, SimulationTimer timer, PointValueDao pointValueDao) {
         this.id = id;
-        this.dataTypeId = dataTypeId;
+        this.mangoDataType = mangoDataType;
         this.pointValueDao = pointValueDao;
         this.timer = timer;
     }
@@ -64,7 +65,7 @@ public class HistoricalDataPoint implements IDataPoint {
     }
 
     @Override
-    public int getDataTypeId() {
-        return dataTypeId;
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 }

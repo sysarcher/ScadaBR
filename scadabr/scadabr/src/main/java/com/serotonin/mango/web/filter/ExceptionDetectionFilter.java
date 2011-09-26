@@ -35,6 +35,7 @@ import com.serotonin.mango.vo.permission.PermissionException;
 public class ExceptionDetectionFilter implements AjaxFilter {
     private static final Log LOG = LogFactory.getLog(ExceptionDetectionFilter.class);
 
+    @Override
     public Object doFilter(Object obj, Method method, Object[] params, AjaxFilterChain chain) throws Exception {
         try {
             return chain.doFilter(obj, method, params);

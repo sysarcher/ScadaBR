@@ -32,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.db.dao.WatchListDao;
@@ -277,7 +277,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
                     else
                         format = "#." + StringUtils.pad("", '#', precision);
 
-                    locator.setDataTypeId(DataTypes.NUMERIC);
+                    locator.setMangoDataType(MangoDataType.NUMERIC);
 
                     if (numericConfig.isFahrenheit()) {
                         dp.setEngineeringUnits(EngineeringUnits.degreesFahrenheit.intValue());
@@ -295,7 +295,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
                     dp.setTextRenderer(new BinaryTextRenderer(binaryConfig.getFalseText(), "#222222", binaryConfig
                             .getTrueText(), "#000000"));
 
-                    locator.setDataTypeId(DataTypes.BINARY);
+                    locator.setMangoDataType(MangoDataType.BINARY);
                 }
                 else if (pointConfig instanceof MultistatePoint) {
                     MultistatePoint multistateConfig = (MultistatePoint) pointConfig;
@@ -306,7 +306,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
                         r.addMultistateValue(i++, label, "#000000");
                     dp.setTextRenderer(r);
 
-                    locator.setDataTypeId(DataTypes.MULTISTATE);
+                    locator.setMangoDataType(MangoDataType.MULTISTATE);
                 }
                 else
                     throw new ShouldNeverHappenException("Unknown point type: " + pointConfig.getClass());
@@ -413,11 +413,11 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
             return;
 
         MangoValue mangoValue;
-        int dataTypeId = rt.getVO().getPointLocator().getDataTypeId();
+        final MangoDataType mangoDataType = rt.getVO().getMangoDataType();
         if (point instanceof NumericPoint) {
             NumericPoint numericConfig = (NumericPoint) point;
-            if (dataTypeId != DataTypes.NUMERIC)
-                throw new ShouldNeverHappenException("Data type mismatch: " + point.getClass() + ", type=" + dataTypeId);
+            if (mangoDataType != MangoDataType.NUMERIC)
+                throw new ShouldNeverHappenException("Data type mismatch: " + point.getClass() + ", type=" + mangoDataType.name());
 
             double d = numericConfig.fromDeviceFormat(deviceValue);
             if (vo.isConvertToCelsius() && numericConfig.isFahrenheit())
@@ -426,15 +426,15 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
         }
         else if (point instanceof BinaryPoint) {
             BinaryPoint binaryConfig = (BinaryPoint) point;
-            if (dataTypeId != DataTypes.BINARY)
-                throw new ShouldNeverHappenException("Data type mismatch: " + point.getClass() + ", type=" + dataTypeId);
+            if (mangoDataType != MangoDataType.BINARY)
+                throw new ShouldNeverHappenException("Data type mismatch: " + point.getClass() + ", type=" + mangoDataType.name());
 
             mangoValue = new BinaryValue(binaryConfig.fromDeviceFormat(deviceValue));
         }
         else if (point instanceof MultistatePoint) {
             MultistatePoint multistateConfig = (MultistatePoint) point;
-            if (dataTypeId != DataTypes.MULTISTATE)
-                throw new ShouldNeverHappenException("Data type mismatch: " + point.getClass() + ", type=" + dataTypeId);
+            if (mangoDataType != MangoDataType.MULTISTATE)
+                throw new ShouldNeverHappenException("Data type mismatch: " + point.getClass() + ", type=" + mangoDataType.name());
 
             mangoValue = new MultistateValue(multistateConfig.fromDeviceFormat(deviceValue));
         }

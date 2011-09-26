@@ -35,6 +35,7 @@ import com.serotonin.mango.rt.dataSource.modbus.ModbusSerialDataSource;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.modbus4j.serial.SerialMaster;
 import com.serotonin.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
@@ -43,7 +44,6 @@ import com.serotonin.web.i18n.LocalizableMessage;
 
 @JsonRemoteEntity
 public class ModbusSerialDataSourceVO extends ModbusDataSourceVO<ModbusSerialDataSourceVO> implements JsonSerializable {
-    public static final Type TYPE = Type.MODBUS_SERIAL;
 
     public enum EncodingType {
         RTU("dsEdit.modbusSerial.encoding.rtu"), //
@@ -77,8 +77,8 @@ public class ModbusSerialDataSourceVO extends ModbusDataSourceVO<ModbusSerialDat
     }
 
     @Override
-    public Type getType() {
-        return TYPE;
+    public DataSourceRegistry getType() {
+        return DataSourceRegistry.MODBUS_SERIAL;
     }
 
     @Override

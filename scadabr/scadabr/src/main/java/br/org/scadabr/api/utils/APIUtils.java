@@ -31,7 +31,6 @@ import br.org.scadabr.api.vo.ModbusIPConfig;
 import br.org.scadabr.api.vo.ModbusPointConfig;
 import br.org.scadabr.api.vo.ModbusSerialConfig;
 
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.ScheduledEventDao;
@@ -117,15 +116,15 @@ public final class APIUtils {
 		try {
 			if (DataType.BOOLEAN == dataType) {
 				System.out.println("Checando " + value + " para binario!");
-				MangoValue.stringToValue(value, DataTypes.BINARY);
+				MangoValue.stringToValue(value, com.serotonin.mango.MangoDataType.BINARY);
 			} else if (DataType.INTEGER == dataType) {
-				MangoValue.stringToValue(value, DataTypes.NUMERIC);
+				MangoValue.stringToValue(value, com.serotonin.mango.MangoDataType.NUMERIC);
 			} else if (DataType.DOUBLE == dataType) {
-				MangoValue.stringToValue(value, DataTypes.NUMERIC);
+				MangoValue.stringToValue(value, com.serotonin.mango.MangoDataType.NUMERIC);
 			} else if (DataType.STRING == dataType) {
-				MangoValue.stringToValue(value, DataTypes.ALPHANUMERIC);
+				MangoValue.stringToValue(value, com.serotonin.mango.MangoDataType.ALPHANUMERIC);
 			} else if (DataType.DOUBLE == dataType) {
-				MangoValue.stringToValue(value, DataTypes.NUMERIC);
+				MangoValue.stringToValue(value, com.serotonin.mango.MangoDataType.NUMERIC);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -839,14 +838,14 @@ public final class APIUtils {
 		return null;
 	}
 
-	public static DataType toDataType(int mangoDataType) {
-		if (mangoDataType == DataTypes.ALPHANUMERIC)
+	public static DataType toDataType(com.serotonin.mango.MangoDataType mangoDataType) {
+		if (mangoDataType == com.serotonin.mango.MangoDataType.ALPHANUMERIC)
 			return DataType.STRING;
-		else if (mangoDataType == DataTypes.BINARY)
+		else if (mangoDataType == com.serotonin.mango.MangoDataType.BINARY)
 			return DataType.BOOLEAN;
-		else if (mangoDataType == DataTypes.NUMERIC)
+		else if (mangoDataType == com.serotonin.mango.MangoDataType.NUMERIC)
 			return DataType.DOUBLE;
-		else if (mangoDataType == DataTypes.MULTISTATE)
+		else if (mangoDataType == com.serotonin.mango.MangoDataType.MULTISTATE)
 			return DataType.INTEGER;
 		return null;
 	}

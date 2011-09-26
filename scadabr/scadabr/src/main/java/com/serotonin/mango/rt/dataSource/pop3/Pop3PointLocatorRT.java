@@ -22,7 +22,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.pop3.Pop3PointLocatorVO;
 import com.serotonin.util.StringUtils;
@@ -34,7 +34,7 @@ public class Pop3PointLocatorRT extends PointLocatorRT {
     private final boolean findInSubject;
     private final Pattern valuePattern;
     private final boolean ignoreIfMissing;
-    private final int dataTypeId;
+    private final MangoDataType mangoDataType;
     private String binary0Value;
     private DecimalFormat valueFormat;
     private final Pattern timePattern;
@@ -46,11 +46,11 @@ public class Pop3PointLocatorRT extends PointLocatorRT {
         findInSubject = vo.isFindInSubject();
         valuePattern = Pattern.compile(vo.getValueRegex());
         ignoreIfMissing = vo.isIgnoreIfMissing();
-        dataTypeId = vo.getDataTypeId();
+        mangoDataType = vo.getMangoDataType();
 
-        if (dataTypeId == DataTypes.BINARY)
+        if (mangoDataType == MangoDataType.BINARY)
             binary0Value = vo.getValueFormat();
-        else if (dataTypeId == DataTypes.NUMERIC && !StringUtils.isEmpty(vo.getValueFormat()))
+        else if (mangoDataType == MangoDataType.NUMERIC && !StringUtils.isEmpty(vo.getValueFormat()))
             valueFormat = new DecimalFormat(vo.getValueFormat());
 
         useReceivedTime = vo.isUseReceivedTime();
@@ -87,8 +87,8 @@ public class Pop3PointLocatorRT extends PointLocatorRT {
         return valueFormat;
     }
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
     public String getBinary0Value() {

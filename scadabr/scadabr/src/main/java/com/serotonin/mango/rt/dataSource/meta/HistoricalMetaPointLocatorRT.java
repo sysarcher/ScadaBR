@@ -32,7 +32,7 @@ public class HistoricalMetaPointLocatorRT extends MetaPointLocatorRT {
         PointValueDao pointValueDao = new PointValueDao();
         for (IntValuePair contextEntry : vo.getContext()) {
             DataPointVO cvo = dataPointDao.getDataPoint(contextEntry.getKey());
-            HistoricalDataPoint point = new HistoricalDataPoint(cvo.getId(), cvo.getPointLocator().getDataTypeId(),
+            HistoricalDataPoint point = new HistoricalDataPoint(cvo.getId(), cvo.getPointLocator().getMangoDataType(),
                     timer, pointValueDao);
             context.put(contextEntry.getValue(), point);
         }

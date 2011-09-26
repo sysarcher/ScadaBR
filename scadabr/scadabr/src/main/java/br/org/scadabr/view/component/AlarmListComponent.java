@@ -16,17 +16,19 @@ import org.directwebremoting.WebContextFactory;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.web.dwr.BaseDwr;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class AlarmListComponent extends CustomComponent {
 
 	public static ImplDefinition DEFINITION = new ImplDefinition("alarmlist",
-			"ALARMLIST", "graphic.alarmlist", new int[] {});
+			"ALARMLIST", "graphic.alarmlist", EnumSet.noneOf(MangoDataType.class));
 
 	@JsonRemoteProperty
 	private int minAlarmLevel = 1;

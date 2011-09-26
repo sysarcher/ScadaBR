@@ -19,7 +19,7 @@
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
 <%@page import="com.serotonin.mango.Common"%>
 <%@page import="com.serotonin.mango.vo.event.EventHandlerVO"%>
-<%@page import="com.serotonin.mango.DataTypes"%>
+<%@page import="com.serotonin.mango.MangoDataType"%>
 <c:set var="NEW_ID"><%= Common.NEW_ID %></c:set>
 
 <tag:page dwr="EventHandlersDwr,ScriptsDwr" js="emailRecipients" onload="init">
@@ -359,14 +359,14 @@
                 function(content) { $("inactiveValueToSetContent").innerHTML = content; });
         
         // Update the source point lists.
-        var targetDataTypeId = getPoint(targetPointId).dataType;
+        var targetMangoDataType = getPoint(targetPointId).mangoDataType;
         var activeSourceSelect = $("activePointId");
         dwr.util.removeAllOptions(activeSourceSelect);
         var inactiveSourceSelect = $("inactivePointId");
         dwr.util.removeAllOptions(inactiveSourceSelect);
         for (var i=0; i<allPoints.length; i++) {
             dp = allPoints[i];
-            if (dp.id != targetPointId && dp.dataType == targetDataTypeId) {
+            if (dp.id != targetPointId && dp.mangoDataType == targetMangoDataType) {
                 activeSourceSelect.options[activeSourceSelect.options.length] = new Option(dp.name, dp.id);
                 inactiveSourceSelect.options[activeSourceSelect.options.length] = new Option(dp.name, dp.id);
             }

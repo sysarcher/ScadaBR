@@ -55,7 +55,7 @@ public class IEC101DataSource extends PollingDataSource {
 
 			for (DataElement dataElement : elements) {
 				MangoValue value = MangoValue.stringToValue(dataElement
-						.getValue(), pointLocator.getDataTypeId());
+						.getValue(), pointLocator.getMangoDataType());
 				Calendar ts = Calendar.getInstance();
 				ts.setTimeInMillis(dataElement.getTimestamp());
 				dataPoint.updatePointValue(new PointValueTime(value, ts

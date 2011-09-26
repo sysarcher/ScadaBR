@@ -34,7 +34,7 @@ import org.springframework.web.util.WebUtils;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.view.chart.BaseChartRenderer;
@@ -99,9 +99,9 @@ public class DataPointEditController extends SimpleFormController {
 
         result.put("dataSource", Common.ctx.getRuntimeManager().getDataSource(point.getDataSourceId()));
 
-        result.put("textRenderers", BaseTextRenderer.getImplementation(point.getPointLocator().getDataTypeId()));
-        result.put("chartRenderers", BaseChartRenderer.getImplementations(point.getPointLocator().getDataTypeId()));
-        result.put("eventDetectors", PointEventDetectorVO.getImplementations(point.getPointLocator().getDataTypeId()));
+        result.put("textRenderers", BaseTextRenderer.getImplementation(point.getPointLocator().getMangoDataType()));
+        result.put("chartRenderers", BaseChartRenderer.getImplementations(point.getPointLocator().getMangoDataType()));
+        result.put("eventDetectors", PointEventDetectorVO.getImplementations(point.getPointLocator().getMangoDataType()));
 
         ControllerUtils.addPointListDataToModel(Common.getUser(request), point.getId(), result);
 
@@ -139,7 +139,7 @@ public class DataPointEditController extends SimpleFormController {
         }
 
         if (point.getLoggingType() == DataPointVO.LoggingTypes.ON_CHANGE
-                && point.getPointLocator().getDataTypeId() == DataTypes.NUMERIC) {
+                && point.getPointLocator().getMangoDataType() == MangoDataType.NUMERIC) {
             if (point.getTolerance() < 0)
                 ValidationUtils.rejectValue(errors, "tolerance", "validate.cannotBeNegative");
         }

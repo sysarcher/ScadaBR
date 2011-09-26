@@ -33,8 +33,8 @@
   
   function editPointCBImpl(locator) {
       $set("settable", locator.settable);
-      $set("dataTypeId", locator.dataTypeId);
-      DataSourceEditDwr.getChangeTypes(locator.dataTypeId, function(data) {
+      $set("mangoDataType", locator.mangoDataType);
+      DataSourceEditDwr.getChangeTypes(locator.mangoDataType, function(data) {
           changeDataTypeCB(data);
           $set("changeTypeId", locator.changeTypeId);
           changeDataType();
@@ -53,7 +53,7 @@
       delete locator.analogAttractorChange.description;
       
       locator.settable = $get("settable");
-      locator.dataTypeId = $get("dataTypeId");
+      locator.mangoDataType = $get("mangoDataType");
       locator.changeTypeId = $get("changeTypeId");
       locator.alternateBooleanChange.startValue = $get("alternateBooleanChange.startValue");
       locator.brownianChange.min = $get("brownianChange.min");
@@ -82,7 +82,7 @@
   }
   
   function changeDataType() {
-      DataSourceEditDwr.getChangeTypes($get("dataTypeId"), changeDataTypeCB);
+      DataSourceEditDwr.getChangeTypes($get("mangoDataType"), changeDataTypeCB);
   }
   
   function changeDataTypeCB(changeTypes) {
@@ -206,7 +206,7 @@
   <tr>
     <td class="formLabelRequired"><fmt:message key="dsEdit.pointDataType"/></td>
     <td class="formField">
-      <select id="dataTypeId" onchange="changeDataType();">
+      <select id="mangoDataType" onchange="changeDataType();">
         <tag:dataTypeOptions excludeImage="true"/>
       </select>
     </td>

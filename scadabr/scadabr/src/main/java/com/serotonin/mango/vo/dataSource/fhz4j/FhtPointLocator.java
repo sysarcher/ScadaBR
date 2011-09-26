@@ -20,7 +20,6 @@ import net.sf.fhz4j.FhzProtocol;
 
 import net.sf.fhz4j.fht.FhtDeviceTypes;
 import net.sf.fhz4j.fht.FhtProperty;
-import net.sf.fhz4j.scada.ScadaProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

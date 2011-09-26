@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view;
 
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.view.graphic.GraphicRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.util.StringUtils;
@@ -54,8 +55,8 @@ public class PointView {
         return settableOverride;
     }
 
-    public int getDataType() {
-        return dataPoint.getPointLocator().getDataTypeId();
+    public MangoDataType getMangoDataType() {
+        return dataPoint.getPointLocator().getMangoDataType();
     }
 
     public int getId() {

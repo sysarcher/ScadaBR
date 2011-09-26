@@ -34,7 +34,7 @@ import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.openv4j.OpenV4JPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -54,24 +54,24 @@ public class OpenV4JPointLocatorVO extends AbstractPointLocatorVO implements Jso
     private DataPoint dataPoint = DataPoint.COMMON_CONFIG_DEVICE_TYPE_ID;
 
     @Override
-    public int getDataTypeId() {
+    public MangoDataType getMangoDataType() {
         if (dataPoint == null) {
-            return DataTypes.UNKNOWN;
+            return MangoDataType.UNKNOWN;
         }
         switch (dataPoint.getType()) {
         case BOOL:
-            return DataTypes.BINARY;
+            return MangoDataType.BINARY;
         case SHORT_HEX:
         case CYCLE_TIMES:
         case ERROR_LIST_ENTRY:
         case TIME_STAMP_8:
-            return DataTypes.ALPHANUMERIC;
+            return MangoDataType.ALPHANUMERIC;
         case BYTE:
         case SHORT:
         case INTEGER:
-            return DataTypes.NUMERIC;
+            return MangoDataType.NUMERIC;
         default:
-            return DataTypes.UNKNOWN;
+            return MangoDataType.UNKNOWN;
         }
     }
 

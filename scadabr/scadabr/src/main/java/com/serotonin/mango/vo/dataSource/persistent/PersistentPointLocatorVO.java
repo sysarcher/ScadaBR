@@ -6,13 +6,16 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 
 import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.json.JsonRemoteProperty;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.persistent.PersistentPointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
 
+
+//TODO apl add datatTyoe to JSON export ???
 @JsonRemoteEntity
 public class PersistentPointLocatorVO extends AbstractPointLocatorVO {
     public PointLocatorRT createRuntime() {
@@ -23,14 +26,16 @@ public class PersistentPointLocatorVO extends AbstractPointLocatorVO {
         return new LocalizableMessage("common.noMessage");
     }
 
-    private int dataTypeId;
+    @JsonRemoteProperty(alias=MangoDataType.ALIAS_DATA_TYPE)
+    private MangoDataType mangoDataType = MangoDataType.UNKNOWN;
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    @Override
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setMangoDataType(MangoDataType mangoDataType) {
+        this.mangoDataType = mangoDataType;
     }
 
     public boolean isSettable() {
@@ -38,8 +43,6 @@ public class PersistentPointLocatorVO extends AbstractPointLocatorVO {
     }
 
     public void validate(DwrResponseI18n response) {
-        if (!DataTypes.CODES.isValidId(dataTypeId))
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
     }
 
     @Override
@@ -62,7 +65,7 @@ public class PersistentPointLocatorVO extends AbstractPointLocatorVO {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(dataTypeId);
+        out.writeInt(mangoDataType.mangoId);
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
@@ -70,7 +73,7 @@ public class PersistentPointLocatorVO extends AbstractPointLocatorVO {
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            dataTypeId = in.readInt();
+            mangoDataType = MangoDataType.fromMangoId(in.readInt());
         }
     }
 }

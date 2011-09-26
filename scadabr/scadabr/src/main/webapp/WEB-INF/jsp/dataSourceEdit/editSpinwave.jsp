@@ -209,7 +209,7 @@
       delete locator.attributeDescription;
       delete locator.attributeTypes;
       delete locator.settable;
-      delete locator.dataTypeId;
+      delete locator.mangoDataType;
       
       locator.sensorAddress = $get("sensorAddress");
       locator.attributeId = $get("attributeId");

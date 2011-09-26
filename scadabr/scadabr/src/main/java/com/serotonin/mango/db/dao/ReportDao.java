@@ -30,7 +30,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
@@ -253,7 +253,7 @@ public class ReportDao extends BaseDao {
         // For each point.
         for (PointInfo pointInfo : points) {
             DataPointVO point = pointInfo.getPoint();
-            int dataType = point.getPointLocator().getDataTypeId();
+            MangoDataType dataType = point.getPointLocator().getMangoDataType();
 
             MangoValue startValue = null;
             if (!instance.isFromInception()) {
@@ -263,7 +263,7 @@ public class ReportDao extends BaseDao {
                     startValue = pvt.getValue();
 
                 // Make sure the data types match
-                if (DataTypes.getDataType(startValue) != dataType)
+                if (startValue.getMangoDataType() != dataType)
                     startValue = null;
             }
 
@@ -273,7 +273,7 @@ public class ReportDao extends BaseDao {
             int reportPointId = doInsert(
                     REPORT_INSTANCE_POINTS_INSERT,
                     new Object[] { instance.getId(), point.getDeviceName(), name, dataType,
-                            DataTypes.valueToString(startValue),
+                            startValue.getMangoDataType(),
                             SerializationHelper.writeObject(point.getTextRenderer()), pointInfo.getColour(),
                             boolToChar(pointInfo.isConsolidatedChart()) }, new int[] { Types.INTEGER, Types.VARCHAR,
                             Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.BLOB, Types.VARCHAR, Types.CHAR });
@@ -426,10 +426,10 @@ public class ReportDao extends BaseDao {
                         rp.setReportPointId(rs.getInt(1));
                         rp.setDeviceName(rs.getString(2));
                         rp.setPointName(rs.getString(3));
-                        rp.setDataType(rs.getInt(4));
+                        rp.setMangoDataType(MangoDataType.fromMangoId(rs.getInt(4)));
                         String startValue = rs.getString(5);
                         if (startValue != null)
-                            rp.setStartValue(MangoValue.stringToValue(startValue, rp.getDataType()));
+                            rp.setStartValue(MangoValue.stringToValue(startValue, rp.getMangoDataType()));
                         rp.setTextRenderer((TextRenderer) SerializationHelper.readObject(rs.getBlob(6)
                                 .getBinaryStream()));
                         rp.setColour(rs.getString(7));
@@ -443,26 +443,25 @@ public class ReportDao extends BaseDao {
             handler.startPoint(point);
 
             rdv.setReportPointId(point.getReportPointId());
-            final int dataType = point.getDataType();
             ejt.query(REPORT_INSTANCE_DATA_SELECT + "where rd.reportInstancePointId=? order by rd.ts",
                     new Object[] { point.getReportPointId() }, new RowCallbackHandler() {
                         public void processRow(ResultSet rs) throws SQLException {
-                            switch (dataType) {
-                            case (DataTypes.NUMERIC):
+                            switch (point.getMangoDataType()) {
+                            case NUMERIC:
                                 rdv.setValue(new NumericValue(rs.getDouble(1)));
                                 break;
-                            case (DataTypes.BINARY):
+                            case BINARY:
                                 rdv.setValue(new BinaryValue(rs.getDouble(1) == 1));
                                 break;
-                            case (DataTypes.MULTISTATE):
+                            case MULTISTATE:
                                 rdv.setValue(new MultistateValue(rs.getInt(1)));
                                 break;
-                            case (DataTypes.ALPHANUMERIC):
+                            case ALPHANUMERIC:
                                 rdv.setValue(new AlphanumericValue(rs.getString(2)));
                                 if (rs.wasNull())
                                     rdv.setValue(new AlphanumericValue(rs.getString(3)));
                                 break;
-                            case (DataTypes.IMAGE):
+                            case IMAGE:
                                 rdv.setValue(new ImageValue(Integer.parseInt(rs.getString(2)), rs.getInt(1)));
                                 break;
                             default:

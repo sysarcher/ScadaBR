@@ -10,7 +10,7 @@ import br.org.scadabr.rt.dataSource.alpha2.Alpha2PointLocatorRT;
 import com.i2msolucoes.alpha24j.DeviceLocator.DeviceCodes;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
@@ -34,11 +34,11 @@ public class Alpha2PointLocatorVO extends AbstractPointLocatorVO {
 	// and write
 
 	@Override
-	public int getDataTypeId() {
+	public MangoDataType getMangoDataType() {
 		if ((deviceCodeId == RUN_STOP_CODE)
 				|| (deviceCodeId == DeviceCodes.SYSTEM_BIT.getId())
 				|| (deviceCodeId == DeviceCodes.COMM_BIT_DEVICE.getId()))
-			return DataTypes.BINARY;
+			return MangoDataType.BINARY;
 
 		if ((deviceCodeId == DeviceCodes.ANALOG_IN.getId())
 				|| (deviceCodeId == DeviceCodes.COMM_WORD_DEVICE.getId())
@@ -48,9 +48,9 @@ public class Alpha2PointLocatorVO extends AbstractPointLocatorVO {
 				|| (deviceCodeId == DeviceCodes.EXTERNAL_INPUT.getId())
 				|| (deviceCodeId == DeviceCodes.LINK_OUTPUT.getId())
 				|| (deviceCodeId == DeviceCodes.LINK_INPUT.getId()))
-			return DataTypes.NUMERIC;
+			return MangoDataType.NUMERIC;
 
-		return DataTypes.ALPHANUMERIC;
+		return MangoDataType.ALPHANUMERIC;
 	}
 
 	@Override

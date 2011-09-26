@@ -314,7 +314,7 @@ abstract public class ViewComponent implements Serializable, JsonSerializable {
                 DataPointVO dataPoint = new DataPointDao().getDataPoint(xid);
                 if (dataPoint == null)
                     throw new LocalizableJsonException("emport.error.missingPoint", xid);
-                if (!comp.definition().supports(dataPoint.getPointLocator().getDataTypeId()))
+                if (!comp.definition().supports(dataPoint.getPointLocator().getMangoDataType()))
                     throw new LocalizableJsonException("emport.error.component.incompatibleDataType", xid, definition()
                             .getExportName());
                 comp.tsetDataPoint(dataPoint);

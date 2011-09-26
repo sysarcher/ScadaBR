@@ -15,7 +15,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
@@ -47,14 +47,14 @@ public class IEC101PointLocatorVO extends AbstractPointLocatorVO implements
 	}
 
 	@Override
-	public int getDataTypeId() {
+	public MangoDataType getMangoDataType() {
 		if (iec101DataType == IEC101Master.SINGLE_POINT_INFORMATION)
-			return DataTypes.BINARY;
+			return MangoDataType.BINARY;
 		else if (iec101DataType == IEC101Master.DOUBLE_POINT_INFORMATION)
-			return DataTypes.ALPHANUMERIC;
+			return MangoDataType.ALPHANUMERIC;
 		else if (iec101DataType == IEC101Master.NORMALIZED_MEASURE)
-			return DataTypes.NUMERIC;
-		return DataTypes.ALPHANUMERIC;
+			return MangoDataType.NUMERIC;
+		return MangoDataType.ALPHANUMERIC;
 	}
 
 	@Override

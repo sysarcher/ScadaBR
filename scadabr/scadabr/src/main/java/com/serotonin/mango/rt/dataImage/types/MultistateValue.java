@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataImage.types;
 
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 
 /**
  * @author Matthew Lohbihler
@@ -78,8 +78,8 @@ public class MultistateValue extends MangoValue implements Comparable<Multistate
     }
 
     @Override
-    public int getDataType() {
-        return DataTypes.MULTISTATE;
+    public MangoDataType getMangoDataType() {
+        return MangoDataType.MULTISTATE;
     }
 
     @Override

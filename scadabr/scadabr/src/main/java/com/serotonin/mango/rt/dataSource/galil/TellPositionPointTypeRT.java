@@ -41,7 +41,7 @@ public class TellPositionPointTypeRT extends PointTypeRT {
 
     @Override
     public MangoValue parsePollResponse(String data, String pointName) throws LocalizableException {
-        double value = parseValue(data, vo.getDataTypeId(), pointName).getDoubleValue();
+        double value = parseValue(data, vo.getMangoDataType(), pointName).getDoubleValue();
 
         value = rawToEngineeringUnits(value, vo.getScaleRawLow(), vo.getScaleRawHigh(), vo.getScaleEngLow(), vo
                 .getScaleEngHigh());

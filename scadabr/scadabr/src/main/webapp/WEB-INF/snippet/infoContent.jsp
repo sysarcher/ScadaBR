@@ -29,7 +29,7 @@
 <c:if test="${!empty point}">
   &nbsp;&nbsp;&nbsp;<fmt:message key="common.value"/>: 
   <c:choose>
-    <c:when test="${point.pointLocator.dataTypeId == applicationScope['constants.DataTypes.IMAGE']}">
+    <c:when test="${point.pointLocator.mangoDataType == applicationScope['constants.DataTypes.IMAGE']}">
       <jsp:include page="/WEB-INF/snippet/imageValueThumbnail.jsp"/>
     </c:when>
     <c:otherwise><span class="infoData">${mango:htmlText(point, pointValue)}</span><br/></c:otherwise>

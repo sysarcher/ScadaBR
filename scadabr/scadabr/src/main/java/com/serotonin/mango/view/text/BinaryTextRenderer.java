@@ -24,11 +24,12 @@ import java.io.ObjectOutputStream;
 
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.util.SerializationHelper;
+import java.util.EnumSet;
 
 /**
  * This class is called "binary" so that we can refer to values as 0 and 1, which is the actual representation in most
@@ -40,7 +41,7 @@ import com.serotonin.util.SerializationHelper;
 @JsonRemoteEntity
 public class BinaryTextRenderer extends BaseTextRenderer {
     private static ImplDefinition definition = new ImplDefinition("textRendererBinary", "BINARY",
-            "textRenderer.binary", new int[] { DataTypes.BINARY });
+            "textRenderer.binary", EnumSet.of(MangoDataType.BINARY ));
 
     public static ImplDefinition getDefinition() {
         return definition;

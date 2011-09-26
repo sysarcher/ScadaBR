@@ -10,6 +10,7 @@ import br.org.scadabr.rt.dataSource.iec101.IEC101SerialDataSource;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
@@ -18,7 +19,6 @@ import com.serotonin.web.i18n.LocalizableMessage;
 @JsonRemoteEntity
 public class IEC101SerialDataSourceVO extends
 		IEC101DataSourceVO<IEC101SerialDataSourceVO> {
-	public static final Type TYPE = Type.IEC101_SERIAL;
 
 	@Override
 	public LocalizableMessage getConnectionDescription() {
@@ -26,8 +26,8 @@ public class IEC101SerialDataSourceVO extends
 	}
 
 	@Override
-	public com.serotonin.mango.vo.dataSource.DataSourceVO.Type getType() {
-		return TYPE;
+	public DataSourceRegistry getType() {
+		return DataSourceRegistry.IEC101_SERIAL;
 	}
 
 	@Override

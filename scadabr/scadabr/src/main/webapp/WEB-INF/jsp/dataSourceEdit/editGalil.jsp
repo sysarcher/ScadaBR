@@ -18,7 +18,7 @@
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
 <%@page import="com.serotonin.mango.vo.dataSource.galil.PointTypeVO"%>
-<%@page import="com.serotonin.mango.DataTypes"%>
+<%@page import="com.serotonin.mango.MangoDataType"%>
 
 <script type="text/javascript">
   var currentPointType;
@@ -72,7 +72,7 @@
       
       // Update the values.
       var locator = currentPoint.pointLocator;
-      $set("inputPointType.dataTypeId", locator.inputPointType.dataTypeId);
+      $set("inputPointType.mangoDataType", locator.inputPointType.mangoDataType);
       $set("inputPointType.inputId", locator.inputPointType.inputId);
       $set("inputPointType.scaleRawLow", locator.inputPointType.scaleRawLow);
       $set("inputPointType.scaleRawHigh", locator.inputPointType.scaleRawHigh);
@@ -86,14 +86,14 @@
       $set("tellPositionPointType.scaleEngHigh", locator.tellPositionPointType.scaleEngHigh);
       $set("tellPositionPointType.roundToInteger", locator.tellPositionPointType.roundToInteger);
       $set("variablePointType.variableName", locator.variablePointType.variableName);
-      $set("variablePointType.dataTypeId", locator.variablePointType.dataTypeId);
+      $set("variablePointType.mangoDataType", locator.variablePointType.mangoDataType);
       
       changeInputDataType();
   }
   
   function changeInputDataType() {
-      var dataType = $get("inputPointType.dataTypeId");
-      var bin = dataType == <c:out value="<%= DataTypes.BINARY %>"/>;
+      var dataType = $get("inputPointType.mangoDataType");
+      var bin = dataType == "<%= MangoDataType.BINARY.name() %>";
       
       display("inputScaleRawLow", !bin);
       display("inputScaleRawHigh", !bin);
@@ -102,24 +102,24 @@
   }
   
   function savePointImpl(locator) {
-      delete locator.dataTypeId;
+      delete locator.mangoDataType;
       delete locator.settable;
-      delete locator.commandPointType.dataTypeId;
+      delete locator.commandPointType.mangoDataType;
       delete locator.commandPointType.description;
       delete locator.commandPointType.settable;
       delete locator.inputPointType.description;
       delete locator.inputPointType.settable;
-      delete locator.outputPointType.dataTypeId;
+      delete locator.outputPointType.mangoDataType;
       delete locator.outputPointType.description;
       delete locator.outputPointType.settable;
-      delete locator.tellPositionPointType.dataTypeId;
+      delete locator.tellPositionPointType.mangoDataType;
       delete locator.tellPositionPointType.description;
       delete locator.tellPositionPointType.settable;
       delete locator.variablePointType.description;
       delete locator.variablePointType.settable;
       
       locator.pointTypeId = $get("pointTypeId");
-      locator.inputPointType.dataTypeId = $get("inputPointType.dataTypeId");
+      locator.inputPointType.mangoDataType = $get("inputPointType.mangoDataType");
       locator.inputPointType.inputId = $get("inputPointType.inputId");
       locator.inputPointType.scaleRawLow = $get("inputPointType.scaleRawLow");
       locator.inputPointType.scaleRawHigh = $get("inputPointType.scaleRawHigh");
@@ -133,7 +133,7 @@
       locator.tellPositionPointType.scaleEngHigh = $get("tellPositionPointType.scaleEngHigh");
       locator.tellPositionPointType.roundToInteger = $get("tellPositionPointType.roundToInteger");
       locator.variablePointType.variableName = $get("variablePointType.variableName");
-      locator.variablePointType.dataTypeId = $get("variablePointType.dataTypeId");
+      locator.variablePointType.mangoDataType = $get("variablePointType.mangoDataType");
       
       DataSourceEditDwr.saveGalilPointLocator(currentPoint.id, $get("xid"), $get("name"), locator, savePointCB);
   }
@@ -222,7 +222,7 @@
     <tr>
       <td class="formLabelRequired"><fmt:message key="dsEdit.pointDataType"/></td>
       <td class="formField">
-        <select id="inputPointType.dataTypeId" onchange="changeInputDataType();">
+        <select id="inputPointType.mangoDataType" onchange="changeInputDataType();">
           <tag:dataTypeOptions excludeAlphanumeric="true" excludeImage="true" excludeMultistate="true"/>
         </select>
       </td>
@@ -322,7 +322,7 @@
     <tr>
       <td class="formLabelRequired"><fmt:message key="dsEdit.pointDataType"/></td>
       <td class="formField">
-        <select id="variablePointType.dataTypeId">
+        <select id="variablePointType.mangoDataType">
           <tag:dataTypeOptions excludeImage="true"/>
         </select>
       </td>

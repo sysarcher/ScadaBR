@@ -103,7 +103,7 @@ public class DataSourceDao extends BaseDao {
 
     private void insertDataSource(final DataSourceVO<?> vo) {
         vo.setId(doInsert("insert into dataSources (xid, name, dataSourceType, data) values (?,?,?,?)", new Object[] {
-                vo.getXid(), vo.getName(), vo.getType().getId(), SerializationHelper.writeObject(vo) }, new int[] {
+                vo.getXid(), vo.getName(), vo.getType().mangoId, SerializationHelper.writeObject(vo) }, new int[] {
                 Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.BLOB }));
 
         AuditEventType.raiseAddedEvent(AuditEventType.TYPE_DATA_SOURCE, vo);

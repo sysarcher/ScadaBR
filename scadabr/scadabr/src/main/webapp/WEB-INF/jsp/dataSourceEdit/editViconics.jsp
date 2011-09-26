@@ -36,7 +36,7 @@
   
   function savePointImpl(locator) {
       delete locator.settable;
-      delete locator.dataTypeId;
+      delete locator.mangoDataType;
       
       DataSourceEditDwr.saveViconicsPointLocator(currentPoint.id, $get("xid"), $get("name"), locator, savePointCB);
   }

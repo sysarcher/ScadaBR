@@ -49,7 +49,7 @@
   }
   
   function changeDataType() {
-      DataSourceEditDwr.getChangeTypes($get("dataTypeId"), changeDataTypeCB);
+      DataSourceEditDwr.getChangeTypes($get("mangoDataType"), changeDataTypeCB);
   }
   
   function changeDataTypeCB(changeTypes) {

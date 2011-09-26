@@ -37,7 +37,7 @@ import com.serotonin.json.JsonSerializable;
 import com.serotonin.json.JsonValue;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.Common.TimePeriods;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.meta.MetaPointLocatorRT;
@@ -75,7 +75,8 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     private List<IntValuePair> context = new ArrayList<IntValuePair>();
     @JsonRemoteProperty
     private String script;
-    private int dataTypeId;
+    @JsonRemoteProperty(alias=MangoDataType.ALIAS_DATA_TYPE)
+    private MangoDataType mangoDataType = MangoDataType.UNKNOWN;
     @JsonRemoteProperty
     private boolean settable;
     private int updateEvent = UPDATE_EVENT_CONTEXT_UPDATE;
@@ -116,12 +117,13 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         this.executionDelaySeconds = executionDelaySeconds;
     }
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    @Override
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setMangoDataType(MangoDataType mangDataType) {
+        this.mangoDataType = mangDataType;
     }
 
     public boolean isSettable() {
@@ -173,9 +175,6 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             varNameSpace.add(varName);
         }
 
-        if (!DataTypes.CODES.isValidId(dataTypeId))
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
-
         if (updateEvent == UPDATE_EVENT_CRON) {
             try {
                 new CronTimerTrigger(updateCronPattern);
@@ -205,7 +204,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", mangoDataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.settable", settable);
         AuditEventType.addPropertyMessage(list, "dsEdit.meta.scriptContext", contextToString());
         AuditEventType.addPropertyMessage(list, "dsEdit.meta.script", script);
@@ -218,7 +217,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         MetaPointLocatorVO from = (MetaPointLocatorVO) o;
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.mangoDataType, mangoDataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.settable", from.settable, settable);
         if (!context.equals(context))
             AuditEventType.addPropertyChangeMessage(list, "dsEdit.meta.scriptContext", from.contextToString(),
@@ -263,7 +262,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         out.writeInt(version);
         out.writeObject(context);
         SerializationHelper.writeSafeUTF(out, script);
-        out.writeInt(dataTypeId);
+        out.writeInt(mangoDataType.mangoId);
         out.writeBoolean(settable);
         out.writeInt(updateEvent);
         SerializationHelper.writeSafeUTF(out, updateCronPattern);
@@ -282,7 +281,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
                 context.add(new IntValuePair(point.getKey(), point.getValue()));
 
             script = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            mangoDataType = MangoDataType.fromMangoId(in.readInt());
             settable = false;
             updateEvent = in.readInt();
             updateCronPattern = "";
@@ -291,7 +290,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         else if (ver == 2) {
             context = (List<IntValuePair>) in.readObject();
             script = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            mangoDataType = MangoDataType.fromMangoId(in.readInt());
             settable = false;
             updateEvent = in.readInt();
             updateCronPattern = "";
@@ -300,7 +299,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         else if (ver == 3) {
             context = (List<IntValuePair>) in.readObject();
             script = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            mangoDataType = MangoDataType.fromMangoId(in.readInt());
             settable = false;
             updateEvent = in.readInt();
             updateCronPattern = SerializationHelper.readSafeUTF(in);
@@ -309,7 +308,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         else if (ver == 4) {
             context = (List<IntValuePair>) in.readObject();
             script = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            mangoDataType = MangoDataType.fromMangoId(in.readInt());
             settable = in.readBoolean();
             updateEvent = in.readInt();
             updateCronPattern = SerializationHelper.readSafeUTF(in);
@@ -319,9 +318,6 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        Integer value = deserializeDataType(json, DataTypes.IMAGE);
-        if (value != null)
-            dataTypeId = value;
 
         String text = json.getString("updateEvent");
         if (text != null) {
@@ -357,7 +353,6 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        serializeDataType(map);
 
         map.put("updateEvent", UPDATE_EVENT_CODES.getCode(updateEvent));
 

@@ -23,7 +23,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
@@ -55,10 +55,10 @@ public class SpinwaveV1PointLocatorVO extends BaseSpinwavePointLocatorVO {
         return "Unknown";
     }
 
-    public static int getAttributeDataType(int attributeId) {
+    public static MangoDataType getAttributeDataType(int attributeId) {
         if (attributeId == AttributeTypes.OVERRIDE)
-            return DataTypes.BINARY;
-        return DataTypes.NUMERIC;
+            return MangoDataType.BINARY;
+        return MangoDataType.NUMERIC;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class SpinwaveV1PointLocatorVO extends BaseSpinwavePointLocatorVO {
         return getAttributeDescription(getAttributeId());
     }
 
-    public int getDataTypeId() {
+    public MangoDataType getMangoDataType() {
         return getAttributeDataType(getAttributeId());
     }
 

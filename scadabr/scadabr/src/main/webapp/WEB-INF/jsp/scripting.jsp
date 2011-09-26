@@ -241,7 +241,7 @@
 
     function validateScript() {
         alert('Not implemented!');
-        //DataSourceEditDwr.validateScript($get("script"), createContextArray(), $get("dataTypeId"), validateScriptCB);
+        //DataSourceEditDwr.validateScript($get("script"), createContextArray(), $get("mangoDataType"), validateScriptCB);
     }
     
     function validateScriptCB(response) {

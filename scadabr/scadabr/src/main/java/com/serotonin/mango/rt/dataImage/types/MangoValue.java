@@ -20,21 +20,21 @@ package com.serotonin.mango.rt.dataImage.types;
 
 import com.serotonin.InvalidArgumentException;
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 
 /**
  * @author Matthew Lohbihler
  */
 abstract public class MangoValue {
-    public static MangoValue stringToValue(String valueStr, int dataType) {
+    public static MangoValue stringToValue(String valueStr, MangoDataType dataType) {
         switch (dataType) {
-        case DataTypes.BINARY:
+        case BINARY:
             return BinaryValue.parseBinary(valueStr);
-        case DataTypes.MULTISTATE:
+        case MULTISTATE:
             return MultistateValue.parseMultistate(valueStr);
-        case DataTypes.NUMERIC:
+        case NUMERIC:
             return NumericValue.parseNumeric(valueStr);
-        case DataTypes.IMAGE:
+        case IMAGE:
             try {
                 return new ImageValue(valueStr);
             }
@@ -42,7 +42,7 @@ abstract public class MangoValue {
                 // no op
             }
             return null;
-        case DataTypes.ALPHANUMERIC:
+        case ALPHANUMERIC:
             return new AlphanumericValue(valueStr);
         }
         throw new ShouldNeverHappenException("Invalid data type " + dataType + ". Cannot instantiate MangoValue");
@@ -73,7 +73,7 @@ abstract public class MangoValue {
 
     abstract public Object getObjectValue();
 
-    abstract public int getDataType();
+    abstract public MangoDataType getMangoDataType();
 
     abstract public Number numberValue();
 

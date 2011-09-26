@@ -17,14 +17,14 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
-<%@page import="com.serotonin.mango.DataTypes"%>
+<%@page import="com.serotonin.mango.MangoDataType"%>
 
 <script type="text/javascript">
   function testValueParams() {
       startImageFader("valueTestImg", true);
       hide("valueTestRow");
       DataSourceEditDwr.testPachubeValueParams($get("apiKey"), $get("timeoutSeconds"), $get("retries"),
-              $get("feedId"), $get("dataStreamId"), $get("dataTypeId"), $get("binary0Value"), function (result) {
+              $get("feedId"), $get("dataStreamId"), $get("mangoDataType"), $get("binary0Value"), function (result) {
           stopImageFader("valueTestImg");
           show("valueTestRow");
           $set("valueTestResult", encodeHtml(result));
@@ -47,7 +47,7 @@
   function editPointCBImpl(locator) {
       $set("feedId", locator.feedId);
       $set("dataStreamId", locator.dataStreamId);
-      $set("dataTypeId", locator.dataTypeId);
+      $set("mangoDataType", locator.mangoDataType);
       $set("binary0Value", locator.binary0Value);
       $set("settable", locator.settable);
       dataTypeChanged();
@@ -56,15 +56,15 @@
   function savePointImpl(locator) {
       locator.feedId = $get("feedId");
       locator.dataStreamId = $get("dataStreamId");
-      locator.dataTypeId = $get("dataTypeId");
+      locator.mangoDataType = $get("mangoDataType");
       locator.binary0Value = $get("binary0Value");
       locator.settable = $get("settable");
       DataSourceEditDwr.savePachubePointLocator(currentPoint.id, $get("xid"), $get("name"), locator, savePointCB);
   }
   
   function dataTypeChanged() {
-      var dataTypeId = $get("dataTypeId");
-      if (dataTypeId == <%= DataTypes.BINARY %>)
+      var mangoDataType = $get("mangoDataType");
+      if (mangoDataType == <%= MangoDataType.BINARY.name() %>)
           show("binaryZeroValueRow");
       else
           hide("binaryZeroValueRow");
@@ -104,7 +104,7 @@
   <tr>
     <td class="formLabelRequired"><fmt:message key="dsEdit.pointDataType"/></td>
     <td class="formField">
-      <select name="dataTypeId" onchange="dataTypeChanged()">
+      <select name="mangoDataType" onchange="dataTypeChanged()">
         <tag:dataTypeOptions excludeImage="true"/>
       </select>
     </td>

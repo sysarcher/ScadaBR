@@ -191,7 +191,7 @@
       $set("useCovSubscription", locator.useCovSubscription);
       $set("settable", locator.settable);
       $set("writePriority", locator.writePriority);
-      $set("dataTypeId", locator.dataTypeId);
+      $set("mangoDataType", locator.mangoDataType);
       objectTypeChanged();
   }
   
@@ -207,7 +207,7 @@
       locator.useCovSubscription = $get("useCovSubscription");
       locator.settable = $get("settable");
       locator.writePriority = $get("writePriority");
-      locator.dataTypeId = $get("dataTypeId");
+      locator.mangoDataType = $get("mangoDataType");
       
       DataSourceEditDwr.saveBACnetIPPointLocator(currentPoint.id, $get("xid"), $get("name"), locator, savePointCB);
   }
@@ -443,7 +443,7 @@
   <tr>
     <td class="formLabelRequired"><fmt:message key="dsEdit.pointDataType"/></td>
     <td class="formField">
-      <select name="dataTypeId">
+      <select name="mangoDataType">
         <tag:dataTypeOptions excludeImage="true"/>
       </select>
     </td>

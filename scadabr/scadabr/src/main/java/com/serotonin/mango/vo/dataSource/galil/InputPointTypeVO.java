@@ -29,22 +29,25 @@ import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.galil.InputPointTypeRT;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class InputPointTypeVO extends PointTypeVO {
-    private static final int[] EXCLUDE_DATA_TYPES = { DataTypes.ALPHANUMERIC, DataTypes.IMAGE, DataTypes.MULTISTATE };
+    private static final EnumSet<MangoDataType> EXCLUDE_DATA_TYPES = EnumSet.of( MangoDataType.ALPHANUMERIC, MangoDataType.IMAGE, MangoDataType.MULTISTATE );
 
-    private int dataTypeId = DataTypes.BINARY;
+
+    @JsonRemoteProperty(alias=MangoDataType.ALIAS_DATA_TYPE)
+    private MangoDataType mangoDataType = MangoDataType.BINARY;
     @JsonRemoteProperty
     private int inputId = 1;
     @JsonRemoteProperty
@@ -67,8 +70,8 @@ public class InputPointTypeVO extends PointTypeVO {
     }
 
     @Override
-    public int getDataTypeId() {
-        return dataTypeId;
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
     @Override
@@ -83,10 +86,8 @@ public class InputPointTypeVO extends PointTypeVO {
 
     @Override
     public void validate(DwrResponseI18n response) {
-        if (!DataTypes.CODES.isValidId(dataTypeId, EXCLUDE_DATA_TYPES))
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
 
-        if (dataTypeId == DataTypes.BINARY) {
+        if (mangoDataType == MangoDataType.BINARY) {
             if (inputId < 1 || inputId > 96)
                 response.addContextualMessage("inputPointType.inputId", "validate.1to96");
         }
@@ -140,13 +141,13 @@ public class InputPointTypeVO extends PointTypeVO {
         this.scaleEngHigh = scaleEngHigh;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setMangoDataType(MangoDataType mangoDataType) {
+        this.mangoDataType = mangoDataType;
     }
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", mangoDataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.galil.inputNumber", inputId);
         AuditEventType.addPropertyMessage(list, "dsEdit.galil.scaleLow", scaleRawLow);
         AuditEventType.addPropertyMessage(list, "dsEdit.galil.scaleHigh", scaleRawHigh);
@@ -157,7 +158,7 @@ public class InputPointTypeVO extends PointTypeVO {
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         InputPointTypeVO from = (InputPointTypeVO) o;
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.mangoDataType, mangoDataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.galil.inputNumber", from.inputId, inputId);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.galil.scaleLow", from.scaleRawLow, scaleRawLow);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.galil.scaleHigh", from.scaleRawHigh, scaleRawHigh);
@@ -175,7 +176,7 @@ public class InputPointTypeVO extends PointTypeVO {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(dataTypeId);
+        out.writeInt(mangoDataType.mangoId);
         out.writeInt(inputId);
         out.writeDouble(scaleRawLow);
         out.writeDouble(scaleRawHigh);
@@ -188,7 +189,7 @@ public class InputPointTypeVO extends PointTypeVO {
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            dataTypeId = in.readInt();
+            mangoDataType = MangoDataType.fromMangoId(in.readInt());
             inputId = in.readInt();
             scaleRawLow = in.readDouble();
             scaleRawHigh = in.readDouble();
@@ -200,19 +201,10 @@ public class InputPointTypeVO extends PointTypeVO {
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
-
-        String text = json.getString("dataType");
-        if (text != null) {
-            dataTypeId = DataTypes.CODES.getId(text);
-            if (!DataTypes.CODES.isValidId(dataTypeId, EXCLUDE_DATA_TYPES))
-                throw new LocalizableJsonException("emport.error.invalid", "dataType", text, DataTypes.CODES
-                        .getCodeList(EXCLUDE_DATA_TYPES));
-        }
     }
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        map.put("dataType", DataTypes.CODES.getCode(dataTypeId));
     }
 }

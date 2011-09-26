@@ -93,7 +93,7 @@ public class JmxPointLocatorRT extends PointLocatorRT {
         String s = null;
         if (value != null)
             s = value.toString();
-        return MangoValue.stringToValue(s, vo.getDataTypeId());
+        return MangoValue.stringToValue(s, vo.getMangoDataType());
     }
 
     static String[] validTypes = { "int", "java.lang.Integer", "long", "java.lang.Long", "java.lang.String", "double",

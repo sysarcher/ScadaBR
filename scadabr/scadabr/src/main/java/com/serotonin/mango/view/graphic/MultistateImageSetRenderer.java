@@ -27,10 +27,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.serotonin.db.IntValuePair;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImageSet;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -39,7 +40,7 @@ import com.serotonin.mango.view.ImplDefinition;
 // Use ViewComponent instead
 public class MultistateImageSetRenderer extends ImageSetRenderer {
     private static ImplDefinition definition = new ImplDefinition("graphicRendererMultistateImage", "MULTISTATE_IMAGE",
-            "graphic.multistateImage", new int[] { DataTypes.MULTISTATE });
+            "graphic.multistateImage", EnumSet.of( MangoDataType.MULTISTATE ));
 
     public static ImplDefinition getDefinition() {
         return definition;

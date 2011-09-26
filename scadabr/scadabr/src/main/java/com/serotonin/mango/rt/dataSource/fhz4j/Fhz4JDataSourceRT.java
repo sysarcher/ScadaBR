@@ -41,7 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -260,7 +260,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT implements FhzDataListener {
 
 
         dp.setPointLocator(fhzLocator);
-        if (dp.getPointLocator().getDataTypeId() == DataTypes.NUMERIC) {
+        if (dp.getPointLocator().getMangoDataType() == MangoDataType.NUMERIC) {
             dp.setTextRenderer(new AnalogRenderer("#,##0.0", fhtMessage.getCommand().getUnitOfMeasurement()));
         }
 
@@ -402,7 +402,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT implements FhzDataListener {
         dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
 
         dp.setPointLocator(fhzLocator);
-        if (dp.getPointLocator().getDataTypeId() == DataTypes.NUMERIC) {
+        if (dp.getPointLocator().getMangoDataType() == MangoDataType.NUMERIC) {
             dp.setTextRenderer(new AnalogRenderer("#,##0.0", prop.getUnitOfMeasurement()));
         }
 

@@ -41,7 +41,7 @@
   
   function savePointImpl(locator) {
       delete locator.settable;
-      delete locator.dataTypeId;
+      delete locator.mangoDataType;
       
       locator.url = $get("url");
       locator.timeoutSeconds = $get("timeoutSeconds");

@@ -36,6 +36,7 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.mbus.MBusDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
@@ -74,8 +75,8 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
     private Connection connection;
 
     @Override
-    public Type getType() {
-        return Type.M_BUS;
+    public DataSourceRegistry getType() {
+        return DataSourceRegistry.M_BUS;
     }
 
     @Override

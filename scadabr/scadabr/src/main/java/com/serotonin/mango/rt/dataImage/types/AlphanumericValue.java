@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataImage.types;
 
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.util.StringUtils;
 
 /**
@@ -63,8 +63,8 @@ public class AlphanumericValue extends MangoValue implements Comparable<Alphanum
     }
 
     @Override
-    public int getDataType() {
-        return DataTypes.ALPHANUMERIC;
+    public MangoDataType getMangoDataType() {
+        return MangoDataType.ALPHANUMERIC;
     }
 
     @Override

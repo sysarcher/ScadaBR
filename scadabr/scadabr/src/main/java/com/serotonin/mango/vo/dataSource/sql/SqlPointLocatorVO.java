@@ -30,7 +30,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.sql.SqlPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -61,7 +61,8 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
     private String fieldName;
     @JsonRemoteProperty
     private String timeOverrideName;
-    private int dataTypeId;
+    @JsonRemoteProperty(alias=MangoDataType.ALIAS_DATA_TYPE)
+    private MangoDataType mangoDataType = MangoDataType.UNKNOWN;
     @JsonRemoteProperty
     private String updateStatement;
 
@@ -89,24 +90,22 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
         this.updateStatement = updateStatement;
     }
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setMangoDataType(MangoDataType mangoDataType) {
+        this.mangoDataType = mangoDataType;
     }
 
     public void validate(DwrResponseI18n response) {
-        if (!DataTypes.CODES.isValidId(dataTypeId))
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
         if (StringUtils.isEmpty(fieldName) && StringUtils.isEmpty(updateStatement))
             response.addContextualMessage("fieldName", "validate.fieldName");
     }
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", mangoDataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.sql.rowId", fieldName);
         AuditEventType.addPropertyMessage(list, "dsEdit.sql.timeColumn", timeOverrideName);
         AuditEventType.addPropertyMessage(list, "dsEdit.sql.update", updateStatement);
@@ -115,7 +114,7 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         SqlPointLocatorVO from = (SqlPointLocatorVO) o;
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.mangoDataType, mangoDataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.rowId", from.fieldName, fieldName);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.timeColumn", from.timeOverrideName,
                 timeOverrideName);
@@ -135,7 +134,7 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
         SerializationHelper.writeSafeUTF(out, fieldName);
         SerializationHelper.writeSafeUTF(out, timeOverrideName);
         SerializationHelper.writeSafeUTF(out, updateStatement);
-        out.writeInt(dataTypeId);
+        out.writeInt(mangoDataType.mangoId);
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
@@ -146,25 +145,21 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
             fieldName = SerializationHelper.readSafeUTF(in);
             timeOverrideName = "";
             updateStatement = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            mangoDataType = MangoDataType.fromMangoId(in.readInt());
         }
         else if (ver == 2) {
             fieldName = SerializationHelper.readSafeUTF(in);
             timeOverrideName = SerializationHelper.readSafeUTF(in);
             updateStatement = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            mangoDataType = MangoDataType.fromMangoId(in.readInt());
         }
     }
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        Integer value = deserializeDataType(json, DataTypes.IMAGE);
-        if (value != null)
-            dataTypeId = value;
     }
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        serializeDataType(map);
     }
 }

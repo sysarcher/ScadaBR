@@ -255,7 +255,7 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
             ScriptExecutor executor = new ScriptExecutor();
             try {
                 PointValueTime pvt = executor.execute(vo.getScript(), context, timer.currentTimeMillis(),
-                        vo.getDataTypeId(), runtime);
+                        vo.getMangoDataType(), runtime);
                 if (pvt.getValue() == null)
                     handleError(runtime, new LocalizableMessage("event.meta.nullResult"));
                 else

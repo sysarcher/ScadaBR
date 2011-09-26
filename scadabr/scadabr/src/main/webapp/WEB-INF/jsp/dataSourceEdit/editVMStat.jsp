@@ -38,7 +38,7 @@
   
   function savePointImpl(locator) {
       delete locator.settable;
-      delete locator.dataTypeId;
+      delete locator.mangoDataType;
       
       locator.attributeId = $get("attributeId");
       

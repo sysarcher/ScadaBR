@@ -27,6 +27,7 @@ import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
 import com.serotonin.mango.util.ExportCodes;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.web.i18n.LocalizableMessage;
@@ -36,7 +37,6 @@ import com.serotonin.web.i18n.LocalizableMessage;
  */
 @JsonRemoteEntity
 public class MetaDataSourceVO extends DataSourceVO<MetaDataSourceVO> {
-    public static final Type TYPE = Type.META;
 
     @Override
     public DataSourceRT createDataSourceRT() {
@@ -44,8 +44,8 @@ public class MetaDataSourceVO extends DataSourceVO<MetaDataSourceVO> {
     }
 
     @Override
-    public Type getType() {
-        return TYPE;
+    public DataSourceRegistry getType() {
+        return DataSourceRegistry.META;
     }
 
     @Override

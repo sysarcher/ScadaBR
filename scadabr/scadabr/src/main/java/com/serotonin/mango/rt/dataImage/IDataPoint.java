@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataImage;
 
+import com.serotonin.mango.MangoDataType;
 import java.util.List;
 
 /**
@@ -40,5 +41,5 @@ public interface IDataPoint {
 
     List<PointValueTime> getPointValuesBetween(long from, long to);
 
-    int getDataTypeId();
+    MangoDataType getMangoDataType();
 }

@@ -48,7 +48,7 @@ import br.org.scadabr.vo.scripting.ScriptVO;
 import com.serotonin.db.IntValuePair;
 import com.serotonin.db.KeyValuePair;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.ViewDao;
 import com.serotonin.mango.rt.RuntimeManager;
@@ -1008,9 +1008,9 @@ public class ViewDwr extends BaseDwr {
 
 			// Add the list of points that are numeric.
 			for (DataPointVO dp : dataPoints) {
-				if (dp.getPointLocator().getDataTypeId() == DataTypes.NUMERIC
-						|| dp.getPointLocator().getDataTypeId() == DataTypes.BINARY
-						|| dp.getPointLocator().getDataTypeId() == DataTypes.MULTISTATE) {
+				if (dp.getPointLocator().getMangoDataType() == MangoDataType.NUMERIC
+						|| dp.getPointLocator().getMangoDataType() == MangoDataType.BINARY
+						|| dp.getPointLocator().getMangoDataType() == MangoDataType.MULTISTATE) {
 					htmlData.append('_');
 					htmlData.append(dp.getId());
 				}

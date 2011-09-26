@@ -48,7 +48,7 @@ import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.db.spring.GenericTransactionCallback;
 import com.serotonin.io.StreamUtils;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.ImageSaveException;
 import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.rt.dataImage.AnnotatedPointValueTime;
@@ -124,11 +124,11 @@ public class PointValueDao extends BaseDao {
 	long savePointValueImpl(final int pointId, final PointValueTime pointValue,
 			final SetPointSource source, boolean async) {
 		MangoValue value = pointValue.getValue();
-		final int dataType = DataTypes.getDataType(value);
+		final MangoDataType dataType = value.getMangoDataType();
 		double dvalue = 0;
 		String svalue = null;
 
-		if (dataType == DataTypes.IMAGE) {
+		if (dataType == MangoDataType.IMAGE) {
 			ImageValue imageValue = (ImageValue) value;
 			dvalue = imageValue.getType();
 			if (imageValue.isSaved())
@@ -141,7 +141,7 @@ public class PointValueDao extends BaseDao {
 		// Check if we need to create an annotation.
 		long id;
 		try {
-			if (svalue != null || source != null || dataType == DataTypes.IMAGE) {
+			if (svalue != null || source != null || dataType == MangoDataType.IMAGE) {
 				final double dvalueFinal = dvalue;
 				final String svalueFinal = svalue;
 
@@ -168,7 +168,7 @@ public class PointValueDao extends BaseDao {
 		}
 
 		// Check if we need to save an image
-		if (dataType == DataTypes.IMAGE) {
+		if (dataType == MangoDataType.IMAGE) {
 			ImageValue imageValue = (ImageValue) value;
 			if (!imageValue.isSaved()) {
 				imageValue.setId(id);
@@ -220,14 +220,14 @@ public class PointValueDao extends BaseDao {
 		savePointValueImpl(pointId, pointValue, new AnonymousUser(), true);
 	}
 
-	long savePointValue(final int pointId, final int dataType, double dvalue,
+	long savePointValue(final int pointId, final MangoDataType dataType, double dvalue,
 			final long time, final String svalue, final SetPointSource source,
 			boolean async) {
 		// Apply database specific bounds on double values.
 		dvalue = DatabaseAccess.getDatabaseAccess().applyBounds(dvalue);
 
 		if (async) {
-			BatchWriteBehind.add(new BatchWriteBehindEntry(pointId, dataType,
+			BatchWriteBehind.add(new BatchWriteBehindEntry(pointId, dataType.mangoId,
 					dvalue, time), ejt);
 			return -1;
 		}
@@ -249,12 +249,12 @@ public class PointValueDao extends BaseDao {
 		}
 	}
 
-	private long savePointValueImpl(int pointId, int dataType, double dvalue,
+	private long savePointValueImpl(int pointId, MangoDataType dataType, double dvalue,
 			long time, String svalue, SetPointSource source) {
 		long id = doInsertLong(POINT_VALUE_INSERT, new Object[] { pointId,
 				dataType, dvalue, time });
 
-		if (svalue == null && dataType == DataTypes.IMAGE)
+		if (svalue == null && dataType == MangoDataType.IMAGE)
 			svalue = Long.toString(id);
 
 		// Check if we need to create an annotation.
@@ -389,25 +389,25 @@ public class PointValueDao extends BaseDao {
 
 	MangoValue createMangoValue(ResultSet rs, int firstParameter)
 			throws SQLException {
-		int dataType = rs.getInt(firstParameter);
+		MangoDataType dataType = MangoDataType.fromMangoId(rs.getInt(firstParameter));
 		MangoValue value;
 		switch (dataType) {
-		case (DataTypes.NUMERIC):
+		case NUMERIC:
 			value = new NumericValue(rs.getDouble(firstParameter + 1));
 			break;
-		case (DataTypes.BINARY):
+		case BINARY:
 			value = new BinaryValue(rs.getDouble(firstParameter + 1) == 1);
 			break;
-		case (DataTypes.MULTISTATE):
+		case MULTISTATE:
 			value = new MultistateValue(rs.getInt(firstParameter + 1));
 			break;
-		case (DataTypes.ALPHANUMERIC):
+		case ALPHANUMERIC:
 			String s = rs.getString(firstParameter + 2);
 			if (s == null)
 				s = rs.getString(firstParameter + 3);
 			value = new AlphanumericValue(s);
 			break;
-		case (DataTypes.IMAGE):
+		case IMAGE:
 			value = new ImageValue(Integer.parseInt(rs
 					.getString(firstParameter + 2)),
 					rs.getInt(firstParameter + 3));
@@ -511,10 +511,10 @@ public class PointValueDao extends BaseDao {
 	}
 
 	public long deletePointValuesWithMismatchedType(int dataPointId,
-			int dataType) {
+			MangoDataType dataType) {
 		return deletePointValues(
 				"delete from pointValues where dataPointId=? and dataType<>?",
-				new Object[] { dataPointId, dataType });
+				new Object[] { dataPointId, dataType.mangoId });
 	}
 
 	public void compressTables() {
@@ -582,12 +582,12 @@ public class PointValueDao extends BaseDao {
 		return queryForList(
 				"select distinct id from ( " //
 						+ "  select id as id from pointValues where dataType="
-						+ DataTypes.IMAGE
+						+ MangoDataType.IMAGE.mangoId
 						+ "  union"
 						+ "  select d.pointValueId as id from reportInstanceData d "
 						+ "    join reportInstancePoints p on d.reportInstancePointId=p.id"
 						+ "  where p.dataType="
-						+ DataTypes.IMAGE
+						+ MangoDataType.IMAGE.mangoId
 						+ ") a order by 1", new Object[] {}, Long.class);
 	}
 

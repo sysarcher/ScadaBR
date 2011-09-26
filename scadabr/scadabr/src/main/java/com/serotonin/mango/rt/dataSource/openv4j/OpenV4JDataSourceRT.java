@@ -33,7 +33,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -151,7 +151,7 @@ public class OpenV4JDataSourceRT extends PollingDataSource {
         final OpenV4JPointLocatorRT locator = dataPoint.getPointLocator();
 
         dc.addToDataContainer(locator.getDataPoint());
-        if (locator.getVo().getDataTypeId() == DataTypes.NUMERIC) {
+        if (locator.getVo().getMangoDataType() == MangoDataType.NUMERIC) {
             locator.getDataPoint().encode(dc, valueTime.getValue().getDoubleValue());
             dataPoint.setPointValue(valueTime, source);
         }

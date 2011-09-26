@@ -90,7 +90,7 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource {
 
             try {
                 // Get the value
-                MangoValue value = DataSourceUtils.getValue(locator.getValuePattern(), data, locator.getDataTypeId(),
+                MangoValue value = DataSourceUtils.getValue(locator.getValuePattern(), data, locator.getMangoDataType(),
                         locator.getBinary0Value(), dp.getVO().getTextRenderer(), locator.getValueFormat(), dp.getVO()
                                 .getName());
 

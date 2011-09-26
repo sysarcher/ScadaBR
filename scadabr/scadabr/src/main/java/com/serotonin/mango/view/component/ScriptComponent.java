@@ -29,7 +29,7 @@ import javax.script.ScriptException;
 
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataSource.meta.ScriptExecutor;
 import com.serotonin.mango.view.ImplDefinition;
@@ -37,14 +37,15 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.web.dwr.BaseDwr;
 import com.serotonin.mango.web.taglib.Functions;
 import com.serotonin.util.SerializationHelper;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class ScriptComponent extends PointComponent {
-    public static ImplDefinition DEFINITION = new ImplDefinition("script", "SCRIPT", "graphic.script", new int[] {
-            DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC, DataTypes.ALPHANUMERIC });
+    public static ImplDefinition DEFINITION = new ImplDefinition("script", "SCRIPT", "graphic.script", EnumSet.of(
+            MangoDataType.BINARY, MangoDataType.MULTISTATE, MangoDataType.NUMERIC, MangoDataType.ALPHANUMERIC ));
 
     private static final String SCRIPT_PREFIX = "function __scriptRenderer__() {";
     private static final String SCRIPT_SUFFIX = "\r\n}\r\n__scriptRenderer__();";

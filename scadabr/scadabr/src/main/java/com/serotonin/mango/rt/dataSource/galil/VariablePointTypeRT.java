@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.galil;
 
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -41,23 +41,23 @@ public class VariablePointTypeRT extends PointTypeRT {
 
     @Override
     protected String getPollRequestImpl() {
-        if (vo.getDataTypeId() == DataTypes.ALPHANUMERIC)
+        if (vo.getMangoDataType() == MangoDataType.ALPHANUMERIC)
             return vo.getVariableName() + "={S6}";
         return vo.getVariableName() + "=";
     }
 
     @Override
     public MangoValue parsePollResponse(String data, String pointName) throws LocalizableException {
-        if (vo.getDataTypeId() == DataTypes.ALPHANUMERIC)
+        if (vo.getMangoDataType() == MangoDataType.ALPHANUMERIC)
             return new AlphanumericValue(data);
 
         try {
             double value = Double.parseDouble(data);
 
-            if (vo.getDataTypeId() == DataTypes.BINARY)
+            if (vo.getMangoDataType() == MangoDataType.BINARY)
                 return new BinaryValue(value != 0);
 
-            if (vo.getDataTypeId() == DataTypes.MULTISTATE)
+            if (vo.getMangoDataType() == MangoDataType.MULTISTATE)
                 return new MultistateValue((int) value);
 
             // Must be numeric.
@@ -73,11 +73,11 @@ public class VariablePointTypeRT extends PointTypeRT {
         StringBuilder data = new StringBuilder();
         data.append(vo.getVariableName()).append('=');
 
-        if (vo.getDataTypeId() == DataTypes.BINARY)
+        if (vo.getMangoDataType() == MangoDataType.BINARY)
             data.append(value.getBooleanValue() ? '1' : '0');
-        else if (vo.getDataTypeId() == DataTypes.MULTISTATE)
+        else if (vo.getMangoDataType() == MangoDataType.MULTISTATE)
             data.append(value.getIntegerValue());
-        else if (vo.getDataTypeId() == DataTypes.NUMERIC)
+        else if (vo.getMangoDataType() == MangoDataType.NUMERIC)
             data.append(value.getDoubleValue());
         else
             data.append('"').append(value.getStringValue()).append('"');

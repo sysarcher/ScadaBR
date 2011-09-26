@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -60,7 +60,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
             return;
         }
 
-        int targetDataType = targetPoint.getVO().getPointLocator().getDataTypeId();
+        final MangoDataType targetDataType = targetPoint.getVO().getMangoDataType();
 
         MangoValue value;
         if (vo.getActiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {
@@ -77,7 +77,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
                 return;
             }
 
-            if (DataTypes.getDataType(valueTime.getValue()) != targetDataType) {
+            if (valueTime.getValue().getMangoDataType() != targetDataType) {
                 raiseFailureEvent(new LocalizableMessage("event.setPoint.activePointDataType"), evt.getEventType());
                 return;
             }
@@ -112,7 +112,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
             return;
         }
 
-        int targetDataType = targetPoint.getVO().getPointLocator().getDataTypeId();
+        final MangoDataType targetDataType = targetPoint.getVO().getMangoDataType();
 
         MangoValue value;
         if (vo.getInactiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {
@@ -129,7 +129,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
                 return;
             }
 
-            if (DataTypes.getDataType(valueTime.getValue()) != targetDataType) {
+            if (valueTime.getValue().getMangoDataType() != targetDataType) {
                 raiseFailureEvent(new LocalizableMessage("event.setPoint.inactivePointDataType"), evt.getEventType());
                 return;
             }

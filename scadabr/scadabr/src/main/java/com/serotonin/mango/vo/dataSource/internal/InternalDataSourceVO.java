@@ -34,6 +34,7 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.internal.InternalDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.web.dwr.DwrResponseI18n;
@@ -44,7 +45,6 @@ import com.serotonin.web.i18n.LocalizableMessage;
  */
 @JsonRemoteEntity
 public class InternalDataSourceVO extends DataSourceVO<InternalDataSourceVO> {
-    public static final Type TYPE = Type.INTERNAL;
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
@@ -57,8 +57,8 @@ public class InternalDataSourceVO extends DataSourceVO<InternalDataSourceVO> {
     }
 
     @Override
-    public Type getType() {
-        return TYPE;
+    public DataSourceRegistry getType() {
+        return DataSourceRegistry.INTERNAL;
     }
 
     @Override

@@ -36,6 +36,7 @@ import com.serotonin.mango.rt.dataSource.onewire.OneWireDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.util.SerializationHelper;
@@ -48,7 +49,6 @@ import com.serotonin.web.i18n.LocalizableMessage;
  */
 @JsonRemoteEntity
 public class OneWireDataSourceVO extends DataSourceVO<OneWireDataSourceVO> {
-    public static final Type TYPE = Type.ONE_WIRE;
     public static final int RESCAN_NONE = 0;
     public static final String RESCAN_NONE_TEXT = "NONE";
 
@@ -80,8 +80,8 @@ public class OneWireDataSourceVO extends DataSourceVO<OneWireDataSourceVO> {
     }
 
     @Override
-    public Type getType() {
-        return TYPE;
+    public DataSourceRegistry getType() {
+        return DataSourceRegistry.ONE_WIRE;
     }
 
     @Override

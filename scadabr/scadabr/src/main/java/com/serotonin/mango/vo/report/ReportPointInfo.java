@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.report;
 
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.text.TextRenderer;
 
@@ -28,7 +29,7 @@ public class ReportPointInfo {
     private int reportPointId;
     private String deviceName;
     private String pointName;
-    private int dataType;
+    private MangoDataType mangoDataType = MangoDataType.UNKNOWN;
     private MangoValue startValue;
     private TextRenderer textRenderer;
     private String colour;
@@ -62,12 +63,12 @@ public class ReportPointInfo {
         this.pointName = pointName;
     }
 
-    public int getDataType() {
-        return dataType;
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
-    public void setDataType(int dataType) {
-        this.dataType = dataType;
+    public void setMangoDataType(MangoDataType mangoDataType) {
+        this.mangoDataType = mangoDataType;
     }
 
     public MangoValue getStartValue() {

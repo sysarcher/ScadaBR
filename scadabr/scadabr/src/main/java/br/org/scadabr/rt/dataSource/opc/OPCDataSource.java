@@ -13,7 +13,7 @@ import br.org.scadabr.RealOPCMaster;
 import br.org.scadabr.vo.dataSource.opc.OPCDataSourceVO;
 import br.org.scadabr.vo.dataSource.opc.OPCPointLocatorVO;
 
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -81,7 +81,7 @@ public class OPCDataSource extends PollingDataSource {
 				value = opcMaster.getValue(dataPointVO.getTag());
 
 				mangoValue = MangoValue.stringToValue(value,
-						dataPointVO.getDataTypeId());
+						dataPointVO.getMangoDataType());
 				dataPoint
 						.updatePointValue(new PointValueTime(mangoValue, time));
 			} catch (Exception e) {
@@ -98,11 +98,11 @@ public class OPCDataSource extends PollingDataSource {
 		String tag = ((OPCPointLocatorVO) dataPoint.getVO().getPointLocator())
 				.getTag();
 		Object value = null;
-		if (dataPoint.getDataTypeId() == DataTypes.NUMERIC)
+		if (dataPoint.getMangoDataType() == MangoDataType.NUMERIC)
 			value = valueTime.getDoubleValue();
-		else if (dataPoint.getDataTypeId() == DataTypes.BINARY)
+		else if (dataPoint.getMangoDataType() == MangoDataType.BINARY)
 			value = valueTime.getBooleanValue();
-		else if (dataPoint.getDataTypeId() == DataTypes.MULTISTATE)
+		else if (dataPoint.getMangoDataType() == MangoDataType.MULTISTATE)
 			value = valueTime.getIntegerValue();
 		else
 			value = valueTime.getStringValue();

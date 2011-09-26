@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view.graphic;
 
+import com.serotonin.mango.MangoDataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -31,7 +32,7 @@ import com.serotonin.mango.view.ImplDefinition;
 abstract public class BaseGraphicRenderer implements GraphicRenderer {
     private static List<ImplDefinition> definitions;
 
-    public static List<ImplDefinition> getImplementations(int dataType) {
+    public static List<ImplDefinition> getImplementations(MangoDataType dataType) {
         if (definitions == null) {
             List<ImplDefinition> d = new ArrayList<ImplDefinition>();
             d.add(AnalogImageSetRenderer.getDefinition());

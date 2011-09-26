@@ -127,7 +127,7 @@
             sel.options[0] = new Option("", 0);
             
             for (var i=0; i<settingsEditor.pointList.length; i++) {
-                if (contains(dataTypes, settingsEditor.pointList[i].dataType))
+                if (contains(dataTypes, settingsEditor.pointList[i].mangoDataType))
                     sel.options[sel.options.length] = new Option(settingsEditor.pointList[i].name,
                             settingsEditor.pointList[i].id);
             }

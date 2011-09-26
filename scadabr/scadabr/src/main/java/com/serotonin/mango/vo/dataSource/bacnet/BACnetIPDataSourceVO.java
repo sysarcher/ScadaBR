@@ -36,6 +36,7 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.bacnet.BACnetIPDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.util.IpAddressUtils;
@@ -48,7 +49,6 @@ import com.serotonin.web.i18n.LocalizableMessage;
  */
 @JsonRemoteEntity
 public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
-    public static final Type TYPE = Type.BACNET;
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
@@ -79,8 +79,8 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
     }
 
     @Override
-    public Type getType() {
-        return TYPE;
+    public DataSourceRegistry getType() {
+        return DataSourceRegistry.BACNET;
     }
 
     @Override

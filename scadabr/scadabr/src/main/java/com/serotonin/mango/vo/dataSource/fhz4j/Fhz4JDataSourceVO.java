@@ -39,6 +39,7 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.fhz4j.Fhz4JDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
@@ -71,8 +72,8 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
     
 
     @Override
-    public Type getType() {
-        return Type.FHZ_4_J;
+    public DataSourceRegistry getType() {
+        return DataSourceRegistry.FHZ_4_J;
     }
 
     @Override

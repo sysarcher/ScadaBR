@@ -17,14 +17,14 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
-<%@page import="com.serotonin.mango.DataTypes"%>
+<%@page import="com.serotonin.mango.MangoDataType"%>
 
 <script type="text/javascript">
   function testValueParams() {
       startImageFader("valueTestImg", true);
       hide("valueTestRow");
       DataSourceEditDwr.testHttpRetrieverValueParams($get("url"), $get("timeoutSeconds"), $get("retries"),
-              $get("valueRegex"), $get("dataTypeId"), $get("valueFormat"), testValueParamsCB);
+              $get("valueRegex"), $get("mangoDataType"), $get("valueFormat"), testValueParamsCB);
   }
   
   function testValueParamsCB(result) {
@@ -61,7 +61,7 @@
   function editPointCBImpl(locator) {
       $set("valueRegex", locator.valueRegex);
       $set("ignoreIfMissing", locator.ignoreIfMissing);
-      $set("dataTypeId", locator.dataTypeId);
+      $set("mangoDataType", locator.mangoDataType);
       $set("valueFormat", locator.valueFormat);
       $set("timeRegex", locator.timeRegex);
       $set("timeFormat", locator.timeFormat);
@@ -75,7 +75,7 @@
       
       locator.valueRegex = $get("valueRegex");
       locator.ignoreIfMissing = $get("ignoreIfMissing");
-      locator.dataTypeId = $get("dataTypeId");
+      locator.mangoDataType = $get("mangoDataType");
       locator.valueFormat = $get("valueFormat");
       locator.timeRegex = $get("timeRegex");
       locator.timeFormat = $get("timeFormat");
@@ -84,13 +84,13 @@
   }
   
   function dataTypeChanged() {
-      var dataTypeId = $get("dataTypeId");
-      if (dataTypeId == <%= DataTypes.BINARY %>) {
+      var mangoDataType = $get("mangoDataType");
+      if (mangoDataType == "<%= MangoDataType.BINARY.name() %>") {
           show("valueFormatRow");
           hide("numberFormatHelp");
           $set("valueFormatLabel", "<fmt:message key="dsEdit.httpRetriever.binaryZeroValue"/>");
       }
-      else if (dataTypeId == <%= DataTypes.NUMERIC %>) {
+      else if (mangoDataType == "<%= MangoDataType.NUMERIC.name() %>") {
           show("valueFormatRow");
           show("numberFormatHelp");
           $set("valueFormatLabel", "<fmt:message key="dsEdit.httpRetriever.numberFormat"/>");
@@ -143,7 +143,7 @@
   <tr>
     <td class="formLabelRequired"><fmt:message key="dsEdit.pointDataType"/></td>
     <td class="formField">
-      <select name="dataTypeId" onchange="dataTypeChanged()">
+      <select name="mangoDataType" onchange="dataTypeChanged()">
         <tag:dataTypeOptions excludeImage="true"/>
       </select>
     </td>

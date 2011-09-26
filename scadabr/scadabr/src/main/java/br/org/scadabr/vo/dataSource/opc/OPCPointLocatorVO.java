@@ -11,15 +11,17 @@ import br.org.scadabr.rt.dataSource.opc.OPCPointLocatorRT;
 import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
+import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import com.serotonin.util.SerializationHelper;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
 
+@JsonRemoteEntity
 public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
 		JsonSerializable {
 
@@ -34,12 +36,12 @@ public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
 	}
 
 	@Override
-	public int getDataTypeId() {
-		return dataType;
+	public MangoDataType getMangoDataType() {
+		return mangoDataType;
 	}
 
-	public void setDataTypeId(int dataType) {
-		this.dataType = dataType;
+	public void setMangoDataType(MangoDataType mangoDataType) {
+		this.mangoDataType = mangoDataType;
 	}
 
 	@Override
@@ -53,8 +55,8 @@ public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
 
 	@JsonRemoteProperty
 	private String tag = "";
-	@JsonRemoteProperty
-	private int dataType = DataTypes.BINARY;
+        @JsonRemoteProperty(alias=MangoDataType.ALIAS_DATA_TYPE)
+	private MangoDataType mangoDataType = MangoDataType.BINARY;
 	@JsonRemoteProperty
 	private boolean settable;
 
@@ -79,7 +81,7 @@ public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(version);
 		SerializationHelper.writeSafeUTF(out, tag);
-		out.writeInt(dataType);
+		out.writeInt(mangoDataType.mangoId);
 		out.writeBoolean(settable);
 
 	}
@@ -89,7 +91,7 @@ public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
 		int ver = in.readInt();
 		if (ver == 1) {
 			tag = SerializationHelper.readSafeUTF(in);
-			dataType = in.readInt();
+			mangoDataType = MangoDataType.fromMangoId(in.readInt());
 			settable = in.readBoolean();
 		}
 	}
@@ -102,7 +104,6 @@ public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
 
 	@Override
 	public void jsonSerialize(Map<String, Object> arg0) {
-
 	}
 
 	public String getTag() {

@@ -32,6 +32,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonSerializable;
 import com.serotonin.json.JsonValue;
 import com.serotonin.json.TypeFactory;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.util.LocalizableJsonException;
@@ -54,7 +55,7 @@ abstract public class BaseTextRenderer implements TextRenderer, JsonSerializable
         }
     }
 
-    public static List<ImplDefinition> getImplementation(int dataType) {
+    public static List<ImplDefinition> getImplementation(MangoDataType dataType) {
         ensureDefinitions();
         List<ImplDefinition> impls = new ArrayList<ImplDefinition>(definitions.size());
         for (ImplDefinition def : definitions) {

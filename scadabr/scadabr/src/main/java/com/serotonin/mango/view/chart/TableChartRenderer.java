@@ -26,15 +26,16 @@ import java.util.Map;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.vo.DataPointVO;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class TableChartRenderer extends BaseChartRenderer {
     private static ImplDefinition definition = new ImplDefinition("chartRendererTable", "TABLE", "chartRenderer.table",
-            new int[] { DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC });
+            EnumSet.of(MangoDataType.ALPHANUMERIC, MangoDataType.BINARY, MangoDataType.MULTISTATE, MangoDataType.NUMERIC ));
 
     public static ImplDefinition getDefinition() {
         return definition;

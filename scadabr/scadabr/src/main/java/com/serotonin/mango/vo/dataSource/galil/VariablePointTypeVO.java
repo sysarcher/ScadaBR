@@ -29,7 +29,7 @@ import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.mango.rt.dataSource.galil.VariablePointTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -46,7 +46,8 @@ import com.serotonin.web.i18n.LocalizableMessage;
 public class VariablePointTypeVO extends PointTypeVO {
     @JsonRemoteProperty
     private String variableName = "";
-    private int dataTypeId = DataTypes.NUMERIC;
+    @JsonRemoteProperty(alias=MangoDataType.ALIAS_DATA_TYPE)
+    private MangoDataType mangoDataType = MangoDataType.NUMERIC;
 
     @Override
     public PointTypeRT createRuntime() {
@@ -59,8 +60,8 @@ public class VariablePointTypeVO extends PointTypeVO {
     }
 
     @Override
-    public int getDataTypeId() {
-        return dataTypeId;
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
     @Override
@@ -75,8 +76,8 @@ public class VariablePointTypeVO extends PointTypeVO {
 
     @Override
     public void validate(DwrResponseI18n response) {
-        if (!DataTypes.CODES.isValidId(dataTypeId, DataTypes.IMAGE))
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
+        if (mangoDataType != MangoDataType.IMAGE)
+            response.addContextualMessage("mangoDataType", "validate.invalidValue");
         if (StringUtils.isEmpty(variableName))
             response.addContextualMessage("variablePointType.variableName", "validate.required");
     }
@@ -89,21 +90,21 @@ public class VariablePointTypeVO extends PointTypeVO {
         this.variableName = variableName;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setMangoDataType(MangoDataType mangoDataType) {
+        this.mangoDataType = mangoDataType;
     }
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.galil.varName", variableName);
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", mangoDataType);
     }
 
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         VariablePointTypeVO from = (VariablePointTypeVO) o;
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.galil.varName", from.variableName, variableName);
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.mangoDataType, mangoDataType);
     }
 
     //
@@ -117,7 +118,7 @@ public class VariablePointTypeVO extends PointTypeVO {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, variableName);
-        out.writeInt(dataTypeId);
+        out.writeInt(mangoDataType.mangoId);
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
@@ -126,26 +127,17 @@ public class VariablePointTypeVO extends PointTypeVO {
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
             variableName = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            mangoDataType = MangoDataType.fromMangoId(in.readInt());
         }
     }
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
-
-        String text = json.getString("dataType");
-        if (text != null) {
-            dataTypeId = DataTypes.CODES.getId(text);
-            if (!DataTypes.CODES.isValidId(dataTypeId, DataTypes.IMAGE))
-                throw new LocalizableJsonException("emport.error.invalid", "dataType", text, DataTypes.CODES
-                        .getCodeList(DataTypes.IMAGE));
-        }
     }
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        map.put("dataType", DataTypes.CODES.getCode(dataTypeId));
     }
 }

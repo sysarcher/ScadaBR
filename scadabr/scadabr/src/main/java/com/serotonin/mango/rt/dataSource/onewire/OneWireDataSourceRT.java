@@ -38,7 +38,7 @@ import com.dalsemi.onewire.container.TemperatureContainer;
 import com.dalsemi.onewire.utils.Address;
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -296,10 +296,10 @@ public class OneWireDataSourceRT extends PollingDataSource {
 
                 if (result != null) {
                     // The value was correctly extracted from the device.
-                    if (DataTypes.getDataType(result) != locator.getVo().getDataTypeId())
+                    if (result.getMangoDataType() != locator.getVo().getMangoDataType())
                         // Huh?
-                        throw new ShouldNeverHappenException("Got " + DataTypes.getDataType(result) + ", expected "
-                                + locator.getVo().getDataTypeId());
+                        throw new ShouldNeverHappenException("Got " + result.getMangoDataType() + ", expected "
+                                + locator.getVo().getMangoDataType().name());
 
                     // Update the data image with the new value.
                     point.updatePointValue(new PointValueTime(result, time));

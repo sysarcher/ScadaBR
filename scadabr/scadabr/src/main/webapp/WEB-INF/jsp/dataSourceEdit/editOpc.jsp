@@ -1,3 +1,4 @@
+<%@page import="com.serotonin.mango.MangoDataType"%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp"%>
 <%@page import="com.serotonin.modbus4j.code.RegisterRange"%>
 <%@page import="com.serotonin.modbus4j.code.DataType"%>
@@ -21,18 +22,18 @@
   var cellFuncs = [
           function(data) { return data.tag; },
           function(data) {
-              if (data.dataType == ${applicationScope['constants.DataTypes.BINARY']})
+              if (data.mangoDataType == ${applicationScope['constants.DataTypes.BINARY']})
                   return "<fmt:message key="common.dataTypes.binary"/>";
-              if (data.dataType == ${applicationScope['constants.DataTypes.MULTISTATE']})
+              if (data.mangoDataType == ${applicationScope['constants.DataTypes.MULTISTATE']})
                   return "<fmt:message key="common.dataTypes.multistate"/>";
-              if (data.dataType == ${applicationScope['constants.DataTypes.NUMERIC']})
+              if (data.mangoDataType == ${applicationScope['constants.DataTypes.NUMERIC']})
                   return "<fmt:message key="common.dataTypes.numeric"/>";
-              if (data.dataType == ${applicationScope['constants.DataTypes.ALPHANUMERIC']})
+              if (data.mangoDataType == ${applicationScope['constants.DataTypes.ALPHANUMERIC']})
                   return "<fmt:message key="common.dataTypes.alphanumeric"/>";
-              if (data.dataType == 7)
+              if (data.mangoDataType == 7)
                       return "<fmt:message key="common.dataTypes.bad"/>";
 
-              return "<fmt:message key="common.unknown"/> ("+ data.dataType +")";
+              return "<fmt:message key="common.unknown"/> ("+ data.mangoDataType +")";
           },
           function(data) { return data.settable; },
           function(data) { return "<input type='checkbox' name='addTag'/>"; }
@@ -102,7 +103,7 @@
       
       // Prevents DWR warnings
       delete locator.configurationDescription;
-      delete locator.dataTypeMessage;
+      delete locator.mangoDataType;
       delete locator.relinquish;
       
 	  var tags = new Array();
@@ -114,15 +115,15 @@
 			  tags.push(list.rows[i].cells[0].innerHTML);
 			  
 			  // TODO Not good. What is put into innerHTML is not always what comes out.
-			  if (list.rows[i].cells[1].innerHTML == "<fmt:message key="common.dataTypes.binary"/>") {
+			  if (list.rows[i].cells[1].innerHTML == "<fmt:message key="<%=MangoDataType.BINARY.getI18nMessageKey()%>"/>") {
 	           	  dataTypes.push(1);
-    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="common.dataTypes.multistate"/>") {
+    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="<%=MangoDataType.MULTISTATE.getI18nMessageKey()%>"/>") {
     			  dataTypes.push(2);
-    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="common.dataTypes.numeric"/>") {
+    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="<%=MangoDataType.NUMERIC.getI18nMessageKey()%>"/>") {
     			  dataTypes.push(3);
-    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="common.dataTypes.alphanumeric"/>") {
+    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="<%=MangoDataType.ALPHANUMERIC.getI18nMessageKey()%>"/>") {
     			  dataTypes.push(4);
-    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="common.unknown"/>") {
+    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="<%=MangoDataType.UNKNOWN.getI18nMessageKey()%>"/>") {
     			  dataTypes.push(0);
     		  }
     		  
@@ -151,7 +152,7 @@
       
       // Prevents DWR warnings
       delete locator.configurationDescription;
-      delete locator.dataTypeMessage;
+      delete locator.mangoDataType;
       delete locator.relinquish;
 
 	  var tags = new Array();
@@ -171,15 +172,15 @@
 			  tags.push(list.rows[i].cells[0].innerHTML);
 			  
 			  // TODO Not good. What is put into innerHTML is not always what comes out.
-			  if (list.rows[i].cells[1].innerHTML == "<fmt:message key="common.dataTypes.binary"/>") {
+			  if (list.rows[i].cells[1].innerHTML == "<fmt:message key="<%=MangoDataType.BINARY.getI18nMessageKey()%>"/>") {
 	           	  dataTypes.push(1);
-    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="common.dataTypes.multistate"/>") {
+    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="<%=MangoDataType.MULTISTATE.getI18nMessageKey()%>"/>") {
     			  dataTypes.push(2);
-    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="common.dataTypes.numeric"/>") {
+    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="<%=MangoDataType.NUMERIC.getI18nMessageKey()%>"/>") {
     			  dataTypes.push(3);
-    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="common.dataTypes.alphanumeric"/>") {
+    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="<%=MangoDataType.ALPHANUMERIC.getI18nMessageKey()%>"/>") {
     			  dataTypes.push(4);
-    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="common.unknown"/>") {
+    		  } else if (list.rows[i].cells[1].innerHTML == "<fmt:message key="<%=MangoDataType.UNKNOWN.getI18nMessageKey()%>"/>") {
     			  dataTypes.push(0);
     		  }
     		  
@@ -226,19 +227,10 @@
 				var td2 = document.createElement("TD");
 				td2.setAttribute("align","center");
 				var text2 = "";
-				if(response.dataType == ${applicationScope['constants.DataTypes.BINARY']}){
-					text2 = document.createTextNode("<fmt:message key="common.dataTypes.binary"/>");
-				}
-				if(response.dataType == ${applicationScope['constants.DataTypes.NUMERIC']}){
-					text2 = document.createTextNode("<fmt:message key="common.dataTypes.numeric"/>");
-				}
-				if(response.dataType == ${applicationScope['constants.DataTypes.ALPHANUMERIC']}){
-					text2 = document.createTextNode("<fmt:message key="common.dataTypes.alphanumeric"/>");
-				}
-				if(response.dataType == 6) {
-					text2 = document.createTextNode("<fmt:message key="common.unknown"/>");
-				}
-				td2.appendChild(text2);
+                                
+				text2 = document.createTextNode("<fmt:message>response.mangoDataType.i18MessageKey</fmt:message>");
+				
+                                td2.appendChild(text2);
 
 	 			var td3 = document.createElement("TD");
 	 			td3.setAttribute("align","center");

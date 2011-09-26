@@ -39,7 +39,7 @@ import org.jfree.data.time.TimeSeries;
 import com.serotonin.InvalidArgumentException;
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.ReportDao;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -129,11 +129,11 @@ public class ReportChartCreator {
         model.put("points", pointStatistics);
         model.put("inline", inlinePrefix == null ? "" : "cid:");
 
-        model.put("ALPHANUMERIC", DataTypes.ALPHANUMERIC);
-        model.put("BINARY", DataTypes.BINARY);
-        model.put("MULTISTATE", DataTypes.MULTISTATE);
-        model.put("NUMERIC", DataTypes.NUMERIC);
-        model.put("IMAGE", DataTypes.IMAGE);
+        model.put(MangoDataType.ALPHANUMERIC.name(), MangoDataType.ALPHANUMERIC.mangoId);
+        model.put(MangoDataType.BINARY.name(), MangoDataType.BINARY.mangoId);
+        model.put(MangoDataType.MULTISTATE.name(), MangoDataType.MULTISTATE.mangoId );
+        model.put(MangoDataType.NUMERIC.name(), MangoDataType.NUMERIC.mangoId);
+        model.put(MangoDataType.IMAGE.name(), MangoDataType.IMAGE.mangoId);
 
         // Create the individual point charts
         for (PointStatistics pointStat : pointStatistics) {
@@ -274,7 +274,7 @@ public class ReportChartCreator {
     public class PointStatistics {
         private final int reportPointId;
         private String name;
-        private int dataType;
+        private MangoDataType mangoDataType = MangoDataType.UNKNOWN;
         private String dataTypeDescription;
         private String startValue;
         private TextRenderer textRenderer;
@@ -296,12 +296,12 @@ public class ReportChartCreator {
             this.name = name;
         }
 
-        public int getDataType() {
-            return dataType;
+        public MangoDataType getMangoDataType() {
+            return mangoDataType;
         }
 
-        public void setDataType(int dataType) {
-            this.dataType = dataType;
+        public void setMangoDataType(MangoDataType mangoDataType) {
+            this.mangoDataType = mangoDataType;
         }
 
         public String getDataTypeDescription() {
@@ -493,8 +493,8 @@ public class ReportChartCreator {
 
             point = new PointStatistics(pointInfo.getReportPointId());
             point.setName(pointInfo.getExtendedName());
-            point.setDataType(pointInfo.getDataType());
-            point.setDataTypeDescription(DataTypes.getDataTypeMessage(pointInfo.getDataType()).getLocalizedMessage(
+            point.setMangoDataType(pointInfo.getMangoDataType());
+            point.setDataTypeDescription(pointInfo.getMangoDataType().getLocalizableMessage().getLocalizedMessage(
                     bundle));
             point.setTextRenderer(pointInfo.getTextRenderer());
             if (pointInfo.getStartValue() != null)
@@ -511,7 +511,9 @@ public class ReportChartCreator {
                 // Should never happen, but leave the color null in case it does.
             }
 
-            if (pointInfo.getDataType() == DataTypes.NUMERIC) {
+            switch (pointInfo.getMangoDataType()) {
+                case NUMERIC:
+            
                 point.setStats(new AnalogStatistics(pointInfo.getStartValue() == null ? null : pointInfo
                         .getStartValue().getDoubleValue(), start, end));
                 quantizer = new NumericDataQuantizer(start, end, imageWidth, this);
@@ -523,8 +525,8 @@ public class ReportChartCreator {
                 point.setNumericTimeSeriesColor(colour);
                 if (pointInfo.isConsolidatedChart())
                     pointTimeSeriesCollection.addNumericTimeSeries(numericTimeSeries, colour);
-            }
-            else if (pointInfo.getDataType() == DataTypes.MULTISTATE) {
+            break;
+                case MULTISTATE:
                 point.setStats(new StartsAndRuntimeList(pointInfo.getStartValue(), start, end));
                 quantizer = new MultistateDataQuantizer(start, end, imageWidth, this);
 
@@ -534,8 +536,8 @@ public class ReportChartCreator {
                 if (pointInfo.isConsolidatedChart())
                     pointTimeSeriesCollection.addDiscreteTimeSeries(discreteTimeSeries);
                 numericTimeSeries = null;
-            }
-            else if (pointInfo.getDataType() == DataTypes.BINARY) {
+            break;
+                case BINARY:
                 point.setStats(new StartsAndRuntimeList(pointInfo.getStartValue(), start, end));
                 quantizer = new BinaryDataQuantizer(start, end, imageWidth, this);
 
@@ -545,15 +547,15 @@ public class ReportChartCreator {
                 if (pointInfo.isConsolidatedChart())
                     pointTimeSeriesCollection.addDiscreteTimeSeries(discreteTimeSeries);
                 numericTimeSeries = null;
-            }
-            else if (pointInfo.getDataType() == DataTypes.ALPHANUMERIC) {
+            break;
+                case ALPHANUMERIC:
                 point.setStats(new ValueChangeCounter(pointInfo.getStartValue()));
                 quantizer = null;
 
                 discreteTimeSeries = null;
                 numericTimeSeries = null;
-            }
-            else if (pointInfo.getDataType() == DataTypes.IMAGE) {
+            break;
+                case IMAGE:
                 point.setStats(new ValueChangeCounter(pointInfo.getStartValue()));
                 quantizer = null;
 

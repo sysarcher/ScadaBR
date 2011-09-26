@@ -31,13 +31,14 @@ import org.springframework.web.servlet.mvc.ParameterizableViewController;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.util.CommPortConfigException;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.permission.Permissions;
 
@@ -56,12 +57,12 @@ public class DataSourceEditController extends ParameterizableViewController {
             String pidStr = request.getParameter("pid");
             if (pidStr == null) {
                 // Adding a new data source? Get the type id.
-                int typeId = Integer.parseInt(request.getParameter("typeId"));
+                DataSourceRegistry dataSourceTtype = DataSourceRegistry.valueOf(request.getParameter("dataSourceType"));
 
                 Permissions.ensureAdmin(user);
 
                 // A new data source
-                dataSourceVO = DataSourceVO.createDataSourceVO(typeId);
+                dataSourceVO = DataSourceVO.createDataSourceVO(dataSourceTtype);
                 dataSourceVO.setId(Common.NEW_ID);
                 dataSourceVO.setXid(new DataSourceDao().generateUniqueXid());
             }
@@ -107,7 +108,7 @@ public class DataSourceEditController extends ParameterizableViewController {
         for (DataPointVO dp : allPoints) {
             if (Permissions.hasDataPointReadPermission(user, dp)) {
                 userPoints.add(dp);
-                if (dp.getPointLocator().getDataTypeId() == DataTypes.NUMERIC)
+                if (dp.getPointLocator().getMangoDataType() == MangoDataType.NUMERIC)
                     analogPoints.add(dp);
             }
         }

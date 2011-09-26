@@ -43,7 +43,7 @@
   
   function editPointCBImpl(locator) {
 	  $set("valueRegex", locator.valueRegex);
-	  $set("dataTypeId", locator.dataType);
+	  $set("mangoDataType", locator.mangoDataType);
 	  $set("command", locator.command);
 	  $set("customTimestamp",locator.customTimestamp);
 	  checkTimestampChanged();
@@ -55,7 +55,7 @@
   }
   
   function savePointImpl(locator) {
-	  locator.dataType = $get("dataTypeId");
+	  locator.mangoDataType = $get("mangoDataType");
 	  locator.command = $get("command");
       locator.valueRegex = $get("valueRegex");
 	  locator.customTimestamp = $get("customTimestamp");
@@ -66,7 +66,7 @@
   }
 
   function changeDataType() {
-      DataSourceEditDwr.getChangeTypes($get("dataTypeId"), changeDataTypeCB);
+      DataSourceEditDwr.getChangeTypes($get("mangoDataType"), changeDataTypeCB);
   }
   
   function changeDataTypeCB(changeTypes) {
@@ -322,7 +322,7 @@
   <tr>
     <td class="formLabelRequired"><fmt:message key="dsEdit.pointDataType"/></td>
     <td class="formField">
-      <select id="dataTypeId">
+      <select id="mangoDataType">
         <tag:dataTypeOptions excludeImage="true"/>
       </select>
     </td>

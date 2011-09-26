@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -315,9 +315,9 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
     }
 
     private void updatePointValue(DataPointRT dataPoint, ModbusPointLocatorRT pl, Object value, long time) {
-        if (pl.getVO().getDataTypeId() == DataTypes.BINARY)
+        if (pl.getVO().getMangoDataType() == MangoDataType.BINARY)
             dataPoint.updatePointValue(new PointValueTime((Boolean) value, time));
-        else if (pl.getVO().getDataTypeId() == DataTypes.ALPHANUMERIC)
+        else if (pl.getVO().getMangoDataType() == MangoDataType.ALPHANUMERIC)
             dataPoint.updatePointValue(new PointValueTime((String) value, time));
         else {
             // Apply arithmetic conversions.
@@ -345,13 +345,13 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
 
         try {
             // See if this is a numeric value that needs to be converted.
-            if (dataPoint.getDataTypeId() == DataTypes.NUMERIC) {
+            if (dataPoint.getMangoDataType() == MangoDataType.NUMERIC) {
                 double convertedValue = valueTime.getDoubleValue();
                 convertedValue -= pl.getVO().getAdditive();
                 convertedValue /= pl.getVO().getMultiplier();
                 modbusMaster.setValue(ml, convertedValue);
             }
-            else if (dataPoint.getDataTypeId() == DataTypes.ALPHANUMERIC)
+            else if (dataPoint.getMangoDataType() == MangoDataType.ALPHANUMERIC)
                 modbusMaster.setValue(ml, valueTime.getStringValue());
             else
                 modbusMaster.setValue(ml, valueTime.getBooleanValue());

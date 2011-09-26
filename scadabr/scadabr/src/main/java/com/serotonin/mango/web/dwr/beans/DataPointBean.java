@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr.beans;
 
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.web.i18n.LocalizableMessage;
 
@@ -25,7 +26,7 @@ public class DataPointBean {
     private int id;
     private String name;
     private boolean settable;
-    private int dataType;
+    private MangoDataType mangoDataType = MangoDataType.UNKNOWN;
     private final LocalizableMessage dataTypeMessage;
     private final String chartColour;
 
@@ -33,8 +34,8 @@ public class DataPointBean {
         id = vo.getId();
         name = vo.getExtendedName();
         settable = vo.getPointLocator().isSettable();
-        dataType = vo.getPointLocator().getDataTypeId();
-        dataTypeMessage = vo.getDataTypeMessage();
+        mangoDataType = vo.getPointLocator().getMangoDataType();
+        dataTypeMessage = mangoDataType.getLocalizableMessage();
         chartColour = vo.getChartColour();
     }
 
@@ -62,12 +63,12 @@ public class DataPointBean {
         this.settable = settable;
     }
 
-    public int getDataType() {
-        return dataType;
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
-    public void setDataType(int dataType) {
-        this.dataType = dataType;
+    public void setMangoDataType(MangoDataType mangoDataType) {
+        this.mangoDataType = mangoDataType;
     }
 
     public LocalizableMessage getDataTypeMessage() {

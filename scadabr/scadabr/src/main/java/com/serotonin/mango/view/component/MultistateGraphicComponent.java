@@ -34,13 +34,14 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonValue;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -48,7 +49,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
 @JsonRemoteEntity
 public class MultistateGraphicComponent extends ImageSetComponent {
     public static ImplDefinition DEFINITION = new ImplDefinition("multistateGraphic", "MULTISTATE_GRAPHIC",
-            "graphic.multistateGraphic", new int[] { DataTypes.MULTISTATE });
+            "graphic.multistateGraphic", EnumSet.of( MangoDataType.MULTISTATE ));
 
     private Map<Integer, Integer> stateImageMap = new HashMap<Integer, Integer>();
     @JsonRemoteProperty

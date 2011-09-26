@@ -31,6 +31,7 @@ import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.util.ExportCodes;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.util.SerializationHelper;
@@ -46,7 +47,6 @@ import com.serotonin.web.i18n.LocalizableMessage;
  */
 @JsonRemoteEntity
 public class ViconicsDataSourceVO extends DataSourceVO<ViconicsDataSourceVO> {
-    public static final Type TYPE = Type.VICONICS;
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
@@ -84,8 +84,8 @@ public class ViconicsDataSourceVO extends DataSourceVO<ViconicsDataSourceVO> {
     }
 
     @Override
-    public Type getType() {
-        return TYPE;
+    public DataSourceRegistry getType() {
+        return DataSourceRegistry.VICONICS;
     }
 
     @Override

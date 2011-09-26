@@ -198,11 +198,11 @@ public class DataPointDao extends BaseDao {
     void updateDataPoint(final DataPointVO dp) {
         DataPointVO old = getDataPoint(dp.getId());
 
-        if (old.getPointLocator().getDataTypeId() != dp.getPointLocator().getDataTypeId())
+        if (old.getPointLocator().getMangoDataType() != dp.getPointLocator().getMangoDataType())
             // Delete any point values where data type doesn't match the vo, just in case the data type was changed.
             // Only do this if the data type has actually changed because it is just really slow if the database is
             // big or busy.
-            new PointValueDao().deletePointValuesWithMismatchedType(dp.getId(), dp.getPointLocator().getDataTypeId());
+            new PointValueDao().deletePointValuesWithMismatchedType(dp.getId(), dp.getPointLocator().getMangoDataType());
 
         // Save the VO information.
         updateDataPointShallow(dp);

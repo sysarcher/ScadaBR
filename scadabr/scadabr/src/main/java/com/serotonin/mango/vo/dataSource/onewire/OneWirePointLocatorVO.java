@@ -30,7 +30,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.onewire.OneWirePointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -82,12 +82,12 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
         return "Unknown";
     }
 
-    public static int getAttributeDataType(int attributeId) {
+    public static MangoDataType getAttributeDataType(int attributeId) {
         if (attributeId == AttributeTypes.LATCH_STATE)
-            return DataTypes.BINARY;
+            return MangoDataType.BINARY;
         if (attributeId == AttributeTypes.WIPER_POSITION)
-            return DataTypes.MULTISTATE;
-        return DataTypes.NUMERIC;
+            return MangoDataType.MULTISTATE;
+        return MangoDataType.NUMERIC;
     }
 
     /**
@@ -110,7 +110,8 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
         return getAttributeDescription(attributeId);
     }
 
-    public int getDataTypeId() {
+    @Override
+    public MangoDataType getMangoDataType() {
         return getAttributeDataType(attributeId);
     }
 

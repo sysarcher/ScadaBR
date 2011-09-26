@@ -30,7 +30,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -59,16 +59,18 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
 
     @JsonRemoteProperty
     private String parameterName;
-    private int dataTypeId;
+    @JsonRemoteProperty(alias=MangoDataType.ALIAS_DATA_TYPE)
+    private MangoDataType mangoDataType = MangoDataType.UNKNOWN;
     @JsonRemoteProperty
     private String binary0Value;
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    @Override
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setMangoDataType(MangoDataType mangoDataType) {
+        this.mangoDataType = mangoDataType;
     }
 
     public String getParameterName() {
@@ -90,14 +92,12 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
     public void validate(DwrResponseI18n response) {
         if (StringUtils.isEmpty(parameterName))
             response.addContextualMessage("parameterName", "validate.required");
-        if (!DataTypes.CODES.isValidId(dataTypeId))
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
     }
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.httpReceiver.httpParamName", parameterName);
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", mangoDataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpReceiver.binaryZeroValue", binary0Value);
     }
 
@@ -106,7 +106,7 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
         HttpReceiverPointLocatorVO from = (HttpReceiverPointLocatorVO) o;
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpReceiver.httpParamName", from.parameterName,
                 parameterName);
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.mangoDataType, mangoDataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpReceiver.binaryZeroValue", from.binary0Value,
                 binary0Value);
     }
@@ -122,7 +122,7 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, parameterName);
-        out.writeInt(dataTypeId);
+        out.writeInt(mangoDataType.mangoId);
         SerializationHelper.writeSafeUTF(out, binary0Value);
     }
 
@@ -132,20 +132,16 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
             parameterName = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            mangoDataType = MangoDataType.fromMangoId(in.readInt());
             binary0Value = SerializationHelper.readSafeUTF(in);
         }
     }
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        Integer value = deserializeDataType(json, DataTypes.IMAGE);
-        if (value != null)
-            dataTypeId = value;
     }
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        serializeDataType(map);
     }
 }

@@ -24,7 +24,7 @@ import java.io.ObjectOutputStream;
 
 import com.serotonin.db.IntValuePair;
 import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
@@ -56,11 +56,11 @@ public class SpinwaveV2PointLocatorVO extends BaseSpinwavePointLocatorVO {
             new IntValuePair(SensorValue.TYPE_FREQUENCY, "dsEdit.spinwave.v2Attr.freq"),
             new IntValuePair(SensorValue.TYPE_PULSECOUNTER, "dsEdit.spinwave.v2Attr.counter"), };
 
-    public static int getAttributeDataType(int attributeId) {
+    public static MangoDataType getAttributeDataType(int attributeId) {
         if (attributeId == SensorValue.TYPE_BATTERY_ALARM || attributeId == SensorValue.TYPE_OVERRIDE
                 || attributeId == SensorValue.TYPE_OCCUPANCY)
-            return DataTypes.BINARY;
-        return DataTypes.NUMERIC;
+            return MangoDataType.BINARY;
+        return MangoDataType.NUMERIC;
     }
 
     public static String getAttributeDescription(int attributeId) {
@@ -80,7 +80,8 @@ public class SpinwaveV2PointLocatorVO extends BaseSpinwavePointLocatorVO {
         return getAttributeDescription(getAttributeId());
     }
 
-    public int getDataTypeId() {
+    @Override
+    public MangoDataType getMangoDataType() {
         return getAttributeDataType(getAttributeId());
     }
 
@@ -92,7 +93,7 @@ public class SpinwaveV2PointLocatorVO extends BaseSpinwavePointLocatorVO {
         if (value == null)
             return null;
 
-        if (getAttributeDataType(getAttributeId()) == DataTypes.BINARY)
+        if (getAttributeDataType(getAttributeId()) == MangoDataType.BINARY)
             return new BinaryValue(value.getBinary());
 
         if (isConvertToCelsius())

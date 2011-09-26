@@ -1,8 +1,10 @@
 package br.org.scadabr.view.component;
 
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.view.component.ViewComponent;
 import com.serotonin.mango.vo.User;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.util.EnumSet;
 
 abstract public class CustomComponent extends ViewComponent {
 
@@ -14,7 +16,7 @@ abstract public class CustomComponent extends ViewComponent {
 		return true;
 	}
 
-	public int[] getSupportedDataTypes() {
+	public EnumSet<MangoDataType> getSupportedDataTypes() {
 		return definition().getSupportedDataTypes();
 	}
 

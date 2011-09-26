@@ -16,7 +16,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import com.serotonin.util.SerializationHelper;
@@ -31,8 +31,8 @@ public class DrStorageHt5bPointLocatorVO extends AbstractPointLocatorVO
 	private String pointType;
 	@JsonRemoteProperty
 	private boolean settable;
-
-	private int dataType = DataTypes.ALPHANUMERIC;
+        @JsonRemoteProperty(alias=MangoDataType.ALIAS_DATA_TYPE)
+	private MangoDataType mangoDataType = MangoDataType.ALPHANUMERIC;
 
 	@Override
 	public void validate(DwrResponseI18n response) {
@@ -108,9 +108,9 @@ public class DrStorageHt5bPointLocatorVO extends AbstractPointLocatorVO
 	}
 
 	@Override
-	public int getDataTypeId() {
+	public MangoDataType getMangoDataType() {
 		// TODO Auto-generated method stub
-		return 4;
+		return MangoDataType.ALPHANUMERIC;
 	}
 
 }
