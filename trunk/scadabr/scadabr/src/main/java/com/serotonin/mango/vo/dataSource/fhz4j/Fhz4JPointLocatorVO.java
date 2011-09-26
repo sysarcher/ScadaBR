@@ -31,7 +31,7 @@ import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
@@ -63,31 +63,31 @@ public class Fhz4JPointLocatorVO<T extends ScadaProperty> extends AbstractPointL
     }
 
     @Override
-    public int getDataTypeId() {
+    public MangoDataType getMangoDataType() {
         if (getProperty() == null) {
-            return DataTypes.UNKNOWN;
+            return MangoDataType.UNKNOWN;
         }
         switch (getProperty().getDataType()) {
             case BOOLEAN:
-                return DataTypes.BINARY;
+                return MangoDataType.BINARY;
             case BYTE:
-                return DataTypes.MULTISTATE;
+                return MangoDataType.MULTISTATE;
             case CHAR:
-                return DataTypes.ALPHANUMERIC;
+                return MangoDataType.ALPHANUMERIC;
             case DOUBLE:
-                return DataTypes.NUMERIC;
+                return MangoDataType.NUMERIC;
             case FLOAT:
-                return DataTypes.NUMERIC;
+                return MangoDataType.NUMERIC;
             case LONG:
-                return DataTypes.MULTISTATE;
+                return MangoDataType.MULTISTATE;
             case INT:
-                return DataTypes.MULTISTATE;
+                return MangoDataType.MULTISTATE;
             case SHORT:
-                return DataTypes.MULTISTATE;
+                return MangoDataType.MULTISTATE;
             case STRING:
-                return DataTypes.ALPHANUMERIC;
+                return MangoDataType.ALPHANUMERIC;
             case TIME:
-                return DataTypes.ALPHANUMERIC;
+                return MangoDataType.ALPHANUMERIC;
             default:
                 throw new RuntimeException("Cant find datatype of " + getProperty());
         }

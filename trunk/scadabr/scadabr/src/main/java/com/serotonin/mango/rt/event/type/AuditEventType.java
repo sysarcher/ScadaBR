@@ -27,7 +27,7 @@ import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.util.ChangeComparable;
@@ -176,9 +176,8 @@ public class AuditEventType extends EventType {
                 getExportCodeMessage(codes, id)));
     }
 
-    public static void addDataTypeMessage(List<LocalizableMessage> list, String propertyNameKey, int dataTypeId) {
-        list.add(new LocalizableMessage("event.audit.property", new LocalizableMessage(propertyNameKey), DataTypes
-                .getDataTypeMessage(dataTypeId)));
+    public static void addDataTypeMessage(List<LocalizableMessage> list, String propertyNameKey, MangoDataType dataType) {
+        list.add(new LocalizableMessage("event.audit.property", new LocalizableMessage(propertyNameKey), dataType.getLocalizableMessage()));
     }
 
     public static void maybeAddPropertyChangeMessage(List<LocalizableMessage> list, String propertyNameKey,
@@ -221,10 +220,10 @@ public class AuditEventType extends EventType {
     }
 
     public static void maybeAddDataTypeChangeMessage(List<LocalizableMessage> list, String propertyNameKey,
-            int fromDataTypeId, int toDataTypeId) {
-        if (fromDataTypeId != toDataTypeId)
-            addPropertyChangeMessage(list, propertyNameKey, DataTypes.getDataTypeMessage(fromDataTypeId),
-                    DataTypes.getDataTypeMessage(toDataTypeId));
+            MangoDataType fromDataType, MangoDataType toDataType) {
+        if (fromDataType != toDataType)
+            addPropertyChangeMessage(list, propertyNameKey, fromDataType.getLocalizableMessage(),
+                    toDataType.getLocalizableMessage());
     }
 
     private static LocalizableMessage getBooleanMessage(boolean value) {

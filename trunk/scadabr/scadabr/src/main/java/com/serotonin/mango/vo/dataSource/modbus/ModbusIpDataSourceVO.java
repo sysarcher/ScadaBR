@@ -34,6 +34,7 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.modbus.ModbusIpDataSource;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.LocalizableJsonException;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.modbus4j.base.ModbusUtils;
 import com.serotonin.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
@@ -42,7 +43,6 @@ import com.serotonin.web.i18n.LocalizableMessage;
 
 @JsonRemoteEntity
 public class ModbusIpDataSourceVO extends ModbusDataSourceVO<ModbusIpDataSourceVO> {
-    public static final Type TYPE = Type.MODBUS_IP;
 
     public enum TransportType {
         TCP("dsEdit.modbusIp.transportType.tcp"), TCP_KEEP_ALIVE("dsEdit.modbusIp.transportType.tcpKA"), UDP(
@@ -80,8 +80,8 @@ public class ModbusIpDataSourceVO extends ModbusDataSourceVO<ModbusIpDataSourceV
     }
 
     @Override
-    public Type getType() {
-        return TYPE;
+    public DataSourceRegistry getType() {
+        return DataSourceRegistry.MODBUS_IP;
     }
 
     @Override

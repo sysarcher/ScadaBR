@@ -25,7 +25,7 @@ import java.util.List;
 
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.mango.rt.dataSource.galil.TellPositionPointTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -62,8 +62,8 @@ public class TellPositionPointTypeVO extends PointTypeVO {
     }
 
     @Override
-    public int getDataTypeId() {
-        return DataTypes.NUMERIC;
+    public MangoDataType getMangoDataType() {
+        return MangoDataType.NUMERIC;
     }
 
     @Override

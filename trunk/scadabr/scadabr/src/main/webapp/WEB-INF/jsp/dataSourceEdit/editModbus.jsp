@@ -183,7 +183,7 @@
   function savePointImpl(locator) {
       delete locator.settable;
       delete locator.rangeMessage;
-      delete locator.dataTypeId;
+      delete locator.mangoDataType;
       delete locator.relinquishable;
       
       locator.slaveId = $get("slaveId");

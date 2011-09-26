@@ -167,7 +167,7 @@ public class PachubeDataSourceRT extends PollingDataSource {
             else {
                 try {
                     // Get the value
-                    MangoValue value = DataSourceUtils.getValue(dataValue.getValue(), locator.getDataTypeId(),
+                    MangoValue value = DataSourceUtils.getValue(dataValue.getValue(), locator.getMangoDataType(),
                             locator.getBinary0Value(), dp.getVO().getTextRenderer(), null, dp.getVO().getName());
 
                     // Get the time.

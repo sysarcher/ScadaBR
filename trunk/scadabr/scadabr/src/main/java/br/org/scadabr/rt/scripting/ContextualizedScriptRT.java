@@ -13,7 +13,7 @@ import br.org.scadabr.vo.scripting.ContextualizedScriptVO;
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.db.IntValuePair;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataSource.meta.AlphanumericPointWrapper;
@@ -81,22 +81,27 @@ public class ContextualizedScriptRT extends ScriptRT {
 		// Put the context variables into the engine with engine scope.
 		for (String varName : context.keySet()) {
 			IDataPoint point = context.get(varName);
-			int dt = point.getDataTypeId();
-			if (dt == DataTypes.BINARY)
+			switch(point.getMangoDataType()) {
+                            case BINARY:
 				engine.put(varName, new BinaryPointWrapper(point,
 						wrapperContext));
-			else if (dt == DataTypes.MULTISTATE)
+			break;
+                            case MULTISTATE:
 				engine.put(varName, new MultistatePointWrapper(point,
 						wrapperContext));
-			else if (dt == DataTypes.NUMERIC)
+			break;
+                            case NUMERIC:
 				engine.put(varName, new NumericPointWrapper(point,
 						wrapperContext));
-			else if (dt == DataTypes.ALPHANUMERIC)
+			break;
+                            case ALPHANUMERIC:
 				engine.put(varName, new AlphanumericPointWrapper(point,
 						wrapperContext));
-			else
+			break;
+                            default:
 				throw new ShouldNeverHappenException("Unknown data type id: "
-						+ point.getDataTypeId());
+						+ point.getMangoDataType().name());
+                        }
 		}
 
 		List<IntValuePair> objectsContext = ((ContextualizedScriptVO) vo)

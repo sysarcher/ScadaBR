@@ -18,9 +18,10 @@
  */
 package com.serotonin.mango.view;
 
+import com.serotonin.mango.MangoDataType;
 import java.util.List;
 
-import com.serotonin.util.ArrayUtils;
+import java.util.EnumSet;
 
 public class ImplDefinition {
     public static ImplDefinition findByName(List<ImplDefinition> list, String name) {
@@ -43,16 +44,16 @@ public class ImplDefinition {
     private String name;
     private String exportName;
     private final String nameKey;
-    private final int[] supportedDataTypes;
+    private final EnumSet<MangoDataType> supportedDataTypes;
 
-    public ImplDefinition(int id, String exportName, String nameKey, int[] supportedDataTypes) {
+    public ImplDefinition(int id, String exportName, String nameKey, EnumSet<MangoDataType> supportedDataTypes) {
         this.id = id;
         this.nameKey = nameKey;
         this.exportName = exportName;
         this.supportedDataTypes = supportedDataTypes;
     }
 
-    public ImplDefinition(String name, String exportName, String nameKey, int[] supportedDataTypes) {
+    public ImplDefinition(String name, String exportName, String nameKey, EnumSet<MangoDataType> supportedDataTypes) {
         this.name = name;
         this.nameKey = nameKey;
         this.exportName = exportName;
@@ -79,11 +80,11 @@ public class ImplDefinition {
         this.exportName = exportName;
     }
 
-    public int[] getSupportedDataTypes() {
+    public EnumSet<MangoDataType> getSupportedDataTypes() {
         return supportedDataTypes;
     }
 
-    public boolean supports(int dataType) {
-        return ArrayUtils.contains(supportedDataTypes, dataType);
+    public boolean supports(MangoDataType dataType) {
+        return supportedDataTypes.contains(dataType);
     }
 }

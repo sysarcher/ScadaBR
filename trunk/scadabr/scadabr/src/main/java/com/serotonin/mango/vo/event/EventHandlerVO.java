@@ -35,7 +35,7 @@ import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.db.dao.MailingListDao;
@@ -379,7 +379,7 @@ public class EventHandlerVO implements Serializable,
 			if (dp == null)
 				response.addGenericMessage("eventHandlers.noTargetPoint");
 			else {
-				int dataType = dp.getPointLocator().getDataTypeId();
+				final MangoDataType dataType = dp.getPointLocator().getMangoDataType();
 
 				if (activeAction == SET_ACTION_NONE
 						&& inactiveAction == SET_ACTION_NONE)
@@ -388,7 +388,7 @@ public class EventHandlerVO implements Serializable,
 
 				// Active
 				if (activeAction == SET_ACTION_STATIC_VALUE
-						&& dataType == DataTypes.MULTISTATE) {
+						&& dataType == MangoDataType.MULTISTATE) {
 					try {
 						Integer.parseInt(activeValueToSet);
 					} catch (NumberFormatException e) {
@@ -398,7 +398,7 @@ public class EventHandlerVO implements Serializable,
 				}
 
 				if (activeAction == SET_ACTION_STATIC_VALUE
-						&& dataType == DataTypes.NUMERIC) {
+						&& dataType == MangoDataType.NUMERIC) {
 					try {
 						Double.parseDouble(activeValueToSet);
 					} catch (NumberFormatException e) {
@@ -415,14 +415,14 @@ public class EventHandlerVO implements Serializable,
 						response
 								.addGenericMessage("eventHandlers.invalidActiveSource");
 					else if (dataType != dpActive.getPointLocator()
-							.getDataTypeId())
+							.getMangoDataType())
 						response
 								.addGenericMessage("eventHandlers.invalidActiveSourceType");
 				}
 
 				// Inactive
 				if (inactiveAction == SET_ACTION_STATIC_VALUE
-						&& dataType == DataTypes.MULTISTATE) {
+						&& dataType == MangoDataType.MULTISTATE) {
 					try {
 						Integer.parseInt(inactiveValueToSet);
 					} catch (NumberFormatException e) {
@@ -432,7 +432,7 @@ public class EventHandlerVO implements Serializable,
 				}
 
 				if (inactiveAction == SET_ACTION_STATIC_VALUE
-						&& dataType == DataTypes.NUMERIC) {
+						&& dataType == MangoDataType.NUMERIC) {
 					try {
 						Double.parseDouble(inactiveValueToSet);
 					} catch (NumberFormatException e) {
@@ -449,7 +449,7 @@ public class EventHandlerVO implements Serializable,
 						response
 								.addGenericMessage("eventHandlers.invalidInactiveSource");
 					else if (dataType != dpInactive.getPointLocator()
-							.getDataTypeId())
+							.getMangoDataType())
 						response
 								.addGenericMessage("eventHandlers.invalidInactiveSourceType");
 				}

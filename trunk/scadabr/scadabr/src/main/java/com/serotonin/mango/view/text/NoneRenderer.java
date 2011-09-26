@@ -23,14 +23,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class NoneRenderer extends BaseTextRenderer {
     private static ImplDefinition definition = new ImplDefinition("textRendererNone", "NONE", "textRenderer.none",
-            new int[] { DataTypes.IMAGE });
+            EnumSet.of( MangoDataType.IMAGE ));
 
     public static ImplDefinition getDefinition() {
         return definition;

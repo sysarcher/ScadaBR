@@ -22,14 +22,15 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 @Deprecated
 // Use ViewComponent instead
 public class ThumbnailRenderer extends BaseGraphicRenderer {
     private static ImplDefinition definition = new ImplDefinition("graphicRendererThumbnailImage", "THUMBNAIL",
-            "graphic.thumbnailImage", new int[] { DataTypes.IMAGE });
+            "graphic.thumbnailImage", EnumSet.of( MangoDataType.IMAGE ));
 
     public static ImplDefinition getDefinition() {
         return definition;

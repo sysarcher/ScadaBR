@@ -24,10 +24,11 @@ import java.io.ObjectOutputStream;
 import java.util.Map;
 
 import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -35,7 +36,7 @@ import com.serotonin.mango.view.ImplDefinition;
 @JsonRemoteEntity
 public class SimpleImageComponent extends PointComponent {
     public static ImplDefinition DEFINITION = new ImplDefinition("simpleImage", "SIMPLE_IMAGE", "graphic.simpleImage",
-            new int[] { DataTypes.IMAGE });
+            EnumSet.of(MangoDataType.IMAGE ));
 
     @Override
     public String snippetName() {

@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.RuntimeManager;
@@ -175,15 +175,15 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
             return;
 
         // Check the data type of the value against that of the locator, just for fun.
-        int valueDataType = DataTypes.getDataType(newValue.getValue());
-        if (valueDataType != DataTypes.UNKNOWN && valueDataType != vo.getPointLocator().getDataTypeId())
+        final MangoDataType valueDataType = newValue.getValue().getMangoDataType();
+        if (valueDataType != MangoDataType.UNKNOWN && valueDataType != vo.getPointLocator().getMangoDataType())
             // This should never happen, but if it does it can have serious downstream consequences. Also, we need
             // to know how it happened, and the stack trace here provides the best information.
             throw new ShouldNeverHappenException("Data type mismatch between new value and point locator: newValue="
-                    + DataTypes.getDataType(newValue.getValue()) + ", locator=" + vo.getPointLocator().getDataTypeId());
+                    + valueDataType + ", locator=" + vo.getPointLocator().getMangoDataType());
 
         // Check if this value qualifies for discardation.
-        if (vo.isDiscardExtremeValues() && DataTypes.getDataType(newValue.getValue()) == DataTypes.NUMERIC) {
+        if (vo.isDiscardExtremeValues() && valueDataType == MangoDataType.NUMERIC) {
             double newd = newValue.getDoubleValue();
             if (newd < vo.getDiscardLowLimit() || newd > vo.getDiscardHighLimit())
                 // Discard the value
@@ -193,7 +193,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         if (newValue.getTime() > System.currentTimeMillis() + SystemSettingsDao.getFutureDateLimit()) {
             // Too far future dated. Toss it. But log a message first.
             LOG.warn("Future dated value detected: pointId=" + vo.getId() + ", value=" + newValue.getStringValue()
-                    + ", type=" + vo.getPointLocator().getDataTypeId() + ", ts=" + newValue.getTime(), new Exception());
+                    + ", type=" + vo.getPointLocator().getMangoDataType() + ", ts=" + newValue.getTime(), new Exception());
             return;
         }
 
@@ -383,8 +383,8 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
     }
 
     @Override
-    public int getDataTypeId() {
-        return vo.getPointLocator().getDataTypeId();
+    public MangoDataType getMangoDataType() {
+        return vo.getPointLocator().getMangoDataType();
     }
 
     public Map<String, Object> getAttributes() {

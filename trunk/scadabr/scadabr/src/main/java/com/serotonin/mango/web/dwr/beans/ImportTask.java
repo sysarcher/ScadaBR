@@ -56,6 +56,7 @@ import com.serotonin.mango.view.text.PlainRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
 import com.serotonin.mango.vo.event.EventHandlerVO;
@@ -350,14 +351,13 @@ public class ImportTask extends ProgressiveTask {
 				String typeStr = dataSource.getString("type");
 				if (StringUtils.isEmpty(typeStr))
 					response.addGenericMessage("emport.dataSource.missingType",
-							xid, DataSourceVO.Type.getTypeList());
+							xid, DataSourceRegistry.values());
 				else {
-					DataSourceVO.Type type = DataSourceVO.Type
-							.valueOfIgnoreCase(typeStr);
+					DataSourceRegistry type = DataSourceRegistry.valueOf(typeStr);
 					if (type == null)
 						response.addGenericMessage(
 								"emport.dataSource.invalidType", xid, typeStr,
-								DataSourceVO.Type.getTypeList());
+								DataSourceRegistry.values());
 					else {
 						vo = type.createDataSourceVO();
 						vo.setXid(xid);
@@ -960,7 +960,7 @@ public class ImportTask extends ProgressiveTask {
 			PointValueDao dao = new PointValueDao();
 			PointValueTime pointValue = new PointValueTime(
 					MangoValue.stringToValue(value, dp.getPointLocator()
-							.getDataTypeId()), time);
+							.getMangoDataType()), time);
 			dao.savePointValue(dp.getId(), pointValue);
 		}
 

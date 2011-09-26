@@ -29,7 +29,7 @@
         pointsArray[pointsArray.length] = {
             id : ${dp.id}, 
             name : '${sst:quotEncode(dp.extendedName)}',
-            type : '<sst:i18n message="${dp.dataTypeMessage}"/>'
+            type : '<sst:i18n message="${dp.dataTypeI18n}"/>'
         };
       </c:forEach>
       
@@ -64,7 +64,7 @@
       writeContextArray();
       
       $set("script", locator.script);
-      $set("dataTypeId", locator.dataTypeId);
+      $set("mangoDataType", locator.mangoDataType);
       $set("settable", locator.settable);
       $set("updateEvent", locator.updateEvent);
       $set("updateCronPattern", locator.updateCronPattern);
@@ -76,7 +76,7 @@
   function savePointImpl(locator) {
       locator.context = createContextArray();
       locator.script = $get("script");
-      locator.dataTypeId = $get("dataTypeId");
+      locator.mangoDataType = $get("mangoDataType");
       locator.settable = $get("settable");
       locator.updateEvent = $get("updateEvent");
       locator.updateCronPattern = $get("updateCronPattern");
@@ -172,7 +172,7 @@
   
   function validateScript() {
       hideContextualMessages("pointProperties");
-      DataSourceEditDwr.validateScript($get("script"), createContextArray(), $get("dataTypeId"), validateScriptCB);
+      DataSourceEditDwr.validateScript($get("script"), createContextArray(), $get("mangoDataType"), validateScriptCB);
   }
   
   function createContextArray() {
@@ -204,7 +204,7 @@
   <tr>
     <td class="formLabelRequired"><fmt:message key="dsEdit.pointDataType"/></td>
     <td class="formField">
-      <select id="dataTypeId">
+      <select id="mangoDataType">
         <tag:dataTypeOptions excludeImage="true"/>
       </select>
     </td>

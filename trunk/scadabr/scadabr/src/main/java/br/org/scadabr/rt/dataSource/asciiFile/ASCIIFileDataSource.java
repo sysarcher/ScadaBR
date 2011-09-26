@@ -89,7 +89,7 @@ public class ASCIIFileDataSource extends PollingDataSource {
 		while (matcher.find()) {
 			found = true;
 			strValue = matcher.group();
-			value = MangoValue.stringToValue(strValue, point.getDataTypeId());
+			value = MangoValue.stringToValue(strValue, point.getMangoDataType());
 		}
 		if (!found) {
 			throw new Exception("Value string not found (regex: " + valueRegex

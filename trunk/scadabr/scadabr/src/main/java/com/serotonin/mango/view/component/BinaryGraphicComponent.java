@@ -24,12 +24,13 @@ import java.io.ObjectOutputStream;
 
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -37,7 +38,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
 @JsonRemoteEntity
 public class BinaryGraphicComponent extends ImageSetComponent {
     public static ImplDefinition DEFINITION = new ImplDefinition("binaryGraphic", "BINARY_GRAPHIC",
-            "graphic.binaryGraphic", new int[] { DataTypes.BINARY });
+            "graphic.binaryGraphic", EnumSet.of( MangoDataType.BINARY ));
 
     @JsonRemoteProperty(alias = "zeroImageIndex")
     private int zeroImage;

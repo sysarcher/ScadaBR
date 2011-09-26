@@ -62,6 +62,7 @@ import com.serotonin.mango.view.ViewGraphic;
 import com.serotonin.mango.view.ViewGraphicLoader;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.UserComment;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.hierarchy.PointHierarchy;
 import com.serotonin.mango.vo.permission.Permissions;
@@ -183,85 +184,12 @@ public class MangoContextListener implements ServletContextListener {
 	//
 	private void constantsInitialize(ServletContext ctx) {
 		ctx.setAttribute("constants.Common.NEW_ID", Common.NEW_ID);
+                
+                for (DataSourceRegistry r : DataSourceRegistry.values()) {
+        		ctx.setAttribute("constants.DataTypes." + r.name() , r.name());
+                }
 
-		ctx.setAttribute("constants.DataTypes.BINARY", DataTypes.BINARY);
-		ctx.setAttribute("constants.DataTypes.MULTISTATE", DataTypes.MULTISTATE);
-		ctx.setAttribute("constants.DataTypes.NUMERIC", DataTypes.NUMERIC);
-		ctx.setAttribute("constants.DataTypes.ALPHANUMERIC",
-				DataTypes.ALPHANUMERIC);
-		ctx.setAttribute("constants.DataTypes.IMAGE", DataTypes.IMAGE);
-
-		ctx.setAttribute("constants.DataSourceVO.Types.VIRTUAL",
-				DataSourceVO.Type.VIRTUAL.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.MODBUS_SERIAL",
-				DataSourceVO.Type.MODBUS_SERIAL.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.MODBUS_IP",
-				DataSourceVO.Type.MODBUS_IP.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.SPINWAVE",
-				DataSourceVO.Type.SPINWAVE.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.SNMP",
-				DataSourceVO.Type.SNMP.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.SQL",
-				DataSourceVO.Type.SQL.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.HTTP_RECEIVER",
-				DataSourceVO.Type.HTTP_RECEIVER.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.ONE_WIRE",
-				DataSourceVO.Type.ONE_WIRE.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.META",
-				DataSourceVO.Type.META.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.BACNET",
-				DataSourceVO.Type.BACNET.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.HTTP_RETRIEVER",
-				DataSourceVO.Type.HTTP_RETRIEVER.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.POP3",
-				DataSourceVO.Type.POP3.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.NMEA",
-				DataSourceVO.Type.NMEA.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.GALIL",
-				DataSourceVO.Type.GALIL.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.HTTP_IMAGE",
-				DataSourceVO.Type.HTTP_IMAGE.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.EBI25",
-				DataSourceVO.Type.EBI25.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.VMSTAT",
-				DataSourceVO.Type.VMSTAT.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.VICONICS",
-				DataSourceVO.Type.VICONICS.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.M_BUS",
-				DataSourceVO.Type.M_BUS.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.OPEN_V_4_J",
-				DataSourceVO.Type.OPEN_V_4_J.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.FHZ_4_J",
-				DataSourceVO.Type.FHZ_4_J.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.DNP3_IP",
-				DataSourceVO.Type.DNP3_IP.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.DNP3_SERIAL",
-				DataSourceVO.Type.DNP3_SERIAL.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.PACHUBE",
-				DataSourceVO.Type.PACHUBE.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.NODAVE_S7",
-				DataSourceVO.Type.NODAVE_S7.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.ALPHA_2",
-				DataSourceVO.Type.ALPHA_2.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.OPC",
-				DataSourceVO.Type.OPC.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.ASCII_FILE",
-				DataSourceVO.Type.ASCII_FILE.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.ASCII_SERIAL",
-				DataSourceVO.Type.ASCII_SERIAL.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.DR_STORAGE_HT5B",
-				DataSourceVO.Type.DR_STORAGE_HT5B.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.PERSISTENT",
-				DataSourceVO.Type.PERSISTENT.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.IEC101_SERIAL",
-				DataSourceVO.Type.IEC101_SERIAL.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.IEC101_ETHERNET",
-				DataSourceVO.Type.IEC101_ETHERNET.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.INTERNAL",
-				DataSourceVO.Type.INTERNAL.getId());
-		ctx.setAttribute("constants.DataSourceVO.Types.JMX",
-				DataSourceVO.Type.JMX.getId());
-		ctx.setAttribute("constants.Permissions.DataPointAccessTypes.NONE",
+                ctx.setAttribute("constants.Permissions.DataPointAccessTypes.NONE",
 				Permissions.DataPointAccessTypes.NONE);
 		ctx.setAttribute("constants.Permissions.DataPointAccessTypes.READ",
 				Permissions.DataPointAccessTypes.READ);

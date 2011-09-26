@@ -18,6 +18,7 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.modbus.ModbusDataSource;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
@@ -28,8 +29,6 @@ import com.serotonin.web.i18n.LocalizableMessage;
 @JsonRemoteEntity
 public class Alpha2DataSourceVO<T extends Alpha2DataSourceVO<?>> extends
 		DataSourceVO<T> {
-
-	public static final Type TYPE = Type.ALPHA_2;
 
 	private int updatePeriodType = Common.TimePeriods.SECONDS;
 	@JsonRemoteProperty
@@ -52,8 +51,8 @@ public class Alpha2DataSourceVO<T extends Alpha2DataSourceVO<?>> extends
 	private int station = 0;
 
 	@Override
-	public com.serotonin.mango.vo.dataSource.DataSourceVO.Type getType() {
-		return TYPE;
+	public DataSourceRegistry getType() {
+		return DataSourceRegistry.ALPHA_2;
 	}
 
 	@Override

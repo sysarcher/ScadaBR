@@ -30,7 +30,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.http.HttpImagePointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -160,8 +160,9 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO implements J
         this.webcamLiveFeedCode = webcamLiveFeedCode;
     }
 
-    public int getDataTypeId() {
-        return DataTypes.IMAGE;
+    @Override
+    public MangoDataType getMangoDataType() {
+        return MangoDataType.IMAGE;
     }
 
     public void validate(DwrResponseI18n response) {

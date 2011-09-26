@@ -200,7 +200,7 @@ public class Pop3DataSourceRT extends PollingDataSource {
 
             MangoValue value;
             try {
-                value = DataSourceUtils.getValue(locator.getValuePattern(), content, locator.getDataTypeId(), locator
+                value = DataSourceUtils.getValue(locator.getValuePattern(), content, locator.getMangoDataType(), locator
                         .getBinary0Value(), dp.getVO().getTextRenderer(), locator.getValueFormat(), dp.getVO()
                         .getName());
             }

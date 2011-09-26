@@ -22,14 +22,15 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 @Deprecated
 // Use ViewComponent instead
 public class BasicRenderer extends BaseGraphicRenderer {
     private static ImplDefinition definition = new ImplDefinition("graphicRendererBasic", "BASIC", "graphic.basic",
-            new int[] { DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC, });//TODO apl lat , typo??? I would expect a compiler error????? 
+            EnumSet.of( MangoDataType.ALPHANUMERIC, MangoDataType.BINARY, MangoDataType.MULTISTATE, MangoDataType.NUMERIC ));
 
     public static ImplDefinition getDefinition() {
         return definition;

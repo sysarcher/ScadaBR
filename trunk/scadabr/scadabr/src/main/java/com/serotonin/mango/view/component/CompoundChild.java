@@ -18,7 +18,9 @@
  */
 package com.serotonin.mango.view.component;
 
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -27,9 +29,9 @@ public class CompoundChild {
     private final String id;
     private final LocalizableMessage description;
     private final ViewComponent viewComponent;
-    private final int[] dataTypesOverride;
+    private final EnumSet<MangoDataType> dataTypesOverride;
 
-    public CompoundChild(String id, LocalizableMessage description, ViewComponent viewComponent, int[] dataTypesOverride) {
+    public CompoundChild(String id, LocalizableMessage description, ViewComponent viewComponent, EnumSet<MangoDataType> dataTypesOverride) {
         this.id = id;
         this.description = description;
         this.viewComponent = viewComponent;
@@ -48,7 +50,7 @@ public class CompoundChild {
         return viewComponent;
     }
 
-    public int[] getDataTypes() {
+    public EnumSet<MangoDataType> getDataTypes() {
         if (dataTypesOverride != null)
             return dataTypesOverride;
         if (viewComponent.isPointComponent())

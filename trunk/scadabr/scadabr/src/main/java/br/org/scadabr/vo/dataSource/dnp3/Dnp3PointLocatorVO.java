@@ -14,7 +14,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import com.serotonin.web.dwr.DwrResponseI18n;
@@ -49,12 +49,12 @@ public class Dnp3PointLocatorVO extends AbstractPointLocatorVO implements
 	}
 
 	@Override
-	public int getDataTypeId() {
+	public MangoDataType getMangoDataType() {
 		if (dnp3DataType == BINARY_INPUT)
-			return DataTypes.BINARY;
+			return MangoDataType.BINARY;
 		else if (dnp3DataType == BINARY_OUTPUT)
-			return DataTypes.ALPHANUMERIC;
-		return DataTypes.NUMERIC;
+			return MangoDataType.ALPHANUMERIC;
+		return MangoDataType.NUMERIC;
 	}
 
 	@JsonRemoteProperty

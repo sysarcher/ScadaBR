@@ -23,7 +23,7 @@ import java.util.List;
 
 import com.serotonin.db.KeyValuePair;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.publish.persistent.PersistentSenderRT;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
@@ -67,7 +67,7 @@ public class PublisherEditDwr extends BaseDwr {
         Iterator<DataPointVO> iter = allPoints.iterator();
         while (iter.hasNext()) {
             DataPointVO dp = iter.next();
-            if (dp.getPointLocator().getDataTypeId() == DataTypes.IMAGE)
+            if (dp.getPointLocator().getMangoDataType() == MangoDataType.IMAGE)
                 iter.remove();
         }
 

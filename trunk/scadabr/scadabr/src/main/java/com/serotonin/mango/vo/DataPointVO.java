@@ -37,7 +37,7 @@ import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
 import com.serotonin.json.JsonValue;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -113,10 +113,6 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         for (int i = 0; i < 190; i++)
             ENGINEERING_UNITS_CODES.addElement(i, StringUtils.capitalize(new EngineeringUnits(i).toString()),
                     "engUnit." + i);
-    }
-
-    public LocalizableMessage getDataTypeMessage() {
-        return pointLocator.getDataTypeMessage();
     }
 
     public LocalizableMessage getConfigurationDescription() {
@@ -212,12 +208,21 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         return deviceName + " - " + name;
     }
 
+    public MangoDataType getMangoDataType() {
+        return pointLocator.getMangoDataType();
+    }
+    
+    public LocalizableMessage getMangoDataTypeI18n() {
+        return getMangoDataType().getLocalizableMessage();
+    }
+
+    
     public void defaultTextRenderer() {
         if (pointLocator == null)
             textRenderer = new PlainRenderer("");
         else {
-            switch (pointLocator.getDataTypeId()) {
-            case DataTypes.IMAGE:
+            switch (pointLocator.getMangoDataType()) {
+            case IMAGE:
                 textRenderer = new NoneRenderer();
                 break;
             default:
@@ -561,7 +566,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
 
         if (!LOGGING_TYPE_CODES.isValidId(loggingType))
             response.addContextualMessage("loggingType", "validate.invalidValue");
-        if (loggingType == DataPointVO.LoggingTypes.ON_CHANGE && pointLocator.getDataTypeId() == DataTypes.NUMERIC) {
+        if (loggingType == DataPointVO.LoggingTypes.ON_CHANGE && pointLocator.getMangoDataType() == MangoDataType.NUMERIC) {
             if (tolerance < 0)
                 response.addContextualMessage("tolerance", "validate.cannotBeNegative");
         }
@@ -599,11 +604,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         pointLocator.validate(response);
 
         // Check text renderer type
-        if (textRenderer != null && !textRenderer.getDef().supports(pointLocator.getDataTypeId()))
+        if (textRenderer != null && !textRenderer.getDef().supports(pointLocator.getMangoDataType()))
             response.addGenericMessage("validate.text.incompatible");
 
         // Check chart renderer type
-        if (chartRenderer != null && !chartRenderer.getDef().supports(pointLocator.getDataTypeId()))
+        if (chartRenderer != null && !chartRenderer.getDef().supports(pointLocator.getMangoDataType()))
             response.addGenericMessage("validate.chart.incompatible");
     }
 

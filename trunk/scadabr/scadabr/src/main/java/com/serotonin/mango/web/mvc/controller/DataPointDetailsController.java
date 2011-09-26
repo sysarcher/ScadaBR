@@ -127,7 +127,7 @@ public class DataPointDetailsController extends ParameterizableViewController {
             model.put("historyLimit", historyLimit);
 
             // Determine our image chart rendering capabilities.
-            if (ImageChartRenderer.getDefinition().supports(point.getPointLocator().getDataTypeId())) {
+            if (ImageChartRenderer.getDefinition().supports(point.getPointLocator().getMangoDataType())) {
                 // This point can render an image chart. Carry on...
                 int periodType = Common.TimePeriods.DAYS;
                 int periodCount = 1;
@@ -141,7 +141,7 @@ public class DataPointDetailsController extends ParameterizableViewController {
             }
 
             // Determine out flipbook rendering capabilities
-            if (ImageFlipbookRenderer.getDefinition().supports(point.getPointLocator().getDataTypeId()))
+            if (ImageFlipbookRenderer.getDefinition().supports(point.getPointLocator().getMangoDataType()))
                 model.put("flipbookLimit", 10);
 
             model.put("currentXid", point.getXid());

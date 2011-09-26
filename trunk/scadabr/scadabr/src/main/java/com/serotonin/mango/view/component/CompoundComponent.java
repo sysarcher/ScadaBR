@@ -32,12 +32,14 @@ import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonValue;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.util.SerializationHelper;
 import com.serotonin.web.i18n.I18NUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -76,11 +78,11 @@ abstract public class CompoundComponent extends ViewComponent {
         addChildImpl(id, descriptionKey, htmlComponent, null);
     }
 
-    protected void addChild(String id, String descriptionKey, PointComponent pointComponent, int[] dataTypesOverride) {
+    protected void addChild(String id, String descriptionKey, PointComponent pointComponent, EnumSet<MangoDataType> dataTypesOverride) {
         addChildImpl(id, descriptionKey, pointComponent, dataTypesOverride);
     }
 
-    private void addChildImpl(String id, String descriptionKey, ViewComponent viewComponent, int[] dataTypesOverride) {
+    private void addChildImpl(String id, String descriptionKey, ViewComponent viewComponent, EnumSet<MangoDataType> dataTypesOverride) {
         viewComponent.setIndex(getIndex());
         viewComponent.setIdSuffix("-" + id);
         children.add(new CompoundChild(id, new LocalizableMessage(descriptionKey), viewComponent, dataTypesOverride));

@@ -31,6 +31,7 @@ import org.springframework.util.Assert;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
@@ -368,7 +369,7 @@ public class RuntimeManager {
 		// Since the point's data type may have changed, we must ensure that the
 		// other attrtibutes are still ok with
 		// it.
-		int dataType = point.getPointLocator().getDataTypeId();
+		final MangoDataType dataType = point.getPointLocator().getMangoDataType();
 
 		// Chart renderer
 		if (point.getChartRenderer() != null

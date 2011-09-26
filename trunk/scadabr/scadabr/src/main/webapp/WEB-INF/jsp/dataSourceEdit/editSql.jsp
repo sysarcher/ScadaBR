@@ -109,7 +109,7 @@
       $set("fieldName", locator.fieldName);
       $set("timeOverrideName", locator.timeOverrideName);
       $set("updateStatement", locator.updateStatement);
-      $set("dataTypeId", locator.dataTypeId);
+      $set("mangoDataType", locator.mangoDataType);
   }
   
   function savePointImpl(locator) {
@@ -118,7 +118,7 @@
       locator.fieldName = $get("fieldName");
       locator.timeOverrideName = $get("timeOverrideName");
       locator.updateStatement = $get("updateStatement");
-      locator.dataTypeId = $get("dataTypeId");
+      locator.mangoDataType = $get("mangoDataType");
       
       DataSourceEditDwr.saveSqlPointLocator(currentPoint.id, $get("xid"), $get("name"), locator, savePointCB);
   }
@@ -210,7 +210,7 @@
   <tr>
     <td class="formLabelRequired"><fmt:message key="dsEdit.pointDataType"/></td>
     <td class="formField">
-      <select name="dataTypeId">
+      <select name="mangoDataType">
         <tag:dataTypeOptions excludeImage="true"/>
       </select>
     </td>

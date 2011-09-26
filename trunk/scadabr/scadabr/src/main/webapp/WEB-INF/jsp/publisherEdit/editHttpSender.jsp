@@ -34,7 +34,7 @@
       var list = response.data.allPoints;
       for (var i=0; i<list.length; i++)
           allPoints[allPoints.length] = {
-                  id: list[i].id, name: list[i].extendedName, enabled: list[i].enabled, type: list[i].dataTypeMessage};
+                  id: list[i].id, name: list[i].extendedName, enabled: list[i].enabled, type: list[i].dataTypei18n};
           
       list = response.data.publisher.staticHeaders;
       for (i=0; i<list.length; i++)

@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.io.StreamUtils;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -81,21 +81,26 @@ public class SqlDataSourceRT extends PollingDataSource {
         try {
             stmt = conn.prepareStatement(locatorVO.getUpdateStatement());
 
-            if (locatorVO.getDataTypeId() == DataTypes.ALPHANUMERIC)
+            switch (locatorVO.getMangoDataType()) {
+                case ALPHANUMERIC:
                 stmt.setString(1, valueTime.getStringValue());
-            else if (locatorVO.getDataTypeId() == DataTypes.BINARY)
+            break;
+                case BINARY:
                 stmt.setBoolean(1, valueTime.getBooleanValue());
-            else if (locatorVO.getDataTypeId() == DataTypes.MULTISTATE)
+            break;
+                case MULTISTATE:
                 stmt.setInt(1, valueTime.getIntegerValue());
-            else if (locatorVO.getDataTypeId() == DataTypes.NUMERIC)
+            break;
+                case NUMERIC:
                 stmt.setDouble(1, valueTime.getDoubleValue());
-            else if (locatorVO.getDataTypeId() == DataTypes.IMAGE) {
+            break;
+                case IMAGE:
                 byte[] data = ((ImageValue) valueTime.getValue()).getImageData();
                 stmt.setBlob(1, new ByteArrayInputStream(data), data.length);
+            break;
+                default:
+                throw new ShouldNeverHappenException("What's this?: " + locatorVO.getMangoDataType().name());
             }
-            else
-                throw new ShouldNeverHappenException("What's this?: " + locatorVO.getDataTypeId());
-
             int rows = stmt.executeUpdate();
             if (rows == 0) {
                 raiseEvent(STATEMENT_EXCEPTION_EVENT, valueTime.getTime(), false, new LocalizableMessage(
@@ -272,22 +277,22 @@ public class SqlDataSourceRT extends PollingDataSource {
     private MangoValue getValue(SqlPointLocatorVO locatorVO, ResultSet rs, String fieldName, long time)
             throws SQLException, IOException {
         try {
-            int dataType = locatorVO.getDataTypeId();
-            if (dataType == DataTypes.ALPHANUMERIC)
+            switch(locatorVO.getMangoDataType()) {
+                case ALPHANUMERIC:
                 return new AlphanumericValue(rs.getString(fieldName));
-            else if (dataType == DataTypes.BINARY)
+                case BINARY:
                 return new BinaryValue(rs.getBoolean(fieldName));
-            else if (dataType == DataTypes.MULTISTATE)
+                case MULTISTATE:
                 return new MultistateValue(rs.getInt(fieldName));
-            else if (dataType == DataTypes.NUMERIC)
+                case  NUMERIC:
                 return new NumericValue(rs.getDouble(fieldName));
-            else if (dataType == DataTypes.IMAGE) {
+                case IMAGE:
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 StreamUtils.transfer(rs.getBlob(fieldName).getBinaryStream(), out);
                 return new ImageValue(out.toByteArray(), ImageValue.TYPE_JPG);
-            }
-            else
-                throw new ShouldNeverHappenException("What's this?: " + locatorVO.getDataTypeId());
+                default:
+                throw new ShouldNeverHappenException("What's this?: " + locatorVO.getMangoDataType().name());
+        }
         }
         catch (SQLException e) {
             // Field level error. Assume a bad field name.

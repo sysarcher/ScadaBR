@@ -42,6 +42,7 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.openv4j.OpenV4JDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
@@ -72,8 +73,8 @@ public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
     private Protocol protocol;
 
     @Override
-    public Type getType() {
-        return Type.OPEN_V_4_J;
+    public DataSourceRegistry getType() {
+        return DataSourceRegistry.OPEN_V_4_J;
     }
 
     @Override

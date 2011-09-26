@@ -24,7 +24,7 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 
 import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.galil.CommandPointTypeRT;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.web.dwr.DwrResponseI18n;
@@ -46,8 +46,8 @@ public class CommandPointTypeVO extends PointTypeVO {
     }
 
     @Override
-    public int getDataTypeId() {
-        return DataTypes.ALPHANUMERIC;
+    public MangoDataType getMangoDataType() {
+        return MangoDataType.ALPHANUMERIC;
     }
 
     @Override

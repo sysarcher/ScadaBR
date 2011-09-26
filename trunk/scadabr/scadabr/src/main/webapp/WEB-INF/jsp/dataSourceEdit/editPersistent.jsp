@@ -17,7 +17,7 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
-<%@page import="com.serotonin.mango.DataTypes"%>
+<%@page import="com.serotonin.mango.MangoDataType"%>
 <%@page import="com.serotonin.mango.Common"%>
 
 <script type="text/javascript">
@@ -38,7 +38,7 @@
   
   function savePointImpl(locator) {
       delete locator.settable;
-      delete locator.dataTypeId;
+      delete locator.mangoDataType;
       DataSourceEditDwr.savePersistentPointLocator(currentPoint.id, $get("xid"), $get("name"), locator, savePointCB);
   }
   

@@ -36,7 +36,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.mbus.MBusPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -93,7 +93,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     private MBusAddressing addressing;
 
     @Override
-    public int getDataTypeId() {
+    public MangoDataType getMangoDataType() {
         switch (DataFieldCode.fromLabel(difCode)) {
             case _12_DIGIT_BCD:
             case _16_BIT_INTEGER:
@@ -107,11 +107,11 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             case _6_DIGIT_BCD:
             case _8_BIT_INTEGER:
             case _8_DIGIT_BCD:
-                return DataTypes.NUMERIC;
+                return MangoDataType.NUMERIC;
             case VARIABLE_LENGTH:
-                return DataTypes.ALPHANUMERIC;
+                return MangoDataType.ALPHANUMERIC;
             default:
-                return DataTypes.UNKNOWN;
+                return MangoDataType.UNKNOWN;
         }
     }
 

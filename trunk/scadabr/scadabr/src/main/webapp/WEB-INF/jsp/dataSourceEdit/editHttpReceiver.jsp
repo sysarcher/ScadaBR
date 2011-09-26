@@ -17,7 +17,7 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
-<%@page import="com.serotonin.mango.DataTypes"%>
+<%@page import="com.serotonin.mango.MangoDataType"%>
 
 <script type="text/javascript">
   var ipWhiteList = new Array();
@@ -183,24 +183,24 @@
   
   function editPointCBImpl(locator) {
       $set("parameterName", locator.parameterName);
-      $set("dataTypeId", locator.dataTypeId);
+      $set("mangoDataType", locator.mangoDataType);
       $set("binary0Value", locator.binary0Value);
-      changeDataTypeId();
+      changeMangoDataType();
   }
   
   function savePointImpl(locator) {
       delete locator.settable;
       
       locator.parameterName = $get("parameterName");
-      locator.dataTypeId = $get("dataTypeId");
+      locator.mangoDataType = $get("mangoDataType");
       locator.binary0Value = $get("binary0Value");
       
       DataSourceEditDwr.saveHttpReceiverPointLocator(currentPoint.id, $get("xid"), $get("name"), locator, savePointCB);
   }
   
-  function changeDataTypeId() {
-      var dataTypeId = $get("dataTypeId");
-      if (dataTypeId == <%= DataTypes.BINARY %>)
+  function changeMangoDataType() {
+      var mangoDataType = $get("mangoDataType");
+      if (mangoDataType == <%= MangoDataType.BINARY.name() %>)
           setDisabled($("binary0Value"), false);
       else
           setDisabled($("binary0Value"), true);
@@ -275,7 +275,7 @@
   <tr>
     <td class="formLabelRequired"><fmt:message key="dsEdit.pointDataType"/></td>
     <td class="formField">
-      <select id="dataTypeId" onchange="changeDataTypeId();">
+      <select id="mangoDataType" onchange="changeMngoDataType();">
         <tag:dataTypeOptions excludeImage="true"/>
       </select>
     </td>

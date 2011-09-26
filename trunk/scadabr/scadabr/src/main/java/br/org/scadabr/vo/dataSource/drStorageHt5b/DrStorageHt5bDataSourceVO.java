@@ -16,6 +16,7 @@ import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.util.ExportCodes;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
@@ -26,8 +27,6 @@ import com.serotonin.web.i18n.LocalizableMessage;
 @JsonRemoteEntity
 public class DrStorageHt5bDataSourceVO<T extends DrStorageHt5bDataSourceVO<?>>
 		extends DataSourceVO<T> {
-
-	public static final Type TYPE = Type.DR_STORAGE_HT5B;
 
 	@Override
 	protected void addEventTypes(List<EventTypeVO> eventTypes) {
@@ -83,8 +82,8 @@ public class DrStorageHt5bDataSourceVO<T extends DrStorageHt5bDataSourceVO<?>>
 	}
 
 	@Override
-	public com.serotonin.mango.vo.dataSource.DataSourceVO.Type getType() {
-		return TYPE;
+	public DataSourceRegistry getType() {
+		return DataSourceRegistry.DR_STORAGE_HT5B;
 	}
 
 	private int updatePeriodType = Common.TimePeriods.SECONDS;

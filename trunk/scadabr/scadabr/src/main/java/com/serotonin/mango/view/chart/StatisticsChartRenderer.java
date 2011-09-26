@@ -26,7 +26,7 @@ import java.util.Map;
 
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.PointValueFacade;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImplDefinition;
@@ -34,12 +34,13 @@ import com.serotonin.mango.view.stats.AnalogStatistics;
 import com.serotonin.mango.view.stats.StartsAndRuntimeList;
 import com.serotonin.mango.view.stats.ValueChangeCounter;
 import com.serotonin.mango.vo.DataPointVO;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class StatisticsChartRenderer extends TimePeriodChartRenderer {
     private static ImplDefinition definition = new ImplDefinition("chartRendererStats", "STATS",
-            "chartRenderer.statistics", new int[] { DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE,
-                    DataTypes.NUMERIC });
+            "chartRenderer.statistics", EnumSet.of( MangoDataType.ALPHANUMERIC, MangoDataType.BINARY, MangoDataType.MULTISTATE,
+                    MangoDataType.NUMERIC ));
 
     public static ImplDefinition getDefinition() {
         return definition;
@@ -79,11 +80,10 @@ public class StatisticsChartRenderer extends TimePeriodChartRenderer {
         List<PointValueTime> values = pointValueFacade.getPointValues(startTime);
 
         // Generate statistics on the values.
-        int dataTypeId = point.getPointLocator().getDataTypeId();
 
         // The start value is the value of the point at the start of the period for this renderer.
         PointValueTime startValue = null;
-        if (values.size() == 0 || values.get(0).getTime() > startTime) {
+        if (values.isEmpty() || values.get(0).getTime() > startTime) {
             // Get the value of the point at the start time
             PointValueTime valueTime = pointValueFacade.getPointValueBefore(startTime);
             if (valueTime != null)
@@ -91,34 +91,35 @@ public class StatisticsChartRenderer extends TimePeriodChartRenderer {
         }
 
         if (startValue != null || values.size() > 0) {
-            if (dataTypeId == DataTypes.BINARY || dataTypeId == DataTypes.MULTISTATE) {
+        switch(point.getPointLocator().getMangoDataType()) {
+            case BINARY:
+            case MULTISTATE:
                 // Runtime stats
                 StartsAndRuntimeList stats = new StartsAndRuntimeList(startValue, values, startTime, startTime
                         + getDuration());
                 model.put("start", stats.getRealStart());
                 model.put("end", stats.getEnd());
                 model.put("startsAndRuntimes", stats.getData());
-            }
-            else if (dataTypeId == DataTypes.NUMERIC) {
-                AnalogStatistics stats = new AnalogStatistics(startValue, values, startTime, startTime + getDuration());
-                model.put("start", stats.getRealStart());
-                model.put("end", stats.getEnd());
-                model.put("minimum", stats.getMinimum());
-                model.put("minTime", stats.getMinTime());
-                model.put("maximum", stats.getMaximum());
-                model.put("maxTime", stats.getMaxTime());
-                model.put("average", stats.getAverage());
+            break;
+            case NUMERIC:
+                AnalogStatistics analogStats = new AnalogStatistics(startValue, values, startTime, startTime + getDuration());
+                model.put("start", analogStats.getRealStart());
+                model.put("end", analogStats.getEnd());
+                model.put("minimum", analogStats.getMinimum());
+                model.put("minTime", analogStats.getMinTime());
+                model.put("maximum", analogStats.getMaximum());
+                model.put("maxTime", analogStats.getMaxTime());
+                model.put("average", analogStats.getAverage());
                 if (includeSum)
-                    model.put("sum", stats.getSum());
-                model.put("count", stats.getCount());
-                model.put("noData", stats.isNoData());
-            }
-            else if (dataTypeId == DataTypes.ALPHANUMERIC) {
-                ValueChangeCounter stats = new ValueChangeCounter(startValue, values);
-                model.put("changeCount", stats.getChangeCount());
+                    model.put("sum", analogStats.getSum());
+                model.put("count", analogStats.getCount());
+                model.put("noData", analogStats.isNoData());
+            break;
+            case ALPHANUMERIC:
+                ValueChangeCounter valueChangeStats = new ValueChangeCounter(startValue, values);
+                model.put("changeCount", valueChangeStats.getChangeCount());
             }
         }
-
         model.put("logEntries", values.size());
     }
 

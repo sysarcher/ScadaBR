@@ -18,19 +18,17 @@
  */
 package com.serotonin.mango.web.dwr;
 
-import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.serotonin.db.IntValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
-import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.DataPointVO;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.web.dwr.DwrResponseI18n;
@@ -39,19 +37,18 @@ import com.serotonin.web.dwr.DwrResponseI18n;
  * @author Matthew Lohbihler
  */
 public class DataSourceListDwr extends BaseDwr {
+
     public DwrResponseI18n init() {
         DwrResponseI18n response = new DwrResponseI18n();
 
         if (Common.getUser().isAdmin()) {
-            List<IntValuePair> translatedTypes = new ArrayList<IntValuePair>();
-            for (DataSourceVO.Type type : DataSourceVO.Type.values()) {
+            Map<DataSourceRegistry, String> dsTypes = new EnumMap<DataSourceRegistry, String>(DataSourceRegistry.class);
+            for (DataSourceRegistry type : DataSourceRegistry.values()) {
                 // Allow customization settings to overwrite the default display value.
-                boolean display = SystemSettingsDao.getBooleanValue(type.name()
-                        + SystemSettingsDao.DATASOURCE_DISPLAY_SUFFIX, type.isDisplay());
-                if (display)
-                    translatedTypes.add(new IntValuePair(type.getId(), getMessage(type.getKey())));
+                if (type.isDisplay())
+                    dsTypes.put(type, getMessage(type.getKey()));
             }
-            response.addData("types", translatedTypes);
+            response.addData("dsTypes", dsTypes);
         }
 
         return response;

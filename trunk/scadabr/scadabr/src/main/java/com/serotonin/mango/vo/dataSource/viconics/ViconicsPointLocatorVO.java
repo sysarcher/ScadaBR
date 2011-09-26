@@ -24,6 +24,8 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 
 import com.serotonin.json.JsonRemoteEntity;
+import com.serotonin.json.JsonRemoteProperty;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.viconics.ViconicsPointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
@@ -48,7 +50,8 @@ public class ViconicsPointLocatorVO extends AbstractPointLocatorVO {
     private byte[] deviceIeee;
     private int deviceCommAddress;
     private int pointAddress;
-    private int dataTypeId;
+    @JsonRemoteProperty(alias=MangoDataType.ALIAS_DATA_TYPE)
+    private MangoDataType mangoDataType = MangoDataType.UNKNOWN;
     private boolean settable;
 
     public byte[] getDeviceIeee() {
@@ -75,12 +78,13 @@ public class ViconicsPointLocatorVO extends AbstractPointLocatorVO {
         this.pointAddress = pointAddress;
     }
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    @Override
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setMangoDataType(MangoDataType mangoDataType) {
+        this.mangoDataType = mangoDataType;
     }
 
     public boolean isSettable() {
@@ -118,7 +122,7 @@ public class ViconicsPointLocatorVO extends AbstractPointLocatorVO {
         out.writeObject(deviceIeee);
         out.writeInt(deviceCommAddress);
         out.writeInt(pointAddress);
-        out.writeInt(dataTypeId);
+        out.writeInt(mangoDataType.mangoId);
         out.writeBoolean(settable);
     }
 
@@ -130,7 +134,7 @@ public class ViconicsPointLocatorVO extends AbstractPointLocatorVO {
             deviceIeee = (byte[]) in.readObject();
             deviceCommAddress = in.readInt();
             pointAddress = in.readInt();
-            dataTypeId = in.readInt();
+            mangoDataType = MangoDataType.fromMangoId(in.readInt());
             settable = in.readBoolean();
         }
     }

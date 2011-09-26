@@ -28,7 +28,7 @@ import java.util.Arrays;
 import com.serotonin.InvalidArgumentException;
 import com.serotonin.io.StreamUtils;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.util.ArrayUtils;
 import com.serotonin.util.image.ImageUtils;
 
@@ -221,8 +221,8 @@ public class ImageValue extends MangoValue implements Comparable<ImageValue> {
     }
 
     @Override
-    public int getDataType() {
-        return DataTypes.IMAGE;
+    public MangoDataType getMangoDataType() {
+        return MangoDataType.IMAGE;
     }
 
     @Override

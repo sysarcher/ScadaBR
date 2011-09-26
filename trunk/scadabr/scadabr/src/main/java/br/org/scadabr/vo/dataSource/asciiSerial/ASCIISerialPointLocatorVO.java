@@ -16,7 +16,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import com.serotonin.util.SerializationHelper;
@@ -37,8 +37,8 @@ public class ASCIISerialPointLocatorVO extends AbstractPointLocatorVO implements
 	private String timestampFormat = "";
 	@JsonRemoteProperty
 	private String timestampRegex = "";
-	@JsonRemoteProperty
-	private int dataType = DataTypes.BINARY;
+    @JsonRemoteProperty(alias=MangoDataType.ALIAS_DATA_TYPE)
+	private MangoDataType mangoDataType = MangoDataType.BINARY;
 	@JsonRemoteProperty
 	private boolean settable;
 
@@ -80,12 +80,13 @@ public class ASCIISerialPointLocatorVO extends AbstractPointLocatorVO implements
 		this.timestampRegex = timestampRegex;
 	}
 
-	public int getDataType() {
-		return dataType;
+    @Override
+	public MangoDataType getMangoDataType() {
+		return mangoDataType;
 	}
 
-	public void setDataType(int dataType) {
-		this.dataType = dataType;
+	public void setDataType(MangoDataType mangoDataType) {
+		this.mangoDataType = mangoDataType;
 	}
 
 	public void setSettable(boolean settable) {
@@ -111,7 +112,7 @@ public class ASCIISerialPointLocatorVO extends AbstractPointLocatorVO implements
 		SerializationHelper.writeSafeUTF(out, command);
 		SerializationHelper.writeSafeUTF(out, timestampFormat);
 		SerializationHelper.writeSafeUTF(out, timestampRegex);
-		out.writeInt(dataType);
+		out.writeInt(mangoDataType.mangoId);
 		out.writeBoolean(settable);
 		out.writeBoolean(customTimestamp);
 
@@ -125,7 +126,7 @@ public class ASCIISerialPointLocatorVO extends AbstractPointLocatorVO implements
 			command = SerializationHelper.readSafeUTF(in);
 			timestampFormat = SerializationHelper.readSafeUTF(in);
 			timestampRegex = SerializationHelper.readSafeUTF(in);
-			dataType = in.readInt();
+			mangoDataType = MangoDataType.fromMangoId(in.readInt());
 			settable = in.readBoolean();
 			customTimestamp = in.readBoolean();
 		}
@@ -134,17 +135,10 @@ public class ASCIISerialPointLocatorVO extends AbstractPointLocatorVO implements
 	@Override
 	public void jsonDeserialize(JsonReader arg0, JsonObject arg1)
 			throws JsonException {
-
 	}
 
 	@Override
 	public void jsonSerialize(Map<String, Object> arg0) {
-
-	}
-
-	@Override
-	public int getDataTypeId() {
-		return dataType;
 	}
 
 	@Override

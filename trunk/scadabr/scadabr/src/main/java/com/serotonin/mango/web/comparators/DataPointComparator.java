@@ -56,8 +56,8 @@ public class DataPointComparator extends BaseComparator<DataPointVO> {
         else if (sortType == SORT_ENABLED)
             result = new Boolean(dp1.isEnabled()).compareTo(new Boolean(dp2.isEnabled()));
         else if (sortType == SORT_DATA_TYPE) {
-            String s1 = dp1.getDataTypeMessage().getLocalizedMessage(bundle);
-            String s2 = dp2.getDataTypeMessage().getLocalizedMessage(bundle);
+            String s1 = dp1.getMangoDataType().getLocalizedMessage(bundle);
+            String s2 = dp2.getMangoDataType().getLocalizedMessage(bundle);
             result = s1.compareTo(s2);
         }
         else if (sortType == SORT_CONFIG) {

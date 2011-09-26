@@ -7,16 +7,17 @@ import java.util.Map;
 
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.component.ScriptComponent;
 import com.serotonin.util.SerializationHelper;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class ButtonComponent extends ScriptComponent {
 	public static ImplDefinition DEFINITION = new ImplDefinition("button",
-			"BUTTON", "graphic.button", new int[] { DataTypes.BINARY });
+			"BUTTON", "graphic.button", EnumSet.of( MangoDataType.BINARY ));
 	@JsonRemoteProperty
 	private String whenOffLabel = "ON";
 

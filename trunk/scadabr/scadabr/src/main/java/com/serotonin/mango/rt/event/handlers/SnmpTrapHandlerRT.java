@@ -172,7 +172,7 @@ public class SnmpTrapHandlerRT /* extends EventHandlerRT */{
     // return;
     // }
     //        
-    // int targetDataType = targetPoint.getVO().getPointLocator().getDataTypeId();
+    // int targetDataType = targetPoint.getVO().getMangoDataType();
     //        
     // Object value;
     // if (vo.getActiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {
@@ -221,7 +221,7 @@ public class SnmpTrapHandlerRT /* extends EventHandlerRT */{
     // return;
     // }
     //        
-    // int targetDataType = targetPoint.getVO().getPointLocator().getDataTypeId();
+    // int targetDataType = targetPoint.getVO().getMangoDataType();
     //        
     // Object value;
     // if (vo.getInactiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {

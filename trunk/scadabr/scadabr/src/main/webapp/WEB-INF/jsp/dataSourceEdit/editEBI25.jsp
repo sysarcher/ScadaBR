@@ -104,7 +104,7 @@
       delete locator.settable;
       delete locator.suffix;
       delete locator.prettyUnit;
-      delete locator.dataTypeId;
+      delete locator.mangoDataType;
       delete locator.prettyType;
       
       locator.sampleRate = $get("sampleRate");

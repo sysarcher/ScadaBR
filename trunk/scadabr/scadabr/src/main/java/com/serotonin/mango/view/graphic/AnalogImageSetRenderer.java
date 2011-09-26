@@ -22,16 +22,17 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImageSet;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 @Deprecated
 // Use ViewComponent instead
 public class AnalogImageSetRenderer extends ImageSetRenderer {
     private static ImplDefinition definition = new ImplDefinition("graphicRendererAnalogImage", "ANALOG_IMAGE",
-            "graphic.multistateImage", new int[] { DataTypes.NUMERIC });
+            "graphic.multistateImage", EnumSet.of( MangoDataType.NUMERIC ));
 
     public static ImplDefinition getDefinition() {
         return definition;

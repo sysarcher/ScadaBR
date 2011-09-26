@@ -26,16 +26,17 @@ import java.util.Date;
 
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.util.SerializationHelper;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class TimeRenderer extends BaseTextRenderer {
     private static ImplDefinition definition = new ImplDefinition("textRendererTime", "TIME", "textRenderer.time",
-            new int[] { DataTypes.NUMERIC });
+            EnumSet.of( MangoDataType.NUMERIC ));
 
     public static ImplDefinition getDefinition() {
         return definition;

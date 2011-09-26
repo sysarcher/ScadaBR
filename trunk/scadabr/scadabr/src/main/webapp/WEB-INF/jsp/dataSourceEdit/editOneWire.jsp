@@ -137,7 +137,7 @@
       delete locator.settable;
       delete locator.attributeIndexDescription;
       delete locator.attributeDescription;
-      delete locator.dataTypeId;
+      delete locator.mangoDataType;
       
       locator.address = $get("address");
       locator.attributeId = $get("attributeId");

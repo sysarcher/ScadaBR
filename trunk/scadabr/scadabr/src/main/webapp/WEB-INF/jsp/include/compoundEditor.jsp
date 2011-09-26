@@ -181,7 +181,7 @@
                 sel = $("compoundPointSelect"+ pointChildren[i].id);
                 sel.options[0] = new Option("", 0);
                 for (p=0; p<compoundEditor.pointList.length; p++) {
-                    if (contains(pointChildren[i].dataTypes, compoundEditor.pointList[p].dataType))
+                    if (contains(pointChildren[i].dataTypes, compoundEditor.pointList[p].mangoDataType))
                         sel.options[sel.options.length] = new Option(settingsEditor.pointList[p].name,
                                 settingsEditor.pointList[p].id);
                 }

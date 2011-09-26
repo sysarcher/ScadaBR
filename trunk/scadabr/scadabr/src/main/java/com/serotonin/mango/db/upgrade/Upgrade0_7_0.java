@@ -32,6 +32,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.view.chart.ChartRenderer;
 import com.serotonin.mango.view.chart.ImageChartRenderer;
 import com.serotonin.mango.view.chart.StatisticsChartRenderer;
@@ -43,6 +44,7 @@ import com.serotonin.mango.view.text.PlainRenderer;
 import com.serotonin.mango.view.text.RangeRenderer;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.modbus.ModbusIpDataSourceVO;
 import com.serotonin.mango.vo.dataSource.modbus.ModbusPointLocatorVO;
@@ -236,7 +238,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
                     public void setValues(PreparedStatement ps) throws SQLException {
                         ps.setInt(1, vo.getId());
                         ps.setString(2, vo.getName());
-                        ps.setInt(3, vo.getType().getId());
+                        ps.setInt(3, vo.getType().mangoId);
                         ps.setBlob(4, SerializationHelper.writeObject(vo));
                     }
                 });
@@ -352,7 +354,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
             case 1:
                 VirtualPointLocatorVO pl1 = new VirtualPointLocatorVO();
                 dp.setPointLocator(pl1);
-                pl1.setDataTypeId(rs.getInt(i + 1));
+                pl1.setMangoDataType(MangoDataType.fromMangoId(rs.getInt(i + 1)));
                 pl1.setChangeTypeId(rs.getInt(i + 2));
                 pl1.setSettable(charToBool(rs.getString(i + 3)));
 
@@ -426,7 +428,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
     }
 
     private void setRelationalData(DataPointVO dp) {
-        if (dp.getDataSourceTypeId() == DataSourceVO.Type.VIRTUAL.getId()) {
+        if (dp.getDataSourceTypeId() == DataSourceRegistry.VIRTUAL.mangoId) {
             VirtualPointLocatorVO tpl = dp.getPointLocator();
             int changeType = tpl.getChangeTypeId();
             if (changeType == 4 || changeType == 8) {

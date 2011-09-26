@@ -18,6 +18,7 @@
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp"%>
 <%@page import="com.serotonin.mango.Common"%>
+<%@page import="com.serotonin.mango.vo.dataSource.DataSourceRegistry"%>
 
 <tag:page dwr="DataSourceEditDwr" onload="init">
 	<script type="text/javascript">
@@ -32,7 +33,7 @@
         pointListColumnFunctions.push(function(p) { return "<b>"+ p.name +"</b>"; });
         
         pointListColumnHeaders.push("<fmt:message key="dsEdit.pointDataType"/>");
-        pointListColumnFunctions.push(function(p) { return p.dataTypeMessage; });
+        pointListColumnFunctions.push(function(p) { return p.dataTypeI18n; });
         
         pointListColumnHeaders.push("<fmt:message key="dsEdit.status"/>");
         pointListColumnFunctions.push(function(p) {
@@ -223,7 +224,7 @@
         
         // Prevents DWR warnings
         delete locator.configurationDescription;
-        delete locator.dataTypeMessage;
+        delete locator.mangoDataType;
         
         savePointImpl(locator);
     }
@@ -316,145 +317,146 @@
 				</table></td>
 		</tr>
 	</table>
-
+                                                <table id="%{DataSourceRegistry.VIRTUAL}"></table>
+                                    
 	<c:choose>
-		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.VIRTUAL']}">
+            <c:when
+                test="${dataSource.type == 'VIRTUAL'}">
 			<jsp:include page="dataSourceEdit/editVirtual.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.MODBUS_SERIAL']}">
+			test="${dataSource.type == 'MODBUS_SERIAL'}">
 			<jsp:include page="dataSourceEdit/editModbus.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.MODBUS_IP']}">
+			test="${dataSource.type == 'MODBUS_IP'}">
 			<jsp:include page="dataSourceEdit/editModbus.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.SPINWAVE']}">
+			test="${dataSource.type == 'SPINWAVE'}">
 			<jsp:include page="dataSourceEdit/editSpinwave.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.SNMP']}">
+			test="${dataSource.type == 'SNMP'}">
 			<jsp:include page="dataSourceEdit/editSnmp.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.SQL']}">
+			test="${dataSource.type == 'SQL'}">
 			<jsp:include page="dataSourceEdit/editSql.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.HTTP_RECEIVER']}">
+			test="${dataSource.type == 'HTTP_RECEIVER'}">
 			<jsp:include page="dataSourceEdit/editHttpReceiver.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.ONE_WIRE']}">
+			test="${dataSource.type == 'ONE_WIRE'}">
 			<jsp:include page="dataSourceEdit/editOneWire.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.META']}">
+			test="${dataSource.type == 'META'}">
 			<jsp:include page="dataSourceEdit/editMeta.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.BACNET']}">
+			test="${dataSource.type == 'BACNET'}">
 			<jsp:include page="dataSourceEdit/editBacnetIp.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.HTTP_RETRIEVER']}">
+			test="${dataSource.type == 'HTTP_RETRIEVER'}">
 			<jsp:include page="dataSourceEdit/editHttpRetriever.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.POP3']}">
+			test="${dataSource.type == 'POP3'}">
 			<jsp:include page="dataSourceEdit/editPop3.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.NMEA']}">
+			test="${dataSource.type == 'NMEA'}">
 			<jsp:include page="dataSourceEdit/editNmea.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.GALIL']}">
+			test="${dataSource.type == 'GALIL'}">
 			<jsp:include page="dataSourceEdit/editGalil.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.HTTP_IMAGE']}">
+			test="${dataSource.type == 'HTTP_IMAGE'}">
 			<jsp:include page="dataSourceEdit/editHttpImage.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.EBI25']}">
+			test="${dataSource.type == 'EBI25'}">
 			<jsp:include page="dataSourceEdit/editEBI25.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.VMSTAT']}">
+			test="${dataSource.type == 'VMSTAT'}">
 			<jsp:include page="dataSourceEdit/editVMStat.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.VICONICS']}">
+			test="${dataSource.type == 'VICONICS'}">
 			<jsp:include page="dataSourceEdit/editViconics.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.M_BUS']}">
+			test="${dataSource.type == 'M_BUS'}">
 			<jsp:include page="dataSourceEdit/editMBus.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.OPEN_V_4_J']}">
+			test="${dataSource.type == 'OPEN_V_4_J'}">
 			<jsp:include page="dataSourceEdit/editOpenV4J.jsp" />
 		</c:when>
-                <c:when test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.FHZ_4_J']}">
+                <c:when test="${dataSource.type == 'FHZ_4_J'}">
                         <jsp:include page="dataSourceEdit/editFhz4J.jsp" />
                 </c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.DNP3_IP']}">
+			test="${dataSource.type == 'DNP3_IP'}">
 			<jsp:include page="dataSourceEdit/editDnp3.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.DNP3_SERIAL']}">
+			test="${dataSource.type == 'DNP3_SERIAL'}">
 			<jsp:include page="dataSourceEdit/editDnp3.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.PACHUBE']}">
+			test="${dataSource.type == 'PACHUBE'}">
 			<jsp:include page="dataSourceEdit/editPachube.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.PERSISTENT']}">
+			test="${dataSource.type == 'PERSISTENT'}">
 			<jsp:include page="dataSourceEdit/editPersistent.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.OPC']}">
+			test="${dataSource.type == 'OPC'}">
 			<jsp:include page="dataSourceEdit/editOpc.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.ASCII_FILE']}">
+			test="${dataSource.type == 'ASCII_FILE'}">
 			<jsp:include page="dataSourceEdit/editAsciiFile.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.ASCII_SERIAL']}">
+			test="${dataSource.type == 'ASCII_SERIAL'}">
 			<jsp:include page="dataSourceEdit/editAsciiSerial.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.IEC101_SERIAL']}">
+			test="${dataSource.type == 'IEC101_SERIAL'}">
 			<jsp:include page="dataSourceEdit/editIEC101.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.IEC101_ETHERNET']}">
+			test="${dataSource.type == 'IEC101_ETHERNET'}">
 			<jsp:include page="dataSourceEdit/editIEC101.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.NODAVE_S7']}">
+			test="${dataSource.type == 'NODAVE_S7'}">
 			<jsp:include page="dataSourceEdit/editNodaveS7.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.DR_STORAGE_HT5B']}">
+			test="${dataSource.type == 'DR_STORAGE_HT5B'}">
 			<jsp:include page="dataSourceEdit/editDrStorageHt5b.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.ALPHA_2']}">
+			test="${dataSource.type == 'ALPHA_2'}">
 			<jsp:include page="dataSourceEdit/editAlpha2.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.INTERNAL']}">
+			test="${dataSource.type == 'INTERNAL'}">
 			<jsp:include page="dataSourceEdit/editInternal.jsp" />
 		</c:when>
 		<c:when
-			test="${dataSource.type.id == applicationScope['constants.DataSourceVO.Types.JMX']}">
+			test="${dataSource.type == 'JMX'}">
 			<jsp:include page="dataSourceEdit/editJmx.jsp" />
 		</c:when>
 	</c:choose>

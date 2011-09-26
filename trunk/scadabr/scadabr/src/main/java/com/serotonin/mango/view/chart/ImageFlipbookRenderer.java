@@ -26,10 +26,11 @@ import java.util.Map;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.vo.DataPointVO;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -37,7 +38,7 @@ import com.serotonin.mango.vo.DataPointVO;
 @JsonRemoteEntity
 public class ImageFlipbookRenderer extends BaseChartRenderer {
     private static ImplDefinition definition = new ImplDefinition("chartRendererImageFlipbook", "FLIPBOOK",
-            "chartRenderer.flipbook", new int[] { DataTypes.IMAGE });
+            "chartRenderer.flipbook", EnumSet.of( MangoDataType.IMAGE ));
 
     public static ImplDefinition getDefinition() {
         return definition;

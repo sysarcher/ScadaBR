@@ -30,7 +30,7 @@ import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.virtual.ChangeTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparableObject;
@@ -67,24 +67,24 @@ abstract public class ChangeTypeVO implements Serializable, JsonSerializable, Ch
         CHANGE_TYPE_CODES.addElement(Types.ANALOG_ATTRACTOR, "ANALOG_ATTRACTOR", "dsEdit.virtual.changeType.attractor");
     }
 
-    public static IntMessagePair[] getChangeTypes(int dataTypeId) {
-        switch (dataTypeId) {
-        case DataTypes.BINARY:
+    public static IntMessagePair[] getChangeTypes(MangoDataType mangoDataType) {
+        switch (mangoDataType) {
+        case BINARY:
             return new IntMessagePair[] { new IntMessagePair(Types.ALTERNATE_BOOLEAN, AlternateBooleanChangeVO.KEY),
                     new IntMessagePair(Types.NO_CHANGE, NoChangeVO.KEY),
                     new IntMessagePair(Types.RANDOM_BOOLEAN, RandomBooleanChangeVO.KEY), };
-        case DataTypes.MULTISTATE:
+        case MULTISTATE:
             return new IntMessagePair[] {
                     new IntMessagePair(Types.INCREMENT_MULTISTATE, IncrementMultistateChangeVO.KEY),
                     new IntMessagePair(Types.NO_CHANGE, NoChangeVO.KEY),
                     new IntMessagePair(Types.RANDOM_MULTISTATE, RandomMultistateChangeVO.KEY), };
-        case DataTypes.NUMERIC:
+        case NUMERIC:
             return new IntMessagePair[] { new IntMessagePair(Types.BROWNIAN, BrownianChangeVO.KEY),
                     new IntMessagePair(Types.INCREMENT_ANALOG, IncrementAnalogChangeVO.KEY),
                     new IntMessagePair(Types.NO_CHANGE, NoChangeVO.KEY),
                     new IntMessagePair(Types.RANDOM_ANALOG, RandomAnalogChangeVO.KEY),
                     new IntMessagePair(Types.ANALOG_ATTRACTOR, AnalogAttractorChangeVO.KEY), };
-        case DataTypes.ALPHANUMERIC:
+        case ALPHANUMERIC:
             return new IntMessagePair[] { new IntMessagePair(Types.NO_CHANGE, NoChangeVO.KEY), };
         }
         return new IntMessagePair[] {};

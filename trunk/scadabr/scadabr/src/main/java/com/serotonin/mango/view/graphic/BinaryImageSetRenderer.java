@@ -22,10 +22,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImageSet;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 /**
  * This class is called "binary" so that we can refer to values as 0 and 1, which is the actual representation in most
@@ -38,7 +39,7 @@ import com.serotonin.mango.view.ImplDefinition;
 // Use ViewComponent instead
 public class BinaryImageSetRenderer extends ImageSetRenderer {
     private static ImplDefinition definition = new ImplDefinition("graphicRendererBinaryImage", "BINARY_IMAGE",
-            "graphic.binaryImage", new int[] { DataTypes.BINARY });
+            "graphic.binaryImage", EnumSet.of(MangoDataType.BINARY ));
 
     public static ImplDefinition getDefinition() {
         return definition;

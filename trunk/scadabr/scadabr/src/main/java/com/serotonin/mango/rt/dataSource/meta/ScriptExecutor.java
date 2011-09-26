@@ -34,7 +34,7 @@ import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.db.IntValuePair;
 import com.serotonin.io.StreamUtils;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
@@ -75,7 +75,7 @@ public class ScriptExecutor {
     }
 
     public PointValueTime execute(String script, Map<String, IDataPoint> context, long runtime,
-            int dataTypeId, long timestamp) throws ScriptException, ResultTypeException {
+            MangoDataType mangoDataType, long timestamp) throws ScriptException, ResultTypeException {
         ensureFunctions();
 
         // Create the script engine.
@@ -106,19 +106,23 @@ public class ScriptExecutor {
         // Put the context variables into the engine with engine scope.
         for (String varName : context.keySet()) {
             IDataPoint point = context.get(varName);
-            int dt = point.getDataTypeId();
-            if (dt == DataTypes.BINARY)
+            switch(point.getMangoDataType()) {
+            case BINARY:
                 engine.put(varName, new BinaryPointWrapper(point, wrapperContext));
-            else if (dt == DataTypes.MULTISTATE)
+            break;  
+            case MULTISTATE:
                 engine.put(varName, new MultistatePointWrapper(point, wrapperContext));
-            else if (dt == DataTypes.NUMERIC)
+            break;
+            case NUMERIC:
                 engine.put(varName, new NumericPointWrapper(point, wrapperContext));
-            else if (dt == DataTypes.ALPHANUMERIC)
+            break;
+            case ALPHANUMERIC:
                 engine.put(varName, new AlphanumericPointWrapper(point, wrapperContext));
-            else
-                throw new ShouldNeverHappenException("Unknown data type id: " + point.getDataTypeId());
+            break;
+            default:
+                throw new ShouldNeverHappenException("Unknown data type id: " + point.getMangoDataType().name());
         }
-
+        }
         // Create the script.
         script = SCRIPT_PREFIX + script + SCRIPT_SUFFIX + FUNCTIONS;
 
@@ -147,32 +151,38 @@ public class ScriptExecutor {
 
         MangoValue value;
         if (result == null) {
-            if (dataTypeId == DataTypes.BINARY)
+            switch (mangoDataType)  {
+                case BINARY:
                 value = new BinaryValue(false);
-            else if (dataTypeId == DataTypes.MULTISTATE)
+            break;
+                case MULTISTATE:
                 value = new MultistateValue(0);
-            else if (dataTypeId == DataTypes.NUMERIC)
+            break;
+                case NUMERIC:
                 value = new NumericValue(0);
-            else if (dataTypeId == DataTypes.ALPHANUMERIC)
+            break;
+            case ALPHANUMERIC:
                 value = new AlphanumericValue("");
-            else
+            break;
+            default:
                 value = null;
+        }
         }
         else if (result instanceof AbstractPointWrapper)
             value = ((AbstractPointWrapper) result).getValueImpl();
         // See if the type matches.
-        else if (dataTypeId == DataTypes.BINARY && result instanceof Boolean)
+        else if (mangoDataType == MangoDataType.BINARY && result instanceof Boolean)
             value = new BinaryValue((Boolean) result);
-        else if (dataTypeId == DataTypes.MULTISTATE && result instanceof Number)
+        else if (mangoDataType == MangoDataType.MULTISTATE && result instanceof Number)
             value = new MultistateValue(((Number) result).intValue());
-        else if (dataTypeId == DataTypes.NUMERIC && result instanceof Number)
+        else if (mangoDataType == MangoDataType.NUMERIC && result instanceof Number)
             value = new NumericValue(((Number) result).doubleValue());
-        else if (dataTypeId == DataTypes.ALPHANUMERIC && result instanceof String)
+        else if (mangoDataType == MangoDataType.ALPHANUMERIC && result instanceof String)
             value = new AlphanumericValue((String) result);
         else
             // If not, ditch it.
             throw new ResultTypeException(new LocalizableMessage("event.script.convertError", result,
-                    DataTypes.getDataTypeMessage(dataTypeId)));
+                    mangoDataType.getLocalizableMessage()));
 
         return new PointValueTime(value, timestamp);
     }

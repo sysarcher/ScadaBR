@@ -29,7 +29,7 @@ import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.internal.InternalPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -96,8 +96,9 @@ public class InternalPointLocatorVO extends AbstractPointLocatorVO implements Js
         return new LocalizableMessage("common.unknown");
     }
 
-    public int getDataTypeId() {
-        return DataTypes.NUMERIC;
+    @Override
+    public MangoDataType getMangoDataType() {
+        return MangoDataType.NUMERIC;
     }
 
     public int getAttributeId() {

@@ -34,7 +34,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.pop3.Pop3PointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -70,7 +70,8 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     private boolean ignoreIfMissing;
     @JsonRemoteProperty
     private String valueFormat;
-    private int dataTypeId;
+    @JsonRemoteProperty(alias=MangoDataType.ALIAS_DATA_TYPE)
+    private MangoDataType mangoDataType = MangoDataType.UNKNOWN;
     @JsonRemoteProperty
     private boolean useReceivedTime;
     @JsonRemoteProperty
@@ -110,12 +111,12 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         this.valueFormat = valueFormat;
     }
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setMangoDataType(MangoDataType mangoDataType) {
+        this.mangoDataType = mangoDataType;
     }
 
     public boolean isUseReceivedTime() {
@@ -156,7 +157,7 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             }
         }
 
-        if (dataTypeId == DataTypes.NUMERIC && !StringUtils.isEmpty(valueFormat)) {
+        if (mangoDataType == MangoDataType.NUMERIC && !StringUtils.isEmpty(valueFormat)) {
             try {
                 new DecimalFormat(valueFormat);
             }
@@ -164,9 +165,6 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
                 response.addContextualMessage("valueFormat", "common.default", e.getMessage());
             }
         }
-
-        if (!DataTypes.CODES.isValidId(dataTypeId))
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
 
         if (!StringUtils.isEmpty(timeRegex)) {
             try {
@@ -193,7 +191,7 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", mangoDataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.pop3.findInSubject", findInSubject);
         AuditEventType.addPropertyMessage(list, "dsEdit.pop3.valueRegex", valueRegex);
         AuditEventType.addPropertyMessage(list, "dsEdit.pop3.ignoreIfMissing", ignoreIfMissing);
@@ -206,7 +204,7 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         Pop3PointLocatorVO from = (Pop3PointLocatorVO) o;
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.mangoDataType, mangoDataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pop3.findInSubject", from.findInSubject,
                 findInSubject);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pop3.valueRegex", from.valueRegex, valueRegex);
@@ -232,7 +230,7 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         out.writeBoolean(findInSubject);
         SerializationHelper.writeSafeUTF(out, valueRegex);
         out.writeBoolean(ignoreIfMissing);
-        out.writeInt(dataTypeId);
+        out.writeInt(mangoDataType.mangoId);
         SerializationHelper.writeSafeUTF(out, valueFormat);
         out.writeBoolean(useReceivedTime);
         SerializationHelper.writeSafeUTF(out, timeRegex);
@@ -247,7 +245,7 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             findInSubject = false;
             valueRegex = SerializationHelper.readSafeUTF(in);
             ignoreIfMissing = in.readBoolean();
-            dataTypeId = in.readInt();
+            mangoDataType = MangoDataType.fromMangoId(in.readInt());
             valueFormat = SerializationHelper.readSafeUTF(in);
             useReceivedTime = in.readBoolean();
             timeRegex = SerializationHelper.readSafeUTF(in);
@@ -257,7 +255,7 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             findInSubject = in.readBoolean();
             valueRegex = SerializationHelper.readSafeUTF(in);
             ignoreIfMissing = in.readBoolean();
-            dataTypeId = in.readInt();
+            mangoDataType = MangoDataType.fromMangoId(in.readInt());
             valueFormat = SerializationHelper.readSafeUTF(in);
             useReceivedTime = in.readBoolean();
             timeRegex = SerializationHelper.readSafeUTF(in);
@@ -267,13 +265,9 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        Integer value = deserializeDataType(json, DataTypes.IMAGE);
-        if (value != null)
-            dataTypeId = value;
     }
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        serializeDataType(map);
     }
 }

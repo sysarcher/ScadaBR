@@ -24,14 +24,15 @@ import java.io.ObjectOutputStream;
 import java.util.Map;
 
 import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.vo.DataPointVO;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class ImageChartRenderer extends TimePeriodChartRenderer {
     private static ImplDefinition definition = new ImplDefinition("chartRendererImage", "IMAGE", "chartRenderer.image",
-            new int[] { DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC });
+            EnumSet.of( MangoDataType.BINARY, MangoDataType.MULTISTATE, MangoDataType.NUMERIC ));
 
     public static ImplDefinition getDefinition() {
         return definition;

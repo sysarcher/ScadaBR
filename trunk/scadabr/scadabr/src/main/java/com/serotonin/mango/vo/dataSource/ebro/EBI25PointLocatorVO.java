@@ -30,7 +30,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.ebro.EBI25Constants;
 import com.serotonin.mango.rt.dataSource.ebro.EBI25PointLocatorRT;
@@ -63,8 +63,9 @@ public class EBI25PointLocatorVO extends AbstractPointLocatorVO implements JsonS
         return new EBI25PointLocatorRT(this);
     }
 
-    public int getDataTypeId() {
-        return DataTypes.NUMERIC;
+    @Override
+    public MangoDataType getMangoDataType() {
+        return MangoDataType.NUMERIC;
     }
 
     @Override

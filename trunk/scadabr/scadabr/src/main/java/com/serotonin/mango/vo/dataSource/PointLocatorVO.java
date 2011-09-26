@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource;
 
+import com.serotonin.mango.MangoDataType;
 import java.io.Serializable;
 
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
@@ -29,13 +30,9 @@ public interface PointLocatorVO extends Serializable, ChangeComparableObject {
     /**
      * One of the com.serotonin.mango.DataTypes
      */
-    public int getDataTypeId();
-
-    /**
-     * The text representation of the data type
-     */
-    public LocalizableMessage getDataTypeMessage();
-
+    public MangoDataType getMangoDataType();
+    
+    
     /**
      * An arbitrary description of the point location configuration for human consumption.
      */

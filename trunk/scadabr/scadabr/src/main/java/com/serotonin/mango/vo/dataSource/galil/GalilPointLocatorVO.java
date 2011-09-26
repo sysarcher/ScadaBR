@@ -32,6 +32,7 @@ import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonSerializable;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.galil.GalilPointLocatorRT;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
@@ -84,10 +85,12 @@ public class GalilPointLocatorVO extends AbstractPointLocatorVO implements JsonS
             pointType.validate(response);
     }
 
-    public int getDataTypeId() {
-        return getPointType().getDataTypeId();
+    @Override
+    public MangoDataType getMangoDataType() {
+        return getPointType().getMangoDataType();
     }
 
+    @Override
     public boolean isSettable() {
         return getPointType().isSettable();
     }

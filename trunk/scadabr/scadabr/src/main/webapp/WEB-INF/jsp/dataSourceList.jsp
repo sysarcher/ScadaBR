@@ -21,8 +21,8 @@
   <script>
     function init() {
         DataSourceListDwr.init(function(response) {
-            if (response.data.types) {
-                dwr.util.addOptions("dataSourceTypes", response.data.types, "key", "value");
+            if (response.data.dsTypes) {
+                dwr.util.addOptions("dataSourceTypes", response.data.dsTypes);
                 show("dataSourceTypesContent");
             }
         });
@@ -88,7 +88,7 @@
     }
     
     function addDataSource() {
-        window.location = "data_source_edit.shtm?typeId="+ $get("dataSourceTypes");
+        window.location = "data_source_edit.shtm?dataSourceType="+ $get("dataSourceTypes");
     }
   </script>
   
@@ -161,7 +161,7 @@
                         <c:forEach items="${listParent.list}" var="point">
                           <tr id="pointRow${point.id}">
                             <td>${point.name}</td>
-                            <td><sst:i18n message="${point.dataTypeMessage}"/> / <sst:i18n message="${point.configurationDescription}"/></td>
+                            <td><sst:i18n message="${point.mangoDataTypeI18n}"/> / <sst:i18n message="${point.configurationDescription}"/></td>
                             <td align="center">
                               <c:choose>
                                 <c:when test="${point.enabled}">

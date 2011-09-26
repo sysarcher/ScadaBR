@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataImage.types;
 
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 
 /**
  * @author Matthew Lohbihler
@@ -72,8 +72,8 @@ public class BinaryValue extends MangoValue implements Comparable<BinaryValue> {
     }
 
     @Override
-    public int getDataType() {
-        return DataTypes.BINARY;
+    public MangoDataType getMangoDataType() {
+        return MangoDataType.BINARY;
     }
 
     @Override

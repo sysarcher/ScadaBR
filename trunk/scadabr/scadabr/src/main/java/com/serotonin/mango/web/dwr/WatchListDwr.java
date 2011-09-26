@@ -30,7 +30,7 @@ import org.joda.time.DateTime;
 
 import com.serotonin.db.IntValuePair;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.db.dao.WatchListDao;
@@ -340,8 +340,8 @@ public class WatchListDwr extends BaseDwr {
 		List<DataPointVO> watchList = Common.getUser().getWatchList()
 				.getPointList();
 		for (DataPointVO dp : watchList) {
-			int dtid = dp.getPointLocator().getDataTypeId();
-			if ((dtid == DataTypes.NUMERIC || dtid == DataTypes.BINARY || dtid == DataTypes.MULTISTATE)
+			MangoDataType dtid = dp.getPointLocator().getMangoDataType();
+			if ((dtid == MangoDataType.NUMERIC || dtid == MangoDataType.BINARY || dtid == MangoDataType.MULTISTATE)
 					&& ArrayUtils.contains(pointIds, dp.getId())) {
 				pointsFound = true;
 				htmlData.append('_');

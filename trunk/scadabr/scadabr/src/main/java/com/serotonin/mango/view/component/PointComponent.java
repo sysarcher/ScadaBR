@@ -27,6 +27,7 @@ import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteProperty;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
@@ -34,6 +35,7 @@ import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -70,7 +72,7 @@ abstract public class PointComponent extends ViewComponent {
         }
         else {
             visible = Permissions.hasDataPointReadPermission(user, dataPoint);
-            valid = definition().supports(dataPoint.getPointLocator().getDataTypeId());
+            valid = definition().supports(dataPoint.getPointLocator().getMangoDataType());
         }
 
         if (makeReadOnly)
@@ -95,7 +97,7 @@ abstract public class PointComponent extends ViewComponent {
         return dataPoint.getId() == dataPointId;
     }
 
-    public int[] getSupportedDataTypes() {
+    public EnumSet<MangoDataType> getSupportedDataTypes() {
         return definition().getSupportedDataTypes();
     }
 

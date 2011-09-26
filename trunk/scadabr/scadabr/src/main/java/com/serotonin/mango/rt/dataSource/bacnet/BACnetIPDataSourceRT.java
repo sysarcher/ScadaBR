@@ -68,7 +68,7 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.PropertyReferences;
 import com.serotonin.bacnet4j.util.PropertyValues;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -398,7 +398,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
             fireDeviceExceptionEvent("event.bacnet.readError", dp.getVO().getName(),
                     ((BACnetError) encodable).getErrorCode());
         else {
-            MangoValue value = encodableToValue(encodable, dp.getDataTypeId());
+            MangoValue value = encodableToValue(encodable, dp.getMangoDataType());
             dp.updatePointValue(new PointValueTime(value, time));
         }
     }
@@ -523,7 +523,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
 
             if (dataPoint != null) {
                 if (pv.getPropertyIdentifier().equals(locator.getPid())) {
-                    MangoValue value = encodableToValue(pv.getValue(), dataPoint.getDataTypeId());
+                    MangoValue value = encodableToValue(pv.getValue(), dataPoint.getMangoDataType());
                     dataPoint.updatePointValue(new PointValueTime(value, System.currentTimeMillis()));
                 }
             }
@@ -651,8 +651,8 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
         Common.ctx.getRuntimeManager().saveDataPoint(dataPointVO);
     }
 
-    private MangoValue encodableToValue(Encodable encodable, int dataTypeId) {
-        if (dataTypeId == DataTypes.BINARY) {
+    private MangoValue encodableToValue(Encodable encodable, MangoDataType MangoDataType) {
+        if (MangoDataType == MangoDataType.BINARY) {
             if (encodable instanceof Enumerated)
                 return new BinaryValue(((Enumerated) encodable).intValue() != 0);
             if (encodable instanceof Real)
@@ -660,7 +660,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
             log.warn("Unexpected Encodable type for data type Binary: " + encodable.getClass().getName());
             return BinaryValue.ZERO;
         }
-        else if (dataTypeId == DataTypes.MULTISTATE) {
+        else if (MangoDataType == MangoDataType.MULTISTATE) {
             if (encodable instanceof UnsignedInteger)
                 return new MultistateValue(((UnsignedInteger) encodable).intValue());
             if (encodable instanceof Enumerated)
@@ -670,7 +670,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
             log.warn("Unexpected Encodable type for data type Multistate: " + encodable.getClass().getName());
             return new MultistateValue(1);
         }
-        else if (dataTypeId == DataTypes.NUMERIC) {
+        else if (MangoDataType == MangoDataType.NUMERIC) {
             if (encodable instanceof Enumerated)
                 return new NumericValue(((Enumerated) encodable).intValue());
             if (encodable instanceof Real)
@@ -678,11 +678,11 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
             log.warn("Unexpected Encodable type for data type Numeric: " + encodable.getClass().getName());
             return new NumericValue(0);
         }
-        else if (dataTypeId == DataTypes.ALPHANUMERIC) {
+        else if (MangoDataType == MangoDataType.ALPHANUMERIC) {
             return new AlphanumericValue(encodable.toString());
         }
 
-        throw new ShouldNeverHappenException("Unknown data type id: " + dataTypeId);
+        throw new ShouldNeverHappenException("Unknown data type id: " + MangoDataType);
     }
 
     private Encodable valueToEncodable(MangoValue value, ObjectType objectType, PropertyIdentifier pid) {

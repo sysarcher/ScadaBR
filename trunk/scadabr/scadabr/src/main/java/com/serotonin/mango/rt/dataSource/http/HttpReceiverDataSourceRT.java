@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
@@ -102,7 +102,7 @@ public class HttpReceiverDataSourceRT extends EventDataSource implements HttpMul
                             time = data.getTime();
 
                         MangoValue value;
-                        if (locator.getDataTypeId() == DataTypes.BINARY
+                        if (locator.getMangoDataType() == MangoDataType.BINARY
                                 && !StringUtils.isEmpty(locator.getBinary0Value())) {
                             if (valueStr.equalsIgnoreCase(locator.getBinary0Value()))
                                 value = BinaryValue.ZERO;
@@ -110,7 +110,7 @@ public class HttpReceiverDataSourceRT extends EventDataSource implements HttpMul
                                 value = BinaryValue.ONE;
                         }
                         else
-                            value = MangoValue.stringToValue(valueStr, locator.getDataTypeId());
+                            value = MangoValue.stringToValue(valueStr, locator.getMangoDataType());
 
                         dp.updatePointValue(new PointValueTime(value, time));
                     }

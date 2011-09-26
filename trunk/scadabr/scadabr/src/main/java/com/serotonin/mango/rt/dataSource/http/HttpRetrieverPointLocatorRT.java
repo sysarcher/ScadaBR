@@ -22,7 +22,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.http.HttpRetrieverPointLocatorVO;
 import com.serotonin.util.StringUtils;
@@ -33,7 +33,7 @@ import com.serotonin.util.StringUtils;
 public class HttpRetrieverPointLocatorRT extends PointLocatorRT {
     private final Pattern valuePattern;
     private final boolean ignoreIfMissing;
-    private final int dataTypeId;
+    private final MangoDataType mangoDataType;
     private String binary0Value;
     private DecimalFormat valueFormat;
     private final Pattern timePattern;
@@ -43,11 +43,11 @@ public class HttpRetrieverPointLocatorRT extends PointLocatorRT {
     public HttpRetrieverPointLocatorRT(HttpRetrieverPointLocatorVO vo) {
         valuePattern = Pattern.compile(vo.getValueRegex());
         ignoreIfMissing = vo.isIgnoreIfMissing();
-        dataTypeId = vo.getDataTypeId();
+        mangoDataType = vo.getMangoDataType();
 
-        if (dataTypeId == DataTypes.BINARY)
+        if (mangoDataType == MangoDataType.BINARY)
             binary0Value = vo.getValueFormat();
-        else if (dataTypeId == DataTypes.NUMERIC && !StringUtils.isEmpty(vo.getValueFormat()))
+        else if (mangoDataType == MangoDataType.NUMERIC && !StringUtils.isEmpty(vo.getValueFormat()))
             valueFormat = new DecimalFormat(vo.getValueFormat());
 
         if (!StringUtils.isEmpty(vo.getTimeRegex())) {
@@ -79,8 +79,8 @@ public class HttpRetrieverPointLocatorRT extends PointLocatorRT {
         return valueFormat;
     }
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
     public String getBinary0Value() {

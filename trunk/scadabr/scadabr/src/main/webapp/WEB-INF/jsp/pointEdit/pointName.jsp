@@ -18,7 +18,7 @@
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
 <script type="text/javascript">
-  var dataTypeId = ${form.pointLocator.dataTypeId};
+  var mangoDataType = ${form.pointLocator.mangoDataType};
 </script>
 <script type="text/javascript">
   function doSave(taskName) {

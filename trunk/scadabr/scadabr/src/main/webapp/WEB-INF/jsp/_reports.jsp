@@ -122,7 +122,7 @@
             reportPointsArray[reportPointsArray.length] = {
                 pointId: pointId,
                 pointName : data.name,
-                pointType : data.dataTypeMessage,
+                pointType : data.mangoDataType,
                 colour : !colour ? "" : colour
             };
         }
@@ -562,7 +562,7 @@
                   <tbody id="reportPointsTableHeaders" style="display:none;">
                     <tr class="smRowHeader">
                       <td><fmt:message key="reports.pointName"/></td>
-                      <td><fmt:message key="reports.dataType"/></td>
+                      <td><fmt:message key="reports.mangoDataType"/></td>
                       <td><fmt:message key="reports.colour"/></td>
                       <td></td>
                     </tr>

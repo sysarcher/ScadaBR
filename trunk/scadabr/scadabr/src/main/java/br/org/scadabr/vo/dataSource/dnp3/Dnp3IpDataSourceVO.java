@@ -14,6 +14,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
@@ -21,7 +22,6 @@ import com.serotonin.web.i18n.LocalizableMessage;
 
 @JsonRemoteEntity
 public class Dnp3IpDataSourceVO extends Dnp3DataSourceVO<Dnp3IpDataSourceVO> {
-	public static final Type TYPE = Type.DNP3_IP;
 
 	@Override
 	public LocalizableMessage getConnectionDescription() {
@@ -29,8 +29,8 @@ public class Dnp3IpDataSourceVO extends Dnp3DataSourceVO<Dnp3IpDataSourceVO> {
 	}
 
 	@Override
-	public Type getType() {
-		return TYPE;
+	public DataSourceRegistry getType() {
+		return DataSourceRegistry.DNP3_IP;
 	}
 
 	@Override

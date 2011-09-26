@@ -30,6 +30,7 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.spinwave.SpinwaveDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
+import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.spinwave.SpinwaveReceiver;
@@ -43,7 +44,6 @@ import com.serotonin.web.i18n.LocalizableMessage;
  */
 @JsonRemoteEntity
 public class SpinwaveDataSourceVO extends DataSourceVO<SpinwaveDataSourceVO> {
-    public static final Type TYPE = Type.SPINWAVE;
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
@@ -73,8 +73,8 @@ public class SpinwaveDataSourceVO extends DataSourceVO<SpinwaveDataSourceVO> {
     }
 
     @Override
-    public Type getType() {
-        return TYPE;
+    public DataSourceRegistry getType() {
+        return DataSourceRegistry.SPINWAVE;
     }
 
     @Override

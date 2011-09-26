@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.galil;
 
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.vo.dataSource.galil.InputPointTypeVO;
@@ -37,17 +37,17 @@ public class InputPointTypeRT extends PointTypeRT {
 
     @Override
     public String getPollRequestImpl() {
-        if (vo.getDataTypeId() == DataTypes.BINARY)
+        if (vo.getMangoDataType() == MangoDataType.BINARY)
             return "MG @IN[" + vo.getInputId() + "]";
         return "MG @AN[" + vo.getInputId() + "]";
     }
 
     @Override
     public MangoValue parsePollResponse(String data, String pointName) throws LocalizableException {
-        int dataTypeId = vo.getDataTypeId();
-        MangoValue value = parseValue(data, dataTypeId, pointName);
+        MangoDataType mangoDataType = vo.getMangoDataType();
+        MangoValue value = parseValue(data, mangoDataType, pointName);
 
-        if (dataTypeId == DataTypes.NUMERIC)
+        if (mangoDataType == MangoDataType.NUMERIC)
             value = new NumericValue(rawToEngineeringUnits(value.getDoubleValue(), vo.getScaleRawLow(), vo
                     .getScaleRawHigh(), vo.getScaleEngLow(), vo.getScaleEngHigh()));
 

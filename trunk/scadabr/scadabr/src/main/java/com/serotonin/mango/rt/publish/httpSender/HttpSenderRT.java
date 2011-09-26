@@ -31,7 +31,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.db.KeyValuePair;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -201,7 +201,7 @@ public class HttpSenderRT extends PublisherRT<HttpPointVO> {
             HttpPointVO pvo = e.getVo();
             PointValueTime pvt = e.getPvt();
 
-            String value = DataTypes.valueToString(pvt.getValue());
+            String value = pvt.getValue().getMangoDataType().name();
 
             if (pvo.isIncludeTimestamp()) {
                 value += "@";

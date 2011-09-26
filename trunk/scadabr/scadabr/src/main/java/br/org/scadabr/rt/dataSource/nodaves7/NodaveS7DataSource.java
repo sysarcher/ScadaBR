@@ -13,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import br.org.scadabr.vo.dataSource.nodaves7.NodaveS7DataSourceVO;
 import br.org.scadabr.vo.dataSource.nodaves7.NodaveS7PointLocatorVO;
 
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -100,7 +101,7 @@ public class NodaveS7DataSource extends PollingDataSource {
 		while (matcher.find()) {
 			found = true;
 			strValue = matcher.group();
-			value = MangoValue.stringToValue(strValue, point.getDataTypeId());
+			value = MangoValue.stringToValue(strValue, point.getMangoDataType());
 		}
 		if (!found) {
 			throw new Exception("Value string not found (regex: " + valueRegex
@@ -166,7 +167,7 @@ public class NodaveS7DataSource extends PollingDataSource {
 		System.out
 				.println("TYPE "
 						+ ((NodaveS7PointLocatorVO) dataPoint.getVO()
-								.getPointLocator()).getDataType());
+								.getPointLocator()).getMangoDataType());
 
 		System.out.println(valueTime.toString());
 
@@ -178,7 +179,7 @@ public class NodaveS7DataSource extends PollingDataSource {
 		// unico bit ativo na word especificada ex.: resets
 
 		if (((NodaveS7PointLocatorVO) dataPoint.getVO().getPointLocator())
-				.getDataType() == 1) {
+				.getMangoDataType() == MangoDataType.BINARY) {
 			int converted = 0;
 			int bit = ((NodaveS7PointLocatorVO) dataPoint.getVO()
 					.getPointLocator()).getS7writeBitOffset();

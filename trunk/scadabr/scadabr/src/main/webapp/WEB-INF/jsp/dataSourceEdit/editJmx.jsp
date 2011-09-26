@@ -39,7 +39,7 @@
       $set("objectName", locator.objectName);
       $set("attributeName", locator.attributeName);
       $set("compositeItemName", locator.compositeItemName);
-      $set("dataTypeId", locator.dataTypeId);
+      $set("mangoDataType", locator.mangoDataType);
       $set("settable", locator.settable);
   }
   
@@ -49,7 +49,7 @@
       locator.objectName = $get("objectName");
       locator.attributeName = $get("attributeName");
       locator.compositeItemName = $get("compositeItemName");
-      locator.dataTypeId = $get("dataTypeId");
+      locator.mangoDataType = $get("mangoDataType");
       locator.settable = $get("settable");
       
       DataSourceEditDwr.saveJmxPointLocator(currentPoint.id, $get("xid"), $get("name"), locator, savePointCB);
@@ -213,7 +213,7 @@
   <tr>
     <td class="formLabelRequired"><fmt:message key="dsEdit.pointDataType"/></td>
     <td class="formField">
-      <select id="dataTypeId">
+      <select id="mangoDataType">
         <tag:dataTypeOptions excludeImage="true" excludeMultistate="true"/>
       </select>
     </td>

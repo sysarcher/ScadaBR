@@ -33,7 +33,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.modbus.ModbusPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -108,14 +108,15 @@ public class ModbusPointLocatorVO extends AbstractPointLocatorVO implements Json
         return new LocalizableMessage("dsEdit.modbus.dpconn", slaveId, offset);
     }
 
-    public int getDataTypeId() {
+    @Override
+    public MangoDataType getMangoDataType() {
         if (slaveMonitor)
-            return DataTypes.BINARY;
+            return MangoDataType.BINARY;
         if (modbusDataType == DataType.BINARY)
-            return DataTypes.BINARY;
+            return MangoDataType.BINARY;
         if (isString())
-            return DataTypes.ALPHANUMERIC;
-        return DataTypes.NUMERIC;
+            return MangoDataType.ALPHANUMERIC;
+        return MangoDataType.NUMERIC;
     }
 
     public boolean isSettable() {

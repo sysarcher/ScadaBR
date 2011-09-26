@@ -27,6 +27,7 @@ import javax.script.ScriptException;
 
 import com.serotonin.db.IntValuePair;
 import com.serotonin.mango.Common;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.PointLinkDao;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -146,11 +147,11 @@ public class PointLinksDwr extends BaseDwr {
         else {
             Map<String, IDataPoint> context = new HashMap<String, IDataPoint>();
             context.put(PointLinkRT.CONTEXT_VAR_NAME, point);
-            int targetDataType = new DataPointDao().getDataPoint(targetPointId).getPointLocator().getDataTypeId();
+            MangoDataType targetMangoDataType = new DataPointDao().getDataPoint(targetPointId).getPointLocator().getMangoDataType();
 
             try {
                 PointValueTime pvt = scriptExecutor.execute(script, context, System.currentTimeMillis(),
-                        targetDataType, -1);
+                        targetMangoDataType, -1);
                 if (pvt.getValue() == null)
                     message = new LocalizableMessage("event.pointLink.nullResult");
                 else if (pvt.getTime() == -1)

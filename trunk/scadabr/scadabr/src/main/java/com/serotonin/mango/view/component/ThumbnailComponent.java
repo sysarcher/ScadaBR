@@ -25,10 +25,11 @@ import java.util.Map;
 
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -36,7 +37,7 @@ import com.serotonin.mango.view.ImplDefinition;
 @JsonRemoteEntity
 public class ThumbnailComponent extends PointComponent {
     public static ImplDefinition DEFINITION = new ImplDefinition("thumbnailImage", "THUMBNAIL",
-            "graphic.thumbnailImage", new int[] { DataTypes.IMAGE });
+            "graphic.thumbnailImage", EnumSet.of( MangoDataType.IMAGE ));
 
     @JsonRemoteProperty
     private int scalePercent;

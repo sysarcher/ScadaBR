@@ -30,7 +30,7 @@ import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.nmea.NmeaPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -61,7 +61,8 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     private String messageName;
     @JsonRemoteProperty
     private int fieldIndex = 1;
-    private int dataTypeId;
+    @JsonRemoteProperty(alias=MangoDataType.ALIAS_DATA_TYPE)
+    private MangoDataType mangoDataType = MangoDataType.UNKNOWN;
     @JsonRemoteProperty
     private String binary0Value;
 
@@ -81,12 +82,13 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         this.fieldIndex = fieldIndex;
     }
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    @Override
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setMangoDataType(MangoDataType mangoDataType) {
+        this.mangoDataType = mangoDataType;
     }
 
     public String getBinary0Value() {
@@ -107,7 +109,7 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", mangoDataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.nmea.messageName", messageName);
         AuditEventType.addPropertyMessage(list, "dsEdit.nmea.binary0Value", binary0Value);
         AuditEventType.addPropertyMessage(list, "dsEdit.nmea.fieldIndex", fieldIndex);
@@ -116,7 +118,7 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         NmeaPointLocatorVO from = (NmeaPointLocatorVO) o;
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.mangoDataType, mangoDataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.nmea.messageName", from.messageName, messageName);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.nmea.binary0Value", from.binary0Value, binary0Value);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.nmea.fieldIndex", from.fieldIndex, fieldIndex);
@@ -134,7 +136,7 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, messageName);
         out.writeInt(fieldIndex);
-        out.writeInt(dataTypeId);
+        out.writeInt(mangoDataType.mangoId);
         SerializationHelper.writeSafeUTF(out, binary0Value);
     }
 
@@ -145,20 +147,16 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         if (ver == 1) {
             messageName = SerializationHelper.readSafeUTF(in);
             fieldIndex = in.readInt();
-            dataTypeId = in.readInt();
+            mangoDataType = MangoDataType.fromMangoId(in.readInt());
             binary0Value = SerializationHelper.readSafeUTF(in);
         }
     }
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        Integer value = deserializeDataType(json, DataTypes.IMAGE);
-        if (value != null)
-            dataTypeId = value;
     }
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        serializeDataType(map);
     }
 }

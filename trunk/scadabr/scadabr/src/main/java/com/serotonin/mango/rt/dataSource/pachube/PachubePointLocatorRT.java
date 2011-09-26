@@ -18,20 +18,21 @@
  */
 package com.serotonin.mango.rt.dataSource.pachube;
 
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.pachube.PachubePointLocatorVO;
 
 public class PachubePointLocatorRT extends PointLocatorRT {
     private final int feedId;
     private final String dataStreamId;
-    private final int dataTypeId;
+    private final MangoDataType mangoDataType;
     private final String binary0Value;
     private final boolean settable;
 
     public PachubePointLocatorRT(PachubePointLocatorVO vo) {
         feedId = vo.getFeedId();
         dataStreamId = vo.getDataStreamId();
-        dataTypeId = vo.getDataTypeId();
+        mangoDataType = vo.getMangoDataType();
         binary0Value = vo.getBinary0Value();
         settable = vo.isSettable();
     }
@@ -49,8 +50,8 @@ public class PachubePointLocatorRT extends PointLocatorRT {
         return settable;
     }
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    public MangoDataType getMangoDataType() {
+        return mangoDataType;
     }
 
     public String getBinary0Value() {

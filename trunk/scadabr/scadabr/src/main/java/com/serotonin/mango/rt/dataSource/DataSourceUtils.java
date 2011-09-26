@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -40,7 +40,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
  * @author Matthew Lohbihler
  */
 public class DataSourceUtils {
-    public static MangoValue getValue(Pattern valuePattern, String data, int dataTypeId, String binary0Value,
+    public static MangoValue getValue(Pattern valuePattern, String data, MangoDataType mangoDataType, String binary0Value,
             TextRenderer textRenderer, DecimalFormat valueFormat, String pointName) throws LocalizableException {
         if (data == null)
             throw new LocalizableException(new LocalizableMessage("event.valueParse.noData", pointName));
@@ -51,7 +51,7 @@ public class DataSourceUtils {
             if (valueStr == null)
                 valueStr = "";
 
-            return getValue(valueStr, dataTypeId, binary0Value, textRenderer, valueFormat, pointName);
+            return getValue(valueStr, mangoDataType, binary0Value, textRenderer, valueFormat, pointName);
         }
 
         throw new NoMatchException(new LocalizableMessage("event.valueParse.noValue", pointName));
@@ -85,15 +85,16 @@ public class DataSourceUtils {
         return valueTime;
     }
 
-    public static MangoValue getValue(String valueStr, int dataTypeId, String binary0Value, TextRenderer textRenderer,
+    public static MangoValue getValue(String valueStr, MangoDataType mangoDataType, String binary0Value, TextRenderer textRenderer,
             DecimalFormat valueFormat, String pointName) throws LocalizableException {
-        if (dataTypeId == DataTypes.ALPHANUMERIC)
+        switch(mangoDataType) {
+            case ALPHANUMERIC:
             return new AlphanumericValue(valueStr);
 
-        if (dataTypeId == DataTypes.BINARY)
+            case BINARY:
             return new BinaryValue(!valueStr.equals(binary0Value));
 
-        if (dataTypeId == DataTypes.MULTISTATE) {
+            case MULTISTATE:
             if (textRenderer instanceof MultistateRenderer) {
                 List<MultistateValue> multistateValues = ((MultistateRenderer) textRenderer).getMultistateValues();
                 for (MultistateValue multistateValue : multistateValues) {
@@ -111,9 +112,8 @@ public class DataSourceUtils {
                 throw new LocalizableException(new LocalizableMessage("event.valueParse.textParsePoint", valueStr,
                         pointName));
             }
-        }
 
-        if (dataTypeId == DataTypes.NUMERIC) {
+            case NUMERIC:
             try {
                 if (valueFormat != null)
                     return new NumericValue(valueFormat.parse(valueStr).doubleValue());
@@ -132,8 +132,9 @@ public class DataSourceUtils {
                 throw new LocalizableException(new LocalizableMessage("event.valueParse.generalParsePoint", e
                         .getMessage(), valueStr, pointName));
             }
-        }
-
+        
+default:
         return null;
+}
     }
 }

@@ -28,6 +28,7 @@ import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonSerializable;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.mango.util.ChangeComparableObject;
 import com.serotonin.mango.util.ExportCodes;
@@ -61,7 +62,7 @@ abstract public class PointTypeVO implements Serializable, JsonSerializable, Cha
 
     abstract public PointTypeRT createRuntime();
 
-    abstract public int getDataTypeId();
+    abstract public MangoDataType getMangoDataType();
 
     abstract public boolean isSettable();
 

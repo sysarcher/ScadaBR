@@ -22,9 +22,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.util.SerializationHelper;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -33,7 +34,7 @@ import com.serotonin.util.SerializationHelper;
 // Use ViewComponent instead
 public class ScriptRenderer extends BaseGraphicRenderer {
     private static ImplDefinition definition = new ImplDefinition("graphicRendererScript", "SCRIPT", "graphic.script",
-            new int[] { DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC, });
+            EnumSet.of( MangoDataType.ALPHANUMERIC, MangoDataType.BINARY, MangoDataType.MULTISTATE, MangoDataType.NUMERIC ));
 
     public static ImplDefinition getDefinition() {
         return definition;

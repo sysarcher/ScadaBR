@@ -20,7 +20,7 @@
 <%@page import="org.snmp4j.mp.SnmpConstants"%>
 <%@page import="com.serotonin.mango.vo.dataSource.snmp.SnmpDataSourceVO"%>
 <%@page import="com.serotonin.mango.vo.dataSource.snmp.SnmpPointLocatorVO"%>
-<%@page import="com.serotonin.mango.DataTypes"%>
+<%@page import="com.serotonin.mango.MangoDataType"%>
 
 <script type="text/javascript">
   function versionChange() {
@@ -85,7 +85,7 @@
   
   function editPointCBImpl(locator) {
       $set("oid", locator.oid);
-      $set("dataTypeId", locator.dataTypeId);
+      $set("mangoDataType", locator.mangoDataType);
       $set("binary0Value", locator.binary0Value);
       $set("setType", locator.setType);
       $set("trapOnly", locator.trapOnly ? "true" : "false");
@@ -96,7 +96,7 @@
       delete locator.settable;
       
       locator.oid = $get("oid");
-      locator.dataTypeId = $get("dataTypeId");
+      locator.mangoDataType = $get("mangoDataType");
       locator.binary0Value = $get("binary0Value");
       locator.setType = $get("setType");
       locator.trapOnly = $get("trapOnly") == "true";
@@ -105,7 +105,7 @@
   }
   
   function dataTypeChanged() {
-      display("binary0ValueRow", $get("dataTypeId") == <c:out value="<%= DataTypes.BINARY %>"/>);
+      display("binary0ValueRow", $get("mangoDataType") == <c:out value="<%= MangoDataType.BINARY.getI18nMessageKey() %>"/>);
   }
 </script>
 
@@ -258,7 +258,7 @@
   <tr>
     <td class="formLabelRequired"><fmt:message key="dsEdit.pointDataType"/></td>
     <td class="formField">
-      <select id="dataTypeId" onchange="dataTypeChanged()">
+      <select id="mangoDataType" onchange="dataTypeChanged()">
         <tag:dataTypeOptions excludeImage="true"/>
       </select>
     </td>
