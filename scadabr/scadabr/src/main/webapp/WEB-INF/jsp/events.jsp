@@ -46,14 +46,20 @@
     }
     
     function doSearch(page, date) {
-        setDisabled("searchBtn", true);
-        $set("searchMessage", "<fmt:message key="events.search.searching"/>");
-        EventsDwr.search($get("eventId"), $get("eventSourceType"), $get("eventStatus"), $get("alarmLevel"),
+//        setDisabled("searchBtn", true);
+//        $set("searchMessage", "<fmt:message key="events.search.searching"/>");
+        var alarmLevel = $get("alarmLevel");
+        if (alarmLevel == "") {
+            alarmLevel = null;
+        }
+        
+        EventsDwr.search($get("eventId"), $get("eventSourceType"), $get("eventStatus"), alarmLevel,
                 $get("keywords"), page, date, function(results) {
             $set("searchResults", results.data.content);
             setDisabled("searchBtn", false);
             $set("searchMessage", results.data.resultCount);
         });
+        alarmLevel = null;
     }
 
     function jumpToDate(parent) {

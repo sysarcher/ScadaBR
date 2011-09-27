@@ -30,6 +30,7 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
+import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.DataPurge;
@@ -208,17 +209,17 @@ public class SystemSettingsDwr extends BaseDwr {
     }
 
     @MethodFilter
-    public void saveSystemEventAlarmLevels(List<IntegerPair> eventAlarmLevels) {
+    public void saveSystemEventAlarmLevels(Map<Integer, AlarmLevels> eventAlarmLevels) {
         Permissions.ensureAdmin();
-        for (IntegerPair eventAlarmLevel : eventAlarmLevels)
-            SystemEventType.setEventTypeAlarmLevel(eventAlarmLevel.getI1(), eventAlarmLevel.getI2());
+        for (Integer eventId : eventAlarmLevels.keySet())
+            SystemEventType.setEventTypeAlarmLevel(eventId, eventAlarmLevels.get(eventId));
     }
 
     @MethodFilter
-    public void saveAuditEventAlarmLevels(List<IntegerPair> eventAlarmLevels) {
+    public void saveAuditEventAlarmLevels(Map<Integer, AlarmLevels> eventAlarmLevels) {
         Permissions.ensureAdmin();
-        for (IntegerPair eventAlarmLevel : eventAlarmLevels)
-            AuditEventType.setEventTypeAlarmLevel(eventAlarmLevel.getI1(), eventAlarmLevel.getI2());
+        for (Integer eventId : eventAlarmLevels.keySet())
+            AuditEventType.setEventTypeAlarmLevel(eventId, eventAlarmLevels.get(eventId));
     }
 
     @MethodFilter

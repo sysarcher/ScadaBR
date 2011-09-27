@@ -33,6 +33,7 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.db.dao.UserDao;
+import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.maint.work.EmailWorkItem;
 import com.serotonin.mango.vo.DataPointNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
@@ -98,7 +99,7 @@ public class UsersDwr extends BaseDwr {
     }
 
     public DwrResponseI18n saveUserAdmin(int id, String username, String password, String email, String phone,
-            boolean admin, boolean disabled, int receiveAlarmEmails, boolean receiveOwnAuditEvents,
+            boolean admin, boolean disabled, AlarmLevels receiveAlarmEmails, boolean receiveOwnAuditEvents,
             List<Integer> dataSourcePermissions, List<DataPointAccess> dataPointPermissions) {
         Permissions.ensureAdmin();
 
@@ -155,7 +156,7 @@ public class UsersDwr extends BaseDwr {
         return response;
     }
 
-    public DwrResponseI18n saveUser(int id, String password, String email, String phone, int receiveAlarmEmails,
+    public DwrResponseI18n saveUser(int id, String password, String email, String phone, AlarmLevels receiveAlarmEmails,
             boolean receiveOwnAuditEvents) {
         HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
         User user = Common.getUser(request);

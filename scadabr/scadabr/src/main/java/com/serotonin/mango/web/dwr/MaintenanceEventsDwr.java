@@ -30,6 +30,7 @@ import com.serotonin.db.IntValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.db.dao.MaintenanceEventDao;
+import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.maintenance.MaintenanceEventRT;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
@@ -96,7 +97,7 @@ public class MaintenanceEventsDwr extends BaseDwr {
         return response;
     }
 
-    public DwrResponseI18n saveMaintenanceEvent(int id, String xid, int dataSourceId, String alias, int alarmLevel,
+    public DwrResponseI18n saveMaintenanceEvent(int id, String xid, int dataSourceId, String alias, AlarmLevels alarmLevel,
             int scheduleType, boolean disabled, int activeYear, int activeMonth, int activeDay, int activeHour,
             int activeMinute, int activeSecond, String activeCron, int inactiveYear, int inactiveMonth,
             int inactiveDay, int inactiveHour, int inactiveMinute, int inactiveSecond, String inactiveCron) {

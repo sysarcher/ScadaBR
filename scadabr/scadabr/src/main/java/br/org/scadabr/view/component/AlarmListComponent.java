@@ -31,7 +31,7 @@ public class AlarmListComponent extends CustomComponent {
 			"ALARMLIST", "graphic.alarmlist", EnumSet.noneOf(MangoDataType.class));
 
 	@JsonRemoteProperty
-	private int minAlarmLevel = 1;
+	private AlarmLevels minAlarmLevel = AlarmLevels.INFORMATION;
 	@JsonRemoteProperty
 	private int maxListSize = 5;
 	@JsonRemoteProperty
@@ -69,23 +69,26 @@ public class AlarmListComponent extends CustomComponent {
 		return content;
 	}
 
-	private void filter(List<EventInstance> list, int alarmLevel) {
+	private void filter(List<EventInstance> list, AlarmLevels alarmLevel) {
 
-		if (AlarmLevels.URGENT == alarmLevel) {
+		switch (alarmLevel) {case 
+                        URGENT:
 			removeAlarmLevel(list, AlarmLevels.INFORMATION);
-		}
-		if (AlarmLevels.CRITICAL == alarmLevel) {
+		break;
+                case CRITICAL:
 			removeAlarmLevel(list, AlarmLevels.INFORMATION);
 			removeAlarmLevel(list, AlarmLevels.URGENT);
-		}
-		if (AlarmLevels.LIFE_SAFETY == alarmLevel) {
+		break;
+                case LIFE_SAFETY:
 			removeAlarmLevel(list, AlarmLevels.INFORMATION);
 			removeAlarmLevel(list, AlarmLevels.URGENT);
 			removeAlarmLevel(list, AlarmLevels.CRITICAL);
+                    break;
+                default:
 		}
 	}
 
-	private void removeAlarmLevel(List<EventInstance> source, int alarmLevel) {
+	private void removeAlarmLevel(List<EventInstance> source, AlarmLevels alarmLevel) {
 		List<EventInstance> copy = new ArrayList<EventInstance>();
 
 		for (EventInstance eventInstance : source) {
@@ -165,7 +168,7 @@ public class AlarmListComponent extends CustomComponent {
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(version);
-		out.writeInt(minAlarmLevel);
+		out.writeInt(minAlarmLevel.mangoId);
 		out.writeInt(maxListSize);
 		out.writeInt(width);
 		out.writeBoolean(hideIdColumn);
@@ -181,7 +184,7 @@ public class AlarmListComponent extends CustomComponent {
 		// Switch on the version of the class so that version changes can be
 		// elegantly handled.
 		if (ver == 1) {
-			minAlarmLevel = in.readInt();
+			minAlarmLevel = AlarmLevels.fromMangoId(in.readInt());
 			maxListSize = in.readInt();
 			width = in.readInt();
 			hideIdColumn = in.readBoolean();
@@ -201,11 +204,11 @@ public class AlarmListComponent extends CustomComponent {
 		return hideAckColumn;
 	}
 
-	public void setMinAlarmLevel(int minAlarmLevel) {
+	public void setMinAlarmLevel(AlarmLevels minAlarmLevel) {
 		this.minAlarmLevel = minAlarmLevel;
 	}
 
-	public int getMinAlarmLevel() {
+	public AlarmLevels getMinAlarmLevel() {
 		return minAlarmLevel;
 	}
 

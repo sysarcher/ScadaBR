@@ -613,7 +613,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 	private List<EventInstance> getAcknowledgedEvents() {
 		// Adicionados parametros novos (?)
 		// return new EventDao().search(0, -1, null, -1, null, 20000, 1, null);
-		return new EventDao().search(0, -1, null, -1, null, 1, null, 0, 5000,
+		return new EventDao().search(0, -1, null, null, null, 1, null, 0, 5000,
 				null);
 	}
 
@@ -641,7 +641,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 			}
 		}
 
-		if (alarms.size() == 0) {
+		if (alarms.isEmpty()) {
 			APIError error = new APIError();
 			error.setCode(ErrorCode.OK);
 			error.setDescription("No alarm found in this period");

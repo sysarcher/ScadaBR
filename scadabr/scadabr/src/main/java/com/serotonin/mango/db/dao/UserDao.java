@@ -31,6 +31,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
+import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.UserComment;
@@ -68,7 +69,7 @@ public class UserDao extends BaseDao {
             user.setSelectedWatchList(rs.getInt(++i));
             user.setHomeUrl(rs.getString(++i));
             user.setLastLogin(rs.getLong(++i));
-            user.setReceiveAlarmEmails(rs.getInt(++i));
+            user.setReceiveAlarmEmails(AlarmLevels.fromMangoId(rs.getInt(++i)));
             user.setReceiveOwnAuditEvents(charToBool(rs.getString(++i)));
             return user;
         }
@@ -133,7 +134,7 @@ public class UserDao extends BaseDao {
                 USER_INSERT,
                 new Object[] { user.getUsername(), user.getPassword(), user.getEmail(), user.getPhone(),
                         boolToChar(user.isAdmin()), boolToChar(user.isDisabled()), user.getHomeUrl(),
-                        user.getReceiveAlarmEmails(), boolToChar(user.isReceiveOwnAuditEvents()) }, new int[] {
+                        user.getReceiveAlarmEmails().mangoId, boolToChar(user.isReceiveOwnAuditEvents()) }, new int[] {
                         Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
                         Types.VARCHAR, Types.INTEGER, Types.VARCHAR });
         user.setId(id);
@@ -149,7 +150,7 @@ public class UserDao extends BaseDao {
                 USER_UPDATE,
                 new Object[] { user.getUsername(), user.getPassword(), user.getEmail(), user.getPhone(),
                         boolToChar(user.isAdmin()), boolToChar(user.isDisabled()), user.getHomeUrl(),
-                        user.getReceiveAlarmEmails(), boolToChar(user.isReceiveOwnAuditEvents()), user.getId() });
+                        user.getReceiveAlarmEmails().mangoId, boolToChar(user.isReceiveOwnAuditEvents()), user.getId() });
         saveRelationalData(user);
     }
 

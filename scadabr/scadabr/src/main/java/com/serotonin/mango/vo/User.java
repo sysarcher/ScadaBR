@@ -41,6 +41,7 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
+import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.View;
@@ -79,7 +80,8 @@ public class User implements SetPointSource, HttpSessionBindingListener,
 	@JsonRemoteProperty
 	private String homeUrl;
 	private long lastLogin;
-	private int receiveAlarmEmails;
+        @JsonRemoteProperty
+	private AlarmLevels receiveAlarmEmails = AlarmLevels.NONE;
 	@JsonRemoteProperty
 	private boolean receiveOwnAuditEvents;
 
@@ -350,11 +352,11 @@ public class User implements SetPointSource, HttpSessionBindingListener,
 		this.muted = muted;
 	}
 
-	public int getReceiveAlarmEmails() {
+	public AlarmLevels getReceiveAlarmEmails() {
 		return receiveAlarmEmails;
 	}
 
-	public void setReceiveAlarmEmails(int receiveAlarmEmails) {
+	public void setReceiveAlarmEmails(AlarmLevels receiveAlarmEmails) {
 		this.receiveAlarmEmails = receiveAlarmEmails;
 	}
 

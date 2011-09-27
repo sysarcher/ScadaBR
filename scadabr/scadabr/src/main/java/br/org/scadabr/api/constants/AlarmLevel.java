@@ -7,6 +7,7 @@
 
 package br.org.scadabr.api.constants;
 
+@Deprecated //also in com.serotonin.mango.rt.event.AlarmLevels;
 public class AlarmLevel implements java.io.Serializable {
     private java.lang.String _value_;
     private static java.util.HashMap _table_ = new java.util.HashMap();

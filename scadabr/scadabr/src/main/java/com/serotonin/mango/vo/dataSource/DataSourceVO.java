@@ -89,7 +89,8 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
     private String name;
     @JsonRemoteProperty
     private boolean enabled;
-    private Map<Integer, Integer> alarmLevels = new HashMap<Integer, Integer>();
+    @JsonRemoteProperty
+    private Map<Integer, AlarmLevels> alarmLevels = new HashMap<Integer, AlarmLevels>();
 
 	public boolean isEnabled() {
 		return enabled;
@@ -123,12 +124,12 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
 		this.name = name;
 	}
 
-	public void setAlarmLevel(int eventId, int level) {
+	public void setAlarmLevel(int eventId, AlarmLevels level) {
 		alarmLevels.put(eventId, level);
 	}
 
-	public int getAlarmLevel(int eventId, int defaultLevel) {
-		Integer level = alarmLevels.get(eventId);
+	public AlarmLevels getAlarmLevel(int eventId, AlarmLevels defaultLevel) {
+		AlarmLevels level = alarmLevels.get(eventId);
 		if (level == null)
 			return defaultLevel;
 		return level;
@@ -150,7 +151,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
 
 	protected EventTypeVO createEventType(int eventId,
 			LocalizableMessage message, int duplicateHandling,
-			int defaultAlarmLevel) {
+			AlarmLevels defaultAlarmLevel) {
 		return new EventTypeVO(EventType.EventSources.DATA_SOURCE, getId(),
 				eventId, message, getAlarmLevel(eventId, defaultAlarmLevel),
 				duplicateHandling);
@@ -202,11 +203,11 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
 	@Override
 	public final void addPropertyChanges(List<LocalizableMessage> list, T from) {
 		AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.head.name",
-				from.name, name);
+				from.getName(), name);
 		AuditEventType.maybeAddPropertyChangeMessage(list, "common.xid",
-				from.xid, xid);
+				from.getXid(), xid);
 		AuditEventType.maybeAddPropertyChangeMessage(list, "common.enabled",
-				from.enabled, enabled);
+				from.isEnabled(), enabled);
 
 		addPropertyChangesImpl(list, from);
 	}
@@ -239,10 +240,10 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
 		// elegantly handled.
 		if (ver == 1) {
 			enabled = in.readBoolean();
-			alarmLevels = new HashMap<Integer, Integer>();
+			alarmLevels = new HashMap<Integer, AlarmLevels>();
 		} else if (ver == 2) {
 			enabled = in.readBoolean();
-			alarmLevels = (HashMap<Integer, Integer>) in.readObject();
+			alarmLevels = (HashMap<Integer, AlarmLevels>) in.readObject();
 		}
 	}
 
@@ -250,49 +251,13 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
 	public void jsonSerialize(Map<String, Object> map) {
 		map.put("xid", xid);
 		map.put("type", getType().name());
-
-		ExportCodes eventCodes = getEventCodes();
-		if (eventCodes != null && eventCodes.size() > 0) {
-			Map<String, String> alarmCodeLevels = new HashMap<String, String>();
-
-			for (int i = 0; i < eventCodes.size(); i++) {
-				int eventId = eventCodes.getId(i);
-				int level = getAlarmLevel(eventId, AlarmLevels.URGENT);
-				alarmCodeLevels.put(eventCodes.getCode(eventId),
-						AlarmLevels.CODES.getCode(level));
-			}
-
-			map.put("alarmLevels", alarmCodeLevels);
-		}
 	}
 
 	@Override
 	public void jsonDeserialize(JsonReader reader, JsonObject json)
 			throws JsonException {
-		// Can't change the type.
-
-		JsonObject alarmCodeLevels = json.getJsonObject("alarmLevels");
-		if (alarmCodeLevels != null) {
-			ExportCodes eventCodes = getEventCodes();
-			if (eventCodes != null && eventCodes.size() > 0) {
-				for (String code : alarmCodeLevels.getProperties().keySet()) {
-					int eventId = eventCodes.getId(code);
-					if (!eventCodes.isValidId(eventId))
-						throw new LocalizableJsonException(
-								"emport.error.eventCode", code,
-								eventCodes.getCodeList());
-
-					String text = alarmCodeLevels.getString(code);
-					int level = AlarmLevels.CODES.getId(text);
-					if (!AlarmLevels.CODES.isValidId(level))
-						throw new LocalizableJsonException(
-								"emport.error.alarmLevel", text, code,
-								AlarmLevels.CODES.getCodeList());
-
-					setAlarmLevel(eventId, level);
-				}
-			}
-		}
+		// Wont't change the type here.
+            // xid is handled elswhere
 	}
 
 	protected void serializeUpdatePeriodType(Map<String, Object> map,

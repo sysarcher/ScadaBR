@@ -27,6 +27,7 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.ScheduledEventDao;
+import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
@@ -99,7 +100,7 @@ public class CompoundEventsDwr extends BaseDwr {
         return new CompoundEventDetectorDao().getCompoundEventDetector(id);
     }
 
-    public DwrResponseI18n saveCompoundEvent(int id, String xid, String name, int alarmLevel, boolean returnToNormal,
+    public DwrResponseI18n saveCompoundEvent(int id, String xid, String name, AlarmLevels alarmLevel, boolean returnToNormal,
             String condition, boolean disabled) {
         Permissions.ensureDataSourcePermission(Common.getUser());
 

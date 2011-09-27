@@ -112,6 +112,7 @@ import com.serotonin.mango.rt.dataSource.pachube.PachubeDataSourceRT;
 import com.serotonin.mango.rt.dataSource.pachube.PachubeValue;
 import com.serotonin.mango.rt.dataSource.snmp.Version;
 import com.serotonin.mango.rt.dataSource.viconics.ViconicsDataSourceRT;
+import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.util.IntMessagePair;
 import com.serotonin.mango.vo.DataPointNameComparator;
@@ -394,7 +395,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 	}
 
 	@MethodFilter
-	public void updateEventAlarmLevel(int eventId, int alarmLevel) {
+	public void updateEventAlarmLevel(int eventId, AlarmLevels alarmLevel) {
 		DataSourceVO<?> ds = Common.getUser().getEditDataSource();
 		ds.setAlarmLevel(eventId, alarmLevel);
 	}

@@ -16,12 +16,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see http://www.gnu.org/licenses/.
 -->
-<#if evt.alarmLevel==1>
+<#if evt.alarmLevel=="INFORMATION">
   <img src="cid:<@img src="flag_blue.png"/>" alt="<@fmt key="common.alarmLevel.info"/>" title="<@fmt key="common.alarmLevel.info"/>"/>
-<#elseif evt.alarmLevel==2>
+<#elseif evt.alarmLevel=='URGENT'>
   <img src="cid:<@img src="flag_yellow.png"/>" alt="<@fmt key="common.alarmLevel.urgent"/>" title="<@fmt key="common.alarmLevel.urgent"/>"/>
-<#elseif evt.alarmLevel==3>
+<#elseif evt.alarmLevel=='CRITICAL'>
   <img src="cid:<@img src="flag_orange.png"/>" alt="<@fmt key="common.alarmLevel.critical"/>" title="<@fmt key="common.alarmLevel.critical"/>"/>
-<#elseif evt.alarmLevel==4>
+<#elseif evt.alarmLevel=='LIFE_SAFETY'>
   <img src="cid:<@img src="flag_red.png"/>" alt="<@fmt key="common.alarmLevel.lifeSafety"/>" title="<@fmt key="common.alarmLevel.lifeSafety"/>"/>
 </#if>

@@ -185,10 +185,6 @@ public class MangoContextListener implements ServletContextListener {
 	private void constantsInitialize(ServletContext ctx) {
 		ctx.setAttribute("constants.Common.NEW_ID", Common.NEW_ID);
                 
-                for (DataSourceRegistry r : DataSourceRegistry.values()) {
-        		ctx.setAttribute("constants.DataTypes." + r.name() , r.name());
-                }
-
                 ctx.setAttribute("constants.Permissions.DataPointAccessTypes.NONE",
 				Permissions.DataPointAccessTypes.NONE);
 		ctx.setAttribute("constants.Permissions.DataPointAccessTypes.READ",

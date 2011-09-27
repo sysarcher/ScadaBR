@@ -10,6 +10,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import com.serotonin.db.spring.ExtendedJdbcTemplate;
 import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
@@ -53,7 +54,7 @@ public class MaintenanceEventDao extends BaseDao {
             me.setXid(rs.getString(++i));
             me.setDataSourceId(rs.getInt(++i));
             me.setAlias(rs.getString(++i));
-            me.setAlarmLevel(rs.getInt(++i));
+            me.setAlarmLevel(AlarmLevels.fromMangoId(rs.getInt(++i)));
             me.setScheduleType(rs.getInt(++i));
             me.setDisabled(charToBool(rs.getString(++i)));
             me.setActiveYear(rs.getInt(++i));
@@ -91,7 +92,7 @@ public class MaintenanceEventDao extends BaseDao {
                         + "  activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, activeCron, "
                         + "  inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute, inactiveSecond, inactiveCron "
                         + ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                new Object[] { me.getXid(), me.getDataSourceId(), me.getAlias(), me.getAlarmLevel(),
+                new Object[] { me.getXid(), me.getDataSourceId(), me.getAlias(), me.getAlarmLevel().mangoId,
                         me.getScheduleType(), boolToChar(me.isDisabled()), me.getActiveYear(), me.getActiveMonth(),
                         me.getActiveDay(), me.getActiveHour(), me.getActiveMinute(), me.getActiveSecond(),
                         me.getActiveCron(), me.getInactiveYear(), me.getInactiveMonth(), me.getInactiveDay(),
@@ -108,7 +109,7 @@ public class MaintenanceEventDao extends BaseDao {
                         + "  inactiveYear=?, inactiveMonth=?, inactiveDay=?, inactiveHour=?, inactiveMinute=?, inactiveSecond=?, "
                         + "  inactiveCron=? "//
                         + "where id=?",
-                new Object[] { me.getXid(), me.getDataSourceId(), me.getAlias(), me.getAlarmLevel(),
+                new Object[] { me.getXid(), me.getDataSourceId(), me.getAlias(), me.getAlarmLevel().mangoId,
                         me.getScheduleType(), boolToChar(me.isDisabled()), me.getActiveYear(), me.getActiveMonth(),
                         me.getActiveDay(), me.getActiveHour(), me.getActiveMinute(), me.getActiveSecond(),
                         me.getActiveCron(), me.getInactiveYear(), me.getInactiveMonth(), me.getInactiveDay(),

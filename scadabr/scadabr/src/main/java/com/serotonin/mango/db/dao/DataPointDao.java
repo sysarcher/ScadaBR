@@ -43,6 +43,7 @@ import com.serotonin.db.IntValuePair;
 import com.serotonin.db.spring.ExtendedJdbcTemplate;
 import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
@@ -358,7 +359,7 @@ public class DataPointDao extends BaseDao {
             detector.setXid(rs.getString(++i));
             detector.setAlias(rs.getString(++i));
             detector.setDetectorType(rs.getInt(++i));
-            detector.setAlarmLevel(rs.getInt(++i));
+            detector.setAlarmLevel(AlarmLevels.fromMangoId(rs.getInt(++i)));
             detector.setLimit(rs.getDouble(++i));
             detector.setDuration(rs.getInt(++i));
             detector.setDurationType(rs.getInt(++i));
@@ -386,7 +387,7 @@ public class DataPointDao extends BaseDao {
                                 + "  binaryState, multistateState, changeCount, alphanumericState, weight) "
                                 + "values (?,?,?,?,?,?,?,?,?,?,?,?,?)",
                         new Object[] { ped.getXid(), ped.getAlias(), dp.getId(), ped.getDetectorType(),
-                                ped.getAlarmLevel(), ped.getLimit(), ped.getDuration(), ped.getDurationType(),
+                                ped.getAlarmLevel().mangoId, ped.getLimit(), ped.getDuration(), ped.getDurationType(),
                                 boolToChar(ped.isBinaryState()), ped.getMultistateState(), ped.getChangeCount(),
                                 ped.getAlphanumericState(), ped.getWeight() }, new int[] { Types.VARCHAR,
                                 Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.DOUBLE,
@@ -401,7 +402,7 @@ public class DataPointDao extends BaseDao {
                         "update pointEventDetectors set xid=?, alias=?, alarmLevel=?, stateLimit=?, duration=?, "
                                 + "  durationType=?, binaryState=?, multistateState=?, changeCount=?, alphanumericState=?, "
                                 + "  weight=? " + "where id=?",
-                        new Object[] { ped.getXid(), ped.getAlias(), ped.getAlarmLevel(), ped.getLimit(),
+                        new Object[] { ped.getXid(), ped.getAlias(), ped.getAlarmLevel().mangoId, ped.getLimit(),
                                 ped.getDuration(), ped.getDurationType(), boolToChar(ped.isBinaryState()),
                                 ped.getMultistateState(), ped.getChangeCount(), ped.getAlphanumericState(),
                                 ped.getWeight(), ped.getId() }, new int[] { Types.VARCHAR, Types.VARCHAR,

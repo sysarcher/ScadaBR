@@ -132,10 +132,17 @@
     <convert converter="bean" match="com.serotonin.mango.rt.dataSource.http.HttpReceiverPointSample"/>
     <convert converter="bean" match="com.serotonin.mango.rt.dataSource.onewire.OneWireContainerInfo"/>
     <convert converter="bean" match="com.serotonin.mango.rt.dataSource.onewire.OneWireContainerAttribute"/>
+
+    
+    
     
     <convert converter="enum" match="com.serotonin.mango.MangoDataType"/>
     
     <convert converter="enum" match="com.serotonin.mango.vo.dataSource.DataSourceRegistry"/>
+
+    <convert converter="enum" match="com.serotonin.mango.rt.event.AlarmLevels"/>
+
+
 
     <convert converter="bean" match="com.serotonin.mango.util.IntMessagePair"/>
     

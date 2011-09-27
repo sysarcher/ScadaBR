@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.event;
 
+import com.serotonin.mango.rt.event.AlarmLevels;
 import java.util.List;
 
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -47,7 +48,7 @@ public class EventTypeVO {
     private int typeRef2;
     private LocalizableMessage description;
     private List<EventHandlerVO> handlers;
-    private int alarmLevel;
+    private AlarmLevels alarmLevel;
     private String eventDetectorKey;
     private int duplicateHandling;
 
@@ -57,13 +58,13 @@ public class EventTypeVO {
         this.typeRef2 = typeRef2;
     }
 
-    public EventTypeVO(int typeId, int typeRef1, int typeRef2, LocalizableMessage description, int alarmLevel) {
+    public EventTypeVO(int typeId, int typeRef1, int typeRef2, LocalizableMessage description, AlarmLevels alarmLevel) {
         this(typeId, typeRef1, typeRef2);
         this.description = description;
         this.alarmLevel = alarmLevel;
     }
 
-    public EventTypeVO(int typeId, int typeRef1, int typeRef2, LocalizableMessage description, int alarmLevel,
+    public EventTypeVO(int typeId, int typeRef1, int typeRef2, LocalizableMessage description, AlarmLevels alarmLevel,
             int duplicateHandling) {
         this(typeId, typeRef1, typeRef2);
         this.description = description;
@@ -71,7 +72,7 @@ public class EventTypeVO {
         this.duplicateHandling = duplicateHandling;
     }
 
-    public EventTypeVO(int typeId, int typeRef1, int typeRef2, LocalizableMessage description, int alarmLevel,
+    public EventTypeVO(int typeId, int typeRef1, int typeRef2, LocalizableMessage description, AlarmLevels alarmLevel,
             String eventDetectorKey) {
         this(typeId, typeRef1, typeRef2, description, alarmLevel);
         this.eventDetectorKey = eventDetectorKey;
@@ -137,11 +138,11 @@ public class EventTypeVO {
         this.handlers = handlers;
     }
 
-    public int getAlarmLevel() {
+    public AlarmLevels getAlarmLevel() {
         return alarmLevel;
     }
 
-    public void setAlarmLevel(int alarmLevel) {
+    public void setAlarmLevel(AlarmLevels alarmLevel) {
         this.alarmLevel = alarmLevel;
     }
 

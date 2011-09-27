@@ -36,7 +36,6 @@ import com.serotonin.mango.rt.event.compound.LogicalOperator;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.util.ChangeComparable;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
@@ -55,7 +54,8 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
     private String xid;
     @JsonRemoteProperty
     private String name;
-    private int alarmLevel = AlarmLevels.NONE;
+    @JsonRemoteProperty
+    private AlarmLevels alarmLevel = AlarmLevels.NONE;
     @JsonRemoteProperty
     private boolean returnToNormal = true;
     @JsonRemoteProperty
@@ -132,7 +132,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "compoundDetectors.name", name);
-        AuditEventType.addPropertyMessage(list, "common.alarmLevel", AlarmLevels.getAlarmLevelMessage(alarmLevel));
+        AuditEventType.addPropertyMessage(list, "common.alarmLevel", alarmLevel.getMessageI18n());
         AuditEventType.addPropertyMessage(list, "common.rtn", returnToNormal);
         AuditEventType.addPropertyMessage(list, "common.disabled", disabled);
         AuditEventType.addPropertyMessage(list, "compoundDetectors.condition", condition);
@@ -168,11 +168,11 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
         this.xid = xid;
     }
 
-    public int getAlarmLevel() {
+    public AlarmLevels getAlarmLevel() {
         return alarmLevel;
     }
 
-    public void setAlarmLevel(int alarmLevel) {
+    public void setAlarmLevel(AlarmLevels alarmLevel) {
         this.alarmLevel = alarmLevel;
     }
 
@@ -215,16 +215,8 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
     //
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
-        map.put("alarmLevel", AlarmLevels.CODES.getCode(alarmLevel));
     }
 
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        String text = json.getString("alarmLevel");
-        if (text != null) {
-            alarmLevel = AlarmLevels.CODES.getId(text);
-            if (!AlarmLevels.CODES.isValidId(alarmLevel))
-                throw new LocalizableJsonException("emport.error.scheduledEvent.invalid", "alarmLevel", text,
-                        AlarmLevels.CODES.getCodeList());
-        }
     }
 }
