@@ -118,7 +118,8 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
     private String alias;
     private DataPointVO dataPoint;
     private int detectorType;
-    private int alarmLevel;
+    @JsonRemoteProperty
+    private AlarmLevels alarmLevel = AlarmLevels.NONE;
     private double limit;
     private int duration;
     private int durationType = Common.TimePeriods.SECONDS;
@@ -286,7 +287,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "pointEdit.detectors.alias", alias);
         AuditEventType.addPropertyMessage(list, "pointEdit.detectors.type", getDef().getNameKey());
-        AuditEventType.addPropertyMessage(list, "common.alarmLevel", AlarmLevels.getAlarmLevelMessage(alarmLevel));
+        AuditEventType.addPropertyMessage(list, "common.alarmLevel", alarmLevel.getMessageI18n());
         AuditEventType.addPropertyMessage(list, "common.configuration", getConfigurationDescription());
         AuditEventType.addPropertyMessage(list, "pointEdit.detectors.weight", weight);
     }
@@ -298,7 +299,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
         if (from.detectorType != detectorType)
             AuditEventType.addPropertyChangeMessage(list, "pointEdit.detectors.type", from.getDef().getNameKey(),
                     getDef().getNameKey());
-        AuditEventType.maybeAddAlarmLevelChangeMessage(list, "common.alarmLevel", from.alarmLevel, alarmLevel);
+        AuditEventType.maybeAddAlarmLevelChangeMessage(list, "common.alarmLevel", from.getAlarmLevel(), alarmLevel);
         if (from.limit != limit || from.duration != duration || from.durationType != durationType
                 || from.binaryState != binaryState || from.multistateState != multistateState
                 || from.changeCount != changeCount || from.alphanumericState != alphanumericState)
@@ -315,11 +316,11 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
         this.dataPoint = dataPoint;
     }
 
-    public int getAlarmLevel() {
+    public AlarmLevels getAlarmLevel() {
         return alarmLevel;
     }
 
-    public void setAlarmLevel(int alarmLevel) {
+    public void setAlarmLevel(AlarmLevels alarmLevel) {
         this.alarmLevel = alarmLevel;
     }
 
@@ -444,14 +445,6 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
         if (!TYPE_CODES.isValidId(detectorType))
             throw new LocalizableJsonException("emport.error.ped.invalid", "type", text, TYPE_CODES.getCodeList());
 
-        text = json.getString("alarmLevel");
-        if (text != null) {
-            alarmLevel = AlarmLevels.CODES.getId(text);
-            if (!AlarmLevels.CODES.isValidId(alarmLevel))
-                throw new LocalizableJsonException("emport.error.ped.invalid", "alarmLevel", text, AlarmLevels.CODES
-                        .getCodeList());
-        }
-
         switch (detectorType) {
         case TYPE_ANALOG_HIGH_LIMIT:
             limit = getDouble(json, "limit");
@@ -502,7 +495,6 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
         map.put("type", TYPE_CODES.getCode(detectorType));
-        map.put("alarmLevel", AlarmLevels.CODES.getCode(alarmLevel));
 
         switch (detectorType) {
         case TYPE_ANALOG_HIGH_LIMIT:

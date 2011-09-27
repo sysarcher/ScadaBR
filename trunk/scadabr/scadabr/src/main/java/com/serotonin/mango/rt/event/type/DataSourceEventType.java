@@ -32,7 +32,7 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 public class DataSourceEventType extends EventType {
     private int dataSourceId;
     private int dataSourceEventTypeId;
-    private int alarmLevel;
+    private AlarmLevels alarmLevel;
     private int duplicateHandling;
 
     public DataSourceEventType() {
@@ -43,7 +43,7 @@ public class DataSourceEventType extends EventType {
         this(dataSourceId, dataSourceEventTypeId, AlarmLevels.URGENT, EventType.DuplicateHandling.IGNORE);
     }
 
-    public DataSourceEventType(int dataSourceId, int dataSourceEventTypeId, int alarmLevel, int duplicateHandling) {
+    public DataSourceEventType(int dataSourceId, int dataSourceEventTypeId, AlarmLevels alarmLevel, int duplicateHandling) {
         this.dataSourceId = dataSourceId;
         this.dataSourceEventTypeId = dataSourceEventTypeId;
         this.alarmLevel = alarmLevel;
@@ -59,7 +59,7 @@ public class DataSourceEventType extends EventType {
         return dataSourceEventTypeId;
     }
 
-    public int getAlarmLevel() {
+    public AlarmLevels getAlarmLevel() {
         return alarmLevel;
     }
 

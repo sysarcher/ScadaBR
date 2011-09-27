@@ -58,7 +58,8 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     private int dataSourceId;
     @JsonRemoteProperty
     private String alias;
-    private int alarmLevel = AlarmLevels.NONE;
+    @JsonRemoteProperty
+    private AlarmLevels alarmLevel = AlarmLevels.NONE;
     private int scheduleType = TYPE_MANUAL;
     @JsonRemoteProperty
     private boolean disabled = false;
@@ -135,11 +136,11 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
         this.alias = alias;
     }
 
-    public int getAlarmLevel() {
+    public AlarmLevels getAlarmLevel() {
         return alarmLevel;
     }
 
-    public void setAlarmLevel(int alarmLevel) {
+    public void setAlarmLevel(AlarmLevels alarmLevel) {
         this.alarmLevel = alarmLevel;
     }
 
@@ -476,7 +477,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "maintenanceEvents.dataSource", dataSourceId);
         AuditEventType.addPropertyMessage(list, "maintenanceEvents.alias", alias);
-        AuditEventType.addPropertyMessage(list, "common.alarmLevel", AlarmLevels.getAlarmLevelMessage(alarmLevel));
+        AuditEventType.addPropertyMessage(list, "common.alarmLevel", alarmLevel.getMessageI18n());
         AuditEventType.addPropertyMessage(list, "maintenanceEvents.type", getTypeMessage());
         AuditEventType.addPropertyMessage(list, "common.disabled", disabled);
         AuditEventType.addPropertyMessage(list, "common.configuration", getDescription());
@@ -511,7 +512,6 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
         map.put("dataSourceXid", dataSourceXid);
-        map.put("alarmLevel", AlarmLevels.CODES.getCode(alarmLevel));
         map.put("scheduleType", TYPE_CODES.getCode(scheduleType));
     }
 
@@ -522,14 +522,6 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
             if (ds == null)
                 throw new LocalizableJsonException("emport.error.maintenanceEvent.invalid", "dataSourceXid", text);
             dataSourceId = ds.getId();
-        }
-
-        text = json.getString("alarmLevel");
-        if (text != null) {
-            alarmLevel = AlarmLevels.CODES.getId(text);
-            if (!AlarmLevels.CODES.isValidId(alarmLevel))
-                throw new LocalizableJsonException("emport.error.maintenanceEvent.invalid", "alarmLevel", text,
-                        AlarmLevels.CODES.getCodeList());
         }
 
         text = json.getString("scheduleType");

@@ -78,8 +78,8 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
 
     @Override
     protected void addEventTypes(List<EventTypeVO> eventTypes) {
-        eventTypes.add(createEventType(Fhz4JDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessage(
-                "event.ds.dataSource")));
+        eventTypes.add(createEventType(Fhz4JDataSourceRT.SERIAL_PORT_EXCEPTION_EVENT, new LocalizableMessage(
+                "event.ds.serialPort")));
         eventTypes.add(createEventType(Fhz4JDataSourceRT.POINT_READ_EXCEPTION_EVENT, new LocalizableMessage(
                 "event.ds.pointRead")));
         eventTypes.add(createEventType(Fhz4JDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, new LocalizableMessage(

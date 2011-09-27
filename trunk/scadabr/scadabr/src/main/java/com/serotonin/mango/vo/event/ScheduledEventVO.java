@@ -84,7 +84,8 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     private String xid;
     @JsonRemoteProperty
     private String alias;
-    private int alarmLevel = AlarmLevels.NONE;
+    @JsonRemoteProperty
+    private AlarmLevels alarmLevel = AlarmLevels.NONE;
     private int scheduleType = TYPE_DAILY;
     @JsonRemoteProperty
     private boolean returnToNormal = true;
@@ -333,7 +334,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "scheduledEvents.alias", alias);
-        AuditEventType.addPropertyMessage(list, "common.alarmLevel", AlarmLevels.getAlarmLevelMessage(alarmLevel));
+        AuditEventType.addPropertyMessage(list, "common.alarmLevel", alarmLevel.getMessageI18n());
         AuditEventType.addPropertyMessage(list, "scheduledEvents.type", getTypeMessage());
         AuditEventType.addPropertyMessage(list, "common.rtn", returnToNormal);
         AuditEventType.addPropertyMessage(list, "common.disabled", disabled);
@@ -433,11 +434,11 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         this.activeYear = activeYear;
     }
 
-    public int getAlarmLevel() {
+    public AlarmLevels getAlarmLevel() {
         return alarmLevel;
     }
 
-    public void setAlarmLevel(int alarmLevel) {
+    public void setAlarmLevel(AlarmLevels alarmLevel) {
         this.alarmLevel = alarmLevel;
     }
 
@@ -536,18 +537,11 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     //
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
-        map.put("alarmLevel", AlarmLevels.CODES.getCode(alarmLevel));
         map.put("scheduleType", TYPE_CODES.getCode(scheduleType));
     }
 
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("alarmLevel");
-        if (text != null) {
-            alarmLevel = AlarmLevels.CODES.getId(text);
-            if (!AlarmLevels.CODES.isValidId(alarmLevel))
-                throw new LocalizableJsonException("emport.error.scheduledEvent.invalid", "alarmLevel", text,
-                        AlarmLevels.CODES.getCodeList());
-        }
 
         text = json.getString("scheduleType");
         if (text != null) {

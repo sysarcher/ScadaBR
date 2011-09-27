@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see http://www.gnu.org/licenses/.
 -->
-<#if evt.alarmLevel gt 0>
+<#if evt.alarmLevel != 'NONE'>
 
 <@fmt key="ftl.note"/>: <#if evt.rtnApplicable><@fmt key="ftl.rtn"/><#else><@fmt key="ftl.manual"/></#if>
 

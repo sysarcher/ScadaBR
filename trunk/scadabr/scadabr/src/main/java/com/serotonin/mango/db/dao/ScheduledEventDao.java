@@ -28,6 +28,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import com.serotonin.db.spring.ExtendedJdbcTemplate;
 import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
@@ -72,7 +73,7 @@ public class ScheduledEventDao extends BaseDao {
             se.setId(rs.getInt(++i));
             se.setXid(rs.getString(++i));
             se.setAlias(rs.getString(++i));
-            se.setAlarmLevel(rs.getInt(++i));
+            se.setAlarmLevel(AlarmLevels.fromMangoId(rs.getInt(++i)));
             se.setScheduleType(rs.getInt(++i));
             se.setReturnToNormal(charToBool(rs.getString(++i)));
             se.setDisabled(charToBool(rs.getString(++i)));
@@ -109,7 +110,7 @@ public class ScheduledEventDao extends BaseDao {
                                 + "  activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, activeCron, "
                                 + "  inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute, inactiveSecond, inactiveCron "
                                 + ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", new Object[] { se.getXid(),
-                                se.getAlarmLevel(), se.getAlias(), se.getScheduleType(),
+                                se.getAlarmLevel().mangoId, se.getAlias(), se.getScheduleType(),
                                 boolToChar(se.isReturnToNormal()), boolToChar(se.isDisabled()), se.getActiveYear(),
                                 se.getActiveMonth(), se.getActiveDay(), se.getActiveHour(), se.getActiveMinute(),
                                 se.getActiveSecond(), se.getActiveCron(), se.getInactiveYear(), se.getInactiveMonth(),
@@ -126,7 +127,7 @@ public class ScheduledEventDao extends BaseDao {
                                 + "  xid=?, alarmLevel=?, alias=?, scheduleType=?, returnToNormal=?, disabled=?, "
                                 + "  activeYear=?, activeMonth=?, activeDay=?, activeHour=?, activeMinute=?, activeSecond=?, activeCron=?, "
                                 + "  inactiveYear=?, inactiveMonth=?, inactiveDay=?, inactiveHour=?, inactiveMinute=?, inactiveSecond=?, "
-                                + "  inactiveCron=? " + "where id=?", new Object[] { se.getXid(), se.getAlarmLevel(),
+                                + "  inactiveCron=? " + "where id=?", new Object[] { se.getXid(), se.getAlarmLevel().mangoId,
                                 se.getAlias(), se.getScheduleType(), boolToChar(se.isReturnToNormal()),
                                 boolToChar(se.isDisabled()), se.getActiveYear(), se.getActiveMonth(),
                                 se.getActiveDay(), se.getActiveHour(), se.getActiveMinute(), se.getActiveSecond(),

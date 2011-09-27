@@ -47,11 +47,11 @@
                     var etid = et.typeId +"-"+ et.typeRef1;
                     var content = "<select id='alarmLevel"+ etid +"' ";
                     content += "onchange='updateAlarmLevel("+ et.typeId +", "+ et.typeRef1 +", this.value)'>";
-                    content += "<option value='<c:out value="<%= AlarmLevels.NONE %>"/>'><fmt:message key="<%= AlarmLevels.NONE_DESCRIPTION %>"/></option>";
-                    content += "<option value='<c:out value="<%= AlarmLevels.INFORMATION %>"/>'><fmt:message key="<%= AlarmLevels.INFORMATION_DESCRIPTION %>"/></option>";
-                    content += "<option value='<c:out value="<%= AlarmLevels.URGENT %>"/>'><fmt:message key="<%= AlarmLevels.URGENT_DESCRIPTION %>"/></option>";
-                    content += "<option value='<c:out value="<%= AlarmLevels.CRITICAL %>"/>'><fmt:message key="<%= AlarmLevels.CRITICAL_DESCRIPTION %>"/></option>";
-                    content += "<option value='<c:out value="<%= AlarmLevels.LIFE_SAFETY %>"/>'><fmt:message key="<%= AlarmLevels.LIFE_SAFETY_DESCRIPTION %>"/></option>";
+                    content += "<option value='<c:out value="<%= AlarmLevels.NONE.name() %>"/>'><fmt:message key="<%= AlarmLevels.NONE.getI18nMessageKey() %>"/></option>";
+                    content += "<option value='<c:out value="<%= AlarmLevels.INFORMATION.name() %>"/>'><fmt:message key="<%= AlarmLevels.INFORMATION.getI18nMessageKey() %>"/></option>";
+                    content += "<option value='<c:out value="<%= AlarmLevels.URGENT.name() %>"/>'><fmt:message key="<%= AlarmLevels.URGENT.getI18nMessageKey() %>"/></option>";
+                    content += "<option value='<c:out value="<%= AlarmLevels.CRITICAL.name() %>"/>'><fmt:message key="<%= AlarmLevels.CRITICAL.getI18nMessageKey() %>"/></option>";
+                    content += "<option value='<c:out value="<%= AlarmLevels.LIFE_SAFETY.name() %>"/>'><fmt:message key="<%= AlarmLevels.LIFE_SAFETY.getI18nMessageKey() %>"/></option>";
                     content += "</select> ";
                     content += "<img id='alarmLevelImg"+ etid +"' src='images/flag_green.png' style='display:none'>";
                     return content;

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see http://www.gnu.org/licenses/.
 -->
-<#if evt.alarmLevel gt 0>
+<#if evt.alarmLevel != 'NONE'>
   <tr>
     <td valign="top"><img src="cid:<@img src="exclamation.png"/>" alt="<@fmt key="ftl.note"/>" title="<@fmt key="ftl.note"/>"/></td>
     <td colspan="2">

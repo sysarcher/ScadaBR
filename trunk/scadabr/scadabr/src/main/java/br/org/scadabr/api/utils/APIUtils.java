@@ -35,6 +35,7 @@ import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.ScheduledEventDao;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
+import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.UserComment;
@@ -731,23 +732,23 @@ public final class APIUtils {
 	}
 
 	public static EventDefinition toEventDefinition(String name,
-			int alarmLevel, EventType eventType) {
+			AlarmLevels alarmLevel, EventType eventType) {
 		EventDefinition event = new EventDefinition();
 		event.setMessage(name);
 		switch (alarmLevel) {
-		case 0:
+		case NONE:
 			event.setAlarmLevel(AlarmLevel.NONE);
 			break;
-		case 1:
+		case INFORMATION:
 			event.setAlarmLevel(AlarmLevel.INFORMATION);
 			break;
-		case 2:
+		case URGENT:
 			event.setAlarmLevel(AlarmLevel.URGENT);
 			break;
-		case 3:
+		case CRITICAL:
 			event.setAlarmLevel(AlarmLevel.CRITICAL);
 			break;
-		case 4:
+		case LIFE_SAFETY:
 			event.setAlarmLevel(AlarmLevel.LIFE_SAFETY);
 			break;
 		}
@@ -924,17 +925,17 @@ public final class APIUtils {
 		return "1.11.0";
 	}
 
-	public static AlarmLevel toAlarmLevel(int i) {
+	public static AlarmLevel toAlarmLevel(AlarmLevels i) {
 		switch (i) {
-		case 0:
+		case NONE:
 			return AlarmLevel.NONE;
-		case 1:
+		case INFORMATION:
 			return AlarmLevel.INFORMATION;
-		case 2:
+		case URGENT:
 			return AlarmLevel.URGENT;
-		case 3:
+		case CRITICAL:
 			return AlarmLevel.CRITICAL;
-		case 4:
+		case LIFE_SAFETY:
 			return AlarmLevel.LIFE_SAFETY;
 		default:
 			return AlarmLevel.NONE;

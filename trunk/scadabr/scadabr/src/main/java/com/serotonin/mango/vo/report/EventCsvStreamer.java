@@ -49,7 +49,7 @@ public class EventCsvStreamer {
 
         for (EventInstance event : events) {
             data[0] = Integer.toString(event.getId());
-            data[1] = AlarmLevels.getAlarmLevelMessage(event.getAlarmLevel()).getLocalizedMessage(bundle);
+            data[1] = event.getAlarmLevel().getLocalizedMessage(bundle);
             data[2] = event.getFullPrettyActiveTimestamp();
             data[3] = event.getMessage().getLocalizedMessage(bundle);
 

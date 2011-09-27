@@ -54,6 +54,7 @@ import com.serotonin.mango.db.dao.ViewDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
+import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.view.DynamicImage;
 import com.serotonin.mango.view.ImageSet;
 import com.serotonin.mango.view.ImplDefinition;
@@ -867,7 +868,7 @@ public class ViewDwr extends BaseDwr {
 
 	@MethodFilter
 	public DwrResponseI18n saveAlarmListComponent(String viewComponentId,
-			int minAlarmLevel, int maxListSize, int width,
+			AlarmLevels minAlarmLevel, int maxListSize, int width,
 			boolean hideIdColumn, boolean hideAlarmLevelColumn,
 			boolean hideTimestampColumn, boolean hideInactivityColumn,
 			boolean hideAckColumn) {

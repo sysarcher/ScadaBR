@@ -1,18 +1,21 @@
 package com.serotonin.mango.web.dwr.beans;
 
+import com.serotonin.mango.rt.event.AlarmLevels;
+import java.util.Date;
+
 
 public class EventExportDefinition {
     private final int eventId;
     private final int eventSourceType;
     private final String status;
-    private final int alarmLevel;
+    private final AlarmLevels alarmLevel;
     private final String[] keywords;
-    private final long dateFrom;
-    private final long dateTo;
+    private final Date dateFrom;
+    private final Date dateTo;
     private final int userId;
 
-    public EventExportDefinition(int eventId, int eventSourceType, String status, int alarmLevel, String[] keywords,
-            long dateFrom, long dateTo, int userId) {
+    public EventExportDefinition(int eventId, int eventSourceType, String status, AlarmLevels alarmLevel, String[] keywords,
+            Date dateFrom, Date dateTo, int userId) {
         this.eventId = eventId;
         this.eventSourceType = eventSourceType;
         this.status = status;
@@ -35,7 +38,7 @@ public class EventExportDefinition {
         return status;
     }
 
-    public int getAlarmLevel() {
+    public AlarmLevels getAlarmLevel() {
         return alarmLevel;
     }
 
@@ -43,11 +46,11 @@ public class EventExportDefinition {
         return keywords;
     }
 
-    public long getDateFrom() {
+    public Date getDateFrom() {
         return dateFrom;
     }
 
-    public long getDateTo() {
+    public Date getDateTo() {
         return dateTo;
     }
 

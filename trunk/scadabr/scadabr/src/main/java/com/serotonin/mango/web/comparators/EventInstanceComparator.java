@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.comparators;
 
+import com.serotonin.mango.rt.event.AlarmLevels;
 import java.util.ResourceBundle;
 
 import com.serotonin.mango.rt.event.EventInstance;
@@ -50,7 +51,7 @@ public class EventInstanceComparator extends BaseComparator<EventInstance> {
     public int compare(EventInstance e1, EventInstance e2) {
         int result = 0;
         if (sortType == SORT_ALARM_LEVEL)
-            result = e1.getAlarmLevel() - e2.getAlarmLevel();
+            result = e1.getAlarmLevel().ordinal() - e2.getAlarmLevel().ordinal();
         else if (sortType == SORT_ACTIVE_TIME) {
             long diff = e1.getActiveTimestamp() - e2.getActiveTimestamp();
             if (diff < 0)

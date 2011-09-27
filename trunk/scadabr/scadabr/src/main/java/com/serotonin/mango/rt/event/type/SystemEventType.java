@@ -87,9 +87,9 @@ public class SystemEventType extends EventType {
         return systemEventTypes;
     }
 
-    private static void addEventTypeVO(int type, String key, int defaultAlarmLevel) {
+    private static void addEventTypeVO(int type, String key, AlarmLevels defaultAlarmLevel) {
         systemEventTypes.add(new EventTypeVO(EventType.EventSources.SYSTEM, type, 0, new LocalizableMessage(key),
-                SystemSettingsDao.getIntValue(SYSTEM_SETTINGS_PREFIX + type, defaultAlarmLevel)));
+                AlarmLevels.fromMangoId(SystemSettingsDao.getIntValue(SYSTEM_SETTINGS_PREFIX + type, defaultAlarmLevel.mangoId))));
     }
 
     public static EventTypeVO getEventType(int type) {
@@ -100,17 +100,17 @@ public class SystemEventType extends EventType {
         return null;
     }
 
-    public static void setEventTypeAlarmLevel(int type, int alarmLevel) {
+    public static void setEventTypeAlarmLevel(int type, AlarmLevels alarmLevel) {
         EventTypeVO et = getEventType(type);
         et.setAlarmLevel(alarmLevel);
 
         SystemSettingsDao dao = new SystemSettingsDao();
-        dao.setIntValue(SYSTEM_SETTINGS_PREFIX + type, alarmLevel);
+        dao.setIntValue(SYSTEM_SETTINGS_PREFIX + type, alarmLevel.mangoId);
     }
 
     public static void raiseEvent(SystemEventType type, long time, boolean rtn, LocalizableMessage message) {
         EventTypeVO vo = getEventType(type.getSystemEventTypeId());
-        int alarmLevel = vo.getAlarmLevel();
+        AlarmLevels alarmLevel = vo.getAlarmLevel();
         Common.ctx.getEventManager().raiseEvent(type, time, rtn, alarmLevel, message, null);
     }
 

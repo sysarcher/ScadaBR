@@ -42,6 +42,7 @@ import com.serotonin.db.spring.ExtendedJdbcTemplate;
 import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.db.spring.GenericTransactionCallback;
 import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.CompoundDetectorEventType;
@@ -91,7 +92,7 @@ public class EventDao extends BaseDao {
 			args[5] = event.getRtnTimestamp();
 			args[6] = event.getRtnCause();
 		}
-		args[7] = event.getAlarmLevel();
+		args[7] = event.getAlarmLevel().mangoId;
 		args[8] = event.getMessage().serialize();
 		if (!event.isAlarm()) {
 			event.setAcknowledgedTimestamp(event.getActiveTimestamp());
@@ -282,7 +283,7 @@ public class EventDao extends BaseDao {
 			}
 
 			EventInstance event = new EventInstance(type, rs.getLong(5),
-					charToBool(rs.getString(6)), rs.getInt(9), message, null);
+					charToBool(rs.getString(6)), AlarmLevels.fromMangoId(rs.getInt(9)), message, null);
 			event.setId(rs.getInt(1));
 			long rtnTs = rs.getLong(7);
 			if (!rs.wasNull())
@@ -398,16 +399,16 @@ public class EventDao extends BaseDao {
 	}
 
 	public List<EventInstance> search(int eventId, int eventSourceType,
-			String status, int alarmLevel, final String[] keywords, int userId,
+			String status, AlarmLevels alarmLevel, final String[] keywords, int userId,
 			final ResourceBundle bundle, final int from, final int to,
 			final Date date) {
 		return search(eventId, eventSourceType, status, alarmLevel, keywords,
-				-1, -1, userId, bundle, from, to, date);
+				null, null, userId, bundle, from, to, date);
 	}
 
 	public List<EventInstance> search(int eventId, int eventSourceType,
-			String status, int alarmLevel, final String[] keywords,
-			long dateFrom, long dateTo, int userId,
+			String status, AlarmLevels alarmLevel, final String[] keywords,
+			Date dateFrom, Date dateTo, int userId,
 			final ResourceBundle bundle, final int from, final int to,
 			final Date date) {
 		List<String> where = new ArrayList<String>();
@@ -439,19 +440,19 @@ public class EventDao extends BaseDao {
 			params.add(boolToChar(false));
 		}
 
-		if (alarmLevel != -1) {
+		if (alarmLevel != null) {
 			where.add("e.alarmLevel=?");
-			params.add(alarmLevel);
+			params.add(alarmLevel.mangoId);
 		}
 
-		if (dateFrom != -1) {
+		if (dateFrom != null) {
 			where.add("activeTs>=?");
-			params.add(dateFrom);
+			params.add(dateFrom.getTime());
 		}
 
-		if (dateTo != -1) {
+		if (dateTo != null) {
 			where.add("activeTs<?");
-			params.add(dateTo);
+			params.add(dateTo.getTime());
 		}
 
 		if (!where.isEmpty()) {
