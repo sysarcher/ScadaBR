@@ -49,6 +49,7 @@ import com.serotonin.mango.db.dao.MailingListDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.EventManager;
+import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.maint.work.EmailWorkItem;
 import com.serotonin.mango.util.DocumentationItem;
@@ -307,7 +308,7 @@ public class MiscDwr extends BaseDwr {
                     state.setLastAlarmLevelChange(lastEMUpdate);
 
                     // The events have changed. See if the user's particular max alarm level has changed.
-                    int maxAlarmLevel = eventDao.getHighestUnsilencedAlarmLevel(user.getId());
+                    AlarmLevels maxAlarmLevel = eventDao.getHighestUnsilencedAlarmLevel(user.getId());
                     if (maxAlarmLevel != state.getMaxAlarmLevel()) {
                         response.put("highestUnsilencedAlarmLevel", maxAlarmLevel);
                         state.setMaxAlarmLevel(maxAlarmLevel);

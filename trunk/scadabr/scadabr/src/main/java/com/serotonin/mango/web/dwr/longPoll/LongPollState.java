@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr.longPoll;
 
+import com.serotonin.mango.rt.event.AlarmLevels;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -35,7 +36,7 @@ import com.serotonin.mango.web.dwr.beans.WatchListState;
 public class LongPollState implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private int maxAlarmLevel = -1;
+    private AlarmLevels maxAlarmLevel = null;
     private long lastAlarmLevelChange = 0;
     private List<WatchListState> watchListStates = new ArrayList<WatchListState>();
     private WatchListState pointDetailsState = null;
@@ -67,11 +68,11 @@ public class LongPollState implements Serializable {
         return null;
     }
 
-    public int getMaxAlarmLevel() {
+    public AlarmLevels getMaxAlarmLevel() {
         return maxAlarmLevel;
     }
 
-    public void setMaxAlarmLevel(int maxAlarmLevel) {
+    public void setMaxAlarmLevel(AlarmLevels maxAlarmLevel) {
         this.maxAlarmLevel = maxAlarmLevel;
     }
 
@@ -136,7 +137,7 @@ public class LongPollState implements Serializable {
      *            required by the serialization API.
      */
     private void readObject(ObjectInputStream in) {
-        maxAlarmLevel = -1;
+        maxAlarmLevel = null;
         lastAlarmLevelChange = 0;
         watchListStates = new ArrayList<WatchListState>();
         pointDetailsState = null;

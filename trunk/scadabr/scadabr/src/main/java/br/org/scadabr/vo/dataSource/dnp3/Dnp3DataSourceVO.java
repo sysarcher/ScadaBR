@@ -194,23 +194,23 @@ abstract public class Dnp3DataSourceVO<T extends Dnp3DataSourceVO<?>> extends
 	@Override
 	protected void addPropertyChangesImpl(List<LocalizableMessage> list, T from) {
 		AuditEventType.maybeAddPeriodChangeMessage(list,
-				"dsEdit.dnp3.rbePeriod", from.rbePeriodType,
-				from.rbePollPeriods, rbePeriodType, rbePollPeriods);
+				"dsEdit.dnp3.rbePeriod", from.getRbePeriodType(),
+				from.getRbePollPeriods(), rbePeriodType, rbePollPeriods);
 		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.dnp3.synchPeriod", from.synchPeriods, synchPeriods);
+				"dsEdit.dnp3.synchPeriod", from.getSynchPeriods(), synchPeriods);
 		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.dnp3.staticPeriod", from.staticPollPeriods,
+				"dsEdit.dnp3.staticPeriod", from.getStaticPollPeriods(),
 				staticPollPeriods);
 		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.dnp3.sourceAddress", from.sourceAddress, sourceAddress);
+				"dsEdit.dnp3.sourceAddress", from.getSourceAddress(), sourceAddress);
 		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.dnp3.slaveAddress", from.slaveAddress, slaveAddress);
+				"dsEdit.dnp3.slaveAddress", from.getSlaveAddress(), slaveAddress);
 		AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.quantize",
-				from.quantize, quantize);
+				from.isQuantize(), quantize);
 		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.modbus.timeout", from.timeout, timeout);
+				"dsEdit.modbus.timeout", from.getTimeout(), timeout);
 		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.modbus.retries", from.retries, retries);
+				"dsEdit.modbus.retries", from.getRetries(), retries);
 	}
 
 	private static final long serialVersionUID = -1;

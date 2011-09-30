@@ -468,7 +468,7 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
                 if (dprt.getVO().getMangoDataType() != newDpvo.getMangoDataType()) {
                     // Data type mismatch. Abort
                     LocalizableMessage lm = new LocalizableMessage("event.persistent.dataTypeMismatch", xid,
-                            newDpvo.getMangoDataType().getLocalizableMessage(), dprt.getVO().getMangoDataType().getLocalizableMessage());
+                            newDpvo.getMangoDataType().getMessageI18n(), dprt.getVO().getMangoDataType().getMessageI18n());
                     throw new DoAbortException(lm);
                 }
 

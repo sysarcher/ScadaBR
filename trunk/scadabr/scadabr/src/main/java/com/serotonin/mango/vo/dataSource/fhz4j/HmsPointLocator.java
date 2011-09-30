@@ -18,6 +18,7 @@ import net.sf.fhz4j.hms.HmsProperty;
 import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
+import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.web.i18n.LocalizableMessage;
 
@@ -28,7 +29,9 @@ import com.serotonin.web.i18n.LocalizableMessage;
 @JsonRemoteEntity
 public class HmsPointLocator extends ProtocolLocator<HmsProperty> {
 
+    @JsonRemoteProperty
     private short housecode;
+    @JsonRemoteProperty
     private HmsDeviceType hmsDeviceType;
     
 
@@ -110,8 +113,7 @@ public class HmsPointLocator extends ProtocolLocator<HmsProperty> {
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        map.put("deviceHousecode", housecode);
-        map.put("hmsDeviceType", hmsDeviceType);
+        super.jsonSerialize(map);
     }
 
     @Override

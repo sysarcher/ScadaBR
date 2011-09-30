@@ -1,6 +1,6 @@
-<#--
+<%--
     Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2009 Serotonin Software Technologies Inc.
+    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
     @author Matthew Lohbihler
     
     This program is free software: you can redistribute it and/or modify
@@ -15,13 +15,11 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see http://www.gnu.org/licenses/.
--->
-<#if evt.alarmLevel == "INFORMATION">
-** <@fmt key="common.alarmLevel.info"/> **
-<#elseif evt.alarmLevel ==  "URGENT">
-** <@fmt key="common.alarmLevel.urgent"/> **
-<#elseif evt.alarmLevel == "CRITICAL">
-** <@fmt key="common.alarmLevel.critical"/> **
-<#elseif evt.alarmLevel == "LIFE_SAFETY">
-** <@fmt key="common.alarmLevel.lifeSafety"/> **
-</#if>
+--%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<%@include file="/WEB-INF/tags/decl.tagf"%>
+<%@attribute name="dsDwr" %>
+
+  <c:forEach items="${dsDwr}" var="dwrname">
+    <script type="text/javascript" src="dwr/interface/${dwrname}.js"></script>
+  </c:forEach>

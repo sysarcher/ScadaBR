@@ -19,10 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.serotonin.mango.rt.event;
 
 import com.serotonin.ShouldNeverHappenException;
+import com.serotonin.mango.i18n.LocalizableEnum;
 import com.serotonin.web.i18n.LocalizableMessage;
 import java.util.ResourceBundle;
 
-public enum AlarmLevels {
+public enum AlarmLevels implements LocalizableEnum<AlarmLevels> {
 
     NONE(0, "common.alarmLevel.none"),
     INFORMATION(1, "common.alarmLevel.info"),
@@ -47,16 +48,29 @@ public enum AlarmLevels {
         throw new ShouldNeverHappenException("Cant find alarmLevel of mangoId: " + mangoId);
     }
 
+    @Override
     public LocalizableMessage getMessageI18n() {
         return messageI18n;
     }
 
+    @Override
     public String getLocalizedMessage(ResourceBundle bundle) {
         return messageI18n.getLocalizedMessage(bundle);
     }
     
+    @Override
     public String getI18nMessageKey() {
         return messageI18n.getKey();
+    }
+
+    @Override
+    public String getName() {
+        return name();
+    }
+
+    @Override
+    public Class<AlarmLevels> getEnum() {
+        return AlarmLevels.class;
     }
     
 }

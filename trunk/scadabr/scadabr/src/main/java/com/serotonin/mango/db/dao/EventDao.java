@@ -709,11 +709,11 @@ public class EventDao extends BaseDao {
 		return silenced;
 	}
 
-	public int getHighestUnsilencedAlarmLevel(int userId) {
-		return ejt.queryForInt("select max(e.alarmLevel) from userEvents u "
+	public AlarmLevels getHighestUnsilencedAlarmLevel(int userId) {
+		return AlarmLevels.fromMangoId(ejt.queryForInt("select max(e.alarmLevel) from userEvents u "
 				+ "  join events e on u.eventId=e.id "
 				+ "where u.silenced=? and u.userId=?", new Object[] {
-				boolToChar(false), userId });
+				boolToChar(false), userId }));
 	}
 
 	//

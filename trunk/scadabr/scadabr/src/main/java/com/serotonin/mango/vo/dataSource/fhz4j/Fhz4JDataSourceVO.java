@@ -18,15 +18,12 @@
  */
 package com.serotonin.mango.vo.dataSource.fhz4j;
 
-import com.serotonin.ShouldNeverHappenException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -102,6 +99,8 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
                 return new Fhz4JPointLocatorVO(new FhtPointLocator());
             case HMS:
                 return new Fhz4JPointLocatorVO(new HmsPointLocator());
+            case FHT_TEMP:
+                return new Fhz4JPointLocatorVO(new FhtMeasuredTempPointLocator());
             default:
                 throw new RuntimeException("Unknown protocol");
         }

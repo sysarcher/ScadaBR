@@ -16,12 +16,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see http://www.gnu.org/licenses/.
 -->
-<#if evt.alarmLevel=="INFORMATION">
+<#if evt.alarmLevel == "INFORMATION">
 ** <@fmt key="common.alarmLevel.info"/> **
-<#elseif evt.alarmLevel=='URGENT'>
+<#elseif evt.alarmLevel == "URGENT">
 ** <@fmt key="common.alarmLevel.urgent"/> **
-<#elseif evt.alarmLevel=='CRITICAL'>
+<#elseif evt.alarmLevel == "CRITICAL">
 ** <@fmt key="common.alarmLevel.critical"/> **
-<#elseif evt.alarmLevel=='LIFE_SAFETY'>
+<#elseif evt.alarmLevel == "LIFE_SAFETY">
 ** <@fmt key="common.alarmLevel.lifeSafety"/> **
 </#if>

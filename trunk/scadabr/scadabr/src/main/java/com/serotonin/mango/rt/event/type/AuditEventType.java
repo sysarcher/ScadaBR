@@ -177,7 +177,7 @@ public class AuditEventType extends EventType {
     }
 
     public static void addDataTypeMessage(List<LocalizableMessage> list, String propertyNameKey, MangoDataType dataType) {
-        list.add(new LocalizableMessage("event.audit.property", new LocalizableMessage(propertyNameKey), dataType.getLocalizableMessage()));
+        list.add(new LocalizableMessage("event.audit.property", new LocalizableMessage(propertyNameKey), dataType.getMessageI18n()));
     }
 
     public static void maybeAddPropertyChangeMessage(List<LocalizableMessage> list, String propertyNameKey,
@@ -222,8 +222,8 @@ public class AuditEventType extends EventType {
     public static void maybeAddDataTypeChangeMessage(List<LocalizableMessage> list, String propertyNameKey,
             MangoDataType fromDataType, MangoDataType toDataType) {
         if (fromDataType != toDataType)
-            addPropertyChangeMessage(list, propertyNameKey, fromDataType.getLocalizableMessage(),
-                    toDataType.getLocalizableMessage());
+            addPropertyChangeMessage(list, propertyNameKey, fromDataType.getMessageI18n(),
+                    toDataType.getMessageI18n());
     }
 
     private static LocalizableMessage getBooleanMessage(boolean value) {

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see http://www.gnu.org/licenses/.
 --%>
-<%@ include file="/WEB-INF/jsp/include/tech.jsp"%>
+<%@include file="/WEB-INF/jsp/include/tech.jsp"%>
 <%@page import="com.serotonin.mango.Common"%>
 <%@page import="com.serotonin.mango.vo.dataSource.DataSourceRegistry"%>
 
@@ -33,12 +33,12 @@
         pointListColumnFunctions.push(function(p) { return "<b>"+ p.name +"</b>"; });
         
         pointListColumnHeaders.push("<fmt:message key="dsEdit.pointDataType"/>");
-        pointListColumnFunctions.push(function(p) { return p.dataTypeI18n; });
+        pointListColumnFunctions.push(function(p) { return p.mangoDataTypeI18n; });//Fehler
         
         pointListColumnHeaders.push("<fmt:message key="dsEdit.status"/>");
         pointListColumnFunctions.push(function(p) {
                 var id = "toggleImg"+ p.id;
-                var onclick = "togglePoint("+ p.id +")";
+                var onclick = "+"+ p.id +")";
                 if (p.enabled)
                     return writeImage(id, null, "brick_go", "<fmt:message key="common.enabledToggle"/>", onclick);
                 return writeImage(id, null, "brick_stop", "<fmt:message key="common.disabledToggle"/>", onclick);

@@ -27,7 +27,7 @@ public class DataPointBean {
     private String name;
     private boolean settable;
     private MangoDataType mangoDataType = MangoDataType.UNKNOWN;
-    private final LocalizableMessage dataTypeMessage;
+    private final LocalizableMessage mangoDataTypeI18n;
     private final String chartColour;
 
     public DataPointBean(DataPointVO vo) {
@@ -35,7 +35,7 @@ public class DataPointBean {
         name = vo.getExtendedName();
         settable = vo.getPointLocator().isSettable();
         mangoDataType = vo.getPointLocator().getMangoDataType();
-        dataTypeMessage = mangoDataType.getLocalizableMessage();
+        mangoDataTypeI18n = mangoDataType.getMessageI18n();
         chartColour = vo.getChartColour();
     }
 
@@ -71,8 +71,8 @@ public class DataPointBean {
         this.mangoDataType = mangoDataType;
     }
 
-    public LocalizableMessage getDataTypeMessage() {
-        return dataTypeMessage;
+    public LocalizableMessage getMangoDataTypeI18n() {
+        return mangoDataTypeI18n;
     }
 
     public String getChartColour() {

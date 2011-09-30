@@ -21,15 +21,15 @@
 --%><%@attribute name="eventBean" type="com.serotonin.mango.web.dwr.beans.EventInstanceBean" %><%--
 --%><c:if test="${empty event}"><c:set var="event" value="${eventBean}"/></c:if><%--
 --%><c:choose>
-  <c:when test="${event.active && event.alarmLevel == 'NONE'}"><tag:img png="flag_green" title="common.alarmLevel.none"/></c:when>
+  <c:when test="${event.active && event.alarmLevel.name == 'NONE'}"><tag:img png="flag_green" title="common.alarmLevel.none"/></c:when>
   <c:when test="${event.alarmLevel == 'NONE'}"><tag:img png="flag_green_off" title="common.alarmLevel.none.rtn"/></c:when>
-  <c:when test="${event.active && event.alarmLevel == 'INFORMATION'}"><tag:img png="flag_blue" title="common.alarmLevel.info"/></c:when>
+  <c:when test="${event.active && event.alarmLevel.name == 'INFORMATION'}"><tag:img png="flag_blue" title="common.alarmLevel.info"/></c:when>
   <c:when test="${event.alarmLevel == 'INFORMATION'}"><tag:img png="flag_blue_off" title="common.alarmLevel.info.rtn"/></c:when>
-  <c:when test="${event.active && event.alarmLevel == 'URGENT'}"><tag:img png="flag_yellow" title="common.alarmLevel.urgent"/></c:when>
+  <c:when test="${event.active && event.alarmLevel.name == 'URGENT'}"><tag:img png="flag_yellow" title="common.alarmLevel.urgent"/></c:when>
   <c:when test="${event.alarmLevel == 'URGENT'}"><tag:img png="flag_yellow_off" title="common.alarmLevel.urgent.rtn"/></c:when>
-  <c:when test="${event.active && event.alarmLevel == 'CRITICAL'}"><tag:img png="flag_orange" title="common.alarmLevel.critical"/></c:when>
+  <c:when test="${event.active && event.alarmLevel.name == 'CRITICAL'}"><tag:img png="flag_orange" title="common.alarmLevel.critical"/></c:when>
   <c:when test="${event.alarmLevel == 'CRITICAL'}"><tag:img png="flag_orange_off" title="common.alarmLevel.critical.rtn"/></c:when>
-  <c:when test="${event.active && event.alarmLevel == 'LIFE_SAFETY'}"><tag:img png="flag_red" title="common.alarmLevel.lifeSafety"/></c:when>
+  <c:when test="${event.active && event.alarmLevel.name == 'LIFE_SAFETY'}"><tag:img png="flag_red" title="common.alarmLevel.lifeSafety"/></c:when>
   <c:when test="${event.alarmLevel == 'LIFE_SAFETY'}"><tag:img png="flag_red_off" title="common.alarmLevel.lifeSafety.rtn"/></c:when>
   <c:otherwise>(<fmt:message key="common.alarmLevel.unknown"/> ${event.alarmLevel})</c:otherwise>
 </c:choose>
