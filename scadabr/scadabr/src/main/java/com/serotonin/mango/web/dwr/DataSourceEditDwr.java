@@ -168,8 +168,6 @@ import com.serotonin.mango.vo.dataSource.viconics.ViconicsPointLocatorVO;
 import com.serotonin.mango.vo.dataSource.virtual.ChangeTypeVO;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualDataSourceVO;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualPointLocatorVO;
-import com.serotonin.mango.vo.dataSource.vmstat.VMStatDataSourceVO;
-import com.serotonin.mango.vo.dataSource.vmstat.VMStatPointLocatorVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.dwr.beans.BACnetDiscovery;
@@ -242,7 +240,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 		return response;
 	}
 
-	private DwrResponseI18n tryDataSourceSave(DataSourceVO<?> ds) {
+	protected DwrResponseI18n tryDataSourceSave(DataSourceVO<?> ds) {
 		DwrResponseI18n response = new DwrResponseI18n();
 
 		ds.validate(response);
@@ -326,7 +324,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 		return dp;
 	}
 
-	private DwrResponseI18n validatePoint(int id, String xid, String name,
+	protected DwrResponseI18n validatePoint(int id, String xid, String name,
 			PointLocatorVO locator, DataPointDefaulter defaulter) {
 		DwrResponseI18n response = new DwrResponseI18n();
 
@@ -1666,30 +1664,6 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 			response = validatePoint(id, xid, name, locator, null);
 
 		return response;
-	}
-
-	//
-	//
-	// VMStat stuff
-	//
-	@MethodFilter
-	public DwrResponseI18n saveVMStatDataSource(String name, String xid,
-			int pollSeconds, int outputScale) {
-		VMStatDataSourceVO ds = (VMStatDataSourceVO) Common.getUser()
-				.getEditDataSource();
-
-		ds.setXid(xid);
-		ds.setName(name);
-		ds.setPollSeconds(pollSeconds);
-		ds.setOutputScale(outputScale);
-
-		return tryDataSourceSave(ds);
-	}
-
-	@MethodFilter
-	public DwrResponseI18n saveVMStatPointLocator(int id, String xid,
-			String name, VMStatPointLocatorVO locator) {
-		return validatePoint(id, xid, name, locator, null);
 	}
 
 	//

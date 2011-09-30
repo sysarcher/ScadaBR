@@ -204,21 +204,21 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<?>> extend
 
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, T from) {
-        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", from.updatePeriodType,
-                from.updatePeriods, updatePeriodType, updatePeriods);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.quantize", from.quantize, quantize);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbus.timeout", from.timeout, timeout);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbus.retries", from.retries, retries);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbus.contiguousBatches", from.contiguousBatches,
+        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", from.getUpdatePeriodType(),
+                from.getUpdatePeriods(), updatePeriodType, updatePeriods);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.quantize", from.isQuantize(), quantize);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbus.timeout", from.getTimeout(), timeout);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbus.retries", from.getRetries(), retries);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbus.contiguousBatches", from.isContiguousBatches(),
                 contiguousBatches);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbus.createSlaveMonitorPoints",
-                from.createSlaveMonitorPoints, createSlaveMonitorPoints);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbus.maxReadBitCount", from.maxReadBitCount,
+                from.isCreateSlaveMonitorPoints(), createSlaveMonitorPoints);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbus.maxReadBitCount", from.getMaxReadBitCount(),
                 maxReadBitCount);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbus.maxReadRegisterCount",
-                from.maxReadRegisterCount, maxReadRegisterCount);
+                from.getMaxReadRegisterCount(), maxReadRegisterCount);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbus.maxWriteRegisterCount",
-                from.maxWriteRegisterCount, maxWriteRegisterCount);
+                from.getMaxWriteRegisterCount(), maxWriteRegisterCount);
     }
 
     //

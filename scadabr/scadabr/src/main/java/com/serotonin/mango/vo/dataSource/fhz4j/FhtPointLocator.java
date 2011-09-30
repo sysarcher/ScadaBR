@@ -150,6 +150,7 @@ public class FhtPointLocator extends ProtocolLocator<FhtProperty> {
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
+        super.jsonSerialize(map);
     }
 
     @Override

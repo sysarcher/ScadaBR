@@ -30,9 +30,11 @@ import org.apache.commons.logging.LogFactory;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataSource.EventDataSource;
+import com.serotonin.mango.vo.dataSource.vmstat.VMStatAttributes;
 import com.serotonin.mango.vo.dataSource.vmstat.VMStatDataSourceVO;
 import com.serotonin.mango.vo.dataSource.vmstat.VMStatPointLocatorVO;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.util.EnumMap;
 
 /**
  * @author Matthew Lohbihler
@@ -45,7 +47,7 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
     private final VMStatDataSourceVO vo;
     private Process vmstatProcess;
     private BufferedReader in;
-    private Map<Integer, Integer> attributePositions;
+    private Map<VMStatAttributes, Integer> attributePositions;
     private boolean terminated;
 
     public VMStatDataSourceRT(VMStatDataSourceVO vo) {
@@ -91,47 +93,47 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
             String headers = in.readLine();
 
             // Create a mapping of attribute ids to split array positions.
-            attributePositions = new HashMap<Integer, Integer>();
+            attributePositions = new EnumMap<VMStatAttributes, Integer>(VMStatAttributes.class);
             String[] headerParts = headers.split("\\s+");
             for (int i = 0; i < headerParts.length; i++) {
-                int attributeId = -1;
+                VMStatAttributes attribute = null;
                 if ("r".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.PROCS_R;
+                    attribute = VMStatAttributes.PROCS_R;
                 else if ("b".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.PROCS_B;
+                    attribute = VMStatAttributes.PROCS_B;
                 else if ("swpd".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.MEMORY_SWPD;
+                    attribute = VMStatAttributes.MEMORY_SWPD;
                 else if ("free".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.MEMORY_FREE;
+                    attribute = VMStatAttributes.MEMORY_FREE;
                 else if ("buff".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.MEMORY_BUFF;
+                    attribute = VMStatAttributes.MEMORY_BUFF;
                 else if ("cache".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.MEMORY_CACHE;
+                    attribute = VMStatAttributes.MEMORY_CACHE;
                 else if ("si".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.SWAP_SI;
+                    attribute = VMStatAttributes.SWAP_SI;
                 else if ("so".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.SWAP_SO;
+                    attribute = VMStatAttributes.SWAP_SO;
                 else if ("bi".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.IO_BI;
+                    attribute = VMStatAttributes.IO_BI;
                 else if ("bo".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.IO_BO;
+                    attribute = VMStatAttributes.IO_BO;
                 else if ("in".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.SYSTEM_IN;
+                    attribute = VMStatAttributes.SYSTEM_IN;
                 else if ("cs".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.SYSTEM_CS;
+                    attribute = VMStatAttributes.SYSTEM_CS;
                 else if ("us".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.CPU_US;
+                    attribute = VMStatAttributes.CPU_US;
                 else if ("sy".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.CPU_SY;
+                    attribute = VMStatAttributes.CPU_SY;
                 else if ("id".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.CPU_ID;
+                    attribute = VMStatAttributes.CPU_ID;
                 else if ("wa".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.CPU_WA;
+                    attribute = VMStatAttributes.CPU_WA;
                 else if ("st".equals(headerParts[i]))
-                    attributeId = VMStatPointLocatorVO.Attributes.CPU_ST;
+                    attribute = VMStatAttributes.CPU_ST;
 
-                if (attributeId != -1)
-                    attributePositions.put(attributeId, i);
+                if (attribute != null)
+                    attributePositions.put(attribute, i);
             }
 
             // Read the first line of data. This is a summary of beginning of time until now, so it is no good for
@@ -197,7 +199,7 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
             for (DataPointRT dp : enabledDataPoints) {
                 VMStatPointLocatorVO locator = ((VMStatPointLocatorRT) dp.getPointLocator()).getPointLocatorVO();
 
-                Integer position = attributePositions.get(locator.getAttributeId());
+                Integer position = attributePositions.get(locator.getAttribute());
                 if (position == null) {
                     if (error != null)
                         error = new LocalizableMessage("event.vmstat.attributeNotFound", locator
@@ -211,7 +213,7 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
                     }
                     catch (NumberFormatException e) {
                         log.error("Weird. We couldn't parse the value " + parts[position]
-                                + " into a double. attribute=" + locator.getAttributeId());
+                                + " into a double. attribute=" + locator.getAttribute());
                     }
                     catch (ArrayIndexOutOfBoundsException e) {
                         log.error("Weird. We need element " + position + " but the vmstat data is only " + parts.length

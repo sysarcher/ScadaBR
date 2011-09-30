@@ -95,17 +95,17 @@ public class Alpha2DataSourceVO<T extends Alpha2DataSourceVO<?>> extends
 	@Override
 	protected void addPropertyChangesImpl(List<LocalizableMessage> list, T from) {
 		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.dnp3Serial.port", from.commPortId, commPortId);
+				"dsEdit.dnp3Serial.port", from.getCommPortId(), commPortId);
 		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.dnp3Serial.baud", from.baudRate, baudRate);
+				"dsEdit.dnp3Serial.baud", from.getBaudRate(), baudRate);
 		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.dnp3Serial.dataBits", from.dataBits, dataBits);
+				"dsEdit.dnp3Serial.dataBits", from.getDataBits(), dataBits);
 		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.dnp3Serial.stopBits", from.stopBits, stopBits);
+				"dsEdit.dnp3Serial.stopBits", from.getStopBits(), stopBits);
 		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.dnp3Serial.parity", from.parity, parity);
+				"dsEdit.dnp3Serial.parity", from.getParity(), parity);
 		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.alpha2.station", from.station, station);
+				"dsEdit.alpha2.station", from.getStation(), station);
 
 	}
 

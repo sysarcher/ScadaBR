@@ -50,6 +50,12 @@
       <param name="beanName" value="DataSourceEditDwr"/>
       <filter class="com.serotonin.mango.web.dwr.util.LoggedInAjaxFilter"/>
     </create>
+    <!-- VM_STAT BEGIN-->
+    <create creator="spring" javascript="VMStatEditDwr">
+      <param name="beanName" value="VMStatEditDwr"/>
+      <filter class="com.serotonin.mango.web.dwr.util.LoggedInAjaxFilter"/>
+    </create>
+    <!-- VM_STAT END-->
     <create creator="spring" javascript="DataSourceListDwr">
       <param name="beanName" value="DataSourceListDwr"/>
       <filter class="com.serotonin.mango.web.dwr.util.LoggedInAjaxFilter"/>
@@ -142,6 +148,7 @@
 
     <convert converter="enum" match="com.serotonin.mango.rt.event.AlarmLevels"/>
 
+    <convert converter="enum" match="com.serotonin.mango.vo.dataSource.vmstat.VMStatAttributes"/>
 
 
     <convert converter="bean" match="com.serotonin.mango.util.IntMessagePair"/>
@@ -183,7 +190,7 @@
     <convert converter="bean" match="com.serotonin.mango.vo.publish.persistent.*"/>
     <convert converter="bean" match="com.serotonin.mango.vo.report.*"/>
     <convert converter="bean" match="com.serotonin.mango.vo.DataPointVO">
-      <param name="include" value="id,xid,name,extendedName,dataSourceId,enabled,mangoDataType,pointLocator"/>
+      <param name="include" value="id,xid,name,extendedName,dataSourceId,enabled,mangoDataType,mangoDataTypeI18n,pointLocator"/>
     </convert>
     <convert converter="bean" match="com.serotonin.mango.vo.User">
       <param name="include" value="id,username,email,phone,admin,disabled,receiveAlarmEmails,receiveOwnAuditEvents,dataSourcePermissions,dataPointPermissions"/>

@@ -182,7 +182,7 @@ public class ScriptExecutor {
         else
             // If not, ditch it.
             throw new ResultTypeException(new LocalizableMessage("event.script.convertError", result,
-                    mangoDataType.getLocalizableMessage()));
+                    mangoDataType.getMessageI18n()));
 
         return new PointValueTime(value, timestamp);
     }

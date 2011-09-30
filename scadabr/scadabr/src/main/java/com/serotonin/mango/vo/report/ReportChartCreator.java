@@ -494,7 +494,7 @@ public class ReportChartCreator {
             point = new PointStatistics(pointInfo.getReportPointId());
             point.setName(pointInfo.getExtendedName());
             point.setMangoDataType(pointInfo.getMangoDataType());
-            point.setDataTypeDescription(pointInfo.getMangoDataType().getLocalizableMessage().getLocalizedMessage(
+            point.setDataTypeDescription(pointInfo.getMangoDataType().getMessageI18n().getLocalizedMessage(
                     bundle));
             point.setTextRenderer(pointInfo.getTextRenderer());
             if (pointInfo.getStartValue() != null)

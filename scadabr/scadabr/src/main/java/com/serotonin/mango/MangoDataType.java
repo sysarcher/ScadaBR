@@ -19,13 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.serotonin.mango;
 
 import com.serotonin.ShouldNeverHappenException;
+import com.serotonin.mango.i18n.LocalizableEnum;
 import com.serotonin.web.i18n.LocalizableMessage;
-import com.sun.mail.handlers.message_rfc822;
-import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.ResourceBundle;
 
-public enum MangoDataType implements Serializable {
+public enum MangoDataType implements LocalizableEnum<MangoDataType> {
 
     UNKNOWN(0,"common.unknown"),
     BINARY(1, "common.dataTypes.binary"),
@@ -45,18 +44,14 @@ public enum MangoDataType implements Serializable {
         throw new ShouldNeverHappenException("Cant find dataType of mangoId: " + mangoId);
     }
     
-    private final LocalizableMessage dataTypeMessage;
+    private final LocalizableMessage messageI18n;
     public final int mangoId;
     
-    private MangoDataType(int mangoId, String msg) {
+    private MangoDataType(int mangoId, String keyI18n) {
         this.mangoId = mangoId;
-        this.dataTypeMessage = new LocalizableMessage(msg);
+        this.messageI18n = new LocalizableMessage(keyI18n);
     }
 
-    public LocalizableMessage getLocalizableMessage() {
-        return dataTypeMessage;
-    }
-    
     public static EnumSet<MangoDataType> getCodeList(EnumSet<MangoDataType> exclude) {
         return EnumSet.complementOf(exclude);
     }
@@ -67,12 +62,29 @@ public enum MangoDataType implements Serializable {
         return result;
     }
 
-    public String getLocalizedMessage(ResourceBundle bundle) {
-        return dataTypeMessage.getLocalizedMessage(bundle);
+    @Override
+    public LocalizableMessage getMessageI18n() {
+        return messageI18n;
     }
     
+    @Override
+    public String getLocalizedMessage(ResourceBundle bundle) {
+        return messageI18n.getLocalizedMessage(bundle);
+    }
+    
+    @Override
     public String getI18nMessageKey() {
-        return dataTypeMessage.getKey();
+        return messageI18n.getKey();
+    }
+
+    @Override
+    public String getName() {
+        return name();
+    }
+
+    @Override
+    public Class<MangoDataType> getEnum() {
+        return MangoDataType.class;
     }
 
 }

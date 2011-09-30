@@ -36,6 +36,7 @@ public interface PointLocatorVO extends Serializable, ChangeComparableObject {
     /**
      * An arbitrary description of the point location configuration for human consumption.
      */
+    @Deprecated
     public LocalizableMessage getConfigurationDescription();
 
     /**

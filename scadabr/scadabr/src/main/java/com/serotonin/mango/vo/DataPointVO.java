@@ -213,7 +213,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     }
     
     public LocalizableMessage getMangoDataTypeI18n() {
-        return getMangoDataType().getLocalizableMessage();
+        return getMangoDataType().getMessageI18n();
     }
 
     

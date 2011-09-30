@@ -402,13 +402,12 @@ function disableOnclick(node) {
 function enableOnclick(node) {
     if (node.disabledOnclick) {
         node.onclick = node.disabledOnclick;
-        node.disabledOnclick = null;;
+        node.disabledOnclick = null;
     }
 }
 
 function updateTemplateNode(elem, replaceText) {
-    var i;
-    for (i=0; i<elem.attributes.length; i++) {
+    for (var i=0; i<elem.attributes.length; i++) {
         if (elem.attributes[i].value && elem.attributes[i].value.indexOf('_TEMPLATE_') != -1)
             elem.attributes[i].value = elem.attributes[i].value.replace(/_TEMPLATE_/, replaceText);
     }
@@ -444,33 +443,33 @@ function getMangoId(node) {
 }
 
 function setAlarmLevelImg(alarmLevel, imgNode) {
-    if (alarmLevel == 0)
+    if (alarmLevel == "NONE")
         updateImg(imgNode, "images/flag_green.png", mango.i18n["common.alarmLevel.none"], false);
-    else if (alarmLevel == 1)
+    else if (alarmLevel == "INFORMATION")
         updateImg(imgNode, "images/flag_blue.png", mango.i18n["common.alarmLevel.info"], true);
-    else if (alarmLevel == 2)
+    else if (alarmLevel == "URGENT")
         updateImg(imgNode, "images/flag_yellow.png", mango.i18n["common.alarmLevel.urgent"], true);
-    else if (alarmLevel == 3)
+    else if (alarmLevel == "CRITICAL")
         updateImg(imgNode, "images/flag_orange.png", mango.i18n["common.alarmLevel.critical"], true);
-    else if (alarmLevel == 4)
+    else if (alarmLevel == "LIFE_SAFETY")
         updateImg(imgNode, "images/flag_red.png", mango.i18n["common.alarmLevel.lifeSafety"], true);
     else
-        updateImg(imgNode, "(unknown)", "(unknown)", true);
+        updateImg(imgNode, "(error in comons.js setAlarmlevel)" + alarmLevel, "(error in comons.js setAlarmlevel)" + alarmLevel, true);
 }
 
 function setAlarmLevelText(alarmLevel, textNode) {
-    if (alarmLevel == 0)
+    if (alarmLevel == "NONE")
         textNode.innerHTML = "";
-    else if (alarmLevel == 1)
+    else if (alarmLevel == "INFORMATION")
         textNode.innerHTML = mango.i18n["common.alarmLevel.info"];
-    else if (alarmLevel == 2)
+    else if (alarmLevel == "URGENT")
         textNode.innerHTML = mango.i18n["common.alarmLevel.urgent"];
-    else if (alarmLevel == 3)
+    else if (alarmLevel == "CRITICAL")
         textNode.innerHTML = mango.i18n["common.alarmLevel.critical"];
-    else if (alarmLevel == 4)
+    else if (alarmLevel == "LIFE_SAFETY")
         textNode.innerHTML = mango.i18n["common.alarmLevel.lifeSafety"];
     else
-        textNode.innerHTML = "Unknown alarm level: "+ alarmLevel;
+        textNode.innerHTML = "error in comons.js setAlarmlevelText: "+ alarmLevel;
 }
 
 function setUserImg(admin, disabled, imgNode) {

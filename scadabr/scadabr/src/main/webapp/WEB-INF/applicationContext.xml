@@ -26,6 +26,7 @@
   <bean id="DataPointDetailsDwr" class="com.serotonin.mango.web.dwr.DataPointDetailsDwr"/>
   <bean id="DataPointEditDwr" class="com.serotonin.mango.web.dwr.DataPointEditDwr"/>
   <bean id="DataSourceEditDwr" class="com.serotonin.mango.web.dwr.DataSourceEditDwr"/>
+  <bean id="VMStatEditDwr" class="com.serotonin.mango.web.dwr.vmstat.VMStatEditDwr"/>
   <bean id="DataSourceListDwr" class="com.serotonin.mango.web.dwr.DataSourceListDwr"/>
   <bean id="EmportDwr" class="com.serotonin.mango.web.dwr.EmportDwr"/>
   <bean id="EventHandlersDwr" class="com.serotonin.mango.web.dwr.EventHandlersDwr"/>

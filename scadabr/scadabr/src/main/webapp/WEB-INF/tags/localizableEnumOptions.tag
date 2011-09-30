@@ -1,6 +1,6 @@
-<#--
+<%--
     Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2009 Serotonin Software Technologies Inc.
+    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
     @author Matthew Lohbihler
     
     This program is free software: you can redistribute it and/or modify
@@ -15,13 +15,9 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see http://www.gnu.org/licenses/.
--->
-<#if evt.alarmLevel == "INFORMATION">
-** <@fmt key="common.alarmLevel.info"/> **
-<#elseif evt.alarmLevel ==  "URGENT">
-** <@fmt key="common.alarmLevel.urgent"/> **
-<#elseif evt.alarmLevel == "CRITICAL">
-** <@fmt key="common.alarmLevel.critical"/> **
-<#elseif evt.alarmLevel == "LIFE_SAFETY">
-** <@fmt key="common.alarmLevel.lifeSafety"/> **
-</#if>
+--%><%@include file="/WEB-INF/tags/decl.tagf"%><%--
+--%><%@tag body-content="empty"%><%--
+--%><%@attribute name="enumValues" type="com.serotonin.mango.i18n.LocalizableEnum[]" required="true"%><%--
+--%><c:forEach items="${enumValues}" var="enumValue">
+    <sst:option value="${enumValue.name}"><fmt:message key="${enumValue.i18nMessageKey}"/></sst:option>
+</c:forEach>
