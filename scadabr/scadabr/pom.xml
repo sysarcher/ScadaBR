@@ -388,15 +388,15 @@
                 <version>1.6</version>
                 <executions>
                     <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
+                        <id>native2ascii</id>
+                        <phase>process-resources</phase>
                         <configuration>
-                            <task>
+                            <target>
                                 <native2ascii
        reverse="true"
        dest="${project.build.directory}/classes"
        src="${basedir}/src/main/native2ascii" />
-                            </task>
+                            </target>
                         </configuration>
                         <goals>
                             <goal>run</goal>
@@ -405,14 +405,9 @@
                 </executions>
                 <dependencies>
                     <dependency>
-                        <groupId>ant</groupId>
-                        <artifactId>ant</artifactId>
-                        <version>1.6.5</version>
-                    </dependency>
-                    <dependency>
                         <groupId>com.sun</groupId>
                         <artifactId>tools</artifactId>
-                        <version>1.6.0</version>
+                        <version>${java.version}</version>
                         <scope>system</scope>
                         <systemPath>${java.home}/../lib/tools.jar</systemPath>
                     </dependency>
