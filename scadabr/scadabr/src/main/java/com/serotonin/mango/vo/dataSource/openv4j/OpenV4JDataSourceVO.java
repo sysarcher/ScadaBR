@@ -29,8 +29,8 @@ import net.sf.openv4j.Devices;
 import net.sf.openv4j.Group;
 import net.sf.openv4j.Protocol;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
@@ -54,7 +54,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
 @JsonRemoteEntity
 public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
 
-    private final static Log LOG = LogFactory.getLog(OpenV4JDataSourceVO.class);
+    private final static Logger LOG = LoggerFactory.getLogger(OpenV4JDataSourceVO.class);
     private static final ExportCodes EVENT_CODES = new ExportCodes();
 
     static {

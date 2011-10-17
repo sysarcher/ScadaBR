@@ -7,8 +7,8 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.org.scadabr.vo.dataSource.asciiFile.ASCIIFileDataSourceVO;
 import br.org.scadabr.vo.dataSource.asciiFile.ASCIIFilePointLocatorVO;
@@ -22,7 +22,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
 
 public class ASCIIFileDataSource extends PollingDataSource {
 
-	private final Log LOG = LogFactory.getLog(ASCIIFileDataSource.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ASCIIFileDataSource.class);
 	public static final int POINT_READ_EXCEPTION_EVENT = 1;
 	public static final int DATA_SOURCE_EXCEPTION_EVENT = 2;
 	private final ASCIIFileDataSourceVO<?> vo;

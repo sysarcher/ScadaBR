@@ -30,12 +30,11 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.io.StreamUtils;
-import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -59,7 +58,7 @@ public class SqlDataSourceRT extends PollingDataSource {
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int STATEMENT_EXCEPTION_EVENT = 2;
 
-    private final Log log = LogFactory.getLog(SqlDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(SqlDataSourceRT.class);
 
     private final SqlDataSourceVO vo;
     private Connection conn;
@@ -344,7 +343,7 @@ public class SqlDataSourceRT extends PollingDataSource {
         catch (Exception e) {
             raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true,
                     DataSourceRT.getExceptionMessage(e));
-            log.info("Error while initializing data source", e);
+            LOG.info("Error while initializing data source", e);
             return;
         }
 

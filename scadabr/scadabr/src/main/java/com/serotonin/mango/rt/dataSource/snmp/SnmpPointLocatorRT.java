@@ -18,8 +18,8 @@
  */
 package com.serotonin.mango.rt.dataSource.snmp;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.snmp4j.smi.Counter32;
 import org.snmp4j.smi.Counter64;
 import org.snmp4j.smi.Gauge32;
@@ -47,7 +47,7 @@ import com.serotonin.util.StringUtils;
  * 
  */
 public class SnmpPointLocatorRT extends PointLocatorRT {
-    private static final Log LOG = LogFactory.getLog(SnmpPointLocatorRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(SnmpPointLocatorRT.class);
 
     private final SnmpPointLocatorVO vo;
     private final OID oid;

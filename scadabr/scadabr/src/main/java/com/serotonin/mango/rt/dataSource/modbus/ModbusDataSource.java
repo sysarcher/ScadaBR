@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
@@ -54,7 +54,7 @@ import com.serotonin.modbus4j.locator.BaseLocator;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 abstract public class ModbusDataSource extends PollingDataSource implements MessagingExceptionHandler {
-    private final Log LOG = LogFactory.getLog(ModbusDataSource.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ModbusDataSource.class);
 
     public static final int POINT_READ_EXCEPTION_EVENT = 1;
     public static final int POINT_WRITE_EXCEPTION_EVENT = 2;

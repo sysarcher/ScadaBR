@@ -132,8 +132,8 @@
     <convert converter="bean" match="br.org.scadabr.OPCItem" />
     <convert converter="bean" match="br.org.scadabr.api.vo.*" />
     
-    <convert converter="bean" match="com.serotonin.db.IntValuePair"/>
-    <convert converter="bean" match="com.serotonin.db.KeyValuePair"/>
+    <convert converter="map" match="java.util.HashMap"/>
+    
     
     <convert converter="bean" match="com.serotonin.mango.rt.dataSource.http.HttpReceiverPointSample"/>
     <convert converter="bean" match="com.serotonin.mango.rt.dataSource.onewire.OneWireContainerInfo"/>
@@ -241,7 +241,6 @@
     <![CDATA[
       import java.util.List;
       
-      import com.serotonin.db.IntValuePair;
       import com.serotonin.mango.web.dwr.DataPointEditDwr;
       import com.serotonin.mango.view.text.RangeValue;
       import com.serotonin.mango.view.text.MultistateValue;
@@ -254,6 +253,7 @@
       MailingListsDwr.sendTestEmail(int, String, List<RecipientListEntryBean>);
       
       import com.serotonin.mango.web.dwr.MiscDwr;
+      
       MiscDwr.sendTestEmail(List<RecipientListEntryBean>, String, String);
       
       import com.serotonin.mango.web.dwr.UsersDwr;
@@ -262,7 +262,7 @@
               List<DataPointAccess>);
       
       import com.serotonin.mango.vo.hierarchy.PointFolder;
-      PointFolder.setPoints(List<IntValuePair>);
+      PointFolder.setPoints(Map<Integer, String>);
       PointFolder.setSubfolders(List<PointFolder>);
       
       import com.serotonin.mango.web.dwr.beans.IntegerPair;

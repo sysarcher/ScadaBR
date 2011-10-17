@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.MailingListDao;
@@ -44,7 +44,7 @@ import com.serotonin.web.i18n.I18NUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 public class MailingListsDwr extends BaseDwr {
-    private final Log log = LogFactory.getLog(MailingListsDwr.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MailingListsDwr.class);
 
     public DwrResponseI18n init() {
         DwrResponseI18n response = new DwrResponseI18n();
@@ -113,7 +113,7 @@ public class MailingListsDwr extends BaseDwr {
         }
         catch (Exception e) {
             response.addGenericMessage("mailingLists.testerror", e.getMessage());
-            log.warn("", e);
+            LOG.warn("", e);
         }
 
         return response;

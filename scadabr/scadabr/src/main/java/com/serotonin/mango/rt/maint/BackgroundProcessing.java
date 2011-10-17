@@ -24,8 +24,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.maint.work.WorkItem;
@@ -41,7 +41,7 @@ public class BackgroundProcessing implements ILifecycle {
     public static final String JOB_NAME = BackgroundProcessing.class.getName();
     public static final String JOB_GROUP = "maintenance";
 
-    final Log log = LogFactory.getLog(BackgroundProcessing.class);
+    private final static Logger LOG = LoggerFactory.getLogger(BackgroundProcessing.class);
 
     private ThreadPoolExecutor mediumPriorityService;
     private ExecutorService lowPriorityService;
@@ -54,7 +54,7 @@ public class BackgroundProcessing implements ILifecycle {
                 }
                 catch (Throwable t) {
                     try {
-                        log.error("Error in work item", t);
+                        LOG.error("Error in work item", t);
                     }
                     catch (RuntimeException e) {
                         t.printStackTrace();
@@ -107,19 +107,19 @@ public class BackgroundProcessing implements ILifecycle {
                     break;
 
                 if (!lowDone && !medDone)
-                    log.info("BackgroundProcessing waiting for medium (" + mediumPriorityService.getQueue().size()
+                    LOG.info("BackgroundProcessing waiting for medium (" + mediumPriorityService.getQueue().size()
                             + ") and low priority tasks to complete");
                 else if (!medDone)
-                    log.info("BackgroundProcessing waiting for medium priority tasks ("
+                    LOG.info("BackgroundProcessing waiting for medium priority tasks ("
                             + mediumPriorityService.getQueue().size() + ") to complete");
                 else
-                    log.info("BackgroundProcessing waiting for low priority tasks to complete");
+                    LOG.info("BackgroundProcessing waiting for low priority tasks to complete");
 
                 rewaits--;
             }
         }
         catch (InterruptedException e) {
-            log.info("", e);
+            LOG.info("", e);
         }
     }
 }

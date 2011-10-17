@@ -24,8 +24,8 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
@@ -51,7 +51,7 @@ import net.sf.fhz4j.fht.FhtDeviceTypes;
 public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
 
     private final static int MAX_FHZ_ADDR = 9999;
-    private final static Log LOG = LogFactory.getLog(Fhz4JDataSourceVO.class);
+    private final static Logger LOG = LoggerFactory.getLogger(Fhz4JDataSourceVO.class);
     private static final ExportCodes EVENT_CODES = new ExportCodes();
 
     static {

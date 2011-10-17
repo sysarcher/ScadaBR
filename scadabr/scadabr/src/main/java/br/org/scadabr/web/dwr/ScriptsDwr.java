@@ -7,13 +7,13 @@ import br.org.scadabr.rt.scripting.ScriptRT;
 import br.org.scadabr.vo.scripting.ContextualizedScriptVO;
 import br.org.scadabr.vo.scripting.ScriptVO;
 
-import com.serotonin.db.IntValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.web.dwr.BaseDwr;
 import com.serotonin.web.dwr.DwrResponseI18n;
+import java.util.Map;
 
 public class ScriptsDwr extends BaseDwr {
 
@@ -39,8 +39,8 @@ public class ScriptsDwr extends BaseDwr {
 	}
 
 	public DwrResponseI18n saveScript(int id, String xid, String name,
-			String script, List<IntValuePair> pointsOnContext,
-			List<IntValuePair> objectsOnContext) {
+			String script, Map<Integer, String> pointsOnContext,
+			Map<Integer, String> objectsOnContext) {
 
 		ContextualizedScriptVO vo = new ContextualizedScriptVO();
 		vo.setId(id);

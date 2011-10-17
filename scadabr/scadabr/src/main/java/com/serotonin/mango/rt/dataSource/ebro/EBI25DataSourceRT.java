@@ -22,8 +22,8 @@ import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.NotImplementedException;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -45,7 +45,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
  * @author Matthew Lohbihler
  */
 public class EBI25DataSourceRT extends PollingDataSource implements MessagingExceptionHandler {
-    private final Log LOG = LogFactory.getLog(EBI25DataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(EBI25DataSourceRT.class);
 
     // public static final int POINT_READ_EXCEPTION_EVENT = 1;
     // public static final int POINT_WRITE_EXCEPTION_EVENT = 2;

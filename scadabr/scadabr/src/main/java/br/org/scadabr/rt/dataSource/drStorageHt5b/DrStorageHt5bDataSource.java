@@ -8,8 +8,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.org.scadabr.vo.dataSource.drStorageHt5b.DrStorageHt5bDataSourceVO;
 import br.org.scadabr.vo.dataSource.drStorageHt5b.DrStorageHt5bPointLocatorVO;
@@ -22,7 +22,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
 
 public class DrStorageHt5bDataSource extends PollingDataSource {
 
-	private final Log LOG = LogFactory.getLog(DrStorageHt5bDataSource.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DrStorageHt5bDataSource.class);
 	public static final int POINT_READ_EXCEPTION_EVENT = 1;
 	public static final int DATA_SOURCE_EXCEPTION_EVENT = 2;
 	private final DrStorageHt5bDataSourceVO<?> vo;

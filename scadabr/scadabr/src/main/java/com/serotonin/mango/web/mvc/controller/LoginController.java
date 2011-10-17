@@ -23,8 +23,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
@@ -39,7 +39,7 @@ import com.serotonin.util.StringUtils;
 import com.serotonin.util.ValidationUtils;
 
 public class LoginController extends SimpleFormController {
-    private static final Log logger = LogFactory.getLog(LoginController.class);
+    private final static Logger LOG = LoggerFactory.getLogger(LoginController.class);
 
     private boolean mobile;
     private String successUrl;
@@ -143,8 +143,8 @@ public class LoginController extends SimpleFormController {
         User user = Common.getUser(request);
         if (user != null && user.getUsername().equals(username)) {
             // The user is already logged in. Nothing to do.
-            if (logger.isDebugEnabled())
-                logger.debug("User is already logged in, not relogging in");
+            if (LOG.isDebugEnabled())
+                LOG.debug("User is already logged in, not relogging in");
         }
         else {
             UserDao userDao = new UserDao();
@@ -157,8 +157,8 @@ public class LoginController extends SimpleFormController {
             // Add the user object to the session. This indicates to the rest
             // of the application whether the user is logged in or not.
             Common.setUser(request, user);
-            if (logger.isDebugEnabled())
-                logger.debug("User object added to session");
+            if (LOG.isDebugEnabled())
+                LOG.debug("User object added to session");
         }
 
         if (!mobile) {

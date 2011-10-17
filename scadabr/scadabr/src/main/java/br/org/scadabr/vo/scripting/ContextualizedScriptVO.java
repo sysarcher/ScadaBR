@@ -12,7 +12,6 @@ import br.org.scadabr.rt.scripting.ContextualizedScriptRT;
 import br.org.scadabr.rt.scripting.ScriptRT;
 import br.org.scadabr.rt.scripting.context.ScriptContextObject;
 
-import com.serotonin.db.IntValuePair;
 import com.serotonin.json.JsonArray;
 import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
@@ -23,6 +22,7 @@ import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
+import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 @JsonRemoteEntity
@@ -35,8 +35,8 @@ public class ContextualizedScriptVO extends ScriptVO<ContextualizedScriptVO>
 		return TYPE;
 	}
 
-	private List<IntValuePair> pointsOnContext = new ArrayList<IntValuePair>();
-	private List<IntValuePair> objectsOnContext = new ArrayList<IntValuePair>();
+	private Map<Integer, String> pointsOnContext = new HashMap<Integer, String>();
+	private Map<Integer, String> objectsOnContext = new HashMap<Integer, String>();
 
 	//
 	// /
@@ -48,8 +48,8 @@ public class ContextualizedScriptVO extends ScriptVO<ContextualizedScriptVO>
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(version);
-		out.writeObject(pointsOnContext);
-		out.writeObject(objectsOnContext);
+		AbstractPointLocatorVO.writeIntValuePairList(pointsOnContext, out);
+		AbstractPointLocatorVO.writeIntValuePairList(objectsOnContext, out);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -58,8 +58,8 @@ public class ContextualizedScriptVO extends ScriptVO<ContextualizedScriptVO>
 		int ver = in.readInt();
 		// Switch on the version of the class so that version changes can be
 		if (ver == 1) {
-			pointsOnContext = (List<IntValuePair>) in.readObject();
-			objectsOnContext = (List<IntValuePair>) in.readObject();
+			pointsOnContext = AbstractPointLocatorVO.readIntValuePairList(in);
+			objectsOnContext = AbstractPointLocatorVO.readIntValuePairList(in);
 		}
 	}
 
@@ -68,19 +68,19 @@ public class ContextualizedScriptVO extends ScriptVO<ContextualizedScriptVO>
 		return new ContextualizedScriptRT(this);
 	}
 
-	public List<IntValuePair> getPointsOnContext() {
+	public Map<Integer, String> getPointsOnContext() {
 		return pointsOnContext;
 	}
 
-	public void setPointsOnContext(List<IntValuePair> pointsOnContext) {
+	public void setPointsOnContext(Map<Integer, String> pointsOnContext) {
 		this.pointsOnContext = pointsOnContext;
 	}
 
-	public void setObjectsOnContext(List<IntValuePair> objectsOnContext) {
+	public void setObjectsOnContext(Map<Integer, String> objectsOnContext) {
 		this.objectsOnContext = objectsOnContext;
 	}
 
-	public List<IntValuePair> getObjectsOnContext() {
+	public Map<Integer, String> getObjectsOnContext() {
 		return objectsOnContext;
 	}
 
@@ -129,7 +129,7 @@ public class ContextualizedScriptVO extends ScriptVO<ContextualizedScriptVO>
 					throw new LocalizableJsonException(
 							"emport.error.meta.missing", "varName");
 
-				pointsOnContext.add(new IntValuePair(dp.getId(), var));
+				pointsOnContext.put(dp.getId(), var);
 			}
 		}
 
@@ -153,7 +153,7 @@ public class ContextualizedScriptVO extends ScriptVO<ContextualizedScriptVO>
 					throw new LocalizableJsonException(
 							"emport.error.meta.missing", "varName");
 
-				objectsOnContext.add(new IntValuePair(key, var));
+				objectsOnContext.put(key, var);
 			}
 		}
 
@@ -163,23 +163,23 @@ public class ContextualizedScriptVO extends ScriptVO<ContextualizedScriptVO>
 	public void jsonSerialize(Map<String, Object> map) {
 		super.jsonSerialize(map);
 		List<Map<String, Object>> pointList = new ArrayList<Map<String, Object>>();
-		for (IntValuePair p : pointsOnContext) {
-			DataPointVO dp = new DataPointDao().getDataPoint(p.getKey());
+		for (Integer pointId : pointsOnContext.keySet()) {
+			DataPointVO dp = new DataPointDao().getDataPoint(pointId);
 			if (dp != null) {
 				Map<String, Object> point = new HashMap<String, Object>();
 				pointList.add(point);
-				point.put("varName", p.getValue());
+				point.put("varName", pointsOnContext.get(pointId));
 				point.put("dataPointXid", dp.getXid());
 			}
 		}
 		map.put("pointsOnContext", pointList);
 
 		List<Map<String, Object>> objectsList = new ArrayList<Map<String, Object>>();
-		for (IntValuePair p : objectsOnContext) {
+		for (Integer pointId : objectsOnContext.keySet()) {
 			Map<String, Object> point = new HashMap<String, Object>();
 			objectsList.add(point);
-			point.put("varName", p.getValue());
-			point.put("objectId", p.getKey());
+			point.put("varName", objectsOnContext.get(pointId));
+			point.put("objectId", pointId);
 		}
 
 		map.put("objectsOnContext", objectsList);

@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
@@ -87,7 +87,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
     public static final int NETWORK_OFFLINE_EVENT = 4;
     public static final int DUPLICATE_COMM_ADDRESS_EVENT = 5;
 
-    private final Log log = LogFactory.getLog(ViconicsDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ViconicsDataSourceRT.class);
     private final ViconicsDataSourceVO vo;
     private ViconicsNetwork network;
     private final Map<PointKey, DataPointRT> pointLookup = new ConcurrentHashMap<PointKey, DataPointRT>();
@@ -185,7 +185,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
 
     @Override
     public void viconicsDeviceAdded(ViconicsDevice device) {
-        log.info("Device added: " + device.getIeeeString());
+        LOG.info("Device added: " + device.getIeeeString());
 
         synchronized (newDeviceLock) {
             Thermostat tstat = device.getConfiguration();
@@ -313,7 +313,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
 
                 // Add the point.
                 Common.ctx.getRuntimeManager().saveDataPoint(dp);
-                log.info("Point added: " + dp.getXid());
+                LOG.info("Point added: " + dp.getXid());
 
                 //
                 // Watchlists
@@ -381,7 +381,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
 
     @Override
     public void viconicsDeviceRemoved(ViconicsDevice device) {
-        log.info("Device removed: " + device.getIeeeString());
+        LOG.info("Device removed: " + device.getIeeeString());
 
         // Don't disable the points.
 

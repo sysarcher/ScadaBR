@@ -34,8 +34,8 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;
 import org.springframework.beans.propertyeditors.LocaleEditor;
@@ -72,7 +72,7 @@ import com.serotonin.web.i18n.I18NUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 public class MiscDwr extends BaseDwr {
-    public static final Log LOG = LogFactory.getLog(MiscDwr.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MiscDwr.class);
     private static final String LONG_POLL_DATA_KEY = "LONG_POLL_DATA";
     private static final String LONG_POLL_DATA_TIMEOUT_KEY = "LONG_POLL_DATA_TIMEOUT";
 

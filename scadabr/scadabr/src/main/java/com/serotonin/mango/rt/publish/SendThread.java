@@ -1,12 +1,12 @@
 package com.serotonin.mango.rt.publish;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.util.ILifecycle;
 
 abstract public class SendThread extends Thread implements ILifecycle {
-    private static final Log LOG = LogFactory.getLog(SendThread.class);
+    private final static Logger LOG = LoggerFactory.getLogger(SendThread.class);
     private boolean running;
 
     public SendThread(String threadName) {

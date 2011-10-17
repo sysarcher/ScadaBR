@@ -7,10 +7,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.serotonin.db.MappedRowCallback;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.PointValueDao;
+import com.serotonin.mango.db.dao.RowCallback;
 import com.serotonin.mango.rt.dataImage.AnnotatedPointValueTime;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.vo.DataPointVO;
@@ -47,7 +47,8 @@ public class ChartExportServlet extends HttpServlet {
         final ReportCsvStreamer exportCreator = new ReportCsvStreamer(response.getWriter(), bundle);
 
         final ReportDataValue rdv = new ReportDataValue();
-        MappedRowCallback<PointValueTime> callback = new MappedRowCallback<PointValueTime>() {
+        RowCallback<PointValueTime> callback = new RowCallback<PointValueTime>() {
+            
             @Override
             public void row(PointValueTime pvt, int rowIndex) {
                 rdv.setValue(pvt.getValue());

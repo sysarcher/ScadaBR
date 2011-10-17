@@ -57,9 +57,13 @@
       mango.view.initWatchlist();
       mango.share.dwr = WatchListDwr;
       var owner;
-      var pointNames = {};
+      var pointNames = new Object();
       var watchlistChangeId = 0;
       
+      /* tree initialization: initialize  root folder and the subfoldernames in the root folder, 
+       * all other will be fetched, id the treenode is expanded ...
+       * 
+       */
       function init() {
           WatchListDwr.init(function(data) {
               mango.share.users = data.shareUsers;
@@ -67,17 +71,19 @@
               // Create the point tree.
               var rootFolder = data.pointFolder;
               var tree = dojo.widget.manager.getWidgetById('tree');
-              var i;
               
-              for (i=0; i<rootFolder.subfolders.length; i++)
+              for (var i=0; i<rootFolder.subfolders.length; i++) {
                   addFolder(rootFolder.subfolders[i], tree);
+              }
               
-              for (i=0; i<rootFolder.points.length; i++)
-                  addPoint(rootFolder.points[i], tree);
+              for (var pointId in  rootFolder.points) {
+                  addPoint(pointId, rootFolder.points[pointId], tree);
+              }
               
               hide("loadingImg");
               show("treeDiv");
               
+              pointNames = new Object();
               addPointNames(rootFolder);
               
               // Add default points.
@@ -91,10 +97,9 @@
       }
       
       function addPointNames(folder) {
-          var i;
-          for (i=0; i<folder.points.length; i++)
-              pointNames[folder.points[i].key] = folder.points[i].value;
-          for (i=0; i<folder.subfolders.length; i++)
+          for (var pointId in folder.points)
+              pointNames[pointId] = folder.points[pointId];
+          for (var i=0; i<folder.subfolders.length; i++)
               addPointNames(folder.subfolders[i]);
       }
       
@@ -111,27 +116,28 @@
           // Turn this off so as not to confuse the tree node.
           folderNode.isExpanded = false;
           
-          var i;
-          for (i=0; i<lazyLoadData.subfolders.length; i++)
+          for (var i=0; i<lazyLoadData.subfolders.length; i++) {
               addFolder(lazyLoadData.subfolders[i], folderNode);
+          }
           
-          for (i=0; i<lazyLoadData.points.length; i++) {
-              addPoint(lazyLoadData.points[i], folderNode);
-              if ($("p"+ lazyLoadData.points[i].key))
-                  togglePointTreeIcon(lazyLoadData.points[i].key, false);
+          for (var pointId in lazyLoadData.points) {
+              addPoint(pointId, lazyLoadData.points[pointId], folderNode);
+              if ($("p"+ pointId)) {
+                  togglePointTreeIcon(pointId, false);
+              }
           }
           
           folderNode.expand();
       }
       
-      function addPoint(point, parent) {
+      function addPoint(pointId, pointLabel, parent) {
           var pointNode = dojo.widget.createWidget("TreeNode", {
-                  title: "<img src='images/icon_comp.png'/> <span id='ph"+ point.key +"Name'>"+ point.value +"</span> "+
-                          "<img src='images/bullet_go.png' id='ph"+ point.key +"Image' title='<fmt:message key="watchlist.addToWatchlist"/>'/>",
-                  object: point
+                  title: "<img src='images/icon_comp.png'/> <span id='ph"+ pointId +"Name'>"+ pointLabel +"</span> "+
+                          "<img src='images/bullet_go.png' id='ph"+ pointId +"Image' title='<fmt:message key="watchlist.addToWatchlist"/>'/>",
+                object: {key:pointId, value:pointLabel}
           });
           parent.addChild(pointNode);
-          $("ph"+ point.key +"Image").mangoName = "pointTreeIcon";
+          $("ph"+ pointId +"Image").mangoName = "pointTreeIcon";
       }
       
       var TreeClickHandler = function() {

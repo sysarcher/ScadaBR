@@ -20,8 +20,8 @@ package com.serotonin.mango.rt.dataSource.spinwave;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.io.serial.SerialParameters;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -45,7 +45,7 @@ public class SpinwaveDataSourceRT extends EventDataSource implements SwListener 
     public static final int UNKNOWN_SENSOR_EVENT = 3;
     public static final int ATTRIBUTE_NOT_FOUND_EVENT = 4;
 
-    private final Log log = LogFactory.getLog(SpinwaveDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(SpinwaveDataSourceRT.class);
 
     private final SpinwaveDataSourceVO vo;
     private SpinwaveReceiver spinwaveReceiver;
@@ -83,7 +83,7 @@ public class SpinwaveDataSourceRT extends EventDataSource implements SwListener 
         catch (Exception e) {
             raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, getSerialExceptionMessage(e, vo
                     .getCommPortId()));
-            log.debug("Error while initializing data source", e);
+            LOG.debug("Error while initializing data source", e);
             return;
         }
 
@@ -103,15 +103,15 @@ public class SpinwaveDataSourceRT extends EventDataSource implements SwListener 
     //
     @Override
     public void receivedException(Exception e) {
-        log.error("Exception from spinwave receiver", e);
+        LOG.error("Exception from spinwave receiver", e);
     }
 
     public void receivedMessageMismatchException(Exception e) {
-        log.error("Exception from spinwave receiver", e);
+        LOG.error("Exception from spinwave receiver", e);
     }
 
     public void receivedResponseException(Exception e) {
-        log.error("Exception from spinwave receiver", e);
+        LOG.error("Exception from spinwave receiver", e);
     }
 
     @Override

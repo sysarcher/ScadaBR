@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import com.serotonin.ShouldNeverHappenException;
@@ -70,7 +70,7 @@ import com.serotonin.web.i18n.LocalizableException;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 public class RuntimeManager {
-	private static final Log LOG = LogFactory.getLog(RuntimeManager.class);
+	private final static Logger LOG = LoggerFactory.getLogger(RuntimeManager.class);
 
 	private final List<DataSourceRT> runningDataSources = new CopyOnWriteArrayList<DataSourceRT>();
 

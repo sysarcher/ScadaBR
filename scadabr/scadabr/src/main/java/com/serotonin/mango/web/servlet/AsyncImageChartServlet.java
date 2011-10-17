@@ -16,11 +16,10 @@ import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 
 import com.serotonin.InvalidArgumentException;
-import com.serotonin.db.MappedRowCallback;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.PointValueDao;
+import com.serotonin.mango.db.dao.RowCallback;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.stats.AbstractDataQuantizer;
@@ -164,7 +163,7 @@ public class AsyncImageChartServlet extends BaseInfoServlet {
         return null;
     }
 
-    class PointDataRetriever implements Runnable, MappedRowCallback<PointValueTime>, DataQuantizerCallback {
+    class PointDataRetriever implements Runnable, RowCallback<PointValueTime>, DataQuantizerCallback {
         private final int dataPointId;
         private Color colour;
         private final int imageWidth;

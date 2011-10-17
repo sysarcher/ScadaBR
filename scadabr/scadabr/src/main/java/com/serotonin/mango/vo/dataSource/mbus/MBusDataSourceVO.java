@@ -24,8 +24,8 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
@@ -52,12 +52,12 @@ import net.sf.mbus4j.dataframes.MBusMedium;
 @JsonRemoteEntity
 public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
     
-    private final static Log LOG = LogFactory.getLog(MBusDataSourceVO.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MBusDataSourceVO.class);
 
     public static MBusDataSourceVO createNewDataSource() {
         MBusDataSourceVO result = new MBusDataSourceVO();
         result.setConnection(new TcpIpConnection("91.135.13.66", 65031, Connection.DEFAULT_BAUDRATE, TcpIpConnection.DEFAULT_RESPONSE_TIMEOUT_OFFSET));
-        LOG.fatal("TCP CONN");
+        LOG.error("TCP CONN");
         return result;
     }
     private static final ExportCodes EVENT_CODES = new ExportCodes();
@@ -186,14 +186,14 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
         super.jsonDeserialize(reader, json);
         JsonObject jsonConnection = null;
         if (!json.isNull("tcpConnection")) {
-            LOG.fatal("TCP FROM JSON");
+            LOG.error("TCP FROM JSON");
             jsonConnection = json.getJsonObject("tcpConnection");
             TcpIpConnection tcpConnection = new TcpIpConnection();
             tcpConnection.setHost(jsonConnection.getString("host"));
             tcpConnection.setPort(jsonConnection.getInt("port"));
             connection = tcpConnection;
         } else {
-              LOG.fatal("NO TCP FROM JSON");
+              LOG.error("NO TCP FROM JSON");
         }
         //TODO serial stuff
         connection.setBitPerSecond(jsonConnection.getInt("bitPerSecond"));

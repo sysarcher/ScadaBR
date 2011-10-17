@@ -25,14 +25,14 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthew Lohbihler
  */
 public class DBConvert {
-    private static final Log LOG = LogFactory.getLog(DBConvert.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DBConvert.class);
 
     private DatabaseAccess source;
     private DatabaseAccess target;

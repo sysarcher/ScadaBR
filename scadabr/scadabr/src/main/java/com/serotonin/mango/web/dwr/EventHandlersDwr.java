@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.directwebremoting.WebContextFactory;
 
 import com.serotonin.mango.Common;
@@ -65,7 +65,7 @@ import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 public class EventHandlersDwr extends BaseDwr {
-	private static final Log LOG = LogFactory.getLog(EventHandlersDwr.class);
+    private final static Logger LOG = LoggerFactory.getLogger(EventHandlersDwr.class);
 
 	private final ResourceBundle setPointSnippetMap = ResourceBundle
 			.getBundle("setPointSnippetMap");

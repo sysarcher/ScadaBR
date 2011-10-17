@@ -2,11 +2,10 @@ package com.serotonin.mango.vo.bean;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import com.serotonin.db.spring.GenericRowMapper;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 public class LongPair {
-    public static final GenericRowMapper<LongPair> ROW_MAPPER = new GenericRowMapper<LongPair>() {
+    public static final ParameterizedRowMapper<LongPair> ROW_MAPPER = new ParameterizedRowMapper<LongPair>() {
         @Override
         public LongPair mapRow(ResultSet rs, int index) throws SQLException {
             return new LongPair(rs.getLong(1), rs.getLong(2));

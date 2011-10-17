@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -51,7 +51,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
  * @author Matthew Lohbihler
  */
 public class EBI25InterfaceReader {
-    private static final Log LOG = LogFactory.getLog(EBI25InterfaceReader.class);
+    private final static Logger LOG = LoggerFactory.getLogger(EBI25InterfaceReader.class);
 
     private ModbusMaster modbusMaster = null;
     private String errorMessage;

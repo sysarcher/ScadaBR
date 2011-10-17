@@ -27,7 +27,6 @@ import java.util.Map;
 import javax.script.ScriptException;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.IntValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointListener;
@@ -50,7 +49,7 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
     private static final ThreadLocal<List<Integer>> threadLocal = new ThreadLocal<List<Integer>>();
     private static final int MAX_RECURSION = 10;
 
-    final Boolean LOCK = new Boolean(false);
+    final Object LOCK = new Object();
 
     final MetaPointLocatorVO vo;
     AbstractTimer timer;
@@ -90,11 +89,11 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
         createContext();
 
         // Add listener registrations
-        RuntimeManager rm = Common.ctx.getRuntimeManager();
-        for (IntValuePair contextKey : vo.getContext()) {
+        final RuntimeManager rm = Common.ctx.getRuntimeManager();
+        for (Integer contextKey : vo.getContext().keySet()) {
             // Points shouldn't listen for their own updates.
-            if (dataPoint.getId() != contextKey.getKey())
-                rm.addDataPointListener(contextKey.getKey(), this);
+            if (dataPoint.getId() != contextKey)
+                rm.addDataPointListener(contextKey, this);
         }
 
         initialized = true;
@@ -113,8 +112,9 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
         synchronized (LOCK) {
             // Remove listener registrations
             RuntimeManager rm = Common.ctx.getRuntimeManager();
-            for (IntValuePair contextKey : vo.getContext())
-                rm.removeDataPointListener(contextKey.getKey(), this);
+            for (Integer contextKey : vo.getContext().keySet()) {
+                rm.removeDataPointListener(contextKey, this);
+            }
 
             // Cancel scheduled job
             if (timerTask != null)
@@ -127,14 +127,17 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
     //
     // / DataPointListener
     //
+    @Override
     public void pointChanged(PointValueTime oldValue, PointValueTime newValue) {
         // No op. Events are covered in pointUpdated.
     }
 
+    @Override
     public void pointSet(PointValueTime oldValue, PointValueTime newValue) {
         // No op. Events are covered in pointUpdated.
     }
 
+    @Override
     public void pointUpdated(PointValueTime newValue) {
         // Ignore if this is not a context update.
         if (vo.getUpdateEvent() == MetaPointLocatorVO.UPDATE_EVENT_CONTEXT_UPDATE) {
@@ -160,15 +163,18 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
         }
     }
 
+    @Override
     public void pointBackdated(PointValueTime value) {
         // No op.
     }
 
+    @Override
     public void pointInitialized() {
         createContext();
         dataSource.checkForDisabledPoints();
     }
 
+    @Override
     public void pointTerminated() {
         createContext();
         dataSource.checkForDisabledPoints();

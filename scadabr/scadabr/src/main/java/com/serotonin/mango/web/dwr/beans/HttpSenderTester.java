@@ -1,24 +1,25 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr.beans;
 
-import java.util.List;
+
+import java.util.Map;
 
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpStatus;
@@ -26,7 +27,6 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 
-import com.serotonin.db.KeyValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.publish.httpSender.HttpSenderRT;
 import com.serotonin.web.http.HttpUtils;
@@ -35,15 +35,15 @@ import com.serotonin.web.http.HttpUtils;
  * @author Matthew Lohbihler
  */
 public class HttpSenderTester extends Thread implements TestingUtility {
+
     private final String url;
     private final boolean usePost;
-    private final List<KeyValuePair> staticHeaders;
-    private final List<KeyValuePair> staticParameters;
-
+    private final Map<String, String> staticHeaders;
+    private final Map<String, String> staticParameters;
     private String result;
 
-    public HttpSenderTester(String url, boolean usePost, List<KeyValuePair> staticHeaders,
-            List<KeyValuePair> staticParameters) {
+    public HttpSenderTester(String url, boolean usePost, Map<String, String> staticHeaders,
+            Map<String, String> staticParameters) {
         this.url = url;
         this.usePost = usePost;
         this.staticHeaders = staticHeaders;
@@ -58,8 +58,7 @@ public class HttpSenderTester extends Thread implements TestingUtility {
             PostMethod post = new PostMethod(url);
             post.addParameters(convertToNVPs(staticParameters));
             method = post;
-        }
-        else {
+        } else {
             GetMethod get = new GetMethod(url);
             get.setQueryString(convertToNVPs(staticParameters));
             method = get;
@@ -69,20 +68,20 @@ public class HttpSenderTester extends Thread implements TestingUtility {
         method.addRequestHeader("User-Agent", HttpSenderRT.USER_AGENT);
 
         // Add the user-defined headers.
-        for (KeyValuePair kvp : staticHeaders)
-            method.addRequestHeader(kvp.getKey(), kvp.getValue());
+        for (String kvp : staticHeaders.keySet()) {
+            method.addRequestHeader(kvp, staticHeaders.get(kvp));
+        }
 
         try {
             int code = Common.getHttpClient().executeMethod(method);
-            if (code != HttpStatus.SC_OK)
+            if (code != HttpStatus.SC_OK) {
                 result = "ERROR: Invalid response code: " + code;
-            else
+            } else {
                 result = HttpUtils.readResponseBody(method, 1024);
-        }
-        catch (Exception e) {
+            }
+        } catch (Exception e) {
             result = "ERROR: " + e.getMessage();
-        }
-        finally {
+        } finally {
             method.releaseConnection();
         }
     }
@@ -91,15 +90,16 @@ public class HttpSenderTester extends Thread implements TestingUtility {
         return result;
     }
 
-    private NameValuePair[] convertToNVPs(List<KeyValuePair> staticParameters) {
+    private NameValuePair[] convertToNVPs(Map<String, String> staticParameters) {
         NameValuePair[] nvps = new NameValuePair[staticParameters.size()];
-        for (int i = 0; i < nvps.length; i++) {
-            KeyValuePair kvp = staticParameters.get(i);
-            nvps[i] = new NameValuePair(kvp.getKey(), kvp.getValue());
+        int i = 0;
+        for (String key : staticParameters.keySet()) {
+            nvps[i++] = new NameValuePair(key, staticParameters.get(key));
         }
         return nvps;
     }
 
+    @Override
     public void cancel() {
         // no op
     }

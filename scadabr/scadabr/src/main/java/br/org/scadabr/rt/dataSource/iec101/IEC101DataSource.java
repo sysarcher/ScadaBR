@@ -4,8 +4,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.org.scadabr.protocol.iec101.session.database.DataElement;
 import br.org.scadabr.vo.dataSource.iec101.IEC101DataSourceVO;
@@ -19,7 +19,7 @@ import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 public class IEC101DataSource extends PollingDataSource {
-	private final Log LOG = LogFactory.getLog(IEC101DataSource.class);
+    private final static Logger LOG = LoggerFactory.getLogger(IEC101DataSource.class);
 
 	public static final int POINT_READ_EXCEPTION_EVENT = 1;
 	public static final int POINT_WRITE_EXCEPTION_EVENT = 2;

@@ -21,8 +21,8 @@ package com.serotonin.mango.web.filter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.directwebremoting.AjaxFilter;
 import org.directwebremoting.AjaxFilterChain;
 
@@ -33,7 +33,7 @@ import com.serotonin.mango.vo.permission.PermissionException;
  * @author Matthew Lohbihler
  */
 public class ExceptionDetectionFilter implements AjaxFilter {
-    private static final Log LOG = LogFactory.getLog(ExceptionDetectionFilter.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ExceptionDetectionFilter.class);
 
     @Override
     public Object doFilter(Object obj, Method method, Object[] params, AjaxFilterChain chain) throws Exception {

@@ -23,8 +23,8 @@ import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.joda.time.DateTime;
 
 import com.serotonin.ShouldNeverHappenException;
@@ -42,7 +42,7 @@ import com.serotonin.timer.CronTimerTrigger;
 import com.serotonin.timer.TimerTask;
 
 public class DataPurge {
-    private final Log log = LogFactory.getLog(DataPurge.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DataPurge.class);
     private long runtime;
 
     private final RuntimeManager rm = Common.ctx.getRuntimeManager();
@@ -62,7 +62,7 @@ public class DataPurge {
     }
 
     private void executeImpl() {
-        log.info("Data purge started");
+        LOG.info("Data purge started");
 
         // Get the data point information.
         DataPointDao dataPointDao = new DataPointDao();
@@ -73,7 +73,7 @@ public class DataPurge {
         // if (deleteCount > 0)
         // new PointValueDao().compressTables();
 
-        log.info("Data purge ended, " + deleteCount + " point values deleted");
+        LOG.info("Data purge ended, " + deleteCount + " point values deleted");
 
         // File data purge
         filedataPurge();
@@ -120,7 +120,7 @@ public class DataPurge {
         }
 
         if (deleteCount > 0)
-            log.info("Filedata purge ended, " + deleteCount + " files deleted");
+            LOG.info("Filedata purge ended, " + deleteCount + " files deleted");
     }
 
     private void eventPurge() {
@@ -130,7 +130,7 @@ public class DataPurge {
 
         int deleteCount = new EventDao().purgeEventsBefore(cutoff.getMillis());
         if (deleteCount > 0)
-            log.info("Event purge ended, " + deleteCount + " events deleted");
+            LOG.info("Event purge ended, " + deleteCount + " events deleted");
     }
 
     private void reportPurge() {
@@ -140,7 +140,7 @@ public class DataPurge {
 
         int deleteCount = new ReportDao().purgeReportsBefore(cutoff.getMillis());
         if (deleteCount > 0)
-            log.info("Report purge ended, " + deleteCount + " report instances deleted");
+            LOG.info("Report purge ended, " + deleteCount + " report instances deleted");
     }
 
     static class DataPurgeTask extends TimerTask {

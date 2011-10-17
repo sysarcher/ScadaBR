@@ -22,11 +22,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.db.IntValuePair;
 import com.serotonin.json.JsonArray;
 import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
@@ -51,6 +49,7 @@ import com.serotonin.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.util.HashMap;
 
 /**
  * @author Matthew Lohbihler
@@ -72,7 +71,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         UPDATE_EVENT_CODES.addElement(UPDATE_EVENT_CRON, "CRON", "dsEdit.meta.event.cron");
     }
 
-    private List<IntValuePair> context = new ArrayList<IntValuePair>();
+    private Map<Integer, String> context = new HashMap<Integer, String>();
     @JsonRemoteProperty
     private String script;
     @JsonRemoteProperty(alias=MangoDataType.ALIAS_DATA_TYPE)
@@ -85,20 +84,22 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @JsonRemoteProperty
     private int executionDelaySeconds;
 
+    @Override
     public PointLocatorRT createRuntime() {
         return new MetaPointLocatorRT(this);
     }
 
+    @Override
     public LocalizableMessage getConfigurationDescription() {
         return new LocalizableMessage("common.default", "'" + StringUtils.truncate(script, 40) + "'");
     }
 
-    public List<IntValuePair> getContext() {
+    public Map<Integer, String> getContext() {
         return context;
     }
 
-    public void setContext(List<IntValuePair> context) {
-        this.context = context;
+    public void setContext(Map<Integer, String> context) {
+        this.context = new HashMap<Integer, String>(context);
     }
 
     public String getScript() {
@@ -126,6 +127,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         this.mangoDataType = mangDataType;
     }
 
+    @Override
     public boolean isSettable() {
         return settable;
     }
@@ -150,13 +152,13 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         this.updateCronPattern = updateCronPattern;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
         if (StringUtils.isEmpty(script))
             response.addContextualMessage("script", "validate.required");
 
         List<String> varNameSpace = new ArrayList<String>();
-        for (IntValuePair point : context) {
-            String varName = point.getValue();
+        for (String varName : context.values()) {
             if (StringUtils.isEmpty(varName)) {
                 response.addContextualMessage("context", "validate.allVarNames");
                 break;
@@ -235,8 +237,8 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         DataPointDao dataPointDao = new DataPointDao();
         StringBuilder sb = new StringBuilder();
         boolean first = true;
-        for (IntValuePair ivp : context) {
-            DataPointVO dp = dataPointDao.getDataPoint(ivp.getKey());
+        for (Integer pointId : context.keySet()) {
+            DataPointVO dp = dataPointDao.getDataPoint(pointId);
             if (first)
                 first = false;
             else
@@ -246,7 +248,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
                 sb.append("?=");
             else
                 sb.append(dp.getName()).append("=");
-            sb.append(ivp.getValue());
+            sb.append(context.get(pointId));
         }
         return sb.toString();
     }
@@ -260,7 +262,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeObject(context);
+        writeIntValuePairList(context, out);
         SerializationHelper.writeSafeUTF(out, script);
         out.writeInt(mangoDataType.mangoId);
         out.writeBoolean(settable);
@@ -275,10 +277,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            context = new ArrayList<IntValuePair>();
-            Map<Integer, String> ctxMap = (Map<Integer, String>) in.readObject();
-            for (Map.Entry<Integer, String> point : ctxMap.entrySet())
-                context.add(new IntValuePair(point.getKey(), point.getValue()));
+            context = (Map<Integer, String>) in.readObject();
 
             script = SerializationHelper.readSafeUTF(in);
             mangoDataType = MangoDataType.fromMangoId(in.readInt());
@@ -288,7 +287,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             executionDelaySeconds = in.readInt();
         }
         else if (ver == 2) {
-            context = (List<IntValuePair>) in.readObject();
+            context = readIntValuePairList(in);
             script = SerializationHelper.readSafeUTF(in);
             mangoDataType = MangoDataType.fromMangoId(in.readInt());
             settable = false;
@@ -297,7 +296,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             executionDelaySeconds = in.readInt();
         }
         else if (ver == 3) {
-            context = (List<IntValuePair>) in.readObject();
+            context = readIntValuePairList(in);
             script = SerializationHelper.readSafeUTF(in);
             mangoDataType = MangoDataType.fromMangoId(in.readInt());
             settable = false;
@@ -306,7 +305,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             executionDelaySeconds = in.readInt();
         }
         else if (ver == 4) {
-            context = (List<IntValuePair>) in.readObject();
+            context = readIntValuePairList(in);
             script = SerializationHelper.readSafeUTF(in);
             mangoDataType = MangoDataType.fromMangoId(in.readInt());
             settable = in.readBoolean();
@@ -346,7 +345,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
                 if (var == null)
                     throw new LocalizableJsonException("emport.error.meta.missing", "varName");
 
-                context.add(new IntValuePair(dp.getId(), var));
+                context.put(dp.getId(), var);
             }
         }
     }
@@ -358,15 +357,16 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
         DataPointDao dataPointDao = new DataPointDao();
         List<Map<String, Object>> pointList = new ArrayList<Map<String, Object>>();
-        for (IntValuePair p : context) {
-            DataPointVO dp = dataPointDao.getDataPoint(p.getKey());
+        for (Integer pointId : context.keySet()) {
+            DataPointVO dp = dataPointDao.getDataPoint(pointId);
             if (dp != null) {
                 Map<String, Object> point = new HashMap<String, Object>();
                 pointList.add(point);
-                point.put("varName", p.getValue());
+                point.put("varName", context.get(pointId));
                 point.put("dataPointXid", dp.getXid());
             }
         }
         map.put("context", pointList);
     }
+
 }

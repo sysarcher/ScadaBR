@@ -31,7 +31,6 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.IntValuePair;
 import com.serotonin.io.StreamUtils;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.MangoDataType;
@@ -59,16 +58,16 @@ public class ScriptExecutor {
         SCRIPT_FUNCTION_PATH = path;
     }
 
-    public Map<String, IDataPoint> convertContext(List<IntValuePair> context) throws DataPointStateException {
+    public Map<String, IDataPoint> convertContext(Map<Integer, String> context) throws DataPointStateException {
         RuntimeManager rtm = Common.ctx.getRuntimeManager();
 
         Map<String, IDataPoint> converted = new HashMap<String, IDataPoint>();
-        for (IntValuePair contextEntry : context) {
-            DataPointRT point = rtm.getDataPoint(contextEntry.getKey());
+        for (Integer contextEntryId : context.keySet()) {
+            DataPointRT point = rtm.getDataPoint(contextEntryId);
             if (point == null)
-                throw new DataPointStateException(contextEntry.getKey(), new LocalizableMessage(
+                throw new DataPointStateException(contextEntryId, new LocalizableMessage(
                         "event.meta.pointMissing"));
-            converted.put(contextEntry.getValue(), point);
+            converted.put(context.get(contextEntryId), point);
         }
 
         return converted;

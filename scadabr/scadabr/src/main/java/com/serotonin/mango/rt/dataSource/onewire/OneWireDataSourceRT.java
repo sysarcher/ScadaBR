@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dalsemi.onewire.OneWireException;
 import com.dalsemi.onewire.adapter.OneWireIOException;
@@ -59,7 +59,7 @@ import java.util.Set;
  * @author Matthew Lohbihler
  */
 public class OneWireDataSourceRT extends PollingDataSource {
-    private static final Log LOG = LogFactory.getLog(OneWireDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(OneWireDataSourceRT.class);
 
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int POINT_READ_EXCEPTION_EVENT = 2;

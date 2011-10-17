@@ -23,8 +23,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.io.StreamUtils;
 import com.serotonin.mango.Common;
@@ -37,7 +37,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
  * @author Matthew Lohbihler
  */
 public class ProcessWorkItem implements WorkItem {
-    static final Log LOG = LogFactory.getLog(ProcessWorkItem.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ProcessWorkItem.class);
     private static final int TIMEOUT = 15000; // 15 seconds
 
     public static void queueProcess(String command) {

@@ -21,15 +21,15 @@ package com.serotonin.mango.rt.event.detectors;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 public class StateChangeCountDetectorRT extends TimeoutDetectorRT {
-    private final Log log = LogFactory.getLog(StateChangeCountDetectorRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(StateChangeCountDetectorRT.class);
 
     /**
      * State field. The point values that have accumulated so far. Each call to pointChanged will drop off the values
@@ -138,7 +138,7 @@ public class StateChangeCountDetectorRT extends TimeoutDetectorRT {
                     sb.append(pvt.getTime()).append(", ");
                 sb.append("], durationMS=").append(getDurationMS());
                 sb.append(", changeCount=").append(vo.getChangeCount());
-                log.error(sb.toString(), new Exception());
+                LOG.error(sb.toString(), new Exception());
             }
         }
 

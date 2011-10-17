@@ -46,7 +46,6 @@ import org.directwebremoting.WebContextFactory;
 import org.joda.time.Period;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.KeyValuePair;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.util.BackgroundContext;
 import com.serotonin.mango.util.CommPortConfigException;
@@ -64,6 +63,8 @@ import com.serotonin.util.StringUtils;
 import com.serotonin.web.i18n.I18NUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
 import com.serotonin.web.i18n.Utf8ResourceBundle;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Common {
 	private static final String SESSION_USER = "sessionUser";
@@ -479,7 +480,7 @@ public class Common {
 	//
 	// i18n
 	//
-	private static Object i18nLock = new Object();
+	private final static Object i18nLock = new Object();
 	private static String systemLanguage;
 	private static ResourceBundle systemBundle;
 
@@ -494,7 +495,6 @@ public class Common {
 	}
 
 	private static void ensureI18n() {
-		if (systemLanguage == null) {
 			synchronized (i18nLock) {
 				if (systemLanguage == null) {
 					systemLanguage = SystemSettingsDao
@@ -508,7 +508,6 @@ public class Common {
 							locale);
 				}
 			}
-		}
 	}
 
 	public static String getMessage(String key, Object... args) {
@@ -533,11 +532,11 @@ public class Common {
 		return null;
 	}
 
-	public static List<KeyValuePair> getLanguages() {
-		List<KeyValuePair> languages = new ArrayList<KeyValuePair>();
+	public static Map<String, String> getLanguages() {
+		Map<String, String> languages = new HashMap<String, String>();
 		ResourceBundle i18n = Utf8ResourceBundle.getBundle("i18n");
 		for (String key : i18n.keySet())
-			languages.add(new KeyValuePair(key, i18n.getString(key)));
+			languages.put(key, i18n.getString(key));
 		return languages;
 	}
 

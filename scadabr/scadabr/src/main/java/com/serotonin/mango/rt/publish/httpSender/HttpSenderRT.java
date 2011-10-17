@@ -29,9 +29,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.KeyValuePair;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -46,6 +44,7 @@ import com.serotonin.mango.web.servlet.HttpDataSourceServlet;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.http.HttpUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.util.Map;
 
 /**
  * @author Matthew Lohbihler
@@ -141,8 +140,9 @@ public class HttpSenderRT extends PublisherRT<HttpPointVO> {
             method.addRequestHeader("User-Agent", USER_AGENT);
 
             // Add the user-defined headers.
-            for (KeyValuePair kvp : vo.getStaticHeaders())
-                method.addRequestHeader(kvp.getKey(), kvp.getValue());
+            final Map<String, String> staticHeaders = vo.getStaticHeaders(); 
+            for (String kvp : staticHeaders.keySet())
+                method.addRequestHeader(kvp, staticHeaders.get(kvp));
 
             // Send the request. Set message non-null if there is a failure.
             LocalizableMessage message = null;
@@ -191,11 +191,11 @@ public class HttpSenderRT extends PublisherRT<HttpPointVO> {
         }
     }
 
-    NameValuePair[] createNVPs(List<KeyValuePair> staticParameters, List<PublishQueueEntry<HttpPointVO>> list) {
+    NameValuePair[] createNVPs(Map<String, String> staticParameters, List<PublishQueueEntry<HttpPointVO>> list) {
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 
-        for (KeyValuePair kvp : staticParameters)
-            nvps.add(new NameValuePair(kvp.getKey(), kvp.getValue()));
+        for (String kvp : staticParameters.keySet())
+            nvps.add(new NameValuePair(kvp, staticParameters.get(kvp)));
 
         for (PublishQueueEntry<HttpPointVO> e : list) {
             HttpPointVO pvo = e.getVo();

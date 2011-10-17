@@ -44,22 +44,21 @@
   </appender>
   
   <category name="org.directwebremoting">
-    <level value="warn"/>
+    <level value="debug"/>
   </category>
   
   <category name="org">
-    <level value="warn"/>
+    <level value="debug"/>
   </category>
   
-  <category name="org.springframework.web.servlet.FrameworkServlet"><level value="error"/></category>
-  <category name="com.serotonin.db.spring.ExtendedJdbcTemplate"><level value="error"/></category>
+  <category name="org.springframework.web.servlet.FrameworkServlet"><level value="debug"/></category>
   
   <category name="com.serotonin.mango">
-    <level value="warn"/>
+    <level value="debug"/>
   </category>
   
   <root>
-    <level value="info"/>
+    <level value="debug"/>
     <appender-ref ref="async"/>
     <appender-ref ref="stdout"/>
   </root>

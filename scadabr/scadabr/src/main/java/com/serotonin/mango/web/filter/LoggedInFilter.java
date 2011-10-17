@@ -29,15 +29,15 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.integration.CrowdUtils;
 
 abstract public class LoggedInFilter implements Filter {
-    private final Log LOGGER = LogFactory.getLog(LoggedInFilter.class);
+    private final static Logger LOG = LoggerFactory.getLogger(LoggedInFilter.class);
 
     private String forwardUrl;
 
@@ -64,7 +64,7 @@ abstract public class LoggedInFilter implements Filter {
         }
 
         if (!loggedIn) {
-            LOGGER.info("Denying access to secure page for session id " + request.getSession().getId() + ", uri="
+            LOG.info("Denying access to secure page for session id " + request.getSession().getId() + ", uri="
                     + request.getRequestURI());
             response.sendRedirect(request.getContextPath() + forwardUrl);
             //request.getRequestDispatcher(forwardUrl).forward(request, response);

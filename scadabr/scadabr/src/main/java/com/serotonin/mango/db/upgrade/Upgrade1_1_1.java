@@ -24,39 +24,39 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 
-import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.vo.event.EventHandlerVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import com.serotonin.util.SerializationHelper;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 /**
  * @author Matthew Lohbihler
  */
 public class Upgrade1_1_1 extends DBUpgrade {
-    private final Log log = LogFactory.getLog(getClass());
+    private final static Logger LOG = LoggerFactory.getLogger(Upgrade1_1_1.class);
 
     @Override
     public void upgrade() throws Exception {
         OutputStream out = createUpdateLogOutputStream("1_1_1");
 
         // Get the event handlers from the field mapping version.
-        List<EventTypeAndHandler> eventHandlers = query(EVENT_HANDLER_SELECT, new EventHandlerRowMapper());
+        List<EventTypeAndHandler> eventHandlers = getSimpleJdbcTemplate().query(EVENT_HANDLER_SELECT, new EventHandlerRowMapper());
         for (EventTypeAndHandler e : eventHandlers)
             attachHandlerRelationalInfo(e.eventHandler);
-        log.info("Retrieved " + eventHandlers.size() + " event handlers");
+        LOG.info("Retrieved " + eventHandlers.size() + " event handlers");
 
         // Run the script.
-        log.info("Running script");
+        LOG.info("Running script");
         runScript(script, out);
 
         // Save the event handlers to BLOBs.
         for (EventTypeAndHandler e : eventHandlers) {
-            log.info("Saved handler " + e.eventHandler.getId());
+            LOG.info("Saved handler " + e.eventHandler.getId());
             insertEventHandler(e.eventType, e.eventHandler);
         }
 
@@ -94,8 +94,9 @@ public class Upgrade1_1_1 extends DBUpgrade {
             + "  handlerType, targetDataPointId, useSourceValue, valueToSet, "
             + "  sendEscalation, escalationDelayType, escalationDelay, sendInactive " + "from eventHandlers ";
 
-    class EventHandlerRowMapper implements GenericRowMapper<EventTypeAndHandler> {
+    class EventHandlerRowMapper implements ParameterizedRowMapper<EventTypeAndHandler> {
         @SuppressWarnings("synthetic-access")
+        @Override
         public EventTypeAndHandler mapRow(ResultSet rs, int rowNum) throws SQLException {
 
             EventHandlerVO h = new EventHandlerVO();
@@ -128,13 +129,14 @@ public class Upgrade1_1_1 extends DBUpgrade {
 
     private void attachHandlerRelationalInfo(EventHandlerVO handler) {
         RecipientListEntryBeanRowMapper mapper = new RecipientListEntryBeanRowMapper();
-        handler.setActiveRecipients(query(EMAIL_HANDLER_SELECT, new Object[] { handler.getId(),
-                EventHandlerVO.RECIPIENT_TYPE_ACTIVE }, mapper));
-        handler.setEscalationRecipients(query(EMAIL_HANDLER_SELECT, new Object[] { handler.getId(),
-                EventHandlerVO.RECIPIENT_TYPE_ESCALATION }, mapper));
+        handler.setActiveRecipients(getSimpleJdbcTemplate().query(EMAIL_HANDLER_SELECT, mapper, handler.getId(),
+                EventHandlerVO.RECIPIENT_TYPE_ACTIVE));
+        handler.setEscalationRecipients(getSimpleJdbcTemplate().query(EMAIL_HANDLER_SELECT, mapper, handler.getId(),
+                EventHandlerVO.RECIPIENT_TYPE_ESCALATION));
     }
 
-    class RecipientListEntryBeanRowMapper implements GenericRowMapper<RecipientListEntryBean> {
+    class RecipientListEntryBeanRowMapper implements ParameterizedRowMapper<RecipientListEntryBean> {
+        @Override
         public RecipientListEntryBean mapRow(ResultSet rs, int rowNum) throws SQLException {
             RecipientListEntryBean bean = new RecipientListEntryBean();
             bean.setRecipientType(rs.getInt(1));
@@ -145,8 +147,9 @@ public class Upgrade1_1_1 extends DBUpgrade {
     }
 
     private void insertEventHandler(final EventTypeVO type, final EventHandlerVO handler) {
-        ejt.update("insert into eventHandlers " + "  (id, eventTypeId, eventTypeRef1, eventTypeRef2, data) "
+        getSimpleJdbcTemplate().update("insert into eventHandlers " + "  (id, eventTypeId, eventTypeRef1, eventTypeRef2, data) "
                 + "values (?,?,?,?,?)", new PreparedStatementSetter() {
+            @Override
             public void setValues(PreparedStatement ps) throws SQLException {
                 ps.setInt(1, handler.getId());
                 ps.setInt(2, type.getTypeId());

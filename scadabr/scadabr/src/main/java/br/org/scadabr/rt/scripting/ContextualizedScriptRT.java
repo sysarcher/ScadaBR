@@ -11,9 +11,7 @@ import br.org.scadabr.rt.scripting.context.ScriptContextObject;
 import br.org.scadabr.vo.scripting.ContextualizedScriptVO;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.IntValuePair;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataSource.meta.AlphanumericPointWrapper;
@@ -104,15 +102,15 @@ public class ContextualizedScriptRT extends ScriptRT {
                         }
 		}
 
-		List<IntValuePair> objectsContext = ((ContextualizedScriptVO) vo)
+		Map<Integer, String> objectsContext = ((ContextualizedScriptVO) vo)
 				.getObjectsOnContext();
 
 		User user = new UserDao().getUser(vo.getUserId());
-		for (IntValuePair object : objectsContext) {
+		for (Integer objectId : objectsContext.keySet()) {
 			ScriptContextObject o = ScriptContextObject.Type.valueOf(
-					object.getKey()).createScriptContextObject();
+					objectId).createScriptContextObject();
 			o.setUser(user);
-			engine.put(object.getValue(), o);
+			engine.put(objectsContext.get(objectId), o);
 		}
 
 		// Create the script.

@@ -21,11 +21,10 @@ package com.serotonin.mango.rt.dataSource.vmstat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -43,7 +42,7 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int PARSE_EXCEPTION_EVENT = 2;
 
-    private final Log log = LogFactory.getLog(VMStatDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(VMStatDataSourceRT.class);
     private final VMStatDataSourceVO vo;
     private Process vmstatProcess;
     private BufferedReader in;
@@ -212,11 +211,11 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
                         dp.updatePointValue(new PointValueTime(value, time));
                     }
                     catch (NumberFormatException e) {
-                        log.error("Weird. We couldn't parse the value " + parts[position]
+                        LOG.error("Weird. We couldn't parse the value " + parts[position]
                                 + " into a double. attribute=" + locator.getAttribute());
                     }
                     catch (ArrayIndexOutOfBoundsException e) {
-                        log.error("Weird. We need element " + position + " but the vmstat data is only " + parts.length
+                        LOG.error("Weird. We need element " + position + " but the vmstat data is only " + parts.length
                                 + " elements long");
                     }
                 }
@@ -247,11 +246,11 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
                     }
 
                     if (!terminated)
-                        log.warn("Error message from vmstat process: " + errorMessage);
+                        LOG.warn("Error message from vmstat process: " + errorMessage);
                 }
             }
             catch (IOException e) {
-                log.warn("Exception while reading error stream", e);
+                LOG.warn("Exception while reading error stream", e);
             }
         }
     }

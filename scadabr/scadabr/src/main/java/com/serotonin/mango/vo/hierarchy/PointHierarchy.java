@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.IntValuePair;
 
 /**
  * @author Matthew Lohbihler
@@ -68,20 +67,19 @@ public class PointHierarchy {
     }
 
     public void addDataPoint(int id, int folderId, String name) {
-        IntValuePair point = new IntValuePair(id, name);
-        boolean added = addDataPoint(point, folderId, root);
+        boolean added = addDataPoint(id, name, folderId, root);
         if (!added)
-            root.addDataPoint(point);
+            root.addDataPoint(id, name);
     }
 
-    private static boolean addDataPoint(IntValuePair p, int folderId, PointFolder parent) {
+    private static boolean addDataPoint(int id, String name, int folderId, PointFolder parent) {
         if (parent.getId() == folderId) {
-            parent.addDataPoint(p);
+            parent.addDataPoint(id, name);
             return true;
         }
 
         for (PointFolder child : parent.getSubfolders()) {
-            if (addDataPoint(p, folderId, child))
+            if (addDataPoint(id, name, folderId, child))
                 return true;
         }
 
@@ -125,7 +123,7 @@ public class PointHierarchy {
             sub = folder.getSubfolders().get(i);
             parseEmptyFoldersRecursive(sub);
 
-            if (sub.getPoints().size() == 0 && sub.getSubfolders().size() == 0)
+            if (sub.getPoints().isEmpty() && sub.getSubfolders().isEmpty())
                 folder.getSubfolders().remove(i);
         }
     }

@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.joda.time.DateTime;
 
 import com.serotonin.mango.Common;
@@ -44,7 +44,7 @@ import com.serotonin.web.email.EmailInline;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient<EventInstance> {
-    private static final Log LOG = LogFactory.getLog(EmailHandlerRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(EmailHandlerRT.class);
 
     private TimerTask escalationTask;
 

@@ -24,8 +24,8 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.json.JsonException;
@@ -53,7 +53,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
 
 @JsonRemoteEntity
 public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
-    private static final Log LOG = LogFactory.getLog(VirtualPointLocatorVO.class);
+    private final static Logger LOG = LoggerFactory.getLogger(VirtualPointLocatorVO.class);
 
     public LocalizableMessage getConfigurationDescription() {
         ChangeTypeVO changeType = getChangeType();

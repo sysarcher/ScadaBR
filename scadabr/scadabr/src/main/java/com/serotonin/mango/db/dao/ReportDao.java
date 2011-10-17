@@ -1,34 +1,36 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.db.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.DatabaseAccess;
@@ -63,21 +65,24 @@ public class ReportDao extends BaseDao {
     //
     // Report Templates
     //
+
     private static final String REPORT_SELECT = "select data, id, userId, name from reports ";
 
     public List<ReportVO> getReports() {
-        return query(REPORT_SELECT, new ReportRowMapper());
+        return getSimpleJdbcTemplate().query(REPORT_SELECT, new ReportRowMapper());
     }
 
     public List<ReportVO> getReports(int userId) {
-        return query(REPORT_SELECT + "where userId=? order by name", new Object[] { userId }, new ReportRowMapper());
+        return getSimpleJdbcTemplate().query(REPORT_SELECT + "where userId=? order by name", new ReportRowMapper(), userId);
     }
 
     public ReportVO getReport(int id) {
-        return queryForObject(REPORT_SELECT + "where id=?", new Object[] { id }, new ReportRowMapper(), null);
+        return getSimpleJdbcTemplate().queryForObject(REPORT_SELECT + "where id=?", new ReportRowMapper(), id);
     }
 
-    class ReportRowMapper implements GenericRowMapper<ReportVO> {
+    class ReportRowMapper implements ParameterizedRowMapper<ReportVO> {
+
+        @Override
         public ReportVO mapRow(ResultSet rs, int rowNum) throws SQLException {
             int i = 0;
             ReportVO report = (ReportVO) SerializationHelper.readObject(rs.getBlob(++i).getBinaryStream());
@@ -89,33 +94,34 @@ public class ReportDao extends BaseDao {
     }
 
     public void saveReport(ReportVO report) {
-        if (report.getId() == Common.NEW_ID)
+        if (report.getId() == Common.NEW_ID) {
             insertReport(report);
-        else
+        } else {
             updateReport(report);
+        }
     }
-
-    private static final String REPORT_INSERT = "insert into reports (userId, name, data) values (?,?,?)";
 
     private void insertReport(final ReportVO report) {
-        report.setId(doInsert(REPORT_INSERT,
-                new Object[] { report.getUserId(), report.getName(), SerializationHelper.writeObject(report) },
-                new int[] { Types.INTEGER, Types.VARCHAR, Types.BLOB }));
-    }
+        SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("reports").usingGeneratedKeyColumns("id");
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("userId", report.getUserId());
+        params.put("name", report.getName());
+        params.put("data", SerializationHelper.writeObjectToArray(report));
 
+        Number id = insertActor.executeAndReturnKey(params);
+        report.setId(id.intValue());
+    }
     private static final String REPORT_UPDATE = "update reports set userId=?, name=?, data=? where id=?";
 
     private void updateReport(final ReportVO report) {
-        ejt.update(
+        getSimpleJdbcTemplate().update(
                 REPORT_UPDATE,
-                new Object[] { report.getUserId(), report.getName(), SerializationHelper.writeObject(report),
-                        report.getId() }, new int[] { Types.INTEGER, Types.VARCHAR, Types.BLOB, Types.INTEGER });
+                report.getUserId(), report.getName(), SerializationHelper.writeObjectToArray(report), report.getId());
     }
 
     public void deleteReport(int reportId) {
-        ejt.update("delete from reports where id=?", new Object[] { reportId });
+        getSimpleJdbcTemplate().update("delete from reports where id=?", reportId);
     }
-
     //
     //
     // Report Instances
@@ -124,16 +130,16 @@ public class ReportDao extends BaseDao {
             + "  runEndTime, recordCount, preventPurge " + "from reportInstances ";
 
     public List<ReportInstance> getReportInstances(int userId) {
-        return query(REPORT_INSTANCE_SELECT + "where userId=? order by runStartTime desc", new Object[] { userId },
-                new ReportInstanceRowMapper());
+        return getSimpleJdbcTemplate().query(REPORT_INSTANCE_SELECT + "where userId=? order by runStartTime desc", new ReportInstanceRowMapper(), userId);
     }
 
     public ReportInstance getReportInstance(int id) {
-        return queryForObject(REPORT_INSTANCE_SELECT + "where id=?", new Object[] { id },
-                new ReportInstanceRowMapper(), null);
+        return getSimpleJdbcTemplate().queryForObject(REPORT_INSTANCE_SELECT + "where id=?", new ReportInstanceRowMapper(), id);
     }
 
-    class ReportInstanceRowMapper implements GenericRowMapper<ReportInstance> {
+    class ReportInstanceRowMapper implements ParameterizedRowMapper<ReportInstance> {
+
+        @Override
         public ReportInstance mapRow(ResultSet rs, int rowNum) throws SQLException {
             int i = 0;
             ReportInstance ri = new ReportInstance();
@@ -153,52 +159,57 @@ public class ReportDao extends BaseDao {
     }
 
     public void deleteReportInstance(int id, int userId) {
-        ejt.update("delete from reportInstances where id=? and userId=?", new Object[] { id, userId });
+        getSimpleJdbcTemplate().update("delete from reportInstances where id=? and userId=?", id, userId);
     }
 
     public int purgeReportsBefore(final long time) {
-        return ejt.update("delete from reportInstances where runStartTime<? and preventPurge=?", new Object[] { time,
-                boolToChar(false) });
+        return getSimpleJdbcTemplate().update("delete from reportInstances where runStartTime<? and preventPurge=?", time, boolToChar(false));
     }
 
     public void setReportInstancePreventPurge(int id, boolean preventPurge, int userId) {
-        ejt.update("update reportInstances set preventPurge=? where id=? and userId=?", new Object[] {
-                boolToChar(preventPurge), id, userId });
+        getSimpleJdbcTemplate().update("update reportInstances set preventPurge=? where id=? and userId=?", boolToChar(preventPurge), id, userId);
     }
-
     /**
      * This method should only be called by the ReportWorkItem.
      */
     private static final String REPORT_INSTANCE_INSERT = "insert into reportInstances "
-            + "  (userId, name, includeEvents, includeUserComments, reportStartTime, reportEndTime, runStartTime, "
-            + "     runEndTime, recordCount, preventPurge) " + "  values (?,?,?,?,?,?,?,?,?,?)";
+            + "  (userId, name, , , , , , "
+            + "     runEndTime, , ) " + "  values (?,?,?,?,?,?,?,?,?,?)";
     private static final String REPORT_INSTANCE_UPDATE = "update reportInstances set reportStartTime=?, reportEndTime=?, runStartTime=?, runEndTime=?, recordCount=? "
             + "where id=?";
 
     public void saveReportInstance(ReportInstance instance) {
-        if (instance.getId() == Common.NEW_ID)
-            instance.setId(doInsert(
-                    REPORT_INSTANCE_INSERT,
-                    new Object[] { instance.getUserId(), instance.getName(), instance.getIncludeEvents(),
-                            boolToChar(instance.isIncludeUserComments()), instance.getReportStartTime(),
-                            instance.getReportEndTime(), instance.getRunStartTime(), instance.getRunEndTime(),
-                            instance.getRecordCount(), boolToChar(instance.isPreventPurge()) }));
-        else
-            ejt.update(
+        if (instance.getId() == Common.NEW_ID) {
+            SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("reportInstances").usingGeneratedKeyColumns("id");
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("userId", instance.getUserId());
+            params.put("name", instance.getName());
+            params.put("includeEvents", instance.getIncludeEvents());
+            params.put("includeUserComments", boolToChar(instance.isIncludeUserComments()));
+            params.put("reportStartTime", instance.getReportStartTime());
+            params.put("reportEndTime", instance.getReportEndTime());
+            params.put("runStartTime", instance.getRunStartTime());
+            params.put("runEndTime", instance.getRunStartTime());
+            params.put("recordCount", instance.getRunEndTime());
+            params.put("preventPurge", boolToChar(instance.isPreventPurge()));
+
+            Number reportPointId = insertActor.executeAndReturnKey(params);
+
+            instance.setId(reportPointId.intValue());
+        } else {
+            getSimpleJdbcTemplate().update(
                     REPORT_INSTANCE_UPDATE,
-                    new Object[] { instance.getReportStartTime(), instance.getReportEndTime(),
-                            instance.getRunStartTime(), instance.getRunEndTime(), instance.getRecordCount(),
-                            instance.getId() });
+                    instance.getReportStartTime(), instance.getReportEndTime(),
+                    instance.getRunStartTime(), instance.getRunEndTime(), instance.getRecordCount(),
+                    instance.getId());
+        }
     }
 
     /**
      * This method should only be called by the ReportWorkItem.
      */
-    private static final String REPORT_INSTANCE_POINTS_INSERT = "insert into reportInstancePoints " //
-            + "(reportInstanceId, dataSourceName, pointName, dataType, startValue, textRenderer, colour, consolidatedChart) "
-            + "values (?,?,?,?,?,?,?,?)";
-
     public static class PointInfo {
+
         private final DataPointVO point;
         private final String colour;
         private final boolean consolidatedChart;
@@ -236,18 +247,15 @@ public class ReportDao extends BaseDao {
         if (instance.isFromInception() && instance.isToNow()) {
             timestampSql = "";
             timestampParams = new Object[0];
-        }
-        else if (instance.isFromInception()) {
+        } else if (instance.isFromInception()) {
             timestampSql = "and ${field}<?";
-            timestampParams = new Object[] { instance.getReportEndTime() };
-        }
-        else if (instance.isToNow()) {
+            timestampParams = new Object[]{instance.getReportEndTime()};
+        } else if (instance.isToNow()) {
             timestampSql = "and ${field}>=?";
-            timestampParams = new Object[] { instance.getReportStartTime() };
-        }
-        else {
+            timestampParams = new Object[]{instance.getReportStartTime()};
+        } else {
             timestampSql = "and ${field}>=? and ${field}<?";
-            timestampParams = new Object[] { instance.getReportStartTime(), instance.getReportEndTime() };
+            timestampParams = new Object[]{instance.getReportStartTime(), instance.getReportEndTime()};
         }
 
         // For each point.
@@ -259,66 +267,74 @@ public class ReportDao extends BaseDao {
             if (!instance.isFromInception()) {
                 // Get the value just before the start of the report
                 PointValueTime pvt = pointValueDao.getPointValueBefore(point.getId(), instance.getReportStartTime());
-                if (pvt != null)
+                if (pvt != null) {
                     startValue = pvt.getValue();
+                }
 
                 // Make sure the data types match
-                if (startValue.getMangoDataType() != dataType)
+                if (startValue.getMangoDataType() != dataType) {
                     startValue = null;
+                }
             }
 
             // Insert the reportInstancePoints record
             String name = Functions.truncate(point.getName(), 100);
 
-            int reportPointId = doInsert(
-                    REPORT_INSTANCE_POINTS_INSERT,
-                    new Object[] { instance.getId(), point.getDeviceName(), name, dataType,
-                            startValue.getMangoDataType(),
-                            SerializationHelper.writeObject(point.getTextRenderer()), pointInfo.getColour(),
-                            boolToChar(pointInfo.isConsolidatedChart()) }, new int[] { Types.INTEGER, Types.VARCHAR,
-                            Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.BLOB, Types.VARCHAR, Types.CHAR });
+            SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("reportInstancePoints").usingGeneratedKeyColumns("id");
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("reportInstanceId", instance.getId());
+            params.put("dataSourceName", point.getDeviceName());
+            params.put("pointName", name);
+            params.put("dataType", dataType);
+            params.put("startValue", startValue.getMangoDataType());
+            params.put("textRenderer", SerializationHelper.writeObjectToArray(point.getTextRenderer()));
+            params.put("colour", pointInfo.getColour());
+            params.put("consolidatedChart", boolToChar(pointInfo.isConsolidatedChart()));
+
+            Number reportPointId = insertActor.executeAndReturnKey(params);
 
             // Insert the reportInstanceData records
-            String insertSQL = "insert into reportInstanceData " + "  select id, " + reportPointId
+            String insertSQL = "insert into reportInstanceData " + "  select id, " + reportPointId.intValue()
                     + ", pointValue, ts from pointValues " + "    where dataPointId=? and dataType=? "
                     + StringUtils.replaceMacro(timestampSql, "field", "ts");
-            count += ejt.update(insertSQL, appendParameters(timestampParams, point.getId(), dataType));
+            count += getSimpleJdbcTemplate().update(insertSQL, appendParameters(timestampParams, point.getId(), dataType));
 
             String annoCase;
-            if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.DERBY)
+            if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.DERBY) {
                 annoCase = "    case when pva.sourceType=1 then '" + userLabel //
                         + ": ' || (case when u.username is null then '" + deletedLabel + "' else u.username end) " //
                         + "         when pva.sourceType=2 then '" + setPointLabel + "' " //
                         + "         when pva.sourceType=3 then '" + anonymousLabel + "' " //
                         + "         else 'Unknown source type: ' || cast(pva.sourceType as char(3)) " //
                         + "    end ";
-            else if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.MSSQL)
+            } else if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.MSSQL) {
                 annoCase = "    case pva.sourceType" //
                         + "        when 1 then '" + userLabel + ": ' + isnull(u.username, '" + deletedLabel + "') " //
                         + "        when 2 then '" + setPointLabel + "'" //
                         + "        when 3 then '" + anonymousLabel + "'" //
                         + "        else 'Unknown source type: ' + cast(pva.sourceType as nvarchar)" //
                         + "    end ";
-            else if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.MYSQL)
+            } else if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.MYSQL) {
                 annoCase = "    case pva.sourceType" //
                         + "      when 1 then concat('" + userLabel + ": ',ifnull(u.username,'" + deletedLabel + "')) " //
                         + "      when 2 then '" + setPointLabel + "'" //
                         + "      when 3 then '" + anonymousLabel + "'" //
                         + "      else concat('Unknown source type: ', pva.sourceType)" //
                         + "    end ";
-            else
+            } else {
                 throw new ShouldNeverHappenException("unhandled database type: "
                         + Common.ctx.getDatabaseAccess().getType());
+            }
 
             // Insert the reportInstanceDataAnnotations records
-            ejt.update("insert into reportInstanceDataAnnotations " //
+            getSimpleJdbcTemplate().update("insert into reportInstanceDataAnnotations " //
                     + "  (pointValueId, reportInstancePointId, textPointValueShort, textPointValueLong, sourceValue) " //
                     + "  select rd.pointValueId, rd.reportInstancePointId, pva.textPointValueShort, " //
                     + "    pva.textPointValueLong, " + annoCase + "  from reportInstanceData rd " //
                     + "    join reportInstancePoints rp on rd.reportInstancePointId = rp.id " //
                     + "    join pointValueAnnotations pva on rd.pointValueId = pva.pointValueId " //
                     + "    left join users u on pva.sourceType=1 and pva.sourceId = u.id " //
-                    + "  where rp.id = ?", new Object[] { reportPointId });
+                    + "  where rp.id = ?", reportPointId);
 
             // Insert the reportInstanceEvents records for the point.
             if (instance.getIncludeEvents() != ReportVO.EVENTS_NONE) {
@@ -335,11 +351,12 @@ public class ReportDao extends BaseDao {
                         + EventType.EventSources.DATA_POINT //
                         + "    and e.typeRef1=? ";
 
-                if (instance.getIncludeEvents() == ReportVO.EVENTS_ALARMS)
+                if (instance.getIncludeEvents() == ReportVO.EVENTS_ALARMS) {
                     eventSQL += "and e.alarmLevel > 0 ";
+                }
 
                 eventSQL += StringUtils.replaceMacro(timestampSql, "field", "e.activeTs");
-                ejt.update(eventSQL, appendParameters(timestampParams, instance.getUserId(), point.getId()));
+                getSimpleJdbcTemplate().update(eventSQL, appendParameters(timestampParams, instance.getUserId(), point.getId()));
             }
 
             // Insert the reportInstanceUserComments records for the point.
@@ -355,7 +372,7 @@ public class ReportDao extends BaseDao {
 
                 // Only include comments made in the duration of the report.
                 commentSQL += StringUtils.replaceMacro(timestampSql, "field", "uc.ts");
-                ejt.update(commentSQL, appendParameters(timestampParams, point.getId()));
+                getSimpleJdbcTemplate().update(commentSQL, appendParameters(timestampParams, point.getId()));
             }
         }
 
@@ -370,22 +387,26 @@ public class ReportDao extends BaseDao {
                     + "    join reportInstanceEvents re on re.eventId=uc.typeKey " //
                     + "  where uc.commentType=" + UserComment.TYPE_EVENT //
                     + "    and re.reportInstanceId=? ";
-            ejt.update(commentSQL, new Object[] { instance.getId() });
+            getSimpleJdbcTemplate().update(commentSQL, instance.getId());
         }
 
         // If the report had undefined start or end times, update them with values from the data.
         if (instance.isFromInception() || instance.isToNow()) {
-            ejt.query(
+            getJdbcTemplate().query(
                     "select min(rd.ts), max(rd.ts) " //
-                            + "from reportInstancePoints rp "
-                            + "  join reportInstanceData rd on rp.id=rd.reportInstancePointId "
-                            + "where rp.reportInstanceId=?", new Object[] { instance.getId() },
+                    + "from reportInstancePoints rp "
+                    + "  join reportInstanceData rd on rp.id=rd.reportInstancePointId "
+                    + "where rp.reportInstanceId=?", new Object[]{instance.getId()},
                     new RowCallbackHandler() {
+
+                        @Override
                         public void processRow(ResultSet rs) throws SQLException {
-                            if (instance.isFromInception())
+                            if (instance.isFromInception()) {
                                 instance.setReportStartTime(rs.getLong(1));
-                            if (instance.isToNow())
+                            }
+                            if (instance.isToNow()) {
                                 instance.setReportEndTime(rs.getLong(2));
+                            }
                         }
                     });
         }
@@ -394,17 +415,18 @@ public class ReportDao extends BaseDao {
     }
 
     private Object[] appendParameters(Object[] toAppend, Object... params) {
-        if (toAppend.length == 0)
+        if (toAppend.length == 0) {
             return params;
-        if (params.length == 0)
+        }
+        if (params.length == 0) {
             return toAppend;
+        }
 
         Object[] result = new Object[params.length + toAppend.length];
         System.arraycopy(params, 0, result, 0, params.length);
         System.arraycopy(toAppend, 0, result, params.length, toAppend.length);
         return result;
     }
-
     /**
      * This method guarantees that the data is provided to the setData handler method grouped by point (points are not
      * ordered), and sorted by time ascending.
@@ -419,8 +441,10 @@ public class ReportDao extends BaseDao {
 
     public void reportInstanceData(int instanceId, final ReportDataStreamHandler handler) {
         // Retrieve point information.
-        List<ReportPointInfo> pointInfos = query(REPORT_INSTANCE_POINT_SELECT + "where reportInstanceId=?",
-                new Object[] { instanceId }, new GenericRowMapper<ReportPointInfo>() {
+        List<ReportPointInfo> pointInfos = getSimpleJdbcTemplate().query(REPORT_INSTANCE_POINT_SELECT + "where reportInstanceId=?",
+                new ParameterizedRowMapper<ReportPointInfo>() {
+
+                    @Override
                     public ReportPointInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
                         ReportPointInfo rp = new ReportPointInfo();
                         rp.setReportPointId(rs.getInt(1));
@@ -428,58 +452,60 @@ public class ReportDao extends BaseDao {
                         rp.setPointName(rs.getString(3));
                         rp.setMangoDataType(MangoDataType.fromMangoId(rs.getInt(4)));
                         String startValue = rs.getString(5);
-                        if (startValue != null)
+                        if (startValue != null) {
                             rp.setStartValue(MangoValue.stringToValue(startValue, rp.getMangoDataType()));
-                        rp.setTextRenderer((TextRenderer) SerializationHelper.readObject(rs.getBlob(6)
-                                .getBinaryStream()));
+                        }
+                        rp.setTextRenderer((TextRenderer) SerializationHelper.readObject(rs.getBlob(6).getBinaryStream()));
                         rp.setColour(rs.getString(7));
                         rp.setConsolidatedChart(charToBool(rs.getString(8)));
                         return rp;
                     }
-                });
+                }, instanceId);
 
         final ReportDataValue rdv = new ReportDataValue();
         for (final ReportPointInfo point : pointInfos) {
             handler.startPoint(point);
 
             rdv.setReportPointId(point.getReportPointId());
-            ejt.query(REPORT_INSTANCE_DATA_SELECT + "where rd.reportInstancePointId=? order by rd.ts",
-                    new Object[] { point.getReportPointId() }, new RowCallbackHandler() {
-                        public void processRow(ResultSet rs) throws SQLException {
-                            switch (point.getMangoDataType()) {
-                            case NUMERIC:
-                                rdv.setValue(new NumericValue(rs.getDouble(1)));
-                                break;
-                            case BINARY:
-                                rdv.setValue(new BinaryValue(rs.getDouble(1) == 1));
-                                break;
-                            case MULTISTATE:
-                                rdv.setValue(new MultistateValue(rs.getInt(1)));
-                                break;
-                            case ALPHANUMERIC:
-                                rdv.setValue(new AlphanumericValue(rs.getString(2)));
-                                if (rs.wasNull())
-                                    rdv.setValue(new AlphanumericValue(rs.getString(3)));
-                                break;
-                            case IMAGE:
-                                rdv.setValue(new ImageValue(Integer.parseInt(rs.getString(2)), rs.getInt(1)));
-                                break;
-                            default:
-                                rdv.setValue(null);
+            getJdbcTemplate().query(REPORT_INSTANCE_DATA_SELECT + "where rd.reportInstancePointId=? order by rd.ts",
+                    new Object[]{point.getReportPointId()}, new RowCallbackHandler() {
+
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    switch (point.getMangoDataType()) {
+                        case NUMERIC:
+                            rdv.setValue(new NumericValue(rs.getDouble(1)));
+                            break;
+                        case BINARY:
+                            rdv.setValue(new BinaryValue(rs.getDouble(1) == 1));
+                            break;
+                        case MULTISTATE:
+                            rdv.setValue(new MultistateValue(rs.getInt(1)));
+                            break;
+                        case ALPHANUMERIC:
+                            rdv.setValue(new AlphanumericValue(rs.getString(2)));
+                            if (rs.wasNull()) {
+                                rdv.setValue(new AlphanumericValue(rs.getString(3)));
                             }
+                            break;
+                        case IMAGE:
+                            rdv.setValue(new ImageValue(Integer.parseInt(rs.getString(2)), rs.getInt(1)));
+                            break;
+                        default:
+                            rdv.setValue(null);
+                    }
 
-                            rdv.setTime(rs.getLong(4));
-                            rdv.setAnnotation(rs.getString(5));
+                    rdv.setTime(rs.getLong(4));
+                    rdv.setAnnotation(rs.getString(5));
 
-                            handler.pointData(rdv);
-                        }
-                    });
+                    handler.pointData(rdv);
+                }
+            });
         }
         handler.done();
     }
-
     private static final String EVENT_SELECT = //
-    "select eventId, typeId, typeRef1, typeRef2, activeTs, rtnApplicable, rtnTs, rtnCause, alarmLevel, message, " //
+            "select eventId, typeId, typeRef1, typeRef2, activeTs, rtnApplicable, rtnTs, rtnCause, alarmLevel, message, " //
             + "ackTs, 0, ackUsername, alternateAckSource " //
             + "from reportInstanceEvents " //
             + "where reportInstanceId=? " //
@@ -491,10 +517,11 @@ public class ReportDao extends BaseDao {
 
     public List<EventInstance> getReportInstanceEvents(int instanceId) {
         // Get the events.
-        final List<EventInstance> events = query(EVENT_SELECT, new Object[] { instanceId },
-                new EventDao.EventInstanceRowMapper());
+        final List<EventInstance> events = getSimpleJdbcTemplate().query(EVENT_SELECT, new EventDao.EventInstanceRowMapper(), instanceId);
         // Add in the comments.
-        ejt.query(EVENT_COMMENT_SELECT, new Object[] { instanceId, UserComment.TYPE_EVENT }, new RowCallbackHandler() {
+        getJdbcTemplate().query(EVENT_COMMENT_SELECT, new Object[]{instanceId, UserComment.TYPE_EVENT}, new RowCallbackHandler() {
+
+            @Override
             public void processRow(ResultSet rs) throws SQLException {
                 // Create the comment
                 UserComment c = new UserComment();
@@ -506,8 +533,9 @@ public class ReportDao extends BaseDao {
                 int eventId = rs.getInt(2);
                 for (EventInstance event : events) {
                     if (event.getId() == eventId) {
-                        if (event.getEventComments() == null)
+                        if (event.getEventComments() == null) {
                             event.setEventComments(new ArrayList<UserComment>());
+                        }
                         event.addEventComment(c);
                     }
                 }
@@ -516,7 +544,6 @@ public class ReportDao extends BaseDao {
         // Done
         return events;
     }
-
     private static final String USER_COMMENT_SELECT = "select rc.username, rc.commentType, rc.typeKey, rp.pointName, " //
             + "  rc.ts, rc.commentText "
             + "from reportInstanceUserComments rc "
@@ -525,10 +552,11 @@ public class ReportDao extends BaseDao {
             + " " + "where rc.reportInstanceId=? " + "order by rc.ts ";
 
     public List<ReportUserComment> getReportInstanceUserComments(int instanceId) {
-        return query(USER_COMMENT_SELECT, new Object[] { instanceId }, new ReportCommentRowMapper());
+        return getSimpleJdbcTemplate().query(USER_COMMENT_SELECT, new ReportCommentRowMapper(), instanceId);
     }
 
-    class ReportCommentRowMapper implements GenericRowMapper<ReportUserComment> {
+    class ReportCommentRowMapper implements ParameterizedRowMapper<ReportUserComment> {
+
         @Override
         public ReportUserComment mapRow(ResultSet rs, int rowNum) throws SQLException {
             ReportUserComment c = new ReportUserComment();

@@ -18,8 +18,8 @@
  */
 package com.serotonin.mango.web.dwr.beans;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.rt.dataSource.ebro.EBI25Constants;
 import com.serotonin.mango.vo.dataSource.ebro.EBI25PointLocatorVO;
@@ -34,7 +34,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
  * @author Matthew Lohbihler
  */
 public class EBI25InterfaceUpdater {
-    private static final Log LOG = LogFactory.getLog(EBI25InterfaceUpdater.class);
+    private final static Logger LOG = LoggerFactory.getLogger(EBI25InterfaceUpdater.class);
 
     public LocalizableMessage updateLogger(String host, int port, int timeout, int retries, EBI25PointLocatorVO locator) {
         if (StringUtils.isEmpty(host))

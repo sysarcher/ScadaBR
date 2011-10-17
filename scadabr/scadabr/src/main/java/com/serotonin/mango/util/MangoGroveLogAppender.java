@@ -31,7 +31,6 @@ import org.apache.log4j.spi.LoggingEvent;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
-import com.serotonin.mango.rt.maint.VersionCheck;
 
 /**
  * @author Matthew Lohbihler

@@ -18,8 +18,8 @@
  */
 package com.serotonin.mango.rt.dataSource.nmea;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.io.serial.SerialParameters;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -41,7 +41,7 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int PARSE_EXCEPTION_EVENT = 2;
 
-    private final Log log = LogFactory.getLog(NmeaDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(NmeaDataSourceRT.class);
 
     private final NmeaDataSourceVO vo;
     private NmeaReceiver nmeaReceiver;
@@ -89,7 +89,7 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
         catch (Exception e) {
             LocalizableMessage message = getSerialExceptionMessage(e, vo.getCommPortId());
             raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, message);
-            log.debug("Error while initializing data source", e);
+            LOG.debug("Error while initializing data source", e);
             return false;
         }
 
@@ -107,7 +107,7 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
     //
     @Override
     public void receivedException(Exception e) {
-        log.error("Exception from nmea receiver", e);
+        LOG.error("Exception from nmea receiver", e);
     }
 
     @Override

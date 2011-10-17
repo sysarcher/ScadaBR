@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.serotonin.db.IntValuePair;
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
@@ -32,29 +31,33 @@ import com.serotonin.mango.view.conversion.Conversions;
 import com.serotonin.spinwave.SwMessage;
 import com.serotonin.spinwave.v2.SensorValue;
 import com.serotonin.spinwave.v2.SwMessageV2;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class SpinwaveV2PointLocatorVO extends BaseSpinwavePointLocatorVO {
-    public static IntValuePair[] attributeTypes = {
-            new IntValuePair(SensorValue.TYPE_TEMPERATURE, "dsEdit.spinwave.v2Attr.temp"),
-            new IntValuePair(SensorValue.TYPE_SETPOINT, "dsEdit.spinwave.v2Attr.setPoint"),
-            new IntValuePair(SensorValue.TYPE_BATTERY, "dsEdit.spinwave.v2Attr.battery"),
-            new IntValuePair(SensorValue.TYPE_BATTERY_ALARM, "dsEdit.spinwave.v2Attr.batteryAlarm"),
-            new IntValuePair(SensorValue.TYPE_OVERRIDE, "dsEdit.spinwave.v2Attr.override"),
-            new IntValuePair(SensorValue.TYPE_HUMIDITY, "dsEdit.spinwave.v2Attr.humidity"),
-            new IntValuePair(SensorValue.TYPE_VOLTAGE, "dsEdit.spinwave.v2Attr.voltage"),
-            new IntValuePair(SensorValue.TYPE_AIRFLOW, "dsEdit.spinwave.v2Attr.airflow"),
-            new IntValuePair(SensorValue.TYPE_KWH, "dsEdit.spinwave.v2Attr.kwhours"),
-            new IntValuePair(SensorValue.TYPE_OCCUPANCY, "dsEdit.spinwave.v2Attr.occupancy"),
-            new IntValuePair(SensorValue.TYPE_CO2, "dsEdit.spinwave.v2Attr.co2"),
-            new IntValuePair(SensorValue.TYPE_VOC, "dsEdit.spinwave.v2Attr.voc"),
-            new IntValuePair(SensorValue.TYPE_IAQ, "dsEdit.spinwave.v2Attr.iaq"),
-            new IntValuePair(SensorValue.TYPE_CO, "dsEdit.spinwave.v2Attr.co"),
-            new IntValuePair(SensorValue.TYPE_FREQUENCY, "dsEdit.spinwave.v2Attr.freq"),
-            new IntValuePair(SensorValue.TYPE_PULSECOUNTER, "dsEdit.spinwave.v2Attr.counter"), };
+    public final static Map<Integer, String> attributeTypes = new HashMap();
+    static {
+            attributeTypes.put(SensorValue.TYPE_TEMPERATURE, "dsEdit.spinwave.v2Attr.temp");
+            attributeTypes.put(SensorValue.TYPE_SETPOINT, "dsEdit.spinwave.v2Attr.setPoint");
+            attributeTypes.put(SensorValue.TYPE_BATTERY, "dsEdit.spinwave.v2Attr.battery");
+            attributeTypes.put(SensorValue.TYPE_BATTERY_ALARM, "dsEdit.spinwave.v2Attr.batteryAlarm");
+            attributeTypes.put(SensorValue.TYPE_OVERRIDE, "dsEdit.spinwave.v2Attr.override");
+            attributeTypes.put(SensorValue.TYPE_HUMIDITY, "dsEdit.spinwave.v2Attr.humidity");
+            attributeTypes.put(SensorValue.TYPE_VOLTAGE, "dsEdit.spinwave.v2Attr.voltage");
+            attributeTypes.put(SensorValue.TYPE_AIRFLOW, "dsEdit.spinwave.v2Attr.airflow");
+            attributeTypes.put(SensorValue.TYPE_KWH, "dsEdit.spinwave.v2Attr.kwhours");
+            attributeTypes.put(SensorValue.TYPE_OCCUPANCY, "dsEdit.spinwave.v2Attr.occupancy");
+            attributeTypes.put(SensorValue.TYPE_CO2, "dsEdit.spinwave.v2Attr.co2");
+            attributeTypes.put(SensorValue.TYPE_VOC, "dsEdit.spinwave.v2Attr.voc");
+            attributeTypes.put(SensorValue.TYPE_IAQ, "dsEdit.spinwave.v2Attr.iaq");
+            attributeTypes.put(SensorValue.TYPE_CO, "dsEdit.spinwave.v2Attr.co");
+            attributeTypes.put(SensorValue.TYPE_FREQUENCY, "dsEdit.spinwave.v2Attr.freq");
+            attributeTypes.put(SensorValue.TYPE_PULSECOUNTER, "dsEdit.spinwave.v2Attr.counter");
+    }
 
     public static MangoDataType getAttributeDataType(int attributeId) {
         if (attributeId == SensorValue.TYPE_BATTERY_ALARM || attributeId == SensorValue.TYPE_OVERRIDE
@@ -64,14 +67,14 @@ public class SpinwaveV2PointLocatorVO extends BaseSpinwavePointLocatorVO {
     }
 
     public static String getAttributeDescription(int attributeId) {
-        for (IntValuePair attr : attributeTypes) {
-            if (attributeId == attr.getKey())
-                return attr.getValue();
+        for (Integer attr : attributeTypes.keySet()) {
+            if (attributeId == attr)
+                return attributeTypes.get(attr);
         }
         return "Unknown";
     }
 
-    public IntValuePair[] getAttributeTypes() {
+    public Map<Integer, String> getAttributeTypes() {
         return attributeTypes;
     }
 

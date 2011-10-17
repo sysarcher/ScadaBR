@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.db.KeyValuePair;
 import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
@@ -37,12 +36,14 @@ import com.serotonin.mango.rt.publish.PublisherRT;
 import com.serotonin.mango.rt.publish.httpSender.HttpSenderRT;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
+import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import com.serotonin.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.util.HashMap;
 
 /**
  * @author Matthew Lohbihler
@@ -68,7 +69,7 @@ public class HttpSenderVO extends PublisherVO<HttpPointVO> {
     public static final int DATE_FORMAT_TZ = 2;
     public static final int DATE_FORMAT_UTC = 3;
 
-    private static ExportCodes DATE_FORMAT_CODES = new ExportCodes();
+    private final static ExportCodes DATE_FORMAT_CODES = new ExportCodes();
     static {
         DATE_FORMAT_CODES.addElement(DATE_FORMAT_BASIC, "DATE_FORMAT_BASIC",
                 "publisherEdit.httpSender.dateFormat.basic");
@@ -105,10 +106,10 @@ public class HttpSenderVO extends PublisherVO<HttpPointVO> {
     private String url;
     @JsonRemoteProperty
     private boolean usePost;
-    @JsonRemoteProperty(innerType = KeyValuePair.class)
-    private List<KeyValuePair> staticHeaders = new ArrayList<KeyValuePair>();
-    @JsonRemoteProperty(innerType = KeyValuePair.class)
-    private List<KeyValuePair> staticParameters = new ArrayList<KeyValuePair>();
+    @JsonRemoteProperty
+    private Map<String, String> staticHeaders = new HashMap<String, String>();
+    @JsonRemoteProperty
+    private Map<String, String> staticParameters = new HashMap<String, String>();
     @JsonRemoteProperty
     private boolean raiseResultWarning = true;
     private int dateFormat = DATE_FORMAT_BASIC;
@@ -129,19 +130,19 @@ public class HttpSenderVO extends PublisherVO<HttpPointVO> {
         this.usePost = usePost;
     }
 
-    public List<KeyValuePair> getStaticHeaders() {
+    public Map<String, String> getStaticHeaders() {
         return staticHeaders;
     }
 
-    public void setStaticHeaders(List<KeyValuePair> staticHeaders) {
+    public void setStaticHeaders(Map<String, String> staticHeaders) {
         this.staticHeaders = staticHeaders;
     }
 
-    public List<KeyValuePair> getStaticParameters() {
+    public Map<String, String> getStaticParameters() {
         return staticParameters;
     }
 
-    public void setStaticParameters(List<KeyValuePair> staticParameters) {
+    public void setStaticParameters(Map<String, String> staticParameters) {
         this.staticParameters = staticParameters;
     }
 
@@ -191,6 +192,8 @@ public class HttpSenderVO extends PublisherVO<HttpPointVO> {
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, url);
         out.writeBoolean(usePost);
+        AbstractPointLocatorVO.writeKeyValuePairList(staticHeaders, out);
+        AbstractPointLocatorVO.writeKeyValuePairList(staticParameters, out);
         out.writeObject(staticHeaders);
         out.writeObject(staticParameters);
         out.writeBoolean(raiseResultWarning);
@@ -205,24 +208,24 @@ public class HttpSenderVO extends PublisherVO<HttpPointVO> {
         if (ver == 1) {
             url = SerializationHelper.readSafeUTF(in);
             usePost = in.readBoolean();
-            staticHeaders = new ArrayList<KeyValuePair>();
-            staticParameters = (List<KeyValuePair>) in.readObject();
+            staticHeaders = new HashMap<String, String> ();
+            staticParameters = AbstractPointLocatorVO.readKeyValuePairList(in);
             raiseResultWarning = in.readBoolean();
             dateFormat = DATE_FORMAT_BASIC;
         }
         else if (ver == 2) {
             url = SerializationHelper.readSafeUTF(in);
             usePost = in.readBoolean();
-            staticHeaders = (List<KeyValuePair>) in.readObject();
-            staticParameters = (List<KeyValuePair>) in.readObject();
+            staticHeaders = AbstractPointLocatorVO.readKeyValuePairList(in);
+            staticParameters = AbstractPointLocatorVO.readKeyValuePairList(in);
             raiseResultWarning = in.readBoolean();
             dateFormat = DATE_FORMAT_BASIC;
         }
         else if (ver == 3) {
             url = SerializationHelper.readSafeUTF(in);
             usePost = in.readBoolean();
-            staticHeaders = (List<KeyValuePair>) in.readObject();
-            staticParameters = (List<KeyValuePair>) in.readObject();
+            staticHeaders = AbstractPointLocatorVO.readKeyValuePairList(in);
+            staticParameters = AbstractPointLocatorVO.readKeyValuePairList(in);
             raiseResultWarning = in.readBoolean();
             dateFormat = in.readInt();
         }

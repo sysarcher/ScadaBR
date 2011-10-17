@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.PointValueDao;
@@ -21,7 +21,7 @@ import com.serotonin.util.queue.ByteQueue;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 class SyncHandler implements Runnable {
-    static final Log LOG = LogFactory.getLog(SyncHandler.class);
+    private final static Logger LOG = LoggerFactory.getLogger(SyncHandler.class);
     private static final String START_TIMES_KEY = "startTimes";
 
     final PersistentSendThread sendThread;

@@ -35,8 +35,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.org.scadabr.api.utils.APIUtils;
 
@@ -81,10 +81,10 @@ import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 
 public class MangoContextListener implements ServletContextListener {
-	private final Log log = LogFactory.getLog(MangoContextListener.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MangoContextListener.class);
 
 	public void contextInitialized(ServletContextEvent evt) {
-		log.info("Mango context starting");
+		LOG.info("Mango context starting");
 
 		// Get a handle on the context.
 		ServletContext ctx = evt.getServletContext();
@@ -108,7 +108,7 @@ public class MangoContextListener implements ServletContextListener {
 		if (knownContextPath != null) {
 			String contextPath = ctx.getContextPath();
 			if (!StringUtils.isEqual(knownContextPath, contextPath))
-				log.warn("Mango's known servlet context path has changed from "
+				LOG.warn("Mango's known servlet context path has changed from "
 						+ knownContextPath + " to " + contextPath
 						+ ". Are there two instances of Mango running?");
 		}
@@ -127,12 +127,12 @@ public class MangoContextListener implements ServletContextListener {
 				.currentTimeMillis(), false, new LocalizableMessage(
 				"event.system.startup"));
 
-		log.info("Mango context started");
+		LOG.info("Mango context started");
 
 	}
 
 	public void contextDestroyed(ServletContextEvent evt) {
-		log.info("Mango context terminating");
+		LOG.info("Mango context terminating");
 
 		if (Common.ctx.getEventManager() != null) {
 			// Notify the event manager of the shutdown.
@@ -156,7 +156,7 @@ public class MangoContextListener implements ServletContextListener {
 
 		Common.ctx = null;
 
-		log.info("Mango context terminated");
+		LOG.info("Mango context terminated");
 	}
 
 	private void dataPointsNameToIdMapping(ServletContext ctx) {
@@ -376,7 +376,7 @@ public class MangoContextListener implements ServletContextListener {
 			sb.append("* To find all objects that were automatically disabled, *\r\n");
 			sb.append("* search for Audit Events on the alarms page.           *\r\n");
 			sb.append("*********************************************************");
-			log.warn(sb.toString());
+			LOG.warn(sb.toString());
 			safe = true;
 		}
 
@@ -385,7 +385,7 @@ public class MangoContextListener implements ServletContextListener {
 				BackgroundContext.set("common.safeMode");
 			rtm.initialize(safe);
 		} catch (Exception e) {
-			log.error("RuntimeManager initialization failure", e);
+			LOG.error("RuntimeManager initialization failure", e);
 		} finally {
 			if (safe)
 				BackgroundContext.remove();
@@ -447,7 +447,7 @@ public class MangoContextListener implements ServletContextListener {
 			cfg.setTemplateLoader(new MultiTemplateLoader(loaders
 					.toArray(new TemplateLoader[loaders.size()])));
 		} catch (IOException e) {
-			log.error("Exception defining Freemarker template directories", e);
+			LOG.error("Exception defining Freemarker template directories", e);
 		}
 		cfg.setObjectWrapper(new DefaultObjectWrapper());
 		ctx.setAttribute(Common.ContextKeys.FREEMARKER_CONFIG, cfg);
@@ -464,7 +464,7 @@ public class MangoContextListener implements ServletContextListener {
 				ReportJob.scheduleReportJob(report);
 			} catch (ShouldNeverHappenException e) {
 				// Don't stop the startup if there is an error. Just log it.
-				log.error("Error starting report " + report.getName(), e);
+				LOG.error("Error starting report " + report.getName(), e);
 			}
 		}
 	}

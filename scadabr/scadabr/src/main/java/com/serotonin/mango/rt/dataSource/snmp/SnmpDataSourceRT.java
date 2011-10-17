@@ -23,10 +23,8 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.Target;
@@ -53,7 +51,7 @@ public class SnmpDataSourceRT extends PollingDataSource {
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int PDU_EXCEPTION_EVENT = 2;
 
-    private final Log log = LogFactory.getLog(SnmpDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(SnmpDataSourceRT.class);
 
     private final SnmpDataSourceVO vo;
     private final Version version;
@@ -127,7 +125,7 @@ public class SnmpDataSourceRT extends PollingDataSource {
         long responseTime = System.currentTimeMillis();
         response = snmp.get(request, target).getResponse();
         responseTime = System.currentTimeMillis() - responseTime;
-        log.debug("Snmp request/response time: " + responseTime);
+        LOG.debug("Snmp request/response time: " + responseTime);
 
         // Take a look at the response.
         LocalizableMessage message = validatePdu(response);
@@ -240,7 +238,7 @@ public class SnmpDataSourceRT extends PollingDataSource {
                     }
 
                     if (!found)
-                        log.warn("Trap not handled: " + vb);
+                        LOG.warn("Trap not handled: " + vb);
                 }
             }
         }
@@ -272,7 +270,7 @@ public class SnmpDataSourceRT extends PollingDataSource {
         catch (Exception e) {
             raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true,
                     DataSourceRT.getExceptionMessage(e));
-            log.debug("Error while initializing data source", e);
+            LOG.debug("Error while initializing data source", e);
             return;
         }
 

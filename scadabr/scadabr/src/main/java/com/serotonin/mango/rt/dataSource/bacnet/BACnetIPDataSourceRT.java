@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.bacnet4j.LocalDevice;
@@ -96,7 +96,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
     public static final int MESSAGE_EXCEPTION_EVENT = 2;
     public static final int DEVICE_EXCEPTION_EVENT = 3;
 
-    final Log log = LogFactory.getLog(BACnetIPDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(BACnetIPDataSourceRT.class);
     final BACnetIPDataSourceVO vo;
     private LocalDevice localDevice;
     private boolean initialized = false;
@@ -253,7 +253,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
             }
             catch (PropertyValueException e) {
                 // Shouldn't happen, so just log.
-                log.error("Couldn't manually get segmentation and vendor id from device", e);
+                LOG.error("Couldn't manually get segmentation and vendor id from device", e);
             }
         }
 
@@ -329,7 +329,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
             synchronized (pollsInProgress) {
                 if (pollsInProgress.contains(d)) {
                     // There is another poll still running for the device, so abort this one.
-                    log.warn(vo.getName() + ": poll of " + d + " at " + DateFunctions.getFullSecondTime(time)
+                    LOG.warn(vo.getName() + ": poll of " + d + " at " + DateFunctions.getFullSecondTime(time)
                             + " aborted because a previous poll is still running");
                     return;
                 }
@@ -587,7 +587,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
 
     @Override
     public void unimplementedVendorService(UnsignedInteger vendorId, UnsignedInteger serviceNumber, ByteQueue queue) {
-        log.warn("Received unimplemented vendor service: vendor id=" + vendorId + ", service number=" + serviceNumber
+        LOG.warn("Received unimplemented vendor service: vendor id=" + vendorId + ", service number=" + serviceNumber
                 + ", bytes (with context id)=" + queue);
     }
 
@@ -634,7 +634,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
 
     private void fireMessageExceptionEvent(Throwable t) {
         fireMessageExceptionEvent("common.default", t.getMessage());
-        log.info("", t);
+        LOG.info("", t);
     }
 
     private void fireMessageExceptionEvent(String key, Object... args) {
@@ -657,7 +657,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
                 return new BinaryValue(((Enumerated) encodable).intValue() != 0);
             if (encodable instanceof Real)
                 return new BinaryValue(((Real) encodable).floatValue() != 0);
-            log.warn("Unexpected Encodable type for data type Binary: " + encodable.getClass().getName());
+            LOG.warn("Unexpected Encodable type for data type Binary: " + encodable.getClass().getName());
             return BinaryValue.ZERO;
         }
         else if (MangoDataType == MangoDataType.MULTISTATE) {
@@ -667,7 +667,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
                 return new MultistateValue(((Enumerated) encodable).intValue());
             if (encodable instanceof Real)
                 return new MultistateValue((int) ((Real) encodable).floatValue());
-            log.warn("Unexpected Encodable type for data type Multistate: " + encodable.getClass().getName());
+            LOG.warn("Unexpected Encodable type for data type Multistate: " + encodable.getClass().getName());
             return new MultistateValue(1);
         }
         else if (MangoDataType == MangoDataType.NUMERIC) {
@@ -675,7 +675,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
                 return new NumericValue(((Enumerated) encodable).intValue());
             if (encodable instanceof Real)
                 return new NumericValue(((Real) encodable).floatValue());
-            log.warn("Unexpected Encodable type for data type Numeric: " + encodable.getClass().getName());
+            LOG.warn("Unexpected Encodable type for data type Numeric: " + encodable.getClass().getName());
             return new NumericValue(0);
         }
         else if (MangoDataType == MangoDataType.ALPHANUMERIC) {

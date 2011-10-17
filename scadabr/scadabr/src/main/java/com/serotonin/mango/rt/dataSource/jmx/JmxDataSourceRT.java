@@ -34,8 +34,8 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -52,7 +52,7 @@ public class JmxDataSourceRT extends PollingDataSource {
     public static final int POINT_READ_EXCEPTION_EVENT = 2;
     public static final int POINT_WRITE_EXCEPTION_EVENT = 3;
 
-    private final Log log = LogFactory.getLog(JmxDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(JmxDataSourceRT.class);
     private final JmxDataSourceVO vo;
 
     private JMXConnector connector;
@@ -105,7 +105,7 @@ public class JmxDataSourceRT extends PollingDataSource {
             if (loc.isComposite()) {
                 if (!(attr instanceof CompositeData)) {
                     // Should have already been checked, so just write a warning and continue.
-                    log.warn("CompositeData attribute was expected. Received " + attr);
+                    LOG.warn("CompositeData attribute was expected. Received " + attr);
                     continue;
                 }
 

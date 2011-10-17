@@ -31,8 +31,8 @@ import java.util.zip.ZipOutputStream;
 
 import javax.mail.internet.AddressException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.joda.time.DateTime;
 
 import com.serotonin.InvalidArgumentException;
@@ -62,7 +62,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
  * @author Matthew Lohbihler
  */
 public class ReportWorkItem implements WorkItem {
-    static final Log LOG = LogFactory.getLog(ReportWorkItem.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ReportWorkItem.class);
 
     public int getPriority() {
         return WorkItem.PRIORITY_LOW;
@@ -100,6 +100,7 @@ public class ReportWorkItem implements WorkItem {
     private ReportInstance reportInstance;
     List<File> filesToDelete = new ArrayList<File>();
 
+    @Override
     public void execute() {
         LOG.info("Running report with id " + reportConfig.getId() + ", instance id " + reportInstance.getId());
 
@@ -189,6 +190,7 @@ public class ReportWorkItem implements WorkItem {
             if (reportConfig.isIncludeData()) {
                 // See that the temp file(s) gets deleted after the email is sent.
                 Runnable deleteTempFile = new Runnable() {
+                    @Override
                     public void run() {
                         for (File file : filesToDelete) {
                             if (!file.delete())
@@ -204,7 +206,7 @@ public class ReportWorkItem implements WorkItem {
                 EmailWorkItem.queueEmail(toAddrs, lm.getLocalizedMessage(bundle), emailContent, postEmail);
             }
             catch (AddressException e) {
-                LOG.error(e);
+                LOG.error("send email", e);
             }
 
             // Delete the report instance.

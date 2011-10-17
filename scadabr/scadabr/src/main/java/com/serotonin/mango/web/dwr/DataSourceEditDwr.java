@@ -33,8 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.management.MBeanAttributeInfo;
@@ -55,8 +53,8 @@ import net.sf.openv4j.Devices;
 import net.sf.openv4j.Group;
 import net.sf.openv4j.Protocol;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jinterop.dcom.common.JISystem;
 
 import br.org.scadabr.OPCItem;
@@ -85,7 +83,6 @@ import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
-import com.serotonin.db.IntValuePair;
 import com.serotonin.io.StreamUtils;
 import com.serotonin.io.serial.SerialParameters;
 import com.serotonin.mango.Common;
@@ -226,7 +223,7 @@ import net.sf.fhz4j.fht.FhtProperty;
  * @author Matthew Lohbihler
  */
 public class DataSourceEditDwr extends DataSourceListDwr {
-	private static final Log LOG = LogFactory.getLog(DataSourceEditDwr.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DataSourceEditDwr.class);
 
 	//
 	//
@@ -1116,7 +1113,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
 	@MethodFilter
 	public DwrResponseI18n validateScript(String script,
-			List<IntValuePair> context, MangoDataType mangoDataType) {
+			Map<Integer, String> context, MangoDataType mangoDataType) {
 		DwrResponseI18n response = new DwrResponseI18n();
 
 		ScriptExecutor executor = new ScriptExecutor();
@@ -2189,8 +2186,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 	public ArrayList<String> searchOpcServer(String host, String domain,
 			String user, String password) {
 
-		Logger log = JISystem.getLogger();
-		log.setLevel(Level.OFF);
+		JISystem.getLogger().setLevel(java.util.logging.Level.OFF);
 
 		ArrayList<String> serverList = new ArrayList<String>();
 		try {
@@ -2206,8 +2202,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 	public ArrayList<OPCItem> listOPCTags(String host, String domain,
 			String user, String password, String serverName) {
 
-		Logger log = JISystem.getLogger();
-		log.setLevel(Level.OFF);
+		JISystem.getLogger().setLevel(java.util.logging.Level.OFF);
 
 		ArrayList<OPCItem> opcItems = new ArrayList<OPCItem>();
 
@@ -2224,8 +2219,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 	public OPCItem validateOPCTag(String tag, String user, String password,
 			String host, String domain, String servername) {
 
-		Logger log = JISystem.getLogger();
-		log.setLevel(Level.OFF);
+		JISystem.getLogger().setLevel(java.util.logging.Level.OFF);
 
 		OPCItem opcItem = new OPCItem(tag, 0, false);
 
