@@ -34,22 +34,23 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.derby.jdbc.EmbeddedXADataSource40;
 import org.apache.derby.tools.ij;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.CallableStatementCreator;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.spring.ConnectionCallbackVoid;
-import com.serotonin.db.spring.ExtendedJdbcTemplate;
-import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
+import org.springframework.jdbc.core.ConnectionCallback;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 public class DerbyAccess extends DatabaseAccess {
-    private final Log log = LogFactory.getLog(DerbyAccess.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DerbyAccess.class);
 
     private static final double LARGEST_POSITIVE = 1.79769E+308;
     private static final double SMALLEST_POSITIVE = 2.225E-307;
@@ -69,7 +70,7 @@ public class DerbyAccess extends DatabaseAccess {
 
     @Override
     protected void initializeImpl(String propertyPrefix) {
-        log.info("Initializing derby connection manager");
+        LOG.info("Initializing derby connection manager");
         dataSource = new EmbeddedXADataSource40();
         dataSource.setCreateDatabase("create");
 
@@ -90,7 +91,7 @@ public class DerbyAccess extends DatabaseAccess {
 
     @Override
     public void terminate() {
-        log.info("Stopping database");
+        LOG.info("Stopping database");
         dataSource.setDatabaseName("");
         dataSource.setShutdownDatabase("shutdown");
         Connection conn = null;
@@ -100,7 +101,7 @@ public class DerbyAccess extends DatabaseAccess {
         catch (CannotGetJdbcConnectionException e) {
             SQLException se = (SQLException) e.getCause();
             if ("XJ015".equals(se.getSQLState())) {
-                log.debug("Stopped database");
+                LOG.debug("Stopped database");
                 // A SQL code indicating that the system was successfully shut down. We can ignore this.
             }
             else
@@ -115,8 +116,8 @@ public class DerbyAccess extends DatabaseAccess {
     }
 
     @Override
-    protected boolean newDatabaseCheck(ExtendedJdbcTemplate ejt) {
-        int count = ejt.queryForInt("select count(1) from sys.systables where tablename='USERS'");
+    protected boolean newDatabaseCheck(JdbcTemplate jdbcTemplate) {
+        int count = jdbcTemplate.queryForInt("select count(1) from sys.systables where tablename='USERS'");
         if (count == 0) {
             // The users table wasn't found, so assume that this is a new Mango instance.
             // Create the tables
@@ -141,8 +142,8 @@ public class DerbyAccess extends DatabaseAccess {
     }
 
     @Override
-    protected void postInitialize(ExtendedJdbcTemplate ejt) {
-        updateIndentityStarts(ejt);
+    protected void postInitialize(JdbcTemplate jdbcTemplate) {
+        updateIndentityStarts(jdbcTemplate);
     }
 
     @Override
@@ -152,15 +153,18 @@ public class DerbyAccess extends DatabaseAccess {
             sb.append(line).append("\r\n");
         final InputStream in = new ByteArrayInputStream(sb.toString().getBytes("ASCII"));
 
-        Common.ctx.getDatabaseAccess().doInConnection(new ConnectionCallbackVoid() {
-            public void doInConnection(Connection conn) {
+        Common.ctx.getDatabaseAccess().doInConnection(new ConnectionCallback() {
+            @Override
+            public Object doInConnection(Connection conn) throws SQLException, DataAccessException {
                 try {
                     ij.runScript(conn, in, "ASCII", out, Common.UTF8);
                 }
                 catch (UnsupportedEncodingException e) {
                     throw new ShouldNeverHappenException(e);
                 }
+                return null;
             }
+
         });
     }
 
@@ -174,10 +178,10 @@ public class DerbyAccess extends DatabaseAccess {
      * autoincrement value or max(id)+1. This ensures that updates to tables that may have occurred are handled, and
      * prevents cases where inserts are attempted with identities that already exist.
      */
-    private void updateIndentityStarts(ExtendedJdbcTemplate ejt) {
-        List<IdentityStart> starts = ejt.query("select t.tablename, c.columnname, c.autoincrementvalue " + //
+    private void updateIndentityStarts(JdbcTemplate jdbcTemplate) {
+        List<IdentityStart> starts = jdbcTemplate.query("select t.tablename, c.columnname, c.autoincrementvalue " + //
                 "from sys.syscolumns c join sys.systables t on c.referenceid = t.tableid " + //
-                "where t.tabletype='T' and c.autoincrementvalue is not null", new GenericRowMapper<IdentityStart>() {
+                "where t.tabletype='T' and c.autoincrementvalue is not null", new ParameterizedRowMapper<IdentityStart>() {
             @Override
             public IdentityStart mapRow(ResultSet rs, int index) throws SQLException {
                 IdentityStart is = new IdentityStart();
@@ -189,9 +193,9 @@ public class DerbyAccess extends DatabaseAccess {
         });
 
         for (IdentityStart is : starts) {
-            int maxId = ejt.queryForInt("select max(" + is.column + ") from " + is.table);
+            int maxId = jdbcTemplate.queryForInt("select max(" + is.column + ") from " + is.table);
             if (is.aiValue <= maxId)
-                ejt.execute("alter table " + is.table + " alter column " + is.column + " restart with " + (maxId + 1));
+                jdbcTemplate.execute("alter table " + is.table + " alter column " + is.column + " restart with " + (maxId + 1));
         }
     }
 
@@ -222,7 +226,7 @@ public class DerbyAccess extends DatabaseAccess {
     }
 
     @Override
-    public void executeCompress(ExtendedJdbcTemplate ejt) {
+    public void executeCompress(JdbcTemplate ejt) {
         compressTable(ejt, "pointValues");
         compressTable(ejt, "pointValueAnnotations");
         compressTable(ejt, "events");
@@ -232,7 +236,7 @@ public class DerbyAccess extends DatabaseAccess {
         compressTable(ejt, "reportInstanceUserComments");
     }
 
-    private void compressTable(ExtendedJdbcTemplate ejt, final String tableName) {
+    private void compressTable(JdbcTemplate ejt, final String tableName) {
         ejt.call(new CallableStatementCreator() {
             @Override
             public CallableStatement createCallableStatement(Connection conn) throws SQLException {

@@ -18,8 +18,8 @@
  */
 package com.serotonin.mango.rt.event.detectors;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.text.TextRenderer;
@@ -39,7 +39,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
  * @author Matthew Lohbihler
  */
 public class AnalogLowLimitDetectorRT extends TimeDelayedEventDetectorRT {
-    private final Log log = LogFactory.getLog(AnalogLowLimitDetectorRT.class);
+    private final Logger log = LoggerFactory.getLogger(AnalogLowLimitDetectorRT.class);
 
     /**
      * State field. Whether the low limit is currently active or not. This field is used to prevent multiple events

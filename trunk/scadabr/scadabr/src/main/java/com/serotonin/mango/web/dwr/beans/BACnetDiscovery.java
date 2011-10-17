@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.Network;
@@ -46,7 +46,6 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.PropertyReferences;
 import com.serotonin.bacnet4j.util.PropertyValues;
-import com.serotonin.db.IntValuePair;
 import com.serotonin.mango.MangoDataType;
 import com.serotonin.util.queue.ByteQueue;
 import com.serotonin.web.i18n.I18NUtils;
@@ -55,13 +54,13 @@ import com.serotonin.web.i18n.I18NUtils;
  * @author Matthew Lohbihler
  */
 public class BACnetDiscovery extends DefaultDeviceEventListener implements TestingUtility, ExceptionListener {
-    private static final Log LOG = LogFactory.getLog(BACnetDiscovery.class);
+    private final static Logger LOG = LoggerFactory.getLogger(BACnetDiscovery.class);
 
     final ResourceBundle bundle;
     private int removeDeviceIndex = 1;
     private final LocalDevice localDevice;
     private final AutoShutOff autoShutOff;
-    private final List<IntValuePair> iamsReceived = new ArrayList<IntValuePair>();
+    private final Map<Integer, String> iamsReceived = new HashMap<Integer, String> ();
     String message;
     private boolean finished;
 
@@ -151,6 +150,7 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
         }
     }
 
+    @Override
     public void cancel() {
         message = I18NUtils.getMessage(bundle, "dsEdit.bacnetIp.tester.cancelled");
         cleanup();
@@ -165,11 +165,13 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
         }
     }
 
+    @Override
     public void receivedException(Exception e) {
         message = e.getMessage();
         // cleanup();
     }
 
+    @Override
     public void receivedThrowable(Throwable t) {
         message = t.getMessage();
         // cleanup();
@@ -189,7 +191,7 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
             index = removeDeviceIndex++;
         }
         d.setUserData(index);
-        iamsReceived.add(new IntValuePair(index, getDeviceDescription(d)));
+        iamsReceived.put(index, getDeviceDescription(d));
     }
 
     public static String getDeviceDescription(RemoteDevice d) {

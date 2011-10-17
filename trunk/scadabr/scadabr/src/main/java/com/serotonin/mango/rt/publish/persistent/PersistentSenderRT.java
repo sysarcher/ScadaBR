@@ -2,8 +2,8 @@ package com.serotonin.mango.rt.publish.persistent;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -22,7 +22,7 @@ import com.serotonin.util.queue.ByteQueue;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 public class PersistentSenderRT extends PublisherRT<PersistentPointVO> {
-    static final Log LOG = LogFactory.getLog(PersistentSenderRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(PersistentSenderRT.class);
 
     public static final int CONNECTION_FAILED_EVENT = 11;
     public static final int PROTOCOL_FAILURE_EVENT = 12;

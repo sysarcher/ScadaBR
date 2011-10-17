@@ -21,12 +21,14 @@ package com.serotonin.mango.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.serotonin.db.IntValuePair;
 import com.serotonin.util.ArrayUtils;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Matthew Lohbihler
  */
+@Deprecated
 public class ExportCodes {
     private final List<Element> elements = new ArrayList<Element>();
 
@@ -94,11 +96,11 @@ public class ExportCodes {
         return elements.get(index).id;
     }
 
-    public List<IntValuePair> getIdKeys(int... excludeIds) {
-        List<IntValuePair> result = new ArrayList<IntValuePair>(elements.size());
+    public Map<Integer, String> getIdKeys(int... excludeIds) {
+        Map<Integer, String> result = new HashMap<Integer, String>(elements.size());
         for (Element e : elements) {
             if (!ArrayUtils.contains(excludeIds, e.id))
-                result.add(new IntValuePair(e.id, e.key));
+                result.put(e.id, e.key);
         }
         return result;
     }

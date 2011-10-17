@@ -1,11 +1,9 @@
 package br.org.scadabr.rt.dataSource.opc;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jinterop.dcom.common.JISystem;
 
 import br.org.scadabr.OPCMaster;
@@ -23,7 +21,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
 
 public class OPCDataSource extends PollingDataSource {
 
-	private final Log LOG = LogFactory.getLog(OPCDataSource.class);
+    private final static Logger LOG = LoggerFactory.getLogger(OPCDataSource.class);
 	public static final int POINT_READ_EXCEPTION_EVENT = 1;
 	public static final int DATA_SOURCE_EXCEPTION_EVENT = 2;
 	public static final int POINT_WRITE_EXCEPTION_EVENT = 3;
@@ -36,8 +34,7 @@ public class OPCDataSource extends PollingDataSource {
 		setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(),
 				vo.isQuantize());
 
-		Logger log = JISystem.getLogger();
-		log.setLevel(Level.OFF);
+		JISystem.getLogger().setLevel(java.util.logging.Level.OFF);
 
 	}
 

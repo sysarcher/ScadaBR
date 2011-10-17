@@ -1,32 +1,35 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.db.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
-import com.serotonin.db.spring.ExtendedJdbcTemplate;
-import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -37,6 +40,7 @@ import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
  * @author Matthew Lohbihler
  */
 public class CompoundEventDetectorDao extends BaseDao {
+
     private static final String COMPOUND_EVENT_DETECTOR_SELECT = "select id, xid, name, alarmLevel, returnToNormal, disabled, conditionText from compoundEventDetectors ";
 
     public String generateUniqueXid() {
@@ -48,20 +52,20 @@ public class CompoundEventDetectorDao extends BaseDao {
     }
 
     public List<CompoundEventDetectorVO> getCompoundEventDetectors() {
-        return query(COMPOUND_EVENT_DETECTOR_SELECT + "order by name", new CompoundEventDetectorRowMapper());
+        return getSimpleJdbcTemplate().query(COMPOUND_EVENT_DETECTOR_SELECT + "order by name", new CompoundEventDetectorRowMapper());
     }
 
     public CompoundEventDetectorVO getCompoundEventDetector(int id) {
-        return queryForObject(COMPOUND_EVENT_DETECTOR_SELECT + "where id=?", new Object[] { id },
-                new CompoundEventDetectorRowMapper());
+        return getSimpleJdbcTemplate().queryForObject(COMPOUND_EVENT_DETECTOR_SELECT + "where id=?", new CompoundEventDetectorRowMapper(), id);
     }
 
     public CompoundEventDetectorVO getCompoundEventDetector(String xid) {
-        return queryForObject(COMPOUND_EVENT_DETECTOR_SELECT + "where xid=?", new Object[] { xid },
-                new CompoundEventDetectorRowMapper(), null);
+        return getSimpleJdbcTemplate().queryForObject(COMPOUND_EVENT_DETECTOR_SELECT + "where xid=?", new CompoundEventDetectorRowMapper(), xid);
     }
 
-    class CompoundEventDetectorRowMapper implements GenericRowMapper<CompoundEventDetectorVO> {
+    class CompoundEventDetectorRowMapper implements ParameterizedRowMapper<CompoundEventDetectorVO> {
+
+        @Override
         public CompoundEventDetectorVO mapRow(ResultSet rs, int rowNum) throws SQLException {
             CompoundEventDetectorVO ced = new CompoundEventDetectorVO();
             int i = 0;
@@ -77,47 +81,51 @@ public class CompoundEventDetectorDao extends BaseDao {
     }
 
     public void saveCompoundEventDetector(final CompoundEventDetectorVO ced) {
-        if (ced.getId() == Common.NEW_ID)
+        if (ced.getId() == Common.NEW_ID) {
             insertCompoundEventDetector(ced);
-        else
+        } else {
             updateCompoundEventDetector(ced);
+        }
     }
-
-    private static final String COMPOUND_EVENT_DETECTOR_INSERT = "insert into compoundEventDetectors (xid, name, alarmLevel, returnToNormal, disabled, conditionText) "
-            + "values (?,?,?,?,?,?)";
 
     private void insertCompoundEventDetector(CompoundEventDetectorVO ced) {
-        int id = doInsert(COMPOUND_EVENT_DETECTOR_INSERT, new Object[] { ced.getXid(), ced.getName(),
-                ced.getAlarmLevel().mangoId, boolToChar(ced.isReturnToNormal()), boolToChar(ced.isDisabled()),
-                ced.getCondition() });
-        ced.setId(id);
+        SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("compoundEventDetectors").usingGeneratedKeyColumns("id");
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("xid", ced.getXid());
+        params.put("name", ced.getName());
+        params.put("alarmLevel", ced.getAlarmLevel().mangoId);
+        params.put("returnToNormal", boolToChar(ced.isReturnToNormal()));
+        params.put("disabled", boolToChar(ced.isDisabled()));
+        params.put("conditionText", ced.getCondition());
+
+        Number id = insertActor.executeAndReturnKey(params);
+        ced.setId(id.intValue());
+
         AuditEventType.raiseAddedEvent(AuditEventType.TYPE_COMPOUND_EVENT_DETECTOR, ced);
     }
-
     private static final String COMPOUND_EVENT_DETECTOR_UPDATE = "update compoundEventDetectors set xid=?, name=?, alarmLevel=?, returnToNormal=?, disabled=?, conditionText=? "
             + "where id=?";
 
     private void updateCompoundEventDetector(CompoundEventDetectorVO ced) {
         CompoundEventDetectorVO old = getCompoundEventDetector(ced.getId());
 
-        ejt.update(COMPOUND_EVENT_DETECTOR_UPDATE, new Object[] { ced.getXid(), ced.getName(), ced.getAlarmLevel().mangoId,
-                boolToChar(ced.isReturnToNormal()), boolToChar(ced.isDisabled()), ced.getCondition(), ced.getId() });
+        getSimpleJdbcTemplate().update(COMPOUND_EVENT_DETECTOR_UPDATE, ced.getXid(), ced.getName(), ced.getAlarmLevel().mangoId,
+                boolToChar(ced.isReturnToNormal()), boolToChar(ced.isDisabled()), ced.getCondition(), ced.getId());
 
         AuditEventType.raiseChangedEvent(AuditEventType.TYPE_COMPOUND_EVENT_DETECTOR, old, ced);
 
     }
 
     public void deleteCompoundEventDetector(final int compoundEventDetectorId) {
-        final ExtendedJdbcTemplate ejt2 = ejt;
         CompoundEventDetectorVO ced = getCompoundEventDetector(compoundEventDetectorId);
         if (ced != null) {
-            getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
+            new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
+
                 @Override
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    ejt2.update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.COMPOUND
-                            + " and eventTypeRef1=?", new Object[] { compoundEventDetectorId });
-                    ejt2.update("delete from compoundEventDetectors where id=?",
-                            new Object[] { compoundEventDetectorId });
+                    getSimpleJdbcTemplate().update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.COMPOUND
+                            + " and eventTypeRef1=?", compoundEventDetectorId);
+                    getSimpleJdbcTemplate().update("delete from compoundEventDetectors where id=?", compoundEventDetectorId);
                 }
             });
 

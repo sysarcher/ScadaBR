@@ -25,8 +25,8 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
@@ -44,7 +44,7 @@ import com.serotonin.mango.vo.publish.pachube.PachubeSenderVO;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 public class PachubeSenderRT extends PublisherRT<PachubePointVO> {
-    static final Log LOG = LogFactory.getLog(PachubeSenderRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(PachubeSenderRT.class);
     private static final int MAX_FAILURES = 5;
 
     public static final int SEND_EXCEPTION_EVENT = 11;

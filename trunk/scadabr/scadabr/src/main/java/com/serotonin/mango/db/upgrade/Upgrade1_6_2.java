@@ -22,8 +22,8 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.db.DatabaseAccess;
 
@@ -31,13 +31,13 @@ import com.serotonin.mango.db.DatabaseAccess;
  * @author Matthew Lohbihler
  */
 public class Upgrade1_6_2 extends DBUpgrade {
-    private final Log log = LogFactory.getLog(getClass());
+    private final static Logger LOG = LoggerFactory.getLogger(Upgrade1_6_2.class);
 
     @Override
     public void upgrade() throws Exception {
         OutputStream out = createUpdateLogOutputStream("1_6_2");
 
-        log.info("Running script 1");
+        LOG.info("Running script 1");
         runScript(script1, out);
 
         Map<String, String[]> script2 = new HashMap<String, String[]>();

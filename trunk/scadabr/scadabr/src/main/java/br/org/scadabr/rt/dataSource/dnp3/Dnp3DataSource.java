@@ -5,8 +5,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.org.scadabr.dnp34j.master.session.database.DataElement;
 import br.org.scadabr.vo.dataSource.dnp3.Dnp3DataSourceVO;
@@ -23,7 +23,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
 
 public class Dnp3DataSource extends PollingDataSource {
 
-	private final Log LOG = LogFactory.getLog(Dnp3DataSource.class);
+    private final static Logger LOG = LoggerFactory.getLogger(Dnp3DataSource.class);
 
 	public static final int POINT_READ_EXCEPTION_EVENT = 1;
 	public static final int DATA_SOURCE_EXCEPTION_EVENT = 2;

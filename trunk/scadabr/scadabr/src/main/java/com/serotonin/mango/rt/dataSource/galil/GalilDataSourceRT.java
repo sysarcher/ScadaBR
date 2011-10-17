@@ -23,8 +23,8 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -44,7 +44,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
 public class GalilDataSourceRT extends PollingDataSource implements MessagingExceptionHandler {
     public static final Charset CHARSET = Charset.forName("US-ASCII");
 
-    private final Log LOG = LogFactory.getLog(GalilDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(GalilDataSourceRT.class);
 
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int POINT_READ_EXCEPTION_EVENT = 2;

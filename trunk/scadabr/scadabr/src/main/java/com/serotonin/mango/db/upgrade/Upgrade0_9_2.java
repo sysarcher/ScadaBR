@@ -20,8 +20,8 @@ package com.serotonin.mango.db.upgrade;
 
 import java.io.OutputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.PointValueDao;
@@ -31,14 +31,14 @@ import com.serotonin.mango.vo.DataPointVO;
  * @author Matthew Lohbihler
  */
 public class Upgrade0_9_2 extends DBUpgrade {
-    private final Log log = LogFactory.getLog(getClass());
+    private final static Logger LOG = LoggerFactory.getLogger(Upgrade0_9_2.class);
 
     @Override
     public void upgrade() throws Exception {
         OutputStream out = createUpdateLogOutputStream("0_9_2");
 
         // Run the script.
-        log.info("Running script");
+        LOG.info("Running script");
         runScript(script, out);
 
         out.flush();

@@ -31,8 +31,8 @@ import net.sf.mbus4j.master.MBusMaster;
 import net.sf.mbus4j.master.ValueRequest;
 import net.sf.mbus4j.master.ValueRequestPointLocator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -46,7 +46,7 @@ import net.sf.mbus4j.dataframes.datablocks.BcdValue;
  */
 public class MBusDataSourceRT extends PollingDataSource {
 
-    private final static Log LOG = LogFactory.getLog(MBusDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MBusDataSourceRT.class);
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int POINT_READ_EXCEPTION_EVENT = 2;
     public static final int POINT_WRITE_EXCEPTION_EVENT = 3;
@@ -61,13 +61,13 @@ public class MBusDataSourceRT extends PollingDataSource {
 
     @Override
     public void initialize() {
-        LOG.fatal("INITIALIZE MBusaDataSourceRT" + Thread.getAllStackTraces().get(Thread.currentThread()));
+        LOG.error("INITIALIZE MBusaDataSourceRT" + Thread.getAllStackTraces().get(Thread.currentThread()));
         super.initialize();
     }
 
     @Override
     public void terminate() {
-        LOG.fatal("TERMINATE MBusaDataSourceRT" + Thread.getAllStackTraces().get(Thread.currentThread()));
+        LOG.error("TERMINATE MBusaDataSourceRT" + Thread.getAllStackTraces().get(Thread.currentThread()));
         super.terminate();
     }
 
@@ -103,7 +103,7 @@ public class MBusDataSourceRT extends PollingDataSource {
 
                         } else if ((vr.getDb() instanceof BcdValue) && ((BcdValue) vr.getDb()).isBcdError()) {
                             pointError = true;
-                            LOG.fatal("BCD Error : " + ((BcdValue) vr.getDb()).getBcdError());
+                            LOG.error("BCD Error : " + ((BcdValue) vr.getDb()).getBcdError());
                             raiseEvent(POINT_READ_EXCEPTION_EVENT, time, true,
                                     new LocalizableMessage("event.exception2", vo.getName(),
                                     String.format("BCD error %s value: ", vr.getReference().getVO().getName()), ((BcdValue) vr.getDb()).getBcdError()));
@@ -126,14 +126,14 @@ public class MBusDataSourceRT extends PollingDataSource {
                             vr.getReference().updatePointValue(
                                     new PointValueTime(((StringDataBlock) vr.getDb()).getValue(), time));
                         } else {
-                            LOG.fatal("Dont know how to save: " + vr.getReference().getVO().getName());
+                            LOG.error("Dont know how to save: " + vr.getReference().getVO().getName());
                             raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true,
                                     new LocalizableMessage("event.exception2", vo.getName(),
                                     "Dont know how to save: ", vr.getReference().getVO().getName()));
 
                         }
                     } catch (Exception ex) {
-                        LOG.fatal("Error during saving: " + vo.getName(), ex);
+                        LOG.error("Error during saving: " + vo.getName(), ex);
                         raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true,
                                 new LocalizableMessage("event.exception2", vo.getName(),
                                 "Dont know how to save : ", ex));
@@ -173,7 +173,7 @@ public class MBusDataSourceRT extends PollingDataSource {
             master.open();
             return true;
         } catch (Exception ex) {
-            LOG.fatal("MBus Open serial port exception", ex);
+            LOG.error("MBus Open serial port exception", ex);
             master.setConnection(null);
             raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
                     "event.exception2", vo.getName(), ex.getMessage(), "openConnection() Failed"));
@@ -185,11 +185,11 @@ public class MBusDataSourceRT extends PollingDataSource {
         try {
             master.close();
         } catch (IOException ex) {
-            LOG.fatal("Close port", ex);
+            LOG.error("Close port", ex);
             raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
                     "event.exception2", vo.getName(), ex.getMessage(), "closeConnection() Failed"));
         } catch (InterruptedException ex) {
-            LOG.fatal("Close port", ex);
+            LOG.error("Close port", ex);
             raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
                     "event.exception2", vo.getName(), ex.getMessage(), "closeConnection() Failed"));
         } finally {

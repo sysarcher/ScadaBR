@@ -29,8 +29,8 @@ import net.sf.openv4j.protocolhandlers.ProtocolHandler;
 import net.sf.openv4j.protocolhandlers.SegmentedDataContainer;
 import net.sf.openv4j.protocolhandlers.SimpleDataContainer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.MangoDataType;
@@ -47,7 +47,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
  */
 public class OpenV4JDataSourceRT extends PollingDataSource {
 
-    private final static Log LOG = LogFactory.getLog(OpenV4JDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(OpenV4JDataSourceRT.class);
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int POINT_READ_EXCEPTION_EVENT = 2;
     public static final int POINT_WRITE_EXCEPTION_EVENT = 3;
@@ -131,7 +131,7 @@ public class OpenV4JDataSourceRT extends PollingDataSource {
 
                     }
                     catch (Exception ex) {
-                        LOG.fatal("Error during saving: " + locator.getDataPoint(), ex);
+                        LOG.error("Error during saving: " + locator.getDataPoint(), ex);
                     }
 
                 }
@@ -189,7 +189,7 @@ public class OpenV4JDataSourceRT extends PollingDataSource {
             return true;
         }
         catch (Exception ex) {
-            LOG.fatal("OpenV4J Open serial port exception", ex);
+            LOG.error("OpenV4J Open serial port exception", ex);
             // Raise an event.
             raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true,
                     getSerialExceptionMessage(ex, vo.getCommPortId()));
@@ -202,7 +202,7 @@ public class OpenV4JDataSourceRT extends PollingDataSource {
             protocolHandler.close();
         }
         catch (InterruptedException ex) {
-            LOG.fatal("Close port", ex);
+            LOG.error("Close port", ex);
             raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
                     "event.exception2", vo.getName(), ex.getMessage(), "HALLO3"));
         }

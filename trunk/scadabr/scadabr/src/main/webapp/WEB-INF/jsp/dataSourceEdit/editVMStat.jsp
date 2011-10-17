@@ -17,7 +17,7 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 --%>
 <%@page import="com.serotonin.mango.vo.dataSource.vmstat.VMStatAttributes"%>
-<%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
+<%@include file="/WEB-INF/jsp/include/tech.jsp" %>
 
 <%@page import="com.serotonin.mango.vo.dataSource.vmstat.VMStatDataSourceVO"%>
 <%@page import="com.serotonin.mango.vo.dataSource.vmstat.VMStatPointLocatorVO"%>
@@ -64,7 +64,7 @@
 
     <c:set var="dsDesc"><fmt:message key="dsEdit.vmstat.desc"/></c:set>
     <c:set var="dsHelpId" value="vmstatDS"/>
-    <%@ include file="/WEB-INF/jsp/dataSourceEdit/dsHead.jspf" %>
+    <%@include file="/WEB-INF/jsp/dataSourceEdit/dsHead.jspf" %>
     <tr>
         <td class="formLabelRequired"><fmt:message key="dsEdit.vmstat.pollSeconds"/></td>
         <td class="formField"><input id="pollSeconds" type="text" value="${dataSource.pollSeconds}"/></td>
@@ -73,7 +73,7 @@
         <td class="formLabelRequired"><fmt:message key="dsEdit.vmstat.outputScale"/></td>
         <td class="formField">
             <sst:select id="outputScale" value="${dataSource.outputScale}">
-                <tag:exportCodesOptions sst="true" optionList="<%= VMStatDataSourceVO.OUTPUT_SCALE_CODES.getIdKeys()%>"/>
+                <tag:exportCodesOptions sst="true" optionMap="<%= VMStatDataSourceVO.OUTPUT_SCALE_CODES.getIdKeys()%>"/>
             </sst:select>
         </td>
     </tr>

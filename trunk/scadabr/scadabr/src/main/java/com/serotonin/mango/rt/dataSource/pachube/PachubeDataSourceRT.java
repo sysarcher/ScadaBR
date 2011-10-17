@@ -36,8 +36,8 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.json.JsonArray;
@@ -66,7 +66,7 @@ public class PachubeDataSourceRT extends PollingDataSource {
 
     public static final String HEADER_API_KEY = "X-PachubeApiKey";
 
-    final Log log = LogFactory.getLog(PachubeDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(PachubeDataSourceRT.class);
     final PachubeDataSourceVO vo;
     private final HttpClient httpClient;
     final SimpleDateFormat sdf;

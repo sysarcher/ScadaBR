@@ -18,9 +18,6 @@
  */
 package com.serotonin.mango.rt.dataSource.virtual;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -28,8 +25,11 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.vo.dataSource.virtual.AnalogAttractorChangeVO;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class AnalogAttractorChangeRT extends ChangeTypeRT {
-    private static Log log = LogFactory.getLog(AnalogAttractorChangeRT.class);
+    private static Logger log = LoggerFactory.getLogger(AnalogAttractorChangeRT.class);
 
     private final AnalogAttractorChangeVO vo;
 

@@ -4,12 +4,6 @@
  */
 package com.serotonin.mango.vo.dataSource.fhz4j;
 
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.web.i18n.LocalizableMessage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -19,8 +13,16 @@ import net.sf.fhz4j.Fhz1000;
 import net.sf.fhz4j.FhzProtocol;
 import net.sf.fhz4j.fht.FhtDeviceTypes;
 import net.sf.fhz4j.fht.FhtTempPropery;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.serotonin.json.JsonObject;
+import com.serotonin.json.JsonReader;
+import com.serotonin.json.JsonRemoteEntity;
+import com.serotonin.json.JsonRemoteProperty;
+import com.serotonin.mango.rt.event.type.AuditEventType;
+import com.serotonin.web.i18n.LocalizableMessage;
 
 /**
  *

@@ -18,8 +18,8 @@
  */
 package com.serotonin.mango.rt.event.handlers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
@@ -37,7 +37,7 @@ import com.serotonin.util.StringUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource {
-    private static final Log LOG = LogFactory.getLog(SetPointHandlerRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(SetPointHandlerRT.class);
 
     public SetPointHandlerRT(EventHandlerVO vo) {
         this.vo = vo;

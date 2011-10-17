@@ -11,8 +11,8 @@ import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.org.scadabr.vo.dataSource.asciiSerial.ASCIISerialDataSourceVO;
 import br.org.scadabr.vo.dataSource.asciiSerial.ASCIISerialPointLocatorVO;
@@ -26,7 +26,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
 
 public class ASCIISerialDataSource extends PollingDataSource {
 
-	private final Log LOG = LogFactory.getLog(ASCIISerialDataSource.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ASCIISerialDataSource.class);
 	public static final int POINT_READ_EXCEPTION_EVENT = 1;
 	public static final int DATA_SOURCE_EXCEPTION_EVENT = 2;
 	private final ASCIISerialDataSourceVO<?> vo;

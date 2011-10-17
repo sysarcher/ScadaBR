@@ -12,6 +12,9 @@
     <properties>
         <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        
+        <org.springframework.version>3.0.6.RELEASE</org.springframework.version>
+        
         <db.type>derby</db.type>
         <db.url></db.url>
         <db.username></db.username>
@@ -43,20 +46,39 @@
 
         <dependency>
             <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>1.6.2</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.6.2</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>log4j</artifactId>
-                    <groupId>log4j</groupId>
-                </exclusion>
-            </exclusions>
+            <scope>runtime</scope>
         </dependency>
-
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>com.atlassian.crowd</groupId>
             <artifactId>crowd-integration-client</artifactId>
             <version>2.3.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+
         </dependency>
         <dependency>
             <groupId>br.org.scadabr.protocol</groupId>
@@ -138,11 +160,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.directwebremoting</groupId>
             <artifactId>dwr</artifactId>
             <version>2.0.7</version>
@@ -163,18 +180,135 @@
             <version>2.1</version>
             <scope>provided</scope>
         </dependency>
+ <!--
+    Core utilities used by other modules.
+    Define this if you use Spring Utility APIs (org.springframework.core.*/org.springframework.util.*)
+-->
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring</artifactId>
-            <version>2.5.6</version>
-            <scope>compile</scope>
+            <artifactId>spring-core</artifactId>
+            <version>${org.springframework.version}</version>
         </dependency>
+ 
+<!--
+    Expression Language (depends on spring-core)
+    Define this if you use Spring Expression APIs (org.springframework.expression.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-expression</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Bean Factory and JavaBeans utilities (depends on spring-core)
+    Define this if you use Spring Bean APIs (org.springframework.beans.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Aspect Oriented Programming (AOP) Framework (depends on spring-core, spring-beans)
+    Define this if you use Spring AOP APIs (org.springframework.aop.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Application Context (depends on spring-core, spring-expression, spring-aop, spring-beans)
+    This is the central artifact for Spring's Dependency Injection Container and is generally always defined
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${org.springframework.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+ 
+<!--
+    Various Application Context utilities, including EhCache, JavaMail, Quartz, and Freemarker integration
+    Define this if you need any of these integrations
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Transaction Management Abstraction (depends on spring-core, spring-beans, spring-aop, spring-context)
+    Define this if you use Spring Transactions or DAO Exception Hierarchy
+    (org.springframework.transaction.*/org.springframework.dao.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    JDBC Data Access Library (depends on spring-core, spring-beans, spring-context, spring-tx)
+    Define this if you use Spring's JdbcTemplate API (org.springframework.jdbc.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Web application development utilities applicable to both Servlet and Portlet Environments
+    (depends on spring-core, spring-beans, spring-context)
+    Define this if you use Spring MVC, or wish to use Struts, JSF, or another web framework with Spring (org.springframework.web.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Spring MVC for Servlet Environments (depends on spring-core, spring-beans, spring-context, spring-web)
+    Define this if you use Spring MVC with a Servlet Container such as Apache Tomcat (org.springframework.web.servlet.*)
+-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>2.5.6</version>
-            <scope>compile</scope>
+            <version>${org.springframework.version}</version>
         </dependency>
+ 
+<!--
+    Spring MVC for Portlet Environments (depends on spring-core, spring-beans, spring-context, spring-web)
+    Define this if you use Spring MVC with a Portlet Container (org.springframework.web.portlet.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc-portlet</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Support for testing Spring applications with tools such as JUnit and TestNG
+    This artifact is generally always defined with a 'test' scope for the integration testing framework and unit testing stubs
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${org.springframework.version}</version>
+            <scope>test</scope>
+        </dependency>
+        
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
@@ -196,13 +330,13 @@
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
-            <version>10.6.1.0</version>
+            <version>10.8.1.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derbytools</artifactId>
-            <version>10.6.1.0</version>
+            <version>10.8.1.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -210,6 +344,12 @@
             <artifactId>axis</artifactId>
             <version>1.2.1</version>
             <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
@@ -228,6 +368,12 @@
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
             <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>jfree</groupId>
@@ -333,7 +479,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.13</version>
+            <version>5.1.18</version>
         </dependency>
         <dependency>
             <groupId>br.org.scadabr</groupId>
@@ -343,7 +489,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.9</version>
+            <version>4.10</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

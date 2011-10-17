@@ -26,8 +26,8 @@ import net.sf.mbus4j.dataframes.MBusResponseFramesContainer;
 import net.sf.mbus4j.master.MBusMaster;
 import net.sf.mbus4j.master.MasterEventListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.web.i18n.I18NUtils;
 import net.sf.mbus4j.Connection;
@@ -85,7 +85,7 @@ public class MBusDiscovery implements MasterEventListener, TestingUtility {
             }
         }
     }
-    static final Log LOG = LogFactory.getLog(MBusDiscovery.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MBusDiscovery.class);
     final ResourceBundle bundle;
     final MBusMaster master;
     private final AutoShutOff autoShutOff;

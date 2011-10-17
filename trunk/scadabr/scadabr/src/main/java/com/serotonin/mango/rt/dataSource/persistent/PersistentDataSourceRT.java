@@ -12,12 +12,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.serotonin.db.IntValuePair;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -49,7 +47,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
 public class PersistentDataSourceRT extends EventDataSource implements Runnable {
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
 
-    final Log log = LogFactory.getLog(PersistentDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(PersistentDataSourceRT.class);
     final PersistentDataSourceVO vo;
     volatile ServerSocket serverSocket;
     final Map<String, DataPointRT> pointXids = new ConcurrentHashMap<String, DataPointRT>();
@@ -160,12 +158,13 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
         pointXids.remove(dataPoint.getVO().getXid());
     }
 
+    @Override
     public void run() {
         try {
             while (serverSocket != null) {
                 try {
                     Socket socket = serverSocket.accept();
-                    log.info("Received socket from " + socket.getRemoteSocketAddress());
+                    LOG.info("Received socket from " + socket.getRemoteSocketAddress());
                     ConnectionHandler ch = new ConnectionHandler(socket);
                     connectionHandlers.add(ch);
                     Common.timer.execute(ch);
@@ -208,22 +207,23 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
             return packetsReceived;
         }
 
+        @Override
         public void run() {
             try {
                 runImpl();
             }
             catch (IOException e) {
-                log.warn("Connection handler exception", e);
+                LOG.warn("Connection handler exception", e);
             }
             catch (PersistentProtocolException e) {
                 try {
                     Packet.pushString(writeBuffer, e.getMessage());
                     Packet.writePacket(out, version, PacketType.ABORT, writeBuffer);
-                    log.warn("Connection handler exception", e);
+                    LOG.warn("Connection handler exception", e);
                     sleepImpl();
                 }
                 catch (IOException e1) {
-                    log.warn("Connection handler exception", e1);
+                    LOG.warn("Connection handler exception", e1);
                 }
             }
             catch (DoAbortException e) {
@@ -233,11 +233,11 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
                     sleepImpl();
                 }
                 catch (IOException e1) {
-                    log.warn("Connection handler exception", e1);
+                    LOG.warn("Connection handler exception", e1);
                 }
             }
             catch (PersistentAbortException e) {
-                log.warn("Connection handler exception", e);
+                LOG.warn("Connection handler exception", e);
             }
             finally {
                 connectionHandlers.remove(this);
@@ -245,7 +245,7 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
                     socket.close();
                 }
                 catch (IOException e) {
-                    log.warn("Connection handler exception", e);
+                    LOG.warn("Connection handler exception", e);
                 }
             }
         }
@@ -354,7 +354,7 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
                             sb.append(previousPackets[index].receivedTime).append(']');
                         }
                     }
-                    log.error("Payload read timeout: type=" + e.getType().name() + ", len=" + e.getLength()
+                    LOG.error("Payload read timeout: type=" + e.getType().name() + ", len=" + e.getLength()
                             + ", payload=[" + ArrayUtils.toHexString(e.getPayload()) + "], previous=" + sb);
                     continue;
                 }
@@ -451,7 +451,7 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
                 return (DataPointVO) SerializationHelper.readObjectFromArray(serializedData);
             }
             catch (Exception e) {
-                log.error("Point deserialization error", e);
+                LOG.error("Point deserialization error", e);
                 throw new DoAbortException(new LocalizableMessage("event.persistent.pointDeserialization",
                         e.getMessage()));
             }
@@ -558,7 +558,7 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
 
                 if (oldFolder != newFolder) {
                     oldFolder.removeDataPoint(dpvo.getId());
-                    newFolder.addDataPoint(new IntValuePair(dpvo.getId(), dpvo.getName()));
+                    newFolder.addDataPoint(dpvo.getId(), dpvo.getName());
 
                     // Save the hierarchy
                     dataPointDao.savePointHierarchy(pointHierarchy.getRoot());
@@ -571,7 +571,7 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
                 return pointXids.get(indexedXids.get(index));
             }
             catch (IndexOutOfBoundsException e) {
-                log.error("Received invalid point index: " + index);
+                LOG.error("Received invalid point index: " + index);
                 return null;
             }
         }

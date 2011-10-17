@@ -20,8 +20,8 @@ package com.serotonin.mango.web.dwr.util;
 
 import java.lang.reflect.Method;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.directwebremoting.AjaxFilter;
 import org.directwebremoting.AjaxFilterChain;
 
@@ -31,7 +31,7 @@ import com.serotonin.mango.vo.permission.Permissions;
  * @author Matthew Lohbihler
  */
 public class LoggedInAjaxFilter implements AjaxFilter {
-    private static final Log LOG = LogFactory.getLog(LoggedInAjaxFilter.class);
+    private final static Logger LOG = LoggerFactory.getLogger(LoggedInAjaxFilter.class);
 
     @Override
     public Object doFilter(Object obj, Method method, Object[] params, AjaxFilterChain chain) throws Exception {

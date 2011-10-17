@@ -23,8 +23,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import com.serotonin.mango.Common;
@@ -59,14 +59,14 @@ import com.serotonin.util.SerializationHelper;
  */
 @SuppressWarnings("deprecation")
 public class Upgrade1_5_0 extends DBUpgrade {
-    private final Log log = LogFactory.getLog(getClass());
+        private final static Logger LOG = LoggerFactory.getLogger(Upgrade1_5_0.class);
 
     @Override
     public void upgrade() throws Exception {
         OutputStream out = createUpdateLogOutputStream("1_5_0");
 
         // Run the script.
-        log.info("Running script 1");
+        LOG.info("Running script 1");
         runScript(script1, out);
 
         xid();
@@ -74,7 +74,7 @@ public class Upgrade1_5_0 extends DBUpgrade {
         eventData();
 
         // Run the script.
-        log.info("Running script 2");
+        LOG.info("Running script 2");
         runScript(script2, out);
 
         out.flush();
@@ -174,21 +174,20 @@ public class Upgrade1_5_0 extends DBUpgrade {
     private void xid() {
         // Default the xid values.
         DataSourceDao dataSourceDao = new DataSourceDao();
-        List<Integer> dsids = queryForList("select id from dataSources", Integer.class);
+        List<Integer> dsids = getJdbcTemplate().queryForList("select id from dataSources", Integer.class);
         for (Integer dsid : dsids)
-            ejt.update("update dataSources set xid=? where id=?", new Object[] { dataSourceDao.generateUniqueXid(),
-                    dsid });
+            getSimpleJdbcTemplate().update("update dataSources set xid=? where id=?", dataSourceDao.generateUniqueXid(),dsid );
 
         DataPointDao dataPointDao = new DataPointDao();
-        List<Integer> dpids = queryForList("select id from dataPoints", Integer.class);
+        List<Integer> dpids = getJdbcTemplate().queryForList("select id from dataPoints", Integer.class);
         for (Integer dpid : dpids)
-            ejt.update("update dataPoints set xid=? where id=?",
-                    new Object[] { dataPointDao.generateUniqueXid(), dpid });
+            getSimpleJdbcTemplate().update("update dataPoints set xid=? where id=?",
+                    dataPointDao.generateUniqueXid(), dpid);
 
-        List<Integer> pedids = queryForList("select id from pointEventDetectors", Integer.class);
+        List<Integer> pedids = getJdbcTemplate().queryForList("select id from pointEventDetectors", Integer.class);
         for (Integer pedid : pedids)
-            ejt.update("update pointEventDetectors set xid=? where id=?", new Object[] {
-                    Common.generateXid(PointEventDetectorVO.XID_PREFIX), pedid });
+            getSimpleJdbcTemplate().update("update pointEventDetectors set xid=? where id=?", 
+                    Common.generateXid(PointEventDetectorVO.XID_PREFIX), pedid );
     }
 
     private void viewData() {
@@ -200,7 +199,7 @@ public class Upgrade1_5_0 extends DBUpgrade {
         for (View view : views) {
             final View finalView = view;
 
-            ejt.query("select x, y, content from staticViews where mangoViewId=?", new Object[] { view.getId() },
+            getJdbcTemplate().query("select x, y, content from staticViews where mangoViewId=?", new Object[] { view.getId() },
                     new RowCallbackHandler() {
                         @Override
                         public void processRow(ResultSet rs) throws SQLException {
@@ -211,7 +210,7 @@ public class Upgrade1_5_0 extends DBUpgrade {
                         }
                     });
 
-            ejt.query("select x, y, dataPointId, nameOverride, settableOverride, bkgdColorOverride, displayControls, "
+            getJdbcTemplate().query("select x, y, dataPointId, nameOverride, settableOverride, bkgdColorOverride, displayControls, "
                     + "  grData " + "from pointViews where mangoViewId=?", new Object[] { view.getId() },
                     new RowCallbackHandler() {
                         @SuppressWarnings("synthetic-access")
@@ -292,11 +291,11 @@ public class Upgrade1_5_0 extends DBUpgrade {
     }
 
     private void eventData() {
-        ejt.update("update events set rtnTs=inactiveTs, rtnCause=inactiveCause where rtnApplicable='Y'");
-        ejt.update("insert into userEvents (eventId, userId, silenced) ("
+        getJdbcTemplate().update("update events set rtnTs=inactiveTs, rtnCause=inactiveCause where rtnApplicable='Y'");
+        getJdbcTemplate().update("insert into userEvents (eventId, userId, silenced) ("
                 + "  select e.id, u.id, 'N' from events e, users u " + "  where u.admin='Y' and u.disabled='N'"
                 + "    and e.inactiveTs is null" + ")");
-        ejt.update("insert into userEvents (eventId, userId, silenced, ackTs) ("
+        getJdbcTemplate().update("insert into userEvents (eventId, userId, silenced, ackTs) ("
                 + "  select e.id, u.id, 'Y', e.inactiveTs from events e, users u "
                 + "  where u.admin='Y' and u.disabled='N'" + "    and e.inactiveTs is not null" + ")");
     }

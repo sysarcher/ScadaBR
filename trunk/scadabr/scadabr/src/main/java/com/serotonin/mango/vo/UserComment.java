@@ -19,6 +19,7 @@
 package com.serotonin.mango.vo;
 
 import com.serotonin.web.taglib.DateFunctions;
+import com.serotonin.web.taglib.Functions;
 
 public class UserComment {
     public static final int TYPE_EVENT = 1;
@@ -41,7 +42,7 @@ public class UserComment {
     }
 
     public void setComment(String comment) {
-        this.comment = comment;
+       this.comment =  Functions.truncate(comment, 1024);
     }
 
     public long getTs() {

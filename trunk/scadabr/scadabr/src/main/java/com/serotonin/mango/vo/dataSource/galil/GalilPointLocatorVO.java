@@ -24,8 +24,8 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
@@ -47,7 +47,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
  */
 @JsonRemoteEntity
 public class GalilPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
-    private static final Log LOG = LogFactory.getLog(GalilPointLocatorVO.class);
+    private final static Logger LOG = LoggerFactory.getLogger(GalilPointLocatorVO.class);
 
     public LocalizableMessage getConfigurationDescription() {
         PointTypeVO pointType = getPointType();

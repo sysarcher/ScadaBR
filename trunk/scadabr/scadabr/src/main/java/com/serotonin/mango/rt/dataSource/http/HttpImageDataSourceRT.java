@@ -25,8 +25,8 @@ import java.util.List;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.io.StreamUtils;
 import com.serotonin.mango.Common;
@@ -51,7 +51,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
  * @author Matthew Lohbihler
  */
 public class HttpImageDataSourceRT extends PollingDataSource {
-    static final Log LOG = LogFactory.getLog(HttpImageDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(HttpImageDataSourceRT.class);
 
     public static final int DATA_RETRIEVAL_FAILURE_EVENT = 1;
     public static final int FILE_SAVE_EXCEPTION_EVENT = 2;

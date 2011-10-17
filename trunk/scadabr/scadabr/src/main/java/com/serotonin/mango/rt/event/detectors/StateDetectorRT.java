@@ -18,8 +18,8 @@
  */
 package com.serotonin.mango.rt.event.detectors;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 
@@ -27,7 +27,7 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
  * @author Matthew Lohbihler
  */
 abstract public class StateDetectorRT extends TimeDelayedEventDetectorRT {
-    private final Log log = LogFactory.getLog(StateDetectorRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(StateDetectorRT.class);
 
     /**
      * State field. Whether the state has been detected or not. This field is used to prevent multiple events being
@@ -96,7 +96,7 @@ abstract public class StateDetectorRT extends TimeDelayedEventDetectorRT {
                 raiseEvent(stateActiveTime + getDurationMS(), createEventContext());
             else {
                 // Perhaps the job wasn't successfully unscheduled. Write a log entry and ignore.
-                log.warn("Call to set event active when state is not active. Ignoring.");
+                LOG.warn("Call to set event active when state is not active. Ignoring.");
                 eventActive = false;
             }
         }

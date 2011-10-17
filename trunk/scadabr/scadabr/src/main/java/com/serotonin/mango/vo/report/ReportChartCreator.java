@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 
@@ -67,7 +67,7 @@ import freemarker.template.Template;
  * @author Matthew Lohbihler
  */
 public class ReportChartCreator {
-    static final Log LOG = LogFactory.getLog(ReportChartCreator.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ReportChartCreator.class);
 
     private static final String IMAGE_SERVLET = "reportImageChart/";
     /**

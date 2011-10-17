@@ -18,8 +18,8 @@
  */
 package com.serotonin.mango.rt.maint;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.Common;
 import com.serotonin.timer.FixedRateTrigger;
@@ -29,7 +29,7 @@ import com.serotonin.timer.TimerTask;
  * @author Matthew Lohbihler
  */
 public class MemoryCheck extends TimerTask {
-    private static final Log log = LogFactory.getLog(MemoryCheck.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MemoryCheck.class);
     private static final long TIMEOUT = 1000 * 5; // Run every five seconds.
 
     /**
@@ -51,6 +51,6 @@ public class MemoryCheck extends TimerTask {
 
     public static void memoryCheck() {
         Runtime rt = Runtime.getRuntime();
-        log.info("Free=" + rt.freeMemory() + ", total=" + rt.totalMemory() + ", max=" + rt.maxMemory());
+        LOG.info("Free=" + rt.freeMemory() + ", total=" + rt.totalMemory() + ", max=" + rt.maxMemory());
     }
 }

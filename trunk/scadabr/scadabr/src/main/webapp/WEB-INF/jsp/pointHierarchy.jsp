@@ -47,11 +47,13 @@
         var tree = dojo.widget.manager.getWidgetById('tree');
         var i;
         
-        for (i=0; i<rootFolder.subfolders.length; i++)
+        for (i=0; i<rootFolder.subfolders.length; i++) {
             addFolder(rootFolder.subfolders[i], tree);
+        }
         
-        for (i=0; i<rootFolder.points.length; i++)
-            addPoint(rootFolder.points[i], tree);
+        for (var pointId in rootFolder.points) {
+            addPoint(pointId, rootFolder.points[pointId], tree);
+        }
         
         hide("loadingImg");
         show("treeDiv");
@@ -72,18 +74,18 @@
         }
         
         if (folder.points) {
-            for (i=0; i<folder.points.length; i++)
-                addPoint(folder.points[i], folderNode);
+            for (var pointId in  folder.points)
+                addPoint(pointId, folder.points[pointId], folderNode);
         }
         
         folder.subfolders = null;
         folder.points = null;
     }
     
-    function addPoint(point, parent) {
+    function addPoint(pointId, pointLabel, parent) {
         var pointNode = dojo.widget.createWidget("TreeNode", {
-                title: "<img src='images/icon_comp.png'/> "+ point.value,
-                object: point
+                title: "<img src='images/icon_comp.png'/> "+ pointLabel,
+                object: {key:pointId, value:pointLabel}
         });
         parent.addChild(pointNode);
     }
@@ -102,7 +104,7 @@
         setErrorMessage();
         hide("folderEditDiv");
         var tree = dojo.widget.manager.getWidgetById('tree');
-        var rootFolder = { id: 0, name: "root", subfolders: new Array(), points: new Array() };
+        var rootFolder = { id: 0, name: "root", subfolders: new Array(), points: new Object() };
         gatherTreeData(tree, rootFolder);
         PointHierarchyDwr.savePointHierarchy(rootFolder, saveCB);
     }
@@ -123,19 +125,21 @@
                 var subfolder = treeNode.children[i].object;
                 folder.subfolders[folder.subfolders.length] = subfolder;
                 subfolder.subfolders = new Array();
-                subfolder.points = new Array();
+                subfolder.points = new Object();
                 gatherTreeData(treeNode.children[i], subfolder);
+            } else {
+                var pointId = treeNode.children[i].object.key;
+                folder.points[pointId] = treeNode.children[i].object.value;
             }
-            else
-                folder.points[folder.points.length] = treeNode.children[i].object;
         }
     }
     
     function deleteFolder() {
         setErrorMessage();
         if (selectedFolderNode.children.length > 0) {
-            if (!confirm("<fmt:message key="pointHierarchy.deleteConfirm"/>"))
+            if (!confirm("<fmt:message key="pointHierarchy.deleteConfirm"/>")) {
                 return;
+            }
         }
         
         while (selectedFolderNode.children.length > 0) {
@@ -151,9 +155,9 @@
     function saveFolder() {
         setErrorMessage();
         var name = $get("folderName");
-        if (!name || name == "")
+        if (!name || name == "") {
             alert("<fmt:message key="pointHierarchy.noName"/>");
-        else {
+        } else {
           selectedFolderNode.object.name = name;
           selectedFolderNode.titleNode.innerHTML =
                   "<img src='images/folder_brick.png'/> "+ selectedFolderNode.object.name;

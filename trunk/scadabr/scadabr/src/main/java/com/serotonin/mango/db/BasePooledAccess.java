@@ -31,18 +31,18 @@ import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.spring.ExtendedJdbcTemplate;
 import com.serotonin.mango.Common;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * @author Matthew Lohbihler
  */
 abstract public class BasePooledAccess extends DatabaseAccess {
-    private final Log log = LogFactory.getLog(BasePooledAccess.class);
+    private final static Logger LOG = LoggerFactory.getLogger(BasePooledAccess.class);
     protected BasicDataSource dataSource;
 
     public BasePooledAccess(ServletContext ctx) {
@@ -51,7 +51,7 @@ abstract public class BasePooledAccess extends DatabaseAccess {
 
     @Override
     protected void initializeImpl(String propertyPrefix) {
-        log.info("Initializing pooled connection manager");
+        LOG.info("Initializing pooled connection manager");
         dataSource = new BasicDataSource();
         dataSource.setDriverClassName(getDriverClassName());
         dataSource.setUrl(getUrl(propertyPrefix));
@@ -69,8 +69,7 @@ abstract public class BasePooledAccess extends DatabaseAccess {
 
     @Override
     public void runScript(String[] script, OutputStream out) {
-        ExtendedJdbcTemplate ejt = new ExtendedJdbcTemplate();
-        ejt.setDataSource(dataSource);
+        JdbcTemplate ejt = new JdbcTemplate(dataSource);
 
         StringBuilder statement = new StringBuilder();
 
@@ -113,19 +112,19 @@ abstract public class BasePooledAccess extends DatabaseAccess {
                 in.close();
             }
             catch (IOException ioe) {
-                log.warn("", ioe);
+                LOG.warn("", ioe);
             }
         }
     }
 
     @Override
     public void terminate() {
-        log.info("Stopping database");
+        LOG.info("Stopping database");
         try {
             dataSource.close();
         }
         catch (SQLException e) {
-            log.warn("", e);
+            LOG.warn("", e);
         }
     }
 

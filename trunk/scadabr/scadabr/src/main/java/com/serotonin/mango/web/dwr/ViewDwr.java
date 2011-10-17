@@ -45,8 +45,6 @@ import br.org.scadabr.view.component.LinkComponent;
 import br.org.scadabr.view.component.ScriptButtonComponent;
 import br.org.scadabr.vo.scripting.ScriptVO;
 
-import com.serotonin.db.IntValuePair;
-import com.serotonin.db.KeyValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -86,6 +84,7 @@ import com.serotonin.mango.web.dwr.beans.ViewComponentState;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.dwr.MethodFilter;
+import java.util.LinkedHashMap;
 
 /**
  * This class is so not threadsafe. Do not use class fields except for the
@@ -126,11 +125,11 @@ public class ViewDwr extends BaseDwr {
 	}
 
 	@MethodFilter
-	public List<IntValuePair> getViews() {
+	public Map<Integer, String> getViews() {
 		ViewDao viewDao = new ViewDao();
 		User user = Common.getUser();
 
-		List<IntValuePair> views = viewDao.getViewNames(user.getId());
+		Map<Integer, String> views = viewDao.getViewNames(user);
 
 		return views;
 	}
@@ -382,10 +381,9 @@ public class ViewDwr extends BaseDwr {
 		result.put("viewUsers", user.getView().getViewUsers());
 
 		// View component types
-		List<KeyValuePair> components = new ArrayList<KeyValuePair>();
+		Map<String, String> components = new LinkedHashMap<String, String>();
 		for (ImplDefinition impl : ViewComponent.getImplementations())
-			components.add(new KeyValuePair(impl.getName(), getMessage(impl
-					.getNameKey())));
+			components.put(impl.getName(), getMessage(impl.getNameKey()));
 		result.put("componentTypes", components);
 
 		// Available points
@@ -622,7 +620,7 @@ public class ViewDwr extends BaseDwr {
 
 	@MethodFilter
 	public DwrResponseI18n saveMultistateGraphicComponent(
-			String viewComponentId, List<IntValuePair> imageStates,
+			String viewComponentId, Map<Integer, String> imageStates,
 			int defaultImage, boolean displayText, String imageSetId) {
 		DwrResponseI18n response = new DwrResponseI18n();
 
@@ -696,15 +694,15 @@ public class ViewDwr extends BaseDwr {
 	@MethodFilter
 	public DwrResponseI18n saveSimpleCompoundComponent(String viewComponentId,
 			String name, String backgroundColour,
-			List<KeyValuePair> childPointIds) {
+			Map<String, String> childPointIds) {
 		DwrResponseI18n response = new DwrResponseI18n();
 
 		validateCompoundComponent(response, name);
 
 		String leadPointId = null;
-		for (KeyValuePair kvp : childPointIds) {
-			if (SimpleCompoundComponent.LEAD_POINT.equals(kvp.getKey())) {
-				leadPointId = kvp.getValue();
+		for (String kvp : childPointIds.keySet()) {
+			if (SimpleCompoundComponent.LEAD_POINT.equals(kvp)) {
+				leadPointId = childPointIds.get(kvp);
 				break;
 			}
 		}
@@ -727,7 +725,7 @@ public class ViewDwr extends BaseDwr {
 	@MethodFilter
 	public DwrResponseI18n saveImageChartComponent(String viewComponentId,
 			String name, int width, int height, int durationType,
-			int durationPeriods, List<KeyValuePair> childPointIds) {
+			int durationPeriods, Map<String, String> childPointIds) {
 		DwrResponseI18n response = new DwrResponseI18n();
 
 		validateCompoundComponent(response, name);
@@ -759,7 +757,7 @@ public class ViewDwr extends BaseDwr {
 
 	@MethodFilter
 	public DwrResponseI18n saveCompoundComponent(String viewComponentId,
-			String name, List<KeyValuePair> childPointIds) {
+			String name, Map<String, String> childPointIds) {
 		DwrResponseI18n response = new DwrResponseI18n();
 
 		validateCompoundComponent(response, name);
@@ -905,13 +903,13 @@ public class ViewDwr extends BaseDwr {
 	}
 
 	private void saveCompoundPoints(CompoundComponent c,
-			List<KeyValuePair> childPointIds) {
+			Map<String, String> childPointIds) {
 		User user = Common.getUser();
 
-		for (KeyValuePair kvp : childPointIds) {
+		for (String kvp : childPointIds.keySet()) {
 			int dataPointId = -1;
 			try {
-				dataPointId = Integer.parseInt(kvp.getValue());
+				dataPointId = Integer.parseInt(childPointIds.get(kvp));
 			} catch (NumberFormatException e) {
 				// no op
 			}
@@ -919,10 +917,10 @@ public class ViewDwr extends BaseDwr {
 			DataPointVO dp = new DataPointDao().getDataPoint(dataPointId);
 
 			if (dp == null || !Permissions.hasDataPointReadPermission(user, dp))
-				c.setDataPoint(kvp.getKey(), null);
+				c.setDataPoint(kvp, null);
 			else
-				c.setDataPoint(kvp.getKey(), dp);
-			c.getChildComponent(kvp.getKey()).validateDataPoint(user, false);
+				c.setDataPoint(kvp, dp);
+			c.getChildComponent(kvp).validateDataPoint(user, false);
 		}
 	}
 

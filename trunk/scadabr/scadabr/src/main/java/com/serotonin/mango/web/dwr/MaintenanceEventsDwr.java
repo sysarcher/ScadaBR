@@ -26,7 +26,6 @@ import java.util.ResourceBundle;
 
 import org.joda.time.DateTime;
 
-import com.serotonin.db.IntValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.db.dao.MaintenanceEventDao;
@@ -38,6 +37,9 @@ import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author Matthew Lohbihler
@@ -59,9 +61,9 @@ public class MaintenanceEventsDwr extends BaseDwr {
         });
         response.addData("events", events);
 
-        List<IntValuePair> dataSources = new ArrayList<IntValuePair>();
+        Map<Integer, String> dataSources = new HashMap<Integer, String>();
         for (DataSourceVO<?> ds : new DataSourceDao().getDataSources())
-            dataSources.add(new IntValuePair(ds.getId(), ds.getName()));
+            dataSources.put(ds.getId(), ds.getName());
         response.addData("dataSources", dataSources);
 
         return response;

@@ -18,8 +18,8 @@
  */
 package com.serotonin.mango.rt.dataSource.http;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.MangoDataType;
@@ -36,7 +36,7 @@ import com.serotonin.util.StringUtils;
  * @author Matthew Lohbihler
  */
 public class HttpReceiverDataSourceRT extends EventDataSource implements HttpMulticastListener {
-    private final Log log = LogFactory.getLog(HttpReceiverDataSourceRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(HttpReceiverDataSourceRT.class);
     private final HttpReceiverDataSourceVO vo;
 
     public HttpReceiverDataSourceRT(HttpReceiverDataSourceVO vo) {
@@ -78,7 +78,7 @@ public class HttpReceiverDataSourceRT extends EventDataSource implements HttpMul
 
     @Override
     public void ipWhiteListError(String message) {
-        log.warn("Error checking white list: " + message);
+        LOG.warn("Error checking white list: " + message);
     }
 
     @Override

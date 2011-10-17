@@ -20,21 +20,21 @@ package com.serotonin.mango.db.upgrade;
 
 import java.io.OutputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthew Lohbihler
  */
 public class Upgrade0_9_1 extends DBUpgrade {
-    private final Log log = LogFactory.getLog(getClass());
+    private final static Logger LOG = LoggerFactory.getLogger(Upgrade0_9_1.class);
 
     @Override
     public void upgrade() throws Exception {
         OutputStream out = createUpdateLogOutputStream("0_9_1");
 
         // Run the script.
-        log.info("Running script");
+        LOG.info("Running script");
         runScript(script, out);
 
         out.flush();

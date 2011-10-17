@@ -18,16 +18,13 @@
  */
 package com.serotonin.mango.rt.dataSource;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.util.timeout.TimeoutClient;
 import com.serotonin.mango.util.timeout.TimeoutTask;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
@@ -36,7 +33,7 @@ import com.serotonin.timer.TimerTask;
 import com.serotonin.web.taglib.DateFunctions;
 
 abstract public class PollingDataSource extends DataSourceRT implements TimeoutClient {
-    private final Log LOG = LogFactory.getLog(PollingDataSource.class);
+    private final static Logger LOG = LoggerFactory.getLogger(PollingDataSource.class);
 
     private final DataSourceVO<?> vo;
     private long pollingPeriodMillis = 300000; // Default to 5 minutes just to have something here

@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
@@ -37,27 +37,27 @@ import com.serotonin.mango.db.dao.ScheduledEventDao;
  * @author Matthew Lohbihler
  */
 public class Upgrade1_8_3 extends DBUpgrade {
-    private final Log log = LogFactory.getLog(getClass());
+    private final static Logger LOG = LoggerFactory.getLogger(Upgrade1_8_3.class);
 
     @Override
     public void upgrade() throws Exception {
         OutputStream out = createUpdateLogOutputStream("1_8_3");
 
         // Run the script.
-        log.info("Running script 1");
+        LOG.info("Running script 1");
         runScript(script1, out);
 
         xid();
 
         // Run the script.
-        log.info("Running script 2");
+        LOG.info("Running script 2");
         Map<String, String[]> scripts = new HashMap<String, String[]>();
         scripts.put(DatabaseAccess.DatabaseType.DERBY.name(), derbyScript2);
         scripts.put(DatabaseAccess.DatabaseType.MYSQL.name(), mysqlScript2);
         runScript(scripts, out);
 
         // Run the MySQL fix script
-        log.info("Running MySQL fix script");
+        LOG.info("Running MySQL fix script");
         scripts.clear();
         scripts.put(DatabaseAccess.DatabaseType.DERBY.name(), new String[0]);
         scripts.put(DatabaseAccess.DatabaseType.MYSQL.name(), mysqlScript3);
@@ -115,31 +115,28 @@ public class Upgrade1_8_3 extends DBUpgrade {
     private void xid() {
         // Default the xid values.
         ScheduledEventDao scheduledEventDao = new ScheduledEventDao();
-        List<Integer> ids = queryForList("select id from scheduledEvents", Integer.class);
+        List<Integer> ids = getJdbcTemplate().queryForList("select id from scheduledEvents", Integer.class);
         for (Integer id : ids)
-            ejt.update("update scheduledEvents set xid=? where id=?", new Object[] {
-                    scheduledEventDao.generateUniqueXid(), id });
+            getSimpleJdbcTemplate().update("update scheduledEvents set xid=? where id=?", scheduledEventDao.generateUniqueXid(), id );
 
         CompoundEventDetectorDao compoundEventDetectorDao = new CompoundEventDetectorDao();
-        ids = queryForList("select id from compoundEventDetectors", Integer.class);
+        ids = getJdbcTemplate().queryForList("select id from compoundEventDetectors", Integer.class);
         for (Integer id : ids)
-            ejt.update("update compoundEventDetectors set xid=? where id=?", new Object[] {
-                    compoundEventDetectorDao.generateUniqueXid(), id });
+            getSimpleJdbcTemplate().update("update compoundEventDetectors set xid=? where id=?", compoundEventDetectorDao.generateUniqueXid(), id);
 
         MailingListDao mailingListDao = new MailingListDao();
-        ids = queryForList("select id from mailingLists", Integer.class);
+        ids = getJdbcTemplate().queryForList("select id from mailingLists", Integer.class);
         for (Integer id : ids)
-            ejt.update("update mailingLists set xid=? where id=?", new Object[] { mailingListDao.generateUniqueXid(),
-                    id });
+            getSimpleJdbcTemplate().update("update mailingLists set xid=? where id=?", mailingListDao.generateUniqueXid(),id);
 
         PublisherDao publisherDao = new PublisherDao();
-        ids = queryForList("select id from publishers", Integer.class);
+        ids = getJdbcTemplate().queryForList("select id from publishers", Integer.class);
         for (Integer id : ids)
-            ejt.update("update publishers set xid=? where id=?", new Object[] { publisherDao.generateUniqueXid(), id });
+            getSimpleJdbcTemplate().update("update publishers set xid=? where id=?", publisherDao.generateUniqueXid(), id);
 
         EventDao eventDao = new EventDao();
-        ids = queryForList("select id from eventHandlers", Integer.class);
+        ids = getJdbcTemplate().queryForList("select id from eventHandlers", Integer.class);
         for (Integer id : ids)
-            ejt.update("update eventHandlers set xid=? where id=?", new Object[] { eventDao.generateUniqueXid(), id });
+            getSimpleJdbcTemplate().update("update eventHandlers set xid=? where id=?", eventDao.generateUniqueXid(), id);
     }
 }

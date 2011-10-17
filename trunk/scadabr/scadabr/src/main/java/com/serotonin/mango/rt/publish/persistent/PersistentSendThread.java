@@ -8,12 +8,11 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -32,7 +31,7 @@ import com.serotonin.util.StringUtils;
 import com.serotonin.util.queue.ByteQueue;
 
 class PersistentSendThread extends SendThread {
-    static final Log LOG = LogFactory.getLog(PersistentSendThread.class);
+    private final static Logger LOG = LoggerFactory.getLogger(PersistentSendThread.class);
 
     final PersistentSenderRT publisher;
 

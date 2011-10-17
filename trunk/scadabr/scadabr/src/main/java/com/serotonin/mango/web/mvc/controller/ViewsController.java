@@ -1,25 +1,24 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.mvc.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.ParameterizableViewController;
 
-import com.serotonin.db.IntValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.ViewDao;
 import com.serotonin.mango.view.ShareUser;
@@ -37,6 +35,7 @@ import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
 
 public class ViewsController extends ParameterizableViewController {
+
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
@@ -44,7 +43,7 @@ public class ViewsController extends ParameterizableViewController {
         ViewDao viewDao = new ViewDao();
         User user = Common.getUser(request);
 
-        List<IntValuePair> views = viewDao.getViewNames(user.getId());
+        Map<Integer, String> views = viewDao.getViewNames(user);
         model.put("views", views);
 
         // Set the current view.
@@ -52,13 +51,13 @@ public class ViewsController extends ParameterizableViewController {
         String vid = request.getParameter("viewId");
         try {
             currentView = viewDao.getView(Integer.parseInt(vid));
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             // no op
         }
 
-        if (currentView == null && views.size() > 0)
-            currentView = viewDao.getView(views.get(0).getKey());
+        if (currentView == null && views.size() > 0) {
+            currentView = viewDao.getView(views.keySet().iterator().next());
+        }
 
         if (currentView != null) {
             Permissions.ensureViewPermission(user, currentView);

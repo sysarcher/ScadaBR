@@ -24,12 +24,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.view.PointView;
 import com.serotonin.mango.view.graphic.AnalogImageSetRenderer;
@@ -38,33 +37,34 @@ import com.serotonin.mango.view.graphic.BinaryImageSetRenderer;
 import com.serotonin.mango.view.graphic.GraphicRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.util.SerializationHelper;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 /**
  * @author Matthew Lohbihler
  */
 @SuppressWarnings("deprecation")
 public class Upgrade1_0_1 extends DBUpgrade {
-    private final Log log = LogFactory.getLog(getClass());
+    private final static Logger LOG = LoggerFactory.getLogger(Upgrade1_0_1.class);
 
     @Override
     public void upgrade() throws Exception {
         OutputStream out = createUpdateLogOutputStream("1_0_1");
 
         // Get the point views from the field mapping version.
-        List<PointView> pointViews = query(POINT_VIEW_SELECT, new PointViewRowMapper());
+        List<PointView> pointViews = getSimpleJdbcTemplate().query(POINT_VIEW_SELECT, new PointViewRowMapper());
         for (PointView pv : pointViews) {
             DataPointVO dp = getDataPointFromPointViewId(pv.getId());
             pv.setDataPoint(dp);
         }
-        log.info("Retrieved " + pointViews.size() + " point views");
+        LOG.info("Retrieved " + pointViews.size() + " point views");
 
         // Run the first script.
-        log.info("Running script");
+        LOG.info("Running script");
         runScript(script, out);
 
         // Save the point views to BLOBs.
         for (PointView pv : pointViews) {
-            log.info("Saved point view " + pv.getId());
+            LOG.info("Saved point view " + pv.getId());
             insertPointView(pv);
         }
 
@@ -90,7 +90,7 @@ public class Upgrade1_0_1 extends DBUpgrade {
     // / Point views.
     //
     private DataPointVO getDataPointFromPointViewId(int pointViewId) {
-        int dpid = ejt.queryForInt("select dataPointId from pointViews where id=?", new Object[] { pointViewId });
+        int dpid = getSimpleJdbcTemplate().queryForInt("select dataPointId from pointViews where id=?", pointViewId);
         DataPointVO dp = new DataPointVO();
         dp.setId(dpid);
         return dp;
@@ -100,8 +100,8 @@ public class Upgrade1_0_1 extends DBUpgrade {
             + "  grType, grImageSetId, grDisplayText, grBinaryZeroImage, grBinaryOneImage, grAnalogMin, grAnalogMax "
             + "from pointViews";
 
-    class PointViewRowMapper implements GenericRowMapper<PointView> {
-        @SuppressWarnings("synthetic-access")
+    class PointViewRowMapper implements ParameterizedRowMapper<PointView> {
+        @Override
         public PointView mapRow(ResultSet rs, int rowNum) throws SQLException {
             PointView pv = new PointView();
             int i = 0;
@@ -146,9 +146,10 @@ public class Upgrade1_0_1 extends DBUpgrade {
     }
 
     private void insertPointView(final PointView pv) {
-        ejt.update("insert into pointViews "
+        getSimpleJdbcTemplate().update("insert into pointViews "
                 + "  (id, mangoViewId, dataPointId, nameOverride, settableOverride, bkgdColorOverride, x, y, grData) "
                 + "values (?,?,?,?,?,?,?,?,?)", new PreparedStatementSetter() {
+            @Override
             public void setValues(PreparedStatement ps) throws SQLException {
                 ps.setInt(1, pv.getId());
                 ps.setInt(2, pv.getViewId());

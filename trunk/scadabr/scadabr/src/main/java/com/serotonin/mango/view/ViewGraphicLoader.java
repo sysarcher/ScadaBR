@@ -29,11 +29,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ViewGraphicLoader {
-    private static final Log LOG = LogFactory.getLog(ViewGraphicLoader.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ViewGraphicLoader.class);
 
     private static final String GRAPHICS_PATH = "graphics";
     private static final String INFO_FILE_NAME = "info.txt";

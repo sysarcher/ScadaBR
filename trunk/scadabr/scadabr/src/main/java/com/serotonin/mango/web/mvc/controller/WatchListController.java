@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.ParameterizableViewController;
 
-import com.serotonin.db.IntValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.view.ShareUser;
@@ -38,6 +37,7 @@ import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.web.i18n.I18NUtils;
+import java.util.LinkedHashMap;
 
 public class WatchListController extends ParameterizableViewController {
     public static final String KEY_WATCHLISTS = "watchLists";
@@ -66,7 +66,7 @@ public class WatchListController extends ParameterizableViewController {
         int selected = user.getSelectedWatchList();
         boolean found = false;
 
-        List<IntValuePair> watchListNames = new ArrayList<IntValuePair>(watchLists.size());
+        Map<Integer, String> watchListNames = new LinkedHashMap<Integer, String>(watchLists.size());
         for (WatchList watchList : watchLists) {
             if (watchList.getId() == selected)
                 found = true;
@@ -88,7 +88,7 @@ public class WatchListController extends ParameterizableViewController {
                     watchListDao.saveWatchList(watchList);
             }
 
-            watchListNames.add(new IntValuePair(watchList.getId(), watchList.getName()));
+            watchListNames.put(watchList.getId(), watchList.getName());
         }
 
         if (!found) {

@@ -27,8 +27,8 @@ import java.util.Map;
 import net.sf.openv4j.AccessType;
 import net.sf.openv4j.DataPoint;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
@@ -47,7 +47,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
 @JsonRemoteEntity
 public class OpenV4JPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
-    private final static Log LOG = LogFactory.getLog(OpenV4JPointLocatorVO.class);
+    private final static Logger LOG = LoggerFactory.getLogger(OpenV4JPointLocatorVO.class);
     /**
      * The address of the device.
      */
@@ -130,12 +130,12 @@ public class OpenV4JPointLocatorVO extends AbstractPointLocatorVO implements Jso
                 dataPoint = DataPoint.valueOf(s);
             }
             catch (IllegalArgumentException ex) {
-                LOG.fatal("UNKNOWN DataPoint: " + s);
+                LOG.error("UNKNOWN DataPoint: " + s);
                 dataPoint = DataPoint.COMMON_CONFIG_DEVICE_TYPE_ID;
             }
             break;
         default:
-            LOG.fatal("Version fall trough DataPoint unknown");
+            LOG.error("Version fall trough DataPoint unknown");
             dataPoint = DataPoint.COMMON_CONFIG_DEVICE_TYPE_ID;
 
         }

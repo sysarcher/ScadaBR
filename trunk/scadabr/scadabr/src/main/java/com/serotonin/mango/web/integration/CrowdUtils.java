@@ -3,8 +3,8 @@ package com.serotonin.mango.web.integration;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.atlassian.crowd.exception.ApplicationAccessDeniedException;
 import com.atlassian.crowd.exception.ApplicationPermissionException;
@@ -28,7 +28,7 @@ import com.atlassian.crowd.service.factory.CrowdClientFactory;
 import com.serotonin.mango.Common;
 
 public class CrowdUtils {
-    private static final Log LOG = LogFactory.getLog(CrowdUtils.class);
+    private final static Logger LOG = LoggerFactory.getLogger(CrowdUtils.class);
     private static final String CROWD_AUTHENTICATED_KEY = CrowdUtils.class.getName() + "CROWD_AUTHENTICATED_KEY";
 
     private static CrowdHttpAuthenticator authenticator;

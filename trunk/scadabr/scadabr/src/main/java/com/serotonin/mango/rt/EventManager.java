@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.EventDao;
@@ -49,7 +49,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
  * @author Matthew Lohbihler
  */
 public class EventManager implements ILifecycle {
-    private final Log log = LogFactory.getLog(EventManager.class);
+    private final static Logger LOG = LoggerFactory.getLogger(EventManager.class);
 
     private final List<EventInstance> activeEvents = new CopyOnWriteArrayList<EventInstance>();
     private EventDao eventDao;
@@ -70,7 +70,7 @@ public class EventManager implements ILifecycle {
             int dh = type.getDuplicateHandling();
             if (dh == EventType.DuplicateHandling.DO_NOT_ALLOW) {
                 // Create a log error...
-                log.error("An event was raised for a type that is already active: type=" + type + ", message="
+                LOG.error("An event was raised for a type that is already active: type=" + type + ", message="
                         + message.getKey());
                 // ... but ultimately just ignore the thing.
                 return;
@@ -143,8 +143,8 @@ public class EventManager implements ILifecycle {
             // Call raiseEvent handlers.
             handleRaiseEvent(evt, emailUsers);
 
-            if (log.isDebugEnabled())
-                log.debug("Event raised: type=" + type + ", message=" + message.getLocalizedMessage(Common.getBundle()));
+            if (LOG.isDebugEnabled())
+                LOG.debug("Event raised: type=" + type + ", message=" + message.getLocalizedMessage(Common.getBundle()));
         }
     }
 
@@ -169,8 +169,8 @@ public class EventManager implements ILifecycle {
             evt = remove(type);
         }
 
-        if (log.isDebugEnabled())
-            log.debug("Event returned to normal: type=" + type);
+        if (LOG.isDebugEnabled())
+            LOG.debug("Event returned to normal: type=" + type);
     }
 
     private void deactivateEvent(EventInstance evt, long time, int inactiveCause) {

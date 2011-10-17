@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.openv4j.DataPoint;
 import net.sf.openv4j.Devices;
@@ -37,8 +35,8 @@ import net.sf.openv4j.Group;
 import net.sf.openv4j.protocolhandlers.ProtocolHandler;
 import net.sf.openv4j.protocolhandlers.SegmentedDataContainer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.web.i18n.I18NUtils;
 
@@ -87,7 +85,7 @@ public class OpenV4JDiscovery implements TestingUtility {
         }
     }
 
-    static final Log LOG = LogFactory.getLog(OpenV4JDiscovery.class);
+    private final static Logger LOG = LoggerFactory.getLogger(OpenV4JDiscovery.class);
     final ResourceBundle bundle;
     SerialPort sPort;
     final ProtocolHandler protocolHandler;
@@ -137,16 +135,12 @@ public class OpenV4JDiscovery implements TestingUtility {
             protocolHandler.setStreams(sPort.getInputStream(), sPort.getOutputStream());
         }
         catch (NoSuchPortException ex) {
-            Logger.getLogger(OpenV4JDiscovery.class.getName()).log(Level.SEVERE, null, ex);
         }
         catch (PortInUseException ex) {
-            Logger.getLogger(OpenV4JDiscovery.class.getName()).log(Level.SEVERE, null, ex);
         }
         catch (UnsupportedCommOperationException ex) {
-            Logger.getLogger(OpenV4JDiscovery.class.getName()).log(Level.SEVERE, null, ex);
         }
         catch (IOException ex) {
-            Logger.getLogger(OpenV4JDiscovery.class.getName()).log(Level.SEVERE, null, ex);
         }
         searchThread = new SearchThread();
         searchThread.start();

@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.db.dao;
 
@@ -27,17 +27,21 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import com.serotonin.db.spring.ExtendedJdbcTemplate;
-import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.view.ShareUser;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.WatchList;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Matthew Lohbihler
  */
 public class WatchListDao extends BaseDao {
+
     public String generateUniqueXid() {
         return generateUniqueXid(WatchList.XID_PREFIX, "watchLists");
     }
@@ -50,43 +54,45 @@ public class WatchListDao extends BaseDao {
      * Note: this method only returns basic watchlist information. No data points or share users.
      */
     public List<WatchList> getWatchLists(final int userId) {
-        return query("select id, xid, userId, name from watchLists " //
+        return getSimpleJdbcTemplate().query("select id, xid, userId, name from watchLists " //
                 + "where userId=? or id in (select watchListId from watchListUsers where userId=?) " //
-                + "order by name", new Object[] { userId, userId }, new WatchListRowMapper());
+                + "order by name", new WatchListRowMapper(), userId, userId);
     }
 
     /**
      * Note: this method only returns basic watchlist information. No data points or share users.
      */
     public List<WatchList> getWatchLists() {
-        return query("select id, xid, userId, name from watchLists", new WatchListRowMapper());
+        return getSimpleJdbcTemplate().query("select id, xid, userId, name from watchLists", new WatchListRowMapper());
     }
 
     public WatchList getWatchList(int watchListId) {
         // Get the watch lists.
-        WatchList watchList = queryForObject("select id, xid, userId, name from watchLists where id=?",
-                new Object[] { watchListId }, new WatchListRowMapper());
+        WatchList watchList = getSimpleJdbcTemplate().queryForObject("select id, xid, userId, name from watchLists where id=?", new WatchListRowMapper(), watchListId);
         populateWatchlistData(watchList);
         return watchList;
     }
 
     public void populateWatchlistData(List<WatchList> watchLists) {
-        for (WatchList watchList : watchLists)
+        for (WatchList watchList : watchLists) {
             populateWatchlistData(watchList);
+        }
     }
 
     public void populateWatchlistData(WatchList watchList) {
-        if (watchList == null)
+        if (watchList == null) {
             return;
+        }
 
         // Get the points for each of the watch lists.
-        List<Integer> pointIds = queryForList(
+        List<Integer> pointIds = getJdbcTemplate().queryForList(
                 "select dataPointId from watchListPoints where watchListId=? order by sortOrder",
-                new Object[] { watchList.getId() }, Integer.class);
+                new Object[]{watchList.getId()}, Integer.class);
         List<DataPointVO> points = watchList.getPointList();
         DataPointDao dataPointDao = new DataPointDao();
-        for (Integer pointId : pointIds)
+        for (Integer pointId : pointIds) {
             points.add(dataPointDao.getDataPoint(pointId));
+        }
 
         setWatchListUsers(watchList);
     }
@@ -95,11 +101,12 @@ public class WatchListDao extends BaseDao {
      * Note: this method only returns basic watchlist information. No data points or share users.
      */
     public WatchList getWatchList(String xid) {
-        return queryForObject("select id, xid, userId, name from watchLists where xid=?", new Object[] { xid },
-                new WatchListRowMapper(), null);
+        return getSimpleJdbcTemplate().queryForObject("select id, xid, userId, name from watchLists where xid=?", new WatchListRowMapper(), xid);
     }
 
-    class WatchListRowMapper implements GenericRowMapper<WatchList> {
+    class WatchListRowMapper implements ParameterizedRowMapper<WatchList> {
+
+        @Override
         public WatchList mapRow(ResultSet rs, int rowNum) throws SQLException {
             WatchList wl = new WatchList();
             wl.setId(rs.getInt(1));
@@ -111,35 +118,54 @@ public class WatchListDao extends BaseDao {
     }
 
     public void saveSelectedWatchList(int userId, int watchListId) {
-        ejt.update("update users set selectedWatchList=? where id=?", new Object[] { watchListId, userId });
+        getSimpleJdbcTemplate().update("update users set selectedWatchList=? where id=?", watchListId, userId);
     }
 
+    //TODO call saveWatchlist???
+    @Deprecated
     public WatchList createNewWatchList(WatchList watchList, int userId) {
         watchList.setUserId(userId);
         watchList.setXid(generateUniqueXid());
-        watchList.setId(doInsert("insert into watchLists (xid, userId, name) values (?,?,?)",
-                new Object[] { watchList.getXid(), userId, watchList.getName() }));
+
+        SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("watchLists").usingGeneratedKeyColumns("id");
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("xid", watchList.getXid());
+        params.put("userId", watchList.getUserId());
+        params.put("name", watchList.getName());
+
+        Number id = insertActor.executeAndReturnKey(params);
+        watchList.setId(id.intValue());
+
         return watchList;
     }
 
     public void saveWatchList(final WatchList watchList) {
-        final ExtendedJdbcTemplate ejt2 = ejt;
-        getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
-            @SuppressWarnings("synthetic-access")
+        new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
+
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
-                if (watchList.getId() == Common.NEW_ID)
-                    watchList.setId(doInsert("insert into watchLists (xid, name, userId) values (?,?,?)", new Object[] {
-                            watchList.getXid(), watchList.getName(), watchList.getUserId() }));
-                else
-                    ejt2.update("update watchLists set xid=?, name=? where id=?", new Object[] { watchList.getXid(),
-                            watchList.getName(), watchList.getId() });
-                ejt2.update("delete from watchListPoints where watchListId=?", new Object[] { watchList.getId() });
-                ejt2.batchUpdate("insert into watchListPoints values (?,?,?)", new BatchPreparedStatementSetter() {
+                if (watchList.getId() == Common.NEW_ID) {
+                    SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("watchLists").usingGeneratedKeyColumns("id");
+                    Map<String, Object> params = new HashMap<String, Object>();
+                    params.put("xid", watchList.getXid());
+                    params.put("userId", watchList.getUserId());
+                    params.put("name", watchList.getName());
+
+                    Number id = insertActor.executeAndReturnKey(params);
+                    watchList.setId(id.intValue());
+                } else {
+                    getSimpleJdbcTemplate().update("update watchLists set xid=?, name=? where id=?", watchList.getXid(),
+                            watchList.getName(), watchList.getId());
+                }
+                getSimpleJdbcTemplate().update("delete from watchListPoints where watchListId=?", watchList.getId());
+                getJdbcTemplate().batchUpdate("insert into watchListPoints values (?,?,?)", new BatchPreparedStatementSetter() {
+
+                    @Override
                     public int getBatchSize() {
                         return watchList.getPointList().size();
                     }
 
+                    @Override
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
                         ps.setInt(1, watchList.getId());
                         ps.setInt(2, watchList.getPointList().get(i).getId());
@@ -153,13 +179,13 @@ public class WatchListDao extends BaseDao {
     }
 
     public void deleteWatchList(final int watchListId) {
-        final ExtendedJdbcTemplate ejt2 = ejt;
-        getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
+        new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
+
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 deleteWatchListUsers(watchListId);
-                ejt2.update("delete from watchListPoints where watchListId=?", new Object[] { watchListId });
-                ejt2.update("delete from watchLists where id=?", new Object[] { watchListId });
+                getSimpleJdbcTemplate().update("delete from watchListPoints where watchListId=?", watchListId);
+                getSimpleJdbcTemplate().update("delete from watchLists where id=?", watchListId);
             }
         });
     }
@@ -169,11 +195,12 @@ public class WatchListDao extends BaseDao {
     // Watch list users
     //
     private void setWatchListUsers(WatchList watchList) {
-        watchList.setWatchListUsers(query("select userId, accessType from watchListUsers where watchListId=?",
-                new Object[] { watchList.getId() }, new WatchListUserRowMapper()));
+        watchList.setWatchListUsers(getSimpleJdbcTemplate().query("select userId, accessType from watchListUsers where watchListId=?", new WatchListUserRowMapper(), watchList.getId()));
     }
 
-    class WatchListUserRowMapper implements GenericRowMapper<ShareUser> {
+    class WatchListUserRowMapper implements ParameterizedRowMapper<ShareUser> {
+
+        @Override
         public ShareUser mapRow(ResultSet rs, int rowNum) throws SQLException {
             ShareUser wlu = new ShareUser();
             wlu.setUserId(rs.getInt(1));
@@ -183,7 +210,7 @@ public class WatchListDao extends BaseDao {
     }
 
     void deleteWatchListUsers(int watchListId) {
-        ejt.update("delete from watchListUsers where watchListId=?", new Object[] { watchListId });
+        getSimpleJdbcTemplate().update("delete from watchListUsers where watchListId=?", watchListId);
     }
 
     void saveWatchListUsers(final WatchList watchList) {
@@ -191,7 +218,8 @@ public class WatchListDao extends BaseDao {
         deleteWatchListUsers(watchList.getId());
 
         // Add in all of the entries.
-        ejt.batchUpdate("insert into watchListUsers values (?,?,?)", new BatchPreparedStatementSetter() {
+        getJdbcTemplate().batchUpdate("insert into watchListUsers values (?,?,?)", new BatchPreparedStatementSetter() {
+
             @Override
             public int getBatchSize() {
                 return watchList.getWatchListUsers().size();
@@ -208,6 +236,6 @@ public class WatchListDao extends BaseDao {
     }
 
     public void removeUserFromWatchList(int watchListId, int userId) {
-        ejt.update("delete from watchListUsers where watchListId=? and userId=?", new Object[] { watchListId, userId });
+        getSimpleJdbcTemplate().update("delete from watchListUsers where watchListId=? and userId=?", watchListId, userId);
     }
 }

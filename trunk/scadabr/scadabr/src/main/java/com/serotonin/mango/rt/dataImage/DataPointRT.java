@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
@@ -50,7 +50,7 @@ import com.serotonin.util.ILifecycle;
 import com.serotonin.util.ObjectUtils;
 
 public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
-    private static final Log LOG = LogFactory.getLog(DataPointRT.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DataPointRT.class);
     private static final PvtTimeComparator pvtTimeComparator = new PvtTimeComparator();
 
     // Configuration data.
