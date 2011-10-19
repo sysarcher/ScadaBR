@@ -1,0 +1,617 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>br.org.scadabr</groupId>
+    <artifactId>papaya</artifactId>
+    <packaging>war</packaging>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>Papaya</name>
+    <url>http://www.scadabr.org.br</url>
+    
+    <properties>
+        <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        
+        <org.springframework.version>3.0.6.RELEASE</org.springframework.version>
+        
+        <db.type>derby</db.type>
+        <db.url></db.url>
+        <db.username></db.username>
+        <db.password></db.password>
+        <db.pool.maxIdle></db.pool.maxIdle>
+        <db.pool.maxActive></db.pool.maxActive>
+        <scadabr.branding>Papaya</scadabr.branding>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>atlassian</id>
+            <name>Atlassian Repository</name>
+            <url>http://repository.atlassian.com/maven2</url>
+        </repository>
+        <repository>
+            <id>mbus4j</id>
+            <name>mbus4j sourceforge repository</name>
+            <url>http://mbus4j.sourceforge.net/repository</url>
+        </repository>
+        <repository>
+            <id>fhz4j SNAPSHOT</id>
+            <name>fhz4j sourceforge snapshot repository</name>
+            <url>http://fhz4j.sourceforge.net/snapshot-repository</url>
+        </repository>
+    </repositories>
+        
+    <dependencies>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>1.6.2</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.6.2</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.crowd</groupId>
+            <artifactId>crowd-integration-client</artifactId>
+            <version>2.3.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+
+        </dependency>
+        <dependency>
+            <groupId>br.org.scadabr.protocol</groupId>
+            <artifactId>iec101</artifactId>
+            <version>version-unknown</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml</groupId>
+            <artifactId>jaxrpc-api</artifactId>
+            <version>1.1</version>
+        </dependency>
+
+        
+        <dependency>
+            <groupId>com.i2msolucoes</groupId>
+            <artifactId>alpha24j</artifactId>
+            <version>version-unknown</version>
+        </dependency>
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>1.7.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openscada</groupId>
+            <artifactId>opc-driver</artifactId>
+            <version>version-unknown</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openscada</groupId>
+            <artifactId>openscada-utils</artifactId>
+            <version>version-unknown</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openscada</groupId>
+            <artifactId>opc-dcom</artifactId>
+            <version>0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openscada</groupId>
+            <artifactId>opc-lib</artifactId>
+            <version>0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.serotonin.mango</groupId>
+            <artifactId>spinwave-mango</artifactId>
+            <version>1.12.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.serotonin.mango</groupId>
+            <artifactId>seroUtils-mango</artifactId>
+            <version>1.12.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.serotonin.mango</groupId>
+            <artifactId>modbus4J-mango</artifactId>
+            <version>1.12.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.serotonin.mango</groupId>
+            <artifactId>bacnet4J-mango</artifactId>
+            <version>1.12.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.serotonin.mango</groupId>
+            <artifactId>viconics-ScadaBR</artifactId>
+            <version>20100917</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.directwebremoting</groupId>
+            <artifactId>dwr</artifactId>
+            <version>2.0.7</version>
+        </dependency>
+        <!-- ??? apl ??? dependency>
+            <groupId>org.dojotoolkit</groupId>
+            <artifactId>dojo</artifactId>
+            <version>1.3.1</version>
+        </dependency-->
+        <dependency>
+            <groupId>org.rxtx</groupId>
+            <artifactId>rxtx</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>2.1</version>
+            <scope>provided</scope>
+        </dependency>
+ <!--
+    Core utilities used by other modules.
+    Define this if you use Spring Utility APIs (org.springframework.core.*/org.springframework.util.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Expression Language (depends on spring-core)
+    Define this if you use Spring Expression APIs (org.springframework.expression.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-expression</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Bean Factory and JavaBeans utilities (depends on spring-core)
+    Define this if you use Spring Bean APIs (org.springframework.beans.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Aspect Oriented Programming (AOP) Framework (depends on spring-core, spring-beans)
+    Define this if you use Spring AOP APIs (org.springframework.aop.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Application Context (depends on spring-core, spring-expression, spring-aop, spring-beans)
+    This is the central artifact for Spring's Dependency Injection Container and is generally always defined
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${org.springframework.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+ 
+<!--
+    Various Application Context utilities, including EhCache, JavaMail, Quartz, and Freemarker integration
+    Define this if you need any of these integrations
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Transaction Management Abstraction (depends on spring-core, spring-beans, spring-aop, spring-context)
+    Define this if you use Spring Transactions or DAO Exception Hierarchy
+    (org.springframework.transaction.*/org.springframework.dao.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    JDBC Data Access Library (depends on spring-core, spring-beans, spring-context, spring-tx)
+    Define this if you use Spring's JdbcTemplate API (org.springframework.jdbc.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Web application development utilities applicable to both Servlet and Portlet Environments
+    (depends on spring-core, spring-beans, spring-context)
+    Define this if you use Spring MVC, or wish to use Struts, JSF, or another web framework with Spring (org.springframework.web.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Spring MVC for Servlet Environments (depends on spring-core, spring-beans, spring-context, spring-web)
+    Define this if you use Spring MVC with a Servlet Container such as Apache Tomcat (org.springframework.web.servlet.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Spring MVC for Portlet Environments (depends on spring-core, spring-beans, spring-context, spring-web)
+    Define this if you use Spring MVC with a Portlet Container (org.springframework.web.portlet.*)
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc-portlet</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+ 
+<!--
+    Support for testing Spring applications with tools such as JUnit and TestNG
+    This artifact is generally always defined with a 'test' scope for the integration testing framework and unit testing stubs
+-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${org.springframework.version}</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>1.6.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.snmp4j</groupId>
+            <artifactId>snmp4j</artifactId>
+            <version>1.10.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.16</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.8.1.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbytools</artifactId>
+            <version>10.8.1.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.2.1</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>jfree</groupId>
+            <artifactId>jcommon</artifactId>
+            <version>1.0.15</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.0.13</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>taglibs</groupId>
+            <artifactId>standard</artifactId>
+            <version>1.1.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>taglibs</groupId>
+            <artifactId>log</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.dalsemi</groupId>
+            <artifactId>onewire</artifactId>
+            <version>1.10</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.mbus4j</groupId>
+            <artifactId>mbus4j-master</artifactId>
+            <version>0.1.4</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>org.rxtx</artifactId>
+                    <groupId>rxtx</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.openv4j</groupId>
+            <artifactId>openv4j-core</artifactId>
+            <version>0.1.4-SNAPSHOT</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>org.rxtx</artifactId>
+                    <groupId>rxtx</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.fhz4j</groupId>
+            <artifactId>fhz4j-core</artifactId>
+            <version>0.1.4-SNAPSHOT</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>org.rxtx</artifactId>
+                    <groupId>rxtx</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <!-- snapshot from serotonin 1.7.0 -->
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>1.5.5</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.18</version>
+        </dependency>
+        <dependency>
+            <groupId>br.org.scadabr</groupId>
+            <artifactId>dnp34j</artifactId>
+            <version>version-unknown</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <maxmem>512m</maxmem>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.2.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.0</version>
+                <configuration>
+                    <generateReports>${site.generateReports}</generateReports>
+                    <port>${site.run.port}</port>
+                    <stagingDirectory>${java.io.tmpdir}/${scadabr.branding}</stagingDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>native2ascii</id>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <target>
+                                <native2ascii
+       reverse="true"
+       dest="${project.build.directory}/classes"
+       src="${basedir}/src/main/native2ascii" />
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.sun</groupId>
+                        <artifactId>tools</artifactId>
+                        <version>${java.version}</version>
+                        <scope>system</scope>
+                        <systemPath>${java.home}/../lib/tools.jar</systemPath>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <finalName>${scadabr.branding}</finalName>
+
+    </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <configLocation>config/sun_checks.xml</configLocation>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+    
+    <profiles>
+        <profile>
+            <id>mysqlLocal</id>
+            <properties>
+                <db.type>mysql</db.type>
+                <db.url>jdbc:mysql://localhost/${scadabr.branding}</db.url>
+                <db.username>${scadabr.branding}</db.username>
+                <db.password>${scadabr.branding}</db.password>
+                <db.pool.maxIdle>10</db.pool.maxIdle>
+                <db.pool.maxActive>10</db.pool.maxActive>
+            </properties>
+        </profile>
+        <profile>
+            <id>mango</id>
+            <properties>
+                <scadabr.branding>mango</scadabr.branding>
+            </properties>
+        </profile>
+    </profiles>
+
+</project>
+
+
+
+
+
+
+
+
+
+
