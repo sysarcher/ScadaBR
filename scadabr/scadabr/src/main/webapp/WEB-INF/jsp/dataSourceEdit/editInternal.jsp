@@ -66,7 +66,7 @@
     <td class="formLabelRequired"><fmt:message key="dsEdit.internal.attribute"/></td>
     <td class="formField">
       <select id="attributeId">
-        <tag:exportCodesOptions optionMap="<%= InternalPointLocatorVO.ATTRIBUTE_CODES.getIdKeys() %>"/>
+        <tag:exportCodesOptions optionList="<%= InternalPointLocatorVO.ATTRIBUTE_CODES.getIdKeys() %>"/>
       </select>
     </td>
   </tr>
