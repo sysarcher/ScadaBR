@@ -17,7 +17,7 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 --%><%@include file="/WEB-INF/tags/decl.tagf"%><%--
 --%><%@tag body-content="empty"%><%--
---%><%@attribute name="optionMap" type="java.util.Map<Integer, String>" required="true"%><%--
+--%><%@attribute name="optionList" type="java.util.List" required="true"%><%--
 --%><%@attribute name="sst" type="java.lang.Boolean"%><%--
 --%><c:forEach items="${optionMap}" var="option">
   <c:choose>
