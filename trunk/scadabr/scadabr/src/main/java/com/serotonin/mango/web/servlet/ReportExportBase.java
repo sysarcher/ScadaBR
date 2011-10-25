@@ -32,6 +32,7 @@ import com.serotonin.mango.vo.report.EventCsvStreamer;
 import com.serotonin.mango.vo.report.ReportCsvStreamer;
 import com.serotonin.mango.vo.report.ReportInstance;
 import com.serotonin.mango.vo.report.UserCommentCsvStreamer;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -43,21 +44,28 @@ abstract public class ReportExportBase extends HttpServlet {
     protected static final int CONTENT_EVENTS = 2;
     protected static final int CONTENT_COMMENTS = 3;
 
+    @Autowired
+    private Common common;
+    @Autowired
+    private Permissions permissions;
+    @Autowired
+    private ReportDao reportDao;
+
+
     protected void execute(HttpServletRequest request, HttpServletResponse response, int content) throws IOException {
         // Get the report instance id
         int instanceId = Integer.parseInt(request.getParameter("instanceId"));
 
         // Get the report instance
-        ReportDao reportDao = new ReportDao();
         ReportInstance instance = reportDao.getReportInstance(instanceId);
 
         // Ensure the user is allowed access.
-        Permissions.ensureReportInstancePermission(Common.getUser(request), instance);
+        permissions.ensureReportInstancePermission(common.getUser(request), instance);
 
         // Stream the content.
         response.setContentType("text/csv");
 
-        ResourceBundle bundle = Common.getBundle();
+        ResourceBundle bundle = common.getBundle();
         if (content == CONTENT_REPORT) {
             ReportCsvStreamer creator = new ReportCsvStreamer(response.getWriter(), bundle);
             reportDao.reportInstanceData(instanceId, creator);

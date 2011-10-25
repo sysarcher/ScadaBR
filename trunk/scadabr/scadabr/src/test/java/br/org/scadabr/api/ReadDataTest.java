@@ -1,11 +1,12 @@
 package br.org.scadabr.api;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
-public class ReadDataTest extends TestCase {
+public class ReadDataTest {
 
-	public void testParams() {
-		assertTrue(true);
-	}
-
+    @Test
+    public void testParams() {
+        assertTrue(true);
+    }
 }

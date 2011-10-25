@@ -40,6 +40,7 @@ import com.serotonin.mango.web.mvc.SimpleFormRedirectController;
 import com.serotonin.mango.web.mvc.form.ViewEditForm;
 import com.serotonin.util.ValidationUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ViewEditController extends SimpleFormRedirectController {
     private static final String SUBMIT_UPLOAD = "upload";
@@ -50,6 +51,10 @@ public class ViewEditController extends SimpleFormRedirectController {
 
     private String uploadDirectory;
     private int nextImageId = -1;
+    @Autowired
+    private Common common;
+    @Autowired
+    private Permissions permissions;
 
     public void setUploadDirectory(String uploadDirectory) {
         this.uploadDirectory = uploadDirectory;
@@ -58,7 +63,7 @@ public class ViewEditController extends SimpleFormRedirectController {
     @Override
     protected Object formBackingObject(HttpServletRequest request) {
         View view;
-        User user = Common.getUser(request);
+        User user = common.getUser(request);
 
         if (!isFormSubmission(request)) {
             // Fresh hit. Get the id.
@@ -66,7 +71,7 @@ public class ViewEditController extends SimpleFormRedirectController {
             if (viewIdStr != null) {
                 // An existing view.
                 view = new ViewDao().getView(Integer.parseInt(viewIdStr));
-                Permissions.ensureViewEditPermission(user, view);
+                permissions.ensureViewEditPermission(user, view);
             }
             else {
                 // A new view.
@@ -159,7 +164,7 @@ public class ViewEditController extends SimpleFormRedirectController {
 
         if (hasSubmitParameter(request, SUBMIT_SAVE)) {
             View view = form.getView();
-            view.setUserId(Common.getUser(request).getId());
+            view.setUserId(common.getUser(request).getId());
             viewDao.saveView(view);
             return getSuccessRedirectView("viewId=" + form.getView().getId());
         }

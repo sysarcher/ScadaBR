@@ -31,6 +31,7 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.MangoDataType;
 import com.serotonin.util.ArrayUtils;
 import com.serotonin.util.image.ImageUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -44,6 +45,9 @@ public class ImageValue extends MangoValue implements Comparable<ImageValue> {
     private long id = Common.NEW_ID;
     private int type;
     private byte[] data;
+    
+    @Autowired
+    private Common common;
 
     public ImageValue(long id, int type) {
         this.id = id;
@@ -108,7 +112,7 @@ public class ImageValue extends MangoValue implements Comparable<ImageValue> {
         try {
             if (data != null)
                 return ImageUtils.createImage(data);
-            return ImageUtils.loadImage(new File(Common.getFiledataPath(), getFilename()).getPath());
+            return ImageUtils.loadImage(new File(common.getFiledataPath(), getFilename()).getPath());
         }
         catch (InterruptedException e) {
             // no op
@@ -123,7 +127,7 @@ public class ImageValue extends MangoValue implements Comparable<ImageValue> {
         FileInputStream in = null;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
-            in = new FileInputStream(new File(Common.getFiledataPath(), getFilename()).getPath());
+            in = new FileInputStream(new File(common.getFiledataPath(), getFilename()).getPath());
             StreamUtils.transfer(in, out);
         }
         finally {

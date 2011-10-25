@@ -1,52 +1,57 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr;
 
 import java.util.List;
 
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.ScheduledEventDao;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
-import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
 
 /**
  * @author Matthew Lohbihler
- * 
+ *
  */
 public class ScheduledEventsDwr extends BaseDwr {
+
+    @Autowired
+    private RuntimeManager runtimeManager;
+
     //
     // /
     // / Public methods
     // /
     //
     public List<ScheduledEventVO> getScheduledEvents() {
-        Permissions.ensureDataSourcePermission(Common.getUser());
+        permissions.ensureDataSourcePermission(common.getUser());
         return new ScheduledEventDao().getScheduledEvents();
     }
 
     public ScheduledEventVO getScheduledEvent(int id) {
-        Permissions.ensureDataSourcePermission(Common.getUser());
+        permissions.ensureDataSourcePermission(common.getUser());
 
         if (id == Common.NEW_ID) {
             DateTime dt = new DateTime();
@@ -65,7 +70,7 @@ public class ScheduledEventsDwr extends BaseDwr {
             boolean returnToNormal, boolean disabled, int activeYear, int activeMonth, int activeDay, int activeHour,
             int activeMinute, int activeSecond, String activeCron, int inactiveYear, int inactiveMonth,
             int inactiveDay, int inactiveHour, int inactiveMinute, int inactiveSecond, String inactiveCron) {
-        Permissions.ensureDataSourcePermission(Common.getUser());
+        permissions.ensureDataSourcePermission(common.getUser());
 
         // Validate the given information. If there is a problem, return an appropriate error message.
         ScheduledEventVO se = new ScheduledEventVO();
@@ -94,24 +99,26 @@ public class ScheduledEventsDwr extends BaseDwr {
         DwrResponseI18n response = new DwrResponseI18n();
         ScheduledEventDao scheduledEventDao = new ScheduledEventDao();
 
-        if (StringUtils.isEmpty(xid))
+        if (StringUtils.isEmpty(xid)) {
             response.addContextualMessage("xid", "validate.required");
-        else if (!scheduledEventDao.isXidUnique(xid, id))
+        } else if (!scheduledEventDao.isXidUnique(xid, id)) {
             response.addContextualMessage("xid", "validate.xidUsed");
+        }
 
         se.validate(response);
 
         // Save the scheduled event
-        if (!response.getHasMessages())
-            Common.ctx.getRuntimeManager().saveScheduledEvent(se);
+        if (!response.getHasMessages()) {
+            runtimeManager.saveScheduledEvent(se);
+        }
 
         response.addData("seId", se.getId());
         return response;
     }
 
     public void deleteScheduledEvent(int seId) {
-        Permissions.ensureDataSourcePermission(Common.getUser());
+        permissions.ensureDataSourcePermission(common.getUser());
         new ScheduledEventDao().deleteScheduledEvent(seId);
-        Common.ctx.getRuntimeManager().stopSimpleEventDetector(ScheduledEventVO.getEventDetectorKey(seId));
+        runtimeManager.stopSimpleEventDetector(ScheduledEventVO.getEventDetectorKey(seId));
     }
 }

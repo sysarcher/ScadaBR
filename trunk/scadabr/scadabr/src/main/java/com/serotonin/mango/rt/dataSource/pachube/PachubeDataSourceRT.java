@@ -58,6 +58,7 @@ import com.serotonin.util.StringUtils;
 import com.serotonin.web.http.HttpUtils;
 import com.serotonin.web.i18n.LocalizableException;
 import com.serotonin.web.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class PachubeDataSourceRT extends PollingDataSource {
     public static final int DATA_RETRIEVAL_FAILURE_EVENT = 1;
@@ -71,22 +72,18 @@ public class PachubeDataSourceRT extends PollingDataSource {
     private final HttpClient httpClient;
     final SimpleDateFormat sdf;
 
+    @Autowired
+    private Common common;
+    
     public PachubeDataSourceRT(PachubeDataSourceVO vo) {
         super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
         this.vo = vo;
 
-        httpClient = createHttpClient(vo.getTimeoutSeconds(), vo.getRetries());
+        httpClient = common.createHttpClient(vo.getTimeoutSeconds(), vo.getRetries());
 
         sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
-
-    public static HttpClient createHttpClient(int timeoutSeconds, int retries) {
-        HttpClient httpClient = Common.getHttpClient(timeoutSeconds * 1000);
-        httpClient.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
-                new DefaultHttpMethodRetryHandler(retries, true));
-        return httpClient;
     }
 
     @Override

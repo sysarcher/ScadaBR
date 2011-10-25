@@ -16,6 +16,8 @@ import com.serotonin.mango.db.dao.BaseDao;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 public class FlexProjectDao extends BaseDao {
 
@@ -33,7 +35,7 @@ public class FlexProjectDao extends BaseDao {
     private int insertFlexProject(int id, String name, String description,
             String xmlConfig) {
         SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("flexProjects").usingGeneratedKeyColumns("id");
-        Map<String, Object> params = new HashMap<String, Object> ();
+        Map<String, Object> params = new HashMap<String, Object>();
         params.put("name", name);
         params.put("description", description);
         params.put("xmlConfig", xmlConfig);
@@ -51,21 +53,14 @@ public class FlexProjectDao extends BaseDao {
 
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void deleteFlexProject(final int flexProjectId) {
-        new TransactionTemplate(getTransactionManager()).execute(
-                new TransactionCallbackWithoutResult() {
-
-                    @Override
-                    protected void doInTransactionWithoutResult(
-                            TransactionStatus status) {
-                        getSimpleJdbcTemplate().update("delete from flexProjects where id=?",
-                                flexProjectId);
-                    }
-                });
+        getSimpleJdbcTemplate().update("delete from flexProjects where id=?",
+                flexProjectId);
     }
 
     public FlexProject getFlexProject(int id) {
-        return getSimpleJdbcTemplate().queryForObject(FLEX_PROJECT_SELECT + " where id=?", new FlexProjectRowMapper(), id);
+        return getJdbcTemplate().queryForObject(FLEX_PROJECT_SELECT + " where id=?", new FlexProjectRowMapper(), id);
     }
 
     public List<FlexProject> getFlexProjects() {

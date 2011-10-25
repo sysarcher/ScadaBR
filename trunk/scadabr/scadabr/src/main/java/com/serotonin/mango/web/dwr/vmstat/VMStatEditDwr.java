@@ -36,7 +36,7 @@ public class VMStatEditDwr extends DataSourceEditDwr {
 	@MethodFilter
 	public DwrResponseI18n saveVMStatDataSource(String name, String xid,
 			int pollSeconds, int outputScale) {
-		VMStatDataSourceVO ds = (VMStatDataSourceVO) Common.getUser()
+		VMStatDataSourceVO ds = (VMStatDataSourceVO) common.getUser()
 				.getEditDataSource();
 
 		ds.setXid(xid);

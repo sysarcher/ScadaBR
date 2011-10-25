@@ -11,8 +11,9 @@ import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonSerializable;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 
+@Deprecated
 @JsonRemoteEntity
-public class SystemSettingsJSONWrapper implements JsonSerializable {
+public class SystemSettingsJSONWrapper { /*implements JsonSerializable {
 
 	public SystemSettingsJSONWrapper() {
 	}
@@ -56,5 +57,5 @@ public class SystemSettingsJSONWrapper implements JsonSerializable {
 			}
 		}
 	}
-
+*/
 }

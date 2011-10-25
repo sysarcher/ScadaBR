@@ -33,8 +33,16 @@ import com.serotonin.mango.web.comparators.EventInstanceComparator;
 import com.serotonin.web.util.PaginatedData;
 import com.serotonin.web.util.PaginatedListController;
 import com.serotonin.web.util.PagingDataForm;
+import org.springframework.beans.factory.annotation.Autowired;
 
+@Deprecated
 public class EventsController extends PaginatedListController {
+        @Autowired
+    private Common common;
+    @Autowired
+    private EventDao eventDao;
+
+    
     @SuppressWarnings("unchecked")
     @Override
     protected PaginatedData getData(HttpServletRequest request, PagingDataForm paging, BindException errors)
@@ -52,7 +60,7 @@ public class EventsController extends PaginatedListController {
 //        }
 //        else
 //            data = Common.ctx.getEventManager().getActiveEvents(Common.getUser(request));
-        List<EventInstance> data = new EventDao().getPendingEvents(Common.getUser(request).getId());
+        List<EventInstance> data = eventDao.getPendingEvents(common.getUser(request).getId());
         sortData(bundle, data, paging);
         return new PaginatedData<EventInstance>(data, data.size());
     }

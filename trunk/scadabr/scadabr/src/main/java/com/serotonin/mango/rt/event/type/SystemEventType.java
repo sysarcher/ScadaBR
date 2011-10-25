@@ -32,9 +32,13 @@ import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.web.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @JsonRemoteEntity
 public class SystemEventType extends EventType {
+    
+    @Autowired
+    private SystemSettingsDao systemSettingsDao;
     //
     // /
     // / Static stuff
@@ -67,9 +71,9 @@ public class SystemEventType extends EventType {
         TYPE_CODES.addElement(TYPE_PROCESS_FAILURE, "PROCESS_FAILURE");
     }
 
-    private static List<EventTypeVO> systemEventTypes;
+    private List<EventTypeVO> systemEventTypes;
 
-    public static List<EventTypeVO> getSystemEventTypes() {
+    public List<EventTypeVO> getSystemEventTypes() {
         if (systemEventTypes == null) {
             systemEventTypes = new ArrayList<EventTypeVO>();
 
@@ -87,12 +91,12 @@ public class SystemEventType extends EventType {
         return systemEventTypes;
     }
 
-    private static void addEventTypeVO(int type, String key, AlarmLevels defaultAlarmLevel) {
+    private void addEventTypeVO(int type, String key, AlarmLevels defaultAlarmLevel) {
         systemEventTypes.add(new EventTypeVO(EventType.EventSources.SYSTEM, type, 0, new LocalizableMessage(key),
-                AlarmLevels.fromMangoId(SystemSettingsDao.getIntValue(SYSTEM_SETTINGS_PREFIX + type, defaultAlarmLevel.mangoId))));
+                AlarmLevels.fromMangoId(systemSettingsDao.getIntValue(SYSTEM_SETTINGS_PREFIX + type, defaultAlarmLevel.mangoId))));
     }
 
-    public static EventTypeVO getEventType(int type) {
+    public EventTypeVO getEventType(int type) {
         for (EventTypeVO et : getSystemEventTypes()) {
             if (et.getTypeRef1() == type)
                 return et;
@@ -100,22 +104,12 @@ public class SystemEventType extends EventType {
         return null;
     }
 
-    public static void setEventTypeAlarmLevel(int type, AlarmLevels alarmLevel) {
+    public void setEventTypeAlarmLevel(int type, AlarmLevels alarmLevel) {
         EventTypeVO et = getEventType(type);
         et.setAlarmLevel(alarmLevel);
 
         SystemSettingsDao dao = new SystemSettingsDao();
         dao.setIntValue(SYSTEM_SETTINGS_PREFIX + type, alarmLevel.mangoId);
-    }
-
-    public static void raiseEvent(SystemEventType type, long time, boolean rtn, LocalizableMessage message) {
-        EventTypeVO vo = getEventType(type.getSystemEventTypeId());
-        AlarmLevels alarmLevel = vo.getAlarmLevel();
-        Common.ctx.getEventManager().raiseEvent(type, time, rtn, alarmLevel, message, null);
-    }
-
-    public static void returnToNormal(SystemEventType type, long time) {
-        Common.ctx.getEventManager().returnToNormal(type, time);
     }
 
     //

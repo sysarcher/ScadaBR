@@ -21,14 +21,22 @@ package com.serotonin.mango.db.dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
+
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.object.MappingSqlQuery;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -37,56 +45,105 @@ import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.vo.User;
-import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.vo.permission.DataPointAccess;
+import org.springframework.transaction.annotation.Propagation;
 
+@Repository
+@Transactional(readOnly = true)
 public class UserDao extends BaseDao {
 
-    private static final String USER_SELECT = "select id, username, password, email, phone, admin, disabled, selectedWatchList, homeUrl, lastLogin, "
-            + "  receiveAlarmEmails, receiveOwnAuditEvents " + "from users ";
+    public class UsersMappingQuery extends MappingSqlQuery<User> {
+
+        public UsersMappingQuery(DataSource ds, String sql) {
+            super(ds, sql);
+            compile();
+        }
+        private UserRowMapper userRowMapper = new UserRowMapper();
+
+        @Override
+        protected User mapRow(ResultSet rs, int i) throws SQLException {
+            return userRowMapper.mapRow(rs, i);
+        }
+    }
+    private UsersMappingQuery selectUsers;
+
+    @PostConstruct
+    public void init() {
+        selectUsers = new UsersMappingQuery(getDataSource(), UserRowMapper.USER_SELECT + "order by mangoUserName"); // + " order by username");
+    }
 
     public User getUser(int id) {
-        User user = getSimpleJdbcTemplate().queryForObject(USER_SELECT + "where id=?", new UserRowMapper(), id);
-        populateUserPermissions(user);
-        return user;
+        try {
+            User user = getJdbcTemplate().queryForObject(UserRowMapper.USER_SELECT + "where id=?", new UserRowMapper(), id);
+            populateUserPermissions(user);
+            return user;
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
+        }
     }
 
     public User getUser(String username) {
-        User user = getSimpleJdbcTemplate().queryForObject(USER_SELECT + "where lower(username)=?", new UserRowMapper(), username.toLowerCase());
-        populateUserPermissions(user);
-        return user;
+        try {
+            User user = getJdbcTemplate().queryForObject(UserRowMapper.USER_SELECT + "where lower(username)=?", new UserRowMapper(), username.toLowerCase());
+            populateUserPermissions(user);
+            return user;
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
+        }
     }
 
     class UserRowMapper implements ParameterizedRowMapper<User> {
 
+        static final String USER_SELECT = 
+                "select "
+                + " id, "
+                + " mangoUsername, "
+                + " mangoUserPassword, "
+                + " email, "
+                + " phone, "
+                + " mangoAdmin, "
+                + " disabled, "
+                + " selectedWatchList, "
+                + " homeUrl, "
+                + " lastLogin, "
+                + " receiveAlarmEmails, "
+                + " receiveOwnAuditEvents "
+                + "from users ";
+
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
             User user = new User();
-            int i = 0;
-            user.setId(rs.getInt(++i));
-            user.setUsername(rs.getString(++i));
-            user.setPassword(rs.getString(++i));
-            user.setEmail(rs.getString(++i));
-            user.setPhone(rs.getString(++i));
-            user.setAdmin(charToBool(rs.getString(++i)));
-            user.setDisabled(charToBool(rs.getString(++i)));
-            user.setSelectedWatchList(rs.getInt(++i));
-            user.setHomeUrl(rs.getString(++i));
-            user.setLastLogin(rs.getLong(++i));
-            user.setReceiveAlarmEmails(AlarmLevels.fromMangoId(rs.getInt(++i)));
-            user.setReceiveOwnAuditEvents(charToBool(rs.getString(++i)));
+            user.setId(rs.getInt("id"));
+            user.setUsername(rs.getString("mangoUserName"));
+            user.setPassword(rs.getString("mangoUserPassword"));
+            user.setEmail(rs.getString("email"));
+            user.setPhone(rs.getString("phone"));
+            user.setAdmin(charToBool(rs.getString("mangoAdmin")));
+            user.setDisabled(charToBool(rs.getString("disabled")));
+            user.setSelectedWatchList(rs.getInt("selectedWatchList"));
+            user.setHomeUrl(rs.getString("homeUrl"));
+            final Timestamp lastLogin = rs.getTimestamp("lastLogin");
+            user.setLastLogin(lastLogin != null ? lastLogin.getTime() : 0);
+            user.setReceiveAlarmEmails(AlarmLevels.valueOf(rs.getString("receiveAlarmEmails")));
+            user.setReceiveOwnAuditEvents(charToBool(rs.getString("receiveOwnAuditEvents")));
             return user;
         }
     }
 
     public List<User> getUsers() {
-        List<User> users = getSimpleJdbcTemplate().query(USER_SELECT + "order by username", new UserRowMapper());
+        List<User> users = null;
+        try {
+            users = selectUsers.execute();
+        } catch (Exception ex) {
+            System.err.print(ex);
+            throw new RuntimeException(ex);
+        }
         populateUserPermissions(users);
         return users;
     }
 
     public List<User> getActiveUsers() {
-        List<User> users = getSimpleJdbcTemplate().query(USER_SELECT + "where disabled=?", new UserRowMapper(), boolToChar(false));
+        List<User> users = getJdbcTemplate().query(UserRowMapper.USER_SELECT + "where disabled=?", new UserRowMapper(), false);
         populateUserPermissions(users);
         return users;
     }
@@ -96,16 +153,15 @@ public class UserDao extends BaseDao {
             populateUserPermissions(user);
         }
     }
-    private static final String SELECT_DATA_SOURCE_PERMISSIONS = "select dataSourceId from dataSourceUsers where userId=?";
-    private static final String SELECT_DATA_POINT_PERMISSIONS = "select dataPointId, permission from dataPointUsers where userId=?";
 
+    @Transactional(readOnly=true)
     public void populateUserPermissions(User user) {
         if (user == null) {
             return;
         }
 
-        user.setDataSourcePermissions(getJdbcTemplate().queryForList(SELECT_DATA_SOURCE_PERMISSIONS, new Object[]{user.getId()}, Integer.class));
-        user.setDataPointPermissions(getSimpleJdbcTemplate().query(SELECT_DATA_POINT_PERMISSIONS, new ParameterizedRowMapper<DataPointAccess>() {
+        user.setDataSourcePermissions(getJdbcTemplate().queryForList("select dataSourceId from dataSourceUsers where userId=?", new Object[]{user.getId()}, Integer.class));
+        user.setDataPointPermissions(getJdbcTemplate().query("select dataPointId, dataPointUserPermission from dataPointUsers where userId=?", new ParameterizedRowMapper<DataPointAccess>() {
 
             @Override
             public DataPointAccess mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -118,34 +174,27 @@ public class UserDao extends BaseDao {
     }
 
     public void saveUser(final User user) {
-        new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
-
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                if (user.getId() == Common.NEW_ID) {
-                    insertUser(user);
-                } else {
-                    updateUser(user);
-                }
-            }
-        });
+        getDataBaseType();
+        if (user.getId() == Common.NEW_ID) {
+            insertUser(user);
+        } else {
+            updateUser(user);
+        }
     }
-    private static final String USER_INSERT = "insert into users ("
-            + "  username, password, email, phone, admin, disabled, homeUrl, receiveAlarmEmails, receiveOwnAuditEvents) "
-            + "values (?,?,?,?,?,?,?,?,?)";
 
-    void insertUser(User user) {
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+    private void insertUser(User user) {
         SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("users").usingGeneratedKeyColumns("id");
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("username", user.getUsername());
-        params.put("password", user.getPassword());
+        Map<String, Object> params = new HashMap();
+        params.put("mangoUsername", user.getUsername());
+        params.put("mangoUserPassword", user.getPassword());
         params.put("email", user.getEmail());
         params.put("phone", user.getPhone());
-        params.put("admin", boolToChar(user.isAdmin()));
-        params.put("disabled", boolToChar(user.isDisabled()));
+        params.put("mangoAdmin", user.isAdmin());
+        params.put("disabled", user.isDisabled());
         params.put("homeUrl", user.getHomeUrl());
-        params.put("receiveAlarmEmails", user.getReceiveAlarmEmails().mangoId);
-        params.put("receiveOwnAuditEvents", boolToChar(user.isReceiveOwnAuditEvents()));
+        params.put("receiveAlarmEmails", user.getReceiveAlarmEmails());
+        params.put("receiveOwnAuditEvents", user.isReceiveOwnAuditEvents());
 
         Number id = insertActor.executeAndReturnKey(params);
 
@@ -153,23 +202,47 @@ public class UserDao extends BaseDao {
 
         saveRelationalData(user);
     }
-    private static final String USER_UPDATE = "update users set "
-            + "  username=?, password=?, email=?, phone=?, admin=?, disabled=?, homeUrl=?, receiveAlarmEmails=?, "
-            + "  receiveOwnAuditEvents=? " + "where id=?";
 
-    void updateUser(User user) {
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+    private void updateUser(User user) {
+        final String UPDATE_SQL =
+                "update users set "
+                + " mangoUsername=:mangoUsername,"
+                + " mangoUserPassword=:mangoUserPassword,"
+                + " email=:email,"
+                + " phone=:phone,"
+                + " mangoAdmin=mangoAdmin,"
+                + " disabled=:disabled,"
+                + " homeUrl=:homeUrl,"
+                + " receiveAlarmEmails=:receiveAlarmEmails,"
+                + " receiveOwnAuditEvents=:receiveOwnAuditEvents "
+                + " where id=:id";
+        Map<String, Object> params = new HashMap();
+        params.put("mangoUsername", user.getUsername());
+        params.put("mangoUserPassword", user.getPassword());
+        params.put("email", user.getEmail());
+        params.put("phone", user.getPhone());
+        params.put("mangoAdmin", user.isAdmin());
+        params.put("disabled", user.isDisabled());
+        params.put("homeUrl", user.getHomeUrl());
+        params.put("receiveAlarmEmails", user.getReceiveAlarmEmails().name());
+        params.put("receiveOwnAuditEvents", user.isReceiveOwnAuditEvents());
+        params.put("id", user.getId());
         getSimpleJdbcTemplate().update(
-                USER_UPDATE,
-                user.getUsername(), user.getPassword(), user.getEmail(), user.getPhone(),
-                boolToChar(user.isAdmin()), boolToChar(user.isDisabled()), user.getHomeUrl(),
-                user.getReceiveAlarmEmails().mangoId, boolToChar(user.isReceiveOwnAuditEvents()), user.getId());
+                UPDATE_SQL, params);
+
         saveRelationalData(user);
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     private void saveRelationalData(final User user) {
-        // Delete existing permissions.
+        // Delete existing permissions. 
         getSimpleJdbcTemplate().update("delete from dataSourceUsers where userId=?", user.getId());
         getSimpleJdbcTemplate().update("delete from dataPointUsers where userId=?", user.getId());
+
+        if (user.getDataSourcePermissions().isEmpty()) {
+            return;
+        }
 
         // Save the new ones.
         getJdbcTemplate().batchUpdate("insert into dataSourceUsers (dataSourceId, userId) values (?,?)",
@@ -203,40 +276,36 @@ public class UserDao extends BaseDao {
                 });
     }
 
-    public void deleteUser(final int userId) {
-        new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
-
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                getSimpleJdbcTemplate().update("update userComments set userId=null where userId=?", userId);
-                getSimpleJdbcTemplate().update("delete from mailingListMembers where userId=?", userId);
-                getSimpleJdbcTemplate().update("update pointValueAnnotations set sourceId=null where sourceId=? and sourceType="
-                        + SetPointSource.Types.USER, userId);
-                getSimpleJdbcTemplate().update("delete from userEvents where userId=?", userId);
-                getSimpleJdbcTemplate().update("update events set ackUserId=null, alternateAckSource="
-                        + EventInstance.AlternateAcknowledgementSources.DELETED_USER + " where ackUserId=?", userId);
-                getSimpleJdbcTemplate().update("delete from users where id=?", userId);
-            }
-        });
+    /**
+     * Delete user from database.
+     * First clean upn any references (usercomments, pointValueAnnotations and events) and then delete user
+     * @param user the user to delete
+     */
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+    public void deleteUser(final User user) {
+        
+        getSimpleJdbcTemplate().update("update userComments "
+                + " set userId=null "
+                + "where userId=?", user.getId());
+        getSimpleJdbcTemplate().update("update pointValueAnnotations "
+                + " set sourceId=null "
+                + "where sourceId=? and sourceType=? "
+                , user.getId(), SetPointSource.Types.USER);
+        getSimpleJdbcTemplate().update("update events "
+                + " set ackUserId=null, "
+                + " alternateAckSource=? "
+                + "where ackUserId=?", EventInstance.AlternateAcknowledgementSources.DELETED_USER, user.getId());
+        
+        getSimpleJdbcTemplate().update("delete from users where id=?", user.getId());
     }
 
-    public void recordLogin(int userId) {
-        getSimpleJdbcTemplate().update("update users set lastLogin=? where id=?", System.currentTimeMillis(), userId);
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+    public void saveLastLogin(User user) {
+        getSimpleJdbcTemplate().update("update users set lastLogin=? where id=?", user.getLastLogin(), user.getId());
     }
 
-    public void saveHomeUrl(int userId, String homeUrl) {
-        getSimpleJdbcTemplate().update("update users set homeUrl=? where id=?", homeUrl, userId);
-    }
-
-    public void insertUserComment(int typeId, int referenceId, UserComment comment) {
-        SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("userComments");
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("userId", comment.getUserId());
-        params.put("commentType", typeId);
-        params.put("typeKey", referenceId);
-        params.put("ts", comment.getTs());
-        params.put("commentText", comment.getComment());
-
-        insertActor.execute(params);
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+    public void saveHomeUrl(User user, String homeUrl) {
+        getSimpleJdbcTemplate().update("update users set homeUrl=? where id=?", homeUrl, user.getId());
     }
 }

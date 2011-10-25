@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.publish.pachube;
 
@@ -27,9 +27,11 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.dataSource.pachube.PachubeDataSourceRT;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -44,20 +46,22 @@ import com.serotonin.mango.vo.publish.pachube.PachubeSenderVO;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 public class PachubeSenderRT extends PublisherRT<PachubePointVO> {
+
     private final static Logger LOG = LoggerFactory.getLogger(PachubeSenderRT.class);
     private static final int MAX_FAILURES = 5;
-
     public static final int SEND_EXCEPTION_EVENT = 11;
-
     final EventType sendExceptionEventType = new PublisherEventType(getId(), SEND_EXCEPTION_EVENT);
-
     final PachubeSenderVO vo;
     final HttpClient httpClient;
+    @Autowired
+    private Common common;
+    @Autowired
+    private EventManager eventManager;
 
     public PachubeSenderRT(PachubeSenderVO vo) {
         super(vo);
         this.vo = vo;
-        httpClient = PachubeDataSourceRT.createHttpClient(vo.getTimeoutSeconds(), vo.getRetries());
+        httpClient = common.createHttpClient(vo.getTimeoutSeconds(), vo.getRetries());
     }
 
     @Override
@@ -80,6 +84,7 @@ public class PachubeSenderRT extends PublisherRT<PachubePointVO> {
     }
 
     class PachubeSendThread extends SendThread {
+
         private int failureCount = 0;
         private LocalizableMessage failureMessage;
 
@@ -93,20 +98,19 @@ public class PachubeSenderRT extends PublisherRT<PachubePointVO> {
                 PublishQueueEntry<PachubePointVO> entry = getPublishQueue().next();
 
                 if (entry != null) {
-                    if (send(entry))
+                    if (send(entry)) {
                         getPublishQueue().remove(entry);
-                    else {
+                    } else {
                         // The send failed, so take a break so as not to over exert ourselves.
                         try {
                             Thread.sleep(2000);
-                        }
-                        catch (InterruptedException e1) {
+                        } catch (InterruptedException e1) {
                             // no op
                         }
                     }
-                }
-                else
+                } else {
                     waitImpl(10000);
+                }
             }
         }
 
@@ -122,8 +126,7 @@ public class PachubeSenderRT extends PublisherRT<PachubePointVO> {
             try {
                 method.setRequestEntity(new StringRequestEntity(entry.getPvt().getValue().toString(), "text/csv",
                         "UTF-8"));
-            }
-            catch (UnsupportedEncodingException e) {
+            } catch (UnsupportedEncodingException e) {
                 throw new ShouldNeverHappenException(e);
             }
 
@@ -138,30 +141,31 @@ public class PachubeSenderRT extends PublisherRT<PachubePointVO> {
                     // 500-type errors are server side, and so may be recoverable.
                     permanentFailure = code < 500;
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 message = new LocalizableMessage("common.default", e.getMessage());
-            }
-            finally {
+            } finally {
                 method.releaseConnection();
             }
 
             // Check for failure.
             if (message != null) {
                 failureCount++;
-                if (failureMessage == null)
+                if (failureMessage == null) {
                     failureMessage = message;
+                }
 
-                if (failureCount == MAX_FAILURES + 1)
-                    Common.ctx.getEventManager().raiseEvent(sendExceptionEventType, System.currentTimeMillis(), true,
+                if (failureCount == MAX_FAILURES + 1) {
+                    eventManager.raiseEvent(sendExceptionEventType, System.currentTimeMillis(), true,
                             AlarmLevels.URGENT, failureMessage, createEventContext());
+                }
 
                 return permanentFailure;
             }
 
             if (failureCount > 0) {
-                if (failureCount > MAX_FAILURES)
-                    Common.ctx.getEventManager().returnToNormal(sendExceptionEventType, System.currentTimeMillis());
+                if (failureCount > MAX_FAILURES) {
+                    eventManager.returnToNormal(sendExceptionEventType, System.currentTimeMillis());
+                }
 
                 failureCount = 0;
                 failureMessage = null;

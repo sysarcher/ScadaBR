@@ -23,6 +23,7 @@ import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.web.dwr.BaseDwr;
 import java.util.EnumSet;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @JsonRemoteEntity
 public class AlarmListComponent extends CustomComponent {
@@ -36,6 +37,10 @@ public class AlarmListComponent extends CustomComponent {
 	private int maxListSize = 5;
 	@JsonRemoteProperty
 	private int width = 500;
+    @Autowired
+    private EventDao eventDao;
+    @Autowired
+    private Common common;
 
 	private boolean hideIdColumn = true;
 	private boolean hideAlarmLevelColumn = false;
@@ -48,7 +53,7 @@ public class AlarmListComponent extends CustomComponent {
 		Map<String, Object> model = new HashMap<String, Object>();
 		WebContext webContext = WebContextFactory.get();
 		HttpServletRequest request = webContext.getHttpServletRequest();
-		List<EventInstance> events = new EventDao().getPendingEvents(Common
+		List<EventInstance> events = eventDao.getPendingEvents(common
 				.getUser().getId());
 
 		filter(events, minAlarmLevel);

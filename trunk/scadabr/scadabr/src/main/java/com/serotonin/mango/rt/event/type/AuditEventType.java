@@ -36,9 +36,15 @@ import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @JsonRemoteEntity
 public class AuditEventType extends EventType {
+    
+    @Autowired
+    private Common common;
+    @Autowired
+    private SystemSettingsDao systemSettingsDao;
     //
     // /
     // / Static stuff
@@ -67,9 +73,9 @@ public class AuditEventType extends EventType {
         TYPE_CODES.addElement(TYPE_MAINTENANCE_EVENT, "MAINTENANCE_EVENT");
     }
 
-    private static List<EventTypeVO> auditEventTypes;
+    private List<EventTypeVO> auditEventTypes;
 
-    public static List<EventTypeVO> getAuditEventTypes() {
+    public List<EventTypeVO> getAuditEventTypes() {
         if (auditEventTypes == null) {
             auditEventTypes = new ArrayList<EventTypeVO>();
 
@@ -85,12 +91,13 @@ public class AuditEventType extends EventType {
         return auditEventTypes;
     }
 
-    private static void addEventTypeVO(int type, String key) {
+    private void addEventTypeVO(int type, String key) {
         auditEventTypes.add(new EventTypeVO(EventType.EventSources.AUDIT, type, 0, new LocalizableMessage(key),
-                AlarmLevels.fromMangoId(SystemSettingsDao.getIntValue(AUDIT_SETTINGS_PREFIX + type, AlarmLevels.INFORMATION.mangoId))));
+                AlarmLevels.fromMangoId(systemSettingsDao.getIntValue(AUDIT_SETTINGS_PREFIX + type, AlarmLevels.INFORMATION.mangoId))));
     }
 
-    public static EventTypeVO getEventType(int type) {
+    @Deprecated
+    public EventTypeVO getEventType(int type) {
         for (EventTypeVO et : getAuditEventTypes()) {
             if (et.getTypeRef1() == type)
                 return et;
@@ -98,56 +105,12 @@ public class AuditEventType extends EventType {
         return null;
     }
 
-    public static void setEventTypeAlarmLevel(int type, AlarmLevels alarmLevel) {
+    public void setEventTypeAlarmLevel(int type, AlarmLevels alarmLevel) {
         EventTypeVO et = getEventType(type);
         et.setAlarmLevel(alarmLevel);
 
         SystemSettingsDao dao = new SystemSettingsDao();
         dao.setIntValue(AUDIT_SETTINGS_PREFIX + type, alarmLevel.mangoId);
-    }
-
-    public static void raiseAddedEvent(int auditEventTypeId, ChangeComparable<?> o) {
-        List<LocalizableMessage> list = new ArrayList<LocalizableMessage>();
-        o.addProperties(list);
-        raiseEvent(auditEventTypeId, o, "event.audit.added", list.toArray());
-    }
-
-    public static <T> void raiseChangedEvent(int auditEventTypeId, T from, ChangeComparable<T> to) {
-        List<LocalizableMessage> changes = new ArrayList<LocalizableMessage>();
-        to.addPropertyChanges(changes, from);
-        if (changes.size() == 0)
-            // If the object wasn't in fact changed, don't raise an event.
-            return;
-        raiseEvent(auditEventTypeId, to, "event.audit.changed", changes.toArray());
-    }
-
-    public static void raiseDeletedEvent(int auditEventTypeId, ChangeComparable<?> o) {
-        List<LocalizableMessage> list = new ArrayList<LocalizableMessage>();
-        o.addProperties(list);
-        raiseEvent(auditEventTypeId, o, "event.audit.deleted", list.toArray());
-    }
-
-    private static void raiseEvent(int auditEventTypeId, ChangeComparable<?> o, String key, Object[] props) {
-        User user = Common.getUser();
-        Object username;
-        if (user != null)
-            username = user.getUsername() + " (" + user.getId() + ")";
-        else {
-            String descKey = Common.getBackgroundProcessDescription();
-            if (descKey == null)
-                username = new LocalizableMessage("common.unknown");
-            else
-                username = new LocalizableMessage(descKey);
-        }
-
-        LocalizableMessage message = new LocalizableMessage(key, username, new LocalizableMessage(o.getTypeKey()),
-                o.getId(), new LocalizableMessage("event.audit.propertyList." + props.length, props));
-
-        AuditEventType type = new AuditEventType(auditEventTypeId, o.getId());
-        type.setRaisingUser(user);
-
-        Common.ctx.getEventManager().raiseEvent(type, System.currentTimeMillis(), false,
-                getEventType(type.getAuditEventTypeId()).getAlarmLevel(), message, null);
     }
 
     //

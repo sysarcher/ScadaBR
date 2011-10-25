@@ -33,10 +33,12 @@ import javax.servlet.http.HttpServletResponse;
 import com.serotonin.cache.ObjectCreator;
 import com.serotonin.cache.ThreadSafeCache;
 import com.serotonin.mango.Common;
+import com.serotonin.mango.SysProperties;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverData;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverMulticaster;
 import com.serotonin.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -47,6 +49,7 @@ public class HttpDataSourceServlet extends HttpServlet {
 
     public static final ThreadSafeCache<SimpleDateFormat> BASIC_SDF_CACHE = new ThreadSafeCache<SimpleDateFormat>(
             new ObjectCreator<SimpleDateFormat>() {
+        @Override
                 public SimpleDateFormat create() {
                     return new SimpleDateFormat("yyyyMMddHHmmss");
                 }
@@ -54,6 +57,7 @@ public class HttpDataSourceServlet extends HttpServlet {
 
     public static final ThreadSafeCache<SimpleDateFormat> TZ_SDF_CACHE = new ThreadSafeCache<SimpleDateFormat>(
             new ObjectCreator<SimpleDateFormat>() {
+        @Override
                 public SimpleDateFormat create() {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                     sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -69,6 +73,10 @@ public class HttpDataSourceServlet extends HttpServlet {
 
     private HttpReceiverMulticaster multicaster;
 
+    @Autowired
+    private SystemSettingsDao systemSettingsDao;
+            
+    
     @Override
     public void init() {
         multicaster = Common.ctx.getHttpReceiverMulticaster();
@@ -149,7 +157,7 @@ public class HttpDataSourceServlet extends HttpServlet {
             messages.add("Unconsumed key: " + unconsumed);
 
         // Write the prologue
-        response.getWriter().write(SystemSettingsDao.getValue(SystemSettingsDao.HTTPDS_EPILOGUE));
+        response.getWriter().write(systemSettingsDao.getValue(SysProperties.HTTPDS_EPILOGUE));
 
         for (String message : messages) {
             response.getWriter().write(message);
@@ -157,7 +165,7 @@ public class HttpDataSourceServlet extends HttpServlet {
         }
 
         // Write the epilogue
-        response.getWriter().write(SystemSettingsDao.getValue(SystemSettingsDao.HTTPDS_EPILOGUE));
+        response.getWriter().write(systemSettingsDao.getValue(SysProperties.HTTPDS_EPILOGUE));
     }
 
     private void addData(HttpReceiverData data, String name, String value, String time) {

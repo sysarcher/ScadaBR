@@ -63,16 +63,25 @@ import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class EventHandlersDwr extends BaseDwr {
     private final static Logger LOG = LoggerFactory.getLogger(EventHandlersDwr.class);
+    @Autowired
+    private Permissions permissions;
+    @Autowired
+    private Common common;
+    @Autowired
+    private AuditEventType auditEventType;
+    @Autowired
+    private SystemEventType systemEventType;
 
 	private final ResourceBundle setPointSnippetMap = ResourceBundle
 			.getBundle("setPointSnippetMap");
 
 	public Map<String, Object> getInitData() {
-		User user = Common.getUser();
-		Permissions.ensureDataSourcePermission(user);
+		User user = common.getUser();
+		permissions.ensureDataSourcePermission(user);
 
 		EventDao eventDao = new EventDao();
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -83,7 +92,7 @@ public class EventHandlersDwr extends BaseDwr {
 		List<DataPointVO> dps = new DataPointDao().getDataPoints(
 				DataPointExtendedNameComparator.instance, true);
 		for (DataPointVO dp : dps) {
-			if (!Permissions
+			if (!permissions
 					.hasDataSourcePermission(user, dp.getDataSourceId()))
 				continue;
 
@@ -129,7 +138,7 @@ public class EventHandlersDwr extends BaseDwr {
 		// Get the data sources
 		List<EventSourceBean> dataSources = new ArrayList<EventSourceBean>();
 		for (DataSourceVO<?> ds : new DataSourceDao().getDataSources()) {
-			if (!Permissions.hasDataSourcePermission(user, ds.getId()))
+			if (!permissions.hasDataSourcePermission(user, ds.getId()))
 				continue;
 
 			if (ds.getEventTypes().size() > 0) {
@@ -146,7 +155,7 @@ public class EventHandlersDwr extends BaseDwr {
 			}
 		}
 
-		if (Permissions.hasAdmin(user)) {
+		if (permissions.hasAdmin(user)) {
 			// Get the publishers
 			List<EventSourceBean> publishers = new ArrayList<EventSourceBean>();
 			for (PublisherVO<? extends PublishedPointVO> p : new PublisherDao()
@@ -179,7 +188,7 @@ public class EventHandlersDwr extends BaseDwr {
 
 			// Get the system events
 			List<EventTypeVO> systemEvents = new ArrayList<EventTypeVO>();
-			for (EventTypeVO sets : SystemEventType.getSystemEventTypes()) {
+			for (EventTypeVO sets : systemEventType.getSystemEventTypes()) {
 				sets.setHandlers(eventDao.getEventHandlers(sets));
 				systemEvents.add(sets);
 			}
@@ -187,7 +196,7 @@ public class EventHandlersDwr extends BaseDwr {
 
 			// Get the audit events
 			List<EventTypeVO> auditEvents = new ArrayList<EventTypeVO>();
-			for (EventTypeVO aets : AuditEventType.getAuditEventTypes()) {
+			for (EventTypeVO aets : auditEventType.getAuditEventTypes()) {
 				aets.setHandlers(eventDao.getEventHandlers(aets));
 				auditEvents.add(aets);
 			}
@@ -210,7 +219,7 @@ public class EventHandlersDwr extends BaseDwr {
 	public String createSetValueContent(int pointId, String valueStr,
 			String idSuffix) {
 		DataPointVO pointVO = new DataPointDao().getDataPoint(pointId);
-		Permissions.ensureDataSourcePermission(Common.getUser(),
+		permissions.ensureDataSourcePermission(common.getUser(),
 				pointVO.getDataSourceId());
 
 		MangoValue value = MangoValue.stringToValue(valueStr, pointVO
@@ -301,7 +310,7 @@ public class EventHandlersDwr extends BaseDwr {
 			String alias, boolean disabled) {
 		EventTypeVO type = new EventTypeVO(eventSourceId, eventTypeRef1,
 				eventTypeRef2);
-		Permissions.ensureEventTypePermission(Common.getUser(), type);
+		permissions.ensureEventTypePermission(common.getUser(), type);
 		EventDao eventDao = new EventDao();
 
 		vo.setId(handlerId);
@@ -322,7 +331,7 @@ public class EventHandlersDwr extends BaseDwr {
 
 	public void deleteEventHandler(int handlerId) {
 		EventDao eventDao = new EventDao();
-		Permissions.ensureEventTypePermission(Common.getUser(),
+		permissions.ensureEventTypePermission(common.getUser(),
 				eventDao.getEventHandlerType(handlerId));
 		eventDao.deleteEventHandler(handlerId);
 	}

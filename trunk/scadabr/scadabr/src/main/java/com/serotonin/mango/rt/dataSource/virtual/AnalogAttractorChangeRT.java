@@ -1,37 +1,41 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource.virtual;
 
-import com.serotonin.mango.Common;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.vo.dataSource.virtual.AnalogAttractorChangeVO;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class AnalogAttractorChangeRT extends ChangeTypeRT {
-    private static Logger log = LoggerFactory.getLogger(AnalogAttractorChangeRT.class);
 
+    private static Logger log = LoggerFactory.getLogger(AnalogAttractorChangeRT.class);
     private final AnalogAttractorChangeVO vo;
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     public AnalogAttractorChangeRT(AnalogAttractorChangeVO vo) {
         this.vo = vo;
@@ -42,18 +46,20 @@ public class AnalogAttractorChangeRT extends ChangeTypeRT {
         double current = currentValue.getDoubleValue();
 
         // Get the value we're attracted to.
-        DataPointRT point = Common.ctx.getRuntimeManager().getDataPoint(vo.getAttractionPointId());
+        DataPointRT point = runtimeManager.getDataPoint(vo.getAttractionPointId());
         if (point == null) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Attraction point is not enabled");
+            }
             // Point is not currently active.
             return new NumericValue(current);
         }
 
         MangoValue attractorValue = PointValueTime.getValue(point.getPointValue());
         if (attractorValue == null) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Attraction point has not vaue");
+            }
             return new NumericValue(current);
         }
 
@@ -63,16 +69,18 @@ public class AnalogAttractorChangeRT extends ChangeTypeRT {
         double change = (attraction - current) / 2;
 
         // ... subject to the maximum change allowed...
-        if (change < 0 && -change > vo.getMaxChange())
+        if (change < 0 && -change > vo.getMaxChange()) {
             change = -vo.getMaxChange();
-        else if (change > vo.getMaxChange())
+        } else if (change > vo.getMaxChange()) {
             change = vo.getMaxChange();
+        }
 
         // ... and a random fluctuation.
         change += RANDOM.nextDouble() * vo.getVolatility() * 2 - vo.getVolatility();
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("attraction=" + attraction + ", change=" + change);
+        }
 
         return new NumericValue(current + change);
     }

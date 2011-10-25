@@ -104,7 +104,7 @@ public class MailingListsDwr extends BaseDwr {
         String[] toAddrs = addresses.toArray(new String[0]);
 
         try {
-            ResourceBundle bundle = Common.getBundle();
+            ResourceBundle bundle = common.getBundle();
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("message", new LocalizableMessage("ftl.userTestEmail", ml.getName()));
             MangoEmailContent cnt = new MangoEmailContent("ftl.testEmail", model, bundle, I18NUtils.getMessage(bundle,

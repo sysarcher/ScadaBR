@@ -35,11 +35,17 @@ import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.vo.report.ReportChartCreator;
 import com.serotonin.mango.vo.report.ReportChartCreator.PointStatistics;
 import com.serotonin.mango.vo.report.ReportInstance;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
  */
 public class ReportChartController extends AbstractController {
+    @Autowired
+    private Permissions permissions;
+    @Autowired
+    private Common common;
+
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
@@ -48,8 +54,8 @@ public class ReportChartController extends AbstractController {
         ReportDao reportDao = new ReportDao();
         ReportInstance instance = reportDao.getReportInstance(instanceId);
 
-        User user = Common.getUser(request);
-        Permissions.ensureReportInstancePermission(user, instance);
+        User user = common.getUser(request);
+        permissions.ensureReportInstancePermission(user, instance);
 
         ReportChartCreator creator = new ReportChartCreator(ControllerUtils.getResourceBundle(request));
         creator.createContent(instance, reportDao, null, false);

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.dataImage.DataPointListener;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.event.SimpleEventDetector;
@@ -30,8 +31,14 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 abstract public class PointEventDetectorRT extends SimpleEventDetector implements DataPointListener {
+    
+@Autowired
+private EventManager eventManager;
+
     protected PointEventDetectorVO vo;
 
     protected EventType getEventType() {
@@ -48,13 +55,13 @@ abstract public class PointEventDetectorRT extends SimpleEventDetector implement
         else
             msg = getMessage();
 
-        Common.ctx.getEventManager().raiseEvent(getEventType(), time, vo.isRtnApplicable(), vo.getAlarmLevel(), msg,
+        eventManager.raiseEvent(getEventType(), time, vo.isRtnApplicable(), vo.getAlarmLevel(), msg,
                 context);
         fireEventDetectorStateChanged(time);
     }
 
     protected void returnToNormal(long time) {
-        Common.ctx.getEventManager().returnToNormal(getEventType(), time);
+        eventManager.returnToNormal(getEventType(), time);
         fireEventDetectorStateChanged(time);
     }
 

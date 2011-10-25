@@ -27,15 +27,20 @@ import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.view.custom.CustomView;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.permission.Permissions;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
  */
 abstract public class ViewTagSupport extends TagSupport {
     private static final long serialVersionUID = -1;
+    @Autowired
+    private Common common;
+    @Autowired
+    private Permissions permissions;
 
     protected CustomView getCustomView() throws JspException {
-        CustomView view = Common.getCustomView((HttpServletRequest) pageContext.getRequest());
+        CustomView view = common.getCustomView((HttpServletRequest) pageContext.getRequest());
         if (view == null)
             throw new JspException("No custom view in session. Use the init tag before defining points");
         return view;
@@ -48,7 +53,7 @@ abstract public class ViewTagSupport extends TagSupport {
             throw new JspException("Point with XID '" + xid + "' not found");
 
         // Check that the authorizing user has access to the point.
-        Permissions.ensureDataPointReadPermission(view.getAuthorityUser(), dataPointVO);
+        permissions.ensureDataPointReadPermission(view.getAuthorityUser(), dataPointVO);
 
         return dataPointVO;
     }

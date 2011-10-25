@@ -49,7 +49,7 @@ public class ScriptsDwr extends BaseDwr {
 		vo.setScript(script);
 		vo.setPointsOnContext(pointsOnContext);
 		vo.setObjectsOnContext(objectsOnContext);
-		vo.setUserId(Common.getUser().getId());
+		vo.setUserId(common.getUser().getId());
 
 		DwrResponseI18n response = new DwrResponseI18n();
 

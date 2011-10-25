@@ -38,10 +38,17 @@ import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.web.i18n.I18NUtils;
 import java.util.LinkedHashMap;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class WatchListController extends ParameterizableViewController {
     public static final String KEY_WATCHLISTS = "watchLists";
     public static final String KEY_SELECTED_WATCHLIST = "selectedWatchList";
+    
+     @Autowired
+     protected Common common;
+     @Autowired
+     protected Permissions permissions; 
+     
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) {
@@ -50,13 +57,13 @@ public class WatchListController extends ParameterizableViewController {
 
     protected Map<String, Object> createModel(HttpServletRequest request) {
         Map<String, Object> model = new HashMap<String, Object>();
-        User user = Common.getUser(request);
+        User user = common.getUser(request);
 
         // The user's permissions may have changed since the last session, so make sure the watch lists are correct.
         WatchListDao watchListDao = new WatchListDao();
         List<WatchList> watchLists = watchListDao.getWatchLists(user.getId());
 
-        if (watchLists.size() == 0) {
+        if (watchLists.isEmpty()) {
             // Add a default watch list if none exist.
             WatchList watchList = new WatchList();
             watchList.setName(I18NUtils.getMessage(ControllerUtils.getResourceBundle(request), "common.newName"));
@@ -78,7 +85,7 @@ public class WatchListController extends ParameterizableViewController {
                 List<DataPointVO> list = watchList.getPointList();
                 List<DataPointVO> copy = new ArrayList<DataPointVO>(list);
                 for (DataPointVO point : copy) {
-                    if (point == null || !Permissions.hasDataPointReadPermission(user, point)) {
+                    if (point == null || !permissions.hasDataPointReadPermission(user, point)) {
                         list.remove(point);
                         changed = true;
                     }

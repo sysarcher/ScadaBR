@@ -57,13 +57,19 @@ import com.serotonin.web.email.EmailAttachment;
 import com.serotonin.web.email.EmailContent;
 import com.serotonin.web.email.EmailInline;
 import com.serotonin.web.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
  */
 public class ReportWorkItem implements WorkItem {
     private final static Logger LOG = LoggerFactory.getLogger(ReportWorkItem.class);
+    @Autowired
+    private Permissions permissions;
+    @Autowired
+    private Common common;
 
+    @Override
     public int getPriority() {
         return WorkItem.PRIORITY_LOW;
     }
@@ -106,14 +112,14 @@ public class ReportWorkItem implements WorkItem {
 
         reportInstance.setRunStartTime(System.currentTimeMillis());
         reportDao.saveReportInstance(reportInstance);
-        ResourceBundle bundle = Common.getBundle();
+        ResourceBundle bundle = common.getBundle();
 
         // Create a list of DataPointVOs to which the user has permission.
         DataPointDao dataPointDao = new DataPointDao();
         List<ReportDao.PointInfo> points = new ArrayList<ReportDao.PointInfo>(reportConfig.getPoints().size());
         for (ReportPointVO reportPoint : reportConfig.getPoints()) {
             DataPointVO point = dataPointDao.getDataPoint(reportPoint.getPointId());
-            if (point != null && Permissions.hasDataPointReadPermission(user, point)) {
+            if (point != null && permissions.hasDataPointReadPermission(user, point)) {
                 String colour = null;
                 try {
                     if (!StringUtils.isEmpty(reportPoint.getColour()))

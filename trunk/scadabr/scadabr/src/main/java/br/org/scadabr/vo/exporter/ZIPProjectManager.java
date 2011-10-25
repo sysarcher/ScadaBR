@@ -30,6 +30,7 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.upgrade.DBUpgrade;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.dwr.EmportDwr;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ZIPProjectManager {
 	private static final String JSON_FILE_NAME = "json_project.txt";
@@ -49,6 +50,11 @@ public class ZIPProjectManager {
 	private int maxPointValues;
 	private boolean includeUploadsFolder;
 	private boolean includeGraphicsFolder;
+        
+        @Autowired
+        private Common common;
+        @Autowired
+        private EmportDwr emportDwr;
 
 	public void exportProject(HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -105,11 +111,11 @@ public class ZIPProjectManager {
 
 		if (DBUpgrade.isUpgradeNeeded(version)) {
 			errorList.add(Common.getMessage("emport.versionError", version,
-					Common.getVersion()));
+					common.getVersion()));
 			return new ModelAndView("import_result", model);
 		}
 
-		User user = Common.getUser(request);
+		User user = common.getUser(request);
 		user.setUploadedProject(this);
 		return new ModelAndView("import_result", model);
 
@@ -118,8 +124,8 @@ public class ZIPProjectManager {
 	public void importProject() throws Exception {
 		String jsonContent = getJsonContent();
 
-		EmportDwr.importDataImpl(jsonContent, Common.getBundle(),
-				Common.getUser());
+		emportDwr.importDataImpl(jsonContent, common.getBundle(),
+				common.getUser());
 
 		List<ZipEntry> uploadFiles = getUploadFiles();
 		restoreFiles(uploadFiles);
@@ -321,7 +327,7 @@ public class ZIPProjectManager {
 		projectName = projectName + "\n";
 
 		projectName += projectDescription + "\n";
-		projectName += Common.getVersion() + "\n";
+		projectName += common.getVersion() + "\n";
 		projectName += new Date().toLocaleString();
 
 		File file = FileUtil.createTxtTempFile("tempprojectdescription",

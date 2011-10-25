@@ -1,34 +1,37 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.db.dao.MaintenanceEventDao;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.maintenance.MaintenanceEventRT;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
@@ -37,40 +40,44 @@ import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * @author Matthew Lohbihler
  */
 public class MaintenanceEventsDwr extends BaseDwr {
+
+    @Autowired
+    private Permissions permissions;
+    @Autowired
+    private RuntimeManager runtimeManager;
+
     public DwrResponseI18n getMaintenanceEvents() {
-        Permissions.ensureAdmin();
+        permissions.ensureAdmin();
 
         DwrResponseI18n response = new DwrResponseI18n();
         final ResourceBundle bundle = getResourceBundle();
 
         List<MaintenanceEventVO> events = new MaintenanceEventDao().getMaintenanceEvents();
         Collections.sort(events, new Comparator<MaintenanceEventVO>() {
+
             @Override
             public int compare(MaintenanceEventVO m1, MaintenanceEventVO m2) {
-                return m1.getDescription().getLocalizedMessage(bundle)
-                        .compareTo(m1.getDescription().getLocalizedMessage(bundle));
+                return m1.getDescription().getLocalizedMessage(bundle).compareTo(m1.getDescription().getLocalizedMessage(bundle));
             }
         });
         response.addData("events", events);
 
         Map<Integer, String> dataSources = new HashMap<Integer, String>();
-        for (DataSourceVO<?> ds : new DataSourceDao().getDataSources())
+        for (DataSourceVO<?> ds : new DataSourceDao().getDataSources()) {
             dataSources.put(ds.getId(), ds.getName());
+        }
         response.addData("dataSources", dataSources);
 
         return response;
     }
 
     public DwrResponseI18n getMaintenanceEvent(int id) {
-        Permissions.ensureAdmin();
+        permissions.ensureAdmin();
 
         DwrResponseI18n response = new DwrResponseI18n();
 
@@ -84,13 +91,13 @@ public class MaintenanceEventsDwr extends BaseDwr {
             me.setInactiveYear(dt.getYear());
             me.setActiveMonth(dt.getMonthOfYear());
             me.setInactiveMonth(dt.getMonthOfYear());
-        }
-        else {
+        } else {
             me = new MaintenanceEventDao().getMaintenanceEvent(id);
 
-            MaintenanceEventRT rt = Common.ctx.getRuntimeManager().getRunningMaintenanceEvent(me.getId());
-            if (rt != null)
+            MaintenanceEventRT rt = runtimeManager.getRunningMaintenanceEvent(me.getId());
+            if (rt != null) {
                 activated = rt.isEventActive();
+            }
         }
 
         response.addData("me", me);
@@ -103,7 +110,7 @@ public class MaintenanceEventsDwr extends BaseDwr {
             int scheduleType, boolean disabled, int activeYear, int activeMonth, int activeDay, int activeHour,
             int activeMinute, int activeSecond, String activeCron, int inactiveYear, int inactiveMonth,
             int inactiveDay, int inactiveHour, int inactiveMinute, int inactiveSecond, String inactiveCron) {
-        Permissions.ensureAdmin();
+        permissions.ensureAdmin();
 
         MaintenanceEventVO e = new MaintenanceEventVO();
         e.setId(id);
@@ -131,16 +138,17 @@ public class MaintenanceEventsDwr extends BaseDwr {
         DwrResponseI18n response = new DwrResponseI18n();
         MaintenanceEventDao maintenanceEventDao = new MaintenanceEventDao();
 
-        if (StringUtils.isEmpty(xid))
+        if (StringUtils.isEmpty(xid)) {
             response.addContextualMessage("xid", "validate.required");
-        else if (!maintenanceEventDao.isXidUnique(xid, id))
+        } else if (!maintenanceEventDao.isXidUnique(xid, id)) {
             response.addContextualMessage("xid", "validate.xidUsed");
+        }
 
         e.validate(response);
 
         // Save the maintenance event
         if (!response.getHasMessages()) {
-            Common.ctx.getRuntimeManager().saveMaintenanceEvent(e);
+            runtimeManager.saveMaintenanceEvent(e);
             response.addData("meId", e.getId());
         }
 
@@ -148,20 +156,21 @@ public class MaintenanceEventsDwr extends BaseDwr {
     }
 
     public void deleteMaintenanceEvent(int meId) {
-        Permissions.ensureAdmin();
-        Common.ctx.getRuntimeManager().deleteMaintenanceEvent(meId);
+        permissions.ensureAdmin();
+        runtimeManager.deleteMaintenanceEvent(meId);
     }
 
     public DwrResponseI18n toggleMaintenanceEvent(int id) {
-        Permissions.ensureAdmin();
+        permissions.ensureAdmin();
         DwrResponseI18n response = new DwrResponseI18n();
 
-        MaintenanceEventRT rt = Common.ctx.getRuntimeManager().getRunningMaintenanceEvent(id);
+        MaintenanceEventRT rt = runtimeManager.getRunningMaintenanceEvent(id);
         boolean activated = false;
-        if (rt == null)
+        if (rt == null) {
             response.addMessage(new LocalizableMessage("maintenanceEvents.toggle.disabled"));
-        else
+        } else {
             activated = rt.toggle();
+        }
 
         response.addData("activated", activated);
 

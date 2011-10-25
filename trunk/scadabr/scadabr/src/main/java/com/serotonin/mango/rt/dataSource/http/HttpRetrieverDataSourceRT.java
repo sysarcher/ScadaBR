@@ -35,6 +35,7 @@ import com.serotonin.mango.vo.dataSource.http.HttpRetrieverDataSourceVO;
 import com.serotonin.web.http.HttpUtils;
 import com.serotonin.web.i18n.LocalizableException;
 import com.serotonin.web.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -46,6 +47,8 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource {
     public static final int PARSE_EXCEPTION_EVENT = 2;
 
     private final HttpRetrieverDataSourceVO vo;
+    @Autowired
+    private Common common;
 
     public HttpRetrieverDataSourceRT(HttpRetrieverDataSourceVO vo) {
         super(vo, true);
@@ -68,7 +71,7 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource {
     protected void doPoll(long time) {
         String data;
         try {
-            data = getData(vo.getUrl(), vo.getTimeoutSeconds(), vo.getRetries());
+            data = common.getData(vo.getUrl(), vo.getTimeoutSeconds(), vo.getRetries());
         }
         catch (Exception e) {
             LocalizableMessage lm;
@@ -119,44 +122,4 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource {
             returnToNormal(PARSE_EXCEPTION_EVENT, time);
     }
 
-    public static String getData(String url, int timeoutSeconds, int retries) throws LocalizableException {
-        // Try to get the data.
-        String data;
-        while (true) {
-            HttpClient client = Common.getHttpClient(timeoutSeconds * 1000);
-            GetMethod method = null;
-            LocalizableMessage message;
-
-            try {
-                method = new GetMethod(url);
-                int responseCode = client.executeMethod(method);
-                if (responseCode == HttpStatus.SC_OK) {
-                    data = HttpUtils.readResponseBody(method, READ_LIMIT);
-                    break;
-                }
-                message = new LocalizableMessage("event.http.response", url, responseCode);
-            }
-            catch (Exception e) {
-                message = DataSourceRT.getExceptionMessage(e);
-            }
-            finally {
-                if (method != null)
-                    method.releaseConnection();
-            }
-
-            if (retries <= 0)
-                throw new LocalizableException(message);
-            retries--;
-
-            // Take a little break instead of trying again immediately.
-            try {
-                Thread.sleep(1000);
-            }
-            catch (InterruptedException e) {
-                // no op
-            }
-        }
-
-        return data;
-    }
 }

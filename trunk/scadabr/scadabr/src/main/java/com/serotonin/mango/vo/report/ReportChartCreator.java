@@ -62,6 +62,7 @@ import com.serotonin.util.ColorUtils;
 import com.serotonin.web.taglib.DateFunctions;
 
 import freemarker.template.Template;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -91,6 +92,8 @@ public class ReportChartCreator {
     private List<PointStatistics> pointStatistics;
 
     final ResourceBundle bundle;
+    @Autowired
+    private ImageChartUtils imageChartUtils;
 
     public ReportChartCreator(ResourceBundle bundle) {
         this.bundle = bundle;
@@ -147,7 +150,7 @@ public class ReportChartCreator {
             if (ptsc.hasData()) {
                 if (inlinePrefix != null)
                     model.put("chartName", inlinePrefix + pointStat.getChartName());
-                pointStat.setImageData(ImageChartUtils.getChartData(ptsc, POINT_IMAGE_WIDTH, POINT_IMAGE_HEIGHT));
+                pointStat.setImageData(imageChartUtils.getChartData(ptsc, POINT_IMAGE_WIDTH, POINT_IMAGE_HEIGHT));
             }
         }
 
@@ -161,7 +164,7 @@ public class ReportChartCreator {
                 model.put("chartName", IMAGE_SERVLET + chartName);
             }
 
-            imageData = ImageChartUtils.getChartData(ptsc, true, IMAGE_WIDTH, IMAGE_HEIGHT);
+            imageData = imageChartUtils.getChartData(ptsc, true, IMAGE_WIDTH, IMAGE_HEIGHT);
         }
 
         List<EventInstance> events = null;

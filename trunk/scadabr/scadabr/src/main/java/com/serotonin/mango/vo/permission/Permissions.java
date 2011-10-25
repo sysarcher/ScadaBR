@@ -31,12 +31,18 @@ import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.mango.vo.report.ReportInstance;
 import com.serotonin.mango.vo.report.ReportVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Matthew Lohbihler
  * 
  */
+@Service
 public class Permissions {
+    @Autowired
+    private Common common;
+    
     public interface DataPointAccessTypes {
         int NONE = 0;
         int READ = 1;
@@ -52,15 +58,15 @@ public class Permissions {
     //
     // / Valid user
     //
-    public static void ensureValidUser() throws PermissionException {
-        ensureValidUser(Common.getUser());
+    public void ensureValidUser() throws PermissionException {
+        ensureValidUser(common.getUser());
     }
 
-    public static void ensureValidUser(HttpServletRequest request) throws PermissionException {
-        ensureValidUser(Common.getUser(request));
+    public void ensureValidUser(HttpServletRequest request) throws PermissionException {
+        ensureValidUser(common.getUser(request));
     }
 
-    public static void ensureValidUser(User user) throws PermissionException {
+    public void ensureValidUser(User user) throws PermissionException {
         if (user == null)
             throw new PermissionException("Not logged in", null);
         if (user.isDisabled())
@@ -70,28 +76,28 @@ public class Permissions {
     //
     // / Administrator
     //
-    public static boolean hasAdmin() throws PermissionException {
-        return hasAdmin(Common.getUser());
+    public boolean hasAdmin() throws PermissionException {
+        return hasAdmin(common.getUser());
     }
 
-    public static boolean hasAdmin(HttpServletRequest request) throws PermissionException {
-        return hasAdmin(Common.getUser(request));
+    public boolean hasAdmin(HttpServletRequest request) throws PermissionException {
+        return hasAdmin(common.getUser(request));
     }
 
-    public static boolean hasAdmin(User user) throws PermissionException {
+    public boolean hasAdmin(User user) throws PermissionException {
         ensureValidUser(user);
         return user.isAdmin();
     }
 
-    public static void ensureAdmin() throws PermissionException {
-        ensureAdmin(Common.getUser());
+    public void ensureAdmin() throws PermissionException {
+        ensureAdmin(common.getUser());
     }
 
-    public static void ensureAdmin(HttpServletRequest request) throws PermissionException {
-        ensureAdmin(Common.getUser(request));
+    public void ensureAdmin(HttpServletRequest request) throws PermissionException {
+        ensureAdmin(common.getUser(request));
     }
 
-    public static void ensureAdmin(User user) throws PermissionException {
+    public void ensureAdmin(User user) throws PermissionException {
         if (!hasAdmin(user))
             throw new PermissionException("User is not an administrator", user);
     }
@@ -99,24 +105,24 @@ public class Permissions {
     //
     // / Data source admin
     //
-    public static void ensureDataSourcePermission(User user, int dataSourceId) throws PermissionException {
+    public void ensureDataSourcePermission(User user, int dataSourceId) throws PermissionException {
         if (!hasDataSourcePermission(user, dataSourceId))
             throw new PermissionException("User does not have permission to data source", user);
     }
 
-    public static void ensureDataSourcePermission(User user) throws PermissionException {
+    public void ensureDataSourcePermission(User user) throws PermissionException {
         if (!hasDataSourcePermission(user))
             throw new PermissionException("User does not have permission to any data sources", user);
     }
 
-    public static boolean hasDataSourcePermission(User user, int dataSourceId) throws PermissionException {
+    public boolean hasDataSourcePermission(User user, int dataSourceId) throws PermissionException {
         ensureValidUser(user);
         if (user.isAdmin())
             return true;
         return user.getDataSourcePermissions().contains(dataSourceId);
     }
 
-    public static boolean hasDataSourcePermission(User user) throws PermissionException {
+    public boolean hasDataSourcePermission(User user) throws PermissionException {
         ensureValidUser(user);
         if (user.isAdmin())
             return true;
@@ -126,16 +132,16 @@ public class Permissions {
     //
     // / Data point access
     //
-    public static void ensureDataPointReadPermission(User user, DataPointVO point) throws PermissionException {
+    public void ensureDataPointReadPermission(User user, DataPointVO point) throws PermissionException {
         if (!hasDataPointReadPermission(user, point))
             throw new PermissionException("User does not have read permission to point", user);
     }
 
-    public static boolean hasDataPointReadPermission(User user, DataPointVO point) throws PermissionException {
+    public boolean hasDataPointReadPermission(User user, DataPointVO point) throws PermissionException {
         return hasDataPointReadPermission(user, point.getDataSourceId(), point.getId());
     }
 
-    private static boolean hasDataPointReadPermission(User user, int dataSourceId, int dataPointId)
+    private boolean hasDataPointReadPermission(User user, int dataSourceId, int dataPointId)
             throws PermissionException {
         if (hasDataSourcePermission(user, dataSourceId))
             return true;
@@ -145,14 +151,14 @@ public class Permissions {
         return a.getPermission() == DataPointAccess.READ || a.getPermission() == DataPointAccess.SET;
     }
 
-    public static void ensureDataPointSetPermission(User user, DataPointVO point) throws PermissionException {
+    public void ensureDataPointSetPermission(User user, DataPointVO point) throws PermissionException {
         if (!point.getPointLocator().isSettable())
             throw new ShouldNeverHappenException("Point is not settable");
         if (!hasDataPointSetPermission(user, point))
             throw new PermissionException("User does not have set permission to point", user);
     }
 
-    public static boolean hasDataPointSetPermission(User user, DataPointVO point) throws PermissionException {
+    public boolean hasDataPointSetPermission(User user, DataPointVO point) throws PermissionException {
         if (hasDataSourcePermission(user, point.getDataSourceId()))
             return true;
         DataPointAccess a = getDataPointAccess(user, point.getId());
@@ -161,7 +167,7 @@ public class Permissions {
         return a.getPermission() == DataPointAccess.SET;
     }
 
-    private static DataPointAccess getDataPointAccess(User user, int dataPointId) {
+    private DataPointAccess getDataPointAccess(User user, int dataPointId) {
         for (DataPointAccess a : user.getDataPointPermissions()) {
             if (a.getDataPointId() == dataPointId)
                 return a;
@@ -169,7 +175,7 @@ public class Permissions {
         return null;
     }
 
-    public static int getDataPointAccessType(User user, DataPointVO point) {
+    public int getDataPointAccessType(User user, DataPointVO point) {
         if (user == null || user.isDisabled())
             return DataPointAccessTypes.NONE;
         if (user.isAdmin())
@@ -189,12 +195,12 @@ public class Permissions {
     //
     // / View access
     //
-    public static void ensureViewPermission(User user, View view) throws PermissionException {
+    public void ensureViewPermission(User user, View view) throws PermissionException {
         if (view.getUserAccess(user) == ShareUser.ACCESS_NONE)
             throw new PermissionException("User does not have permission to the view", user);
     }
 
-    public static void ensureViewEditPermission(User user, View view) throws PermissionException {
+    public void ensureViewEditPermission(User user, View view) throws PermissionException {
         if (view.getUserAccess(user) != ShareUser.ACCESS_OWNER)
             throw new PermissionException("User does not have permission to edit the view", user);
     }
@@ -202,12 +208,12 @@ public class Permissions {
     //
     // / Watch list access
     //
-    public static void ensureWatchListPermission(User user, WatchList watchList) throws PermissionException {
+    public void ensureWatchListPermission(User user, WatchList watchList) throws PermissionException {
         if (watchList.getUserAccess(user) == ShareUser.ACCESS_NONE)
             throw new PermissionException("User does not have permission to the watch list", user);
     }
 
-    public static void ensureWatchListEditPermission(User user, WatchList watchList) throws PermissionException {
+    public void ensureWatchListEditPermission(User user, WatchList watchList) throws PermissionException {
         if (watchList.getUserAccess(user) != ShareUser.ACCESS_OWNER)
             throw new PermissionException("User does not have permission to edit the watch list", user);
     }
@@ -215,7 +221,7 @@ public class Permissions {
     //
     // / Report access
     //
-    public static void ensureReportPermission(User user, ReportVO report) throws PermissionException {
+    public void ensureReportPermission(User user, ReportVO report) throws PermissionException {
         if (user == null)
             throw new PermissionException("User is null", user);
         if (report == null)
@@ -224,7 +230,7 @@ public class Permissions {
             throw new PermissionException("User does not have permission to access the report", user);
     }
 
-    public static void ensureReportInstancePermission(User user, ReportInstance instance) throws PermissionException {
+    public void ensureReportInstancePermission(User user, ReportInstance instance) throws PermissionException {
         if (user == null)
             throw new PermissionException("User is null", user);
         if (instance == null)
@@ -236,7 +242,7 @@ public class Permissions {
     //
     // / Event access
     //
-    public static boolean hasEventTypePermission(User user, EventType eventType) {
+    public boolean hasEventTypePermission(User user, EventType eventType) {
         switch (eventType.getEventSourceId()) {
         case EventType.EventSources.DATA_POINT:
             return hasDataPointReadPermission(user, eventType.getDataSourceId(), eventType.getDataPointId());
@@ -253,12 +259,12 @@ public class Permissions {
         return false;
     }
 
-    public static void ensureEventTypePermission(User user, EventType eventType) throws PermissionException {
+    public void ensureEventTypePermission(User user, EventType eventType) throws PermissionException {
         if (!hasEventTypePermission(user, eventType))
             throw new PermissionException("User does not have permission to the view", user);
     }
 
-    public static void ensureEventTypePermission(User user, EventTypeVO eventType) throws PermissionException {
+    public void ensureEventTypePermission(User user, EventTypeVO eventType) throws PermissionException {
         ensureEventTypePermission(user, eventType.createEventType());
     }
 }

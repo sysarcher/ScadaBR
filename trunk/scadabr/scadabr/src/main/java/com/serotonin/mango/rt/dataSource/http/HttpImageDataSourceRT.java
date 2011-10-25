@@ -46,6 +46,7 @@ import com.serotonin.util.image.JpegImageFormat;
 import com.serotonin.util.image.PercentScaledImage;
 import com.serotonin.web.i18n.LocalizableException;
 import com.serotonin.web.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -55,6 +56,9 @@ public class HttpImageDataSourceRT extends PollingDataSource {
 
     public static final int DATA_RETRIEVAL_FAILURE_EVENT = 1;
     public static final int FILE_SAVE_EXCEPTION_EVENT = 2;
+    
+    @Autowired
+    private Common common;
 
     public HttpImageDataSourceRT(HttpImageDataSourceVO vo) {
         super(vo, true);
@@ -151,6 +155,7 @@ public class HttpImageDataSourceRT extends PollingDataSource {
             this.time = time;
         }
 
+        @Override
         public void execute() {
             try {
                 executeImpl();
@@ -214,16 +219,17 @@ public class HttpImageDataSourceRT extends PollingDataSource {
             return saveFailure;
         }
 
+        @Override
         public int getPriority() {
             return WorkItem.PRIORITY_HIGH;
         }
     }
 
-    public static byte[] getData(String url, int timeoutSeconds, int retries, int readLimitKb)
+    public byte[] getData(String url, int timeoutSeconds, int retries, int readLimitKb)
             throws LocalizableException {
         byte[] data;
         while (true) {
-            HttpClient client = Common.getHttpClient(timeoutSeconds * 1000);
+            HttpClient client = common.getHttpClient(timeoutSeconds * 1000);
             GetMethod method = null;
             LocalizableMessage message;
 

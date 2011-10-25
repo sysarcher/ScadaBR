@@ -43,13 +43,23 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class DataPointDetailsController extends ParameterizableViewController {
+    
+    @Autowired
+    private Common common;
+    @Autowired
+    private Permissions permissions;
+    @Autowired
+    private ControllerUtils controllerUtils;
+
+
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         Map<String, Object> model = new HashMap<String, Object>();
-        User user = Common.getUser(request);
+        User user = common.getUser(request);
 
         int id;
         DataPointDao dataPointDao = new DataPointDao();
@@ -82,7 +92,7 @@ public class DataPointDetailsController extends ParameterizableViewController {
             point = dataPointDao.getDataPoint(id);
 
         if (point != null) {
-            Permissions.ensureDataPointReadPermission(user, point);
+            permissions.ensureDataPointReadPermission(user, point);
 
             model.put("point", point);
 
@@ -102,7 +112,7 @@ public class DataPointDetailsController extends ParameterizableViewController {
             Map<String, Object> userData;
             int accessType;
             for (User mangoUser : allUsers) {
-                accessType = Permissions.getDataPointAccessType(mangoUser, point);
+                accessType = permissions.getDataPointAccessType(mangoUser, point);
                 if (accessType != Permissions.DataPointAccessTypes.NONE) {
                     userData = new HashMap<String, Object>();
                     userData.put("user", mangoUser);
@@ -113,7 +123,7 @@ public class DataPointDetailsController extends ParameterizableViewController {
             model.put("users", users);
 
             // Determine whether the link to edit the point should be displayed
-            model.put("pointEditor", Permissions.hasDataSourcePermission(user, point.getDataSourceId()));
+            model.put("pointEditor", permissions.hasDataSourcePermission(user, point.getDataSourceId()));
 
             // Put the events in the model.
             model.put("events", new EventDao().getEventsForDataPoint(id, user.getId()));
@@ -151,7 +161,7 @@ public class DataPointDetailsController extends ParameterizableViewController {
         user.setEditPoint(point);
 
         // Find accessible points for the goto list
-        ControllerUtils.addPointListDataToModel(user, id, model);
+        controllerUtils.addPointListDataToModel(user, id, model);
 
         return new ModelAndView(getViewName(), model);
     }

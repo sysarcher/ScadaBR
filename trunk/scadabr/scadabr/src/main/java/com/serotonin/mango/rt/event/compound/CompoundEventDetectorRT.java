@@ -21,8 +21,9 @@ package com.serotonin.mango.rt.event.compound;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
+import com.serotonin.mango.rt.EventManager;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.event.EventDetectorListener;
 import com.serotonin.mango.rt.event.SimpleEventDetector;
 import com.serotonin.mango.rt.event.type.CompoundDetectorEventType;
@@ -34,6 +35,7 @@ import com.serotonin.util.LifecycleException;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.i18n.LocalizableException;
 import com.serotonin.web.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -46,18 +48,23 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
     private CompoundDetectorEventType eventType;
     private LogicalOperator condition;
     private boolean currentState;
+    
+    @Autowired
+    private EventManager eventManager;
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     public CompoundEventDetectorRT(CompoundEventDetectorVO vo) {
         this.vo = vo;
     }
 
     private void raiseEvent(long time) {
-        Common.ctx.getEventManager().raiseEvent(eventType, time, vo.isReturnToNormal(), vo.getAlarmLevel(),
+        eventManager.raiseEvent(eventType, time, vo.isReturnToNormal(), vo.getAlarmLevel(),
                 new LocalizableMessage("event.compound.activated", vo.getName()), null);
     }
 
     private void returnToNormal(long time) {
-        Common.ctx.getEventManager().returnToNormal(eventType, time);
+        eventManager.returnToNormal(eventType, time);
     }
 
     public static LogicalOperator parseConditionStatement(String condition) throws ConditionParseException {
@@ -207,7 +214,7 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
 
     public void raiseFailureEvent(LocalizableMessage message) {
         SystemEventType eventType = new SystemEventType(SystemEventType.TYPE_COMPOUND_DETECTOR_FAILURE, vo.getId());
-        SystemEventType.raiseEvent(eventType, System.currentTimeMillis(), false, message);
+        eventManager.raiseEvent(eventType, System.currentTimeMillis(), false, message);
         vo.setDisabled(true);
         new CompoundEventDetectorDao().saveCompoundEventDetector(vo);
     }
@@ -215,6 +222,7 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
     //
     // / EventDetectorListener
     //
+    @Override
     public void eventDetectorStateChanged(long time) {
         // Evaluate the condition.
         boolean newState = condition.evaluate();
@@ -231,8 +239,9 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
         }
     }
 
+    @Override
     public void eventDetectorTerminated(SimpleEventDetector source) {
-        Common.ctx.getRuntimeManager().stopCompoundEventDetector(vo.getId());
+        runtimeManager.stopCompoundEventDetector(vo.getId());
         raiseFailureEvent(new LocalizableMessage("event.compound.sourceFailure", vo.getName()));
     }
 
@@ -243,6 +252,7 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
     // /
     //
     //
+    @Override
     public void initialize() throws LifecycleException {
         // Validate the condition statement.
         try {
@@ -274,12 +284,14 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
             returnToNormal(System.currentTimeMillis());
     }
 
+    @Override
     public void terminate() {
         if (condition != null)
             condition.terminate(this);
         returnToNormal(System.currentTimeMillis());
     }
 
+    @Override
     public void joinTermination() {
         // no op
     }

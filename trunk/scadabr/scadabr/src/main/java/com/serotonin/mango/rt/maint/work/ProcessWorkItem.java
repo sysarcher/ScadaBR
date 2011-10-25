@@ -28,10 +28,12 @@ import org.slf4j.LoggerFactory;
 
 import com.serotonin.io.StreamUtils;
 import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.BackgroundProcessing;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -39,6 +41,8 @@ import com.serotonin.web.i18n.LocalizableMessage;
 public class ProcessWorkItem implements WorkItem {
     private final static Logger LOG = LoggerFactory.getLogger(ProcessWorkItem.class);
     private static final int TIMEOUT = 15000; // 15 seconds
+    @Autowired
+    private EventManager eventManager;
 
     public static void queueProcess(String command) {
         ProcessWorkItem item = new ProcessWorkItem(command);
@@ -57,7 +61,7 @@ public class ProcessWorkItem implements WorkItem {
             executeProcessCommand(command);
         }
         catch (IOException e) {
-            SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_PROCESS_FAILURE),
+            eventManager.raiseEvent(new SystemEventType(SystemEventType.TYPE_PROCESS_FAILURE),
                     System.currentTimeMillis(), false,
                     new LocalizableMessage("event.process.failure", command, e.getMessage()));
         }
@@ -126,6 +130,7 @@ public class ProcessWorkItem implements WorkItem {
             }
         }
 
+        @Override
         public void execute() {
             try {
                 synchronized (this) {
@@ -174,6 +179,7 @@ public class ProcessWorkItem implements WorkItem {
             return WorkItem.PRIORITY_HIGH;
         }
 
+        @Override
         public void execute() {
             try {
                 StreamUtils.transfer(reader, writer);

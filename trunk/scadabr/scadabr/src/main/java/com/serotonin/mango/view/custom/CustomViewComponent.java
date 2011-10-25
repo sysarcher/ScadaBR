@@ -37,12 +37,12 @@ abstract public class CustomViewComponent {
         return id;
     }
 
-    public CustomComponentState createState(RuntimeManager rtm, HttpServletRequest request) {
+    public CustomComponentState createState(HttpServletRequest request) {
         CustomComponentState state = new CustomComponentState();
         state.setId(id);
-        createStateImpl(rtm, request, state);
+        createStateImpl(request, state);
         return state;
     }
 
-    abstract protected void createStateImpl(RuntimeManager rtm, HttpServletRequest request, CustomComponentState state);
+    abstract protected void createStateImpl(HttpServletRequest request, CustomComponentState state);
 }

@@ -28,20 +28,24 @@ import org.directwebremoting.AjaxFilterChain;
 import com.serotonin.mango.vo.permission.PermissionException;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.web.dwr.MethodFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
  */
 public class LoggedInAjaxMethodFilter implements AjaxFilter {
     private final static Logger LOG = LoggerFactory.getLogger(LoggedInAjaxFilter.class);
+    @Autowired
+    private Permissions permissions;
 
+    @Override
     public Object doFilter(Object obj, Method method, Object[] params, AjaxFilterChain chain) throws Exception {
         LOG.debug("Running LoggedInAjaxFilter, hash=" + hashCode());
 
         if (method.isAnnotationPresent(MethodFilter.class)) {
             LOG.debug("Method filter found. We should check if the user is logged in");
             try {
-                Permissions.ensureValidUser();
+                permissions.ensureValidUser();
             }
             catch (PermissionException e) {
                 LOG.error("Permission exception while checking method " + method);

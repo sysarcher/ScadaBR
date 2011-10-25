@@ -29,25 +29,25 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.EventManager;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.vo.bean.PointHistoryCount;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.mango.vo.hierarchy.PointFolder;
@@ -57,15 +57,21 @@ import com.serotonin.mango.vo.link.PointLinkVO;
 import com.serotonin.util.SerializationHelper;
 import com.serotonin.util.Tuple;
 
+@Service
 public class DataPointDao extends BaseDao {
 
-    public DataPointDao() {
-        super();
-    }
-
-    public DataPointDao(DataSource dataSource) {
-        super(dataSource);
-    }
+    @Autowired
+    private UserCommentDao userCommentDao;
+    @Autowired
+    private DataSourceDao dataSourceDao;
+    @Autowired
+    private PointValueDao pointValueDao;
+    @Autowired
+    private PointLinkDao pointLinkDao;
+    @Autowired
+    private EventManager eventManager;
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     //
     //
@@ -146,7 +152,7 @@ public class DataPointDao extends BaseDao {
             // The spinwave changes were not correctly implemented, so we need to handle potential errors here.
             if (dp.getPointLocator() == null) {
                 // Use the data source tpe id to determine what type of locator is needed.
-                dp.setPointLocator(new DataSourceDao().getDataSource(dp.getDataSourceId()).createPointLocator());
+                dp.setPointLocator(dataSourceDao.getDataSource(dp.getDataSourceId()).createPointLocator());
             }
 
             return dp;
@@ -164,27 +170,22 @@ public class DataPointDao extends BaseDao {
             return;
         }
         setEventDetectors(dp);
-        setPointComments(dp);
+        userCommentDao.populateComments(dp);
     }
 
     public void saveDataPoint(final DataPointVO dp) {
-        new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
-
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                // Decide whether to insert or update.
-                if (dp.getId() == Common.NEW_ID) {
-                    insertDataPoint(dp);
-                    // Reset the point hierarchy so that the new point gets included.
-                    cachedPointHierarchy = null;
-                } else {
-                    updateDataPoint(dp);
-                }
-            }
-        });
+        // Decide whether to insert or update.
+        if (dp.getId() == Common.NEW_ID) {
+            insertDataPoint(dp);
+            // Reset the point hierarchy so that the new point gets included.
+            cachedPointHierarchy = null;
+        } else {
+            updateDataPoint(dp);
+        }
     }
 
-    void insertDataPoint(final DataPointVO dp) {
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+    private void insertDataPoint(final DataPointVO dp) {
         // Create a default text renderer
         if (dp.getTextRenderer() == null) {
             dp.defaultTextRenderer();
@@ -192,7 +193,7 @@ public class DataPointDao extends BaseDao {
 
         // Insert the main data point record.
         SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("dataPoints").usingGeneratedKeyColumns("id");
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap();
         params.put("xid", dp.getXid());
         params.put("dataSourceId", dp.getDataSourceId());
         params.put("data", SerializationHelper.writeObjectToArray(dp));
@@ -203,33 +204,36 @@ public class DataPointDao extends BaseDao {
         // Save the relational information.
         saveEventDetectors(dp);
 
-        AuditEventType.raiseAddedEvent(AuditEventType.TYPE_DATA_POINT, dp);
+        eventManager.raiseAddedEvent(AuditEventType.TYPE_DATA_POINT, dp);
     }
 
-    void updateDataPoint(final DataPointVO dp) {
+    private void updateDataPoint(final DataPointVO dp) {
         DataPointVO old = getDataPoint(dp.getId());
 
         if (old.getPointLocator().getMangoDataType() != dp.getPointLocator().getMangoDataType()) // Delete any point values where data type doesn't match the vo, just in case the data type was changed.
         // Only do this if the data type has actually changed because it is just really slow if the database is
         // big or busy.
         {
-            new PointValueDao().deletePointValuesWithMismatchedType(dp.getId(), dp.getPointLocator().getMangoDataType());
+            pointValueDao.deletePointValuesWithMismatchedType(dp.getId(), dp.getPointLocator().getMangoDataType());
         }
 
         // Save the VO information.
         updateDataPointShallow(dp);
 
-        AuditEventType.raiseChangedEvent(AuditEventType.TYPE_DATA_POINT, old, dp);
+        eventManager.raiseChangedEvent(AuditEventType.TYPE_DATA_POINT, old, dp);
 
         // Save the relational information.
         saveEventDetectors(dp);
     }
+//TODO fix order of transaction propagation ...
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void updateDataPointShallow(final DataPointVO dp) {
         getSimpleJdbcTemplate().update("update dataPoints set xid=?, data=? where id=?",
                 dp.getXid(), SerializationHelper.writeObjectToArray(dp), dp.getId());
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void deleteDataPoints(final int dataSourceId) {
         List<DataPointVO> old = getDataPoints(dataSourceId, null);
         for (DataPointVO dp : old) {
@@ -240,55 +244,44 @@ public class DataPointDao extends BaseDao {
             deletePointHistory(dp.getId());
         }
 
-        new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
-
-            @SuppressWarnings("synthetic-access")
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                List<Integer> pointIds = getJdbcTemplate().queryForList("select id from dataPoints where dataSourceId=?",
-                        new Object[]{dataSourceId}, Integer.class);
-                if (pointIds.size() > 0) {
-                    deleteDataPointImpl(createDelimitedList(new HashSet<Integer>(pointIds), ",", null));
-                }
-            }
-        });
+        List<Integer> pointIds = getJdbcTemplate().queryForList("select id from dataPoints where dataSourceId=?",
+                new Object[]{dataSourceId}, Integer.class);
+        if (pointIds.size() > 0) {
+            deleteDataPointImpl(createDelimitedList(new HashSet(pointIds), ",", null));
+        }
 
         for (DataPointVO dp : old) {
-            AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_DATA_POINT, dp);
+            eventManager.raiseDeletedEvent(AuditEventType.TYPE_DATA_POINT, dp);
         }
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void deleteDataPoint(final int dataPointId) {
         DataPointVO dp = getDataPoint(dataPointId);
         if (dp != null) {
             beforePointDelete(dataPointId);
             deletePointHistory(dataPointId);
-            new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
-
-                @Override
-                protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    deleteDataPointImpl(Integer.toString(dataPointId));
-                }
-            });
-
-            AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_DATA_POINT, dp);
+            deleteDataPointImpl(Integer.toString(dataPointId));
+            eventManager.raiseDeletedEvent(AuditEventType.TYPE_DATA_POINT, dp);
         }
     }
 
     private void beforePointDelete(int dataPointId) {
-        for (PointLinkVO link : new PointLinkDao().getPointLinksForPoint(dataPointId)) {
-            Common.ctx.getRuntimeManager().deletePointLink(link.getId());
+        for (PointLinkVO link : pointLinkDao.getPointLinksForPoint(dataPointId)) {
+            runtimeManager.deletePointLink(link.getId());
         }
     }
 
-    void deletePointHistory(int dataPointId) {
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    private void deletePointHistory(int dataPointId) {
         Object[] p = new Object[]{dataPointId};
         long min = getSimpleJdbcTemplate().queryForLong("select min(ts) from pointValues where dataPointId=?", p);
         long max = getSimpleJdbcTemplate().queryForLong("select max(ts) from pointValues where dataPointId=?", p);
         deletePointHistory(dataPointId, min, max);
     }
 
-    void deletePointHistory(int dataPointId, long min, long max) {
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    private void deletePointHistory(int dataPointId, long min, long max) {
         while (true) {
             try {
                 getSimpleJdbcTemplate().update("delete from pointValues where dataPointId=? and ts <= ?", dataPointId, max);
@@ -305,7 +298,8 @@ public class DataPointDao extends BaseDao {
         }
     }
 
-    void deleteDataPointImpl(String dataPointIdList) {
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    private void deleteDataPointImpl(String dataPointIdList) {
         dataPointIdList = "(" + dataPointIdList + ")";
         getSimpleJdbcTemplate().update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.DATA_POINT
                 + " and eventTypeRef1 in " + dataPointIdList);
@@ -357,7 +351,7 @@ public class DataPointDao extends BaseDao {
                 "select id, xid, alias, detectorType, alarmLevel, stateLimit, duration, durationType, binaryState, " //
                 + "  multistateState, changeCount, alphanumericState, weight " //
                 + "from pointEventDetectors " //
-                + "where dataPointId=? " // 
+                + "where dataPointId=? " //
                 + "order by id", new EventDetectorRowMapper(dp), dp.getId());
     }
 
@@ -391,6 +385,7 @@ public class DataPointDao extends BaseDao {
         }
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     private void saveEventDetectors(DataPointVO dp) {
         // Get the ids of the existing detectors for this point.
         final List<PointEventDetectorVO> existingDetectors = getEventDetectors(dp);
@@ -400,7 +395,7 @@ public class DataPointDao extends BaseDao {
             if (ped.getId() < 0) {
                 // Insert the record.
                 SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("eventHandlers").usingGeneratedKeyColumns("id");
-                Map<String, Object> params = new HashMap<String, Object>();
+                Map<String, Object> params = new HashMap();
                 params.put("xid", ped.getXid());
                 params.put("alias", ped.getAlias());
                 params.put("dataPointId", dp.getId());
@@ -416,7 +411,7 @@ public class DataPointDao extends BaseDao {
                 params.put("weight", ped.getWeight());
                 Number id = insertActor.executeAndReturnKey(params);
                 ped.setId(id.intValue());
-                AuditEventType.raiseAddedEvent(AuditEventType.TYPE_POINT_EVENT_DETECTOR, ped);
+                eventManager.raiseAddedEvent(AuditEventType.TYPE_POINT_EVENT_DETECTOR, ped);
             } else {
                 PointEventDetectorVO old = removeFromList(existingDetectors, ped.getId());
 
@@ -429,7 +424,7 @@ public class DataPointDao extends BaseDao {
                         ped.getMultistateState(), ped.getChangeCount(), ped.getAlphanumericState(),
                         ped.getWeight(), ped.getId());
 
-                AuditEventType.raiseChangedEvent(AuditEventType.TYPE_POINT_EVENT_DETECTOR, old, ped);
+                eventManager.raiseChangedEvent(AuditEventType.TYPE_POINT_EVENT_DETECTOR, old, ped);
             }
         }
 
@@ -439,7 +434,7 @@ public class DataPointDao extends BaseDao {
                     + " and eventTypeRef1=? and eventTypeRef2=?", dp.getId(), ped.getId());
             getSimpleJdbcTemplate().update("delete from pointEventDetectors where id=?", ped.getId());
 
-            AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_POINT_EVENT_DETECTOR, ped);
+            eventManager.raiseDeletedEvent(AuditEventType.TYPE_POINT_EVENT_DETECTOR, ped);
         }
     }
 
@@ -478,16 +473,6 @@ public class DataPointDao extends BaseDao {
                 ps.setInt(3, ups.get(i).getElement2());
             }
         });
-    }
-    //
-    //
-    // Point comments
-    //
-    private static final String POINT_COMMENT_SELECT = UserCommentRowMapper.USER_COMMENT_SELECT
-            + "where uc.commentType= " + UserComment.TYPE_POINT + " and uc.typeKey=? " + "order by uc.ts";
-
-    private void setPointComments(DataPointVO dp) {
-        dp.setComments(getSimpleJdbcTemplate().query(POINT_COMMENT_SELECT, new UserCommentRowMapper(), dp.getId()));
     }
     //
     //
@@ -543,18 +528,13 @@ public class DataPointDao extends BaseDao {
         }
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void savePointHierarchy(final PointFolder root) {
-        new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
+        // Dump the hierarchy table.
+        getSimpleJdbcTemplate().update("delete from pointHierarchy");
 
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                // Dump the hierarchy table.
-                getSimpleJdbcTemplate().update("delete from pointHierarchy");
-
-                // Save the point folders.
-                savePointFolder(root, 0);
-            }
-        });
+        // Save the point folders.
+        savePointFolder(root, 0);
 
         // Save the point folders. This is not done in the transaction because it can cause deadlocks in Derby.
         savePointsInFolder(root);
@@ -564,11 +544,12 @@ public class DataPointDao extends BaseDao {
         PointHierarchyEventDispatcher.firePointHierarchySaved(root);
     }
 
-    void savePointFolder(PointFolder folder, int parentId) {
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    private void savePointFolder(PointFolder folder, int parentId) {
         // Save the folder.
         if (folder.getId() == Common.NEW_ID) {
             SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("pointHierarchy").usingGeneratedKeyColumns("id");
-            Map<String, Object> params = new HashMap<String, Object>();
+            Map<String, Object> params = new HashMap();
             params.put("parentId", parentId);
             params.put("name", folder.getName());
 
@@ -586,7 +567,8 @@ public class DataPointDao extends BaseDao {
         }
     }
 
-    void savePointsInFolder(PointFolder folder) {
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    private void savePointsInFolder(PointFolder folder) {
         // Save the points in the subfolders
         for (PointFolder sf : folder.getSubfolders()) {
             savePointsInFolder(sf);

@@ -26,15 +26,19 @@ import com.atlassian.crowd.service.client.ClientResourceLocator;
 import com.atlassian.crowd.service.client.CrowdClient;
 import com.atlassian.crowd.service.factory.CrowdClientFactory;
 import com.serotonin.mango.Common;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class CrowdUtils {
+    @Autowired
+    private Common common;
+
     private final static Logger LOG = LoggerFactory.getLogger(CrowdUtils.class);
     private static final String CROWD_AUTHENTICATED_KEY = CrowdUtils.class.getName() + "CROWD_AUTHENTICATED_KEY";
 
     private static CrowdHttpAuthenticator authenticator;
 
-    public static boolean isCrowdEnabled() {
-        return Common.getEnvironmentProfile().getBoolean("auth.crowd.on", false);
+    public boolean isCrowdEnabled() {
+        return Boolean.valueOf(common.getEnvironmentProfile().getProperty("auth.crowd.on", Boolean.FALSE.toString()));
     }
 
     public static boolean authenticate(HttpServletRequest request, HttpServletResponse response, String username,

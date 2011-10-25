@@ -18,15 +18,12 @@
  */
 package com.serotonin.mango.db.upgrade;
 
-import java.io.OutputStream;
-import java.util.HashMap;
+import com.serotonin.ShouldNeverHappenException;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.db.dao.ViewDao;
 
 /**
@@ -37,23 +34,18 @@ public class Upgrade1_6_0 extends DBUpgrade {
 
     @Override
     public void upgrade() throws Exception {
-        OutputStream out = createUpdateLogOutputStream("1_6_0");
-
-        // Run the script.
-        LOG.info("Running script 1");
-        runScript(script1, out);
+        runScript(script1);
 
         xid();
 
-        // Run the script.
-        LOG.info("Running script 2");
-        Map<String, String[]> scripts = new HashMap<String, String[]>();
-        scripts.put(DatabaseAccess.DatabaseType.DERBY.name(), derbyScript2);
-        scripts.put(DatabaseAccess.DatabaseType.MYSQL.name(), mysqlScript2);
-        runScript(scripts, out);
+        switch (getDataBaseType()) {case DERBY: runScript(derbyScript2);
+            break;
+        case MYSQL: runScript(mysqlScript2);
+                break;
+            default:
+                throw new ShouldNeverHappenException("Unknow database " + getDataBaseType());
 
-        out.flush();
-        out.close();
+        }
     }
 
     @Override

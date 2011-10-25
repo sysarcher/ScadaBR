@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr;
 
@@ -34,12 +34,15 @@ import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;
 import org.joda.time.DateTime;
 import org.joda.time.IllegalFieldValueException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
+import com.serotonin.mango.db.dao.UserCommentDao;
 import com.serotonin.mango.db.dao.UserDao;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -64,22 +67,26 @@ import com.serotonin.web.i18n.I18NUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 abstract public class BaseDwr {
+
     public static final String MODEL_ATTR_EVENTS = "events";
     public static final String MODEL_ATTR_HAS_UNACKED_EVENT = "hasUnacknowledgedEvent";
     public static final String MODEL_ATTR_RESOURCE_BUNDLE = "bundle";
-
-    protected static EventDao EVENT_DAO;
-
-    public static void initialize() {
-        EVENT_DAO = new EventDao();
-    }
-
+    @Autowired
+    protected Common common;
+    @Autowired
+    protected Permissions permissions;
+    @Autowired
+    protected UserCommentDao userCommentDao;
+    @Autowired
+    protected EventDao eventDao;
+    @Autowired
+    private RuntimeManager runtimeManager;
     protected ResourceBundle changeSnippetMap = ResourceBundle.getBundle("changeSnippetMap");
     protected ResourceBundle chartSnippetMap = ResourceBundle.getBundle("chartSnippetMap");
 
     /**
      * Base method for preparing information in a state object and returning a point value.
-     * 
+     *
      * @param componentId
      *            a unique id for the browser side component. Required for set point snippets.
      * @param state
@@ -97,12 +104,13 @@ abstract public class BaseDwr {
         model.put(MODEL_ATTR_RESOURCE_BUNDLE, getResourceBundle());
 
         PointValueTime pointValue = null;
-        if (point == null)
+        if (point == null) {
             model.put("disabled", "true");
-        else {
+        } else {
             pointValue = point.getPointValue();
-            if (pointValue != null)
+            if (pointValue != null) {
                 model.put("pointValue", pointValue);
+            }
         }
 
         return pointValue;
@@ -110,14 +118,16 @@ abstract public class BaseDwr {
 
     protected void setEvents(DataPointVO pointVO, User user, Map<String, Object> model) {
         int userId = 0;
-        if (user != null)
+        if (user != null) {
             userId = user.getId();
-        List<EventInstance> events = EVENT_DAO.getPendingEventsForDataPoint(pointVO.getId(), userId);
+        }
+        List<EventInstance> events = eventDao.getPendingEventsForDataPoint(pointVO.getId(), userId);
         if (events != null) {
             model.put(MODEL_ATTR_EVENTS, events);
             for (EventInstance event : events) {
-                if (!event.isAcknowledged())
+                if (!event.isAcknowledged()) {
                     model.put(MODEL_ATTR_HAS_UNACKED_EVENT, true);
+                }
             }
         }
     }
@@ -128,24 +138,26 @@ abstract public class BaseDwr {
         model.put("text", prettyText);
         if (!ObjectUtils.isEqual(pointVO.lastValue(), pointValue)) {
             state.setValue(prettyText);
-            if (pointValue != null)
+            if (pointValue != null) {
                 state.setTime(Functions.getTime(pointValue));
+            }
             pointVO.updateLastValue(pointValue);
         }
     }
 
     protected void setChange(DataPointVO pointVO, BasePointState state, DataPointRT point, HttpServletRequest request,
             Map<String, Object> model, User user) {
-        if (Permissions.hasDataPointSetPermission(user, pointVO))
+        if (permissions.hasDataPointSetPermission(user, pointVO)) {
             setChange(pointVO, state, point, request, model);
+        }
     }
 
     protected void setChange(DataPointVO pointVO, BasePointState state, DataPointRT point, HttpServletRequest request,
             Map<String, Object> model) {
         if (pointVO.getPointLocator().isSettable()) {
-            if (point == null)
+            if (point == null) {
                 state.setChange(getMessage("common.pointDisabled"));
-            else {
+            } else {
                 String snippet = changeSnippetMap.getString(pointVO.getTextRenderer().getClass().getName());
                 state.setChange(generateContent(request, snippet, model));
             }
@@ -170,91 +182,96 @@ abstract public class BaseDwr {
     /**
      * Allows the setting of a given data point. Used by the watch list and point details pages. Views implement their
      * own version to accommodate anonymous users.
-     * 
+     *
      * @param pointId
      * @param valueStr
      * @return
      */
     @MethodFilter
     public int setPoint(int pointId, int componentId, String valueStr) {
-        User user = Common.getUser();
+        User user = common.getUser();
         DataPointVO point = new DataPointDao().getDataPoint(pointId);
 
         // Check permissions.
-        Permissions.ensureDataPointSetPermission(user, point);
+        permissions.ensureDataPointSetPermission(user, point);
 
         setPointImpl(point, valueStr, user);
         return componentId;
     }
 
     protected void setPointImpl(DataPointVO point, String valueStr, SetPointSource source) {
-        if (point == null)
+        if (point == null) {
             return;
+        }
 
-        if (valueStr == null)
-            Common.ctx.getRuntimeManager().relinquish(point.getId());
-        else {
+        if (valueStr == null) {
+            runtimeManager.relinquish(point.getId());
+        } else {
             // Convert the string value into an object.
             MangoValue value = MangoValue.stringToValue(valueStr, point.getPointLocator().getMangoDataType());
-            Common.ctx.getRuntimeManager().setDataPointValue(point.getId(), value, source);
+            runtimeManager.setDataPointValue(point.getId(), value, source);
         }
     }
 
     @MethodFilter
     public void forcePointRead(int pointId) {
-        User user = Common.getUser();
+        User user = common.getUser();
         DataPointVO point = new DataPointDao().getDataPoint(pointId);
 
         // Check permissions.
-        Permissions.ensureDataPointReadPermission(user, point);
+        permissions.ensureDataPointReadPermission(user, point);
 
-        Common.ctx.getRuntimeManager().forcePointRead(pointId);
+        runtimeManager.forcePointRead(pointId);
     }
 
     /**
      * Logs a user comment after validation.
-     * 
+     *
      * @param eventId
      * @param comment
      * @return
      */
     public UserComment addUserComment(int typeId, int referenceId, String comment) {
-        if (StringUtils.isEmpty(comment))
+        if (StringUtils.isEmpty(comment)) {
             return null;
+        }
 
-        User user = Common.getUser();
+        User user = common.getUser();
         UserComment c = new UserComment();
         c.setComment(comment);
         c.setTs(System.currentTimeMillis());
         c.setUserId(user.getId());
         c.setUsername(user.getUsername());
 
-        if (typeId == UserComment.TYPE_EVENT)
-            EVENT_DAO.insertEventComment(referenceId, c);
-        else if (typeId == UserComment.TYPE_POINT)
-            new UserDao().insertUserComment(UserComment.TYPE_POINT, referenceId, c);
-        else
+        if (typeId == UserComment.TYPE_EVENT) {
+            eventDao.insertEventComment(referenceId, c);
+        } else if (typeId == UserComment.TYPE_POINT) {
+            userCommentDao.insertUserComment(UserComment.TYPE_POINT, referenceId, c);
+        } else {
             throw new ShouldNeverHappenException("Invalid comment type: " + typeId);
+        }
 
         return c;
     }
 
     protected List<DataPointBean> getReadablePoints() {
-        User user = Common.getUser();
+        User user = common.getUser();
 
         List<DataPointVO> points = new DataPointDao().getDataPoints(DataPointExtendedNameComparator.instance, false);
-        if (!Permissions.hasAdmin(user)) {
+        if (!permissions.hasAdmin(user)) {
             List<DataPointVO> userPoints = new ArrayList<DataPointVO>();
             for (DataPointVO dp : points) {
-                if (Permissions.hasDataPointReadPermission(user, dp))
+                if (permissions.hasDataPointReadPermission(user, dp)) {
                     userPoints.add(dp);
+                }
             }
             points = userPoints;
         }
 
         List<DataPointBean> result = new ArrayList<DataPointBean>();
-        for (DataPointVO dp : points)
+        for (DataPointVO dp : points) {
             result.add(new DataPointBean(dp));
+        }
 
         return result;
     }
@@ -300,11 +317,9 @@ abstract public class BaseDwr {
     public static String generateContent(HttpServletRequest request, String snippet, Map<String, Object> model) {
         try {
             return ContentGenerator.generateContent(request, "/WEB-INF/snippet/" + snippet, model);
-        }
-        catch (ServletException e) {
+        } catch (ServletException e) {
             throw new ShouldNeverHappenException(e);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ShouldNeverHappenException(e);
         }
     }
@@ -312,8 +327,9 @@ abstract public class BaseDwr {
     protected List<User> getShareUsers(User excludeUser) {
         List<User> users = new ArrayList<User>();
         for (User u : new UserDao().getUsers()) {
-            if (u.getId() != excludeUser.getId())
+            if (u.getId() != excludeUser.getId()) {
                 users.add(u);
+            }
         }
         return users;
     }
@@ -325,10 +341,10 @@ abstract public class BaseDwr {
     protected DateTime createDateTime(int year, int month, int day, int hour, int minute, int second, boolean none) {
         DateTime dt = null;
         try {
-            if (!none)
+            if (!none) {
                 dt = new DateTime(year, month, day, hour, minute, second, 0);
-        }
-        catch (IllegalFieldValueException e) {
+            }
+        } catch (IllegalFieldValueException e) {
             dt = new DateTime();
         }
         return dt;

@@ -37,13 +37,19 @@ import com.serotonin.mango.web.integration.CrowdUtils;
 import com.serotonin.mango.web.mvc.form.LoginForm;
 import com.serotonin.util.StringUtils;
 import com.serotonin.util.ValidationUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
+@Deprecated
 public class LoginController extends SimpleFormController {
     private final static Logger LOG = LoggerFactory.getLogger(LoginController.class);
 
     private boolean mobile;
     private String successUrl;
     private String newUserUrl;
+    @Autowired
+    private Common common;
+    @Autowired
+    private CrowdUtils crowdUtils;
 
     public void setMobile(boolean mobile) {
         this.mobile = mobile;
@@ -61,7 +67,7 @@ public class LoginController extends SimpleFormController {
     protected ModelAndView showForm(HttpServletRequest request, HttpServletResponse response, BindException errors,
             @SuppressWarnings("rawtypes") Map controlModel) throws Exception {
         // Check if Crowd is enabled
-        if (CrowdUtils.isCrowdEnabled()) {
+        if (crowdUtils.isCrowdEnabled()) {
             String username = CrowdUtils.getCrowdUsername(request);
 
             if (username != null) {
@@ -78,7 +84,7 @@ public class LoginController extends SimpleFormController {
                     else {
                         if (CrowdUtils.isAuthenticated(request, response)) {
                             ModelAndView mav = performLogin(request, username);
-                            CrowdUtils.setCrowdAuthenticated(Common.getUser(request));
+                            CrowdUtils.setCrowdAuthenticated(common.getUser(request));
                             return mav;
                         }
                     }
@@ -115,13 +121,13 @@ public class LoginController extends SimpleFormController {
         else if (user.isDisabled())
             ValidationUtils.reject(errors, "login.validation.accountDisabled");
         else {
-            if (CrowdUtils.isCrowdEnabled())
+            if (crowdUtils.isCrowdEnabled())
                 // First attempt authentication with Crowd.
                 crowdAuthenticated = CrowdUtils.authenticate(request, response, login.getUsername(),
                         login.getPassword());
 
             if (!crowdAuthenticated) {
-                String passwordHash = Common.encrypt(login.getPassword());
+                String passwordHash = common.encrypt(login.getPassword());
 
                 // Validating the password against the database.
                 if (!passwordHash.equals(user.getPassword()))
@@ -134,13 +140,13 @@ public class LoginController extends SimpleFormController {
 
         ModelAndView mav = performLogin(request, login.getUsername());
         if (crowdAuthenticated)
-            CrowdUtils.setCrowdAuthenticated(Common.getUser(request));
+            CrowdUtils.setCrowdAuthenticated(common.getUser(request));
         return mav;
     }
 
     private ModelAndView performLogin(HttpServletRequest request, String username) {
         // Check if the user is already logged in.
-        User user = Common.getUser(request);
+        User user = common.getUser(request);
         if (user != null && user.getUsername().equals(username)) {
             // The user is already logged in. Nothing to do.
             if (LOG.isDebugEnabled())
@@ -152,11 +158,12 @@ public class LoginController extends SimpleFormController {
             user = new UserDao().getUser(username);
 
             // Update the last login time.
-            userDao.recordLogin(user.getId());
+            user.setLastLogin(System.currentTimeMillis());
+            userDao.saveLastLogin(user);
 
             // Add the user object to the session. This indicates to the rest
             // of the application whether the user is logged in or not.
-            Common.setUser(request, user);
+            common.setUser(request, user);
             if (LOG.isDebugEnabled())
                 LOG.debug("User object added to session");
         }

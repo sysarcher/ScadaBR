@@ -42,10 +42,14 @@ import com.serotonin.mango.vo.report.ImageChartUtils;
 import com.serotonin.mango.vo.report.PointTimeSeriesCollection;
 import com.serotonin.util.ColorUtils;
 import com.serotonin.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ImageChartServlet extends BaseInfoServlet {
     private static final long serialVersionUID = -1;
     private static final long CACHE_PURGE_INTERVAL = 1000 * 60 * 10; // 10 minutes
+    
+    @Autowired
+    private ImageChartUtils imageChartUtils;
 
     private long lastCachePurgeTime = 0;
     private final Map<String, CacheElement> cachedImages = new ConcurrentHashMap<String, CacheElement>();
@@ -169,7 +173,7 @@ public class ImageChartServlet extends BaseInfoServlet {
                 }
             }
 
-            return ImageChartUtils.getChartData(ptsc, width, height);
+            return imageChartUtils.getChartData(ptsc, width, height);
         }
         catch (StringIndexOutOfBoundsException e) {
             // no op

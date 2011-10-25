@@ -30,6 +30,7 @@ import java.util.Map;
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataSourceDao;
+import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.IDataPointLiveCycleListener;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -41,6 +42,7 @@ import com.serotonin.util.ILifecycle;
 import com.serotonin.web.i18n.LocalizableMessage;
 import java.util.HashSet;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Data sources are things that produce data for consumption of this system. Anything that houses, creates, manages, or
@@ -60,6 +62,9 @@ abstract public class DataSourceRT implements ILifecycle, IDataPointLiveCycleLis
     public static final String ATTR_UNRELIABLE_KEY = "UNRELIABLE";
     private final DataSourceVO<?> vo;
     private final List<DataSourceEventType> eventTypes;
+    @Autowired
+    private EventManager eventManager;
+    
     /**
      * Under the expectation that most data sources will run in their own threads, the addedPoints field is used as a
      * cache for points that have been added to the data source, so that at a convenient time for the data source they
@@ -119,22 +124,6 @@ abstract public class DataSourceRT implements ILifecycle, IDataPointLiveCycleLis
 
     public String getName() {
         return vo.getName();
-    }
-
-    /**
-     * This method is usable by subclasses to retrieve serializable data stored using the setPersistentData method.
-     */
-    public Object getPersistentData() {
-        return new DataSourceDao().getPersistentData(vo.getId());
-    }
-
-    /**
-     * This method is usable by subclasses to store any type of serializable data. This intention is to provide a
-     * mechanism for data source RTs to be able to persist data between runs. Normally this method would at least be
-     * called in the terminate method, but may also be called regularly for failover purposes.
-     */
-    protected void setPersistentData(Object persistentData) {
-        new DataSourceDao().savePersistentData(vo.getId(), persistentData);
     }
 
     /*
@@ -234,12 +223,12 @@ abstract public class DataSourceRT implements ILifecycle, IDataPointLiveCycleLis
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("dataSource", vo);
 
-        Common.ctx.getEventManager().raiseEvent(type, time, rtn, type.getAlarmLevel(), message, context);
+        eventManager.raiseEvent(type, time, rtn, type.getAlarmLevel(), message, context);
     }
 
     protected void returnToNormal(int eventId, long time) {
         DataSourceEventType type = getEventType(eventId);
-        Common.ctx.getEventManager().returnToNormal(type, time);
+        eventManager.returnToNormal(type, time);
     }
 
     private DataSourceEventType getEventType(int eventId) {
@@ -261,7 +250,7 @@ abstract public class DataSourceRT implements ILifecycle, IDataPointLiveCycleLis
         return getExceptionMessage(e);
     }
 
-    protected static LocalizableMessage getExceptionMessage(Exception e) {
+    public static LocalizableMessage getExceptionMessage(Exception e) {
         return new LocalizableMessage("event.exception2", e.getClass().getName(), e.getMessage());
     }
 
@@ -278,7 +267,7 @@ abstract public class DataSourceRT implements ILifecycle, IDataPointLiveCycleLis
     @Override
     public void terminate() {
         // Remove any outstanding events.
-        Common.ctx.getEventManager().cancelEventsForDataSource(vo.getId());
+        eventManager.cancelEventsForDataSource(vo.getId());
     }
 
     @Override

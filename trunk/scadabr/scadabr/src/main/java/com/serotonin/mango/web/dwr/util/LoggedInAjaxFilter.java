@@ -26,17 +26,20 @@ import org.directwebremoting.AjaxFilter;
 import org.directwebremoting.AjaxFilterChain;
 
 import com.serotonin.mango.vo.permission.Permissions;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
  */
 public class LoggedInAjaxFilter implements AjaxFilter {
     private final static Logger LOG = LoggerFactory.getLogger(LoggedInAjaxFilter.class);
+    @Autowired
+    private Permissions permissions;
 
     @Override
     public Object doFilter(Object obj, Method method, Object[] params, AjaxFilterChain chain) throws Exception {
         LOG.debug("Running LoggedInAjaxFilter, hash=" + hashCode());
-        Permissions.ensureValidUser();
+        permissions.ensureValidUser();
         return chain.doFilter(obj, method, params);
     }
 }

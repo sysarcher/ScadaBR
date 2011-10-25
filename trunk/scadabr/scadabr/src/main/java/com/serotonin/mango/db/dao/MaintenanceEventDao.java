@@ -2,24 +2,30 @@ package com.serotonin.mango.db.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
-import java.util.HashMap;
-import java.util.Map;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.transaction.support.TransactionTemplate;
 
+@Service
 public class MaintenanceEventDao extends BaseDao {
 
+    @Autowired
+    private EventManager eventManager;
+    
     private static final String MAINTENANCE_EVENT_SELECT = //
             "select m.id, m.xid, m.dataSourceId, m.alias, m.alarmLevel, "
             + "  m.scheduleType, m.disabled, m.activeYear, m.activeMonth, m.activeDay, m.activeHour, m.activeMinute, "
@@ -117,7 +123,7 @@ public class MaintenanceEventDao extends BaseDao {
         Number id = insertActor.executeAndReturnKey(params);
         me.setId(id.intValue());
 
-        AuditEventType.raiseAddedEvent(AuditEventType.TYPE_MAINTENANCE_EVENT, me);
+        eventManager.raiseAddedEvent(AuditEventType.TYPE_MAINTENANCE_EVENT, me);
     }
 
     private void updateMaintenanceEvent(MaintenanceEventVO me) {
@@ -135,7 +141,7 @@ public class MaintenanceEventDao extends BaseDao {
                 me.getActiveCron(), me.getInactiveYear(), me.getInactiveMonth(), me.getInactiveDay(),
                 me.getInactiveHour(), me.getInactiveMinute(), me.getInactiveSecond(), me.getInactiveCron(),
                 me.getId());
-        AuditEventType.raiseChangedEvent(AuditEventType.TYPE_MAINTENANCE_EVENT, old, me);
+        eventManager.raiseChangedEvent(AuditEventType.TYPE_MAINTENANCE_EVENT, old, me);
     }
 
     public void deleteMaintenanceEventsForDataSource(int dataSourceId) {
@@ -146,20 +152,14 @@ public class MaintenanceEventDao extends BaseDao {
         }
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void deleteMaintenanceEvent(final int maintenanceEventId) {
         MaintenanceEventVO me = getMaintenanceEvent(maintenanceEventId);
         if (me != null) {
-            new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
-
-                @Override
-                protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    getSimpleJdbcTemplate().update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.MAINTENANCE
-                            + " and eventTypeRef1=?", maintenanceEventId);
-                    getSimpleJdbcTemplate().update("delete from maintenanceEvents where id=?", maintenanceEventId);
-                }
-            });
-
-            AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_MAINTENANCE_EVENT, me);
+            getSimpleJdbcTemplate().update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.MAINTENANCE
+                    + " and eventTypeRef1=?", maintenanceEventId);
+            getSimpleJdbcTemplate().update("delete from maintenanceEvents where id=?", maintenanceEventId);
+            eventManager.raiseDeletedEvent(AuditEventType.TYPE_MAINTENANCE_EVENT, me);
         }
     }
 }

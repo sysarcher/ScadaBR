@@ -30,6 +30,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.publish.httpSender.HttpSenderRT;
 import com.serotonin.web.http.HttpUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -41,6 +42,8 @@ public class HttpSenderTester extends Thread implements TestingUtility {
     private final Map<String, String> staticHeaders;
     private final Map<String, String> staticParameters;
     private String result;
+    @Autowired
+    private Common common;
 
     public HttpSenderTester(String url, boolean usePost, Map<String, String> staticHeaders,
             Map<String, String> staticParameters) {
@@ -73,7 +76,7 @@ public class HttpSenderTester extends Thread implements TestingUtility {
         }
 
         try {
-            int code = Common.getHttpClient().executeMethod(method);
+            int code = common.getHttpClient().executeMethod(method);
             if (code != HttpStatus.SC_OK) {
                 result = "ERROR: Invalid response code: " + code;
             } else {

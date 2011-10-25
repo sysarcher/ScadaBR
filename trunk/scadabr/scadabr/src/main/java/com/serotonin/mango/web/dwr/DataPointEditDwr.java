@@ -1,24 +1,26 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr;
 
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -43,15 +45,18 @@ import com.serotonin.mango.view.text.TimeRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
-import com.serotonin.mango.vo.permission.Permissions;
 
 public class DataPointEditDwr extends BaseDwr {
+
+    @Autowired
+    private RuntimeManager runtimeManager;
+
     private DataPointVO getDataPoint() {
         // The user can also end up with this point in their session in the point details page, which only requires
         // read access. So, ensure that any access here is allowed with edit permission.
-        User user = Common.getUser();
+        User user = common.getUser();
         DataPointVO dataPoint = user.getEditPoint();
-        Permissions.ensureDataSourcePermission(user, dataPoint.getDataSourceId());
+        permissions.ensureDataSourcePermission(user, dataPoint.getDataSourceId());
         return dataPoint;
     }
 
@@ -68,8 +73,9 @@ public class DataPointEditDwr extends BaseDwr {
 
     public void setMultistateRenderer(List<MultistateValue> values) {
         MultistateRenderer r = new MultistateRenderer();
-        for (MultistateValue v : values)
+        for (MultistateValue v : values) {
             r.addMultistateValue(v.getKey(), v.getText(), v.getColour());
+        }
         setTextRenderer(r);
     }
 
@@ -83,8 +89,9 @@ public class DataPointEditDwr extends BaseDwr {
 
     public void setRangeRenderer(String format, List<RangeValue> values) {
         RangeRenderer r = new RangeRenderer(format);
-        for (RangeValue v : values)
+        for (RangeValue v : values) {
             r.addRangeValues(v.getFrom(), v.getTo(), v.getText(), v.getColour());
+        }
         setTextRenderer(r);
     }
 
@@ -128,12 +135,12 @@ public class DataPointEditDwr extends BaseDwr {
     //
     public long purgeNow(int purgeType, int purgePeriod, boolean allData) {
         DataPointVO point = getDataPoint();
-        RuntimeManager rm = Common.ctx.getRuntimeManager();
         Long count;
-        if (allData)
-            count = rm.purgeDataPointValues(point.getId());
-        else
-            count = rm.purgeDataPointValues(point.getId(), purgeType, purgePeriod);
+        if (allData) {
+            count = runtimeManager.purgeDataPointValues(point.getId());
+        } else {
+            count = runtimeManager.purgeDataPointValues(point.getId(), purgeType, purgePeriod);
+        }
         return count;
     }
 
@@ -142,9 +149,10 @@ public class DataPointEditDwr extends BaseDwr {
     //
     public void clearPointCache() {
         DataPointVO point = getDataPoint();
-        DataPointRT rt = Common.ctx.getRuntimeManager().getDataPoint(point.getId());
-        if (rt != null)
+        DataPointRT rt = runtimeManager.getDataPoint(point.getId());
+        if (rt != null) {
             rt.resetValues();
+        }
     }
 
     //
@@ -164,18 +172,19 @@ public class DataPointEditDwr extends BaseDwr {
         if (typeId == PointEventDetectorVO.TYPE_STATE_CHANGE_COUNT) {
             ped.setChangeCount(2);
             ped.setDuration(1);
+        } else if (typeId == PointEventDetectorVO.TYPE_NO_CHANGE) {
+            ped.setDuration(1);
+        } else if (typeId == PointEventDetectorVO.TYPE_NO_UPDATE) {
+            ped.setDuration(1);
         }
-        else if (typeId == PointEventDetectorVO.TYPE_NO_CHANGE)
-            ped.setDuration(1);
-        else if (typeId == PointEventDetectorVO.TYPE_NO_UPDATE)
-            ped.setDuration(1);
 
         int id = -1;
         synchronized (dp) {
             // Get a unique negative id as an indicator that this is new.
             for (PointEventDetectorVO d : dp.getEventDetectors()) {
-                if (d.getId() <= id)
+                if (d.getId() <= id) {
                     id = d.getId() - 1;
+                }
             }
             ped.setId(id);
             ped.njbSetDataPoint(dp);
