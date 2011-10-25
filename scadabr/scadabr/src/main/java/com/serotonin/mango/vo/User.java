@@ -59,6 +59,8 @@ import com.serotonin.mango.web.dwr.beans.TestingUtility;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.util.Set;
+import java.util.HashSet;
 
 @JsonRemoteEntity
 public class User implements SetPointSource, HttpSessionBindingListener,
@@ -77,7 +79,8 @@ public class User implements SetPointSource, HttpSessionBindingListener,
     private boolean admin;
     @JsonRemoteProperty
     private boolean disabled;
-    private List<Integer> dataSourcePermissions = new ArrayList<Integer>();
+    //TODO replacew with set???
+    private List<Integer> dataSourcePermissions = new ArrayList();
     private List<DataPointAccess> dataPointPermissions;
     private int selectedWatchList;
     @JsonRemoteProperty
@@ -92,6 +95,9 @@ public class User implements SetPointSource, HttpSessionBindingListener,
     private transient Permissions permissions;
     @Autowired
     private transient EventManager eventManager;
+    @Autowired
+    private transient DataSourceDao dataSourceDao;
+    
     //
     // Session data. The user object is stored in session, and some other
     // session-based information is cached here
@@ -108,8 +114,11 @@ public class User implements SetPointSource, HttpSessionBindingListener,
     private transient boolean muted = false;
     private transient DataExportDefinition dataExportDefinition;
     private transient EventExportDefinition eventExportDefinition;
-    private transient Map<String, Object> attributes = new HashMap<String, Object>();
+    private transient Map<String, Object> attributes = new HashMap();
 
+    @Autowired
+    private DataPointDao dataPointDao;
+    
     /**
      * Used for various display purposes.
      */
@@ -462,7 +471,6 @@ public class User implements SetPointSource, HttpSessionBindingListener,
             JsonArray jsonDataSources = json.getJsonArray("dataSourcePermissions");
             if (jsonDataSources != null) {
                 dataSourcePermissions.clear();
-                DataSourceDao dataSourceDao = new DataSourceDao();
 
                 for (JsonValue jv : jsonDataSources.getElements()) {
                     String xid = jv.toJsonString().getValue();
@@ -479,10 +487,9 @@ public class User implements SetPointSource, HttpSessionBindingListener,
             if (jsonPoints != null) {
                 // Get a list of points to which permission already exists due
                 // to data source access.
-                DataPointDao dataPointDao = new DataPointDao();
-                List<Integer> permittedPoints = new ArrayList<Integer>();
+                List<Integer> permittedPoints = new ArrayList();
                 for (Integer dsId : dataSourcePermissions) {
-                    for (DataPointVO dp : dataPointDao.getDataPoints(dsId, null)) {
+                    for (DataPointVO dp : dataPointDao.getDataPoints(dataSourceDao.getDataSource(dsId), null)) {
                         permittedPoints.add(dp.getId());
                     }
                 }
@@ -504,8 +511,7 @@ public class User implements SetPointSource, HttpSessionBindingListener,
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         if (!admin) {
-            List<String> dsXids = new ArrayList<String>();
-            DataSourceDao dataSourceDao = new DataSourceDao();
+            List<String> dsXids = new ArrayList();
             for (Integer dsId : dataSourcePermissions) {
                 dsXids.add(dataSourceDao.getDataSource(dsId).getXid());
             }

@@ -4,6 +4,7 @@
  */
 package com.serotonin.mango.db.dao;
 
+import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
@@ -37,17 +38,21 @@ public class DataSourceDaoTest  extends AbstractDaoTests{
     }
     
     @Transactional(readOnly=false, propagation= Propagation.REQUIRES_NEW)
-    private void setUpDataSources() {
+    private void setUpTableDataSources() {
         executeSqlScript("classpath:db/setUp-Table-DataSources.sql", false);
     }
 
+    private int countDataSourcesRows() {
+        return countRowsInTable("dataSources");
+    }
+    
     /**
      * Test of getDataSources method, of class DataSourceDao.
      */
     @Test
     public void testGetDataSources() {
         System.out.println("getDataSources");
-        setUpDataSources();
+        setUpTableDataSources();
         List dataSources = dataSourceDao.getDataSources();
         assertEquals(countRowsInTable("dataSources"), dataSources.size());
     }
@@ -58,7 +63,7 @@ public class DataSourceDaoTest  extends AbstractDaoTests{
     @Test
     public void testGetDataSource_int() {
         System.out.println("getDataSource");
-        setUpDataSources();
+        setUpTableDataSources();
         DataSourceVO dataSource = dataSourceDao.getDataSource(-11);
         assertNotNull(dataSource);
         dataSource = dataSourceDao.getDataSource(0);
@@ -71,7 +76,7 @@ public class DataSourceDaoTest  extends AbstractDaoTests{
     @Test
     public void testGetDataSource_String() {
         System.out.println("getDataSource");
-        setUpDataSources();
+        setUpTableDataSources();
         DataSourceVO dataSource = dataSourceDao.getDataSource("DS_000010");
         assertNotNull(dataSource);
         dataSource = dataSourceDao.getDataSource("");
@@ -81,33 +86,21 @@ public class DataSourceDaoTest  extends AbstractDaoTests{
     /**
      * Test of generateUniqueXid method, of class DataSourceDao.
      */
-    @Ignore
     @Test
     public void testGenerateUniqueXid() {
         System.out.println("generateUniqueXid");
-        DataSourceDao instance = new DataSourceDao();
-        String expResult = "";
-        String result = instance.generateUniqueXid();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertNotNull(dataSourceDao.generateUniqueXid());
     }
 
     /**
      * Test of isXidUnique method, of class DataSourceDao.
      */
-    @Ignore
     @Test
     public void testIsXidUnique() {
         System.out.println("isXidUnique");
-        String xid = "";
-        int excludeId = 0;
-        DataSourceDao instance = new DataSourceDao();
-        boolean expResult = false;
-        boolean result = instance.isXidUnique(xid, excludeId);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        setUpTableDataSources();
+        assertFalse(dataSourceDao.isXidUnique("DS_000012", Common.NEW_ID));
+        assertTrue(dataSourceDao.isXidUnique("DS_XXXXXX", Common.NEW_ID));
     }
 
     /**
@@ -146,44 +139,46 @@ public class DataSourceDaoTest  extends AbstractDaoTests{
     /**
      * Test of deleteDataSource method, of class DataSourceDao.
      */
-    @Ignore
     @Test
     public void testDeleteDataSource() {
         System.out.println("deleteDataSource");
-        int dataSourceId = 0;
-        DataSourceDao instance = new DataSourceDao();
-        instance.deleteDataSource(dataSourceId);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+        setUpTableDataSources();
+        final DataSourceVO<?> dataSourceVo = dataSourceDao.getDataSource(-11);
+        final int rows = countDataSourcesRows();
+        
+        IMocksControl ctl = EasyMock.createStrictControl();
+        DataPointDao dataPointDao = ctl.createMock("dataPointDao", DataPointDao.class);
+        MaintenanceEventDao maintenanceEventDao = ctl.createMock("maintenanceEventDao", MaintenanceEventDao.class);
+        EventManager eventManager = ctl.createMock("eventManager", EventManager.class); 
+        
+        dataPointDao.deleteDataPoints(dataSourceVo);
+        maintenanceEventDao.deleteMaintenanceEventsForDataSource(dataSourceVo);
+        eventManager.raiseDeletedEvent(AuditEventType.TYPE_DATA_SOURCE, dataSourceVo);
 
-    /**
-     * Test of copyPermissions method, of class DataSourceDao.
-     */
-    @Ignore
-    @Test
-    public void testCopyPermissions() {
-        System.out.println("copyPermissions");
-        int fromDataSourceId = 0;
-        int toDataSourceId = 0;
-        DataSourceDao instance = new DataSourceDao();
-        instance.copyPermissions(fromDataSourceId, toDataSourceId);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+        ctl.replay();
+        dataSourceDao.setDataPointDao(dataPointDao);
+        dataSourceDao.setMaintenanceEventDao(maintenanceEventDao);
+        dataSourceDao.setEventManager(eventManager);
+        
+        dataSourceDao.deleteDataSource(dataSourceVo);
+        ctl.verify();
+
+        assertEquals(-1, countDataSourcesRows() - rows);
+  }
 
     /**
      * Test of copyDataSource method, of class DataSourceDao.
      */
+    //TODO multi table test
     @Ignore
     @Test
     public void testCopyDataSource() {
         System.out.println("copyDataSource");
-        int dataSourceId = 0;
+        DataSourceVO<?> dataSource = null;
         ResourceBundle bundle = null;
         DataSourceDao instance = new DataSourceDao();
         int expResult = 0;
-        int result = instance.copyDataSource(dataSourceId, bundle);
+        int result = instance.copyDataSource(dataSource, bundle);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

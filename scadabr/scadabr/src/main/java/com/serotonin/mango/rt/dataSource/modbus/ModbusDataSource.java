@@ -100,7 +100,7 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
                 DataPointDao dataPointDao = new DataPointDao();
                 boolean found = false;
 
-                List<DataPointVO> points = dataPointDao.getDataPoints(vo.getId(), null);
+                List<DataPointVO> points = dataPointDao.getDataPoints(vo, null);
                 for (DataPointVO dp : points) {
                     ModbusPointLocatorVO loc = dp.getPointLocator();
                     if (loc.getSlaveId() == slaveId && loc.isSlaveMonitor()) {

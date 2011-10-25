@@ -59,20 +59,20 @@ public class DataSourceListController extends PaginatedListController {
         DataPointDao dataPointDao = new DataPointDao();
 
         List<DataSourceVO<?>> data = runtimeManager.getDataSources();
-        List<ListParent<DataSourceVO<?>, DataPointVO>> dataSources = new ArrayList<ListParent<DataSourceVO<?>, DataPointVO>>();
+        List<ListParent<DataSourceVO<?>, DataPointVO>> dataSources = new ArrayList();
         ListParent<DataSourceVO<?>, DataPointVO> listParent;
         for (DataSourceVO<?> ds : data) {
             if (permissions.hasDataSourcePermission(user, ds.getId())) {
-                listParent = new ListParent<DataSourceVO<?>, DataPointVO>();
+                listParent = new ListParent();
                 listParent.setParent(ds);
-                listParent.setList(dataPointDao.getDataPoints(ds.getId(), DataPointNameComparator.instance));
+                listParent.setList(dataPointDao.getDataPoints(ds, DataPointNameComparator.instance));
                 dataSources.add(listParent);
             }
         }
 
         sortData(ControllerUtils.getResourceBundle(request), dataSources, paging);
 
-        return new PaginatedData<ListParent<DataSourceVO<?>, DataPointVO>>(dataSources, data.size());
+        return new PaginatedData(dataSources, data.size());
     }
 
     private void sortData(ResourceBundle bundle, List<ListParent<DataSourceVO<?>, DataPointVO>> data,
@@ -102,14 +102,19 @@ public class DataSourceListController extends PaginatedListController {
 
         public DataSourceComparator(ResourceBundle bundle, String sortField, boolean descending) {
             this.bundle = bundle;
-            if ("name".equals(sortField)) {
-                sortType = SORT_NAME;
-            } else if ("type".equals(sortField)) {
-                sortType = SORT_TYPE;
-            } else if ("conn".equals(sortField)) {
-                sortType = SORT_TYPE;
-            } else if ("enabled".equals(sortField)) {
-                sortType = SORT_ENABLED;
+            switch (sortField) {
+                case "name":
+                    sortType = SORT_NAME;
+                    break;
+                case "type":
+                    sortType = SORT_TYPE;
+                    break;
+                case "conn":
+                    sortType = SORT_TYPE;
+                    break;
+                case "enabled":
+                    sortType = SORT_ENABLED;
+                    break;
             }
             this.descending = descending;
         }

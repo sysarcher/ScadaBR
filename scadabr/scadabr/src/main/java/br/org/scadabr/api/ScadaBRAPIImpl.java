@@ -74,11 +74,15 @@ import br.org.scadabr.db.dao.FlexProjectDao;
 import br.org.scadabr.rt.dataSource.ServerStateChecker;
 
 import com.serotonin.mango.Common;
+import com.serotonin.mango.db.dao.DataSourceDao;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
 		APIConstants {
 	private ScadaBRAPIDao dataDao = new MangoDaoImpl(AuthenticationHandler
 			.getUsername());
+        @Autowired
+        private DataSourceDao dataSourceDao;
 
 	/**
 	 * This method attempts to return a {@link GetStatusResponse} object
@@ -884,7 +888,7 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
 		}
 
 		try {
-			dataDao.removeDataSource(parameters.getId());
+			dataDao.removeDataSource(dataSourceDao.getDataSource(parameters.getId()));
 			response.setErrors(new APIError[] { new APIError(ErrorCode.OK,
 					"No Problem Found") });
 		} catch (ScadaBRAPIException e) {
@@ -915,7 +919,7 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
 		}
 		List<Object> dataPoints = null;
 		try {
-			dataPoints = dataDao.getDataPoints(parameters.getDataSourceId());
+			dataPoints = dataDao.getDataPoints(dataSourceDao.getDataSource(parameters.getDataSourceId()));
 			response.setErrors(new APIError[] { new APIError(ErrorCode.OK,
 					"No Problem Found") });
 
@@ -952,7 +956,7 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
 
 		int id = 0;
 		try {
-			id = dataDao.configureDataPoint(parameters.getDataSourceId(),
+			id = dataDao.configureDataPoint(dataSourceDao.getDataSource(parameters.getDataSourceId()),
 					parameters.getType(), parameters.getDataPoint());
 			response.setErrors(new APIError[] { new APIError(ErrorCode.OK,
 					"No Problem Found") });

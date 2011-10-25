@@ -54,7 +54,7 @@ public class UsersDwr extends BaseDwr {
     private UserDao userDao;
 
     public Map<String, Object> getInitData() {
-        Map<String, Object> initData = new HashMap<String, Object>();
+        Map<String, Object> initData = new HashMap();
 
         User user = common.getUser();
         if (permissions.hasAdmin(user)) {
@@ -64,17 +64,17 @@ public class UsersDwr extends BaseDwr {
 
             // Data sources
             List<DataSourceVO<?>> dataSourceVOs = new DataSourceDao().getDataSources();
-            List<Map<String, Object>> dataSources = new ArrayList<Map<String, Object>>(dataSourceVOs.size());
+            List<Map<String, Object>> dataSources = new ArrayList(dataSourceVOs.size());
             Map<String, Object> ds, dp;
             List<Map<String, Object>> points;
             DataPointDao dataPointDao = new DataPointDao();
             for (DataSourceVO<?> dsvo : dataSourceVOs) {
-                ds = new HashMap<String, Object>();
+                ds = new HashMap();
                 ds.put("id", dsvo.getId());
                 ds.put("name", dsvo.getName());
-                points = new LinkedList<Map<String, Object>>();
-                for (DataPointVO dpvo : dataPointDao.getDataPoints(dsvo.getId(), DataPointNameComparator.instance)) {
-                    dp = new HashMap<String, Object>();
+                points = new LinkedList();
+                for (DataPointVO dpvo : dataPointDao.getDataPoints(dsvo, DataPointNameComparator.instance)) {
+                    dp = new HashMap();
                     dp.put("id", dpvo.getId());
                     dp.put("name", dpvo.getName());
                     dp.put("settable", dpvo.getPointLocator().isSettable());
@@ -110,7 +110,6 @@ public class UsersDwr extends BaseDwr {
         // Validate the given information. If there is a problem, return an appropriate error message.
         HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
         User currentUser = common.getUser(request);
-        UserDao userDao = new UserDao();
 
         User user;
         if (id == Common.NEW_ID) {
@@ -174,7 +173,6 @@ public class UsersDwr extends BaseDwr {
             throw new PermissionException("Cannot update a different user", user);
         }
 
-        UserDao userDao = new UserDao();
         User updateUser = userDao.getUser(id);
         if (!StringUtils.isEmpty(password)) {
             updateUser.setPassword(common.encrypt(password));
@@ -199,10 +197,10 @@ public class UsersDwr extends BaseDwr {
 
     public Map<String, Object> sendTestEmail(String email, String username) {
         permissions.ensureAdmin();
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap();
         try {
             ResourceBundle bundle = common.getBundle();
-            Map<String, Object> model = new HashMap<String, Object>();
+            Map<String, Object> model = new HashMap();
             model.put("message", new LocalizableMessage("ftl.userTestEmail", username));
             MangoEmailContent cnt = new MangoEmailContent("testEmail", model, bundle, I18NUtils.getMessage(bundle,
                     "ftl.testEmail"), Common.UTF8);

@@ -71,11 +71,6 @@ public class MetaDataSourceVO extends DataSourceVO<MetaDataSourceVO> {
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
-
-    @Override
     public LocalizableMessage getConnectionDescription() {
         return new LocalizableMessage("common.noMessage");
     }

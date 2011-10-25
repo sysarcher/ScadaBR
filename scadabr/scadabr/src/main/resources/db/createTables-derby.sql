@@ -106,7 +106,7 @@ create table dataSourceUsers (
   dataSourceId int not null,
   userId int not null
 );
-alter table dataSourceUsers add constraint dataSourceUsersFk1 foreign key (dataSourceId) references dataSources(id);
+alter table dataSourceUsers add constraint dataSourceUsersFk1 foreign key (dataSourceId) references dataSources(id) on delete cascade;
 alter table dataSourceUsers add constraint dataSourceUsersFk2 foreign key (userId) references users(id) on delete cascade;
 
 --

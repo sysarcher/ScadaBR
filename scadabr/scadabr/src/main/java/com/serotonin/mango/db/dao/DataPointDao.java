@@ -49,6 +49,7 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.bean.PointHistoryCount;
+import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.mango.vo.hierarchy.PointFolder;
 import com.serotonin.mango.vo.hierarchy.PointHierarchy;
@@ -92,12 +93,9 @@ public class DataPointDao extends BaseDao {
         }
         return vo.getExtendedName();
     }
-    private static final String DATA_POINT_SELECT = "select dp.id, dp.xid, dp.dataSourceId, dp.data, ds.name, " //
-            + "ds.xid, ds.dataSourceType " //
-            + "from dataPoints dp join dataSources ds on ds.id = dp.dataSourceId ";
 
     public List<DataPointVO> getDataPoints(Comparator<DataPointVO> comparator, boolean includeRelationalData) {
-        List<DataPointVO> dps = getSimpleJdbcTemplate().query(DATA_POINT_SELECT, new DataPointRowMapper());
+        List<DataPointVO> dps = getJdbcTemplate().query(DataPointRowMapper.DATA_POINT_SELECT, new DataPointRowMapper());
         if (includeRelationalData) {
             setRelationalData(dps);
         }
@@ -107,8 +105,8 @@ public class DataPointDao extends BaseDao {
         return dps;
     }
 
-    public List<DataPointVO> getDataPoints(int dataSourceId, Comparator<DataPointVO> comparator) {
-        List<DataPointVO> dps = getSimpleJdbcTemplate().query(DATA_POINT_SELECT + " where dp.dataSourceId=?", new DataPointRowMapper(), dataSourceId);
+    public List<DataPointVO> getDataPoints(final DataSourceVO<?> dataSourceVo, Comparator<DataPointVO> comparator) {
+        List<DataPointVO> dps = getJdbcTemplate().query(DataPointRowMapper.DATA_POINT_SELECT + " where dp.dataSourceId=?", new DataPointRowMapper(), dataSourceVo.getId());
         setRelationalData(dps);
         if (comparator != null) {
             Collections.sort(dps, comparator);
@@ -117,18 +115,21 @@ public class DataPointDao extends BaseDao {
     }
 
     public DataPointVO getDataPoint(int id) {
-        DataPointVO dp = getSimpleJdbcTemplate().queryForObject(DATA_POINT_SELECT + " where dp.id=?", new DataPointRowMapper(), id);
+        DataPointVO dp = getJdbcTemplate().queryForObject(DataPointRowMapper.DATA_POINT_SELECT + " where dp.id=?", new DataPointRowMapper(), id);
         setRelationalData(dp);
         return dp;
     }
 
     public DataPointVO getDataPoint(String xid) {
-        DataPointVO dp = getSimpleJdbcTemplate().queryForObject(DATA_POINT_SELECT + " where dp.xid=?", new DataPointRowMapper(), xid);
+        DataPointVO dp = getJdbcTemplate().queryForObject(DataPointRowMapper.DATA_POINT_SELECT + " where dp.xid=?", new DataPointRowMapper(), xid);
         setRelationalData(dp);
         return dp;
     }
 
     class DataPointRowMapper implements ParameterizedRowMapper<DataPointVO> {
+    static final String DATA_POINT_SELECT = "select dp.id, dp.xid, dp.dataSourceId, dp.data, ds.name, " //
+            + "ds.xid, ds.dataSourceType " //
+            + "from dataPoints dp join dataSources ds on ds.id = dp.dataSourceId ";
 
         @Override
         public DataPointVO mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -234,18 +235,18 @@ public class DataPointDao extends BaseDao {
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-    public void deleteDataPoints(final int dataSourceId) {
-        List<DataPointVO> old = getDataPoints(dataSourceId, null);
+    public void deleteDataPoints(final DataSourceVO dataSourceVo) {
+        List<DataPointVO> old = getDataPoints(dataSourceVo, null);
         for (DataPointVO dp : old) {
-            beforePointDelete(dp.getId());
+            beforePointDelete(dp);
         }
 
         for (DataPointVO dp : old) {
-            deletePointHistory(dp.getId());
+            deletePointHistory(dp);
         }
 
         List<Integer> pointIds = getJdbcTemplate().queryForList("select id from dataPoints where dataSourceId=?",
-                new Object[]{dataSourceId}, Integer.class);
+                new Object[]{dataSourceVo.getId()}, Integer.class);
         if (pointIds.size() > 0) {
             deleteDataPointImpl(createDelimitedList(new HashSet(pointIds), ",", null));
         }
@@ -256,40 +257,36 @@ public class DataPointDao extends BaseDao {
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-    public void deleteDataPoint(final int dataPointId) {
-        DataPointVO dp = getDataPoint(dataPointId);
-        if (dp != null) {
-            beforePointDelete(dataPointId);
-            deletePointHistory(dataPointId);
-            deleteDataPointImpl(Integer.toString(dataPointId));
-            eventManager.raiseDeletedEvent(AuditEventType.TYPE_DATA_POINT, dp);
-        }
+    public void deleteDataPoint(final DataPointVO dataPointVo) {
+            beforePointDelete(dataPointVo);
+            deletePointHistory(dataPointVo);
+            deleteDataPointImpl(Integer.toString(dataPointVo.getId()));
+            eventManager.raiseDeletedEvent(AuditEventType.TYPE_DATA_POINT, dataPointVo);
     }
 
-    private void beforePointDelete(int dataPointId) {
-        for (PointLinkVO link : pointLinkDao.getPointLinksForPoint(dataPointId)) {
+    private void beforePointDelete(DataPointVO dataPointVo) {
+        for (PointLinkVO link : pointLinkDao.getPointLinksForPoint(dataPointVo)) {
             runtimeManager.deletePointLink(link.getId());
         }
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
-    private void deletePointHistory(int dataPointId) {
-        Object[] p = new Object[]{dataPointId};
-        long min = getSimpleJdbcTemplate().queryForLong("select min(ts) from pointValues where dataPointId=?", p);
-        long max = getSimpleJdbcTemplate().queryForLong("select max(ts) from pointValues where dataPointId=?", p);
-        deletePointHistory(dataPointId, min, max);
+    private void deletePointHistory(DataPointVO dataPointVo) {
+        long min = getSimpleJdbcTemplate().queryForLong("select min(ts) from pointValues where dataPointId=?", dataPointVo.getId());
+        long max = getSimpleJdbcTemplate().queryForLong("select max(ts) from pointValues where dataPointId=?", dataPointVo.getId());
+        deletePointHistory(dataPointVo, min, max);
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
-    private void deletePointHistory(int dataPointId, long min, long max) {
+    private void deletePointHistory(final DataPointVO dataPointVo, long min, long max) {
         while (true) {
             try {
-                getSimpleJdbcTemplate().update("delete from pointValues where dataPointId=? and ts <= ?", dataPointId, max);
+                getSimpleJdbcTemplate().update("delete from pointValues where dataPointId=? and ts <= ?", dataPointVo.getId(), max);
                 break;
             } catch (UncategorizedSQLException e) {
                 if ("The total number of locks exceeds the lock table size".equals(e.getSQLException().getMessage())) {
                     long mid = (min + max) >> 1;
-                    deletePointHistory(dataPointId, min, mid);
+                    deletePointHistory(dataPointVo, min, mid);
                     min = mid;
                 } else {
                     throw e;
@@ -298,6 +295,7 @@ public class DataPointDao extends BaseDao {
         }
     }
 
+    //TODO replace with named param and map as suggested in springsource docs ...
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     private void deleteDataPointImpl(String dataPointIdList) {
         dataPointIdList = "(" + dataPointIdList + ")";
@@ -451,11 +449,11 @@ public class DataPointDao extends BaseDao {
     public void copyPermissions(final int fromDataPointId, final int toDataPointId) {
         final List<Tuple<Integer, Integer>> ups = getSimpleJdbcTemplate().query(
                 "select userId, permission from dataPointUsers where dataPointId=?",
-                new ParameterizedRowMapper<Tuple<Integer, Integer>>() {
+                new ParameterizedRowMapper() {
 
                     @Override
                     public Tuple<Integer, Integer> mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        return new Tuple<Integer, Integer>(rs.getInt(1), rs.getInt(2));
+                        return new Tuple(rs.getInt(1), rs.getInt(2));
                     }
                 }, fromDataPointId);
 
@@ -482,7 +480,7 @@ public class DataPointDao extends BaseDao {
 
     public PointHierarchy getPointHierarchy() {
         if (cachedPointHierarchy == null) {
-            final Map<Integer, List<PointFolder>> folders = new HashMap<Integer, List<PointFolder>>();
+            final Map<Integer, List<PointFolder>> folders = new HashMap();
 
             // Get the folder list.
             getJdbcTemplate().query("select id, parentId, name from pointHierarchy", new RowCallbackHandler() {
@@ -493,7 +491,7 @@ public class DataPointDao extends BaseDao {
                     int parentId = rs.getInt(2);
                     List<PointFolder> folderList = folders.get(parentId);
                     if (folderList == null) {
-                        folderList = new LinkedList<PointFolder>();
+                        folderList = new LinkedList();
                         folders.put(parentId, folderList);
                     }
                     folderList.add(f);

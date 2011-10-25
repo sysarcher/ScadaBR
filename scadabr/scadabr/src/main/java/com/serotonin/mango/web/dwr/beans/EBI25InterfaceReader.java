@@ -88,7 +88,7 @@ public class EBI25InterfaceReader {
 
             // Get the list of existing data points for the data source. We remove points from this list as they are
             // needed so that when we are done all that is left in the list is points that can be disabled.
-            List<DataPointVO> existingPoints = dataPointDao.getDataPoints(dataSource.getId(), null);
+            List<DataPointVO> existingPoints = dataPointDao.getDataPoints(dataSource, null);
 
             for (EBI25LoggerInfo info : loggerInfo) {
                 EBI25PointLocatorVO locator = null;

@@ -57,15 +57,17 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.dwr.beans.ImportTask;
 import com.serotonin.web.dwr.DwrResponseI18n;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthew Lohbihler
  */
 public class EmportDwr extends BaseDwr {
 
+    private final static Logger LOG = LoggerFactory.getLogger(EmportDwr.class);
     public static final String GRAPHICAL_VIEWS = "graphicalViews";
     public static final String EVENT_HANDLERS = "eventHandlers";
     public static final String DATA_SOURCES = "dataSources";
@@ -83,9 +85,9 @@ public class EmportDwr extends BaseDwr {
     public static final String POINT_VALUES = "pointValues";
     public static final String SYSTEM_SETTINGS = "systemSettings";
     @Autowired
-    private Permissions permissions;
-    @Autowired
     private RuntimeManager runtimeManager;
+    @Autowired
+    private DataSourceDao dataSourceDao;
 
     public String createExportData(int prettyIndent, boolean graphicalViews,
             boolean eventHandlers, boolean dataSources, boolean dataPoints,
@@ -109,7 +111,7 @@ public class EmportDwr extends BaseDwr {
             boolean pointHierarchy, boolean mailingLists, boolean publishers,
             boolean watchLists, boolean maintenanceEvents, boolean scripts,
             boolean pointValues, int maxPointValues, boolean systemSettings) {
-        Map<String, Object> data = new LinkedHashMap<String, Object>();
+        Map<String, Object> data = new LinkedHashMap();
 
         if (graphicalViews) {
             data.put(GRAPHICAL_VIEWS, new ViewDao().getViews());
@@ -165,7 +167,7 @@ public class EmportDwr extends BaseDwr {
             data.put(SCRIPTS, new ScriptDao().getScripts());
         }
         if (pointValues) {
-            List<PointValueJSONWrapper> allWrappedValues = new ArrayList<PointValueJSONWrapper>();
+            List<PointValueJSONWrapper> allWrappedValues = new ArrayList();
 
             long antes = System.currentTimeMillis();
             PointValueDao dao = new PointValueDao();
@@ -178,7 +180,7 @@ public class EmportDwr extends BaseDwr {
         }
         if (systemSettings) {
             SystemSettingsJSONWrapper sysSetWrapp = new SystemSettingsJSONWrapper();
-            List<SystemSettingsJSONWrapper> list = new ArrayList<SystemSettingsJSONWrapper>();
+            List<SystemSettingsJSONWrapper> list = new ArrayList();
             list.add(sysSetWrapp);
             data.put(SYSTEM_SETTINGS, list);
         }
@@ -189,9 +191,7 @@ public class EmportDwr extends BaseDwr {
 
         try {
             return writer.write(data);
-        } catch (JsonException e) {
-            throw new ShouldNeverHappenException(e);
-        } catch (IOException e) {
+        } catch (JsonException | IOException e) {
             throw new ShouldNeverHappenException(e);
         }
     }
@@ -222,11 +222,9 @@ public class EmportDwr extends BaseDwr {
             } else {
                 response.addGenericMessage("emport.invalidImportData");
             }
-        } catch (ClassCastException e) {
-            response.addGenericMessage("emport.parseError", e.getMessage());
         } catch (LocalizableJsonException e) {
             response.addMessage(e.getMsg());
-        } catch (JsonException e) {
+        } catch (ClassCastException | JsonException e) {
             response.addGenericMessage("emport.parseError", e.getMessage());
         }
 
@@ -271,7 +269,7 @@ public class EmportDwr extends BaseDwr {
             new SystemSettingsDao().resetDataBase();
             importer.importProject();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("error during loadProject", e);
             return false;
         }
         return true;
@@ -283,11 +281,9 @@ public class EmportDwr extends BaseDwr {
     }
 
     private void stopRunningDataSources() {
-        List<DataSourceVO<?>> dataSources = new DataSourceDao().getDataSources();
-
-        for (DataSourceVO<?> dataSourceVO : dataSources) {
+        for (DataSourceVO<?> dataSourceVO : dataSourceDao.getDataSources()) {
             if (dataSourceVO.isEnabled()) {
-                runtimeManager.stopDataSource(dataSourceVO.getId());
+                runtimeManager.stopDataSource(dataSourceVO);
             }
         }
 

@@ -78,6 +78,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
 public class RuntimeManager {
 
     private final static Logger LOG = LoggerFactory.getLogger(RuntimeManager.class);
+    //TODO use Set??
     private final List<DataSourceRT> runningDataSources = new CopyOnWriteArrayList();
     @Autowired
     private PointValueDao pointValueDao;
@@ -95,6 +96,8 @@ public class RuntimeManager {
     private PublisherDao publisherDao;
     @Autowired
     private MaintenanceEventDao maintenanceEventDao;
+    @Autowired
+    private DataPointDao dataPointDao;
     
 
     /**
@@ -106,6 +109,7 @@ public class RuntimeManager {
      * notified of point initializations (i.e. a listener can register itself
      * before the point is enabled).
      */
+    //TODO DataPointRT instead of Integer???
     private final Map<Integer, DataPointListener> dataPointListeners = new ConcurrentHashMap();
     /**
      * Store of enabled event detectors.
@@ -287,12 +291,12 @@ public class RuntimeManager {
         // First stop meta data sources.
         for (DataSourceRT dataSource : runningDataSources) {
             if (dataSource instanceof MetaDataSourceRT) {
-                stopDataSource(dataSource.getId());
+                stopDataSource(dataSource);
             }
         }
         // Then stop everything else.
         for (DataSourceRT dataSource : runningDataSources) {
-            stopDataSource(dataSource.getId());
+            stopDataSource(dataSource);
         }
 
         for (String key : simpleEventDetectors.keySet()) {
@@ -305,7 +309,7 @@ public class RuntimeManager {
             try {
                 dataSource.joinTermination();
             } catch (ShouldNeverHappenException e) {
-                LOG.error("Error stopping data source " + dataSource.getId(), e);
+                LOG.error("Error stopping data source " + dataSource.getName(), e);
             }
         }
     }
@@ -314,17 +318,35 @@ public class RuntimeManager {
     //
     // Data sources
     //
-    public DataSourceRT getRunningDataSource(int dataSourceId) {
-        for (DataSourceRT dataSource : runningDataSources) {
-            if (dataSource.getId() == dataSourceId) {
-                return dataSource;
+    public DataSourceRT getRunningDataSource(DataSourceVO<?> dataSourceVo) {
+        for (DataSourceRT dataSourceRt : runningDataSources) {
+            if (dataSourceRt.getVo().equals(dataSourceVo)) {
+                return dataSourceRt;
             }
         }
         return null;
     }
 
-    public boolean isDataSourceRunning(int dataSourceId) {
-        return getRunningDataSource(dataSourceId) != null;
+    private DataSourceRT getRunningDataSource(DataPointVO point) {
+        for (DataSourceRT dataSourceRt : runningDataSources) {
+            if (dataSourceRt.getId() == point.getDataSourceId()) {
+                return dataSourceRt;
+            }
+        }
+        return null;
+    }
+
+    private DataSourceRT getRunningDataSource(DataPointRT point) {
+        for (DataSourceRT dataSourceRt : runningDataSources) {
+            if (dataSourceRt.getId() == point.getDataSourceId()) {
+                return dataSourceRt;
+            }
+        }
+        return null;
+    }
+
+    public boolean isDataSourceRunning(DataSourceVO<?> dataSourceVo) {
+        return getRunningDataSource(dataSourceVo) != null;
     }
 
     public List<DataSourceVO<?>> getDataSources() {
@@ -335,15 +357,15 @@ public class RuntimeManager {
         return new DataSourceDao().getDataSource(dataSourceId);
     }
 
-    public void deleteDataSource(int dataSourceId) {
-        stopDataSource(dataSourceId);
-        new DataSourceDao().deleteDataSource(dataSourceId);
-        eventManager.cancelEventsForDataSource(dataSourceId);
+    public void deleteDataSource(DataSourceVO<?> dataSource) {
+        stopDataSource(dataSource);
+        new DataSourceDao().deleteDataSource(dataSource);
+        eventManager.cancelEventsForDataSource(dataSource);
     }
 
     public void saveDataSource(DataSourceVO<?> vo) {
         // If the data source is running, stop it.
-        stopDataSource(vo.getId());
+        stopDataSource(vo);
 
         // In case this is a new data source, we need to save to the database
         // first so that it has a proper id.
@@ -360,7 +382,7 @@ public class RuntimeManager {
     private boolean initializeDataSource(DataSourceVO<?> vo) {
         synchronized (runningDataSources) {
             // If the data source is already running, just quit.
-            if (isDataSourceRunning(vo.getId())) {
+            if (isDataSourceRunning(vo)) {
                 return false;
             }
 
@@ -375,7 +397,7 @@ public class RuntimeManager {
             runningDataSources.add(dataSource);
 
             // Add the enabled points to the data source.
-            List<DataPointVO> dataSourcePoints = new DataPointDao().getDataPoints(vo.getId(), null);
+            List<DataPointVO> dataSourcePoints = dataPointDao.getDataPoints(vo, null);
             for (DataPointVO dataPoint : dataSourcePoints) {
                 if (dataPoint.isEnabled()) {
                     startDataPoint(dataPoint);
@@ -390,31 +412,49 @@ public class RuntimeManager {
     }
 
     private void startDataSourcePolling(DataSourceVO<?> vo) {
-        DataSourceRT dataSource = getRunningDataSource(vo.getId());
+        DataSourceRT dataSource = getRunningDataSource(vo);
         if (dataSource != null) {
             dataSource.beginPolling();
         }
     }
 
-    public void stopDataSource(int id) {
+    public void stopDataSource(DataSourceVO<?> dataSourceVo) {
         synchronized (runningDataSources) {
-            DataSourceRT dataSource = getRunningDataSource(id);
-            if (dataSource == null) {
+            DataSourceRT dataSourceRt = getRunningDataSource(dataSourceVo);
+            if (dataSourceRt == null) {
                 return;
             }
 
             // Stop the data points.
             for (DataPointRT p : dataPoints.values()) {
-                if (p.getDataSourceId() == id) {
-                    stopDataPoint(p.getId());
+                if (p.getDataSourceId() == dataSourceVo.getId()) {
+                    stopDataPoint(p);
                 }
             }
 
-            runningDataSources.remove(dataSource);
-            dataSource.terminate();
+            runningDataSources.remove(dataSourceRt);
+            dataSourceRt.terminate();
 
-            dataSource.joinTermination();
-            LOG.info("Data source '" + dataSource.getName() + "' stopped");
+            dataSourceRt.joinTermination();
+            LOG.info("Data source '" + dataSourceRt.getName() + "' stopped");
+        }
+    }
+
+    public void stopDataSource(DataSourceRT dataSourceRt) {
+        synchronized (runningDataSources) {
+
+            // Stop the data points.
+            for (DataPointRT p : dataPoints.values()) {
+                if (p.getDataSourceId() == dataSourceRt.getId()) {
+                    stopDataPoint(p);
+                }
+            }
+
+            runningDataSources.remove(dataSourceRt);
+            dataSourceRt.terminate();
+
+            dataSourceRt.joinTermination();
+            LOG.info("Data source '" + dataSourceRt.getName() + "' stopped");
         }
     }
 
@@ -427,7 +467,7 @@ public class RuntimeManager {
      *
      */
     public DataPointRT saveDataPoint(DataPointVO point) {
-        stopDataPoint(point.getId());
+        stopDataPoint(point);
 
         // Since the point's data type may have changed, we must ensure that the
         // other attrtibutes are still ok with
@@ -470,14 +510,14 @@ public class RuntimeManager {
 
     public void deleteDataPoint(DataPointVO point) {
         if (point.isEnabled()) {
-            stopDataPoint(point.getId());
+            stopDataPoint(point);
         }
-        DataSourceRT ds = getRunningDataSource(point.getDataSourceId());
+        DataSourceRT ds = getRunningDataSource(point);
         if (ds != null) {
             ds.dataPointDeleted(point);
         }
-        new DataPointDao().deleteDataPoint(point.getId());
-        eventManager.cancelEventsForDataPoint(point.getId());
+        new DataPointDao().deleteDataPoint(point);
+        eventManager.cancelEventsForDataPoint(point);
     }
 
     private DataPointRT startDataPoint(DataPointVO vo) {
@@ -485,7 +525,7 @@ public class RuntimeManager {
             Assert.isTrue(vo.isEnabled());
 
             // Only add the data point if its data source is enabled.
-            DataSourceRT ds = getRunningDataSource(vo.getDataSourceId());
+            DataSourceRT ds = getRunningDataSource(vo);
             if (ds != null) {
                 // Change the VO into a data point implementation.
                 DataPointRT dataPoint = new DataPointRT(vo, vo.getPointLocator().createRuntime());
@@ -495,7 +535,7 @@ public class RuntimeManager {
 
                 // Initialize it.
                 dataPoint.initialize();
-                DataPointListener l = getDataPointListeners(vo.getId());
+                DataPointListener l = getDataPointListeners(vo);
                 if (l != null) {
                     l.pointInitialized();
                 }
@@ -518,26 +558,32 @@ public class RuntimeManager {
             Assert.isTrue(!vo.isEnabled());
 
             // Only add the data point if its data source is enabled.
-            DataSourceRT ds = getRunningDataSource(vo.getDataSourceId());
+            DataSourceRT ds = getRunningDataSource(vo);
             if (ds != null) {
                 ds.addDisabledDataPoint(vo);
             }
         }
         return;
     }
+    
+    private void stopDataPoint(DataPointVO dataPointVo) {
+        synchronized (dataPoints) {
+            stopDataPoint(dataPoints.get(dataPointVo.getId()));
+        }
+    }
 
-    private void stopDataPoint(int dataPointId) {
+    private void stopDataPoint(DataPointRT dataPointRt) {
         synchronized (dataPoints) {
             // Remove this point from the data image if it is there. If not,
             // just quit.
-            DataPointRT p = dataPoints.remove(dataPointId);
+            DataPointRT p = dataPoints.remove(dataPointRt.getId());
 
 
             // Remove it from the data source, and terminate it.
             if (p != null) {
-                DataSourceRT dsRT = getRunningDataSource(p.getDataSourceId());
+                DataSourceRT dsRT = getRunningDataSource(p);
                 dsRT.dataPointDisabled(p);
-                DataPointListener l = getDataPointListeners(dataPointId);
+                DataPointListener l = getDataPointListeners(dataPointRt);
                 if (l != null) {
                     l.pointTerminated();
                 }
@@ -560,6 +606,7 @@ public class RuntimeManager {
                 DataPointEventMulticaster.add(listeners, l));
     }
 
+    @Deprecated //TODO use not id but DataPointVO|RT
     public void removeDataPointListener(int dataPointId, DataPointListener l) {
         DataPointListener listeners = DataPointEventMulticaster.remove(
                 dataPointListeners.get(dataPointId), l);
@@ -570,8 +617,12 @@ public class RuntimeManager {
         }
     }
 
-    public DataPointListener getDataPointListeners(int dataPointId) {
-        return dataPointListeners.get(dataPointId);
+    public DataPointListener getDataPointListeners(DataPointRT dataPoint) {
+        return dataPointListeners.get(dataPoint.getId());
+    }
+
+    public DataPointListener getDataPointListeners(DataPointVO dataPoint) {
+        return dataPointListeners.get(dataPoint.getId());
     }
 
     //
@@ -594,7 +645,7 @@ public class RuntimeManager {
         }
 
         // Tell the data source to set the value of the point.
-        DataSourceRT ds = getRunningDataSource(dataPoint.getDataSourceId());
+        DataSourceRT ds = getRunningDataSource(dataPoint);
         // The data source may have been disabled. Just make sure.
         if (ds != null) {
             ds.setPointValue(dataPoint, valueTime, source);
@@ -615,7 +666,7 @@ public class RuntimeManager {
         }
 
         // Tell the data source to relinquish value of the point.
-        DataSourceRT ds = getRunningDataSource(dataPoint.getDataSourceId());
+        DataSourceRT ds = getRunningDataSource(dataPoint);
         // The data source may have been disabled. Just make sure.
         if (ds != null) {
             ds.relinquish(dataPoint);
@@ -629,7 +680,7 @@ public class RuntimeManager {
         }
 
         // Tell the data source to read the point value;
-        DataSourceRT ds = getRunningDataSource(dataPoint.getDataSourceId());
+        DataSourceRT ds = getRunningDataSource(dataPoint);
         if (ds != null) // The data source may have been disabled. Just make sure.
         {
             ds.forcePointRead(dataPoint);
@@ -987,4 +1038,6 @@ public class RuntimeManager {
             rt.terminate();
         }
     }
+
 }
+ 
