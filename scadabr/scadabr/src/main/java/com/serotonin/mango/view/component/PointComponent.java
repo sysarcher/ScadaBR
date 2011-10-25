@@ -36,6 +36,7 @@ import com.serotonin.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
 import java.util.EnumSet;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -54,6 +55,10 @@ abstract public class PointComponent extends ViewComponent {
     // Runtime attributes
     private boolean valid;
     private boolean visible;
+    
+    @Autowired
+    private Permissions permissions;
+
 
     @Override
     public boolean isPointComponent() {
@@ -71,7 +76,7 @@ abstract public class PointComponent extends ViewComponent {
             visible = false;
         }
         else {
-            visible = Permissions.hasDataPointReadPermission(user, dataPoint);
+            visible = permissions.hasDataPointReadPermission(user, dataPoint);
             valid = definition().supports(dataPoint.getPointLocator().getMangoDataType());
         }
 

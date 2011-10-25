@@ -31,11 +31,16 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.ViewDao;
 import com.serotonin.mango.view.ShareUser;
 import com.serotonin.mango.view.View;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
  */
 public class PublicViewController extends ParameterizableViewController {
+    
+    @Autowired
+    private Common common;
+    
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) {
         ViewDao viewDao = new ViewDao();
@@ -70,7 +75,7 @@ public class PublicViewController extends ParameterizableViewController {
         if (view != null) {
             model.put("view", view);
             view.validateViewComponents(view.getAnonymousAccess() == ShareUser.ACCESS_READ);
-            Common.addAnonymousView(request, view);
+            common.addAnonymousView(request, view);
         }
 
         return new ModelAndView(getViewName(), model);

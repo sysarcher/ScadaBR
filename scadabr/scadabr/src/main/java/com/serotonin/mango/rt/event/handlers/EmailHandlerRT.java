@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.joda.time.DateTime;
 
 import com.serotonin.mango.Common;
+import com.serotonin.mango.SysProperties;
 import com.serotonin.mango.db.dao.MailingListDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.event.EventInstance;
@@ -42,9 +43,15 @@ import com.serotonin.timer.TimerTask;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.email.EmailInline;
 import com.serotonin.web.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient<EventInstance> {
     private final static Logger LOG = LoggerFactory.getLogger(EmailHandlerRT.class);
+    
+    @Autowired
+    private Common common;
+    @Autowired
+    private SystemSettingsDao systemSettingsDao;
 
     private TimerTask escalationTask;
 
@@ -113,6 +120,7 @@ public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient
     //
     // TimeoutClient
     //
+    @Override
     synchronized public void scheduleTimeout(EventInstance evt, long fireTime) {
         // Get the email addresses to send to
         Set<String> addresses = new MailingListDao().getRecipientAddresses(vo.getEscalationRecipients(), new DateTime(
@@ -138,7 +146,7 @@ public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient
             sendEmail(evt, NotificationType.INACTIVE, inactiveRecipients);
     }
 
-    public static void sendActiveEmail(EventInstance evt, Set<String> addresses) {
+    public void sendActiveEmail(EventInstance evt, Set<String> addresses) {
         sendEmail(evt, NotificationType.ACTIVE, addresses, null);
     }
 
@@ -146,7 +154,7 @@ public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient
         sendEmail(evt, notificationType, addresses, vo.getAlias());
     }
 
-    private static void sendEmail(EventInstance evt, NotificationType notificationType, Set<String> addresses,
+    private void sendEmail(EventInstance evt, NotificationType notificationType, Set<String> addresses,
             String alias) {
         if (evt.getEventType().isSystemMessage()) {
             if (((SystemEventType) evt.getEventType()).getSystemEventTypeId() == SystemEventType.TYPE_EMAIL_SEND_FAILURE) {
@@ -156,7 +164,7 @@ public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient
             }
         }
 
-        ResourceBundle bundle = Common.getBundle();
+        ResourceBundle bundle = common.getBundle();
 
         // Determine the subject to use.
         LocalizableMessage subjectMsg;
@@ -186,7 +194,7 @@ public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient
             if (evt.getContext() != null)
                 model.putAll(evt.getContext());
             model.put("img", inlineImages);
-            model.put("instanceDescription", SystemSettingsDao.getValue(SystemSettingsDao.INSTANCE_DESCRIPTION));
+            model.put("instanceDescription", systemSettingsDao.getValue(SysProperties.INSTANCE_DESCRIPTION));
             MangoEmailContent content = new MangoEmailContent(notificationType.getFile(), model, bundle, subject,
                     Common.UTF8);
 

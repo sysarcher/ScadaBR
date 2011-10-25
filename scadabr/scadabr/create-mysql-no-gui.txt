@@ -1,5 +1,11 @@
-run mysql -u root -p as root
+run "mysql -u root -p" 
 then paste text below:
 
 create database ScadaBR;
 grant ALL PRIVILEGES ON ScadaBR.* TO 'ScadaBR'@'localhost' identified by 'ScadaBR' with grant option;
+
+
+for mysql testDB:
+
+create database mangoTestDB;
+grant ALL PRIVILEGES ON  mangoTestDB.* to 'mango'@'localhost' identified by 'mango' with grant option;

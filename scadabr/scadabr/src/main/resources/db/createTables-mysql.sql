@@ -21,6 +21,45 @@
 -- Make sure that everything get created with utf8 as the charset.
 alter database default character set utf8;
 
+-- drop all existing tables ... copy from dropAllTables
+
+drop table if exists maintenanceEvents;
+drop table if exists pointLinks;
+drop table if exists publishers;
+drop table if exists reportInstanceUserComments;
+drop table if exists reportInstanceEvents;
+drop table if exists reportInstanceDataAnnotations;
+drop table if exists reportInstanceData;
+drop table if exists reportInstancePoints;
+drop table if exists reportInstances;
+drop table if exists reports;
+drop table if exists compoundEventDetectors;
+drop table if exists pointHierarchy;
+drop table if exists scheduledEvents;
+drop table if exists eventHandlers;
+drop table if exists userEvents;
+drop table if exists events;
+drop table if exists pointEventDetectors;
+drop table if exists watchListUsers;
+drop table if exists watchListPoints;
+drop table if exists watchLists;
+drop table if exists pointValueAnnotations;
+drop table if exists pointValues;
+drop table if exists mangoViewUsers;
+drop table if exists mangoViews;
+drop table if exists dataPointUsers;
+drop table if exists dataPoints;
+drop table if exists flexProjects;
+drop table if exists scripts;
+drop table if exists dataSourceUsers;
+drop table if exists dataSources;
+drop table if exists mailingListMembers;
+drop table if exists mailingListInactive;
+drop table if exists mailingLists;
+drop table if exists userComments;
+drop table if exists users;
+drop table if exists systemSettings;
+
 --
 -- System settings
 create table systemSettings (
@@ -34,19 +73,21 @@ create table systemSettings (
 -- Users
 create table users (
   id int not null auto_increment,
-  username varchar(40) not null,
-  password varchar(30) not null,
+  mangoUsername varchar(40) not null,
+  mangoUserPassword varchar(30) not null,
   email varchar(255) not null,
   phone varchar(40),
-  admin char(1) not null,
-  disabled char(1) not null,
-  lastLogin bigint,
+  mangoAdmin boolean not null,
+  disabled boolean not null,
+  lastLogin timestamp,
   selectedWatchList int,
   homeUrl varchar(255),
-  receiveAlarmEmails int not null,
-  receiveOwnAuditEvents char(1) not null,
+  receiveAlarmEmails varchar(16) not null,
+  receiveOwnAuditEvents boolean not null,
   primary key (id)
 ) type=InnoDB;
+alter table users add constraint usersUni unique (mangoUsername);
+create index userNameIdx on users (mangoUsername);
 
 create table userComments (
   userId int,
@@ -94,9 +135,9 @@ alter table mailingListMembers add constraint mailingListMembersFk1 foreign key 
 create table dataSources (
   id int not null auto_increment,
   xid varchar(50) not null,
-  name varchar(40) not null,
-  dataSourceType int not null,
-  data longblob not null,
+  dataSourceName varchar(40) not null,
+  dataSourceType varchar(48) not null,
+  jsonSerialized longtext not null,
   primary key (id)
 ) type=InnoDB;
 alter table dataSources add constraint dataSourcesUn1 unique (xid);
@@ -159,7 +200,7 @@ alter table dataPoints add constraint dataPointsFk1 foreign key (dataSourceId) r
 create table dataPointUsers (
   dataPointId int not null,
   userId int not null,
-  permission int not null
+  dataPointUserPermission int not null
 ) type=InnoDB;
 alter table dataPointUsers add constraint dataPointUsersFk1 foreign key (dataPointId) references dataPoints(id);
 alter table dataPointUsers add constraint dataPointUsersFk2 foreign key (userId) references users(id) on delete cascade;
@@ -317,12 +358,9 @@ create table eventHandlers (
   id int not null auto_increment,
   xid varchar(50) not null,
   alias varchar(255),
-  
-  -- Event type, see events
   eventTypeId int not null,
   eventTypeRef1 int not null,
   eventTypeRef2 int not null,
-  
   data longblob not null,
   primary key (id)
 ) type=InnoDB;

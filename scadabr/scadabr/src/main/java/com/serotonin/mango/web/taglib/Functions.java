@@ -29,8 +29,13 @@ import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.taglib.DateFunctions;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class Functions {
+    
+    @Autowired
+    private Common common;
+
     public static String getHtmlText(DataPointVO point, PointValueTime pointValue) {
         if (point == null)
             return "-";
@@ -115,11 +120,11 @@ public class Functions {
         return result;
     }
 
-    public static String envString(String key, String defaultValue) {
-        return Common.getEnvironmentProfile().getString(key, defaultValue);
+    public String envString(String key, String defaultValue) {
+        return common.getEnvironmentProfile().getProperty(key, defaultValue);
     }
 
-    public static boolean envBoolean(String key, boolean defaultValue) {
-        return Common.getEnvironmentProfile().getBoolean(key, defaultValue);
+    public boolean envBoolean(String key, boolean defaultValue) {
+        return Boolean.parseBoolean(common.getEnvironmentProfile().getProperty(key, String.valueOf(defaultValue)));
     }
 }

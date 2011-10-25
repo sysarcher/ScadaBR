@@ -25,10 +25,13 @@ import java.util.Map;
 
 import javax.script.ScriptException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.serotonin.mango.Common;
 import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.PointLinkDao;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -39,7 +42,6 @@ import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.link.PointLinkVO;
-import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
@@ -50,8 +52,11 @@ import com.serotonin.web.taglib.DateFunctions;
  */
 public class PointLinksDwr extends BaseDwr {
 
+    @Autowired
+    private RuntimeManager runtimeManager;
+
     public Map<String, Object> init() {
-        User user = Common.getUser();
+        User user = common.getUser();
         Map<String, Object> data = new HashMap<String, Object>();
 
         // Get the points that this user can access.
@@ -59,10 +64,10 @@ public class PointLinksDwr extends BaseDwr {
         Map<Integer, String> sourcePoints = new HashMap<Integer, String>();
         Map<Integer, String> targetPoints = new HashMap<Integer, String>();
         for (DataPointVO point : allPoints) {
-            if (Permissions.hasDataPointReadPermission(user, point)) {
+            if (permissions.hasDataPointReadPermission(user, point)) {
                 sourcePoints.put(point.getId(), point.getExtendedName());
             }
-            if (point.getPointLocator().isSettable() && Permissions.hasDataPointSetPermission(user, point)) {
+            if (point.getPointLocator().isSettable() && permissions.hasDataPointSetPermission(user, point)) {
                 targetPoints.put(point.getId(), point.getExtendedName());
             }
         }
@@ -84,7 +89,7 @@ public class PointLinksDwr extends BaseDwr {
         return data;
     }
 
-    @Deprecated // use map direct 
+    @Deprecated // use map direct
     private boolean containsPoint(Map<Integer, String> pointList, int pointId) {
         return pointList.containsKey(pointId);
     }
@@ -126,7 +131,7 @@ public class PointLinksDwr extends BaseDwr {
 
         // Save it
         if (!response.getHasMessages()) {
-            Common.ctx.getRuntimeManager().savePointLink(vo);
+            runtimeManager.savePointLink(vo);
         }
 
         response.addData("plId", vo.getId());
@@ -135,7 +140,7 @@ public class PointLinksDwr extends BaseDwr {
     }
 
     public void deletePointLink(int id) {
-        Common.ctx.getRuntimeManager().deletePointLink(id);
+        runtimeManager.deletePointLink(id);
     }
 
     public DwrResponseI18n validateScript(String script, int sourcePointId, int targetPointId) {
@@ -143,7 +148,7 @@ public class PointLinksDwr extends BaseDwr {
         LocalizableMessage message;
         ScriptExecutor scriptExecutor = new ScriptExecutor();
 
-        DataPointRT point = Common.ctx.getRuntimeManager().getDataPoint(sourcePointId);
+        DataPointRT point = runtimeManager.getDataPoint(sourcePointId);
         if (point == null) {
             message = new LocalizableMessage("event.pointLink.sourceUnavailable");
         } else {

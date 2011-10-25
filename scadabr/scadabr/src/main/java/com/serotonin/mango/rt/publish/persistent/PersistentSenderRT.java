@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
+import com.serotonin.mango.rt.EventManager;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -22,22 +24,24 @@ import com.serotonin.util.queue.ByteQueue;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 public class PersistentSenderRT extends PublisherRT<PersistentPointVO> {
-    private final static Logger LOG = LoggerFactory.getLogger(PersistentSenderRT.class);
 
+    private final static Logger LOG = LoggerFactory.getLogger(PersistentSenderRT.class);
     public static final int CONNECTION_FAILED_EVENT = 11;
     public static final int PROTOCOL_FAILURE_EVENT = 12;
     public static final int CONNECTION_ABORTED_EVENT = 13;
     public static final int CONNECTION_LOST_EVENT = 14;
     public static final int SYNC_COMPLETION_EVENT = 15;
-
     final EventType connectionFailedEventType = new PublisherEventType(getId(), CONNECTION_FAILED_EVENT);
     final EventType protocolFailureEventType = new PublisherEventType(getId(), PROTOCOL_FAILURE_EVENT);
     final EventType connectionAbortedEventType = new PublisherEventType(getId(), CONNECTION_ABORTED_EVENT);
     final EventType connectionLostEventType = new PublisherEventType(getId(), CONNECTION_LOST_EVENT);
     final EventType syncCompletionEventType = new PublisherEventType(getId(), SYNC_COMPLETION_EVENT);
-
     final PersistentSenderVO vo;
     private PersistentSendThread sendThread;
+    @Autowired
+    private RuntimeManager runtimeManager;
+    @Autowired
+    private EventManager eventManager;
 
     public PersistentSenderRT(PersistentSenderVO vo) {
         super(vo);
@@ -74,15 +78,17 @@ public class PersistentSenderRT extends PublisherRT<PersistentPointVO> {
 
     public int getSyncStatus() {
         SyncHandler syncHandler = sendThread.syncHandler;
-        if (syncHandler == null)
+        if (syncHandler == null) {
             return -1;
+        }
         return syncHandler.getPointsCompleted();
     }
 
     public int getSyncRequestsSent() {
         SyncHandler syncHandler = sendThread.syncHandler;
-        if (syncHandler == null)
+        if (syncHandler == null) {
             return -1;
+        }
         return syncHandler.getRequestsSent();
     }
 
@@ -94,7 +100,7 @@ public class PersistentSenderRT extends PublisherRT<PersistentPointVO> {
     protected void pointInitialized(PublishedPointRT<PersistentPointVO> rt) {
         super.pointInitialized(rt);
 
-        DataPointRT pointRT = Common.ctx.getRuntimeManager().getDataPoint(rt.getVo().getDataPointId());
+        DataPointRT pointRT = runtimeManager.getDataPoint(rt.getVo().getDataPointId());
         if (pointRT != null) {
             updatePublishedPointVO(rt.getVo(), pointRT.getVO());
 
@@ -133,21 +139,22 @@ public class PersistentSenderRT extends PublisherRT<PersistentPointVO> {
 
     void raiseConnectionEvent(EventType type, Exception e) {
         LocalizableMessage lm;
-        if (e instanceof PersistentAbortException)
+        if (e instanceof PersistentAbortException) {
             lm = ((PersistentAbortException) e).getLocalizableMessage();
-        else
+        } else {
             lm = new LocalizableMessage("common.default", e.getMessage());
+        }
 
         raiseConnectionEvent(type, lm);
     }
 
     void raiseConnectionEvent(EventType type, LocalizableMessage lm) {
-        Common.ctx.getEventManager().raiseEvent(type, System.currentTimeMillis(), true, AlarmLevels.URGENT, lm,
+        eventManager.raiseEvent(type, System.currentTimeMillis(), true, AlarmLevels.URGENT, lm,
                 createEventContext());
     }
 
     void raiseSyncCompletionEvent(LocalizableMessage lm) {
-        Common.ctx.getEventManager().raiseEvent(syncCompletionEventType, System.currentTimeMillis(), false,
+        eventManager.raiseEvent(syncCompletionEventType, System.currentTimeMillis(), false,
                 AlarmLevels.NONE, lm, createEventContext());
     }
 }

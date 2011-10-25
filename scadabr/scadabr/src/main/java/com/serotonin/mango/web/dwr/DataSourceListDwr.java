@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr;
 
@@ -22,7 +22,8 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.serotonin.mango.Common;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.db.dao.UserDao;
@@ -30,7 +31,6 @@ import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.web.dwr.DwrResponseI18n;
 
 /**
@@ -38,15 +38,21 @@ import com.serotonin.web.dwr.DwrResponseI18n;
  */
 public class DataSourceListDwr extends BaseDwr {
 
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private RuntimeManager runtimeManager;
+
     public DwrResponseI18n init() {
         DwrResponseI18n response = new DwrResponseI18n();
 
-        if (Common.getUser().isAdmin()) {
+        if (common.getUser().isAdmin()) {
             Map<DataSourceRegistry, String> dsTypes = new EnumMap<DataSourceRegistry, String>(DataSourceRegistry.class);
             for (DataSourceRegistry type : DataSourceRegistry.values()) {
                 // Allow customization settings to overwrite the default display value.
-                if (type.isDisplay())
+                if (type.isDisplay()) {
                     dsTypes.put(type, getMessage(type.getKey()));
+                }
             }
             response.addData("dsTypes", dsTypes);
         }
@@ -55,9 +61,8 @@ public class DataSourceListDwr extends BaseDwr {
     }
 
     public Map<String, Object> toggleDataSource(int dataSourceId) {
-        Permissions.ensureDataSourcePermission(Common.getUser(), dataSourceId);
+        permissions.ensureDataSourcePermission(common.getUser(), dataSourceId);
 
-        RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
         DataSourceVO<?> dataSource = runtimeManager.getDataSource(dataSourceId);
         Map<String, Object> result = new HashMap<String, Object>();
 
@@ -70,16 +75,15 @@ public class DataSourceListDwr extends BaseDwr {
     }
 
     public int deleteDataSource(int dataSourceId) {
-        Permissions.ensureDataSourcePermission(Common.getUser(), dataSourceId);
-        Common.ctx.getRuntimeManager().deleteDataSource(dataSourceId);
+        permissions.ensureDataSourcePermission(common.getUser(), dataSourceId);
+        runtimeManager.deleteDataSource(dataSourceId);
         return dataSourceId;
     }
 
     public DwrResponseI18n toggleDataPoint(int dataPointId) {
         DataPointVO dataPoint = new DataPointDao().getDataPoint(dataPointId);
-        Permissions.ensureDataSourcePermission(Common.getUser(), dataPoint.getDataSourceId());
+        permissions.ensureDataSourcePermission(common.getUser(), dataPoint.getDataSourceId());
 
-        RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
         dataPoint.setEnabled(!dataPoint.isEnabled());
         runtimeManager.saveDataPoint(dataPoint);
 
@@ -90,9 +94,9 @@ public class DataSourceListDwr extends BaseDwr {
     }
 
     public int copyDataSource(int dataSourceId) {
-        Permissions.ensureDataSourcePermission(Common.getUser(), dataSourceId);
+        permissions.ensureDataSourcePermission(common.getUser(), dataSourceId);
         int dsId = new DataSourceDao().copyDataSource(dataSourceId, getResourceBundle());
-        new UserDao().populateUserPermissions(Common.getUser());
+        userDao.populateUserPermissions(common.getUser());
         return dsId;
     }
 }

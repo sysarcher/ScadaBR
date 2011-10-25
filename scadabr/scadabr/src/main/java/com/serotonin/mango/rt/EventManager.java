@@ -35,25 +35,46 @@ import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.handlers.EmailHandlerRT;
 import com.serotonin.mango.rt.event.handlers.EventHandlerRT;
+import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.DataPointEventType;
 import com.serotonin.mango.rt.event.type.DataSourceEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
+import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.event.EventHandlerVO;
+import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.util.ILifecycle;
 import com.serotonin.web.i18n.LocalizableMessage;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Matthew Lohbihler
  */
+@Service
 public class EventManager implements ILifecycle {
+    
+    @Autowired
+    private Common common;
+//TODO LookuP???    @Autowired
+    private EmailHandlerRT emailHandlerRT;
+    @Autowired
+    private Permissions permissions;
+    @Autowired
+    private EventDao eventDao;
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private RuntimeManager runtimeManger;
+
+    
     private final static Logger LOG = LoggerFactory.getLogger(EventManager.class);
 
-    private final List<EventInstance> activeEvents = new CopyOnWriteArrayList<EventInstance>();
-    private EventDao eventDao;
-    private UserDao userDao;
+    private final List<EventInstance> activeEvents = new CopyOnWriteArrayList();
     private long lastAlarmTimestamp = 0;
     private AlarmLevels highestActiveAlarmLevel = AlarmLevels.NONE;
 
@@ -104,15 +125,15 @@ public class EventManager implements ILifecycle {
         eventDao.saveEvent(evt);
 
         // Create user alarm records for all applicable users
-        List<Integer> eventUserIds = new ArrayList<Integer>();
-        Set<String> emailUsers = new HashSet<String>();
+        List<Integer> eventUserIds = new ArrayList();
+        Set<String> emailUsers = new HashSet();
 
         for (User user : userDao.getActiveUsers()) {
             // Do not create an event for this user if the event type says the user should be skipped.
             if (type.excludeUser(user))
                 continue;
 
-            if (Permissions.hasEventTypePermission(user, type)) {
+            if (permissions.hasEventTypePermission(user, type)) {
                 eventUserIds.add(user.getId());
                 if (evt.isAlarm() && user.getReceiveAlarmEmails() != AlarmLevels.NONE && alarmLevel.compareTo(user.getReceiveAlarmEmails()) >= 0)
                     emailUsers.add(user.getEmail());
@@ -135,7 +156,7 @@ public class EventManager implements ILifecycle {
                 if (alarmLevel.compareTo(highestActiveAlarmLevel) > 0) {
                     AlarmLevels oldValue = highestActiveAlarmLevel;
                     highestActiveAlarmLevel = alarmLevel;
-                    SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED), time,
+                    raiseEvent(new SystemEventType(SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED), time,
                             false, getAlarmLevelChangeMessage("event.alarmMaxIncreased", oldValue));
                 }
             }
@@ -144,7 +165,7 @@ public class EventManager implements ILifecycle {
             handleRaiseEvent(evt, emailUsers);
 
             if (LOG.isDebugEnabled())
-                LOG.debug("Event raised: type=" + type + ", message=" + message.getLocalizedMessage(Common.getBundle()));
+                LOG.debug("Event raised: type=" + type + ", message=" + message.getLocalizedMessage(common.getBundle()));
         }
     }
 
@@ -223,13 +244,13 @@ public class EventManager implements ILifecycle {
             if (max.compareTo(highestActiveAlarmLevel) > 0) {
                 AlarmLevels oldValue = highestActiveAlarmLevel;
                 highestActiveAlarmLevel = max;
-                SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED), time,
+                raiseEvent(new SystemEventType(SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED), time,
                         false, getAlarmLevelChangeMessage("event.alarmMaxIncreased", oldValue));
             }
             else if (max.compareTo(highestActiveAlarmLevel) < 0) {
                 AlarmLevels oldValue = highestActiveAlarmLevel;
                 highestActiveAlarmLevel = max;
-                SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED), time,
+                raiseEvent(new SystemEventType(SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED), time,
                         false, getAlarmLevelChangeMessage("event.alarmMaxDecreased", oldValue));
             }
         }
@@ -244,6 +265,8 @@ public class EventManager implements ILifecycle {
     //
     // Lifecycle interface
     //
+    @Override
+    @PostConstruct
     public void initialize() {
         eventDao = new EventDao();
         userDao = new UserDao();
@@ -254,10 +277,14 @@ public class EventManager implements ILifecycle {
         resetHighestAlarmLevel(lastAlarmTimestamp, true);
     }
 
+    @Override
+    @PreDestroy
     public void terminate() {
         // no op
     }
 
+    @Override
+    @PreDestroy
     public void joinTermination() {
         // no op
     }
@@ -278,7 +305,7 @@ public class EventManager implements ILifecycle {
     }
 
     private List<EventInstance> getAll(EventType type) {
-        List<EventInstance> result = new ArrayList<EventInstance>();
+        List<EventInstance> result = new ArrayList();
         for (EventInstance e : activeEvents) {
             if (e.getEventType().equals(type))
                 result.add(e);
@@ -308,7 +335,7 @@ public class EventManager implements ILifecycle {
         for (EventHandlerVO vo : vos) {
             if (!vo.isDisabled()) {
                 if (rts == null)
-                    rts = new ArrayList<EventHandlerRT>();
+                    rts = new ArrayList();
                 rts.add(vo.createRuntime());
             }
         }
@@ -332,7 +359,7 @@ public class EventManager implements ILifecycle {
 
         if (!defaultAddresses.isEmpty()) {
             // If there are still any addresses left in the list, send them the notification.
-            EmailHandlerRT.sendActiveEmail(evt, defaultAddresses);
+            emailHandlerRT.sendActiveEmail(evt, defaultAddresses);
         }
     }
 
@@ -346,12 +373,64 @@ public class EventManager implements ILifecycle {
     private boolean isSuppressed(EventType eventType) {
         if (eventType instanceof DataSourceEventType)
             // Data source events can be suppressed by maintenance events.
-            return Common.ctx.getRuntimeManager().isActiveMaintenanceEvent(eventType.getDataSourceId());
+            runtimeManger.isActiveMaintenanceEvent(eventType.getDataSourceId());
 
         if (eventType instanceof DataPointEventType)
             // Data point events can be suppressed by maintenance events on their data sources.
-            return Common.ctx.getRuntimeManager().isActiveMaintenanceEvent(eventType.getDataSourceId());
+            runtimeManger.isActiveMaintenanceEvent(eventType.getDataSourceId());
 
         return false;
     }
+    
+    public void raiseEvent(SystemEventType type, long time, boolean rtn, LocalizableMessage message) {
+        EventTypeVO vo = type.getEventType(type.getSystemEventTypeId());
+        AlarmLevels alarmLevel = vo.getAlarmLevel();
+        raiseEvent(type, time, rtn, alarmLevel, message, null);
+    }
+
+    //Audit eventtypes !!!
+        public void raiseAddedEvent(int auditEventTypeId, ChangeComparable<?> o) {
+        List<LocalizableMessage> list = new ArrayList();
+        o.addProperties(list);
+        raiseEvent(auditEventTypeId, o, "event.audit.added", list.toArray());
+    }
+
+    public <T> void raiseChangedEvent(int auditEventTypeId, T from, ChangeComparable<T> to) {
+        List<LocalizableMessage> changes = new ArrayList();
+        to.addPropertyChanges(changes, from);
+        if (changes.isEmpty())
+            // If the object wasn't in fact changed, don't raise an event.
+            return;
+        raiseEvent(auditEventTypeId, to, "event.audit.changed", changes.toArray());
+    }
+
+    public void raiseDeletedEvent(int auditEventTypeId, ChangeComparable<?> o) {
+        List<LocalizableMessage> list = new ArrayList();
+        o.addProperties(list);
+        raiseEvent(auditEventTypeId, o, "event.audit.deleted", list.toArray());
+    }
+
+    private void raiseEvent(int auditEventTypeId, ChangeComparable<?> o, String key, Object[] props) {
+        User user = common.getUser();
+        Object username;
+        if (user != null)
+            username = user.getUsername() + " (" + user.getId() + ")";
+        else {
+            String descKey = common.getBackgroundProcessDescription();
+            if (descKey == null)
+                username = new LocalizableMessage("common.unknown");
+            else
+                username = new LocalizableMessage(descKey);
+        }
+
+        LocalizableMessage message = new LocalizableMessage(key, username, new LocalizableMessage(o.getTypeKey()),
+                o.getId(), new LocalizableMessage("event.audit.propertyList." + props.length, props));
+
+        AuditEventType type = new AuditEventType(auditEventTypeId, o.getId());
+        type.setRaisingUser(user);
+
+        raiseEvent(type, System.currentTimeMillis(), false,
+                type.getEventType(type.getAuditEventTypeId()).getAlarmLevel(), message, null);
+    }
+
 }

@@ -35,16 +35,23 @@ import org.slf4j.LoggerFactory;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.integration.CrowdUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 abstract public class LoggedInFilter implements Filter {
     private final static Logger LOG = LoggerFactory.getLogger(LoggedInFilter.class);
 
     private String forwardUrl;
+    @Autowired
+    private Common common;
+    @Autowired
+    private CrowdUtils crowdUtils;
 
+    @Override
     public void init(FilterConfig config) {
         forwardUrl = config.getInitParameter("forwardUrl");
     }
 
+    @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
         // Assume an http request.
@@ -53,11 +60,11 @@ abstract public class LoggedInFilter implements Filter {
 
         boolean loggedIn = true;
 
-        User user = Common.getUser(request);
+        User user = common.getUser(request);
         if (!checkAccess(user))
             loggedIn = false;
 
-        if (loggedIn && CrowdUtils.isCrowdEnabled()) {
+        if (loggedIn && crowdUtils.isCrowdEnabled()) {
             if (CrowdUtils.isCrowdAuthenticated(user))
                 // The user may not have been authenticated by Crowd, so only check with Crowd if it was.
                 loggedIn = CrowdUtils.isAuthenticated(request, response);
@@ -75,6 +82,7 @@ abstract public class LoggedInFilter implements Filter {
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
+    @Override
     public void destroy() {
         // no op
     }

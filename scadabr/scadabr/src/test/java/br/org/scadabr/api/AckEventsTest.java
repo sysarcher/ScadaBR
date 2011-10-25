@@ -1,10 +1,12 @@
 package br.org.scadabr.api;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
-public class AckEventsTest extends TestCase {
+public class AckEventsTest {
 
-	public void testParams() {
-		assertTrue(true);
-	}
+    @Test
+    public void testParams() {
+        assertTrue(true);
+    }
 }

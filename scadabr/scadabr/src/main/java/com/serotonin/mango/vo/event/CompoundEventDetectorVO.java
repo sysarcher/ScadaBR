@@ -42,6 +42,7 @@ import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -62,6 +63,11 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
     private boolean disabled = false;
     @JsonRemoteProperty
     private String condition;
+    
+    @Autowired
+    private Common common;
+    @Autowired
+    private Permissions permissions;
 
     public boolean isNew() {
         return id == Common.NEW_ID;
@@ -72,6 +78,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
                 alarmLevel);
     }
 
+    @Override
     public String getTypeKey() {
         return "event.audit.compoundEventDetector";
     }
@@ -80,13 +87,12 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
         if (StringUtils.isEmpty(name))
             response.addContextualMessage("name", "compoundDetectors.validation.nameRequired");
 
-        validate(condition, response);
+        validate(condition, response, common.getUser(), permissions);
     }
 
-    public static void validate(String condition, DwrResponseI18n response) {
+    public static void validate(String condition, DwrResponseI18n response, User user, Permissions permissions) {
         try {
-            User user = Common.getUser();
-            Permissions.ensureDataSourcePermission(user);
+            permissions.ensureDataSourcePermission(user);
 
             LogicalOperator l = CompoundEventDetectorRT.parseConditionStatement(condition);
             List<String> keys = l.getDetectorKeys();
@@ -100,7 +106,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
 
                 boolean found = false;
                 for (DataPointVO dp : dataPoints) {
-                    if (!Permissions.hasDataSourcePermission(user, dp.getDataSourceId()))
+                    if (!permissions.hasDataSourcePermission(user, dp.getDataSourceId()))
                         continue;
 
                     for (PointEventDetectorVO ped : dp.getEventDetectors()) {

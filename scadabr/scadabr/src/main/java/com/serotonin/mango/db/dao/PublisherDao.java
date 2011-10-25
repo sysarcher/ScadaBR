@@ -41,10 +41,14 @@ import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import com.serotonin.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Matthew Lohbihler
  */
+@Service
 public class PublisherDao extends BaseDao {
 
     public String generateUniqueXid() {
@@ -112,16 +116,11 @@ public class PublisherDao extends BaseDao {
         }
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void deletePublisher(final int publisherId) {
-        new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
-
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                getSimpleJdbcTemplate().update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.PUBLISHER
-                        + " and eventTypeRef1=?", publisherId);
-                getSimpleJdbcTemplate().update("delete from publishers where id=?", publisherId);
-            }
-        });
+        getSimpleJdbcTemplate().update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.PUBLISHER
+                + " and eventTypeRef1=?", publisherId);
+        getSimpleJdbcTemplate().update("delete from publishers where id=?", publisherId);
     }
 
     public Object getPersistentData(int id) {

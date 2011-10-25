@@ -24,13 +24,18 @@ import org.directwebremoting.AjaxFilter;
 import org.directwebremoting.AjaxFilterChain;
 
 import com.serotonin.mango.vo.permission.Permissions;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
  */
 public class AdminAjaxFilter implements AjaxFilter {
+    @Autowired
+    private Permissions permissions;
+
+    @Override
     public Object doFilter(Object obj, Method method, Object[] params, AjaxFilterChain chain) throws Exception {
-        Permissions.ensureAdmin();
+        permissions.ensureAdmin();
         return chain.doFilter(obj, method, params);
     }
 }

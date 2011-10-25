@@ -32,6 +32,7 @@ import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -52,6 +53,7 @@ import com.serotonin.modbus4j.exception.ErrorResponseException;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.locator.BaseLocator;
 import com.serotonin.web.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 abstract public class ModbusDataSource extends PollingDataSource implements MessagingExceptionHandler {
     private final static Logger LOG = LoggerFactory.getLogger(ModbusDataSource.class);
@@ -64,6 +66,9 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
     private BatchRead<ModbusPointLocatorRT> batchRead;
     private final ModbusDataSourceVO<?> vo;
     private final Map<Integer, DataPointRT> slaveMonitors = new HashMap<Integer, DataPointRT>();
+
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     public ModbusDataSource(ModbusDataSourceVO<?> vo) {
         super(vo, true);
@@ -119,7 +124,7 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
                     locator.setSlaveMonitor(true);
                     dp.setPointLocator(locator);
 
-                    Common.ctx.getRuntimeManager().saveDataPoint(dp);
+                    runtimeManager.saveDataPoint(dp);
                     LOG.info("Monitor point added: " + dp.getXid());
                 }
             }

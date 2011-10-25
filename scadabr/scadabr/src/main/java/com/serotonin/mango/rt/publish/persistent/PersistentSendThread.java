@@ -10,10 +10,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
+import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.publish.PublishQueueEntry;
@@ -31,10 +33,9 @@ import com.serotonin.util.StringUtils;
 import com.serotonin.util.queue.ByteQueue;
 
 class PersistentSendThread extends SendThread {
+
     private final static Logger LOG = LoggerFactory.getLogger(PersistentSendThread.class);
-
     final PersistentSenderRT publisher;
-
     Socket socket;
     int connecting = -1;
     InputStream in;
@@ -46,6 +47,8 @@ class PersistentSendThread extends SendThread {
     PointHierarchySync pointHierarchySync;
     final List<Packet> packetsToSend = new CopyOnWriteArrayList<Packet>();
     private long lastTestPacket;
+    @Autowired
+    private EventManager eventManager;
 
     public PersistentSendThread(PersistentSenderRT publisher) {
         super("PersistentSenderRT.SendThread");
@@ -70,19 +73,19 @@ class PersistentSendThread extends SendThread {
             //
 
             String pattern;
-            if (publisher.vo.getSyncType() == PersistentSenderVO.SYNC_TYPE_DAILY)
+            if (publisher.vo.getSyncType() == PersistentSenderVO.SYNC_TYPE_DAILY) {
                 pattern = "0 0 1 * * ?";
-            else if (publisher.vo.getSyncType() == PersistentSenderVO.SYNC_TYPE_WEEKLY)
+            } else if (publisher.vo.getSyncType() == PersistentSenderVO.SYNC_TYPE_WEEKLY) {
                 pattern = "0 0 1 ? * MON";
-            else if (publisher.vo.getSyncType() == PersistentSenderVO.SYNC_TYPE_MONTHLY)
+            } else if (publisher.vo.getSyncType() == PersistentSenderVO.SYNC_TYPE_MONTHLY) {
                 pattern = "0 0 1 1 * ?";
-            else
+            } else {
                 throw new ShouldNeverHappenException("Invalid sync type: " + publisher.vo.getSyncType());
+            }
 
             try {
                 syncTimer = new SyncTimer(new CronTimerTrigger(pattern));
-            }
-            catch (ParseException e) {
+            } catch (ParseException e) {
                 throw new ShouldNeverHappenException(e);
             }
 
@@ -99,9 +102,10 @@ class PersistentSendThread extends SendThread {
 
         super.terminate();
 
-        if (syncTimer != null)
-            // Cancel the sync timer.
+        if (syncTimer != null) // Cancel the sync timer.
+        {
             syncTimer.cancel();
+        }
     }
 
     @Override
@@ -110,36 +114,34 @@ class PersistentSendThread extends SendThread {
             if (socket == null) {
                 try {
                     openConnection();
-                }
-                catch (IOException e) {
-                    Common.ctx.getEventManager().returnToNormal(publisher.connectionAbortedEventType,
+                } catch (IOException e) {
+                    eventManager.returnToNormal(publisher.connectionAbortedEventType,
                             System.currentTimeMillis());
-                    Common.ctx.getEventManager().returnToNormal(publisher.protocolFailureEventType,
+                    eventManager.returnToNormal(publisher.protocolFailureEventType,
                             System.currentTimeMillis());
                     publisher.raiseConnectionEvent(publisher.connectionFailedEventType, e);
                     closeConnection(2000);
-                }
-                catch (PersistentAbortException e) {
-                    Common.ctx.getEventManager().returnToNormal(publisher.protocolFailureEventType,
+                } catch (PersistentAbortException e) {
+                    eventManager.returnToNormal(publisher.protocolFailureEventType,
                             System.currentTimeMillis());
                     publisher.raiseConnectionEvent(publisher.connectionAbortedEventType, e);
                     closeConnection(10000);
-                }
-                catch (PersistentProtocolException e) {
-                    Common.ctx.getEventManager().returnToNormal(publisher.connectionAbortedEventType,
+                } catch (PersistentProtocolException e) {
+                    eventManager.returnToNormal(publisher.connectionAbortedEventType,
                             System.currentTimeMillis());
                     publisher.raiseConnectionEvent(publisher.protocolFailureEventType, e);
                     closeConnection(60000);
                 }
 
-                if (socket == null)
+                if (socket == null) {
                     continue;
+                }
 
-                Common.ctx.getEventManager().returnToNormal(publisher.connectionAbortedEventType,
+                eventManager.returnToNormal(publisher.connectionAbortedEventType,
                         System.currentTimeMillis());
-                Common.ctx.getEventManager().returnToNormal(publisher.protocolFailureEventType,
+                eventManager.returnToNormal(publisher.protocolFailureEventType,
                         System.currentTimeMillis());
-                Common.ctx.getEventManager().returnToNormal(publisher.connectionLostEventType,
+                eventManager.returnToNormal(publisher.connectionLostEventType,
                         System.currentTimeMillis());
 
                 writePointHierarchy();
@@ -151,28 +153,23 @@ class PersistentSendThread extends SendThread {
                 try {
                     send(entry);
                     publisher.getPublishQueue().remove(entry);
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     publisher.raiseConnectionEvent(publisher.connectionLostEventType, e);
                     // The send failed. Close the connection and attempt to re-open.
                     closeConnection(0);
                 }
-            }
-            else if (packetsToSend.size() > 0) {
+            } else if (packetsToSend.size() > 0) {
                 Packet packet = packetsToSend.remove(0);
                 try {
                     Packet.writePacket(out, version, packet);
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     publisher.raiseConnectionEvent(publisher.connectionLostEventType, e);
                     // The send failed. Close the connection and attempt to re-open.
                     closeConnection(0);
-                }
-                finally {
+                } finally {
                     packet.release();
                 }
-            }
-            else {
+            } else {
                 try {
                     // Read messages from the server.
                     Packet packet = Packet.readPacketNoBlock(in, version);
@@ -180,34 +177,30 @@ class PersistentSendThread extends SendThread {
                         try {
                             // Handle the packet
                             if (packet.getType() == PacketType.RANGE_COUNT) {
-                                if (syncHandler != null)
+                                if (syncHandler != null) {
                                     syncHandler.responseReceived(packet);
-                            }
-                            else
+                                }
+                            } else {
                                 LOG.error("Unexpected packet type: " + packet.getType());
-                        }
-                        finally {
+                            }
+                        } finally {
                             packet.release();
                         }
-                    }
-                    else if (lastTestPacket + Packet.TEST_PACKET_SEND_DELAY < System.currentTimeMillis()) {
+                    } else if (lastTestPacket + Packet.TEST_PACKET_SEND_DELAY < System.currentTimeMillis()) {
                         // Fire off a test packet for fun.
                         Packet.writePacket(out, version, PacketType.TEST, Packet.EMPTY);
                         lastTestPacket = System.currentTimeMillis();
-                    }
-                    else
-                        // Take a break.
+                    } else // Take a break.
+                    {
                         waitImpl(2000);
-                }
-                catch (IOException e) {
+                    }
+                } catch (IOException e) {
                     publisher.raiseConnectionEvent(publisher.connectionLostEventType, e);
                     closeConnection(0);
-                }
-                catch (PersistentAbortException e) {
+                } catch (PersistentAbortException e) {
                     publisher.raiseConnectionEvent(publisher.connectionLostEventType, e.getLocalizableMessage());
                     closeConnection(0);
-                }
-                catch (PersistentProtocolException e) {
+                } catch (PersistentProtocolException e) {
                     publisher.raiseConnectionEvent(publisher.connectionLostEventType, e);
                     closeConnection(0);
                 }
@@ -231,32 +224,31 @@ class PersistentSendThread extends SendThread {
         MangoValue value = entry.getPvt().getValue();
         writeBuffer.push(value.getMangoDataType().mangoId);
         switch (entry.getPvt().getValue().getMangoDataType()) {
-        case BINARY:
-            writeBuffer.push(value.getBooleanValue() ? 1 : 0);
-            break;
-        case MULTISTATE:
-            writeBuffer.pushS4B(value.getIntegerValue());
-            break;
-        case NUMERIC:
-            Packet.pushDouble(writeBuffer, value.getDoubleValue());
-            break;
-        case ALPHANUMERIC:
-            Packet.pushString(writeBuffer, value.getStringValue());
-            break;
-        case IMAGE:
-            byte[] data;
-            try {
-                data = ((ImageValue) value).getImageData();
-            }
-            catch (IOException e) {
-                LOG.warn("Error reading image data", e);
-                // Don't propagate the exception since the problem is on this side of the connection.
-                return;
-            }
-            writeBuffer.pushS4B(((ImageValue) value).getType());
-            writeBuffer.pushS4B(data.length);
-            writeBuffer.push(data);
-            break;
+            case BINARY:
+                writeBuffer.push(value.getBooleanValue() ? 1 : 0);
+                break;
+            case MULTISTATE:
+                writeBuffer.pushS4B(value.getIntegerValue());
+                break;
+            case NUMERIC:
+                Packet.pushDouble(writeBuffer, value.getDoubleValue());
+                break;
+            case ALPHANUMERIC:
+                Packet.pushString(writeBuffer, value.getStringValue());
+                break;
+            case IMAGE:
+                byte[] data;
+                try {
+                    data = ((ImageValue) value).getImageData();
+                } catch (IOException e) {
+                    LOG.warn("Error reading image data", e);
+                    // Don't propagate the exception since the problem is on this side of the connection.
+                    return;
+                }
+                writeBuffer.pushS4B(((ImageValue) value).getType());
+                writeBuffer.pushS4B(data.length);
+                writeBuffer.push(data);
+                break;
         }
 
         Packet.pushLong(writeBuffer, entry.getPvt().getTime());
@@ -269,22 +261,21 @@ class PersistentSendThread extends SendThread {
         try {
             Socket localSocket = new Socket(publisher.vo.getHost(), publisher.vo.getPort());
             localSocket.setSoTimeout(Packet.PUBLISHER_SOCKET_TIMEOUT);
-            Common.ctx.getEventManager()
-                    .returnToNormal(publisher.connectionFailedEventType, System.currentTimeMillis());
+            eventManager.returnToNormal(publisher.connectionFailedEventType, System.currentTimeMillis());
             in = localSocket.getInputStream();
             out = localSocket.getOutputStream();
 
             //
             // Version. Always sent and received in version 1.
-            Packet.writePacket(out, 1, PacketType.VERSION, new byte[] { (byte) version });
+            Packet.writePacket(out, 1, PacketType.VERSION, new byte[]{(byte) version});
 
             Packet packet = Packet.readPacket(in, 1);
             try {
-                if (packet.getType() != PacketType.VERSION)
+                if (packet.getType() != PacketType.VERSION) {
                     throw new PersistentProtocolException("Expected version, got " + packet.getType());
+                }
                 version = packet.getPayload().popU1B();
-            }
-            finally {
+            } finally {
                 packet.release();
             }
 
@@ -295,20 +286,22 @@ class PersistentSendThread extends SendThread {
 
             packet = Packet.readPacket(in, version);
             try {
-                if (packet.getType() != PacketType.AUTH_KEY)
+                if (packet.getType() != PacketType.AUTH_KEY) {
                     throw new PersistentProtocolException("Expected auth key, got " + packet.getType());
-                if (packet.getPayload().size() != 0)
+                }
+                if (packet.getPayload().size() != 0) {
                     throw new PersistentProtocolException("Expected empty payload");
-            }
-            finally {
+                }
+            } finally {
                 packet.release();
             }
 
             //
             // Points
             String prefix = "";
-            if (!StringUtils.isEmpty(publisher.vo.getXidPrefix()))
+            if (!StringUtils.isEmpty(publisher.vo.getXidPrefix())) {
                 prefix = publisher.vo.getXidPrefix();
+            }
 
             for (PersistentPointVO point : publisher.vo.getPoints()) {
                 connecting++;
@@ -316,9 +309,10 @@ class PersistentSendThread extends SendThread {
                 writeBuffer.push(point.getSerializedDataPoint());
                 Packet.writePacket(out, version, PacketType.POINT, writeBuffer);
 
-                if (version < 3)
-                    // As of version 3 we do not expect this response.
+                if (version < 3) // As of version 3 we do not expect this response.
+                {
                     getPointResponse();
+                }
             }
 
             // Send an empty packet to indicate that we're done.
@@ -326,8 +320,7 @@ class PersistentSendThread extends SendThread {
             getPointResponse();
 
             socket = localSocket;
-        }
-        finally {
+        } finally {
             connecting = -1;
         }
     }
@@ -335,12 +328,13 @@ class PersistentSendThread extends SendThread {
     private void getPointResponse() throws IOException, PersistentAbortException, PersistentProtocolException {
         Packet packet = Packet.readPacket(in, version);
         try {
-            if (packet.getType() != PacketType.POINT)
+            if (packet.getType() != PacketType.POINT) {
                 throw new PersistentProtocolException("Expected points, got " + packet.getType());
-            if (packet.getPayload().size() != 0)
+            }
+            if (packet.getPayload().size() != 0) {
                 throw new PersistentProtocolException("Expected empty payload");
-        }
-        finally {
+            }
+        } finally {
             packet.release();
         }
     }
@@ -352,11 +346,9 @@ class PersistentSendThread extends SendThread {
             try {
                 Packet.writePacket(out, version, PacketType.CLOSE, Packet.EMPTY);
                 socket.close();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 // LOG.warn("", e);
-            }
-            finally {
+            } finally {
                 socket = null;
                 in = null;
                 out = null;
@@ -372,11 +364,13 @@ class PersistentSendThread extends SendThread {
             }
         }
 
-        if (sleep > 0)
+        if (sleep > 0) {
             waitImpl(sleep);
+        }
     }
 
     class SyncTimer extends TimerTask {
+
         public SyncTimer(TimerTrigger trigger) {
             super(trigger);
         }
@@ -404,6 +398,7 @@ class PersistentSendThread extends SendThread {
     }
 
     class PointHierarchySync implements PointHierarchyListener {
+
         @Override
         public void pointHierarchySaved(PointFolder root) {
             PointHierarchy hierarchy = new PointHierarchy(root);
@@ -413,6 +408,7 @@ class PersistentSendThread extends SendThread {
 
     void writePointHierarchy() {
         Common.timer.execute(new Runnable() {
+
             @Override
             public void run() {
                 writePointHierarchy(new DataPointDao().getPointHierarchy());
@@ -422,16 +418,18 @@ class PersistentSendThread extends SendThread {
 
     synchronized void writePointHierarchy(PointHierarchy hierarchy) {
         for (PersistentPointVO p : publisher.vo.getPoints()) {
-            if (!isConnected())
+            if (!isConnected()) {
                 break;
+            }
 
             List<String> path = hierarchy.getPath(p.getDataPointId());
 
             ByteQueue queue = new ByteQueue();
             queue.pushU2B(p.getIndex());
             queue.pushU2B(path.size());
-            for (String s : path)
+            for (String s : path) {
                 Packet.pushString(queue, s);
+            }
 
             Packet packet = Packet.borrowPacket(PacketType.POINT_HIERARCHY, queue);
             sendPacket(packet);

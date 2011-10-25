@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr;
 
@@ -23,10 +23,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.ScheduledEventDao;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
@@ -35,7 +38,6 @@ import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
-import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.dwr.beans.EventSourceBean;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
@@ -45,14 +47,18 @@ import com.serotonin.web.i18n.LocalizableMessage;
  * @author Matthew Lohbihler
  */
 public class CompoundEventsDwr extends BaseDwr {
+
+    @Autowired
+    private RuntimeManager runtimeManager;
     //
     // /
     // / Public methods
     // /
     //
+
     public Map<String, Object> getInitData() {
-        User user = Common.getUser();
-        Permissions.ensureDataSourcePermission(user);
+        User user = common.getUser();
+        permissions.ensureDataSourcePermission(user);
 
         Map<String, Object> model = new HashMap<String, Object>();
 
@@ -63,34 +69,38 @@ public class CompoundEventsDwr extends BaseDwr {
         List<EventSourceBean> dataPoints = new LinkedList<EventSourceBean>();
         EventSourceBean source;
         for (DataPointVO dp : new DataPointDao().getDataPoints(DataPointExtendedNameComparator.instance, true)) {
-            if (!Permissions.hasDataSourcePermission(user, dp.getDataSourceId()))
+            if (!permissions.hasDataSourcePermission(user, dp.getDataSourceId())) {
                 continue;
+            }
 
             source = new EventSourceBean();
             source.setId(dp.getId());
             source.setName(dp.getExtendedName());
             for (PointEventDetectorVO ped : dp.getEventDetectors()) {
-                if (ped.isRtnApplicable())
+                if (ped.isRtnApplicable()) {
                     source.getEventTypes().add(ped.getEventType());
+                }
             }
 
-            if (source.getEventTypes().size() > 0)
+            if (source.getEventTypes().size() > 0) {
                 dataPoints.add(source);
+            }
         }
         model.put("dataPoints", dataPoints);
 
         // Get the scheduled events
         List<EventTypeVO> scheduledEvents = new LinkedList<EventTypeVO>();
         List<ScheduledEventVO> ses = new ScheduledEventDao().getScheduledEvents();
-        for (ScheduledEventVO se : ses)
+        for (ScheduledEventVO se : ses) {
             scheduledEvents.add(se.getEventType());
+        }
         model.put("scheduledEvents", scheduledEvents);
 
         return model;
     }
 
     public CompoundEventDetectorVO getCompoundEvent(int id) {
-        Permissions.ensureDataSourcePermission(Common.getUser());
+        permissions.ensureDataSourcePermission(common.getUser());
 
         if (id == Common.NEW_ID) {
             CompoundEventDetectorVO vo = new CompoundEventDetectorVO();
@@ -102,7 +112,7 @@ public class CompoundEventsDwr extends BaseDwr {
 
     public DwrResponseI18n saveCompoundEvent(int id, String xid, String name, AlarmLevels alarmLevel, boolean returnToNormal,
             String condition, boolean disabled) {
-        Permissions.ensureDataSourcePermission(Common.getUser());
+        permissions.ensureDataSourcePermission(common.getUser());
 
         // Validate the given information. If there is a problem, return an appropriate error message.
         CompoundEventDetectorVO ced = new CompoundEventDetectorVO();
@@ -119,19 +129,21 @@ public class CompoundEventsDwr extends BaseDwr {
 
         CompoundEventDetectorDao compoundEventDetectorDao = new CompoundEventDetectorDao();
 
-        if (StringUtils.isEmpty(xid))
+        if (StringUtils.isEmpty(xid)) {
             response.addContextualMessage("xid", "validate.required");
-        else if (!compoundEventDetectorDao.isXidUnique(xid, id))
+        } else if (!compoundEventDetectorDao.isXidUnique(xid, id)) {
             response.addContextualMessage("xid", "validate.xidUsed");
+        }
 
         ced.validate(response);
 
         // Save it
         if (!response.getHasMessages()) {
-            boolean success = Common.ctx.getRuntimeManager().saveCompoundEventDetector(ced);
+            boolean success = runtimeManager.saveCompoundEventDetector(ced);
 
-            if (!success)
+            if (!success) {
                 response.addData("warning", new LocalizableMessage("compoundDetectors.validation.initError"));
+            }
         }
 
         response.addData("cedId", ced.getId());
@@ -139,14 +151,16 @@ public class CompoundEventsDwr extends BaseDwr {
     }
 
     public void deleteCompoundEvent(int cedId) {
-        Permissions.ensureDataSourcePermission(Common.getUser());
+        permissions.ensureDataSourcePermission(common.getUser());
         new CompoundEventDetectorDao().deleteCompoundEventDetector(cedId);
-        Common.ctx.getRuntimeManager().stopCompoundEventDetector(cedId);
+        runtimeManager.stopCompoundEventDetector(cedId);
     }
 
     public DwrResponseI18n validateCondition(String condition) {
+        User user = common.getUser();
+        permissions.ensureDataSourcePermission(user);
         DwrResponseI18n response = new DwrResponseI18n();
-        CompoundEventDetectorVO.validate(condition, response);
+        CompoundEventDetectorVO.validate(condition, response, common.getUser(), permissions);
         return response;
     }
 }

@@ -21,37 +21,42 @@ package com.serotonin.mango.db.upgrade;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.DatabaseAccess;
+import com.serotonin.mango.SysProperties;
 import com.serotonin.mango.db.dao.BaseDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Base class for instances that perform database upgrades. The naming of
  * subclasses follows the convention 'Upgrade[maj]_[min]_[mic]', where
  * '[maj]_[min]_[mic]' is the version that the class upgrades from. The subclass
  * must be in this package.
- * 
+ *
  * @author Matthew Lohbihler
  */
 abstract public class DBUpgrade extends BaseDao {
 
+    @Autowired
+    private SystemSettingsDao systemSettingsDao;
+    @Autowired
+    private Common common;
+    
     private final static Logger LOG = LoggerFactory.getLogger(DBUpgrade.class);
     protected static final String DEFAULT_DATABASE_TYPE = "*";
 
-    public static void checkUpgrade() {
+    public void checkUpgrade() {
         // If this is a very old version of the system, there may be multiple
         // upgrades to run, so start a loop.
         while (true) {
             // Get the current schema version.
-            String schemaVersion = SystemSettingsDao.getValue(SystemSettingsDao.DATABASE_SCHEMA_VERSION);
+            String schemaVersion = systemSettingsDao.getValue(SysProperties.PRODUCT_VERSION);
 
             // Convert the schema version to the class name convention. This
             // simply means replacing dots with
@@ -87,7 +92,7 @@ abstract public class DBUpgrade extends BaseDao {
                         + upgrade.getNewSchemaVersion());
                 upgrade.upgrade();
                 new SystemSettingsDao().setValue(
-                        SystemSettingsDao.DATABASE_SCHEMA_VERSION,
+                        SysProperties.PRODUCT_VERSION,
                         upgrade.getNewSchemaVersion());
             } catch (Exception e) {
                 throw new ShouldNeverHappenException(e);
@@ -101,31 +106,36 @@ abstract public class DBUpgrade extends BaseDao {
 
     /**
      * Convenience method for subclasses
-     * 
+     *
      * @param script
      *            the array of script lines to run
-     * @param out
-     *            the stream to which to direct output from running the script
      * @throws Exception
      *             if something bad happens
      */
-    protected void runScript(String[] script, OutputStream out)
-            throws Exception {
-        Common.ctx.getDatabaseAccess().runScript(script, out);
-    }
+    public void runScript(String[] script) {
+        StringBuilder statement = new StringBuilder();
 
-    protected void runScript(Map<String, String[]> scripts,
-            final OutputStream out) throws Exception {
-        DatabaseAccess da = Common.ctx.getDatabaseAccess();
-        String[] script = scripts.get(da.getType().name());
-        if (script == null) {
-            script = scripts.get(DEFAULT_DATABASE_TYPE);
+        for (String line : script) {
+            // Trim whitespace
+            line = line.trim();
+
+            // Skip comments
+            if (line.startsWith("--")) {
+                continue;
+            }
+
+            statement.append(line);
+            statement.append(" ");
+            if (line.endsWith(";")) {
+                // Execute the statement
+                getJdbcTemplate().execute(statement.toString());
+                statement.delete(0, statement.length() - 1);
+            }
         }
-        runScript(script, out);
     }
 
     protected OutputStream createUpdateLogOutputStream(String version) {
-        String dir = Common.getEnvironmentProfile().getString(
+        String dir = common.getEnvironmentProfile().getProperty(
                 "db.update.log.dir", "");
         dir = StringUtils.replaceMacros(dir, System.getProperties());
 
@@ -149,9 +159,8 @@ abstract public class DBUpgrade extends BaseDao {
         String upgradeClassname = DBUpgrade.class.getPackage().getName()
                 + ".Upgrade" + schemaVersion.replace('.', '_');
 
-        Class<?> clazz = null;
         try {
-            clazz = Class.forName(upgradeClassname);
+            Class.forName(upgradeClassname);
             return true;
         } catch (ClassNotFoundException e) {
             return false;

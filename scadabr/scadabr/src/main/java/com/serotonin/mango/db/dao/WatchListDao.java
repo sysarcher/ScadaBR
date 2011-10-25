@@ -33,14 +33,22 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.WatchList;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Matthew Lohbihler
  */
+@Service
 public class WatchListDao extends BaseDao {
+
+    @Autowired
+    private DataPointDao dataPointDao;
 
     public String generateUniqueXid() {
         return generateUniqueXid(WatchList.XID_PREFIX, "watchLists");
@@ -89,7 +97,6 @@ public class WatchListDao extends BaseDao {
                 "select dataPointId from watchListPoints where watchListId=? order by sortOrder",
                 new Object[]{watchList.getId()}, Integer.class);
         List<DataPointVO> points = watchList.getPointList();
-        DataPointDao dataPointDao = new DataPointDao();
         for (Integer pointId : pointIds) {
             points.add(dataPointDao.getDataPoint(pointId));
         }
@@ -139,55 +146,45 @@ public class WatchListDao extends BaseDao {
         return watchList;
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void saveWatchList(final WatchList watchList) {
-        new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
+        if (watchList.getId() == Common.NEW_ID) {
+            SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("watchLists").usingGeneratedKeyColumns("id");
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("xid", watchList.getXid());
+            params.put("userId", watchList.getUserId());
+            params.put("name", watchList.getName());
+
+            Number id = insertActor.executeAndReturnKey(params);
+            watchList.setId(id.intValue());
+        } else {
+            getSimpleJdbcTemplate().update("update watchLists set xid=?, name=? where id=?", watchList.getXid(),
+                    watchList.getName(), watchList.getId());
+        }
+        getSimpleJdbcTemplate().update("delete from watchListPoints where watchListId=?", watchList.getId());
+        getJdbcTemplate().batchUpdate("insert into watchListPoints values (?,?,?)", new BatchPreparedStatementSetter() {
 
             @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                if (watchList.getId() == Common.NEW_ID) {
-                    SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("watchLists").usingGeneratedKeyColumns("id");
-                    Map<String, Object> params = new HashMap<String, Object>();
-                    params.put("xid", watchList.getXid());
-                    params.put("userId", watchList.getUserId());
-                    params.put("name", watchList.getName());
+            public int getBatchSize() {
+                return watchList.getPointList().size();
+            }
 
-                    Number id = insertActor.executeAndReturnKey(params);
-                    watchList.setId(id.intValue());
-                } else {
-                    getSimpleJdbcTemplate().update("update watchLists set xid=?, name=? where id=?", watchList.getXid(),
-                            watchList.getName(), watchList.getId());
-                }
-                getSimpleJdbcTemplate().update("delete from watchListPoints where watchListId=?", watchList.getId());
-                getJdbcTemplate().batchUpdate("insert into watchListPoints values (?,?,?)", new BatchPreparedStatementSetter() {
-
-                    @Override
-                    public int getBatchSize() {
-                        return watchList.getPointList().size();
-                    }
-
-                    @Override
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        ps.setInt(1, watchList.getId());
-                        ps.setInt(2, watchList.getPointList().get(i).getId());
-                        ps.setInt(3, i);
-                    }
-                });
-
-                saveWatchListUsers(watchList);
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setInt(1, watchList.getId());
+                ps.setInt(2, watchList.getPointList().get(i).getId());
+                ps.setInt(3, i);
             }
         });
+
+        saveWatchListUsers(watchList);
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void deleteWatchList(final int watchListId) {
-        new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
-
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                deleteWatchListUsers(watchListId);
-                getSimpleJdbcTemplate().update("delete from watchListPoints where watchListId=?", watchListId);
-                getSimpleJdbcTemplate().update("delete from watchLists where id=?", watchListId);
-            }
-        });
+        deleteWatchListUsers(watchListId);
+        getSimpleJdbcTemplate().update("delete from watchListPoints where watchListId=?", watchListId);
+        getSimpleJdbcTemplate().update("delete from watchLists where id=?", watchListId);
     }
 
     //
@@ -213,7 +210,8 @@ public class WatchListDao extends BaseDao {
         getSimpleJdbcTemplate().update("delete from watchListUsers where watchListId=?", watchListId);
     }
 
-    void saveWatchListUsers(final WatchList watchList) {
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    private void saveWatchListUsers(final WatchList watchList) {
         // Delete anything that is currently there.
         deleteWatchListUsers(watchList.getId());
 

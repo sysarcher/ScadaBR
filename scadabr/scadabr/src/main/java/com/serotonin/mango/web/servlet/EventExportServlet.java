@@ -14,13 +14,16 @@ import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.report.EventCsvStreamer;
 import com.serotonin.mango.web.dwr.beans.EventExportDefinition;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class EventExportServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    @Autowired
+    private Common common;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        User user = Common.getUser(request);
+        User user = common.getUser(request);
         if (user == null)
             return;
 
@@ -28,7 +31,7 @@ public class EventExportServlet extends HttpServlet {
         if (def == null)
             return;
 
-        final ResourceBundle bundle = Common.getBundle();
+        final ResourceBundle bundle = common.getBundle();
         List<EventInstance> events = new EventDao().search(def.getEventId(), def.getEventSourceType(), def.getStatus(),
                 def.getAlarmLevel(), def.getKeywords(), def.getDateFrom(), def.getDateTo(), user.getId(), bundle, 0,
                 Integer.MAX_VALUE, null);

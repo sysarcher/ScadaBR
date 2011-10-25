@@ -24,13 +24,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -39,9 +41,12 @@ import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
 /**
  * @author Matthew Lohbihler
  */
+@Service
 public class CompoundEventDetectorDao extends BaseDao {
 
     private static final String COMPOUND_EVENT_DETECTOR_SELECT = "select id, xid, name, alarmLevel, returnToNormal, disabled, conditionText from compoundEventDetectors ";
+    @Autowired
+    private EventManager eventManager;
 
     public String generateUniqueXid() {
         return generateUniqueXid(CompoundEventDetectorVO.XID_PREFIX, "compoundEventDetectors");
@@ -101,7 +106,7 @@ public class CompoundEventDetectorDao extends BaseDao {
         Number id = insertActor.executeAndReturnKey(params);
         ced.setId(id.intValue());
 
-        AuditEventType.raiseAddedEvent(AuditEventType.TYPE_COMPOUND_EVENT_DETECTOR, ced);
+        eventManager.raiseAddedEvent(AuditEventType.TYPE_COMPOUND_EVENT_DETECTOR, ced);
     }
     private static final String COMPOUND_EVENT_DETECTOR_UPDATE = "update compoundEventDetectors set xid=?, name=?, alarmLevel=?, returnToNormal=?, disabled=?, conditionText=? "
             + "where id=?";
@@ -112,24 +117,18 @@ public class CompoundEventDetectorDao extends BaseDao {
         getSimpleJdbcTemplate().update(COMPOUND_EVENT_DETECTOR_UPDATE, ced.getXid(), ced.getName(), ced.getAlarmLevel().mangoId,
                 boolToChar(ced.isReturnToNormal()), boolToChar(ced.isDisabled()), ced.getCondition(), ced.getId());
 
-        AuditEventType.raiseChangedEvent(AuditEventType.TYPE_COMPOUND_EVENT_DETECTOR, old, ced);
+        eventManager.raiseChangedEvent(AuditEventType.TYPE_COMPOUND_EVENT_DETECTOR, old, ced);
 
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void deleteCompoundEventDetector(final int compoundEventDetectorId) {
         CompoundEventDetectorVO ced = getCompoundEventDetector(compoundEventDetectorId);
         if (ced != null) {
-            new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
-
-                @Override
-                protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    getSimpleJdbcTemplate().update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.COMPOUND
-                            + " and eventTypeRef1=?", compoundEventDetectorId);
-                    getSimpleJdbcTemplate().update("delete from compoundEventDetectors where id=?", compoundEventDetectorId);
-                }
-            });
-
-            AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_COMPOUND_EVENT_DETECTOR, ced);
+            getSimpleJdbcTemplate().update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.COMPOUND
+                    + " and eventTypeRef1=?", compoundEventDetectorId);
+            getSimpleJdbcTemplate().update("delete from compoundEventDetectors where id=?", compoundEventDetectorId);
+            eventManager.raiseDeletedEvent(AuditEventType.TYPE_COMPOUND_EVENT_DETECTOR, ced);
         }
     }
 }

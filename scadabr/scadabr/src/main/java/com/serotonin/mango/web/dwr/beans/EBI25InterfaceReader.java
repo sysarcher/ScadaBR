@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr.beans;
 
@@ -24,6 +24,7 @@ import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -51,8 +52,8 @@ import com.serotonin.web.i18n.LocalizableMessage;
  * @author Matthew Lohbihler
  */
 public class EBI25InterfaceReader {
-    private final static Logger LOG = LoggerFactory.getLogger(EBI25InterfaceReader.class);
 
+    private final static Logger LOG = LoggerFactory.getLogger(EBI25InterfaceReader.class);
     private ModbusMaster modbusMaster = null;
     private String errorMessage;
     private String serialNumber;
@@ -63,6 +64,8 @@ public class EBI25InterfaceReader {
     private final List<EBI25LoggerInfo> loggerInfo = new ArrayList<EBI25LoggerInfo>();
     private List<DataPointVO> points;
     private DataPointDao dataPointDao;
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     public EBI25InterfaceReader(ResourceBundle bundle, EBI25DataSourceVO dataSource, String host, int port,
             boolean keepAlive, int timeout, int retries) {
@@ -82,7 +85,6 @@ public class EBI25InterfaceReader {
             dataSource.setFirmwareVersion(firmwareVersion);
 
             dataPointDao = new DataPointDao();
-            RuntimeManager rtm = Common.ctx.getRuntimeManager();
 
             // Get the list of existing data points for the data source. We remove points from this list as they are
             // needed so that when we are done all that is left in the list is points that can be disabled.
@@ -112,47 +114,39 @@ public class EBI25InterfaceReader {
                 // Update the text renderer
                 dp.setTextRenderer(new AnalogRenderer("0.0", locator.getSuffix()));
 
-                rtm.saveDataPoint(dp);
+                runtimeManager.saveDataPoint(dp);
 
                 //
                 // Create or update the logger battery point.
                 dp = removeOrCreatePoint(existingPoints, info, EBI25PointLocatorVO.TYPE_BATTERY, dataSource.getId());
                 dp.setTextRenderer(new AnalogRenderer("0", "%"));
-                rtm.saveDataPoint(dp);
+                runtimeManager.saveDataPoint(dp);
 
                 //
                 // Create or update the logger signal point.
                 dp = removeOrCreatePoint(existingPoints, info, EBI25PointLocatorVO.TYPE_SIGNAL, dataSource.getId());
                 dp.setTextRenderer(new AnalogRenderer("0", "%"));
-                rtm.saveDataPoint(dp);
+                runtimeManager.saveDataPoint(dp);
             }
 
             // Disable anything left over
             for (DataPointVO dp : existingPoints) {
                 dp.setEnabled(false);
-                rtm.saveDataPoint(dp);
+                runtimeManager.saveDataPoint(dp);
             }
-        }
-        catch (ModbusInitException e) {
+        } catch (ModbusInitException e) {
             errorMessage = new LocalizableMessage("dsEdit.ebi25.read.init", e.getMessage()).getLocalizedMessage(bundle);
             LOG.warn("Modbus initialization", e);
-        }
-        catch (ModbusTransportException e) {
-            errorMessage = new LocalizableMessage("dsEdit.ebi25.read.transport", e.getMessage())
-                    .getLocalizedMessage(bundle);
+        } catch (ModbusTransportException e) {
+            errorMessage = new LocalizableMessage("dsEdit.ebi25.read.transport", e.getMessage()).getLocalizedMessage(bundle);
             LOG.warn("Modbus transport", e);
-        }
-        catch (ErrorResponseException e) {
-            errorMessage = new LocalizableMessage("dsEdit.ebi25.read.response", e.getErrorResponse()
-                    .getExceptionMessage()).getLocalizedMessage(bundle);
+        } catch (ErrorResponseException e) {
+            errorMessage = new LocalizableMessage("dsEdit.ebi25.read.response", e.getErrorResponse().getExceptionMessage()).getLocalizedMessage(bundle);
             LOG.warn("Modbus error response: " + e.getErrorResponse().getExceptionMessage());
-        }
-        catch (ExceptionResultException e) {
-            errorMessage = new LocalizableMessage("dsEdit.ebi25.read.response", e.getExceptionResult()
-                    .getExceptionMessage()).getLocalizedMessage(bundle);
+        } catch (ExceptionResultException e) {
+            errorMessage = new LocalizableMessage("dsEdit.ebi25.read.response", e.getExceptionResult().getExceptionMessage()).getLocalizedMessage(bundle);
             LOG.warn("Modbus error response in '" + e.getKey() + "': " + e.getExceptionResult().getExceptionMessage());
-        }
-        finally {
+        } finally {
             EBI25Constants.destroyModbusMaster(modbusMaster);
         }
     }
@@ -167,10 +161,11 @@ public class EBI25InterfaceReader {
         }
 
         String suffix = "";
-        if (type == EBI25PointLocatorVO.TYPE_BATTERY)
+        if (type == EBI25PointLocatorVO.TYPE_BATTERY) {
             suffix = "-Battery";
-        else if (type == EBI25PointLocatorVO.TYPE_SIGNAL)
+        } else if (type == EBI25PointLocatorVO.TYPE_SIGNAL) {
             suffix = "-Signal";
+        }
 
         DataPointVO dp = new DataPointVO();
         dp.setXid(dataPointDao.generateUniqueXid());
@@ -200,15 +195,15 @@ public class EBI25InterfaceReader {
         if (high) {
             type = PointEventDetectorVO.TYPE_ANALOG_HIGH_LIMIT;
             xid = "loggerHigh";
-        }
-        else {
+        } else {
             type = PointEventDetectorVO.TYPE_ANALOG_LOW_LIMIT;
             xid = "loggerLow";
         }
 
         for (PointEventDetectorVO ped : dp.getEventDetectors()) {
-            if (xid.equals(ped.getXid()))
+            if (xid.equals(ped.getXid())) {
                 return ped;
+            }
         }
 
         PointEventDetectorVO ped = new PointEventDetectorVO();
@@ -253,22 +248,23 @@ public class EBI25InterfaceReader {
             try {
                 loggerSerial = modbusMaster.getValue(
                         new NumericLocator(EBI25Constants.SLAVE_NODE, EBI25Constants.RANGE, baseAddress,
-                                EBI25Constants.FOUR_BYTE)).longValue();
-            }
-            catch (ErrorResponseException e) {
+                        EBI25Constants.FOUR_BYTE)).longValue();
+            } catch (ErrorResponseException e) {
                 // Assumed to be an error regarding an illegal address. Just quit.
                 break;
             }
 
-            if (loggerSerial == 0xffffffff)
+            if (loggerSerial == 0xffffffff) {
                 continue;
+            }
 
             batch = createLoggerLocators(baseAddress);
             results = modbusMaster.send(batch);
 
             EBI25LoggerInfo info = extractLoggerInfo(results, i, loggerSerial.toString());
-            if (EBI25Constants.UNIT_CODES.isValidId(info.getUnitType()))
+            if (EBI25Constants.UNIT_CODES.isValidId(info.getUnitType())) {
                 loggerInfo.add(info);
+            }
         }
     }
 

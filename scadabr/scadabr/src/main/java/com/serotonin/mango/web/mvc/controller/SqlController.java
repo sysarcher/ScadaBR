@@ -33,24 +33,29 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ConnectionCallback;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractFormController;
 import org.springframework.web.util.WebUtils;
 
-import com.serotonin.mango.Common;
-import com.serotonin.mango.db.DatabaseAccess;
+import com.serotonin.mango.db.dao.BaseDao;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.mvc.form.SqlForm;
 import com.serotonin.util.SerializationHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.ConnectionCallback;
 
 public class SqlController extends AbstractFormController {
 
     private final static Logger LOG = LoggerFactory.getLogger(SqlController.class);
     private String formView;
+    
+    @Autowired
+    private Permissions permissions;
+    @Autowired
+    private BaseDao baseDao;
 
     public void setFormView(String formView) {
         this.formView = formView;
@@ -59,20 +64,19 @@ public class SqlController extends AbstractFormController {
     @Override
     protected ModelAndView showForm(HttpServletRequest request, HttpServletResponse response, BindException errors)
             throws Exception {
-        Permissions.ensureAdmin(request);
+        permissions.ensureAdmin(request);
         return showForm(request, errors, formView);
     }
 
     @Override
     protected ModelAndView processFormSubmission(HttpServletRequest request, HttpServletResponse response,
             Object command, BindException errors) throws Exception {
-        Permissions.ensureAdmin(request);
+        permissions.ensureAdmin(request);
 
         final SqlForm form = (SqlForm) command;
-        DatabaseAccess databaseAccess = Common.ctx.getDatabaseAccess();
         try {
             if (WebUtils.hasSubmitParameter(request, "query")) {
-                databaseAccess.doInConnection(new ConnectionCallback() {
+                baseDao.doInConnection(new ConnectionCallback() {
 
                     @Override
                     public Object doInConnection(Connection conn) throws SQLException, DataAccessException {
@@ -108,10 +112,11 @@ public class SqlController extends AbstractFormController {
                         form.setData(data);
                         return null;
                     }
+
+
                 });
             } else if (WebUtils.hasSubmitParameter(request, "update")) {
-                JdbcTemplate ejt = new JdbcTemplate(databaseAccess.getDataSource());
-                int result = ejt.update(form.getSqlString());
+                final int result = baseDao.update(form.getSqlString());
                 form.setUpdateResult(result);
             }
         } catch (RuntimeException e) {

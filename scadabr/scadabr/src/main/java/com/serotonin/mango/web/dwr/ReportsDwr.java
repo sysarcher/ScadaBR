@@ -51,7 +51,7 @@ public class ReportsDwr extends BaseDwr {
     public DwrResponseI18n init() {
         DwrResponseI18n response = new DwrResponseI18n();
         ReportDao reportDao = new ReportDao();
-        User user = Common.getUser();
+        User user = common.getUser();
 
         response.addData("points", getReadablePoints());
         response.addData("mailingLists", new MailingListDao().getMailingLists());
@@ -76,7 +76,7 @@ public class ReportsDwr extends BaseDwr {
                 report.setName(LocalizableMessage.getMessage(getResourceBundle(), "common.copyPrefix", report.getName()));
             }
 
-            Permissions.ensureReportPermission(Common.getUser(), report);
+            permissions.ensureReportPermission(common.getUser(), report);
         }
         return report;
     }
@@ -118,7 +118,7 @@ public class ReportsDwr extends BaseDwr {
         if (response.getHasMessages())
             return response;
 
-        User user = Common.getUser();
+        User user = common.getUser();
         ReportDao reportDao = new ReportDao();
         ReportVO report;
         if (id == Common.NEW_ID) {
@@ -128,7 +128,7 @@ public class ReportsDwr extends BaseDwr {
         else
             report = reportDao.getReport(id);
 
-        Permissions.ensureReportPermission(user, report);
+        permissions.ensureReportPermission(user, report);
 
         // Update the new values.
         report.setName(name);
@@ -187,7 +187,7 @@ public class ReportsDwr extends BaseDwr {
         if (!response.getHasMessages()) {
             ReportVO report = new ReportVO();
             report.setName(name);
-            report.setUserId(Common.getUser().getId());
+            report.setUserId(common.getUser().getId());
             report.setPoints(points);
             report.setIncludeEvents(includeEvents);
             report.setIncludeUserComments(includeUserComments);
@@ -225,7 +225,7 @@ public class ReportsDwr extends BaseDwr {
 
         ReportVO report = reportDao.getReport(id);
         if (report != null) {
-            Permissions.ensureReportPermission(Common.getUser(), report);
+            permissions.ensureReportPermission(common.getUser(), report);
             ReportJob.unscheduleReportJob(report);
             reportDao.deleteReport(id);
         }
@@ -249,10 +249,10 @@ public class ReportsDwr extends BaseDwr {
         if (pastPeriodCount < 1)
             response.addContextualMessage("pastPeriodCount", "reports.validate.periodCountLessThan1");
 
-        User user = Common.getUser();
+        User user = common.getUser();
         DataPointDao dataPointDao = new DataPointDao();
         for (ReportPointVO point : points) {
-            Permissions.ensureDataPointReadPermission(user, dataPointDao.getDataPoint(point.getPointId()));
+            permissions.ensureDataPointReadPermission(user, dataPointDao.getDataPoint(point.getPointId()));
 
             try {
                 if (!StringUtils.isEmpty(point.getColour()))
@@ -265,14 +265,14 @@ public class ReportsDwr extends BaseDwr {
     }
 
     public List<ReportInstance> deleteReportInstance(int instanceId) {
-        User user = Common.getUser();
+        User user = common.getUser();
         ReportDao reportDao = new ReportDao();
         reportDao.deleteReportInstance(instanceId, user.getId());
         return getReportInstances(user);
     }
 
     public List<ReportInstance> getReportInstances() {
-        return getReportInstances(Common.getUser());
+        return getReportInstances(common.getUser());
     }
 
     private List<ReportInstance> getReportInstances(User user) {
@@ -284,7 +284,7 @@ public class ReportsDwr extends BaseDwr {
     }
 
     public void setPreventPurge(int instanceId, boolean value) {
-        new ReportDao().setReportInstancePreventPurge(instanceId, value, Common.getUser().getId());
+        new ReportDao().setReportInstancePreventPurge(instanceId, value, common.getUser().getId());
     }
 
     public ReportVO createReportFromWatchlist(int watchListId) {

@@ -27,9 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.DatabaseAccess;
-import com.serotonin.mango.rt.EventManager;
-import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverMulticaster;
 import com.serotonin.mango.rt.maint.BackgroundProcessing;
 import com.serotonin.mango.util.DocumentationManifest;
@@ -47,11 +44,6 @@ public class ContextWrapper {
 
 	public ContextWrapper(HttpServletRequest request) {
 		ctx = request.getSession().getServletContext();
-	}
-
-	public DatabaseAccess getDatabaseAccess() {
-		return (DatabaseAccess) ctx
-				.getAttribute(Common.ContextKeys.DATABASE_ACCESS);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -95,16 +87,6 @@ public class ContextWrapper {
 				return dynamicImage;
 		}
 		return null;
-	}
-
-	public RuntimeManager getRuntimeManager() {
-		return (RuntimeManager) ctx
-				.getAttribute(Common.ContextKeys.RUNTIME_MANAGER);
-	}
-
-	public EventManager getEventManager() {
-		return (EventManager) ctx
-				.getAttribute(Common.ContextKeys.EVENT_MANAGER);
 	}
 
 	public Configuration getFreemarkerConfig() {

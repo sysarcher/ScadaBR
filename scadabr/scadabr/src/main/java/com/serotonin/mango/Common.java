@@ -47,6 +47,7 @@ import org.joda.time.Period;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
+import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.util.BackgroundContext;
 import com.serotonin.mango.util.CommPortConfigException;
 import com.serotonin.mango.util.ExportCodes;
@@ -58,15 +59,31 @@ import com.serotonin.mango.web.ContextWrapper;
 import com.serotonin.monitor.MonitoredValues;
 import com.serotonin.timer.CronTimerTrigger;
 import com.serotonin.timer.RealTimeTimer;
-import com.serotonin.util.PropertiesUtils;
 import com.serotonin.util.StringUtils;
+import com.serotonin.web.http.HttpUtils;
 import com.serotonin.web.i18n.I18NUtils;
+import com.serotonin.web.i18n.LocalizableException;
 import com.serotonin.web.i18n.LocalizableMessage;
 import com.serotonin.web.i18n.Utf8ResourceBundle;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Common {
+    
+    private Properties envProperties;
+    
+    @Autowired
+    private SystemSettingsDao systemSettingsDao;
+    
 	private static final String SESSION_USER = "sessionUser";
 	private static final String ANON_VIEW_KEY = "anonymousViews";
 	private static final String CUSTOM_VIEW_KEY = "customView";
@@ -75,30 +92,32 @@ public class Common {
 	public static final Charset UTF8_CS = Charset.forName(UTF8);
 
 	public static final int NEW_ID = -1;
-	public static ContextWrapper ctx;
+	@Deprecated
+        public static ContextWrapper ctx;
 
 	// This is initialized
 	public static final RealTimeTimer timer = new RealTimeTimer();
 
 	public static final MonitoredValues MONITORED_VALUES = new MonitoredValues();
 
+        public Common() {
+            
+        }
+        
 	/*
 	 * Updating the Mango version: - Create a DBUpdate subclass for the old
 	 * version number. This may not do anything in particular to the schema, but
 	 * is still required to update the system settings so that the database has
 	 * the correct version.
 	 */
-	public static final String getVersion() {
-		return "1.12.4";
+	public final String getVersion() {
+		return getEnvironmentProfile().getProperty(SysProperties.PRODUCT_VERSION.key);
 	}
 
 	public interface ContextKeys {
 		String DATABASE_ACCESS = "DATABASE_ACCESS";
 		String IMAGE_SETS = "IMAGE_SETS";
 		String DYNAMIC_IMAGES = "DYNAMIC_IMAGES";
-		String RUNTIME_MANAGER = "RUNTIME_MANAGER";
-		String SCHEDULER = "SCHEDULER";
-		String EVENT_MANAGER = "EVENT_MANAGER";
 		String FREEMARKER_CONFIG = "FREEMARKER_CONFIG";
 		String BACKGROUND_PROCESSING = "BACKGROUND_PROCESSING";
 		String HTTP_RECEIVER_MULTICASTER = "HTTP_RECEIVER_MULTICASTER";
@@ -117,7 +136,7 @@ public class Common {
 		int YEARS = 7;
 	}
 
-	public static ExportCodes TIME_PERIOD_CODES = new ExportCodes();
+	public final static ExportCodes TIME_PERIOD_CODES = new ExportCodes();
 	static {
 		TIME_PERIOD_CODES.addElement(TimePeriods.MILLISECONDS, "MILLISECONDS");
 		TIME_PERIOD_CODES.addElement(TimePeriods.SECONDS, "SECONDS");
@@ -208,7 +227,7 @@ public class Common {
 
 	//
 	// Session user
-	public static User getUser() {
+	public User getUser() {
 		WebContext webContext = WebContextFactory.get();
 		if (webContext == null) {
 			// If there is no web context, check if there is a background
@@ -221,7 +240,7 @@ public class Common {
 		return getUser(webContext.getHttpServletRequest());
 	}
 
-	public static User getUser(HttpServletRequest request) {
+	public User getUser(HttpServletRequest request) {
 		// Check first to see if the user object is in the request.
 		User user = (User) request.getAttribute(SESSION_USER);
 		if (user != null)
@@ -239,7 +258,7 @@ public class Common {
 		return user;
 	}
 
-	public static void setUser(HttpServletRequest request, User user) {
+	public void setUser(HttpServletRequest request, User user) {
 		request.getSession().setAttribute(SESSION_USER, user);
 	}
 
@@ -247,7 +266,7 @@ public class Common {
 	// Background process description. Used for audit logs when the system
 	// automatically makes changes to data, such as
 	// safe mode disabling stuff.
-	public static String getBackgroundProcessDescription() {
+	public String getBackgroundProcessDescription() {
 		BackgroundContext backgroundContext = BackgroundContext.get();
 		if (backgroundContext == null)
 			return null;
@@ -256,12 +275,12 @@ public class Common {
 
 	//
 	// Anonymous views
-	public static View getAnonymousView(int id) {
+	public View getAnonymousView(int id) {
 		return getAnonymousView(
 				WebContextFactory.get().getHttpServletRequest(), id);
 	}
 
-	public static View getAnonymousView(HttpServletRequest request, int id) {
+	public View getAnonymousView(HttpServletRequest request, int id) {
 		List<View> views = getAnonymousViews(request);
 		if (views == null)
 			return null;
@@ -272,7 +291,7 @@ public class Common {
 		return null;
 	}
 
-	public static void addAnonymousView(HttpServletRequest request, View view) {
+	public void addAnonymousView(HttpServletRequest request, View view) {
 		List<View> views = getAnonymousViews(request);
 		if (views == null) {
 			views = new ArrayList<View>();
@@ -287,46 +306,55 @@ public class Common {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static List<View> getAnonymousViews(HttpServletRequest request) {
+	private List<View> getAnonymousViews(HttpServletRequest request) {
 		return (List<View>) request.getSession().getAttribute(ANON_VIEW_KEY);
 	}
 
 	//
 	// Custom views
-	public static CustomView getCustomView() {
+	public CustomView getCustomView() {
 		return getCustomView(WebContextFactory.get().getHttpServletRequest());
 	}
 
-	public static CustomView getCustomView(HttpServletRequest request) {
+	public CustomView getCustomView(HttpServletRequest request) {
 		return (CustomView) request.getSession().getAttribute(CUSTOM_VIEW_KEY);
 	}
 
-	public static void setCustomView(HttpServletRequest request, CustomView view) {
+	public void setCustomView(HttpServletRequest request, CustomView view) {
 		request.getSession().setAttribute(CUSTOM_VIEW_KEY, view);
 	}
 
 	//
 	// Environment profile
-	public static PropertiesUtils getEnvironmentProfile() {
-		return new PropertiesUtils("env");
+	public synchronized Properties getEnvironmentProfile() {
+            if (envProperties == null) {
+                envProperties = new Properties();
+                try {
+                    envProperties.load(Common.class.getResourceAsStream("classpath:env.properties"));
+                } catch (IOException ex) {
+                    throw new ShouldNeverHappenException(ex);
+                }
+            }
+            return envProperties;
 	}
 
-	public static String getGroveUrl(String servlet) {
-		String grove = getEnvironmentProfile().getString("grove.url",
+        @Deprecated
+	public String getGroveUrl(String servlet) {
+		String grove = getEnvironmentProfile().getProperty("grove.url",
 				"http://mango.serotoninsoftware.com/servlet");
 		return grove + "/" + servlet;
 	}
 
-	public static String getDocPath() {
+	public String getDocPath() {
 		return ctx.getServletContext().getRealPath("WEB-INF/dox") + "/";
 	}
 
 	private static String lazyFiledataPath = null;
 
-	public static String getFiledataPath() {
+	public String getFiledataPath() {
 		if (lazyFiledataPath == null) {
-			String name = SystemSettingsDao
-					.getValue(SystemSettingsDao.FILEDATA_PATH);
+			String name = systemSettingsDao
+					.getValue(SysProperties.FILEDATA_PATH);
 			if (name.startsWith("~"))
 				name = ctx.getServletContext().getRealPath(name.substring(1));
 
@@ -388,7 +416,7 @@ public class Common {
 	public static List<CommPortProxy> getCommPorts()
 			throws CommPortConfigException {
 		try {
-			List<CommPortProxy> ports = new LinkedList<CommPortProxy>();
+			List<CommPortProxy> ports = new LinkedList();
 			Enumeration<?> portEnum = CommPortIdentifier.getPortIdentifiers();
 			CommPortIdentifier cpid;
 			while (portEnum.hasMoreElements()) {
@@ -405,9 +433,9 @@ public class Common {
 		}
 	}
 
-	public synchronized static String encrypt(String plaintext) {
+	public synchronized String encrypt(String plaintext) {
 		try {
-			String alg = getEnvironmentProfile().getString(
+			String alg = getEnvironmentProfile().getProperty(
 					"security.hashAlgorithm", "SHA");
 			if ("NONE".equals(alg))
 				return plaintext;
@@ -432,11 +460,11 @@ public class Common {
 
 	//
 	// HttpClient
-	public static HttpClient getHttpClient() {
+	public HttpClient getHttpClient() {
 		return getHttpClient(30000); // 30 seconds.
 	}
 
-	public static HttpClient getHttpClient(int timeout) {
+	public HttpClient getHttpClient(int timeout) {
 		HttpConnectionManagerParams managerParams = new HttpConnectionManagerParams();
 		managerParams.setConnectionTimeout(timeout);
 		managerParams.setSoTimeout(timeout);
@@ -448,33 +476,77 @@ public class Common {
 		client.getHttpConnectionManager().setParams(managerParams);
 		client.setParams(params);
 
-		if (SystemSettingsDao
-				.getBooleanValue(SystemSettingsDao.HTTP_CLIENT_USE_PROXY)) {
-			String proxyHost = SystemSettingsDao
-					.getValue(SystemSettingsDao.HTTP_CLIENT_PROXY_SERVER);
-			int proxyPort = SystemSettingsDao
-					.getIntValue(SystemSettingsDao.HTTP_CLIENT_PROXY_PORT);
+		if (systemSettingsDao.getBooleanValue(SysProperties.HTTP_CLIENT_USE_PROXY)) {
+			String proxyHost = systemSettingsDao
+					.getValue(SysProperties.HTTP_CLIENT_PROXY_SERVER);
+			int proxyPort = systemSettingsDao
+					.getIntValue(SysProperties.HTTP_CLIENT_PROXY_PORT);
 
 			// Set up the proxy configuration.
 			client.getHostConfiguration().setProxy(proxyHost, proxyPort);
 
 			// Set up the proxy credentials. All realms and hosts.
-			client.getState()
-					.setProxyCredentials(
+			client.getState().setProxyCredentials(
 							AuthScope.ANY,
 							new UsernamePasswordCredentials(
-									SystemSettingsDao
-											.getValue(
-													SystemSettingsDao.HTTP_CLIENT_PROXY_USERNAME,
-													""),
-									SystemSettingsDao
-											.getValue(
-													SystemSettingsDao.HTTP_CLIENT_PROXY_PASSWORD,
-													"")));
+									systemSettingsDao.getValue(SysProperties.HTTP_CLIENT_PROXY_USERNAME),
+									systemSettingsDao.getValue(SysProperties.HTTP_CLIENT_PROXY_PASSWORD)));
 		}
 
 		return client;
 	}
+        
+            public HttpClient createHttpClient(int timeoutSeconds, int retries) {
+        HttpClient result = getHttpClient(timeoutSeconds * 1000);
+        result.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
+                new DefaultHttpMethodRetryHandler(retries, true));
+        return result;
+    }
+
+
+        
+    //TODO move this to a separate bean ....    
+    public String getData(String url, int timeoutSeconds, int retries) throws LocalizableException {
+      final int READ_LIMIT = 1024 * 1024; // One MB
+      // Try to get the data.
+        String data;
+        while (true) {
+            HttpClient client = getHttpClient(timeoutSeconds * 1000);
+            GetMethod method = null;
+            LocalizableMessage message;
+
+            try {
+                method = new GetMethod(url);
+                int responseCode = client.executeMethod(method);
+                if (responseCode == HttpStatus.SC_OK) {
+                    data = HttpUtils.readResponseBody(method, READ_LIMIT);
+                    break;
+                }
+                message = new LocalizableMessage("event.http.response", url, responseCode);
+            }
+            catch (Exception e) {
+                message = DataSourceRT.getExceptionMessage(e);
+            }
+            finally {
+                if (method != null)
+                    method.releaseConnection();
+            }
+
+            if (retries <= 0)
+                throw new LocalizableException(message);
+            retries--;
+
+            // Take a little break instead of trying again immediately.
+            try {
+                Thread.sleep(1000);
+            }
+            catch (InterruptedException e) {
+                // no op
+            }
+        }
+
+        return data;
+    }
 
 	//
 	//
@@ -484,21 +556,21 @@ public class Common {
 	private static String systemLanguage;
 	private static ResourceBundle systemBundle;
 
-	public static String getMessage(String key) {
+	public String getMessage(String key) {
 		ensureI18n();
 		return I18NUtils.getMessage(systemBundle, key);
 	}
 
-	public static ResourceBundle getBundle() {
+	public ResourceBundle getBundle() {
 		ensureI18n();
 		return systemBundle;
 	}
 
-	private static void ensureI18n() {
+	private void ensureI18n() {
 			synchronized (i18nLock) {
 				if (systemLanguage == null) {
-					systemLanguage = SystemSettingsDao
-							.getValue(SystemSettingsDao.LANGUAGE);
+					systemLanguage = systemSettingsDao
+							.getValue(SysProperties.LANGUAGE);
 					Locale locale = findLocale(systemLanguage);
 					if (locale == null)
 						throw new IllegalArgumentException(
@@ -515,11 +587,11 @@ public class Common {
 		return MessageFormat.format(pattern, args);
 	}
 
-	public static void setSystemLanguage(String language) {
+	public void setSystemLanguage(String language) {
 		if (findLocale(language) == null)
 			throw new IllegalArgumentException(
 					"Locale for given language not found: " + language);
-		new SystemSettingsDao().setValue(SystemSettingsDao.LANGUAGE, language);
+		systemSettingsDao.setValue(SysProperties.LANGUAGE, language);
 		systemLanguage = null;
 		systemBundle = null;
 	}
@@ -533,7 +605,7 @@ public class Common {
 	}
 
 	public static Map<String, String> getLanguages() {
-		Map<String, String> languages = new HashMap<String, String>();
+		Map<String, String> languages = new HashMap();
 		ResourceBundle i18n = Utf8ResourceBundle.getBundle("i18n");
 		for (String key : i18n.keySet())
 			languages.put(key, i18n.getString(key));

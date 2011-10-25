@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.db.upgrade;
 
-import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -65,8 +64,6 @@ public class Upgrade0_7_0 extends DBUpgrade {
 
     @Override
     public void upgrade() throws Exception {
-        OutputStream out = createUpdateLogOutputStream("0_7_0");
-
         // Get the data sources from the field mapping version.
         List<DataSourceVO<?>> dataSources = getJdbcTemplate().query(DATA_SOURCE_SELECT, new DataSourceRowMapper());
         LOG.info("Retrieved " + dataSources.size() + " data sources");
@@ -77,7 +74,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
 
         // Run the first script.
         LOG.info("Running script 1");
-        runScript(script1, out);
+        runScript(script1);
 
         // Save the data sources to BLOBs.
         for (DataSourceVO<?> ds : dataSources) {
@@ -93,10 +90,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
 
         // Run the second script.
         LOG.info("Running script 2");
-        runScript(script2, out);
-
-        out.flush();
-        out.close();
+        runScript(script2);
     }
 
     @Override

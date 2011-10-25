@@ -33,7 +33,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.MangoDataType;
-import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
@@ -56,11 +55,17 @@ import com.serotonin.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.i18n.I18NUtils;
 import com.serotonin.web.taglib.Functions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Matthew Lohbihler
  */
+@Service
 public class ReportDao extends BaseDao {
+    
+    @Autowired
+    private PointValueDao pointValueDao;
     //
     //
     // Report Templates
@@ -234,7 +239,6 @@ public class ReportDao extends BaseDao {
     }
 
     public int runReport(final ReportInstance instance, List<PointInfo> points, ResourceBundle bundle) {
-        PointValueDao pointValueDao = new PointValueDao();
         int count = 0;
         String userLabel = I18NUtils.getMessage(bundle, "common.user");
         String setPointLabel = I18NUtils.getMessage(bundle, "annotation.eventHandler");
@@ -300,30 +304,34 @@ public class ReportDao extends BaseDao {
             count += getSimpleJdbcTemplate().update(insertSQL, appendParameters(timestampParams, point.getId(), dataType));
 
             String annoCase;
-            if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.DERBY) {
+            switch (getDataBaseType()) {
+                case DERBY: 
                 annoCase = "    case when pva.sourceType=1 then '" + userLabel //
                         + ": ' || (case when u.username is null then '" + deletedLabel + "' else u.username end) " //
                         + "         when pva.sourceType=2 then '" + setPointLabel + "' " //
                         + "         when pva.sourceType=3 then '" + anonymousLabel + "' " //
                         + "         else 'Unknown source type: ' || cast(pva.sourceType as char(3)) " //
                         + "    end ";
-            } else if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.MSSQL) {
+            break;
+                    case MSSQL: 
                 annoCase = "    case pva.sourceType" //
                         + "        when 1 then '" + userLabel + ": ' + isnull(u.username, '" + deletedLabel + "') " //
                         + "        when 2 then '" + setPointLabel + "'" //
                         + "        when 3 then '" + anonymousLabel + "'" //
                         + "        else 'Unknown source type: ' + cast(pva.sourceType as nvarchar)" //
                         + "    end ";
-            } else if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.MYSQL) {
+            break;
+                    case MYSQL:
                 annoCase = "    case pva.sourceType" //
                         + "      when 1 then concat('" + userLabel + ": ',ifnull(u.username,'" + deletedLabel + "')) " //
                         + "      when 2 then '" + setPointLabel + "'" //
                         + "      when 3 then '" + anonymousLabel + "'" //
                         + "      else concat('Unknown source type: ', pva.sourceType)" //
                         + "    end ";
-            } else {
+            break;
+                    default:
                 throw new ShouldNeverHappenException("unhandled database type: "
-                        + Common.ctx.getDatabaseAccess().getType());
+                        + getDataBaseType());
             }
 
             // Insert the reportInstanceDataAnnotations records

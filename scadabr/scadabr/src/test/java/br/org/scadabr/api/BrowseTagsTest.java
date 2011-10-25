@@ -1,10 +1,12 @@
 package br.org.scadabr.api;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
-public class BrowseTagsTest extends TestCase {
+public class BrowseTagsTest {
 
-	public void testParams() {
-		assertTrue(true);
-	}
+    @Test
+    public void testParams() {
+        assertTrue(true);
+    }
 }

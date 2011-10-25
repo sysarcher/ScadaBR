@@ -2,7 +2,7 @@
     Mango - Open Source M2M - http://mango.serotoninsoftware.com
     Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
     @author Matthew Lohbihler
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -21,16 +21,18 @@ package com.serotonin.mango.view.chart;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.EnumSet;
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.json.JsonRemoteEntity;
 import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.MangoDataType;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.vo.DataPointVO;
-import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -39,6 +41,8 @@ import java.util.EnumSet;
 public class ImageFlipbookRenderer extends BaseChartRenderer {
     private static ImplDefinition definition = new ImplDefinition("chartRendererImageFlipbook", "FLIPBOOK",
             "chartRenderer.flipbook", EnumSet.of( MangoDataType.IMAGE ));
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     public static ImplDefinition getDefinition() {
         return definition;
@@ -68,7 +72,7 @@ public class ImageFlipbookRenderer extends BaseChartRenderer {
     }
 
     public void addDataToModel(Map<String, Object> model, DataPointVO point) {
-        DataPointRT rt = Common.ctx.getRuntimeManager().getDataPoint(point.getId());
+        DataPointRT rt = runtimeManager.getDataPoint(point.getId());
         if (rt != null)
             model.put("chartData", rt.getLatestPointValues(limit));
     }

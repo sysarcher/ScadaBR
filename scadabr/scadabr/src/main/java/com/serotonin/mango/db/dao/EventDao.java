@@ -45,6 +45,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -64,10 +65,19 @@ import com.serotonin.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
 import com.serotonin.web.i18n.LocalizableMessageParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service
 public class EventDao extends BaseDao {
 
     private static final int MAX_PENDING_EVENTS = 100;
+    @Autowired
+    private UserCommentDao userCommentDao;
+    @Autowired
+    private EventManager eventManager;
 
     public void saveEvent(EventInstance event) {
         if (event.getId() == Common.NEW_ID) {
@@ -156,7 +166,7 @@ public class EventDao extends BaseDao {
     public List<EventInstance> getActiveEvents() {
         List<EventInstance> results = getSimpleJdbcTemplate().query(BASIC_EVENT_SELECT
                 + "where e.rtnApplicable=? and e.rtnTs is null", new EventInstanceRowMapper(), boolToChar(true));
-        attachRelationalInfo(results);
+        userCommentDao.populateComments(results);
         return results;
     }
     private static final String EVENT_SELECT_WITH_USER_DATA = "select e.id, e.typeId, e.typeRef1, e.typeRef2, e.activeTs, e.rtnApplicable, e.rtnTs, e.rtnCause, "
@@ -170,7 +180,7 @@ public class EventDao extends BaseDao {
                 + "where e.typeId=" + EventType.EventSources.DATA_POINT
                 + "  and e.typeRef1=? " + "  and ue.userId=? "
                 + "order by e.activeTs desc", new UserEventInstanceRowMapper(), dataPointId, userId);
-        attachRelationalInfo(results);
+        userCommentDao.populateComments(results);
         return results;
     }
 
@@ -247,7 +257,7 @@ public class EventDao extends BaseDao {
         sb.append("order by e.activeTs desc");
 
         List<EventInstance> results = getSimpleJdbcTemplate().query(sb.toString(), new UserEventInstanceRowMapper(), params);
-        attachRelationalInfo(results);
+        userCommentDao.populateComments(results);
         return results;
     }
 
@@ -256,7 +266,7 @@ public class EventDao extends BaseDao {
                 EVENT_SELECT_WITH_USER_DATA
                 + "where ue.userId=? and e.ackTs is null order by e.activeTs desc",
                 new UserEventInstanceRowMapper(), userId);
-        attachRelationalInfo(results);
+        userCommentDao.populateComments(results);
         return results;
     }
 
@@ -342,48 +352,26 @@ public class EventDao extends BaseDao {
         }
     }
 
-    private void attachRelationalInfo(List<EventInstance> list) {
-        for (EventInstance e : list) {
-            attachRelationalInfo(e);
-        }
-    }
-    private static final String EVENT_COMMENT_SELECT = UserCommentRowMapper.USER_COMMENT_SELECT
-            + "where uc.commentType= "
-            + UserComment.TYPE_EVENT
-            + " and uc.typeKey=? " + "order by uc.ts";
-
-    void attachRelationalInfo(EventInstance event) {
-        event.setEventComments(getSimpleJdbcTemplate().query(EVENT_COMMENT_SELECT,
-                new UserCommentRowMapper(), event.getId()));
-    }
-
     public EventInstance insertEventComment(int eventId, UserComment comment) {
-        new UserDao().insertUserComment(UserComment.TYPE_EVENT, eventId,
+        userCommentDao.insertUserComment(UserComment.TYPE_EVENT, eventId,
                 comment);
         return getEventInstance(eventId);
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public int purgeEventsBefore(final long time) {
         // Find a list of event ids with no remaining acknowledgements pending.
-        int count = (Integer) new TransactionTemplate(getTransactionManager()).execute(
-                new TransactionCallback() {
+        int count = getSimpleJdbcTemplate().update("delete from events "
+                + "where activeTs<? "
+                + "  and ackTs is not null "
+                + "  and (rtnApplicable=? or (rtnApplicable=? and rtnTs is not null))",
+                time, boolToChar(false), boolToChar(true));
 
-                    @Override
-                    public Integer doInTransaction(TransactionStatus status) {
-                        int count = getSimpleJdbcTemplate().update("delete from events "
-                                + "where activeTs<? "
-                                + "  and ackTs is not null "
-                                + "  and (rtnApplicable=? or (rtnApplicable=? and rtnTs is not null))",
-                                time, boolToChar(false), boolToChar(true));
+        // Delete orphaned user comments.
+        getSimpleJdbcTemplate().update("delete from userComments where commentType="
+                + UserComment.TYPE_EVENT
+                + "  and typeKey not in (select id from events)");
 
-                        // Delete orphaned user comments.
-                        getSimpleJdbcTemplate().update("delete from userComments where commentType="
-                                + UserComment.TYPE_EVENT
-                                + "  and typeKey not in (select id from events)");
-
-                        return count;
-                    }
-                });
 
         clearCache();
 
@@ -475,7 +463,7 @@ public class EventDao extends BaseDao {
 
                 while (rs.next()) {
                     EventInstance e = rowMapper.mapRow(rs, 0);
-                    attachRelationalInfo(e);
+                    userCommentDao.populateComments(e);
                     boolean add = true;
 
                     if (keywords != null) {
@@ -640,29 +628,22 @@ public class EventDao extends BaseDao {
                 type.getTypeRef2(), handler);
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     private EventHandlerVO saveEventHandler(final int typeId,
             final int typeRef1, final int typeRef2, final EventHandlerVO handler) {
-        new TransactionTemplate(getTransactionManager()).execute(
-                new TransactionCallbackWithoutResult() {
-
-                    @Override
-                    protected void doInTransactionWithoutResult(
-                            TransactionStatus status) {
-                        if (handler.getId() == Common.NEW_ID) {
-                            insertEventHandler(typeId, typeRef1, typeRef2,
-                                    handler);
-                        } else {
-                            updateEventHandler(handler);
-                        }
-                    }
-                });
+        if (handler.getId() == Common.NEW_ID) {
+            insertEventHandler(typeId, typeRef1, typeRef2,
+                    handler);
+        } else {
+            updateEventHandler(handler);
+        }
         return getEventHandler(handler.getId());
     }
 
     void insertEventHandler(int typeId, int typeRef1, int typeRef2,
             EventHandlerVO handler) {
         SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("eventHandlers").usingGeneratedKeyColumns("id");
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap();
         params.put("xid", handler.getXid());
         params.put("alias", handler.getAlias());
         params.put("eventTypeId", typeId);
@@ -673,7 +654,7 @@ public class EventDao extends BaseDao {
         Number id = insertActor.executeAndReturnKey(params);
         handler.setId(id.intValue());
 
-        AuditEventType.raiseAddedEvent(AuditEventType.TYPE_EVENT_HANDLER,
+        eventManager.raiseAddedEvent(AuditEventType.TYPE_EVENT_HANDLER,
                 handler);
     }
 
@@ -683,14 +664,14 @@ public class EventDao extends BaseDao {
                 "update eventHandlers set xid=?, alias=?, data=? where id=?",
                 handler.getXid(), handler.getAlias(), SerializationHelper.writeObjectToArray(handler), handler.getId());
 
-        AuditEventType.raiseChangedEvent(AuditEventType.TYPE_EVENT_HANDLER,
+        eventManager.raiseChangedEvent(AuditEventType.TYPE_EVENT_HANDLER,
                 old, handler);
     }
 
     public void deleteEventHandler(final int handlerId) {
         EventHandlerVO handler = getEventHandler(handlerId);
         getSimpleJdbcTemplate().update("delete from eventHandlers where id=?", handlerId);
-        AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_EVENT_HANDLER,
+        eventManager.raiseDeletedEvent(AuditEventType.TYPE_EVENT_HANDLER,
                 handler);
     }
     //

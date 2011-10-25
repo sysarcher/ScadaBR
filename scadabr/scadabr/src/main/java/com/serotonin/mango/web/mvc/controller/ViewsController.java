@@ -33,15 +33,20 @@ import com.serotonin.mango.view.ShareUser;
 import com.serotonin.mango.view.View;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ViewsController extends ParameterizableViewController {
+    @Autowired
+    private Common common;
+    @Autowired
+    private Permissions permissions;
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         Map<String, Object> model = new HashMap<String, Object>();
         ViewDao viewDao = new ViewDao();
-        User user = Common.getUser(request);
+        User user = common.getUser(request);
 
         Map<Integer, String> views = viewDao.getViewNames(user);
         model.put("views", views);
@@ -60,7 +65,7 @@ public class ViewsController extends ParameterizableViewController {
         }
 
         if (currentView != null) {
-            Permissions.ensureViewPermission(user, currentView);
+            permissions.ensureViewPermission(user, currentView);
 
             // Make sure the owner still has permission to all of the points in the view, and that components are
             // otherwise valid.

@@ -19,7 +19,9 @@
 package com.serotonin.mango.web.filter;
 
 import com.serotonin.mango.vo.User;
+import org.springframework.stereotype.Service;
 
+@Service
 public class NormalLoggedInFilter extends LoggedInFilter {
     @Override
     protected boolean checkAccess(User user) {

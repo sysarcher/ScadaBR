@@ -24,17 +24,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Service;
 
 import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.link.PointLinkVO;
 
 /**
  * @author Matthew Lohbihler
  */
+@Service
 public class PointLinkDao extends BaseDao {
+
+    @Autowired
+    private EventManager eventManager;
 
     public String generateUniqueXid() {
         return generateUniqueXid(PointLinkVO.XID_PREFIX, "pointLinks");
@@ -102,7 +109,7 @@ public class PointLinkDao extends BaseDao {
         Number id = insertActor.executeAndReturnKey(params);
         pl.setId(id.intValue());
 
-        AuditEventType.raiseAddedEvent(AuditEventType.TYPE_POINT_LINK, pl);
+        eventManager.raiseAddedEvent(AuditEventType.TYPE_POINT_LINK, pl);
     }
     private static final String POINT_LINK_UPDATE = "update pointLinks set xid=?, sourcePointId=?, targetPointId=?, script=?, eventType=?, disabled=? "
             + "where id=?";
@@ -113,14 +120,14 @@ public class PointLinkDao extends BaseDao {
         getSimpleJdbcTemplate().update(POINT_LINK_UPDATE, pl.getXid(), pl.getSourcePointId(), pl.getTargetPointId(), pl.getScript(),
                 pl.getEvent(), boolToChar(pl.isDisabled()), pl.getId());
 
-        AuditEventType.raiseChangedEvent(AuditEventType.TYPE_POINT_LINK, old, pl);
+        eventManager.raiseChangedEvent(AuditEventType.TYPE_POINT_LINK, old, pl);
     }
 
     public void deletePointLink(final int pointLinkId) {
         PointLinkVO pl = getPointLink(pointLinkId);
         if (pl != null) {
             getSimpleJdbcTemplate().update("delete from pointLinks where id=?", pointLinkId);
-            AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_POINT_LINK, pl);
+            eventManager.raiseDeletedEvent(AuditEventType.TYPE_POINT_LINK, pl);
         }
     }
 }

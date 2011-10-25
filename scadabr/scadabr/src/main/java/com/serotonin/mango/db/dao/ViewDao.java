@@ -41,7 +41,11 @@ import com.serotonin.mango.view.ShareUser;
 import com.serotonin.mango.view.View;
 import com.serotonin.mango.vo.User;
 import com.serotonin.util.SerializationHelper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service
 public class ViewDao extends BaseDao {
     //
     // /
@@ -151,26 +155,22 @@ public class ViewDao extends BaseDao {
         return isXidUnique(xid, excludeId, "mangoViews");
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void saveView(final View view) {
-        new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
+        // Decide whether to insert or update.
+        if (view.getId() == Common.NEW_ID) {
+            insertView(view);
+        } else {
+            updateView(view);
+        }
 
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                // Decide whether to insert or update.
-                if (view.getId() == Common.NEW_ID) {
-                    insertView(view);
-                } else {
-                    updateView(view);
-                }
-
-                saveViewUsers(view);
-            }
-        });
+        saveViewUsers(view);
     }
 
-    void insertView(View view) {
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    private void insertView(View view) {
         SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("pointHierarchy").usingGeneratedKeyColumns("id");
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap();
         params.put("xid", view.getXid());
         params.put("name", view.getName());
         params.put("background", view.getBackgroundFilename());
@@ -182,12 +182,14 @@ public class ViewDao extends BaseDao {
         view.setId(id.intValue());
     }
 
-    void updateView(View view) {
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    private void updateView(View view) {
         getSimpleJdbcTemplate().update("update mangoViews set xid=?, name=?, background=?, anonymousAccess=?, data=? where id=?",
                 view.getXid(), view.getName(), view.getBackgroundFilename(), view.getAnonymousAccess(),
                 SerializationHelper.writeObjectToArray(view), view.getId());
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void removeView(final int viewId) {
         deleteViewUsers(viewId);
         getSimpleJdbcTemplate().update("delete from mangoViews where id=?", viewId);
@@ -214,10 +216,12 @@ public class ViewDao extends BaseDao {
         }
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     private void deleteViewUsers(int viewId) {
         getSimpleJdbcTemplate().update("delete from mangoViewUsers where mangoViewId=?", viewId);
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     void saveViewUsers(final View view) {
         // Delete anything that is currently there.
         deleteViewUsers(view.getId());
@@ -240,6 +244,7 @@ public class ViewDao extends BaseDao {
         });
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void removeUserFromView(int viewId, int userId) {
         getSimpleJdbcTemplate().update("delete from mangoViewUsers where mangoViewId=? and userId=?", viewId, userId);
     }

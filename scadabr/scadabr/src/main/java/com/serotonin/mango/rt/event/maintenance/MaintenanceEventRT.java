@@ -4,9 +4,10 @@ import java.text.ParseException;
 import java.util.Date;
 
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.MaintenanceEventType;
 import com.serotonin.mango.util.timeout.ModelTimeoutClient;
@@ -19,11 +20,14 @@ import com.serotonin.timer.TimerTrigger;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 public class MaintenanceEventRT implements ModelTimeoutClient<Boolean> {
+
     private final MaintenanceEventVO vo;
     private MaintenanceEventType eventType;
     private boolean eventActive;
     private TimerTask activeTask;
     private TimerTask inactiveTask;
+    @Autowired
+    private EventManager eventManager;
 
     public MaintenanceEventRT(MaintenanceEventVO vo) {
         this.vo = vo;
@@ -35,14 +39,14 @@ public class MaintenanceEventRT implements ModelTimeoutClient<Boolean> {
 
     private void raiseEvent(long time) {
         if (!eventActive) {
-            Common.ctx.getEventManager().raiseEvent(eventType, time, true, vo.getAlarmLevel(), getMessage(), null);
+            eventManager.raiseEvent(eventType, time, true, vo.getAlarmLevel(), getMessage(), null);
             eventActive = true;
         }
     }
 
     private void returnToNormal(long time) {
         if (eventActive) {
-            Common.ctx.getEventManager().returnToNormal(eventType, time);
+            eventManager.returnToNormal(eventType, time);
             eventActive = false;
         }
     }
@@ -62,10 +66,11 @@ public class MaintenanceEventRT implements ModelTimeoutClient<Boolean> {
 
     @Override
     synchronized public void scheduleTimeout(Boolean active, long fireTime) {
-        if (active)
+        if (active) {
             raiseEvent(fireTime);
-        else
+        } else {
             returnToNormal(fireTime);
+        }
     }
 
     //
@@ -86,40 +91,44 @@ public class MaintenanceEventRT implements ModelTimeoutClient<Boolean> {
 
             if (vo.getScheduleType() != MaintenanceEventVO.TYPE_ONCE) {
                 // Check if we are currently active.
-                if (inactiveTrigger.getNextExecutionTime() < activeTrigger.getNextExecutionTime())
+                if (inactiveTrigger.getNextExecutionTime() < activeTrigger.getNextExecutionTime()) {
                     raiseEvent(System.currentTimeMillis());
+                }
             }
         }
     }
 
     public void terminate() {
-        if (activeTask != null)
+        if (activeTask != null) {
             activeTask.cancel();
-        if (inactiveTask != null)
+        }
+        if (inactiveTask != null) {
             inactiveTask.cancel();
+        }
 
-        if (eventActive)
-            Common.ctx.getEventManager().returnToNormal(eventType, System.currentTimeMillis(),
+        if (eventActive) {
+            eventManager.returnToNormal(eventType, System.currentTimeMillis(),
                     EventInstance.RtnCauses.SOURCE_DISABLED);
+        }
     }
 
     public void joinTermination() {
         // no op
     }
-
-    private static final String[] weekdays = { "", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN" };
+    private static final String[] weekdays = {"", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
 
     public TimerTrigger createTrigger(boolean activeTrigger) {
-        if (vo.getScheduleType() == MaintenanceEventVO.TYPE_MANUAL)
+        if (vo.getScheduleType() == MaintenanceEventVO.TYPE_MANUAL) {
             return null;
+        }
 
         if (vo.getScheduleType() == MaintenanceEventVO.TYPE_CRON) {
             try {
-                if (activeTrigger)
+                if (activeTrigger) {
                     return new CronTimerTrigger(vo.getActiveCron());
+                }
                 return new CronTimerTrigger(vo.getInactiveCron());
-            }
-            catch (ParseException e) {
+            } catch (ParseException e) {
                 // Should never happen, so wrap and rethrow
                 throw new ShouldNeverHappenException(e);
             }
@@ -127,12 +136,13 @@ public class MaintenanceEventRT implements ModelTimeoutClient<Boolean> {
 
         if (vo.getScheduleType() == MaintenanceEventVO.TYPE_ONCE) {
             DateTime dt;
-            if (activeTrigger)
+            if (activeTrigger) {
                 dt = new DateTime(vo.getActiveYear(), vo.getActiveMonth(), vo.getActiveDay(), vo.getActiveHour(),
                         vo.getActiveMinute(), vo.getActiveSecond(), 0);
-            else
+            } else {
                 dt = new DateTime(vo.getInactiveYear(), vo.getInactiveMonth(), vo.getInactiveDay(),
                         vo.getInactiveHour(), vo.getInactiveMinute(), vo.getInactiveSecond(), 0);
+            }
             return new OneTimeTrigger(new Date(dt.getMillis()));
         }
 
@@ -152,34 +162,35 @@ public class MaintenanceEventRT implements ModelTimeoutClient<Boolean> {
         StringBuilder expression = new StringBuilder();
         expression.append(second).append(' ');
         expression.append(minute).append(' ');
-        if (vo.getScheduleType() == MaintenanceEventVO.TYPE_HOURLY)
+        if (vo.getScheduleType() == MaintenanceEventVO.TYPE_HOURLY) {
             expression.append("* * * ?");
-        else {
+        } else {
             expression.append(hour).append(' ');
-            if (vo.getScheduleType() == MaintenanceEventVO.TYPE_DAILY)
+            if (vo.getScheduleType() == MaintenanceEventVO.TYPE_DAILY) {
                 expression.append("* * ?");
-            else if (vo.getScheduleType() == MaintenanceEventVO.TYPE_WEEKLY)
+            } else if (vo.getScheduleType() == MaintenanceEventVO.TYPE_WEEKLY) {
                 expression.append("? * ").append(weekdays[day]);
-            else {
-                if (day > 0)
+            } else {
+                if (day > 0) {
                     expression.append(day);
-                else if (day == -1)
+                } else if (day == -1) {
                     expression.append('L');
-                else
+                } else {
                     expression.append(-day).append('L');
+                }
 
-                if (vo.getScheduleType() == MaintenanceEventVO.TYPE_MONTHLY)
+                if (vo.getScheduleType() == MaintenanceEventVO.TYPE_MONTHLY) {
                     expression.append(" * ?");
-                else
+                } else {
                     expression.append(' ').append(month).append(" ?");
+                }
             }
         }
 
         CronTimerTrigger cronTrigger;
         try {
             cronTrigger = new CronTimerTrigger(expression.toString());
-        }
-        catch (ParseException e) {
+        } catch (ParseException e) {
             // Should never happen, so wrap and rethrow
             throw new ShouldNeverHappenException(e);
         }

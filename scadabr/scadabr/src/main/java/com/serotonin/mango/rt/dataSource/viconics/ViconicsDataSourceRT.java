@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource.viconics;
 
@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
@@ -36,6 +37,7 @@ import com.serotonin.mango.MangoDataType;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.db.dao.WatchListDao;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -79,21 +81,24 @@ import com.serotonin.web.i18n.LocalizableMessage;
  * @author Matthew Lohbihler
  */
 public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNetworkListener {
-    private final Object newDeviceLock = new Object();
 
+    private final Object newDeviceLock = new Object();
     public static final int INITIALIZATION_EXCEPTION_EVENT = 1; // init, configuration
     public static final int MESSAGE_EXCEPTION_EVENT = 2; // request failure, timeout, transport
     public static final int DEVICE_OFFLINE_EVENT = 3;
     public static final int NETWORK_OFFLINE_EVENT = 4;
     public static final int DUPLICATE_COMM_ADDRESS_EVENT = 5;
-
     private final static Logger LOG = LoggerFactory.getLogger(ViconicsDataSourceRT.class);
     private final ViconicsDataSourceVO vo;
     private ViconicsNetwork network;
     private final Map<PointKey, DataPointRT> pointLookup = new ConcurrentHashMap<PointKey, DataPointRT>();
+    @Autowired
+    private Permissions permissions;
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     public ViconicsDataSourceRT(ViconicsDataSourceVO vo) {
-        super(vo,false);
+        super(vo, false);
         this.vo = vo;
     }
 
@@ -104,8 +109,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
     public void initialize() {
         try {
             network = new ViconicsNetwork(vo.getCommPortId(), Common.timer);
-        }
-        catch (ViconicsConfigurationException e) {
+        } catch (ViconicsConfigurationException e) {
             raiseEvent(INITIALIZATION_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
                     "event.initializationError", e.getMessage()));
             return;
@@ -122,8 +126,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
         try {
             network.init();
             network.startNetwork(vo.getPanId(), vo.getChannel());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             raiseEvent(INITIALIZATION_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
                     "event.initializationError", e.getMessage()));
             return;
@@ -156,13 +159,15 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
 
     @Override
     public void terminate() {
-        if (network != null)
+        if (network != null) {
             network.removeListener(this);
+        }
 
         super.terminate();
 
-        if (network != null)
+        if (network != null) {
             network.destroy();
+        }
     }
 
     //
@@ -172,15 +177,17 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
     public void viconicsNetworkStatus(boolean online) {
         // Mark all points as unreliable.
         synchronized (enabledDataPoints) {
-            for (DataPointRT rt : enabledDataPoints)
+            for (DataPointRT rt : enabledDataPoints) {
                 rt.setAttribute(ATTR_UNRELIABLE_KEY, true);
+            }
         }
 
-        if (online)
+        if (online) {
             returnToNormal(NETWORK_OFFLINE_EVENT, System.currentTimeMillis());
-        else
+        } else {
             raiseEvent(NETWORK_OFFLINE_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
                     "event.viconics.networkOffline"));
+        }
     }
 
     @Override
@@ -214,9 +221,10 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
                     }
                 }
 
-                if (found)
-                    // Point already exists. Skip it.
+                if (found) // Point already exists. Skip it.
+                {
                     continue;
+                }
 
                 //
                 // Point hierarchy folder
@@ -272,47 +280,47 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
 
                     int precision = numericConfig.getPrecision();
                     String format;
-                    if (precision == 0)
+                    if (precision == 0) {
                         format = "#";
-                    else
+                    } else {
                         format = "#." + StringUtils.pad("", '#', precision);
+                    }
 
                     locator.setMangoDataType(MangoDataType.NUMERIC);
 
                     if (numericConfig.isFahrenheit()) {
                         dp.setEngineeringUnits(EngineeringUnits.degreesFahrenheit.intValue());
-                        if (vo.isConvertToCelsius())
+                        if (vo.isConvertToCelsius()) {
                             dp.setTextRenderer(new AnalogRenderer(format, " &deg;C"));
-                        else
+                        } else {
                             dp.setTextRenderer(new AnalogRenderer(format, " &deg;F"));
-                    }
-                    else
+                        }
+                    } else {
                         dp.setTextRenderer(new AnalogRenderer(format, " " + numericConfig.getUnits()));
-                }
-                else if (pointConfig instanceof BinaryPoint) {
+                    }
+                } else if (pointConfig instanceof BinaryPoint) {
                     BinaryPoint binaryConfig = (BinaryPoint) pointConfig;
 
-                    dp.setTextRenderer(new BinaryTextRenderer(binaryConfig.getFalseText(), "#222222", binaryConfig
-                            .getTrueText(), "#000000"));
+                    dp.setTextRenderer(new BinaryTextRenderer(binaryConfig.getFalseText(), "#222222", binaryConfig.getTrueText(), "#000000"));
 
                     locator.setMangoDataType(MangoDataType.BINARY);
-                }
-                else if (pointConfig instanceof MultistatePoint) {
+                } else if (pointConfig instanceof MultistatePoint) {
                     MultistatePoint multistateConfig = (MultistatePoint) pointConfig;
 
                     MultistateRenderer r = new MultistateRenderer();
                     int i = 0;
-                    for (String label : multistateConfig.getLabels())
+                    for (String label : multistateConfig.getLabels()) {
                         r.addMultistateValue(i++, label, "#000000");
+                    }
                     dp.setTextRenderer(r);
 
                     locator.setMangoDataType(MangoDataType.MULTISTATE);
-                }
-                else
+                } else {
                     throw new ShouldNeverHappenException("Unknown point type: " + pointConfig.getClass());
+                }
 
                 // Add the point.
-                Common.ctx.getRuntimeManager().saveDataPoint(dp);
+                runtimeManager.saveDataPoint(dp);
                 LOG.info("Point added: " + dp.getXid());
 
                 //
@@ -323,8 +331,9 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
                         watchlists = new ArrayList<WatchList>();
 
                         for (User user : userDao.getActiveUsers()) {
-                            if (!Permissions.hasDataSourcePermission(user, vo.getId()))
+                            if (!permissions.hasDataSourcePermission(user, vo.getId())) {
                                 continue;
+                            }
 
                             // Look for an existing watchlist with the same name as the folder
                             WatchList watchList = null;
@@ -347,30 +356,33 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
                     }
 
                     // Add the point to all of the watchlists.
-                    for (WatchList watchList : watchlists)
+                    for (WatchList watchList : watchlists) {
                         watchList.getPointList().add(dp);
+                    }
                 }
             }
 
             // Save the watchlists
             if (watchlists != null) {
-                for (WatchList watchList : watchlists)
+                for (WatchList watchList : watchlists) {
                     watchListDao.saveWatchList(watchList);
+                }
             }
         }
     }
 
     @Override
     public void viconicsDeviceStatus(ViconicsDevice device, boolean online) {
-        if (online)
+        if (online) {
             returnToNormal(DEVICE_OFFLINE_EVENT, System.currentTimeMillis());
-        else {
+        } else {
             // Mark all points for the device as unreliable.
             synchronized (enabledDataPoints) {
                 for (DataPointRT rt : enabledDataPoints) {
                     ViconicsPointLocatorVO locator = rt.getVO().getPointLocator();
-                    if (Arrays.equals(locator.getDeviceIeee(), device.getIeee()))
+                    if (Arrays.equals(locator.getDeviceIeee(), device.getIeee())) {
                         rt.setAttribute(ATTR_UNRELIABLE_KEY, true);
+                    }
                 }
             }
 
@@ -387,7 +399,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
 
         // // Make a local copy of the point list so that the point can be removed from the real list.
         // List<DataPointRT> points = new ArrayList<DataPointRT>(dataPoints);
-        //        
+        //
         // // Disable all points under this device.
         // for (DataPointRT rt : points) {
         // DataPointVO dp = rt.getVO();
@@ -408,38 +420,41 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
     @Override
     public void viconicsDevicePointUpdated(ViconicsDevice device, StatPoint point, int deviceValue, long time) {
         DataPointRT rt = pointLookup.get(new PointKey(device.getIeee(), point.getAddress()));
-        if (rt == null)
-            // Not active. Ignore the update.
+        if (rt == null) // Not active. Ignore the update.
+        {
             return;
+        }
 
         MangoValue mangoValue;
         final MangoDataType mangoDataType = rt.getVO().getMangoDataType();
         if (point instanceof NumericPoint) {
             NumericPoint numericConfig = (NumericPoint) point;
-            if (mangoDataType != MangoDataType.NUMERIC)
+            if (mangoDataType != MangoDataType.NUMERIC) {
                 throw new ShouldNeverHappenException("Data type mismatch: " + point.getClass() + ", type=" + mangoDataType.name());
+            }
 
             double d = numericConfig.fromDeviceFormat(deviceValue);
-            if (vo.isConvertToCelsius() && numericConfig.isFahrenheit())
+            if (vo.isConvertToCelsius() && numericConfig.isFahrenheit()) {
                 d = Conversions.fahrenheitToCelsius(d);
+            }
             mangoValue = new NumericValue(d);
-        }
-        else if (point instanceof BinaryPoint) {
+        } else if (point instanceof BinaryPoint) {
             BinaryPoint binaryConfig = (BinaryPoint) point;
-            if (mangoDataType != MangoDataType.BINARY)
+            if (mangoDataType != MangoDataType.BINARY) {
                 throw new ShouldNeverHappenException("Data type mismatch: " + point.getClass() + ", type=" + mangoDataType.name());
+            }
 
             mangoValue = new BinaryValue(binaryConfig.fromDeviceFormat(deviceValue));
-        }
-        else if (point instanceof MultistatePoint) {
+        } else if (point instanceof MultistatePoint) {
             MultistatePoint multistateConfig = (MultistatePoint) point;
-            if (mangoDataType != MangoDataType.MULTISTATE)
+            if (mangoDataType != MangoDataType.MULTISTATE) {
                 throw new ShouldNeverHappenException("Data type mismatch: " + point.getClass() + ", type=" + mangoDataType.name());
+            }
 
             mangoValue = new MultistateValue(multistateConfig.fromDeviceFormat(deviceValue));
-        }
-        else
+        } else {
             throw new ShouldNeverHappenException("Unknown point type: " + point.getClass());
+        }
 
         rt.setAttribute(ATTR_UNRELIABLE_KEY, false);
 
@@ -465,17 +480,17 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
             StatPoint pointConfig = device.getConfiguration().getPoint(locator.getPointAddress());
             if (pointConfig instanceof NumericPoint) {
                 NumericPoint numericPoint = (NumericPoint) pointConfig;
-                if (numericPoint.isFahrenheit())
-                    // Need to convert back to fahrenheit.
+                if (numericPoint.isFahrenheit()) // Need to convert back to fahrenheit.
+                {
                     value = Conversions.celsiusToFahrenheit((Double) value);
+                }
             }
         }
 
         try {
             network.writeValue(locator.getDeviceIeee(), locator.getPointAddress(), value);
             dataPoint.setPointValue(pvt, source);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             raiseEvent(MESSAGE_EXCEPTION_EVENT, System.currentTimeMillis(), false, new LocalizableMessage(
                     "event.setPointFailed", e.getMessage()));
         }
@@ -488,8 +503,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
         try {
             // Ignore the result. It will be sent via the listener anyway.
             network.readValue(locator.getDeviceIeee(), locator.getPointAddress());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             raiseEvent(MESSAGE_EXCEPTION_EVENT, System.currentTimeMillis(), false, new LocalizableMessage(
                     "event.readPointFailed", e.getMessage()));
         }
@@ -506,6 +520,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
     }
 
     class PointKey {
+
         private final byte[] deviceIeee;
         private final int address;
 
@@ -531,17 +546,22 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            }
+            if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            }
+            if (getClass() != obj.getClass()) {
                 return false;
+            }
             final PointKey other = (PointKey) obj;
-            if (address != other.address)
+            if (address != other.address) {
                 return false;
-            if (!Arrays.equals(deviceIeee, other.deviceIeee))
+            }
+            if (!Arrays.equals(deviceIeee, other.deviceIeee)) {
                 return false;
+            }
             return true;
         }
     }

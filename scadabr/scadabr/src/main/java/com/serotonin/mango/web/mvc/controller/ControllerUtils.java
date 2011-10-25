@@ -36,11 +36,15 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.web.i18n.Utf8ResourceBundle;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
  */
 public class ControllerUtils {
+        @Autowired
+    private Permissions permissions;
+
     public static ResourceBundle getResourceBundle(HttpServletRequest request) {
         return Utf8ResourceBundle.getBundle("messages", getLocale(request));
     }
@@ -52,12 +56,12 @@ public class ControllerUtils {
         return localeResolver.resolveLocale(request);
     }
 
-    public static void addPointListDataToModel(User user, int pointId, Map<String, Object> model) {
+    public void addPointListDataToModel(User user, int pointId, Map<String, Object> model) {
         List<DataPointVO> allPoints = new DataPointDao().getDataPoints(DataPointExtendedNameComparator.instance, false);
         List<DataPointVO> userPoints = new LinkedList<DataPointVO>();
         int pointIndex = -1;
         for (DataPointVO dp : allPoints) {
-            if (Permissions.hasDataPointReadPermission(user, dp)) {
+            if (permissions.hasDataPointReadPermission(user, dp)) {
                 userPoints.add(dp);
                 if (dp.getId() == pointId)
                     pointIndex = userPoints.size() - 1;

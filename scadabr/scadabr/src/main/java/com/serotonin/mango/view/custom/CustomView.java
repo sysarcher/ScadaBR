@@ -25,6 +25,7 @@ import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -33,6 +34,8 @@ public class CustomView {
     private final User authorityUser;
     private final List<CustomViewComponent> components = new ArrayList<CustomViewComponent>();
     private final List<DataPointVO> pointCache = new ArrayList<DataPointVO>();
+    @Autowired
+    private Permissions permissions;
 
     public CustomView(User authorityUser) {
         this.authorityUser = authorityUser;
@@ -67,7 +70,7 @@ public class CustomView {
         DataPointVO dp = new DataPointDao().getDataPoint(xid);
         if (dp != null) {
             // Check permissions.
-            Permissions.ensureDataPointSetPermission(authorityUser, dp);
+            permissions.ensureDataPointSetPermission(authorityUser, dp);
 
             pointCache.add(dp);
         }

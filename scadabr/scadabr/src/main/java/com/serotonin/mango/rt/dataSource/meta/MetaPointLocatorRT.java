@@ -41,6 +41,7 @@ import com.serotonin.timer.CronExpression;
 import com.serotonin.timer.OneTimeTrigger;
 import com.serotonin.timer.TimerTask;
 import com.serotonin.web.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -58,6 +59,8 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
     protected Map<String, IDataPoint> context;
     boolean initialized;
     TimerTask timerTask;
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     public MetaPointLocatorRT(MetaPointLocatorVO vo) {
         this.vo = vo;
@@ -89,11 +92,10 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
         createContext();
 
         // Add listener registrations
-        final RuntimeManager rm = Common.ctx.getRuntimeManager();
         for (Integer contextKey : vo.getContext().keySet()) {
             // Points shouldn't listen for their own updates.
             if (dataPoint.getId() != contextKey)
-                rm.addDataPointListener(contextKey, this);
+                runtimeManager.addDataPointListener(contextKey, this);
         }
 
         initialized = true;
@@ -111,9 +113,8 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
     public void terminate() {
         synchronized (LOCK) {
             // Remove listener registrations
-            RuntimeManager rm = Common.ctx.getRuntimeManager();
             for (Integer contextKey : vo.getContext().keySet()) {
-                rm.removeDataPointListener(contextKey, this);
+                runtimeManager.removeDataPointListener(contextKey, this);
             }
 
             // Cancel scheduled job

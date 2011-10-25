@@ -5,16 +5,21 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import com.serotonin.mango.Common;
+import com.serotonin.mango.SysProperties;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.web.email.TemplateEmailContent;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class MangoEmailContent extends TemplateEmailContent {
     public static final int CONTENT_TYPE_BOTH = 0;
     public static final int CONTENT_TYPE_HTML = 1;
     public static final int CONTENT_TYPE_TEXT = 2;
+    
+    @Autowired
+    private SystemSettingsDao systemSettingsDao;
 
     private final String defaultSubject;
     private final SubjectDirective subjectDirective;
@@ -22,8 +27,8 @@ public class MangoEmailContent extends TemplateEmailContent {
     public MangoEmailContent(String templateName, Map<String, Object> model, ResourceBundle bundle,
             String defaultSubject, String encoding) throws TemplateException, IOException {
         super(encoding);
-
-        int type = SystemSettingsDao.getIntValue(SystemSettingsDao.EMAIL_CONTENT_TYPE);
+                   
+        int type = systemSettingsDao.getIntValue(SysProperties.EMAIL_CONTENT_TYPE);
 
         this.defaultSubject = defaultSubject;
         this.subjectDirective = new SubjectDirective(bundle);

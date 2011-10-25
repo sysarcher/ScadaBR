@@ -26,6 +26,7 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.view.custom.CustomView;
 import com.serotonin.mango.vo.User;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -34,7 +35,10 @@ public class CustomViewInitTag extends TagSupport {
     private static final long serialVersionUID = -1;
 
     private String username;
-
+    
+    @Autowired
+    private Common common;
+    
     public void setUsername(String username) {
         this.username = username;
     }
@@ -48,7 +52,7 @@ public class CustomViewInitTag extends TagSupport {
         if (user.isDisabled())
             throw new JspException("Username '" + username + "' is disabled");
 
-        Common.setCustomView((HttpServletRequest) pageContext.getRequest(), new CustomView(user));
+        common.setCustomView((HttpServletRequest) pageContext.getRequest(), new CustomView(user));
 
         return EVAL_BODY_INCLUDE;
     }

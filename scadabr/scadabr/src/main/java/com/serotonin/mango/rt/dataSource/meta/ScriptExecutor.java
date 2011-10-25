@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
@@ -29,6 +29,8 @@ import java.util.Map;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.io.StreamUtils;
@@ -49,24 +51,27 @@ import com.serotonin.web.i18n.LocalizableMessage;
  * @author Matthew Lohbihler
  */
 public class ScriptExecutor {
+
     private static final String SCRIPT_PREFIX = "function __scriptExecutor__() {";
     private static final String SCRIPT_SUFFIX = "\r\n}\r\n__scriptExecutor__();";
     private static String SCRIPT_FUNCTION_PATH;
     private static String FUNCTIONS;
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     public static void setScriptFunctionPath(String path) {
         SCRIPT_FUNCTION_PATH = path;
     }
 
     public Map<String, IDataPoint> convertContext(Map<Integer, String> context) throws DataPointStateException {
-        RuntimeManager rtm = Common.ctx.getRuntimeManager();
 
         Map<String, IDataPoint> converted = new HashMap<String, IDataPoint>();
         for (Integer contextEntryId : context.keySet()) {
-            DataPointRT point = rtm.getDataPoint(contextEntryId);
-            if (point == null)
+            DataPointRT point = runtimeManager.getDataPoint(contextEntryId);
+            if (point == null) {
                 throw new DataPointStateException(contextEntryId, new LocalizableMessage(
                         "event.meta.pointMissing"));
+            }
             converted.put(context.get(contextEntryId), point);
         }
 
@@ -81,8 +86,7 @@ public class ScriptExecutor {
         ScriptEngineManager manager;
         try {
             manager = new ScriptEngineManager();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ScriptException(e);
         }
         ScriptEngine engine = manager.getEngineByName("js");
@@ -105,22 +109,22 @@ public class ScriptExecutor {
         // Put the context variables into the engine with engine scope.
         for (String varName : context.keySet()) {
             IDataPoint point = context.get(varName);
-            switch(point.getMangoDataType()) {
-            case BINARY:
-                engine.put(varName, new BinaryPointWrapper(point, wrapperContext));
-            break;  
-            case MULTISTATE:
-                engine.put(varName, new MultistatePointWrapper(point, wrapperContext));
-            break;
-            case NUMERIC:
-                engine.put(varName, new NumericPointWrapper(point, wrapperContext));
-            break;
-            case ALPHANUMERIC:
-                engine.put(varName, new AlphanumericPointWrapper(point, wrapperContext));
-            break;
-            default:
-                throw new ShouldNeverHappenException("Unknown data type id: " + point.getMangoDataType().name());
-        }
+            switch (point.getMangoDataType()) {
+                case BINARY:
+                    engine.put(varName, new BinaryPointWrapper(point, wrapperContext));
+                    break;
+                case MULTISTATE:
+                    engine.put(varName, new MultistatePointWrapper(point, wrapperContext));
+                    break;
+                case NUMERIC:
+                    engine.put(varName, new NumericPointWrapper(point, wrapperContext));
+                    break;
+                case ALPHANUMERIC:
+                    engine.put(varName, new AlphanumericPointWrapper(point, wrapperContext));
+                    break;
+                default:
+                    throw new ShouldNeverHappenException("Unknown data type id: " + point.getMangoDataType().name());
+            }
         }
         // Create the script.
         script = SCRIPT_PREFIX + script + SCRIPT_SUFFIX + FUNCTIONS;
@@ -129,8 +133,7 @@ public class ScriptExecutor {
         Object result;
         try {
             result = engine.eval(script);
-        }
-        catch (ScriptException e) {
+        } catch (ScriptException e) {
             throw prettyScriptMessage(e);
         }
 
@@ -138,9 +141,10 @@ public class ScriptExecutor {
         Object ts = engine.get("TIMESTAMP");
         if (ts != null) {
             // Check the type of the object.
-            if (ts instanceof Number)
-                // Convert to long
+            if (ts instanceof Number) // Convert to long
+            {
                 timestamp = ((Number) ts).longValue();
+            }
             // else if (ts instanceof ScriptableObject && "Date".equals(((ScriptableObject)ts).getClassName())) {
             // // A native date
             // // It turns out to be a crazy hack to try and get the value from a native date, and the Rhino source
@@ -150,45 +154,46 @@ public class ScriptExecutor {
 
         MangoValue value;
         if (result == null) {
-            switch (mangoDataType)  {
+            switch (mangoDataType) {
                 case BINARY:
-                value = new BinaryValue(false);
-            break;
+                    value = new BinaryValue(false);
+                    break;
                 case MULTISTATE:
-                value = new MultistateValue(0);
-            break;
+                    value = new MultistateValue(0);
+                    break;
                 case NUMERIC:
-                value = new NumericValue(0);
-            break;
-            case ALPHANUMERIC:
-                value = new AlphanumericValue("");
-            break;
-            default:
-                value = null;
-        }
-        }
-        else if (result instanceof AbstractPointWrapper)
+                    value = new NumericValue(0);
+                    break;
+                case ALPHANUMERIC:
+                    value = new AlphanumericValue("");
+                    break;
+                default:
+                    value = null;
+            }
+        } else if (result instanceof AbstractPointWrapper) {
             value = ((AbstractPointWrapper) result).getValueImpl();
-        // See if the type matches.
-        else if (mangoDataType == MangoDataType.BINARY && result instanceof Boolean)
+        } // See if the type matches.
+        else if (mangoDataType == MangoDataType.BINARY && result instanceof Boolean) {
             value = new BinaryValue((Boolean) result);
-        else if (mangoDataType == MangoDataType.MULTISTATE && result instanceof Number)
+        } else if (mangoDataType == MangoDataType.MULTISTATE && result instanceof Number) {
             value = new MultistateValue(((Number) result).intValue());
-        else if (mangoDataType == MangoDataType.NUMERIC && result instanceof Number)
+        } else if (mangoDataType == MangoDataType.NUMERIC && result instanceof Number) {
             value = new NumericValue(((Number) result).doubleValue());
-        else if (mangoDataType == MangoDataType.ALPHANUMERIC && result instanceof String)
+        } else if (mangoDataType == MangoDataType.ALPHANUMERIC && result instanceof String) {
             value = new AlphanumericValue((String) result);
-        else
-            // If not, ditch it.
+        } else // If not, ditch it.
+        {
             throw new ResultTypeException(new LocalizableMessage("event.script.convertError", result,
                     mangoDataType.getMessageI18n()));
+        }
 
         return new PointValueTime(value, timestamp);
     }
 
     public static ScriptException prettyScriptMessage(ScriptException e) {
-        while (e.getCause() instanceof ScriptException)
+        while (e.getCause() instanceof ScriptException) {
             e = (ScriptException) e.getCause();
+        }
 
         // Try to make the error message look a bit nicer.
         List<String> exclusions = new ArrayList<String>();
@@ -196,31 +201,31 @@ public class ScriptExecutor {
         exclusions.add("sun.org.mozilla.javascript.internal.EvaluatorException: ");
         String message = e.getMessage();
         for (String exclude : exclusions) {
-            if (message.startsWith(exclude))
+            if (message.startsWith(exclude)) {
                 message = message.substring(exclude.length());
+            }
         }
         return new ScriptException(message, e.getFileName(), e.getLineNumber(), e.getColumnNumber());
     }
 
     private static void ensureFunctions() {
         if (FUNCTIONS == null) {
-            if (SCRIPT_FUNCTION_PATH == null)
+            if (SCRIPT_FUNCTION_PATH == null) {
                 SCRIPT_FUNCTION_PATH = Common.ctx.getServletContext().getRealPath("WEB-INF/scripts/scriptFunctions.js");
+            }
             StringWriter sw = new StringWriter();
             FileReader fr = null;
             try {
                 fr = new FileReader(SCRIPT_FUNCTION_PATH);
                 StreamUtils.transfer(fr, sw);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new ShouldNeverHappenException(e);
-            }
-            finally {
+            } finally {
                 try {
-                    if (fr != null)
+                    if (fr != null) {
                         fr.close();
-                }
-                catch (IOException e) {
+                    }
+                } catch (IOException e) {
                     // no op
                 }
             }

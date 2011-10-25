@@ -56,7 +56,7 @@ public class EventsDwr extends BaseDwr {
             int page, Date date) {
         DwrResponseI18n response = new DwrResponseI18n();
         HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
-        User user = Common.getUser(request);
+        User user = common.getUser(request);
 
         int from = PAGE_SIZE * page;
         int to = from + PAGE_SIZE;

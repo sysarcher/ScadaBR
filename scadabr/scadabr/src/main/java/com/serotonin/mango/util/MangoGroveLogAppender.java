@@ -30,12 +30,19 @@ import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
 
 import com.serotonin.mango.Common;
+import com.serotonin.mango.SysProperties;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
  */
 public class MangoGroveLogAppender extends AppenderSkeleton {
+     @Autowired
+     private Common common;
+     @Autowired
+     private SystemSettingsDao systemSettingsDao;
+    
     @Override
     protected void append(LoggingEvent event) {
         // In spite of what the configuration file says, we don't care about anything less than an error.
@@ -44,18 +51,19 @@ public class MangoGroveLogAppender extends AppenderSkeleton {
 
         // Check the logging property setting.
         try {
-            if (!SystemSettingsDao.getBooleanValue(SystemSettingsDao.GROVE_LOGGING, false))
+            if (!systemSettingsDao.getBooleanValue(SysProperties.GROVE_LOGGING)) {
                 return;
+            }
         }
         catch (Throwable t) {
             // If anything bad happens while trying to figure out if we should log, just fuggetabowit.
             return;
         }
 
-        HttpClient client = Common.getHttpClient();
-        PostMethod method = new PostMethod(Common.getGroveUrl(Common.GroveServlets.MANGO_LOG));
+        HttpClient client = common.getHttpClient();
+        PostMethod method = new PostMethod(common.getGroveUrl(Common.GroveServlets.MANGO_LOG));
         method.addParameter("productId", "Mango M2M");
-        method.addParameter("productVersion", Common.getVersion());
+        method.addParameter("productVersion", common.getVersion());
         method.addParameter("ts", Long.toString(event.timeStamp));
         method.addParameter("level", event.getLevel().toString());
         method.addParameter("message", event.getRenderedMessage());

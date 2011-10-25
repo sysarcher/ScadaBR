@@ -17,8 +17,22 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see http://www.gnu.org/licenses/.
 -->
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
-<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
+	<display-name>ScadaBR Papaya</display-name>
+
+	<description>ScadaBR Papaya webapp</description>
+
+  	<!--
+		- Location of the XML file that defines the root application context.
+		- Applied by ContextLoaderServlet.
+	-->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/applicationContext.xml</param-value>
+	</context-param>
+
   <!-- 
     Context parameters.
    -->
@@ -79,8 +93,8 @@
   </filter>
   
   <filter>
-    <filter-name>IsLoggedIn</filter-name>
-    <filter-class>com.serotonin.mango.web.filter.NormalLoggedInFilter</filter-class>
+    <filter-name>normalLoggedInFilter</filter-name>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     <init-param>
       <param-name>forwardUrl</param-name>
       <param-value>/login.htm</param-value>
@@ -116,7 +130,7 @@
   </filter-mapping>
 
   <filter-mapping>
-    <filter-name>IsLoggedIn</filter-name>
+    <filter-name>normalLoggedInFilter</filter-name>
     <url-pattern>*.shtm</url-pattern>
   </filter-mapping>
 
@@ -285,8 +299,13 @@
   <!-- 
     Context listeners.
    -->
-  <listener><listener-class>org.springframework.web.context.ContextLoaderListener</listener-class></listener>
-  <listener><listener-class>com.serotonin.mango.MangoContextListener</listener-class></listener>
+  <listener>
+      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  <listener>
+      <filter-name>mangoContextListener</filter-name>
+      <listener-class>org.springframework.web.filter.DelegatingFilterProxy</listener-class>
+  </listener>
   
   <!-- 
     Other stuff.

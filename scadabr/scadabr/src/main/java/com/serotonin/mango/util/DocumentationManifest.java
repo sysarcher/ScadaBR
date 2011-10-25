@@ -27,18 +27,21 @@ import org.w3c.dom.Element;
 
 import com.serotonin.mango.Common;
 import com.serotonin.util.XmlUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
  */
 public class DocumentationManifest {
     private final List<DocumentationItem> items = new ArrayList<DocumentationItem>();
+    @Autowired
+    private Common common;
 
     public DocumentationManifest() throws Exception {
         // Read the documentation manifest file.
         XmlUtils utils = new XmlUtils();
 
-        Document document = utils.parse(new File(Common.getDocPath() + "manifest.xml"));
+        Document document = utils.parse(new File(common.getDocPath() + "manifest.xml"));
 
         Element root = document.getDocumentElement();
         for (Element item : utils.getElementsByTagName(root, "item")) {

@@ -23,6 +23,7 @@ import com.serotonin.mango.vo.User;
 /**
  * @author Matthew Lohbihler
  */
+@Deprecated
 public class BackgroundContext {
     /**
      * The ThreadLocal instance that will contain the various BackgroundContext objects.

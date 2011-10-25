@@ -1,29 +1,33 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.event.handlers;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.MangoDataType;
+import com.serotonin.mango.rt.EventManager;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -37,7 +41,14 @@ import com.serotonin.util.StringUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource {
+
     private final static Logger LOG = LoggerFactory.getLogger(SetPointHandlerRT.class);
+    @Autowired
+    private EventManager eventManager;
+    @Autowired
+    private Common common;
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     public SetPointHandlerRT(EventHandlerVO vo) {
         this.vo = vo;
@@ -45,11 +56,12 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
 
     @Override
     public void eventRaised(EventInstance evt) {
-        if (vo.getActiveAction() == EventHandlerVO.SET_ACTION_NONE)
+        if (vo.getActiveAction() == EventHandlerVO.SET_ACTION_NONE) {
             return;
+        }
 
         // Validate that the target point is available.
-        DataPointRT targetPoint = Common.ctx.getRuntimeManager().getDataPoint(vo.getTargetPointId());
+        DataPointRT targetPoint = runtimeManager.getDataPoint(vo.getTargetPointId());
         if (targetPoint == null) {
             raiseFailureEvent(new LocalizableMessage("event.setPoint.targetPointMissing"), evt.getEventType());
             return;
@@ -65,7 +77,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
         MangoValue value;
         if (vo.getActiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {
             // Get the source data point.
-            DataPointRT sourcePoint = Common.ctx.getRuntimeManager().getDataPoint(vo.getActivePointId());
+            DataPointRT sourcePoint = runtimeManager.getDataPoint(vo.getActivePointId());
             if (sourcePoint == null) {
                 raiseFailureEvent(new LocalizableMessage("event.setPoint.activePointMissing"), evt.getEventType());
                 return;
@@ -83,12 +95,11 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
             }
 
             value = valueTime.getValue();
-        }
-        else if (vo.getActiveAction() == EventHandlerVO.SET_ACTION_STATIC_VALUE) {
+        } else if (vo.getActiveAction() == EventHandlerVO.SET_ACTION_STATIC_VALUE) {
             value = MangoValue.stringToValue(vo.getActiveValueToSet(), targetDataType);
-        }
-        else
+        } else {
             throw new ShouldNeverHappenException("Unknown active action: " + vo.getActiveAction());
+        }
 
         // Queue a work item to perform the set point.
         Common.ctx.getBackgroundProcessing().addWorkItem(
@@ -97,11 +108,12 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
 
     @Override
     public void eventInactive(EventInstance evt) {
-        if (vo.getInactiveAction() == EventHandlerVO.SET_ACTION_NONE)
+        if (vo.getInactiveAction() == EventHandlerVO.SET_ACTION_NONE) {
             return;
+        }
 
         // Validate that the target point is available.
-        DataPointRT targetPoint = Common.ctx.getRuntimeManager().getDataPoint(vo.getTargetPointId());
+        DataPointRT targetPoint = runtimeManager.getDataPoint(vo.getTargetPointId());
         if (targetPoint == null) {
             raiseFailureEvent(new LocalizableMessage("event.setPoint.targetPointMissing"), evt.getEventType());
             return;
@@ -117,7 +129,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
         MangoValue value;
         if (vo.getInactiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {
             // Get the source data point.
-            DataPointRT sourcePoint = Common.ctx.getRuntimeManager().getDataPoint(vo.getInactivePointId());
+            DataPointRT sourcePoint = runtimeManager.getDataPoint(vo.getInactivePointId());
             if (sourcePoint == null) {
                 raiseFailureEvent(new LocalizableMessage("event.setPoint.inactivePointMissing"), evt.getEventType());
                 return;
@@ -135,11 +147,11 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
             }
 
             value = valueTime.getValue();
-        }
-        else if (vo.getInactiveAction() == EventHandlerVO.SET_ACTION_STATIC_VALUE)
+        } else if (vo.getInactiveAction() == EventHandlerVO.SET_ACTION_STATIC_VALUE) {
             value = MangoValue.stringToValue(vo.getInactiveValueToSet(), targetDataType);
-        else
+        } else {
             throw new ShouldNeverHappenException("Unknown active action: " + vo.getInactiveAction());
+        }
 
         Common.ctx.getBackgroundProcessing().addWorkItem(
                 new SetPointWorkItem(vo.getTargetPointId(), new PointValueTime(value, evt.getRtnTimestamp()), this));
@@ -151,19 +163,21 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
                 // The set point attempt failed for an event that is a set point handler failure in the first place.
                 // Do not propagate the event, but rather just write a log message.
                 LOG.warn("A set point event due to a set point handler failure itself failed. The failure event "
-                        + "has been discarded: " + message.getLocalizedMessage(Common.getBundle()));
+                        + "has been discarded: " + message.getLocalizedMessage(common.getBundle()));
                 return;
             }
         }
 
         SystemEventType eventType = new SystemEventType(SystemEventType.TYPE_SET_POINT_HANDLER_FAILURE, vo.getId());
-        if (StringUtils.isEmpty(vo.getAlias()))
+        if (StringUtils.isEmpty(vo.getAlias())) {
             message = new LocalizableMessage("event.setPointFailed", message);
-        else
+        } else {
             message = new LocalizableMessage("event.setPointFailed.alias", vo.getAlias(), message);
-        SystemEventType.raiseEvent(eventType, System.currentTimeMillis(), false, message);
+        }
+        eventManager.raiseEvent(eventType, System.currentTimeMillis(), false, message);
     }
 
+    @Override
     public void raiseRecursionFailureEvent() {
         raiseFailureEvent(new LocalizableMessage("event.setPoint.recursionFailure"), null);
     }
@@ -171,10 +185,12 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
     //
     // SetPointSource implementation
     //
+    @Override
     public int getSetPointSourceId() {
         return vo.getId();
     }
 
+    @Override
     public int getSetPointSourceType() {
         return SetPointSource.Types.EVENT_HANDLER;
     }

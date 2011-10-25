@@ -19,7 +19,9 @@
 package com.serotonin.mango.rt.event.detectors;
 
 import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This is a base class for all subclasses that need to schedule timeouts for them to become active.
@@ -27,6 +29,10 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
  * @author Matthew Lohbihler
  */
 abstract public class TimeDelayedEventDetectorRT extends TimeoutDetectorRT {
+    
+    @Autowired
+    private RuntimeManager runtimeManager;
+    
     synchronized protected void scheduleJob() {
         if (getDurationMS() > 0)
             scheduleJob(System.currentTimeMillis() + getDurationMS());
@@ -70,7 +76,7 @@ abstract public class TimeDelayedEventDetectorRT extends TimeoutDetectorRT {
 
     protected void initializeState() {
         int pointId = vo.njbGetDataPoint().getId();
-        PointValueTime latest = Common.ctx.getRuntimeManager().getDataPoint(pointId).getPointValue();
+        PointValueTime latest = runtimeManager.getDataPoint(pointId).getPointValue();
 
         if (latest != null)
             pointChanged(null, latest);

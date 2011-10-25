@@ -24,13 +24,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -40,12 +42,15 @@ import com.serotonin.mango.vo.event.ScheduledEventVO;
  * @author Matthew Lohbihler
  *
  */
+@Service
 public class ScheduledEventDao extends BaseDao {
 
     private static final String SCHEDULED_EVENT_SELECT = "select id, xid, alias, alarmLevel, scheduleType, "
             + "  returnToNormal, disabled, activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, "
             + "  activeCron, inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute, inactiveSecond, "
             + "inactiveCron from scheduledEvents ";
+    @Autowired
+    private EventManager eventManager;
 
     public String generateUniqueXid() {
         return generateUniqueXid(ScheduledEventVO.XID_PREFIX, "scheduledEvents");
@@ -133,7 +138,7 @@ public class ScheduledEventDao extends BaseDao {
         Number id = insertActor.executeAndReturnKey(params);
         se.setId(id.intValue());
 
-        AuditEventType.raiseAddedEvent(AuditEventType.TYPE_SCHEDULED_EVENT, se);
+        eventManager.raiseAddedEvent(AuditEventType.TYPE_SCHEDULED_EVENT, se);
     }
 
     private void updateScheduledEvent(ScheduledEventVO se) {
@@ -150,23 +155,18 @@ public class ScheduledEventDao extends BaseDao {
                 se.getActiveCron(), se.getInactiveYear(), se.getInactiveMonth(), se.getInactiveDay(),
                 se.getInactiveHour(), se.getInactiveMinute(), se.getInactiveSecond(),
                 se.getInactiveCron(), se.getId());
-        AuditEventType.raiseChangedEvent(AuditEventType.TYPE_SCHEDULED_EVENT, old, se);
+        eventManager.raiseChangedEvent(AuditEventType.TYPE_SCHEDULED_EVENT, old, se);
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void deleteScheduledEvent(final int scheduledEventId) {
         ScheduledEventVO se = getScheduledEvent(scheduledEventId);
         if (se != null) {
-            new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
+            getSimpleJdbcTemplate().update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.SCHEDULED
+                    + " and eventTypeRef1=?", scheduledEventId);
+            getSimpleJdbcTemplate().update("delete from scheduledEvents where id=?", scheduledEventId);
 
-                @Override
-                protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    getSimpleJdbcTemplate().update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.SCHEDULED
-                            + " and eventTypeRef1=?", scheduledEventId);
-                    getSimpleJdbcTemplate().update("delete from scheduledEvents where id=?", scheduledEventId);
-                }
-            });
-
-            AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_SCHEDULED_EVENT, se);
+            eventManager.raiseDeletedEvent(AuditEventType.TYPE_SCHEDULED_EVENT, se);
         }
     }
 }

@@ -43,11 +43,19 @@ import com.serotonin.mango.vo.mailingList.EmailRecipient;
 import com.serotonin.mango.vo.mailingList.MailingList;
 import com.serotonin.mango.vo.mailingList.UserEntry;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Matthew Lohbihler
  */
+@Service
 public class MailingListDao extends BaseDao {
+
+    @Autowired
+    private UserDao userDao;
 
     public String generateUniqueXid() {
         return generateUniqueXid(MailingList.XID_PREFIX, "mailingLists");
@@ -155,7 +163,6 @@ public class MailingListDao extends BaseDao {
 
     public void populateEntrySubclasses(List<EmailRecipient> entries) {
         // Update the user type entries with their respective user objects.
-        UserDao userDao = new UserDao();
         for (EmailRecipient e : entries) {
             if (e instanceof MailingList) // NOTE: this does not set the mailing list name.
             {
@@ -168,26 +175,20 @@ public class MailingListDao extends BaseDao {
     }
     private static final String MAILING_LIST_UPDATE = "update mailingLists set xid=?, name=? where id=?";
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void saveMailingList(final MailingList ml) {
-        new TransactionTemplate(getTransactionManager()).execute(new TransactionCallbackWithoutResult() {
+        if (ml.getId() == Common.NEW_ID) {
+            SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("pointHierarchy").usingGeneratedKeyColumns("id");
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("xid", ml.getXid());
+            params.put("name", ml.getName());
 
-            @SuppressWarnings("synthetic-access")
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                if (ml.getId() == Common.NEW_ID) {
-                    SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("pointHierarchy").usingGeneratedKeyColumns("id");
-                    Map<String, Object> params = new HashMap<String, Object>();
-                    params.put("xid", ml.getXid());
-                    params.put("name", ml.getName());
-
-                    Number id = insertActor.executeAndReturnKey(params);
-                    ml.setId(id.intValue());
-                } else {
-                    getSimpleJdbcTemplate().update(MAILING_LIST_UPDATE, ml.getXid(), ml.getName(), ml.getId());
-                }
-                saveRelationalData(ml);
-            }
-        });
+            Number id = insertActor.executeAndReturnKey(params);
+            ml.setId(id.intValue());
+        } else {
+            getSimpleJdbcTemplate().update(MAILING_LIST_UPDATE, ml.getXid(), ml.getName(), ml.getId());
+        }
+        saveRelationalData(ml);
     }
     private static final String MAILING_LIST_INACTIVE_INSERT = "insert into mailingListInactive (mailingListId, inactiveInterval) values (?,?)";
     private static final String MAILING_LIST_ENTRY_INSERT = "insert into mailingListMembers (mailingListId, typeId, userId, address) values (?,?,?,?)";

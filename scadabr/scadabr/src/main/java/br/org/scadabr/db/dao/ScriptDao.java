@@ -17,6 +17,8 @@ import com.serotonin.util.SerializationHelper;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 public class ScriptDao extends BaseDao {
 
@@ -51,18 +53,11 @@ public class ScriptDao extends BaseDao {
                 vo.getXid(), vo.getName(), vo.getScript(), vo.getUserId(), SerializationHelper.writeObjectToArray(vo), vo.getId());
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void deleteScript(final int scriptId) {
         ScriptVO<?> vo = getScript(scriptId);
         if (vo != null) {
-            new TransactionTemplate(getTransactionManager()).execute(
-                    new TransactionCallbackWithoutResult() {
-
-                        @Override
-                        protected void doInTransactionWithoutResult(
-                                TransactionStatus status) {
-                            getSimpleJdbcTemplate().update("delete from scripts where id=?", scriptId);
-                        }
-                    });
+            getSimpleJdbcTemplate().update("delete from scripts where id=?", scriptId);
         }
     }
 

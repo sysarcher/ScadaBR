@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.publish;
 
@@ -26,6 +26,7 @@ import java.util.Map;
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.PublisherDao;
+import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -39,19 +40,18 @@ import com.serotonin.mango.vo.publish.PublisherVO;
 import com.serotonin.timer.FixedRateTrigger;
 import com.serotonin.timer.TimerTask;
 import com.serotonin.web.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
  */
 abstract public class PublisherRT<T extends PublishedPointVO> implements TimeoutClient {
+
     public static final int POINT_DISABLED_EVENT = 1;
     public static final int QUEUE_SIZE_WARNING_EVENT = 2;
-
     private final Object persistentDataLock = new Object();
-
     private final EventType pointDisabledEventType;
     private final EventType queueSizeWarningEventType;
-
     private final PublisherVO<T> vo;
     protected final List<PublishedPointRT<T>> pointRTs = new ArrayList<PublishedPointRT<T>>();
     protected final PublishQueue<T> queue;
@@ -59,6 +59,10 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
     private volatile Thread jobThread;
     private SendThread sendThread;
     private TimerTask snapshotTask;
+    @Autowired
+    private EventManager eventManager;
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     public PublisherRT(PublisherVO<T> vo) {
         this.vo = vo;
@@ -87,8 +91,9 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
         synchronized (persistentDataLock) {
             @SuppressWarnings("unchecked")
             Map<String, Object> map = (Map<String, Object>) new PublisherDao().getPersistentData(vo.getId());
-            if (map != null)
+            if (map != null) {
                 return map.get(key);
+            }
             return null;
         }
     }
@@ -103,8 +108,9 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
         synchronized (persistentDataLock) {
             @SuppressWarnings("unchecked")
             Map<String, Object> map = (Map<String, Object>) dao.getPersistentData(vo.getId());
-            if (map == null)
+            if (map == null) {
                 map = new HashMap<String, Object>();
+            }
 
             map.put(key, persistentData);
 
@@ -147,24 +153,25 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
 
         if (pointDisabledEventActive != foundDisabledPoint) {
             pointDisabledEventActive = foundDisabledPoint;
-            if (pointDisabledEventActive)
-                // A published point has been terminated, was never enabled, or no longer exists.
-                Common.ctx.getEventManager().raiseEvent(pointDisabledEventType, System.currentTimeMillis(), true,
+            if (pointDisabledEventActive) // A published point has been terminated, was never enabled, or no longer exists.
+            {
+                eventManager.raiseEvent(pointDisabledEventType, System.currentTimeMillis(), true,
                         AlarmLevels.URGENT, new LocalizableMessage("event.publish.pointMissing"), createEventContext());
-            else
-                // Everything is good
-                Common.ctx.getEventManager().returnToNormal(pointDisabledEventType, System.currentTimeMillis());
+            } else // Everything is good
+            {
+                eventManager.returnToNormal(pointDisabledEventType, System.currentTimeMillis());
+            }
         }
     }
 
     void fireQueueSizeWarningEvent() {
-        Common.ctx.getEventManager().raiseEvent(queueSizeWarningEventType, System.currentTimeMillis(), true,
+        eventManager.raiseEvent(queueSizeWarningEventType, System.currentTimeMillis(), true,
                 AlarmLevels.URGENT, new LocalizableMessage("event.publish.queueSize", vo.getCacheWarningSize()),
                 createEventContext());
     }
 
     void deactivateQueueSizeWarningEvent() {
-        Common.ctx.getEventManager().returnToNormal(queueSizeWarningEventType, System.currentTimeMillis());
+        eventManager.returnToNormal(queueSizeWarningEventType, System.currentTimeMillis());
     }
 
     protected Map<String, Object> createEventContext() {
@@ -183,8 +190,9 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
         this.sendThread = sendThread;
         sendThread.initialize();
 
-        for (T p : vo.getPoints())
+        for (T p : vo.getPoints()) {
             pointRTs.add(new PublishedPointRT<T>(p, this));
+        }
 
         if (vo.isSendSnapshot()) {
             // Add a schedule to send the snapshot
@@ -200,15 +208,17 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
         sendThread.joinTermination();
 
         // Unschedule any job that is running.
-        if (snapshotTask != null)
+        if (snapshotTask != null) {
             snapshotTask.cancel();
+        }
 
         // Terminate the point listeners
-        for (PublishedPointRT<T> rt : pointRTs)
+        for (PublishedPointRT<T> rt : pointRTs) {
             rt.terminate();
+        }
 
         // Remove any outstanding events.
-        Common.ctx.getEventManager().cancelEventsForPublisher(getId());
+        eventManager.cancelEventsForPublisher(getId());
     }
 
     public void joinTermination() {
@@ -216,11 +226,12 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
         if (localThread != null) {
             try {
                 localThread.join(30000); // 30 seconds
+            } catch (InterruptedException e) { /* no op */
+
             }
-            catch (InterruptedException e) { /* no op */
-            }
-            if (jobThread != null)
+            if (jobThread != null) {
                 throw new ShouldNeverHappenException("Timeout waiting for publisher to stop: id=" + getId());
+            }
         }
     }
 
@@ -229,27 +240,27 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
     // Scheduled snapshot send stuff
     //
     public void scheduleTimeout(long fireTime) {
-        if (jobThread != null)
+        if (jobThread != null) {
             return;
+        }
 
         jobThread = Thread.currentThread();
 
         try {
-            RuntimeManager rm = Common.ctx.getRuntimeManager();
             synchronized (this) {
                 for (PublishedPointRT<T> rt : pointRTs) {
                     if (rt.isPointEnabled()) {
-                        DataPointRT dp = rm.getDataPoint(rt.getVo().getDataPointId());
+                        DataPointRT dp = runtimeManager.getDataPoint(rt.getVo().getDataPointId());
                         if (dp != null) {
                             PointValueTime pvt = dp.getPointValue();
-                            if (pvt != null)
+                            if (pvt != null) {
                                 publish(rt.getVo(), pvt);
+                            }
                         }
                     }
                 }
             }
-        }
-        finally {
+        } finally {
             jobThread = null;
         }
     }
