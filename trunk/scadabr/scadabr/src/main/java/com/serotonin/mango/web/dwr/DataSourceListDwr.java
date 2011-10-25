@@ -42,12 +42,14 @@ public class DataSourceListDwr extends BaseDwr {
     private UserDao userDao;
     @Autowired
     private RuntimeManager runtimeManager;
+    @Autowired
+    private DataSourceDao dataSourceDao;
 
     public DwrResponseI18n init() {
         DwrResponseI18n response = new DwrResponseI18n();
 
         if (common.getUser().isAdmin()) {
-            Map<DataSourceRegistry, String> dsTypes = new EnumMap<DataSourceRegistry, String>(DataSourceRegistry.class);
+            Map<DataSourceRegistry, String> dsTypes = new EnumMap(DataSourceRegistry.class);
             for (DataSourceRegistry type : DataSourceRegistry.values()) {
                 // Allow customization settings to overwrite the default display value.
                 if (type.isDisplay()) {
@@ -64,7 +66,7 @@ public class DataSourceListDwr extends BaseDwr {
         permissions.ensureDataSourcePermission(common.getUser(), dataSourceId);
 
         DataSourceVO<?> dataSource = runtimeManager.getDataSource(dataSourceId);
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap();
 
         dataSource.setEnabled(!dataSource.isEnabled());
         runtimeManager.saveDataSource(dataSource);
@@ -76,7 +78,7 @@ public class DataSourceListDwr extends BaseDwr {
 
     public int deleteDataSource(int dataSourceId) {
         permissions.ensureDataSourcePermission(common.getUser(), dataSourceId);
-        runtimeManager.deleteDataSource(dataSourceId);
+        runtimeManager.deleteDataSource(dataSourceDao.getDataSource(dataSourceId));
         return dataSourceId;
     }
 
@@ -95,7 +97,7 @@ public class DataSourceListDwr extends BaseDwr {
 
     public int copyDataSource(int dataSourceId) {
         permissions.ensureDataSourcePermission(common.getUser(), dataSourceId);
-        int dsId = new DataSourceDao().copyDataSource(dataSourceId, getResourceBundle());
+        int dsId = new DataSourceDao().copyDataSource(dataSourceDao.getDataSource(dataSourceId), getResourceBundle());
         userDao.populateUserPermissions(common.getUser());
         return dsId;
     }

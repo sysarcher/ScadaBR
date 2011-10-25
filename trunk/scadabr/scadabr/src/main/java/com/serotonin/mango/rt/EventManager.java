@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.db.dao.UserDao;
+import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.handlers.EmailHandlerRT;
@@ -41,7 +42,9 @@ import com.serotonin.mango.rt.event.type.DataSourceEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.util.ChangeComparable;
+import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
+import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventHandlerVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.mango.vo.permission.Permissions;
@@ -212,16 +215,24 @@ public class EventManager implements ILifecycle {
     //
     // Canceling events.
     //
-    public void cancelEventsForDataPoint(int dataPointId) {
+    public void cancelEventsForDataPoint(DataPointRT dataPointRt) {
         for (EventInstance e : activeEvents) {
-            if (e.getEventType().getDataPointId() == dataPointId)
+            if (e.getEventType().getDataPointId() == dataPointRt.getId())
                 deactivateEvent(e, System.currentTimeMillis(), EventInstance.RtnCauses.SOURCE_DISABLED);
         }
     }
 
-    public void cancelEventsForDataSource(int dataSourceId) {
+    @Deprecated //TODO use RT or VO
+    public void cancelEventsForDataPoint(DataPointVO dataPointVo) {
         for (EventInstance e : activeEvents) {
-            if (e.getEventType().getDataSourceId() == dataSourceId)
+            if (e.getEventType().getDataPointId() == dataPointVo.getId())
+                deactivateEvent(e, System.currentTimeMillis(), EventInstance.RtnCauses.SOURCE_DISABLED);
+        }
+    }
+
+    public void cancelEventsForDataSource(DataSourceVO<?> dataSource) {
+        for (EventInstance e : activeEvents) {
+            if (e.getEventType().getDataSourceId() == dataSource.getId())
                 deactivateEvent(e, System.currentTimeMillis(), EventInstance.RtnCauses.SOURCE_DISABLED);
         }
     }

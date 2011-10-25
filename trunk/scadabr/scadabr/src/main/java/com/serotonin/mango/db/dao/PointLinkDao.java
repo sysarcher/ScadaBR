@@ -32,7 +32,9 @@ import org.springframework.stereotype.Service;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.event.type.AuditEventType;
+import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.link.PointLinkVO;
+import java.util.Collections;
 
 /**
  * @author Matthew Lohbihler
@@ -53,12 +55,12 @@ public class PointLinkDao extends BaseDao {
     private static final String POINT_LINK_SELECT = "select id, xid, sourcePointId, targetPointId, script, eventType, disabled from pointLinks ";
 
     public List<PointLinkVO> getPointLinks() {
-        return getSimpleJdbcTemplate().query(POINT_LINK_SELECT, new PointLinkRowMapper());
+        return getJdbcTemplate().query(POINT_LINK_SELECT, new PointLinkRowMapper());
     }
 
-    public List<PointLinkVO> getPointLinksForPoint(int dataPointId) {
-        return getSimpleJdbcTemplate().query(POINT_LINK_SELECT + "where sourcePointId=? or targetPointId=?", new PointLinkRowMapper(), dataPointId,
-                dataPointId);
+    public List<PointLinkVO> getPointLinksForPoint(DataPointVO dataPointVo) {
+        Map<String, ?> params = Collections.singletonMap("dataPointId", dataPointVo.getId());
+        return getSimpleJdbcTemplate().query(POINT_LINK_SELECT + "where sourcePointId=:dataPointId or targetPointId=:dataPointId", new PointLinkRowMapper(), params);
     }
 
     public PointLinkVO getPointLink(int id) {

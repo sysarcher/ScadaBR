@@ -247,7 +247,6 @@ public class UserDao extends BaseDao {
         // Save the new ones.
         getJdbcTemplate().batchUpdate("insert into dataSourceUsers (dataSourceId, userId) values (?,?)",
                 new BatchPreparedStatementSetter() {
-
                     @Override
                     public int getBatchSize() {
                         return user.getDataSourcePermissions().size();

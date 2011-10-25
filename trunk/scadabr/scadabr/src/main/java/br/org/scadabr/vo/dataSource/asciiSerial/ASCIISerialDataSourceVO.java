@@ -67,12 +67,6 @@ public class ASCIISerialDataSourceVO<T extends ASCIISerialDataSourceVO<?>>
 	}
 
 	@Override
-	protected Object clone() throws CloneNotSupportedException {
-		// TODO Auto-generated method stub
-		return super.clone();
-	}
-
-	@Override
 	public PointLocatorVO createPointLocator() {
 		return new ASCIISerialPointLocatorVO();
 	}

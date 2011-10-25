@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.db.dao;
 
-import com.serotonin.json.JsonException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,10 +28,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.serotonin.json.JsonException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -44,15 +49,10 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * THis class handles the storage and retieving of datasources
- * 
+ *
  * @author aploese
  */
 @Service
@@ -129,7 +129,7 @@ public class DataSourceDao extends BaseDao {
     @Transactional(readOnly = true)
     public DataSourceVO<?> getDataSource(int id) {
         try {
-        return getJdbcTemplate().queryForObject(DataSourceRowMapper.DATA_SOURCE_SELECT + " where id=?", new DataSourceRowMapper(), id);
+            return getJdbcTemplate().queryForObject(DataSourceRowMapper.DATA_SOURCE_SELECT + " where id=?", new DataSourceRowMapper(), id);
         } catch (EmptyResultDataAccessException ex) {
             return null;
         }
@@ -138,8 +138,8 @@ public class DataSourceDao extends BaseDao {
     @Transactional(readOnly = true)
     public DataSourceVO<?> getDataSource(String xid) {
         try {
-        return getJdbcTemplate().queryForObject(DataSourceRowMapper.DATA_SOURCE_SELECT + " where xid=?", new DataSourceRowMapper(),
-                xid);
+            return getJdbcTemplate().queryForObject(DataSourceRowMapper.DATA_SOURCE_SELECT + " where xid=?", new DataSourceRowMapper(),
+                    xid);
         } catch (EmptyResultDataAccessException ex) {
             return null;
         }
@@ -184,8 +184,8 @@ public class DataSourceDao extends BaseDao {
         }
     }
 
-    /** 
-     * @param vo 
+    /**
+     * @param vo
      */
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     private void insertDataSource(final DataSourceVO<?> vo) {
@@ -224,27 +224,25 @@ public class DataSourceDao extends BaseDao {
         eventManager.raiseChangedEvent(AuditEventType.TYPE_DATA_SOURCE, old, (ChangeComparable<DataSourceVO<?>>) vo);
     }
 
+    //TODO split eventHandlers in multiple tables with "humnan readable" col names ...
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-    public void deleteDataSource(final int dataSourceId) {
-        DataSourceVO<?> vo = getDataSource(dataSourceId);
+    public void deleteDataSource(final DataSourceVO<?> dataSourceVo) {
 
-        dataPointDao.deleteDataPoints(dataSourceId);
+        dataPointDao.deleteDataPoints(dataSourceVo);
 
-        if (vo != null) {
-            maintenanceEventDao.deleteMaintenanceEventsForDataSource(dataSourceId);
-            getSimpleJdbcTemplate().update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.DATA_SOURCE
-                    + " and eventTypeRef1=?", dataSourceId);
-            getSimpleJdbcTemplate().update("delete from dataSourceUsers where dataSourceId=?", dataSourceId);
-            getSimpleJdbcTemplate().update("delete from dataSources where id=?", dataSourceId);
+        maintenanceEventDao.deleteMaintenanceEventsForDataSource(dataSourceVo);
+        //TODO via cascade in db???
+        getSimpleJdbcTemplate().update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.DATA_SOURCE
+                + " and eventTypeRef1=?", dataSourceVo.getId());
+        getSimpleJdbcTemplate().update("delete from dataSources where id=?", dataSourceVo.getId());
 
-            eventManager.raiseDeletedEvent(AuditEventType.TYPE_DATA_SOURCE, vo);
-        }
+        eventManager.raiseDeletedEvent(AuditEventType.TYPE_DATA_SOURCE, dataSourceVo);
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-    public void copyPermissions(final int fromDataSourceId, final int toDataSourceId) {
+    private void copyPermissions(final DataSourceVO<?> fromDataSource, final DataSourceVO<?> toDataSource) {
         final List<Integer> userIds = getJdbcTemplate().queryForList("select userId from dataSourceUsers where dataSourceId=?",
-                new Object[]{fromDataSourceId}, Integer.class);
+                new Object[]{fromDataSource.getId()}, Integer.class);
 
         getJdbcTemplate().batchUpdate("insert into dataSourceUsers values (?,?)", new BatchPreparedStatementSetter() {
 
@@ -255,30 +253,28 @@ public class DataSourceDao extends BaseDao {
 
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
-                ps.setInt(1, toDataSourceId);
+                ps.setInt(1, toDataSource.getId());
                 ps.setInt(2, userIds.get(i));
             }
         });
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-    public int copyDataSource(final int dataSourceId, final ResourceBundle bundle) {
-        DataSourceVO<?> dataSource = getDataSource(dataSourceId);
+    public int copyDataSource(final DataSourceVO<?> dataSourceVo, final ResourceBundle bundle) {
 
-        // Copy the data source.
-        DataSourceVO<?> dataSourceCopy = dataSource.copy();
+        DataSourceVO<?> dataSourceCopy = (DataSourceVO<?>) dataSourceVo.clone();
         dataSourceCopy.setId(Common.NEW_ID);
         dataSourceCopy.setXid(generateUniqueXid());
         dataSourceCopy.setEnabled(false);
         dataSourceCopy.setName(StringUtils.truncate(
-                LocalizableMessage.getMessage(bundle, "common.copyPrefix", dataSource.getName()), 40));
+                LocalizableMessage.getMessage(bundle, "common.copyPrefix", dataSourceVo.getName()), 40));
         saveDataSource(dataSourceCopy);
 
         // Copy permissions.
-        copyPermissions(dataSource.getId(), dataSourceCopy.getId());
+        copyPermissions(dataSourceVo, dataSourceCopy);
 
         // Copy the points.
-        for (DataPointVO dataPoint : dataPointDao.getDataPoints(dataSourceId, null)) {
+        for (DataPointVO dataPoint : dataPointDao.getDataPoints(dataSourceVo, null)) {
             DataPointVO dataPointCopy = dataPoint.copy();
             dataPointCopy.setId(Common.NEW_ID);
             dataPointCopy.setXid(dataPointDao.generateUniqueXid());

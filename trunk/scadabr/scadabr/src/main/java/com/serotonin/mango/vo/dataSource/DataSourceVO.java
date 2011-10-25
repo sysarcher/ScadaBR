@@ -91,6 +91,14 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
     @JsonRemoteProperty
     private Map<Integer, AlarmLevels> alarmLevels = new HashMap();
 
+    public DataSourceVO<T> clone() {
+        try {
+            return (DataSourceVO<T>) super.clone();
+        } catch (CloneNotSupportedException ex) {
+            throw new ShouldNeverHappenException(ex);
+        }
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -180,14 +188,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
     protected String getMessage(ResourceBundle bundle, String key,
             Object... args) {
         return new LocalizableMessage(key, args).getLocalizedMessage(bundle);
-    }
-
-    public DataSourceVO<?> copy() {
-        try {
-            return (DataSourceVO<?>) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new ShouldNeverHappenException(e);
-        }
     }
 
     @Override

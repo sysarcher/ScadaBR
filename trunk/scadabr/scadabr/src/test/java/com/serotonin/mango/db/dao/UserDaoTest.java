@@ -37,7 +37,7 @@ public class UserDaoTest extends AbstractDaoTests {
     }
     
     @Transactional(readOnly=false, propagation= Propagation.REQUIRES_NEW)
-    private void setUpUsers() {
+    private void setUpTableUsers() {
         executeSqlScript("classpath:db/setUp-Table-Users.sql", false);
     }
 
@@ -50,7 +50,7 @@ public class UserDaoTest extends AbstractDaoTests {
     
     @Test
     public void getUsers() {
-        setUpUsers();
+        setUpTableUsers();
         List<User> users = this.userDao.getUsers();
         if (users.isEmpty()) {
             fail("Setup not correct expected more than 0 users");
@@ -78,7 +78,7 @@ public class UserDaoTest extends AbstractDaoTests {
     
     @Test(expected=org.springframework.dao.DuplicateKeyException.class)
     public void chekUsernameUnique() {
-        setUpUsers();
+        setUpTableUsers();
         User user = userDao.getUser(-10);
         user.setId(Common.NEW_ID);
         userDao.saveUser(user);
@@ -86,7 +86,7 @@ public class UserDaoTest extends AbstractDaoTests {
 
     @Test
     public void getUser_Int() {
-        setUpUsers();
+        setUpTableUsers();
         User user = userDao.getUser(-10);
         assertNotNull(user);
         user = userDao.getUser(0);
@@ -95,7 +95,7 @@ public class UserDaoTest extends AbstractDaoTests {
     
     @Test
     public void deleteUser() {
-        setUpUsers();
+        setUpTableUsers();
         User user = userDao.getUser(-10);
         userDao.deleteUser(user);
         user = userDao.getUser(user.getId());
@@ -104,7 +104,7 @@ public class UserDaoTest extends AbstractDaoTests {
             
     @Test
     public void getActiveUsers() {
-        setUpUsers();
+        setUpTableUsers();
         List<User> users = userDao.getActiveUsers();
         assertEquals(1, users.size());
         assertEquals(-12, users.get(0).getId());

@@ -18,6 +18,7 @@ import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
+import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
 
 @Service
@@ -98,7 +99,7 @@ public class MaintenanceEventDao extends BaseDao {
 
     private void insertMaintenanceEvent(MaintenanceEventVO me) {
         SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("maintenanceEvents").usingGeneratedKeyColumns("id");
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap();
         params.put("xid", me.getXid());
         params.put("dataSourceId", me.getDataSourceId());
         params.put("alias", me.getAlias());
@@ -144,9 +145,9 @@ public class MaintenanceEventDao extends BaseDao {
         eventManager.raiseChangedEvent(AuditEventType.TYPE_MAINTENANCE_EVENT, old, me);
     }
 
-    public void deleteMaintenanceEventsForDataSource(int dataSourceId) {
+    public void deleteMaintenanceEventsForDataSource(final DataSourceVO<?> dataSourceVo) {
         List<Integer> ids = getJdbcTemplate().queryForList("select id from maintenanceEvents where dataSourceId=?",
-                new Object[]{dataSourceId}, Integer.class);
+                new Object[]{dataSourceVo.getId()}, Integer.class);
         for (Integer id : ids) {
             deleteMaintenanceEvent(id);
         }

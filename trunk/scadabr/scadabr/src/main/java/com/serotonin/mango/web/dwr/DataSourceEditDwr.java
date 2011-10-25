@@ -267,8 +267,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             return null;
         }
 
-        List<DataPointVO> points = new DataPointDao().getDataPoints(ds.getId(),
-                DataPointNameComparator.instance);
+        List<DataPointVO> points = new DataPointDao().getDataPoints(ds, DataPointNameComparator.instance);
         for (DataPointVO dataPointVO : points) {
             if (!dataPointVO.isEnabled()) {
                 permissions.ensureDataSourcePermission(common.getUser(),
@@ -293,8 +292,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             return null;
         }
 
-        List<DataPointVO> points = new DataPointDao().getDataPoints(ds.getId(),
-                DataPointNameComparator.instance);
+        List<DataPointVO> points = new DataPointDao().getDataPoints(ds, DataPointNameComparator.instance);
         return points;
     }
 
@@ -385,7 +383,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     public List<EventInstanceBean> getAlarms() {
         DataSourceVO<?> ds = common.getUser().getEditDataSource();
         List<EventInstance> events = new EventDao().getPendingEventsForDataSource(ds.getId(), common.getUser().getId());
-        List<EventInstanceBean> beans = new ArrayList<EventInstanceBean>();
+        List<EventInstanceBean> beans = new ArrayList();
         if (events != null) {
             for (EventInstance event : events) {
                 beans.add(new EventInstanceBean(event.isActive(), event.getAlarmLevel(), DateFunctions.getTime(event.getActiveTimestamp()), getMessage(event.getMessage())));
@@ -434,7 +432,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public Map<String, Object> modbusScanUpdate() {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap();
         ModbusNodeScanListener scan = common.getUser().getTestingUtility(
                 ModbusNodeScanListener.class);
         if (scan == null) {
@@ -511,7 +509,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                 response.addMessage(new LocalizableMessage("common.default",
                         mres.getExceptionMessage()));
             } else {
-                List<String> results = new ArrayList<String>();
+                List<String> results = new ArrayList();
                 if (binary) {
                     boolean[] data = mres.getBooleanData();
                     for (int i = 0; i < length; i++) {
@@ -527,7 +525,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                 }
                 response.addData("results", results);
             }
-        } catch (ModbusIdException e) {
+        } catch (ModbusIdException | ModbusTransportException e) {
             response.addMessage(ModbusDataSource.localExceptionMessage(e));
         } catch (ModbusInitException e) {
             if (serial) {
@@ -537,8 +535,6 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                 response.addMessage(new LocalizableMessage(
                         "dsEdit.modbus.locatorTestSerial.startError", e.getMessage()));
             }
-        } catch (ModbusTransportException e) {
-            response.addMessage(ModbusDataSource.localExceptionMessage(e));
         } finally {
             modbusMaster.destroy();
         }
@@ -820,7 +816,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             return null;
         }
 
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap();
         result.put("nodes", l.getSensorsFound());
         result.put("message", l.getMessage());
 
@@ -941,7 +937,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
     @MethodFilter
     public Map<String, Object> sqlTestStatementUpdate() {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap();
         SqlStatementTester statementTester = common.getUser().getTestingUtility(SqlStatementTester.class);
         if (statementTester == null) {
             return null;
@@ -992,7 +988,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
     @MethodFilter
     public Map<String, Object> httpReceiverListenerUpdate() {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap();
         HttpReceiverDataListener l = common.getUser().getTestingUtility(
                 HttpReceiverDataListener.class);
         if (l == null) {
@@ -1051,7 +1047,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         try {
             // Check for an RT that already has a network.
             OneWireDataSourceVO ds = (OneWireDataSourceVO) common.getUser().getEditDataSource();
-            OneWireDataSourceRT rt = (OneWireDataSourceRT) runtimeManager.getRunningDataSource(ds.getId());
+            OneWireDataSourceRT rt = (OneWireDataSourceRT) runtimeManager.getRunningDataSource(ds);
             if (rt != null) // Use the existing one if it exists (i.e. initialized properly)
             {
                 network = rt.getNetwork();
@@ -1067,7 +1063,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                 network.quickInitialize();
 
                 List<Long> addresses = network.getAddresses();
-                List<OneWireContainerInfo> devices = new ArrayList<OneWireContainerInfo>();
+                List<OneWireContainerInfo> devices = new ArrayList();
                 for (Long address : addresses) {
                     NetworkPath path = network.getNetworkPath(address);
                     if (!path.isCoupler()) {
@@ -1205,7 +1201,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
     @MethodFilter
     public Map<String, Object> bacnetWhoIsUpdate() {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap();
         BACnetDiscovery test = common.getUser().getTestingUtility(
                 BACnetDiscovery.class);
         if (test == null) {
@@ -1514,7 +1510,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             return null;
         }
 
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap();
         result.put("messages", l.getMessages());
         result.put("message", l.getMessage());
 
@@ -1706,7 +1702,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     public DwrResponseI18n getRfModuleInfo() {
         ViconicsDataSourceVO ds = (ViconicsDataSourceVO) common.getUser().getEditDataSource();
 
-        ViconicsDataSourceRT rt = (ViconicsDataSourceRT) runtimeManager.getRunningDataSource(ds.getId());
+        ViconicsDataSourceRT rt = (ViconicsDataSourceRT) runtimeManager.getRunningDataSource(ds);
         DwrResponseI18n response = new DwrResponseI18n();
 
         if (rt == null) {
@@ -1715,7 +1711,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             try {
                 NetworkIdentifyResponse res = rt.send(new NetworkIdentifyRequest());
 
-                Map<String, String> rfm = new HashMap<String, String>();
+                Map<String, String> rfm = new HashMap();
                 rfm.put("firmware", ViconicsNetwork.getRevisionString(res.getZigbeeFirmwareRevision()));
                 rfm.put("networkAddr",
                         Integer.toString(res.getZigbeeNetworkAddress()));
@@ -1723,9 +1719,9 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                 rfm.put("chipRevision", Integer.toString(res.getChipRevision()));
                 response.addData("rfm", rfm);
 
-                List<Map<String, String>> devices = new ArrayList<Map<String, String>>();
+                List<Map<String, String>> devices = new ArrayList();
                 for (ViconicsDevice device : rt.getDevices()) {
-                    Map<String, String> dev = new HashMap<String, String>();
+                    Map<String, String> dev = new HashMap();
                     dev.put("commAddr",
                             Integer.toString(device.getCommAddress()));
                     dev.put("modelNumber", device.getConfiguration().getModel());
@@ -1746,11 +1742,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                     devices.add(dev);
                 }
                 response.addData("devices", devices);
-            } catch (ViconicsTransportException e) {
-                response.addGenericMessage(
-                        "dsEdit.viconics.networkIdentifyFailure",
-                        e.getMessage());
-            } catch (RequestFailureException e) {
+            } catch (ViconicsTransportException | RequestFailureException e) {
                 response.addGenericMessage(
                         "dsEdit.viconics.networkIdentifyFailure",
                         e.getMessage());
@@ -1797,7 +1789,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     }
 
     public Map<String, Object> mBusSearchUpdate() {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap();
         MBusDiscovery test = common.getUser().getTestingUtility(MBusDiscovery.class);
         if (test == null) {
             return null;
@@ -1808,7 +1800,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     }
 
     public Map<String, Object> getMBusResponseFrames(int deviceIndex) {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap();
         MBusDiscovery test = common.getUser().getTestingUtility(MBusDiscovery.class);
         if (test == null) {
             return null;
@@ -1885,7 +1877,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         permissions.ensureDataSourcePermission(user);
 
         OpenV4JDiscovery discovery = OpenV4JDiscovery.detectDevice(getResourceBundle(), commPortId);
-        ;
+
         user.setTestingUtility(discovery);
     }
 
@@ -1908,7 +1900,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     }
 
     public Map<String, Object> openV4JSearchUpdate() {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap();
         OpenV4JDiscovery test = common.getUser().getTestingUtility(OpenV4JDiscovery.class);
         if (test == null) {
             return null;
@@ -1919,7 +1911,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     }
 
     public Map<String, Object> openV4JDetectDeviceUpdate() {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap();
         OpenV4JDiscovery test = common.getUser().getTestingUtility(OpenV4JDiscovery.class);
         if (test == null) {
             return null;
@@ -1935,7 +1927,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
     public OpenV4JDataPointBean[] getOpenV4jDataPointsOfGroup(String groupName) {
         Group g = Group.valueOf(groupName);
-        List<OpenV4JDataPointBean> result = new ArrayList<OpenV4JDataPointBean>();
+        List<OpenV4JDataPointBean> result = new ArrayList();
         for (DataPoint dp : DataPoint.values()) {
             if (dp.getGroup().equals(g)) {
                 result.add(new OpenV4JDataPointBean(dp));
@@ -2185,7 +2177,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
         JISystem.getLogger().setLevel(java.util.logging.Level.OFF);
 
-        ArrayList<String> serverList = new ArrayList<String>();
+        ArrayList<String> serverList = new ArrayList();
         try {
             serverList = new RealOPCMaster().listOPCServers(user, password,
                     host, domain);
@@ -2201,7 +2193,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
         JISystem.getLogger().setLevel(java.util.logging.Level.OFF);
 
-        ArrayList<OPCItem> opcItems = new ArrayList<OPCItem>();
+        ArrayList<OPCItem> opcItems = new ArrayList();
 
         try {
             opcItems = new RealOPCMaster().browseOPCTags(user, password, host,
@@ -2570,11 +2562,11 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
             if (!response.getHasMessages()) {
                 try {
-                    Map<String, Object> names = new TreeMap<String, Object>();
+                    Map<String, Object> names = new TreeMap();
                     response.addData("names", names);
 
                     for (ObjectName on : server.queryNames(null, null)) {
-                        List<Map<String, Object>> objectAttributesList = new ArrayList<Map<String, Object>>();
+                        List<Map<String, Object>> objectAttributesList = new ArrayList();
                         names.put(on.getCanonicalName(), objectAttributesList);
 
                         for (MBeanAttributeInfo attr : server.getMBeanInfo(on).getAttributes()) {
@@ -2582,18 +2574,18 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                                 continue;
                             }
 
-                            Map<String, Object> objectAttributes = new HashMap<String, Object>();
+                            Map<String, Object> objectAttributes = new HashMap();
                             try {
                                 objectAttributes.put("name", attr.getName());
                                 if (attr.getType().equals("javax.management.openmbean.CompositeData")) {
                                     objectAttributes.put("type", "Composite");
                                     CompositeData cd = (CompositeData) server.getAttribute(on, attr.getName());
                                     if (cd != null) {
-                                        List<Map<String, Object>> compositeItemsList = new ArrayList<Map<String, Object>>();
+                                        List<Map<String, Object>> compositeItemsList = new ArrayList();
                                         objectAttributes.put("items",
                                                 compositeItemsList);
                                         for (String key : cd.getCompositeType().keySet()) {
-                                            Map<String, Object> compositeItems = new HashMap<String, Object>();
+                                            Map<String, Object> compositeItems = new HashMap();
                                             compositeItemsList.add(compositeItems);
                                             compositeItems.put("name", key);
                                             compositeItems.put("type", cd.getCompositeType().getType(key).getTypeName());

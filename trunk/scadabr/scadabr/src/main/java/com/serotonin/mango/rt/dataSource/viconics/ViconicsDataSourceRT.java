@@ -91,7 +91,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
     private final static Logger LOG = LoggerFactory.getLogger(ViconicsDataSourceRT.class);
     private final ViconicsDataSourceVO vo;
     private ViconicsNetwork network;
-    private final Map<PointKey, DataPointRT> pointLookup = new ConcurrentHashMap<PointKey, DataPointRT>();
+    private final Map<PointKey, DataPointRT> pointLookup = new ConcurrentHashMap();
     @Autowired
     private Permissions permissions;
     @Autowired
@@ -204,7 +204,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
             DataPointDao dataPointDao = new DataPointDao();
             UserDao userDao = new UserDao();
             WatchListDao watchListDao = new WatchListDao();
-            List<DataPointVO> points = dataPointDao.getDataPoints(vo.getId(), null);
+            List<DataPointVO> points = dataPointDao.getDataPoints(vo, null);
 
             // Add a point for each address if it doesn't already exist.
             int folderId = -1;
@@ -328,7 +328,7 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
                 if (pointConfig.isWatchlist()) {
                     if (watchlists == null) {
                         // Initialize the list of watchlists
-                        watchlists = new ArrayList<WatchList>();
+                        watchlists = new ArrayList();
 
                         for (User user : userDao.getActiveUsers()) {
                             if (!permissions.hasDataSourcePermission(user, vo.getId())) {

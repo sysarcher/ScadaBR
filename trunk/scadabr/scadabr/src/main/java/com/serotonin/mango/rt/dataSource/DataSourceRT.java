@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.IDataPointLiveCycleListener;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -75,7 +73,7 @@ abstract public class DataSourceRT implements ILifecycle, IDataPointLiveCycleLis
      * Note that updated versions of data points that could already be running may be added here, so implementations
      * should always check for existing instances.
      */
-    protected final Set<DataPointRT> enabledDataPointsCache = new HashSet<DataPointRT>();
+    protected final Set<DataPointRT> enabledDataPointsCache = new HashSet();
     /**
      * Under the expectation that most data sources will run in their own threads, the removedPoints field is used as a
      * cache for points that have been removed from the data source, so that at a convenient time for the data source
@@ -84,7 +82,7 @@ abstract public class DataSourceRT implements ILifecycle, IDataPointLiveCycleLis
      * Access should be synchronized with the monitor of removedPoints
      * 
      */
-    protected final Set<DataPointRT> disabledDataPointsCache = new HashSet<DataPointRT>();
+    protected final Set<DataPointRT> disabledDataPointsCache = new HashSet();
     /**
      * Under the expectation that most data sources will run in their own threads, the removedPoints field is used as a
      * cache for points that have been removed from the data source, so that at a convenient time for the data source
@@ -93,12 +91,12 @@ abstract public class DataSourceRT implements ILifecycle, IDataPointLiveCycleLis
      * Access should be synchronized with the monitor of removedPoints
      * 
      */
-    protected final Set<DataPointVO> deletedDataPointsCache = new HashSet<DataPointVO>();
-    protected final Set<DataPointRT> enabledDataPoints = new HashSet<DataPointRT>();
+    protected final Set<DataPointVO> deletedDataPointsCache = new HashSet();
+    protected final Set<DataPointRT> enabledDataPoints = new HashSet();
     /**
      * all other dataPoints of this dataSource
      */
-    protected final Set<DataPointVO> disabledDataPoints = new HashSet<DataPointVO>();
+    protected final Set<DataPointVO> disabledDataPoints = new HashSet();
     private final boolean caching;
     private boolean cacheChanged = false;
     protected boolean enabledDataPointsChanged = false;
@@ -112,10 +110,14 @@ abstract public class DataSourceRT implements ILifecycle, IDataPointLiveCycleLis
         this.vo = vo;
         caching = doCache;
         
-        eventTypes = new ArrayList<DataSourceEventType>();
+        eventTypes = new ArrayList();
         for (EventTypeVO etvo : vo.getEventTypes()) {
             eventTypes.add((DataSourceEventType) etvo.createEventType());
         }
+    }
+
+    public DataSourceVO<?> getVo() {
+        return vo;
     }
 
     public int getId() {
@@ -267,7 +269,7 @@ abstract public class DataSourceRT implements ILifecycle, IDataPointLiveCycleLis
     @Override
     public void terminate() {
         // Remove any outstanding events.
-        eventManager.cancelEventsForDataSource(vo.getId());
+        eventManager.cancelEventsForDataSource(vo);
     }
 
     @Override

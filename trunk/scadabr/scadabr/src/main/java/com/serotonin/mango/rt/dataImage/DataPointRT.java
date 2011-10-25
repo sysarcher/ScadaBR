@@ -68,7 +68,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
     private volatile PointValueTime pointValue;
     private final PointValueCache valueCache;
     private List<PointEventDetectorRT> detectors;
-    private final Map<String, Object> attributes = new HashMap<String, Object>();
+    private final Map<String, Object> attributes = new HashMap();
     // Interval logging data.
     private PointValueTime intervalValue;
     private long intervalStartTime = -1;
@@ -298,7 +298,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
             intervalValue = pointValue;
             if (vo.getIntervalLoggingType() == DataPointVO.IntervalLoggingTypes.AVERAGE) {
                 intervalStartTime = System.currentTimeMillis();
-                averagingValues = new ArrayList<IValueTime>();
+                averagingValues = new ArrayList();
             }
         }
     }
@@ -456,7 +456,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
     // /
     //
     private void fireEvents(PointValueTime oldValue, PointValueTime newValue, boolean set, boolean backdate) {
-        DataPointListener l = runtimeManager.getDataPointListeners(vo.getId());
+        DataPointListener l = runtimeManager.getDataPointListeners(vo);
         if (l != null) {
             Common.ctx.getBackgroundProcessing().addWorkItem(
                     new EventNotifyWorkItem(l, oldValue, newValue, set, backdate));
@@ -546,7 +546,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
                 runtimeManager.removePointEventDetector(pedRT.getEventDetectorKey());
             }
         }
-        eventManager.cancelEventsForDataPoint(vo.getId());
+        eventManager.cancelEventsForDataPoint(vo);
     }
 
     @Override

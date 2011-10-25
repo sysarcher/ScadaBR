@@ -160,7 +160,7 @@ public class VersionCheck extends TimerTask {
         for (DataSourceVO<?> config : new DataSourceDao().getDataSources()) {
             if (config.isEnabled()) {
                 int points = 0;
-                for (DataPointVO point : dataPointDao.getDataPoints(config.getId(), null)) {
+                for (DataPointVO point : dataPointDao.getDataPoints(config, null)) {
                     if (point.isEnabled()) {
                         points++;
                     }
