@@ -57,12 +57,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class BaseDao {
 
-    /** calendar to write and read timestamps in utc rather local time,
-     * many driverser have problems with '2011-10-30 00:59:59.0000+0:00' which is '2011-10-30 02:59:59.0000 CEST' this timestamp plus 1 second is:
-     * '2011-10-30 01:00:00.0000+0:00' or '2011-10-30 02:00:00.0000 CET'
-     */
-    protected final static Calendar CALENDAR_UTC = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-
     /** the logger */
     private static final Logger LOG = LoggerFactory.getLogger(BaseDao.class);
     /** the jdbcTemplate to work with */

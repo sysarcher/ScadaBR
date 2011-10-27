@@ -91,6 +91,11 @@ public class UserDaoTest extends AbstractDaoTests {
     DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, Locale.GERMANY);
 
     @Test
+    public void testAPL() {
+        test_UTC_DaylightSaving(userDao.getJdbcTemplate());
+    }
+    
+    @Test
     public void testDate_Summer_Winter_Time() {
         setUpTableUsers();
         final Calendar c_cest = Calendar.getInstance(TimeZone.getTimeZone("UTC"));

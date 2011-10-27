@@ -41,9 +41,7 @@ import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.DataPointAccess;
-import java.sql.Timestamp;
 import java.util.Date;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.transaction.annotation.Propagation;
 
 @Repository
