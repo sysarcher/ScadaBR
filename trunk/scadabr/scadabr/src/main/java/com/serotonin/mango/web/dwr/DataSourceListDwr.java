@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
@@ -39,11 +38,11 @@ import com.serotonin.web.dwr.DwrResponseI18n;
 public class DataSourceListDwr extends BaseDwr {
 
     @Autowired
-    private UserDao userDao;
-    @Autowired
     private RuntimeManager runtimeManager;
     @Autowired
     private DataSourceDao dataSourceDao;
+    @Autowired
+    private DataPointDao dataPointDao;
 
     public DwrResponseI18n init() {
         DwrResponseI18n response = new DwrResponseI18n();
@@ -83,7 +82,7 @@ public class DataSourceListDwr extends BaseDwr {
     }
 
     public DwrResponseI18n toggleDataPoint(int dataPointId) {
-        DataPointVO dataPoint = new DataPointDao().getDataPoint(dataPointId);
+        DataPointVO dataPoint = dataPointDao.getDataPoint(dataPointId);
         permissions.ensureDataSourcePermission(common.getUser(), dataPoint.getDataSourceId());
 
         dataPoint.setEnabled(!dataPoint.isEnabled());
@@ -97,7 +96,7 @@ public class DataSourceListDwr extends BaseDwr {
 
     public int copyDataSource(int dataSourceId) {
         permissions.ensureDataSourcePermission(common.getUser(), dataSourceId);
-        int dsId = new DataSourceDao().copyDataSource(dataSourceDao.getDataSource(dataSourceId), getResourceBundle());
+        int dsId = dataSourceDao.copyDataSource(dataSourceDao.getDataSource(dataSourceId), getResourceBundle());
         userDao.populateUserPermissions(common.getUser());
         return dsId;
     }

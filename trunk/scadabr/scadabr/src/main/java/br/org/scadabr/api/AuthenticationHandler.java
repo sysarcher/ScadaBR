@@ -22,6 +22,8 @@ public class AuthenticationHandler extends BasicHandler {
     private static ThreadLocal _username = new ThreadLocal();
     @Autowired
     private Common common;
+    @Autowired
+    private UserDao userDao;
 
     public static String getUsername() {
         return ((String) (_username.get())).toString();
@@ -80,7 +82,7 @@ public class AuthenticationHandler extends BasicHandler {
             String password = common.getEnvironmentProfile().getProperty(
                     "api.password", "admin");
 
-            User user = new UserDao().getUser(username);
+            User user = userDao.getUser(username);
             if (user == null) {
                 throw new AxisFault("Invalid Default Username!");
             }
@@ -98,7 +100,7 @@ public class AuthenticationHandler extends BasicHandler {
         String username = getUsername(hel);
         String password = getPassword(hel);
 
-        User user = new UserDao().getUser(username);
+        User user = userDao.getUser(username);
 
         if (user == null) {
             throw new AxisFault("Invalid Username!");

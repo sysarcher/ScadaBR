@@ -1,38 +1,38 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr;
 
 import java.util.List;
 import java.util.ResourceBundle;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.serotonin.InvalidArgumentException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.MailingListDao;
 import com.serotonin.mango.db.dao.ReportDao;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.rt.maint.work.ReportWorkItem;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
-import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.vo.report.ReportInstance;
 import com.serotonin.mango.vo.report.ReportJob;
 import com.serotonin.mango.vo.report.ReportPointVO;
@@ -48,14 +48,18 @@ import com.serotonin.web.i18n.LocalizableMessage;
  * @author Matthew Lohbihler
  */
 public class ReportsDwr extends BaseDwr {
+
+    @Autowired
+    private MailingListDao mailingListDao;
+
     public DwrResponseI18n init() {
         DwrResponseI18n response = new DwrResponseI18n();
         ReportDao reportDao = new ReportDao();
         User user = common.getUser();
 
         response.addData("points", getReadablePoints());
-        response.addData("mailingLists", new MailingListDao().getMailingLists());
-        response.addData("users", new UserDao().getUsers());
+        response.addData("mailingLists", mailingListDao.getMailingLists());
+        response.addData("users", userDao.getUsers());
         response.addData("reports", reportDao.getReports(user.getId()));
         response.addData("instances", getReportInstances(user));
 
@@ -67,8 +71,7 @@ public class ReportsDwr extends BaseDwr {
         if (id == Common.NEW_ID) {
             report = new ReportVO();
             report.setName(getMessage("common.newName"));
-        }
-        else {
+        } else {
             report = new ReportDao().getReport(id);
 
             if (copy) {
@@ -99,24 +102,25 @@ public class ReportsDwr extends BaseDwr {
                 // Check the cron pattern.
                 try {
                     new CronTimerTrigger(scheduleCron);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     response.addContextualMessage("scheduleCron", "reports.validate.cron", e.getMessage());
                 }
-            }
-            else {
-                if (runDelayMinutes < 0)
+            } else {
+                if (runDelayMinutes < 0) {
                     response.addContextualMessage("runDelayMinutes", "reports.validate.lessThan0");
-                else if (runDelayMinutes > 59)
+                } else if (runDelayMinutes > 59) {
                     response.addContextualMessage("runDelayMinutes", "reports.validate.greaterThan59");
+                }
             }
         }
 
-        if (schedule && email && recipients.isEmpty())
+        if (schedule && email && recipients.isEmpty()) {
             response.addContextualMessage("recipients", "reports.validate.needRecip");
+        }
 
-        if (response.getHasMessages())
+        if (response.getHasMessages()) {
             return response;
+        }
 
         User user = common.getUser();
         ReportDao reportDao = new ReportDao();
@@ -124,9 +128,9 @@ public class ReportsDwr extends BaseDwr {
         if (id == Common.NEW_ID) {
             report = new ReportVO();
             report.setUserId(user.getId());
-        }
-        else
+        } else {
             report = reportDao.getReport(id);
+        }
 
         permissions.ensureReportPermission(user, report);
 
@@ -214,7 +218,8 @@ public class ReportsDwr extends BaseDwr {
             report.setZipData(zipData);
             report.setRecipients(recipients);
 
-            ReportWorkItem.queueReport(report);
+            //TODO changed from static ...
+            new ReportWorkItem().queueReport(report);
         }
 
         return response;
@@ -233,21 +238,28 @@ public class ReportsDwr extends BaseDwr {
 
     private void validateData(DwrResponseI18n response, String name, List<ReportPointVO> points, int dateRangeType,
             int relativeDateType, int previousPeriodCount, int pastPeriodCount) {
-        if (StringUtils.isEmpty(name))
+        if (StringUtils.isEmpty(name)) {
             response.addContextualMessage("name", "reports.validate.required");
-        if (StringUtils.isLengthGreaterThan(name, 100))
+        }
+        if (StringUtils.isLengthGreaterThan(name, 100)) {
             response.addContextualMessage("name", "reports.validate.longerThan100");
-        if (points.isEmpty())
+        }
+        if (points.isEmpty()) {
             response.addContextualMessage("points", "reports.validate.needPoint");
-        if (dateRangeType != ReportVO.DATE_RANGE_TYPE_RELATIVE && dateRangeType != ReportVO.DATE_RANGE_TYPE_SPECIFIC)
+        }
+        if (dateRangeType != ReportVO.DATE_RANGE_TYPE_RELATIVE && dateRangeType != ReportVO.DATE_RANGE_TYPE_SPECIFIC) {
             response.addGenericMessage("reports.validate.invalidDateRangeType");
+        }
         if (relativeDateType != ReportVO.RELATIVE_DATE_TYPE_PAST
-                && relativeDateType != ReportVO.RELATIVE_DATE_TYPE_PREVIOUS)
+                && relativeDateType != ReportVO.RELATIVE_DATE_TYPE_PREVIOUS) {
             response.addGenericMessage("reports.validate.invalidRelativeDateType");
-        if (previousPeriodCount < 1)
+        }
+        if (previousPeriodCount < 1) {
             response.addContextualMessage("previousPeriodCount", "reports.validate.periodCountLessThan1");
-        if (pastPeriodCount < 1)
+        }
+        if (pastPeriodCount < 1) {
             response.addContextualMessage("pastPeriodCount", "reports.validate.periodCountLessThan1");
+        }
 
         User user = common.getUser();
         DataPointDao dataPointDao = new DataPointDao();
@@ -255,10 +267,10 @@ public class ReportsDwr extends BaseDwr {
             permissions.ensureDataPointReadPermission(user, dataPointDao.getDataPoint(point.getPointId()));
 
             try {
-                if (!StringUtils.isEmpty(point.getColour()))
+                if (!StringUtils.isEmpty(point.getColour())) {
                     ColorUtils.toColor(point.getColour());
-            }
-            catch (InvalidArgumentException e) {
+                }
+            } catch (InvalidArgumentException e) {
                 response.addContextualMessage("points", "reports.validate.colour", point.getColour());
             }
         }
@@ -278,8 +290,9 @@ public class ReportsDwr extends BaseDwr {
     private List<ReportInstance> getReportInstances(User user) {
         List<ReportInstance> result = new ReportDao().getReportInstances(user.getId());
         ResourceBundle bundle = getResourceBundle();
-        for (ReportInstance i : result)
+        for (ReportInstance i : result) {
             i.setBundle(bundle);
+        }
         return result;
     }
 
@@ -289,8 +302,9 @@ public class ReportsDwr extends BaseDwr {
 
     public ReportVO createReportFromWatchlist(int watchListId) {
         WatchList watchList = new WatchListDao().getWatchList(watchListId);
-        if (watchList == null)
+        if (watchList == null) {
             return null;
+        }
 
         ReportVO report = new ReportVO();
         report.setName(LocalizableMessage.getMessage(getResourceBundle(), "common.copyPrefix", watchList.getName()));

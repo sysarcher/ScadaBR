@@ -20,7 +20,6 @@ package com.serotonin.mango.db.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +43,7 @@ import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.UserComment;
+import com.serotonin.mango.vo.EventComment;
 import com.serotonin.mango.vo.report.ReportDataStreamHandler;
 import com.serotonin.mango.vo.report.ReportDataValue;
 import com.serotonin.mango.vo.report.ReportInstance;
@@ -108,7 +107,7 @@ public class ReportDao extends BaseDao {
 
     private void insertReport(final ReportVO report) {
         SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("reports").usingGeneratedKeyColumns("id");
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap();
         params.put("userId", report.getUserId());
         params.put("name", report.getName());
         params.put("data", SerializationHelper.writeObjectToArray(report));
@@ -186,7 +185,7 @@ public class ReportDao extends BaseDao {
     public void saveReportInstance(ReportInstance instance) {
         if (instance.getId() == Common.NEW_ID) {
             SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("reportInstances").usingGeneratedKeyColumns("id");
-            Map<String, Object> params = new HashMap<String, Object>();
+            Map<String, Object> params = new HashMap();
             params.put("userId", instance.getUserId());
             params.put("name", instance.getName());
             params.put("includeEvents", instance.getIncludeEvents());
@@ -285,7 +284,7 @@ public class ReportDao extends BaseDao {
             String name = Functions.truncate(point.getName(), 100);
 
             SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("reportInstancePoints").usingGeneratedKeyColumns("id");
-            Map<String, Object> params = new HashMap<String, Object>();
+            Map<String, Object> params = new HashMap();
             params.put("reportInstanceId", instance.getId());
             params.put("dataSourceName", point.getDeviceName());
             params.put("pointName", name);
@@ -367,15 +366,16 @@ public class ReportDao extends BaseDao {
                 getSimpleJdbcTemplate().update(eventSQL, appendParameters(timestampParams, instance.getUserId(), point.getId()));
             }
 
+            //TODO cleanup SQL and use named params
             // Insert the reportInstanceUserComments records for the point.
             if (instance.isIncludeUserComments()) {
                 String commentSQL = "insert into reportInstanceUserComments " //
                         + "  (reportInstanceId, username, commentType, typeKey, ts, commentText)" //
-                        + "  select " + instance.getId() + ", u.username, " + UserComment.TYPE_POINT + ", " //
+//TODO                        + "  select " + instance.getId() + ", u.username, " + UserComment.CommentType.POINT.name() + ", " //
                         + reportPointId + ", uc.ts, uc.commentText " //
                         + "  from userComments uc " //
                         + "    left join users u on uc.userId=u.id " //
-                        + "  where uc.commentType=" + UserComment.TYPE_POINT //
+//TODO                        + "  where uc.commentType=" + UserComment.CommentType.POINT.name() //
                         + "    and uc.typeKey=? ";
 
                 // Only include comments made in the duration of the report.
@@ -388,12 +388,12 @@ public class ReportDao extends BaseDao {
         if (instance.isIncludeUserComments()) {
             String commentSQL = "insert into reportInstanceUserComments " //
                     + "  (reportInstanceId, username, commentType, typeKey, ts, commentText)" //
-                    + "  select " + instance.getId() + ", u.username, " + UserComment.TYPE_EVENT + ", uc.typeKey, " //
+//TODO                    + "  select " + instance.getId() + ", u.username, " + UserComment.CommentType.EVENT.name() + ", uc.typeKey, " //
                     + "    uc.ts, uc.commentText " //
                     + "  from userComments uc " //
                     + "    left join users u on uc.userId=u.id " //
                     + "    join reportInstanceEvents re on re.eventId=uc.typeKey " //
-                    + "  where uc.commentType=" + UserComment.TYPE_EVENT //
+//TODO                    + "  where uc.commentType=" + UserComment.CommentType.EVENT.name() //
                     + "    and re.reportInstanceId=? ";
             getSimpleJdbcTemplate().update(commentSQL, instance.getId());
         }
@@ -527,14 +527,14 @@ public class ReportDao extends BaseDao {
         // Get the events.
         final List<EventInstance> events = getSimpleJdbcTemplate().query(EVENT_SELECT, new EventDao.EventInstanceRowMapper(), instanceId);
         // Add in the comments.
-        getJdbcTemplate().query(EVENT_COMMENT_SELECT, new Object[]{instanceId, UserComment.TYPE_EVENT}, new RowCallbackHandler() {
+        getJdbcTemplate().query(EVENT_COMMENT_SELECT, new Object[]{instanceId, /*TODO UserComment.CommentType.EVENT.name()*/}, new RowCallbackHandler() {
 
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 // Create the comment
-                UserComment c = new UserComment();
+                EventComment c = new EventComment();
                 c.setUsername(rs.getString(1));
-                c.setTs(rs.getLong(3));
+                c.setTs(rs.getDate(3));
                 c.setComment(rs.getString(4));
 
                 // Find the event and add the comment
@@ -542,7 +542,7 @@ public class ReportDao extends BaseDao {
                 for (EventInstance event : events) {
                     if (event.getId() == eventId) {
                         if (event.getEventComments() == null) {
-                            event.setEventComments(new ArrayList<UserComment>());
+                            event.clearEventComments();
                         }
                         event.addEventComment(c);
                     }
@@ -556,7 +556,7 @@ public class ReportDao extends BaseDao {
             + "  rc.ts, rc.commentText "
             + "from reportInstanceUserComments rc "
             + "  left join reportInstancePoints rp on rc.typeKey=rp.id and rc.commentType="
-            + UserComment.TYPE_POINT
+//TODO            + UserComment.CommentType.POINT.name()
             + " " + "where rc.reportInstanceId=? " + "order by rc.ts ";
 
     public List<ReportUserComment> getReportInstanceUserComments(int instanceId) {
@@ -569,7 +569,7 @@ public class ReportDao extends BaseDao {
         public ReportUserComment mapRow(ResultSet rs, int rowNum) throws SQLException {
             ReportUserComment c = new ReportUserComment();
             c.setUsername(rs.getString(1));
-            c.setCommentType(rs.getInt(2));
+//TODO            c.setCommentType(rs.getInt(2));
             c.setTypeKey(rs.getInt(3));
             c.setPointName(rs.getString(4));
             c.setTs(rs.getLong(5));

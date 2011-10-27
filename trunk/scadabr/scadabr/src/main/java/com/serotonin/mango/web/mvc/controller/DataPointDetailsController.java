@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.mvc.controller;
 
@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.ParameterizableViewController;
 
@@ -43,22 +44,22 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.util.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class DataPointDetailsController extends ParameterizableViewController {
-    
+
     @Autowired
     private Common common;
     @Autowired
     private Permissions permissions;
     @Autowired
     private ControllerUtils controllerUtils;
-
+    @Autowired
+    private UserDao userDao;
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap();
         User user = common.getUser(request);
 
         int id;
@@ -72,24 +73,25 @@ public class DataPointDetailsController extends ParameterizableViewController {
             if (pedStr == null) {
                 // Check if an XID was provided.
                 String xid = request.getParameter("dpxid");
-                if (xid == null)
+                if (xid == null) {
                     throw new ShouldNeverHappenException("One of dpid, dpxid, or pedid must be provided for this view");
+                }
 
                 model.put("currentXid", xid);
                 point = dataPointDao.getDataPoint(xid);
                 id = point == null ? -1 : point.getId();
-            }
-            else {
+            } else {
                 int pedid = Integer.parseInt(pedStr);
                 id = dataPointDao.getDataPointIdFromDetectorId(pedid);
             }
-        }
-        else
+        } else {
             id = Integer.parseInt(idStr);
+        }
 
         // Put the point in the model.
-        if (point == null)
+        if (point == null) {
             point = dataPointDao.getDataPoint(id);
+        }
 
         if (point != null) {
             permissions.ensureDataPointReadPermission(user, point);
@@ -98,23 +100,24 @@ public class DataPointDetailsController extends ParameterizableViewController {
 
             // Get the views for this user that contain this point.
             List<View> userViews = new ViewDao().getViews(user.getId());
-            List<View> views = new LinkedList<View>();
+            List<View> views = new LinkedList();
             for (View view : userViews) {
                 view.validateViewComponents(false);
-                if (view.containsValidVisibleDataPoint(id))
+                if (view.containsValidVisibleDataPoint(id)) {
                     views.add(view);
+                }
             }
             model.put("views", views);
 
             // Get the users that have access to this point.
-            List<User> allUsers = new UserDao().getUsers();
-            List<Map<String, Object>> users = new LinkedList<Map<String, Object>>();
+            List<User> allUsers = userDao.getUsers();
+            List<Map<String, Object>> users = new LinkedList();
             Map<String, Object> userData;
             int accessType;
             for (User mangoUser : allUsers) {
                 accessType = permissions.getDataPointAccessType(mangoUser, point);
                 if (accessType != Permissions.DataPointAccessTypes.NONE) {
-                    userData = new HashMap<String, Object>();
+                    userData = new HashMap();
                     userData.put("user", mangoUser);
                     userData.put("accessType", accessType);
                     users.add(userData);
@@ -130,10 +133,11 @@ public class DataPointDetailsController extends ParameterizableViewController {
 
             // Put the default history table count into the model. Default to 10.
             int historyLimit = 10;
-            if (point.getChartRenderer() instanceof TableChartRenderer)
+            if (point.getChartRenderer() instanceof TableChartRenderer) {
                 historyLimit = ((TableChartRenderer) point.getChartRenderer()).getLimit();
-            else if (point.getChartRenderer() instanceof ImageFlipbookRenderer)
+            } else if (point.getChartRenderer() instanceof ImageFlipbookRenderer) {
                 historyLimit = ((ImageFlipbookRenderer) point.getChartRenderer()).getLimit();
+            }
             model.put("historyLimit", historyLimit);
 
             // Determine our image chart rendering capabilities.
@@ -151,8 +155,9 @@ public class DataPointDetailsController extends ParameterizableViewController {
             }
 
             // Determine out flipbook rendering capabilities
-            if (ImageFlipbookRenderer.getDefinition().supports(point.getPointLocator().getMangoDataType()))
+            if (ImageFlipbookRenderer.getDefinition().supports(point.getPointLocator().getMangoDataType())) {
                 model.put("flipbookLimit", 10);
+            }
 
             model.put("currentXid", point.getXid());
         }

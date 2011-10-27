@@ -50,8 +50,10 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.view.chart.ChartRenderer;
+import com.serotonin.mango.vo.DataPointComment;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
+import com.serotonin.mango.vo.EventComment;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.vo.permission.Permissions;
@@ -81,6 +83,8 @@ abstract public class BaseDwr {
     protected EventDao eventDao;
     @Autowired
     private RuntimeManager runtimeManager;
+    @Autowired
+    protected UserDao userDao;
     protected ResourceBundle changeSnippetMap = ResourceBundle.getBundle("changeSnippetMap");
     protected ResourceBundle chartSnippetMap = ResourceBundle.getBundle("chartSnippetMap");
 
@@ -225,33 +229,37 @@ abstract public class BaseDwr {
     }
 
     /**
-     * Logs a user comment after validation.
+     * Logs a dataPoint comment after validation.
      *
-     * @param eventId
+     * @param dataPointId
      * @param comment
      * @return
      */
-    public UserComment addUserComment(int typeId, int referenceId, String comment) {
+    public DataPointComment addDataPointComment(int dataPointId, String comment) {
         if (StringUtils.isEmpty(comment)) {
             return null;
         }
 
         User user = common.getUser();
-        UserComment c = new UserComment();
-        c.setComment(comment);
-        c.setTs(System.currentTimeMillis());
-        c.setUserId(user.getId());
-        c.setUsername(user.getUsername());
+        DataPointComment dpc = new DataPointComment(user, comment, dataPointId);
+        userCommentDao.insertComment(dpc);
 
-        if (typeId == UserComment.TYPE_EVENT) {
-            eventDao.insertEventComment(referenceId, c);
-        } else if (typeId == UserComment.TYPE_POINT) {
-            userCommentDao.insertUserComment(UserComment.TYPE_POINT, referenceId, c);
-        } else {
-            throw new ShouldNeverHappenException("Invalid comment type: " + typeId);
-        }
+        return dpc;
+    }
 
-        return c;
+    /**
+     * Logs a dataPoint comment after validation.
+     *
+     * @param eventId
+     * @param comment
+     * @return
+     */
+    public EventComment addEventComment(int eventId, String comment) {
+        User user = common.getUser();
+        EventComment ec = new EventComment(user, comment, eventId);
+        userCommentDao.insertComment(ec);
+
+        return ec;
     }
 
     protected List<DataPointBean> getReadablePoints() {
@@ -259,7 +267,7 @@ abstract public class BaseDwr {
 
         List<DataPointVO> points = new DataPointDao().getDataPoints(DataPointExtendedNameComparator.instance, false);
         if (!permissions.hasAdmin(user)) {
-            List<DataPointVO> userPoints = new ArrayList<DataPointVO>();
+            List<DataPointVO> userPoints = new ArrayList();
             for (DataPointVO dp : points) {
                 if (permissions.hasDataPointReadPermission(user, dp)) {
                     userPoints.add(dp);
@@ -268,7 +276,7 @@ abstract public class BaseDwr {
             points = userPoints;
         }
 
-        List<DataPointBean> result = new ArrayList<DataPointBean>();
+        List<DataPointBean> result = new ArrayList();
         for (DataPointVO dp : points) {
             result.add(new DataPointBean(dp));
         }
@@ -277,7 +285,7 @@ abstract public class BaseDwr {
     }
 
     public Map<String, Object> getDateRangeDefaults(int periodType, int period) {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap();
 
         // Default the specific date fields.
         DateTime dt = new DateTime();
@@ -317,16 +325,14 @@ abstract public class BaseDwr {
     public static String generateContent(HttpServletRequest request, String snippet, Map<String, Object> model) {
         try {
             return ContentGenerator.generateContent(request, "/WEB-INF/snippet/" + snippet, model);
-        } catch (ServletException e) {
-            throw new ShouldNeverHappenException(e);
-        } catch (IOException e) {
+        } catch (ServletException | IOException e) {
             throw new ShouldNeverHappenException(e);
         }
     }
 
     protected List<User> getShareUsers(User excludeUser) {
-        List<User> users = new ArrayList<User>();
-        for (User u : new UserDao().getUsers()) {
+        List<User> users = new ArrayList();
+        for (User u : userDao.getUsers()) {
             if (u.getId() != excludeUser.getId()) {
                 users.add(u);
             }

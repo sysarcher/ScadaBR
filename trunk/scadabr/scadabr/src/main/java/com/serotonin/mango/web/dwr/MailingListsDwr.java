@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr;
 
@@ -29,10 +29,10 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.MailingListDao;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.maint.work.EmailWorkItem;
 import com.serotonin.mango.vo.mailingList.EmailRecipient;
 import com.serotonin.mango.vo.mailingList.MailingList;
@@ -44,12 +44,15 @@ import com.serotonin.web.i18n.I18NUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 public class MailingListsDwr extends BaseDwr {
+
     private final static Logger LOG = LoggerFactory.getLogger(MailingListsDwr.class);
+    @Autowired
+    private MailingListDao mailingListDao;
 
     public DwrResponseI18n init() {
         DwrResponseI18n response = new DwrResponseI18n();
-        response.addData("lists", new MailingListDao().getMailingLists());
-        response.addData("users", new UserDao().getUsers());
+        response.addData("lists", mailingListDao.getMailingLists());
+        response.addData("users", userDao.getUsers());
         return response;
     }
 
@@ -67,16 +70,16 @@ public class MailingListsDwr extends BaseDwr {
     public DwrResponseI18n saveMailingList(int id, String xid, String name, List<RecipientListEntryBean> entryBeans,
             List<Integer> inactiveIntervals) {
         DwrResponseI18n response = new DwrResponseI18n();
-        MailingListDao mailingListDao = new MailingListDao();
 
         // Validate the given information. If there is a problem, return an appropriate error message.
         MailingList ml = createMailingList(id, xid, name, entryBeans);
         ml.getInactiveIntervals().addAll(inactiveIntervals);
 
-        if (StringUtils.isEmpty(xid))
+        if (StringUtils.isEmpty(xid)) {
             response.addContextualMessage("xid", "validate.required");
-        else if (!mailingListDao.isXidUnique(xid, id))
+        } else if (!mailingListDao.isXidUnique(xid, id)) {
             response.addContextualMessage("xid", "validate.xidUsed");
+        }
 
         ml.validate(response);
 
@@ -99,19 +102,18 @@ public class MailingListsDwr extends BaseDwr {
         MailingList ml = createMailingList(id, null, name, entryBeans);
         new MailingListDao().populateEntrySubclasses(ml.getEntries());
 
-        Set<String> addresses = new HashSet<String>();
+        Set<String> addresses = new HashSet();
         ml.appendAddresses(addresses, null);
         String[] toAddrs = addresses.toArray(new String[0]);
 
         try {
             ResourceBundle bundle = common.getBundle();
-            Map<String, Object> model = new HashMap<String, Object>();
+            Map<String, Object> model = new HashMap();
             model.put("message", new LocalizableMessage("ftl.userTestEmail", ml.getName()));
             MangoEmailContent cnt = new MangoEmailContent("ftl.testEmail", model, bundle, I18NUtils.getMessage(bundle,
                     "ftl.testEmail"), Common.UTF8);
             EmailWorkItem.queueEmail(toAddrs, cnt);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             response.addGenericMessage("mailingLists.testerror", e.getMessage());
             LOG.warn("", e);
         }
@@ -131,9 +133,10 @@ public class MailingListsDwr extends BaseDwr {
         ml.setXid(xid);
         ml.setName(name);
 
-        List<EmailRecipient> entries = new ArrayList<EmailRecipient>(entryBeans.size());
-        for (RecipientListEntryBean bean : entryBeans)
+        List<EmailRecipient> entries = new ArrayList(entryBeans.size());
+        for (RecipientListEntryBean bean : entryBeans) {
             entries.add(bean.createEmailRecipient());
+        }
         ml.setEntries(entries);
 
         return ml;

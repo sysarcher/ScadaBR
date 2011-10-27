@@ -96,6 +96,12 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
     private Permissions permissions;
     @Autowired
     private RuntimeManager runtimeManager;
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private DataPointDao dataPointDao;
+    @Autowired
+    private WatchListDao watchListDao;
 
     public ViconicsDataSourceRT(ViconicsDataSourceVO vo) {
         super(vo, false);
@@ -201,9 +207,6 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
             String folderName = watchListName + " - added " + sdf.format(new Date());
 
             // Get a list of all existing points.
-            DataPointDao dataPointDao = new DataPointDao();
-            UserDao userDao = new UserDao();
-            WatchListDao watchListDao = new WatchListDao();
             List<DataPointVO> points = dataPointDao.getDataPoints(vo, null);
 
             // Add a point for each address if it doesn't already exist.

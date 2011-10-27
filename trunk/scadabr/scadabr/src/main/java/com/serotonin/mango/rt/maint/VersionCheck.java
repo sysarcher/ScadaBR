@@ -72,6 +72,10 @@ public class VersionCheck extends TimerTask {
     private SystemSettingsDao systemSettingsDao;
     @Autowired
     private EventManager eventManager;
+    @Autowired
+    private DataSourceDao dataSourceDao;
+    @Autowired
+    private DataPointDao dataPointDao;
 
     /**
      * This method will set up the version checking job. It assumes that the corresponding system setting for running
@@ -156,8 +160,7 @@ public class VersionCheck extends TimerTask {
         postMethod.addParameter("instanceVersion", common.getVersion());
 
         StringBuilder datasourceTypes = new StringBuilder();
-        DataPointDao dataPointDao = new DataPointDao();
-        for (DataSourceVO<?> config : new DataSourceDao().getDataSources()) {
+        for (DataSourceVO<?> config : dataSourceDao.getDataSources()) {
             if (config.isEnabled()) {
                 int points = 0;
                 for (DataPointVO point : dataPointDao.getDataPoints(config, null)) {
@@ -226,7 +229,7 @@ public class VersionCheck extends TimerTask {
     }
 
     private static String calcMachineId() {
-        List<NI> nis = new ArrayList<NI>();
+        List<NI> nis = new ArrayList();
 
         try {
             Enumeration<NetworkInterface> eni = NetworkInterface.getNetworkInterfaces();

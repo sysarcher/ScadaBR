@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.event.type;
 
@@ -22,21 +22,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
 import com.serotonin.json.JsonReader;
 import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.web.i18n.LocalizableMessage;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @JsonRemoteEntity
 public class SystemEventType extends EventType {
-    
+
     @Autowired
     private SystemSettingsDao systemSettingsDao;
     //
@@ -45,7 +45,6 @@ public class SystemEventType extends EventType {
     // /
     //
     private static final String SYSTEM_SETTINGS_PREFIX = "systemEventAlarmLevel";
-
     public static final int TYPE_SYSTEM_STARTUP = 1;
     public static final int TYPE_SYSTEM_SHUTDOWN = 2;
     public static final int TYPE_MAX_ALARM_LEVEL_CHANGED = 3;
@@ -56,8 +55,8 @@ public class SystemEventType extends EventType {
     public static final int TYPE_EMAIL_SEND_FAILURE = 8;
     public static final int TYPE_POINT_LINK_FAILURE = 9;
     public static final int TYPE_PROCESS_FAILURE = 10;
-
     public static final ExportCodes TYPE_CODES = new ExportCodes();
+
     static {
         TYPE_CODES.addElement(TYPE_SYSTEM_STARTUP, "SYSTEM_STARTUP");
         TYPE_CODES.addElement(TYPE_SYSTEM_SHUTDOWN, "SYSTEM_SHUTDOWN");
@@ -70,12 +69,11 @@ public class SystemEventType extends EventType {
         TYPE_CODES.addElement(TYPE_POINT_LINK_FAILURE, "POINT_LINK_FAILURE");
         TYPE_CODES.addElement(TYPE_PROCESS_FAILURE, "PROCESS_FAILURE");
     }
-
     private List<EventTypeVO> systemEventTypes;
 
     public List<EventTypeVO> getSystemEventTypes() {
         if (systemEventTypes == null) {
-            systemEventTypes = new ArrayList<EventTypeVO>();
+            systemEventTypes = new ArrayList();
 
             addEventTypeVO(TYPE_SYSTEM_STARTUP, "event.system.startup", AlarmLevels.INFORMATION);
             addEventTypeVO(TYPE_SYSTEM_SHUTDOWN, "event.system.shutdown", AlarmLevels.INFORMATION);
@@ -98,8 +96,9 @@ public class SystemEventType extends EventType {
 
     public EventTypeVO getEventType(int type) {
         for (EventTypeVO et : getSystemEventTypes()) {
-            if (et.getTypeRef1() == type)
+            if (et.getTypeRef1() == type) {
                 return et;
+            }
         }
         return null;
     }
@@ -108,10 +107,8 @@ public class SystemEventType extends EventType {
         EventTypeVO et = getEventType(type);
         et.setAlarmLevel(alarmLevel);
 
-        SystemSettingsDao dao = new SystemSettingsDao();
-        dao.setIntValue(SYSTEM_SETTINGS_PREFIX + type, alarmLevel.mangoId);
+        systemSettingsDao.setIntValue(SYSTEM_SETTINGS_PREFIX + type, alarmLevel.mangoId);
     }
-
     //
     // /
     // / Instance stuff
@@ -185,17 +182,22 @@ public class SystemEventType extends EventType {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         SystemEventType other = (SystemEventType) obj;
-        if (refId2 != other.refId2)
+        if (refId2 != other.refId2) {
             return false;
-        if (systemEventTypeId != other.systemEventTypeId)
+        }
+        if (systemEventTypeId != other.systemEventTypeId) {
             return false;
+        }
         return true;
     }
 

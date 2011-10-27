@@ -52,6 +52,10 @@ public class DataSourceEditController extends ParameterizableViewController {
     private Permissions permissions;
     @Autowired
     private RuntimeManager runtimeManager;
+    @Autowired
+    private DataSourceDao dataSourceDao;
+    @Autowired
+    private DataPointDao dataPointDao;
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
@@ -74,10 +78,10 @@ public class DataSourceEditController extends ParameterizableViewController {
                 // A new data source
                 dataSourceVO = DataSourceVO.createDataSourceVO(dataSourceTtype);
                 dataSourceVO.setId(Common.NEW_ID);
-                dataSourceVO.setXid(new DataSourceDao().generateUniqueXid());
+                dataSourceVO.setXid(dataSourceDao.generateUniqueXid());
             } else {
                 int pid = Integer.parseInt(pidStr);
-                DataPointVO dp = new DataPointDao().getDataPoint(pid);
+                DataPointVO dp = dataPointDao.getDataPoint(pid);
                 if (dp == null) {
                     throw new ShouldNeverHappenException("DataPoint not found with id " + pid);
                 }
@@ -100,7 +104,7 @@ public class DataSourceEditController extends ParameterizableViewController {
         user.setEditDataSource(dataSourceVO);
 
         // Create the model.
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap();
 
         // The data source
         model.put("dataSource", dataSourceVO);
@@ -113,8 +117,8 @@ public class DataSourceEditController extends ParameterizableViewController {
         }
 
         List<DataPointVO> allPoints = new DataPointDao().getDataPoints(DataPointExtendedNameComparator.instance, false);
-        List<DataPointVO> userPoints = new LinkedList<DataPointVO>();
-        List<DataPointVO> analogPoints = new LinkedList<DataPointVO>();
+        List<DataPointVO> userPoints = new LinkedList();
+        List<DataPointVO> analogPoints = new LinkedList();
         for (DataPointVO dp : allPoints) {
             if (permissions.hasDataPointReadPermission(user, dp)) {
                 userPoints.add(dp);

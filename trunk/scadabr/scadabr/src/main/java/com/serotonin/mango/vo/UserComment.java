@@ -20,21 +20,33 @@ package com.serotonin.mango.vo;
 
 import com.serotonin.web.taglib.DateFunctions;
 import com.serotonin.web.taglib.Functions;
-
-public class UserComment {
-    public static final int TYPE_EVENT = 1;
-    public static final int TYPE_POINT = 2;
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
+//TODO split this class in two: EventComment and DataPointComment
+public abstract class UserComment {
 
     // Configuration fields
     private int userId;
-    private long ts;
+    private Date ts;
     private String comment;
-
+ 
     // Relational fields
     private String username;
 
+    public UserComment() {
+    }
+
+    public UserComment(User user, String commnet) {
+        this.userId = user.getId();
+        this.username = user.getUsername();
+        this.ts = Calendar.getInstance().getTime();
+        this.comment = commnet;
+    }
+    
+    //TODO Localization???
     public String getPrettyTime() {
-        return DateFunctions.getTime(ts);
+        return DateFormat.getDateTimeInstance().format(ts);
     }
 
     public String getComment() {
@@ -45,11 +57,11 @@ public class UserComment {
        this.comment =  Functions.truncate(comment, 1024);
     }
 
-    public long getTs() {
+    public Date getTs() {
         return ts;
     }
 
-    public void setTs(long ts) {
+    public void setTs(Date ts) {
         this.ts = ts;
     }
 

@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.maint.work;
 
@@ -26,14 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.mail.internet.AddressException;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.InvalidArgumentException;
 import com.serotonin.io.StreamUtils;
@@ -57,30 +57,33 @@ import com.serotonin.web.email.EmailAttachment;
 import com.serotonin.web.email.EmailContent;
 import com.serotonin.web.email.EmailInline;
 import com.serotonin.web.i18n.LocalizableMessage;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
  */
 public class ReportWorkItem implements WorkItem {
+
     private final static Logger LOG = LoggerFactory.getLogger(ReportWorkItem.class);
     @Autowired
     private Permissions permissions;
     @Autowired
     private Common common;
+    @Autowired
+    private UserDao userDao;
 
     @Override
     public int getPriority() {
         return WorkItem.PRIORITY_LOW;
     }
 
-    public static void queueReport(ReportVO report) {
+    public void queueReport(ReportVO report) {
         LOG.info("Queuing report with id " + report.getId());
 
         // Verify that the user is not disabled.
-        User user = new UserDao().getUser(report.getUserId());
-        if (user.isDisabled())
+        User reportUser = userDao.getUser(report.getUserId());
+        if (reportUser.isDisabled()) {
             return;
+        }
 
         // User is ok. Continue...
         ReportWorkItem item = new ReportWorkItem();
@@ -89,7 +92,7 @@ public class ReportWorkItem implements WorkItem {
         item.reportConfig = report;
         ReportInstance reportInstance = new ReportInstance(report);
 
-        item.user = user;
+        item.user = reportUser;
         item.reportDao = new ReportDao();
         item.reportDao.saveReportInstance(reportInstance);
 
@@ -99,12 +102,11 @@ public class ReportWorkItem implements WorkItem {
 
         LOG.info("Queued report with id " + report.getId() + ", instance id " + reportInstance.getId());
     }
-
     ReportVO reportConfig;
     private User user;
     private ReportDao reportDao;
     private ReportInstance reportInstance;
-    List<File> filesToDelete = new ArrayList<File>();
+    List<File> filesToDelete = new ArrayList();
 
     @Override
     public void execute() {
@@ -116,17 +118,17 @@ public class ReportWorkItem implements WorkItem {
 
         // Create a list of DataPointVOs to which the user has permission.
         DataPointDao dataPointDao = new DataPointDao();
-        List<ReportDao.PointInfo> points = new ArrayList<ReportDao.PointInfo>(reportConfig.getPoints().size());
+        List<ReportDao.PointInfo> points = new ArrayList(reportConfig.getPoints().size());
         for (ReportPointVO reportPoint : reportConfig.getPoints()) {
             DataPointVO point = dataPointDao.getDataPoint(reportPoint.getPointId());
             if (point != null && permissions.hasDataPointReadPermission(user, point)) {
                 String colour = null;
                 try {
-                    if (!StringUtils.isEmpty(reportPoint.getColour()))
+                    if (!StringUtils.isEmpty(reportPoint.getColour())) {
                         colour = ColorUtils.toHexString(reportPoint.getColour()).substring(1);
-                }
-                catch (InvalidArgumentException e) {
-                    // Should never happen since the colour would have been validated on save, so just let it go 
+                    }
+                } catch (InvalidArgumentException e) {
+                    // Should never happen since the colour would have been validated on save, so just let it go
                     // as null.
                 }
                 points.add(new ReportDao.PointInfo(point, colour, reportPoint.isConsolidatedChart()));
@@ -135,18 +137,16 @@ public class ReportWorkItem implements WorkItem {
 
         int recordCount = 0;
         try {
-            if (!points.isEmpty())
+            if (!points.isEmpty()) {
                 recordCount = reportDao.runReport(reportInstance, points, bundle);
-        }
-        catch (RuntimeException e) {
+            }
+        } catch (RuntimeException e) {
             recordCount = -1;
             throw e;
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             recordCount = -1;
             throw new RuntimeException("Report instance failed", e);
-        }
-        finally {
+        } finally {
             reportInstance.setRunEndTime(System.currentTimeMillis());
             reportInstance.setRecordCount(recordCount);
             reportDao.saveReportInstance(reportInstance);
@@ -168,22 +168,23 @@ public class ReportWorkItem implements WorkItem {
             EmailContent emailContent = new EmailContent(null, creator.getHtml(), Common.UTF8);
 
             // Add the consolidated chart
-            if (creator.getImageData() != null)
-                emailContent
-                        .addInline(new EmailInline.ByteArrayInline(inlinePrefix + ReportChartCreator.IMAGE_CONTENT_ID,
-                                creator.getImageData(), ImageChartUtils.getContentType()));
+            if (creator.getImageData() != null) {
+                emailContent.addInline(new EmailInline.ByteArrayInline(inlinePrefix + ReportChartCreator.IMAGE_CONTENT_ID,
+                        creator.getImageData(), ImageChartUtils.getContentType()));
+            }
 
             // Add the point charts
             for (PointStatistics pointStatistics : creator.getPointStatistics()) {
-                if (pointStatistics.getImageData() != null)
+                if (pointStatistics.getImageData() != null) {
                     emailContent.addInline(new EmailInline.ByteArrayInline(inlinePrefix
-                            + pointStatistics.getChartName(), pointStatistics.getImageData(), ImageChartUtils
-                            .getContentType()));
+                            + pointStatistics.getChartName(), pointStatistics.getImageData(), ImageChartUtils.getContentType()));
+                }
             }
 
             // Add optional images used by the template.
-            for (String s : creator.getInlineImageList())
+            for (String s : creator.getInlineImageList()) {
                 addImage(emailContent, s);
+            }
 
             // Check if we need to attach the data.
             if (reportConfig.isIncludeData()) {
@@ -196,22 +197,23 @@ public class ReportWorkItem implements WorkItem {
             if (reportConfig.isIncludeData()) {
                 // See that the temp file(s) gets deleted after the email is sent.
                 Runnable deleteTempFile = new Runnable() {
+
                     @Override
                     public void run() {
                         for (File file : filesToDelete) {
-                            if (!file.delete())
+                            if (!file.delete()) {
                                 LOG.warn("Temp file " + file.getPath() + " not deleted");
+                            }
                         }
                     }
                 };
-                postEmail = new Runnable[] { deleteTempFile };
+                postEmail = new Runnable[]{deleteTempFile};
             }
 
             try {
                 LocalizableMessage lm = new LocalizableMessage("ftl.scheduledReport", reportConfig.getName());
                 EmailWorkItem.queueEmail(toAddrs, lm.getLocalizedMessage(bundle), emailContent, postEmail);
-            }
-            catch (AddressException e) {
+            } catch (AddressException e) {
                 LOG.error("send email", e);
             }
 
@@ -232,26 +234,20 @@ public class ReportWorkItem implements WorkItem {
             if (reportConfig.isZipData()) {
                 try {
                     File zipFile = File.createTempFile("tempZIP", ".zip");
-                    ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile));
-                    zipOut.putNextEntry(new ZipEntry(name));
-
-                    FileInputStream in = new FileInputStream(file);
-                    StreamUtils.transfer(in, zipOut);
-                    in.close();
-
-                    zipOut.closeEntry();
-                    zipOut.close();
+                    try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile));
+                            FileInputStream in = new FileInputStream(file)) {
+                        StreamUtils.transfer(in, zipOut);
+                    }
 
                     emailContent.addAttachment(new EmailAttachment.FileAttachment(name + ".zip", zipFile));
 
                     filesToDelete.add(zipFile);
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     LOG.error("Failed to create zip file", e);
                 }
-            }
-            else
+            } else {
                 emailContent.addAttachment(new EmailAttachment.FileAttachment(name, file));
+            }
 
             filesToDelete.add(file);
         }

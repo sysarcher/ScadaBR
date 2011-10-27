@@ -77,6 +77,7 @@ public class ReportJob extends TimerTask {
 
     @Override
     public void run(long runtime) {
-        ReportWorkItem.queueReport(report);
+        //TODO changed from static
+        new ReportWorkItem().queueReport(report);
     }
 }

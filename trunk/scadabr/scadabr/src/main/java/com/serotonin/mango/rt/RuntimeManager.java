@@ -98,8 +98,6 @@ public class RuntimeManager {
     private MaintenanceEventDao maintenanceEventDao;
     @Autowired
     private DataPointDao dataPointDao;
-    
-
     /**
      * Provides a quick lookup map of the running data points.
      */
@@ -350,16 +348,16 @@ public class RuntimeManager {
     }
 
     public List<DataSourceVO<?>> getDataSources() {
-        return new DataSourceDao().getDataSources();
+        return dataSourceDao.getDataSources();
     }
 
     public DataSourceVO<?> getDataSource(int dataSourceId) {
-        return new DataSourceDao().getDataSource(dataSourceId);
+        return dataSourceDao.getDataSource(dataSourceId);
     }
 
     public void deleteDataSource(DataSourceVO<?> dataSource) {
         stopDataSource(dataSource);
-        new DataSourceDao().deleteDataSource(dataSource);
+        dataSourceDao.deleteDataSource(dataSource);
         eventManager.cancelEventsForDataSource(dataSource);
     }
 
@@ -369,7 +367,7 @@ public class RuntimeManager {
 
         // In case this is a new data source, we need to save to the database
         // first so that it has a proper id.
-        new DataSourceDao().saveDataSource(vo);
+        dataSourceDao.saveDataSource(vo);
 
         // If the data source is enabled, start it.
         if (vo.isEnabled()) {
@@ -565,7 +563,7 @@ public class RuntimeManager {
         }
         return;
     }
-    
+
     private void stopDataPoint(DataPointVO dataPointVo) {
         synchronized (dataPoints) {
             stopDataPoint(dataPoints.get(dataPointVo.getId()));
@@ -1038,6 +1036,4 @@ public class RuntimeManager {
             rt.terminate();
         }
     }
-
 }
- 

@@ -36,7 +36,6 @@ import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.maintenance.MaintenanceEventRT;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
-import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
@@ -47,9 +46,9 @@ import com.serotonin.web.i18n.LocalizableMessage;
 public class MaintenanceEventsDwr extends BaseDwr {
 
     @Autowired
-    private Permissions permissions;
-    @Autowired
     private RuntimeManager runtimeManager;
+    @Autowired
+    private DataSourceDao dataSourceDao;
 
     public DwrResponseI18n getMaintenanceEvents() {
         permissions.ensureAdmin();
@@ -67,8 +66,8 @@ public class MaintenanceEventsDwr extends BaseDwr {
         });
         response.addData("events", events);
 
-        Map<Integer, String> dataSources = new HashMap<Integer, String>();
-        for (DataSourceVO<?> ds : new DataSourceDao().getDataSources()) {
+        Map<Integer, String> dataSources = new HashMap();
+        for (DataSourceVO<?> ds : dataSourceDao.getDataSources()) {
             dataSources.put(ds.getId(), ds.getName());
         }
         response.addData("dataSources", dataSources);

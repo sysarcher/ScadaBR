@@ -1,24 +1,26 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.view;
 
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
@@ -36,20 +38,22 @@ import com.serotonin.util.StringUtils;
  */
 @JsonRemoteEntity
 public class ShareUser implements JsonSerializable {
+
     public static final int ACCESS_NONE = 0;
     public static final int ACCESS_READ = 1;
     public static final int ACCESS_SET = 2;
     public static final int ACCESS_OWNER = 3;
-
     public static final ExportCodes ACCESS_CODES = new ExportCodes();
+
     static {
         ACCESS_CODES.addElement(ACCESS_NONE, "NONE", "common.access.none");
         ACCESS_CODES.addElement(ACCESS_READ, "READ", "common.access.read");
         ACCESS_CODES.addElement(ACCESS_SET, "SET", "common.access.set");
     }
-
     private int userId;
     private int accessType;
+    @Autowired
+    private UserDao userDao;
 
     public int getUserId() {
         return userId;
@@ -70,26 +74,28 @@ public class ShareUser implements JsonSerializable {
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("user");
-        if (StringUtils.isEmpty(text))
+        if (StringUtils.isEmpty(text)) {
             throw new LocalizableJsonException("emport.error.viewShare.missing", "user");
-        User user = new UserDao().getUser(text);
-        if (user == null)
+        }
+        User user = userDao.getUser(text);
+        if (user == null) {
             throw new LocalizableJsonException("emport.error.missingUser", text);
+        }
         userId = user.getId();
 
         text = json.getString("accessType");
-        if (StringUtils.isEmpty(text))
-            throw new LocalizableJsonException("emport.error.missing", "accessType", ACCESS_CODES
-                    .getCodeList(ACCESS_OWNER));
+        if (StringUtils.isEmpty(text)) {
+            throw new LocalizableJsonException("emport.error.missing", "accessType", ACCESS_CODES.getCodeList(ACCESS_OWNER));
+        }
         accessType = ACCESS_CODES.getId(text, ACCESS_OWNER);
-        if (accessType == -1)
-            throw new LocalizableJsonException("emport.error.invalid", "permission", text, ACCESS_CODES
-                    .getCodeList(ACCESS_OWNER));
+        if (accessType == -1) {
+            throw new LocalizableJsonException("emport.error.invalid", "permission", text, ACCESS_CODES.getCodeList(ACCESS_OWNER));
+        }
     }
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        map.put("user", new UserDao().getUser(userId).getUsername());
+        map.put("user", userDao.getUser(userId).getUsername());
         map.put("accessType", ACCESS_CODES.getCode(accessType));
     }
 }

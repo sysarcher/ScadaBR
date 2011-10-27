@@ -21,7 +21,6 @@ package com.serotonin.mango.db.dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,17 +34,16 @@ import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.object.MappingSqlQuery;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.event.AlarmLevels;
-import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.DataPointAccess;
+import java.sql.Timestamp;
+import java.util.Date;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.transaction.annotation.Propagation;
 
 @Repository
@@ -94,7 +92,7 @@ public class UserDao extends BaseDao {
 
     class UserRowMapper implements ParameterizedRowMapper<User> {
 
-        static final String USER_SELECT = 
+        static final String USER_SELECT =
                 "select "
                 + " id, "
                 + " mangoUsername, "
@@ -118,14 +116,15 @@ public class UserDao extends BaseDao {
             user.setPassword(rs.getString("mangoUserPassword"));
             user.setEmail(rs.getString("email"));
             user.setPhone(rs.getString("phone"));
-            user.setAdmin(charToBool(rs.getString("mangoAdmin")));
-            user.setDisabled(charToBool(rs.getString("disabled")));
+            user.setAdmin(rs.getBoolean("mangoAdmin"));
+            user.setDisabled(rs.getBoolean("disabled"));
             user.setSelectedWatchList(rs.getInt("selectedWatchList"));
             user.setHomeUrl(rs.getString("homeUrl"));
-            final Timestamp lastLogin = rs.getTimestamp("lastLogin");
-            user.setLastLogin(lastLogin != null ? lastLogin.getTime() : 0);
+            System.err.println(rs.getString("lastLogin"));
+            Long ts = rs.getLong("lastLogin");
+            user.setLastLogin(ts != null ? new Date(ts) : null);
             user.setReceiveAlarmEmails(AlarmLevels.valueOf(rs.getString("receiveAlarmEmails")));
-            user.setReceiveOwnAuditEvents(charToBool(rs.getString("receiveOwnAuditEvents")));
+            user.setReceiveOwnAuditEvents(rs.getBoolean("receiveOwnAuditEvents"));
             return user;
         }
     }
@@ -135,7 +134,6 @@ public class UserDao extends BaseDao {
         try {
             users = selectUsers.execute();
         } catch (Exception ex) {
-            System.err.print(ex);
             throw new RuntimeException(ex);
         }
         populateUserPermissions(users);
@@ -154,7 +152,7 @@ public class UserDao extends BaseDao {
         }
     }
 
-    @Transactional(readOnly=true)
+    @Transactional(readOnly = true)
     public void populateUserPermissions(User user) {
         if (user == null) {
             return;
@@ -174,7 +172,6 @@ public class UserDao extends BaseDao {
     }
 
     public void saveUser(final User user) {
-        getDataBaseType();
         if (user.getId() == Common.NEW_ID) {
             insertUser(user);
         } else {
@@ -247,6 +244,7 @@ public class UserDao extends BaseDao {
         // Save the new ones.
         getJdbcTemplate().batchUpdate("insert into dataSourceUsers (dataSourceId, userId) values (?,?)",
                 new BatchPreparedStatementSetter() {
+
                     @Override
                     public int getBatchSize() {
                         return user.getDataSourcePermissions().size();
@@ -282,25 +280,30 @@ public class UserDao extends BaseDao {
      */
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void deleteUser(final User user) {
-        
-        getSimpleJdbcTemplate().update("update userComments "
-                + " set userId=null "
-                + "where userId=?", user.getId());
-        getSimpleJdbcTemplate().update("update pointValueAnnotations "
-                + " set sourceId=null "
-                + "where sourceId=? and sourceType=? "
-                , user.getId(), SetPointSource.Types.USER);
-        getSimpleJdbcTemplate().update("update events "
-                + " set ackUserId=null, "
-                + " alternateAckSource=? "
-                + "where ackUserId=?", EventInstance.AlternateAcknowledgementSources.DELETED_USER, user.getId());
-        
+        String errorMessage = "";
+        //TODO check if user has ... and if yes then stop deleting
+        if (getSimpleJdbcTemplate().queryForInt("select count(*) from eventComments where userId=?", user.getId()) > 0) {
+            errorMessage += "User has eventComments\n";
+        }
+        if (getSimpleJdbcTemplate().queryForInt("select count(*) from dataPointComments where userId=?", user.getId()) > 0) {
+            errorMessage += "User has dataPointComments\n";
+        }
+        if (getSimpleJdbcTemplate().queryForInt("select count(*) from pointValueAnnotations where sourceId=? and sourceType=? ", user.getId(), SetPointSource.Types.USER) > 0) {
+            errorMessage += "User has pointValueAnnotations\n";
+        }
+        if (getSimpleJdbcTemplate().queryForInt("select count(*) from events where ackUserId=?", user.getId()) > 0) {
+            errorMessage += "User has acknownledget events\n";
+        }
+        //TODO implement caller an Localization
+        if (errorMessage.length() > 0) {
+            throw new RuntimeException(errorMessage);
+        }
         getSimpleJdbcTemplate().update("delete from users where id=?", user.getId());
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-    public void saveLastLogin(User user) {
-        getSimpleJdbcTemplate().update("update users set lastLogin=? where id=?", user.getLastLogin(), user.getId());
+    public void saveLastLogin(final User user) {
+        getJdbcTemplate().update("update users set lastLogin=? where id=?", user.getLastLogin().getTime(), user.getId()); 
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)

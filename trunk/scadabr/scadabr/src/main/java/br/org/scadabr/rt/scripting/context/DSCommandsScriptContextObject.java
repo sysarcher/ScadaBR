@@ -1,6 +1,5 @@
 package br.org.scadabr.rt.scripting.context;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.mango.Common;
@@ -18,6 +17,8 @@ public class DSCommandsScriptContextObject extends ScriptContextObject {
     private Common common;
     @Autowired
     private RuntimeManager runtimeManager;
+    @Autowired
+    private DataSourceDao dataSourceDao;
 
     @Override
     public Type getType() {
@@ -25,7 +26,7 @@ public class DSCommandsScriptContextObject extends ScriptContextObject {
     }
 
     public void enableDataSource(String xid) {
-        DataSourceVO<?> dataSource = new DataSourceDao().getDataSource(xid);
+        DataSourceVO<?> dataSource = dataSourceDao.getDataSource(xid);
         if (dataSource != null) {
             permissions.ensureDataSourcePermission(common.getUser(), dataSource.getId());
             dataSource.setEnabled(true);
@@ -35,7 +36,7 @@ public class DSCommandsScriptContextObject extends ScriptContextObject {
     }
 
     public void disableDataSource(String xid) {
-        DataSourceVO<?> dataSource = new DataSourceDao().getDataSource(xid);
+        DataSourceVO<?> dataSource = dataSourceDao.getDataSource(xid);
         if (dataSource != null) {
             permissions.ensureDataSourcePermission(common.getUser(), dataSource.getId());
             dataSource.setEnabled(false);

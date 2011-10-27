@@ -31,17 +31,15 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
@@ -65,10 +63,6 @@ import com.serotonin.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
 import com.serotonin.web.i18n.LocalizableMessageParseException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EventDao extends BaseDao {
@@ -89,7 +83,7 @@ public class EventDao extends BaseDao {
 
     private void insertEvent(EventInstance event) {
         SimpleJdbcInsert insertActor = new SimpleJdbcInsert(getDataSource()).withTableName("events").usingGeneratedKeyColumns("id");
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap();
 
         EventType type = event.getEventType();
 
@@ -112,7 +106,7 @@ public class EventDao extends BaseDao {
         Number id = insertActor.executeAndReturnKey(params);
         event.setId(id.intValue());
 
-        event.setEventComments(new LinkedList<UserComment>());
+        event.clearEventComments();
     }
     private static final String EVENT_UPDATE = "update events set rtnTs=?, rtnCause=? where id=?";
 
@@ -256,7 +250,7 @@ public class EventDao extends BaseDao {
         sb.append("  and (e.ackTs is null or (e.rtnApplicable=? and e.rtnTs is null and e.alarmLevel > 0)) ");
         sb.append("order by e.activeTs desc");
 
-        List<EventInstance> results = getSimpleJdbcTemplate().query(sb.toString(), new UserEventInstanceRowMapper(), params);
+        List<EventInstance> results = getJdbcTemplate().query(sb.toString(), new UserEventInstanceRowMapper(), params);
         userCommentDao.populateComments(results);
         return results;
     }
@@ -271,7 +265,7 @@ public class EventDao extends BaseDao {
     }
 
     private EventInstance getEventInstance(int eventId) {
-        return getSimpleJdbcTemplate().queryForObject(BASIC_EVENT_SELECT + "where e.id=?",
+        return getJdbcTemplate().queryForObject(BASIC_EVENT_SELECT + "where e.id=?",
                 new EventInstanceRowMapper(), eventId);
     }
 
@@ -352,12 +346,6 @@ public class EventDao extends BaseDao {
         }
     }
 
-    public EventInstance insertEventComment(int eventId, UserComment comment) {
-        userCommentDao.insertUserComment(UserComment.TYPE_EVENT, eventId,
-                comment);
-        return getEventInstance(eventId);
-    }
-
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public int purgeEventsBefore(final long time) {
         // Find a list of event ids with no remaining acknowledgements pending.
@@ -366,12 +354,6 @@ public class EventDao extends BaseDao {
                 + "  and ackTs is not null "
                 + "  and (rtnApplicable=? or (rtnApplicable=? and rtnTs is not null))",
                 time, boolToChar(false), boolToChar(true));
-
-        // Delete orphaned user comments.
-        getSimpleJdbcTemplate().update("delete from userComments where commentType="
-                + UserComment.TYPE_EVENT
-                + "  and typeKey not in (select id from events)");
-
 
         clearCache();
 

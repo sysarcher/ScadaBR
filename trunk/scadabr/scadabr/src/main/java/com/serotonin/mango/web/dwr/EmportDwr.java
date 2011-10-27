@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.ShouldNeverHappenException;
@@ -48,7 +50,6 @@ import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.db.dao.PublisherDao;
 import com.serotonin.mango.db.dao.ScheduledEventDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.db.dao.ViewDao;
 import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.rt.RuntimeManager;
@@ -59,8 +60,6 @@ import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.web.dwr.beans.ImportTask;
 import com.serotonin.web.dwr.DwrResponseI18n;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthew Lohbihler
@@ -88,8 +87,14 @@ public class EmportDwr extends BaseDwr {
     private RuntimeManager runtimeManager;
     @Autowired
     private DataSourceDao dataSourceDao;
+    @Autowired
+    private SystemSettingsDao systemSettingsDao;
+    @Autowired
+    private ViewDao viewDao;
+    @Autowired
+    private DataPointDao dataPointDao;
 
-    public String createExportData(int prettyIndent, boolean graphicalViews,
+    String createExportData(int prettyIndent, boolean graphicalViews,
             boolean eventHandlers, boolean dataSources, boolean dataPoints,
             boolean scheduledEvents, boolean compoundEventDetectors,
             boolean pointLinks, boolean users, boolean pointHierarchy,
@@ -97,14 +102,14 @@ public class EmportDwr extends BaseDwr {
             boolean maintenanceEvents, boolean scripts, boolean pointValues,
             int maxPointValues, boolean systemSettings) {
 
-        return EmportDwr.createExportJSON(prettyIndent, graphicalViews,
+        return createExportJSON(prettyIndent, graphicalViews,
                 eventHandlers, dataSources, dataPoints, scheduledEvents,
                 compoundEventDetectors, pointLinks, users, pointHierarchy,
                 mailingLists, publishers, watchLists, maintenanceEvents,
                 scripts, pointValues, maxPointValues, systemSettings);
     }
 
-    public static String createExportJSON(int prettyIndent,
+    public String createExportJSON(int prettyIndent,
             boolean graphicalViews, boolean eventHandlers, boolean dataSources,
             boolean dataPoints, boolean scheduledEvents,
             boolean compoundEventDetectors, boolean pointLinks, boolean users,
@@ -114,13 +119,13 @@ public class EmportDwr extends BaseDwr {
         Map<String, Object> data = new LinkedHashMap();
 
         if (graphicalViews) {
-            data.put(GRAPHICAL_VIEWS, new ViewDao().getViews());
+            data.put(GRAPHICAL_VIEWS, viewDao.getViews());
         }
         if (dataSources) {
-            data.put(DATA_SOURCES, new DataSourceDao().getDataSources());
+            data.put(DATA_SOURCES, dataSourceDao.getDataSources());
         }
 
-        List<DataPointVO> allDataPoints = new DataPointDao().getDataPoints(
+        List<DataPointVO> allDataPoints = dataPointDao.getDataPoints(
                 null, true);
 
         if (dataPoints) {
@@ -138,7 +143,7 @@ public class EmportDwr extends BaseDwr {
             data.put(POINT_LINKS, new PointLinkDao().getPointLinks());
         }
         if (users) {
-            data.put(USERS, new UserDao().getUsers());
+            data.put(USERS, userDao.getUsers());
         }
         if (mailingLists) {
             data.put(MAILING_LISTS, new MailingListDao().getMailingLists());
@@ -266,7 +271,7 @@ public class EmportDwr extends BaseDwr {
         try {
 
             stopRunningDataSources();
-            new SystemSettingsDao().resetDataBase();
+            systemSettingsDao.resetDataBase();
             importer.importProject();
         } catch (Exception e) {
             LOG.error("error during loadProject", e);
