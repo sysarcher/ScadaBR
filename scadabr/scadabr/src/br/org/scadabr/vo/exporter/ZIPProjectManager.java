@@ -27,7 +27,6 @@ import br.org.scadabr.vo.exporter.util.FileUtil;
 import br.org.scadabr.web.mvc.controller.ProjectExporterController;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.upgrade.DBUpgrade;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.dwr.EmportDwr;
 
@@ -101,16 +100,12 @@ public class ZIPProjectManager {
 			return new ModelAndView("import_result", model);
 		}
 
-		String version = (String) model.get("projectServerVersion");
-
-		System.out.println("versao" + version);
-		System.out.println("getVersion" + version);
-
-//		if (DBUpgrade.isUpgradeNeeded(version)) {
-//			errorList.add(Common.getMessage("emport.versionError", version,
-//					Common.getVersion()));
-//			return new ModelAndView("import_result", model);
-//		}
+		// String version = (String) model.get("projectServerVersion");
+		// if (DBUpgrade.isUpgradeNeeded(version)) {
+		// errorList.add(Common.getMessage("emport.versionError", version,
+		// Common.getVersion()));
+		// return new ModelAndView("import_result", model);
+		// }
 
 		User user = Common.getUser(request);
 		user.setUploadedProject(this);
@@ -161,7 +156,6 @@ public class ZIPProjectManager {
 					}
 					File dirFile = new File(appPath + directory);
 					dirFile.mkdir();
-					// createInfoFile(directory);
 				}
 
 				FileOutputStream out = new FileOutputStream(f);
@@ -177,30 +171,6 @@ public class ZIPProjectManager {
 			e.printStackTrace();
 		}
 	}
-
-	// private File createInfoFile(String directory) {
-	//
-	// File infoFile = new File("info.txt");
-	// try {
-	// FileWriter writer = new FileWriter(infoFile);
-	// PrintWriter printer = new PrintWriter(writer, true);
-	//
-	// printer.println("name=" + directory);
-	// printer.println("type=imageSet");
-	// printer.println("#width=16");
-	// printer.println("#height=9");
-	// printer.println("#text.x=14");
-	// printer.println("#text.y=2");
-	//
-	// printer.close();
-	// writer.close();
-	//
-	// } catch (IOException e) {
-	// e.printStackTrace();
-	// }
-	//
-	// return infoFile;
-	// }
 
 	private List<ZipEntry> getUploadFiles() {
 		return filterZipFiles(uploadsFolder);
@@ -240,14 +210,12 @@ public class ZIPProjectManager {
 				FILE_SEPARATOR)
 				+ "uploads";
 
-		System.out.println(uploadFolder);
 		List<File> files = FileUtil.getFilesOnDirectory(uploadFolder);
 
 		List<FileToPack> pack = new ArrayList<FileToPack>();
 		for (File file : files) {
 
 			String filePartialPath = uploadsFolder + file.getName();
-			System.out.println(filePartialPath);
 
 			pack.add(new FileToPack(filePartialPath.substring(0, 7)
 					+ FILE_SEPARATOR + filePartialPath.substring(8), file));
@@ -259,7 +227,7 @@ public class ZIPProjectManager {
 		String graphicFolder = Common.ctx.getServletContext().getRealPath(
 				FILE_SEPARATOR)
 				+ "graphics";
-		System.out.println(graphicFolder);
+
 		List<File> files = FileUtil.getFilesOnDirectory(graphicFolder);
 
 		List<FileToPack> pack = new ArrayList<FileToPack>();
