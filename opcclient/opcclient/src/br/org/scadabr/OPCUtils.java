@@ -122,12 +122,8 @@ public class  OPCUtils {
 		ArrayList<Item> listOPCItems = new ArrayList<Item>();
 		
 			for (int i = 0; i < nameOPCItems.size(); i++) {
-				try {
 					listOPCItems.add(group.addItem(nameOPCItems.get(i)));
 					getMapNameItem().put(nameOPCItems.get(i),listOPCItems.get(i));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
 			}
 			
 			return listOPCItems;
