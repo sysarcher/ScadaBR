@@ -44,7 +44,6 @@ public class RealOPCMaster extends Thread implements OPCMaster {
 
 
 	public RealOPCMaster() {
-		// TODO Auto-generated constructor stub
 		OPCUtils utils = new OPCUtils();
 		setOpcUtils(utils);
 	}
@@ -115,12 +114,6 @@ public class RealOPCMaster extends Thread implements OPCMaster {
 
 		// Converte os dados para os tipos de dados do ScadaBR
 		ArrayList<Integer> scadaTypes = getOpcUtils().covertTypeToScada(listDataTypeServer);
-
-		//		DEBUG
-		//		for (int i = 0; i < nameTotalOPCItems.size(); i++) {
-		//			System.out.println(nameTotalOPCItems.get(i) + " : " + listDataTypeServer.get(i) + " : " + scadaTypes.get(i));
-		//		}
-		//		Thread.sleep(2000);
 
 		ArrayList<OPCItem> listScadaOPCItems = new ArrayList<OPCItem>();
 
@@ -232,12 +225,9 @@ public class RealOPCMaster extends Thread implements OPCMaster {
 	 * Adiciona os OPCItems em determinado Grupo no Servidor
 	 */
 	public void configureGroup(ArrayList<String> itemsName) throws Exception{
-		// Configurar o grupo correspondente do dataSource
 
-		for (int i = 0; i < itemsName.size(); i++) {
-			getGroup().removeItem(itemsName.get(i));
-		}
-
+		getGroup().clear();
+		
 		ArrayList<Item> OPCItemsEnabled = getOpcUtils().addItemsMap(getGroup(), itemsName);
 		setNameOPCItems(itemsName);
 		setDataSourceItems(OPCItemsEnabled);
@@ -250,7 +240,6 @@ public class RealOPCMaster extends Thread implements OPCMaster {
 			}
 		}
 	}
-
 
 	/**
 	 * Retorna o Valor da Tag fornecida
