@@ -314,29 +314,6 @@
 		</table>
 	</div>
 
-<!-- 	<div class="borderDiv marB marR" style="relative: below;"> -->
-<!-- 		<table width="100%"> -->
-<!-- 			<tr> -->
-<%-- 				<td><span class="smallTitle"><fmt:message --%>
-<!-- 							key="emport.import" /> -->
-<!-- 				</span> -->
-<!-- 				</td> -->
-<!-- 			</tr> -->
-<!-- 			<tr> -->
-<%-- 				<td><fmt:message key="emport.importInstruction" /> <input --%>
-<!-- 					id="importJsonBtn" type="button" -->
-<%-- 					value="<fmt:message key="emport.import"/>" onclick="doImport()" /> --%>
-<!-- 					<input id="cancelBtn" type="button" -->
-<%-- 					value="<fmt:message key="common.cancel"/>" onclick="importCancel()" --%>
-<!-- 					disabled="disabled" /></td> -->
-<!-- 			</tr> -->
-<!-- 			<tbody id="importMessages"></tbody> -->
-<!-- 			<tr> -->
-<!-- 				<td id="alternateMessage"></td> -->
-<!-- 			</tr> -->
-<!-- 		</table> -->
-<!-- 	</div> -->
-
 	<div class="borderDiv marB marR" style="float: left;">
 		<table width="100%">
 			<tr>
@@ -440,35 +417,6 @@
 			
 		</table>
 	</div>
-
-<!-- 	<div class="borderDiv marB marR" style="float: left;"> -->
-<!-- 		<form method="POST" action="import_project.htm" -->
-<!-- 			enctype="multipart/form-data" onsubmit="return checkFileToImport();"> -->
-<!-- 			<table width="100%"> -->
-<!-- 				<tr> -->
-<%-- 					<td><span class="smallTitle"><fmt:message --%>
-<!-- 								key="emport.importProjectTitle" /> -->
-<%-- 					</span> <tag:help id="importProject" /></td> --%>
-<!-- 				</tr> -->
-
-<!-- 				<tr> -->
-<%-- 					<td><fmt:message key="emport.importProjectInstruction" /></td> --%>
-<!-- 				</tr> -->
-
-<!-- 				<tr> -->
-<!-- 					<td><input type="file" name="importFile" id="importFile" /> <input -->
-<!-- 						id="importBtn" type="submit" -->
-<%-- 						value="<fmt:message key="emport.send"/>" /></td> --%>
-<!-- 				</tr> -->
-
-<!-- 				<tr> -->
-<!-- 					<td></td> -->
-<!-- 				</tr> -->
-<!-- 			</table> -->
-<!-- 		</form> -->
-
-<!-- 	</div> -->
-
 
 	<div style="clear: both;">
 		<span class="formLabelRequired"><fmt:message key="emport.data" />

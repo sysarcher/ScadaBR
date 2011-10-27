@@ -103,11 +103,14 @@ public class ZIPProjectManager {
 
 		String version = (String) model.get("projectServerVersion");
 
-		if (DBUpgrade.isUpgradeNeeded(version)) {
-			errorList.add(Common.getMessage("emport.versionError", version,
-					Common.getVersion()));
-			return new ModelAndView("import_result", model);
-		}
+		System.out.println("versao" + version);
+		System.out.println("getVersion" + version);
+
+//		if (DBUpgrade.isUpgradeNeeded(version)) {
+//			errorList.add(Common.getMessage("emport.versionError", version,
+//					Common.getVersion()));
+//			return new ModelAndView("import_result", model);
+//		}
 
 		User user = Common.getUser(request);
 		user.setUploadedProject(this);
@@ -121,11 +124,12 @@ public class ZIPProjectManager {
 		EmportDwr.importDataImpl(jsonContent, Common.getBundle(),
 				Common.getUser());
 
+		List<ZipEntry> graphicsFiles = getGraphicsFiles();
+		restoreFiles(graphicsFiles);
+
 		List<ZipEntry> uploadFiles = getUploadFiles();
 		restoreFiles(uploadFiles);
 
-		List<ZipEntry> graphicsFiles = getGraphicsFiles();
-		restoreFiles(graphicsFiles);
 	}
 
 	private void restoreFiles(List<ZipEntry> uploadFiles) {
