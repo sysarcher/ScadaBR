@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.serotonin.ShouldNeverHappenException;
 import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
@@ -52,6 +54,8 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
         Serializable, Cloneable, JsonSerializable, ChangeComparable<T> {
 
     public static final String XID_PREFIX = "DS_";
+    @Autowired
+    private DataSourceDao dataSourceDao;
 
     public static DataSourceVO<?> createDataSourceVO(DataSourceRegistry dataSourceType) {
         return dataSourceType.createDataSourceVO();
@@ -169,7 +173,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
     public void validate(DwrResponseI18n response) {
         if (StringUtils.isEmpty(xid)) {
             response.addContextualMessage("xid", "validate.required");
-        } else if (!new DataSourceDao().isXidUnique(xid, id)) {
+        } else if (!dataSourceDao.isXidUnique(xid, id)) {
             response.addContextualMessage("xid", "validate.xidUsed");
         } else if (StringUtils.isLengthGreaterThan(xid, 50)) {
             response.addContextualMessage("xid", "validate.notLongerThan", 50);

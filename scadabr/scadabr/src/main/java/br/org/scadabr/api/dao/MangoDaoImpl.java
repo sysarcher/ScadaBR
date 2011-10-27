@@ -36,6 +36,7 @@ import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.db.dao.ScheduledEventDao;
+import com.serotonin.mango.db.dao.UserCommentDao;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -45,7 +46,9 @@ import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.vo.DataPointVO;
+import com.serotonin.mango.vo.EventComment;
 import com.serotonin.mango.vo.User;
+import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.vo.dataSource.DataSourceRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.modbus.ModbusIpDataSourceVO;
@@ -81,10 +84,17 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
     private PointValueDao pointValueDao;
     @Autowired
     private DataSourceDao dataSourceDao;
-            
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private ScheduledEventDao scheduledEventDao;
+    @Autowired
+    private UserCommentDao userCommentDao;
+    @Autowired
+    private EventDao eventDao;
     
     public MangoDaoImpl(String username) {
-        User us = new UserDao().getUser(username);
+        User us = userDao.getUser(username);
         this.user = us;
     }
 
@@ -348,7 +358,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
         }
 
         if (!dataPointVO.isEnabled()
-                || !new DataSourceDao().getDataSource(
+                || !dataSourceDao.getDataSource(
                 dataPointVO.getDataSourceId()).isEnabled()) {
             APIError error = new APIError();
             error.setCode(ErrorCode.INVALID_PARAMETER);
@@ -609,8 +619,11 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
         }
     }
 
+    @Deprecated
     private EventInstance getEvent(int eventId) {
-        List<EventInstance> events = new EventDao().getPendingEvents(1);
+        //TODO Why Iterating and not using eventDat ...
+        //TODO why UserId == 1 in eventDao.getPendingEvents(1) ???
+        List<EventInstance> events = eventDao.getPendingEvents(1);
         for (EventInstance eventInstance : events) {
             if (eventInstance.getId() == eventId) {
                 return eventInstance;
@@ -666,9 +679,8 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
         checkUser();
         EventInstance event = getEvent(eventId);
         if (event != null) {
-            new EventDao().insertEventComment(eventId,
-                    APIUtils.toUserComment(message));
-
+            final EventComment ec = new EventComment(user, message.getMessage(), eventId);
+            userCommentDao.insertComment(ec);
             event = getEvent(eventId);
             return APIUtils.toEventMessage(event.getEventComments());
         } else {
@@ -687,11 +699,11 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
         List<EventDefinition> events = new ArrayList();
 
         if ((eventType == null) || eventType == EventType.POINT_CONDITION_EVENT) {
-            List<DataSourceVO<?>> dataSources = new DataSourceDao().getDataSources();
+            List<DataSourceVO<?>> dataSources = dataSourceDao.getDataSources();
             List<PointEventDetectorVO> pointEventDetectors = new ArrayList();
 
             for (DataSourceVO<?> dataSourceVO : dataSources) {
-                List<DataPointVO> dataPoints = new DataPointDao().getDataPoints(dataSourceVO, null);
+                List<DataPointVO> dataPoints = dataPointDao.getDataPoints(dataSourceVO, null);
                 for (DataPointVO dataPointVO : dataPoints) {
                     pointEventDetectors.addAll(dataPointVO.getEventDetectors());
                 }
@@ -722,7 +734,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
         }
 
         if ((eventType == null) || eventType == EventType.SCHEDULED_EVENT) {
-            List<ScheduledEventVO> scheduledEvents = new ScheduledEventDao().getScheduledEvents();
+            List<ScheduledEventVO> scheduledEvents = scheduledEventDao.getScheduledEvents();
             for (ScheduledEventVO pointEvent : scheduledEvents) {
                 EventDefinition event = APIUtils.toEventDefinition(
                         pointEvent.getAlias(), pointEvent.getAlarmLevel(),
@@ -870,10 +882,10 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 
             if (config.getId() == Common.NEW_ID) {
                 ds = new ModbusIpDataSourceVO();
-                ds.setXid(new DataSourceDao().generateUniqueXid());
+                ds.setXid(dataSourceDao.generateUniqueXid());
             } else {
                 checkValidDataSourceId(config.getId(), dataSourceType);
-                ds = (ModbusIpDataSourceVO) new DataSourceDao().getDataSource(config.getId());
+                ds = (ModbusIpDataSourceVO) dataSourceDao.getDataSource(config.getId());
             }
             if (!permissions.hasDataSourcePermission(user, config.getId())) {
                 APIError error = new APIError();
@@ -903,7 +915,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
                         "Check the configuration parameters."));
             }
 
-            new DataSourceDao().saveDataSource(ds);
+            dataSourceDao.saveDataSource(ds);
             return ds.getId();
         } else if (dataSourceType == DataSourceType.MODBUS_SERIAL) {
             ModbusSerialConfig config = (ModbusSerialConfig) dataSource;
@@ -911,11 +923,11 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 
             if (config.getId() == Common.NEW_ID) {
                 ds = new ModbusSerialDataSourceVO();
-                ds.setXid(new DataSourceDao().generateUniqueXid());
+                ds.setXid(dataSourceDao.generateUniqueXid());
 
             } else {
                 checkValidDataSourceId(config.getId(), dataSourceType);
-                ds = (ModbusSerialDataSourceVO) new DataSourceDao().getDataSource(config.getId());
+                ds = (ModbusSerialDataSourceVO) dataSourceDao.getDataSource(config.getId());
             }
 
             if (!permissions.hasDataSourcePermission(user, config.getId())) {
@@ -945,7 +957,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
                         "Check the configuration parameters."));
             }
 
-            new DataSourceDao().saveDataSource(ds);
+            dataSourceDao.saveDataSource(ds);
             return ds.getId();
         }
         throw new ScadaBRAPIException(new APIError(ErrorCode.UNSPECIFIED_ERROR,
@@ -957,9 +969,9 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
             throws ScadaBRAPIException {
         try {
             if (dataSourceType == DataSourceType.MODBUS_IP) {
-                ModbusIpDataSourceVO ds = (ModbusIpDataSourceVO) new DataSourceDao().getDataSource(id);
+                ModbusIpDataSourceVO ds = (ModbusIpDataSourceVO) dataSourceDao.getDataSource(id);
             } else if (dataSourceType == DataSourceType.MODBUS_SERIAL) {
-                ModbusSerialDataSourceVO ds = (ModbusSerialDataSourceVO) new DataSourceDao().getDataSource(id);
+                ModbusSerialDataSourceVO ds = (ModbusSerialDataSourceVO) dataSourceDao.getDataSource(id);
             }
         } catch (Exception e) {
             throw new ScadaBRAPIException(new APIError(ErrorCode.INVALID_ID,
@@ -971,14 +983,14 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
     @Override
     public void removeDataSource(DataSourceVO<?> ds) throws ScadaBRAPIException {
         checkUser();
-            if (!permissions.hasDataSourcePermission(user, ds.getId())) {
-                APIError error = new APIError();
-                error.setCode(ErrorCode.ACCESS_DENIED);
-                error.setDescription(APIConstants.ACCESS_DENIED);
-                throw new ScadaBRAPIException(error);
-            }
+        if (!permissions.hasDataSourcePermission(user, ds.getId())) {
+            APIError error = new APIError();
+            error.setCode(ErrorCode.ACCESS_DENIED);
+            error.setDescription(APIConstants.ACCESS_DENIED);
+            throw new ScadaBRAPIException(error);
+        }
 
-            runtimeManager.deleteDataSource(ds);
+        runtimeManager.deleteDataSource(ds);
 
     }
 

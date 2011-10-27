@@ -30,6 +30,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.ShouldNeverHappenException;
+import com.serotonin.bacnet4j.type.constructed.TimeStamp;
 import com.serotonin.json.JsonArray;
 import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
@@ -59,8 +60,7 @@ import com.serotonin.mango.web.dwr.beans.TestingUtility;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.Date;
 
 @JsonRemoteEntity
 public class User implements SetPointSource, HttpSessionBindingListener,
@@ -85,7 +85,7 @@ public class User implements SetPointSource, HttpSessionBindingListener,
     private int selectedWatchList;
     @JsonRemoteProperty
     private String homeUrl;
-    private long lastLogin;
+    private Date lastLogin;
     @JsonRemoteProperty
     private AlarmLevels receiveAlarmEmails = AlarmLevels.NONE;
     @JsonRemoteProperty
@@ -127,7 +127,7 @@ public class User implements SetPointSource, HttpSessionBindingListener,
     }
 
     public boolean isFirstLogin() {
-        return lastLogin == 0;
+        return lastLogin == null;
     }
 
     //
@@ -332,12 +332,11 @@ public class User implements SetPointSource, HttpSessionBindingListener,
         this.homeUrl = homeUrl;
     }
 
-    public long getLastLogin() {
+    public Date getLastLogin() {
         return lastLogin;
     }
 
-    @Deprecated // use date ior Timestamp ???
-    public void setLastLogin(long lastLogin) {
+    public void setLastLogin(Date lastLogin) {
         this.lastLogin = lastLogin;
     }
 

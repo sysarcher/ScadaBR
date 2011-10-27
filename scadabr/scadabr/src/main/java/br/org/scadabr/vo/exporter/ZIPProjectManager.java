@@ -64,7 +64,7 @@ public class ZIPProjectManager {
 		response.setHeader("Content-Disposition", "attachment; filename="
 				+ projectName.replaceAll(" ", "") + ".zip");
 
-		List<FileToPack> filesToZip = new ArrayList<FileToPack>();
+		List<FileToPack> filesToZip = new ArrayList();
 
 		filesToZip.add(buildProjectDescriptionFile(projectName,
 				projectDescription));
@@ -229,7 +229,7 @@ public class ZIPProjectManager {
 	}
 
 	private FileToPack buildJSONFile(String packAs, boolean includePointValues) {
-		String jsonToExport = EmportDwr.createExportJSON(3, true, true, true,
+		String jsonToExport = emportDwr.createExportJSON(3, true, true, true,
 				true, true, true, true, true, true, true, true, true, true,
 				true, includePointValues, maxPointValues, true);
 		FileToPack file = new FileToPack(packAs, FileUtil.createTxtTempFile(

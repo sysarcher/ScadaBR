@@ -24,28 +24,27 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.serotonin.InvalidArgumentException;
-import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.mango.Common;
-import com.serotonin.mango.SysProperties;
 import javax.sql.DataSource;
+
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.serotonin.mango.Common;
+import com.serotonin.mango.SysProperties;
+
 @Repository
 public class SystemSettingsDao extends BaseDao {
-    
+
     private final Map<String, String> cache = new HashMap<>();
 
-    
     @Override
     public void setDataSource(DataSource dataSource) {
         super.setDataSource(dataSource);
-        for (SysProperties prop: SysProperties.values()) {
-        cache.put(prop.key, prop.defaultValue);
-            
+        for (SysProperties prop : SysProperties.values()) {
+            cache.put(prop.key, prop.defaultValue);
+
         }
         getJdbcTemplate().query("select settingName, settingValue from systemSettings", new RowCallbackHandler() {
 
@@ -55,19 +54,19 @@ public class SystemSettingsDao extends BaseDao {
             }
         });
     }
-    
+
     public String getValue(SysProperties prop) {
         return cache.get(prop.key);
     }
-    
-   private String getValue(String key) {
+
+    private String getValue(String key) {
         return cache.get(key);
     }
 
     public String getValue(String key, String defaultValue) {
         final String result = cache.get(key);
         if (result == null) {
-                return defaultValue;
+            return defaultValue;
         }
         return result;
     }
@@ -87,7 +86,7 @@ public class SystemSettingsDao extends BaseDao {
     public boolean getBooleanValue(SysProperties prop) {
         return Boolean.valueOf(getValue(prop.key));
     }
-    
+
     public boolean getBooleanValue(String key, boolean defaultValue) {
         String value = getValue(key, null);
         if (value == null) {
@@ -99,7 +98,7 @@ public class SystemSettingsDao extends BaseDao {
     public void setValue(final SysProperties prop, final String value) {
         setValue(prop.key, value);
     }
-    
+
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public void setValue(final String key, final String value) {
         // Delete any existing value.
@@ -109,7 +108,7 @@ public class SystemSettingsDao extends BaseDao {
         if (value != null) {
             getSimpleJdbcTemplate().update(
                     "insert into systemSettings values (?,?)", key, value);
-        } 
+        }
 
         // Update the cache
         cache.put(key, value);
@@ -145,7 +144,7 @@ public class SystemSettingsDao extends BaseDao {
             // Remove the value from the cache
             cache.remove(key);
         }
-        
+
         // Reset the cached values too.
         futureDateLimit = -1;
 
@@ -165,7 +164,6 @@ public class SystemSettingsDao extends BaseDao {
     public Color getColor(SysProperties prop) {
         return new Color(Long.decode(getValue(prop.key)).intValue(), true);
     }
-    
     /**
      * Special caching for the future dated values property, which needs high
      * performance.

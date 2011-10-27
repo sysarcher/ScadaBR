@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Mango - Open Source M2M - http://mango.serotoninsoftware.com
+Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+@author Matthew Lohbihler
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.mailingList;
 
@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;
@@ -33,8 +34,11 @@ import com.serotonin.mango.vo.User;
 
 @JsonRemoteEntity
 public class UserEntry extends EmailRecipient {
+
     private int userId;
     private User user;
+    @Autowired
+    private UserDao userDao;
 
     @Override
     public int getRecipientType() {
@@ -74,24 +78,28 @@ public class UserEntry extends EmailRecipient {
 
     @Override
     public void appendAllAddresses(Set<String> addresses) {
-        if (user == null)
+        if (user == null) {
             return;
-        if (!user.isDisabled())
+        }
+        if (!user.isDisabled()) {
             addresses.add(user.getEmail());
+        }
     }
 
     @Override
     public String toString() {
-        if (user == null)
+        if (user == null) {
             return "userId=" + userId;
+        }
         return user.getUsername();
     }
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        if (user == null)
-            user = new UserDao().getUser(userId);
+        if (user == null) {
+            user = userDao.getUser(userId);
+        }
         map.put("username", user.getUsername());
     }
 
@@ -100,12 +108,14 @@ public class UserEntry extends EmailRecipient {
         super.jsonDeserialize(reader, json);
 
         String username = json.getString("username");
-        if (username == null)
+        if (username == null) {
             throw new LocalizableJsonException("emport.error.recipient.missing.reference", "username");
+        }
 
-        user = new UserDao().getUser(username);
-        if (user == null)
+        user = userDao.getUser(username);
+        if (user == null) {
             throw new LocalizableJsonException("emport.error.recipient.invalid.reference", "username", username);
+        }
 
         userId = user.getId();
     }

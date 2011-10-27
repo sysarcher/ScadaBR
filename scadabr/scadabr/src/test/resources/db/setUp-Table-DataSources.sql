@@ -15,7 +15,8 @@ VALUES(-11, 'DS_000011', 'Vm Stat 11', 'VMSTAT', '{
  "name":"Vm Stat 11",
  "outputScale":1,
  "pollSeconds":61
-}');INSERT INTO dataSources (id, xid, dataSourceName, dataSourceType, jsonSerialized) 
+}');
+INSERT INTO dataSources (id, xid, dataSourceName, dataSourceType, jsonSerialized) 
 VALUES(-12, 'DS_000012', 'Vm Stat 12', 'VMSTAT', '{
  "xid":"DS_000012",
  "type":"VMSTAT",

@@ -51,7 +51,7 @@ import com.serotonin.web.i18n.LocalizableMessage;
 public class UsersDwr extends BaseDwr {
 
     @Autowired
-    private UserDao userDao;
+    private DataSourceDao dataSourceDao;
 
     public Map<String, Object> getInitData() {
         Map<String, Object> initData = new HashMap();
@@ -60,10 +60,10 @@ public class UsersDwr extends BaseDwr {
         if (permissions.hasAdmin(user)) {
             // Users
             initData.put("admin", true);
-            initData.put("users", new UserDao().getUsers());
+            initData.put("users", userDao.getUsers());
 
             // Data sources
-            List<DataSourceVO<?>> dataSourceVOs = new DataSourceDao().getDataSources();
+            List<DataSourceVO<?>> dataSourceVOs = dataSourceDao.getDataSources();
             List<Map<String, Object>> dataSources = new ArrayList(dataSourceVOs.size());
             Map<String, Object> ds, dp;
             List<Map<String, Object>> points;
@@ -99,7 +99,7 @@ public class UsersDwr extends BaseDwr {
             user.setDataPointPermissions(new ArrayList<DataPointAccess>(0));
             return user;
         }
-        return new UserDao().getUser(id);
+        return userDao.getUser(id);
     }
 
     public DwrResponseI18n saveUserAdmin(int id, String username, String password, String email, String phone,

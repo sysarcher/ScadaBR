@@ -152,7 +152,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     @JsonRemoteProperty(typeFactory = BaseChartRenderer.Factory.class)
     private ChartRenderer chartRenderer;
     private List<PointEventDetectorVO> eventDetectors;
-    private List<UserComment> comments;
+    private List<DataPointComment> comments;
     @JsonRemoteProperty
     private int defaultCacheSize = 1;
     @JsonRemoteProperty
@@ -448,11 +448,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         this.eventDetectors = eventDetectors;
     }
 
-    public List<UserComment> getComments() {
+    public List<DataPointComment> getComments() {
         return comments;
     }
 
-    public void setComments(List<UserComment> comments) {
+    public void setComments(List<DataPointComment> comments) {
         this.comments = comments;
     }
 

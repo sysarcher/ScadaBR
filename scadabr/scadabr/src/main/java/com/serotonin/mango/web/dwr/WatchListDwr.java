@@ -57,10 +57,12 @@ public class WatchListDwr extends BaseDwr {
 
     @Autowired
     private RuntimeManager runtimeManager;
+    @Autowired
+    private UserDao userDao;
 
     public Map<String, Object> init() {
         DataPointDao dataPointDao = new DataPointDao();
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap();
 
         PointHierarchy ph = dataPointDao.getPointHierarchy().copyFoldersOnly();
         User user = common.getUser();
@@ -100,15 +102,15 @@ public class WatchListDwr extends BaseDwr {
 
     private List<WatchListState> getPointDataImpl(WatchList watchList) {
         if (watchList == null) {
-            return new ArrayList<WatchListState>();
+            return new ArrayList();
         }
 
         HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
         User user = common.getUser(request);
 
         WatchListState state;
-        List<WatchListState> states = new ArrayList<WatchListState>(watchList.getPointList().size());
-        Map<String, Object> model = new HashMap<String, Object>();
+        List<WatchListState> states = new ArrayList(watchList.getPointList().size());
+        Map<String, Object> model = new HashMap();
         for (DataPointVO point : watchList.getPointList()) {
             // Create the watch list state.
             state = createWatchListState(request, point, model, user);
@@ -214,7 +216,7 @@ public class WatchListDwr extends BaseDwr {
         watchList.getPointList().add(point);
         new WatchListDao().saveWatchList(watchList);
         updateSetPermission(point, watchList.getUserAccess(user),
-                new UserDao().getUser(watchList.getUserId()));
+                userDao.getUser(watchList.getUserId()));
 
         // Return the watch list state for it.
         return createWatchListState(request, point, new HashMap<String, Object>(),
@@ -369,13 +371,13 @@ public class WatchListDwr extends BaseDwr {
     }
 
     private Map<String, Object> getWatchListData(User user, WatchList watchList) {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap();
         if (watchList == null) {
             return data;
         }
 
         List<DataPointVO> points = watchList.getPointList();
-        List<Integer> pointIds = new ArrayList<Integer>(points.size());
+        List<Integer> pointIds = new ArrayList(points.size());
         for (DataPointVO point : points) {
             if (permissions.hasDataPointReadPermission(user, point)) {
                 pointIds.add(point.getId());
@@ -391,7 +393,7 @@ public class WatchListDwr extends BaseDwr {
 
     private void prepareWatchList(WatchList watchList, User user) {
         int access = watchList.getUserAccess(user);
-        User owner = new UserDao().getUser(watchList.getUserId());
+        User owner = userDao.getUser(watchList.getUserId());
         for (DataPointVO point : watchList.getPointList()) {
             updateSetPermission(point, access, owner);
         }

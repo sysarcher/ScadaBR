@@ -91,7 +91,7 @@ abstract public class DBUpgrade extends BaseDao {
                 LOG.warn("Upgrading instance from " + schemaVersion + " to "
                         + upgrade.getNewSchemaVersion());
                 upgrade.upgrade();
-                new SystemSettingsDao().setValue(
+                systemSettingsDao.setValue(
                         SysProperties.PRODUCT_VERSION,
                         upgrade.getNewSchemaVersion());
             } catch (Exception e) {

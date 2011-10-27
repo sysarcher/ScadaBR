@@ -24,18 +24,22 @@ import java.util.Map;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.handlers.EventHandlerRT;
 import com.serotonin.mango.rt.event.type.EventType;
-import com.serotonin.mango.vo.UserComment;
+import com.serotonin.mango.vo.EventComment;
 import com.serotonin.web.i18n.LocalizableMessage;
 import com.serotonin.web.taglib.DateFunctions;
 
 public class EventInstance {
+
+    public void clearEventComments() {
+        eventComments.clear();
+    }
+    
     public interface RtnCauses {
         int RETURN_TO_NORMAL = 1;
         int SOURCE_DISABLED = 4;
     }
 
     public interface AlternateAcknowledgementSources {
-        int DELETED_USER = 1;
         int MAINTENANCE_MODE = 2;
     }
 
@@ -84,7 +88,7 @@ public class EventInstance {
     /**
      * User comments on the event. Added in the events interface after the event has been raised.
      */
-    private List<UserComment> eventComments;
+    private List<EventComment> eventComments;
 
     private List<EventHandlerRT> handlers;
 
@@ -146,8 +150,6 @@ public class EventInstance {
         if (isAcknowledged()) {
             if (acknowledgedByUserId != 0)
                 return new LocalizableMessage("events.ackedByUser", acknowledgedByUsername);
-            if (alternateAckSource == AlternateAcknowledgementSources.DELETED_USER)
-                return new LocalizableMessage("events.ackedByDeletedUser");
             if (alternateAckSource == AlternateAcknowledgementSources.MAINTENANCE_MODE)
                 return new LocalizableMessage("events.ackedByMaintenance");
         }
@@ -159,8 +161,6 @@ public class EventInstance {
         if (isAcknowledged()) {
             if (acknowledgedByUserId != 0)
                 return new LocalizableMessage("events.export.ackedByUser", acknowledgedByUsername);
-            if (alternateAckSource == AlternateAcknowledgementSources.DELETED_USER)
-                return new LocalizableMessage("events.export.ackedByDeletedUser");
             if (alternateAckSource == AlternateAcknowledgementSources.MAINTENANCE_MODE)
                 return new LocalizableMessage("events.export.ackedByMaintenance");
         }
@@ -244,15 +244,15 @@ public class EventInstance {
         return rtnApplicable;
     }
 
-    public void addEventComment(UserComment comment) {
+    public void addEventComment(EventComment comment) {
         eventComments.add(comment);
     }
 
-    public void setEventComments(List<UserComment> eventComments) {
+    public void setEventComments(List<EventComment> eventComments) {
         this.eventComments = eventComments;
     }
 
-    public List<UserComment> getEventComments() {
+    public List<EventComment> getEventComments() {
         return eventComments;
     }
 

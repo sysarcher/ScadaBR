@@ -27,6 +27,7 @@ import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
 import com.serotonin.web.taglib.DateFunctions;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @JsonRemoteEntity
 public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>, JsonSerializable {
@@ -91,6 +92,8 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     private int inactiveSecond;
     @JsonRemoteProperty
     private String inactiveCron;
+    @Autowired
+    private DataSourceDao dataSourceDao;
 
     //
     //
@@ -496,11 +499,11 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.disabled", from.disabled, disabled);
         if (from.activeYear != activeYear || from.activeMonth != activeMonth || from.activeDay != activeDay
                 || from.activeHour != activeHour || from.activeMinute != activeMinute
-                || from.activeSecond != activeSecond || from.activeCron != activeCron
+                || from.activeSecond != activeSecond || (from.activeCron == null ? activeCron != null : !from.activeCron.equals(activeCron))
                 || from.inactiveYear != inactiveYear || from.inactiveMonth != inactiveMonth
                 || from.inactiveDay != inactiveDay || from.inactiveHour != inactiveHour
                 || from.inactiveMinute != inactiveMinute || from.inactiveSecond != inactiveSecond
-                || from.inactiveCron != inactiveCron)
+                || (from.inactiveCron == null ? inactiveCron != null : !from.inactiveCron.equals(inactiveCron)))
             AuditEventType.maybeAddPropertyChangeMessage(list, "common.configuration", from.getDescription(),
                     getDescription());
     }
@@ -518,7 +521,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("dataSourceXid");
         if (text != null) {
-            DataSourceVO<?> ds = new DataSourceDao().getDataSource(text);
+            DataSourceVO<?> ds = dataSourceDao.getDataSource(text);
             if (ds == null)
                 throw new LocalizableJsonException("emport.error.maintenanceEvent.invalid", "dataSourceXid", text);
             dataSourceId = ds.getId();

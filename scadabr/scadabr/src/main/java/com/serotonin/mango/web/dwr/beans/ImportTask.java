@@ -86,15 +86,19 @@ public class ImportTask extends ProgressiveTask {
     private Common common;
     @Autowired
     private RuntimeManager runtimeManager;
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private PointLinkDao pointLinkDao;
+    @Autowired
+    private ViewDao viewDao;
+    @Autowired
+    private DataSourceDao dataSourceDao;
     private final JsonReader reader;
     private final ResourceBundle bundle;
     private final User user;
     private final DwrResponseI18n response;
-    private final UserDao userDao = new UserDao();
-    private final DataSourceDao dataSourceDao = new DataSourceDao();
     private final DataPointDao dataPointDao = new DataPointDao();
-    private final ViewDao viewDao = new ViewDao();
-    private final PointLinkDao pointLinkDao = new PointLinkDao();
     private final ScheduledEventDao scheduledEventDao = new ScheduledEventDao();
     private final CompoundEventDetectorDao compoundEventDetectorDao = new CompoundEventDetectorDao();
     private final EventDao eventDao = new EventDao();

@@ -251,10 +251,6 @@ public class MangoContextListener implements ServletContextListener {
                 PublisherVO.Type.PACHUBE.getId());
         ctx.setAttribute("constants.PublisherVO.Types.PERSISTENT",
                 PublisherVO.Type.PERSISTENT.getId());
-        ctx.setAttribute("constants.UserComment.TYPE_EVENT",
-                UserComment.TYPE_EVENT);
-        ctx.setAttribute("constants.UserComment.TYPE_POINT",
-                UserComment.TYPE_POINT);
 
         String[] codes = {"common.access.read", "common.access.set",
             "common.alarmLevel.none", "common.alarmLevel.info",

@@ -40,6 +40,7 @@ import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * An event class specifies the type of event that was raised.
@@ -148,6 +149,9 @@ abstract public class EventType implements JsonSerializable {
         int ALLOW = 4;
     }
 
+    @Autowired
+    private DataSourceDao dataSourceDao;
+    
     abstract public int getEventSourceId();
 
     /**
@@ -336,7 +340,7 @@ abstract public class EventType implements JsonSerializable {
         String xid = json.getString(name);
         if (xid == null)
             throw new LocalizableJsonException("emport.error.eventType.missing.reference", name);
-        DataSourceVO<?> ds = new DataSourceDao().getDataSource(xid);
+        DataSourceVO<?> ds = dataSourceDao.getDataSource(xid);
         if (ds == null)
             throw new LocalizableJsonException("emport.error.eventType.invalid.reference", name, xid);
         return ds;

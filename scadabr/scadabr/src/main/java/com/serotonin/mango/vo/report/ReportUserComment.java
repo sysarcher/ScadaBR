@@ -21,8 +21,12 @@ package com.serotonin.mango.vo.report;
 import com.serotonin.web.taglib.DateFunctions;
 
 public class ReportUserComment {
+    public enum CommentType{
+        EVENT,
+        DATA_POINT;
+    } 
     private String username;
-    private int commentType;
+    private CommentType commentType;
     private int typeKey;
     private String pointName;
     private long ts;
@@ -40,11 +44,11 @@ public class ReportUserComment {
         this.username = username;
     }
 
-    public int getCommentType() {
+    public CommentType getCommentType() {
         return commentType;
     }
 
-    public void setCommentType(int commentType) {
+    public void setCommentType(CommentType commentType) {
         this.commentType = commentType;
     }
 

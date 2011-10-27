@@ -79,7 +79,7 @@ create table users (
   phone varchar(40),
   mangoAdmin boolean not null,
   disabled boolean not null,
-  lastLogin timestamp,
+  lastLogin bigint,
   selectedWatchList int,
   homeUrl varchar(255),
   receiveAlarmEmails varchar(16) not null,
@@ -205,6 +205,15 @@ create table dataPointUsers (
 alter table dataPointUsers add constraint dataPointUsersFk1 foreign key (dataPointId) references dataPoints(id);
 alter table dataPointUsers add constraint dataPointUsersFk2 foreign key (userId) references users(id) on delete cascade;
 
+
+create table dataPointComments (
+  userId int,
+  dataPointId int not null,
+  ts bigint not null,
+  commentText varchar(1024) not null
+) type=InnoDB;
+alter table dataPointComments add constraint dataPointCommentsFk1 foreign key (userId) references users(id);
+alter table dataPointComments add constraint dataPointCommentsFk2 foreign key (dataPointId) references dataPoints(id) on delete cascade;
 
 --
 --
@@ -396,6 +405,16 @@ create table scheduledEvents (
   primary key (id)
 ) type=InnoDB;
 alter table scheduledEvents add constraint scheduledEventsUn1 unique (xid);
+
+
+create table eventComments (
+  userId int,
+  eventId int not null,
+  ts bigint not null,
+  commentText varchar(1024) not null
+);
+alter table eventComments add constraint eventCommentsFk1 foreign key (userId) references users(id);
+alter table eventComments add constraint eventCommentsFk2 foreign key (eventId) references events(id) on delete cascade;
 
 
 --

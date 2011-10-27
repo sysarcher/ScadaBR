@@ -52,6 +52,7 @@ import com.serotonin.mango.view.graphic.ScriptRenderer;
 import com.serotonin.mango.view.graphic.ThumbnailRenderer;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.util.SerializationHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -60,6 +61,8 @@ import com.serotonin.util.SerializationHelper;
 public class Upgrade1_5_0 extends DBUpgrade {
 
     private final static Logger LOG = LoggerFactory.getLogger(Upgrade1_5_0.class);
+    @Autowired
+    private DataSourceDao dataSourceDao;
 
     @Override
     public void upgrade() throws Exception {
@@ -149,7 +152,6 @@ public class Upgrade1_5_0 extends DBUpgrade {
 
     private void xid() {
         // Default the xid values.
-        DataSourceDao dataSourceDao = new DataSourceDao();
         List<Integer> dsids = getJdbcTemplate().queryForList("select id from dataSources", Integer.class);
         for (Integer dsid : dsids) {
             getSimpleJdbcTemplate().update("update dataSources set xid=? where id=?", dataSourceDao.generateUniqueXid(), dsid);
