@@ -78,6 +78,7 @@ public class ZIPProjectManager {
 
 	public ModelAndView setupToImportProject(HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
+
 		Map<String, Object> model = new HashMap<String, Object>();
 		List<String> errorList = new ArrayList<String>();
 		model.put("errorMessages", errorList);
@@ -100,6 +101,7 @@ public class ZIPProjectManager {
 			return new ModelAndView("import_result", model);
 		}
 
+		// TODO atualizar sistema de upgrade mango -> scadabr
 		// String version = (String) model.get("projectServerVersion");
 		// if (DBUpgrade.isUpgradeNeeded(version)) {
 		// errorList.add(Common.getMessage("emport.versionError", version,
@@ -114,16 +116,17 @@ public class ZIPProjectManager {
 	}
 
 	public void importProject() throws Exception {
-		String jsonContent = getJsonContent();
-
-		EmportDwr.importDataImpl(jsonContent, Common.getBundle(),
-				Common.getUser());
 
 		List<ZipEntry> graphicsFiles = getGraphicsFiles();
 		restoreFiles(graphicsFiles);
 
 		List<ZipEntry> uploadFiles = getUploadFiles();
 		restoreFiles(uploadFiles);
+
+		String jsonContent = getJsonContent();
+
+		EmportDwr.importDataImpl(jsonContent, Common.getBundle(),
+				Common.getUser());
 
 	}
 
