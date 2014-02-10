@@ -56,7 +56,7 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
 
     public static MBusDataSourceVO createNewDataSource() {
         MBusDataSourceVO result = new MBusDataSourceVO();
-        result.setConnection(new TcpIpConnection("91.135.13.66", 65031, Connection.DEFAULT_BAUDRATE, TcpIpConnection.DEFAULT_RESPONSE_TIMEOUT_OFFSET));
+        result.setConnection(new TcpIpConnection("192.168.1.210", 10001, Connection.DEFAULT_BAUDRATE, TcpIpConnection.DEFAULT_RESPONSE_TIMEOUT_OFFSET));
         LOG.fatal("TCP CONN");
         return result;
     }
