@@ -45,13 +45,14 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.web.i18n.LocalizableMessage;
+import javax.script.Invocable;
 
 /**
  * @author Matthew Lohbihler
  */
 public class ScriptExecutor {
     private static final String SCRIPT_PREFIX = "function __scriptExecutor__() {";
-    private static final String SCRIPT_SUFFIX = "\r\n}\r\n__scriptExecutor__();";
+    private static final String SCRIPT_SUFFIX = "\r\n}";
     private static String SCRIPT_FUNCTION_PATH;
     private static String FUNCTIONS;
 
@@ -86,7 +87,7 @@ public class ScriptExecutor {
         catch (Exception e) {
             throw new ScriptException(e);
         }
-        ScriptEngine engine = manager.getEngineByName("js");
+        ScriptEngine engine = manager.getEngineByName("JavaScript");
         // engine.getContext().setErrorWriter(new PrintWriter(System.err));
         // engine.getContext().setWriter(new PrintWriter(System.out));
 
@@ -123,9 +124,14 @@ public class ScriptExecutor {
         script = SCRIPT_PREFIX + script + SCRIPT_SUFFIX + FUNCTIONS;
 
         // Execute.
-        Object result;
+        Object result = null;
         try {
-            result = engine.eval(script);
+            engine.eval(script);
+            Invocable inv = (Invocable)engine;
+            result = inv.invokeFunction("__scriptExecutor__");
+        }
+        catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
         }
         catch (ScriptException e) {
             throw prettyScriptMessage(e);
