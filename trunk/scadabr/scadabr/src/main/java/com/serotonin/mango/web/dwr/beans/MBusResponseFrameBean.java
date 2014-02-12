@@ -58,7 +58,4 @@ public class MBusResponseFrameBean {
         return name;
     }
 
-    public Frame getRsf() {
-        return rsf;
-    }
 }

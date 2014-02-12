@@ -124,7 +124,6 @@ public class MBusDiscovery implements MasterEventListener, TestingUtility {
             devs[i] = new MBusDeviceBean(i, dev);
         }
 
-        result.put("addressing", searchByAddressing.getAddressing());
         result.put("devices", devs);
         result.put("message", message);
         result.put("finished", finished);
@@ -150,8 +149,7 @@ public class MBusDiscovery implements MasterEventListener, TestingUtility {
     public void getDeviceDetails(int deviceIndex, Map<String, Object> result) {
         LOG.info("getDeviceDetails()");
         MBusResponseFramesContainer dev = master.getDevice(deviceIndex);
-        result.put("addressing", searchByAddressing.getAddressing());
-        result.put("deviceName", String.format("%s %s 0x%02X %08d @0x%02X)", dev.getManufacturer(), dev.getMedium(),
+        result.put("deviceName", String.format("%s %s 0x%02X %08d @0x%02X", dev.getManufacturer(), dev.getMedium(),
                 dev.getVersion(), dev.getIdentNumber(), dev.getAddress()));
 
         result.put("deviceIndex", deviceIndex);
