@@ -24,10 +24,11 @@ import com.serotonin.mango.rt.dataSource.meta.NumericPointWrapper;
 import com.serotonin.mango.rt.dataSource.meta.ScriptExecutor;
 import com.serotonin.mango.rt.dataSource.meta.WrapperContext;
 import com.serotonin.mango.vo.User;
+import javax.script.Invocable;
 
 public class ContextualizedScriptRT extends ScriptRT {
 	private static final String SCRIPT_PREFIX = "function __scriptExecutor__() {";
-	private static final String SCRIPT_SUFFIX = "\r\n}\r\n__scriptExecutor__();";
+	private static final String SCRIPT_SUFFIX = "\r\n}";
 
 	private static String SCRIPT_FUNCTION_PATH;
 	private static String FUNCTIONS;
@@ -48,7 +49,7 @@ public class ContextualizedScriptRT extends ScriptRT {
 		} catch (Exception e) {
 			throw new ScriptException(e);
 		}
-		ScriptEngine engine = manager.getEngineByName("js");
+		ScriptEngine engine = manager.getEngineByName("JavaScript");
 		// engine.getContext().setErrorWriter(new PrintWriter(System.err));
 		// engine.getContext().setWriter(new PrintWriter(System.out));
 
@@ -115,8 +116,13 @@ public class ContextualizedScriptRT extends ScriptRT {
 
 		// Execute.
 		Object result;
-		try {
-			result = engine.eval(script);
+        try {
+            engine.eval(script);
+            Invocable inv = (Invocable)engine;
+            result = inv.invokeFunction("__scriptExecutor__");
+        }
+        catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
 		} catch (ScriptException e) {
 			throw e;
 		}
