@@ -134,10 +134,8 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     public void validate(DwrResponseI18n response) {
         switch (getAddressing()) {
             case PRIMARY:
-
-                if (((address & 0xFF) < MBusUtils.FIRST_REGULAR_PRIMARY_ADDRESS)
-                        || (address > MBusUtils.LAST_REGULAR_PRIMARY_ADDRESS)) {
-                    response.addContextualMessage("address", "validate.required");
+                if ((address & 0xFF) > MBusUtils.LAST_REGULAR_PRIMARY_ADDRESS) {
+                    response.addContextualMessage("address >= 0xFD", "validate.required");
                 }
                 break;
             case SECONDARY:
@@ -677,4 +675,22 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     public void setCorrectionFactor(double correctionFactor) {
         this.correctionFactor = correctionFactor;
     }
+    
+    public String getDeviceName() {
+        return String.format("%s %s 0x%02X %08d @0x%02X", getManufacturer(), getMedium(), getVersion(), getIdentNumber(), getAddress());
+    }
+    
+    public String getParams() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<b>dataType = </b> \"").append(difCode).append("\"<br>");
+        sb.append("<b>description =</b> \"").append(vifLabel).append("\"</br>");
+        sb.append("<b>unitOfMeasurement =</b> \"").append(unitOfMeasurement).append("\"<br>");
+        sb.append("<b>exponent =</b> \"").append(exponent).append("\"<br>");
+        sb.append("<b>siPrefix =</b> \"").append(siPrefix).append("\"<br>");
+        sb.append("<b>tariff =</b> \"").append(tariff).append("\"<br>");
+        sb.append("<b>storageNumber =</b> \"").append(storageNumber).append("\"<br>");
+        sb.append("<b>functionField =</b> \"").append(functionField).append("\"<br>");
+        return sb.toString();
+    }
+    
 }

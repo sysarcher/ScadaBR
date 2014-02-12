@@ -201,8 +201,8 @@
     <convert converter="bean" match="com.serotonin.mango.vo.dataSource.mbus.MBusSearchByAddressing"/>
     <convert converter="bean" match="com.serotonin.mango.vo.dataSource.mbus.PrimaryAddressingSearch" javascript="PrimaryAddressingSearch"/>
     <convert converter="bean" match="com.serotonin.mango.vo.dataSource.mbus.SecondaryAddressingSearch" javascript="SecondaryAddressingSearch"/>
-    <convert converter="enum" match="com.serotonin.dataframes.MBusMedium" />
-    <convert converter="enum" match="com.serotonin.MBusAddressing" />
+    <convert converter="enum" match="net.sf.mbus4j.dataframes.MBusMedium" />
+    <convert converter="enum" match="net.sf.mbus4j.MBusAddressing" />
     <!-- End MBus4J stuff-->
 
     <!-- Fhz4J stuff- ->

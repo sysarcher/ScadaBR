@@ -1,7 +1,7 @@
 <%--
     Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2010 Arne Plï¿½se
-    @author Arne Plï¿½se
+    Copyright (C) 2010 Arne Plöse
+    @author Arne Plöse
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -183,9 +183,13 @@
 
                 for (var dbIndex = 0; dbIndex < responseFrame.dataBlocks.length; dbIndex++) {
                     var dataBlock = responseFrame.dataBlocks[dbIndex];
+                    var funcOnClick = "addPoint({deviceIndex: " + result.deviceIndex + ", rsIndex: " + rsIndex + ", dbIndex: " + dbIndex + "})";
+                    var mImage = writeImageSQuote(null, null,
+                        "icon_comp_add", "<fmt:message key='dsEdit.mbus.addPoint'/>", funcOnClick);
+                    var mTitle = dataBlock.name + "(" + dataBlock.params  + ") " + mImage;
+                        
                     var dataBlockNode = dojo.widget.createWidget("TreeNode", {
-                        title: dataBlock.name + "(" + dataBlock.params  + ")" + writeImageSQuote(null, null,
-                        "icon_comp_add", "<fmt:message key='dsEdit.mbus.addPoint'/>", "addPoint( { 'addressing': '" + result.addressing + "', 'deviceIndex': "+ result.deviceIndex + ", 'rsIndex': " + rsIndex + ", 'dbIndex': " + dbIndex + "})"),
+                        title: mTitle,
                         isFolder: "true"});
                     responseFrameNode.addChild(dataBlockNode);
 
@@ -220,72 +224,26 @@
         pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.correctionFactor'/>";
         pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.correctionFactor; };
 
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.addressing'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.addressing; };
-
         pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.addressHex'/>";
         pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.addressHex; };
 
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.identNumber'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.identNumber; };
-
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.medium'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.medium; };
-
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.manufacturer'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.manufacturer; };
-
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.versionHex'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.versionHex; };
+        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.deviceName'/>";
+        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.deviceName; };
 
         pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.responseFrame'/>";
         pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.responseFrame; };
 
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.difCode'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.difCode; };
-
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.functionField'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.functionField; };
-
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.deviceUnit'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.deviceUnit; };
-
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.tariff'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.tariff; };
-
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.storageNumber'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.storageNumber; };
-
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.vifType'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.vifType; };
-
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.vifLabel'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.vifLabel; };
-
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.unitOfMeasurement'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.unitOfMeasurement; };
-
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.siPrefix'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.siPrefix; };
-
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.exponent'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.exponent; };
-
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.vifeTypes'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.vifeTypes; };
-        
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.vifeLabels'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.vifeLabels; };
+        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.mbus.params'/>";
+        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.params; };
 
     }
 
     function addPointImpl(indicies) {
-        DataSourceEditDwr.addMBusPoint(indicies.addressing, indicies.deviceIndex, indicies.rsIndex, indicies.dbIndex, editPointCB);
+        DataSourceEditDwr.addMBusPoint(indicies.deviceIndex, indicies.rsIndex, indicies.dbIndex, editPointCB);
     }
 
     function editPointCBImpl(locator) {
         $set("correctionFactor", locator.correctionFactor);
-        $set("addressing", locator.addressing);
         $set("addressHex", locator.addressHex);
         $set("identNumber", locator.identNumber);
         $set("medium", locator.medium);
@@ -304,17 +262,12 @@
         $set("exponent", locator.exponent);
         $set("vifeTypes", locator.vifeTypes);
         $set("vifeLabels", locator.vifeLabels);
-        if (true) {
-            show("pointSaveImg");
-        } else {
-            // Didn't find the device.
-            hide("pointSaveImg");
-        }
+          //show("readonlyAttributes");
+          show("pointSaveImg");
     }
 
     function savePointImpl(locator) {
         locator.correctionFactor = $get("correctionFactor");
-        locator.addressing = $get("addressing");
         locator.addressHex = $get("addressHex");
         locator.identNumber = $get("identNumber");
         locator.medium = $get("medium");
@@ -559,14 +512,11 @@
 
 
             <tag:pointList pointHelpId="mbusPP">
+          <tbody id="readonlyAttributes">
 
                 <tr>
                     <td class="formLabelRequired"><fmt:message key="dsEdit.mbus.correctionFactor"/></td>
                     <td class="formField"><input type="text" id="correctionFactor"/></td>
-                </tr>
-                <tr>
-                    <td class="formLabelRequired"><fmt:message key="dsEdit.mbus.addressing"/></td>
-                    <td class="formField"><input type="text" id="addressing" disabled="disabled"/></td>
                 </tr>
                 <tr>
                     <td class="formLabelRequired"><fmt:message key="dsEdit.mbus.addressHex"/></td>
@@ -656,5 +606,5 @@
                     <td class="formLabelRequired"><fmt:message key="dsEdit.mbus.vifeLabels"/></td>
                     <td class="formField"><input type="text" id="vifeLabels" disabled="disabled"/></td>
                 </tr>
-
+          </tbody>
             </tag:pointList>

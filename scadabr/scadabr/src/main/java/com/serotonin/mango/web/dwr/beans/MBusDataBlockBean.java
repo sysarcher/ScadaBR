@@ -49,8 +49,24 @@ public class MBusDataBlockBean {
         return devIndex;
     }
 
+    /**
+     * Reformat the generic output omit value and replace LF with tag br.
+     * @return 
+     */
     public String getParams() {
-        return db.toString();
+        String[] splitted =  db.toString().split("\n");
+        StringBuilder sb = new StringBuilder();
+        for (String line : splitted) {
+            if (line.startsWith("value")) {
+                //skip
+            } else {
+                String[] subLine = line.split(" = ");
+                sb.append("<b>").append(subLine[0]).append(" = </b>\"").append(subLine[1]).append("\", ");
+            }
+        }
+        
+        sb.delete(sb.length() -3, sb.length() -1);
+        return sb.toString();
     }
 
     public String getValue() {

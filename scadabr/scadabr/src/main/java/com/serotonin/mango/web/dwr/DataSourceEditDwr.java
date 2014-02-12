@@ -1852,7 +1852,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 		return result;
 	}
 
-	public DataPointVO addMBusPoint(String addressing, int deviceIndex,
+	public DataPointVO addMBusPoint(int deviceIndex,
 			int rsIndex, int dbIndex) {
 		DataPointVO dp = getPoint(Common.NEW_ID, null);
 		MBusPointLocatorVO locator = (MBusPointLocatorVO) dp.getPointLocator();
@@ -1870,7 +1870,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
 			dp.setName(db.getParamDescr());
 
-			locator.setAddressing(MBusAddressing.valueOf(addressing));
+			locator.setAddressing(MBusAddressing.PRIMARY);
 			locator.setAddress(dev.getAddress());
 			locator.setMedium(dev.getMedium().getLabel());
 			locator.setManufacturer(dev.getManufacturer());
