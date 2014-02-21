@@ -19,8 +19,13 @@
 package com.serotonin.mango.web.dwr.beans;
 
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
+import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
+import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifAscii;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
 
 public class MBusDataBlockBean {
+
     private final int dbIndex;
     private final int devIndex;
     private final int rsIndex;
@@ -37,6 +42,24 @@ public class MBusDataBlockBean {
         return db.getParamDescr();
     }
 
+    public String getUiName() {
+        final boolean highlight = (db.getStorageNumber() == 0)
+                && (db.getVif() != VifPrimary.FABRICATION_NO)
+                && (db.getVif() != VifPrimary.TIMEPOINT_DATE)
+                && (db.getVif() != VifPrimary.TIMEPOINT_TIME_AND_DATE)
+                && (!(db.getVif() instanceof VifAscii))
+                && (db.getVif() != VifPrimary.BUS_ADDRESS);
+        if (highlight) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<big><em>");
+            sb.append(db.getParamDescr());
+            sb.append("</em></big>");
+            return sb.toString();
+        } else {
+            return db.getParamDescr();
+        }
+    }
+
     public int getDbIndex() {
         return dbIndex;
     }
@@ -51,21 +74,21 @@ public class MBusDataBlockBean {
 
     /**
      * Reformat the generic output omit value and replace LF with tag br.
-     * @return 
+     *
+     * @return
      */
     public String getParams() {
-        String[] splitted =  db.toString().split("\n");
+        String[] splitted = db.toString().split("\n");
         StringBuilder sb = new StringBuilder();
         for (String line : splitted) {
             if (line.startsWith("value")) {
                 //skip
             } else {
                 String[] subLine = line.split(" = ");
-                sb.append("<b>").append(subLine[0]).append(" = </b>\"").append(subLine[1]).append("\", ");
+                sb.append("<strong>").append(subLine[0]).append(" = </strong>\"").append(subLine[1]).append("\", ");
             }
         }
-        
-        sb.delete(sb.length() -3, sb.length() -1);
+        sb.delete(sb.length() - 3, sb.length() - 1);
         return sb.toString();
     }
 

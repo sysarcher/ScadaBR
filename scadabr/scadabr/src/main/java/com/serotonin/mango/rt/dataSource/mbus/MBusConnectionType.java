@@ -23,6 +23,6 @@ package com.serotonin.mango.rt.dataSource.mbus;
  * @author aploese
  */
 public enum MBusConnectionType {
-        SERIAL_DIRECT, SERIAL_AT_MODEM, TCP_IP;
+        SERIAL_DIRECT, TCP_IP;
     }
 

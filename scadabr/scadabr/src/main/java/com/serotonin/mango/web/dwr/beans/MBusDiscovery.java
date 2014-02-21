@@ -77,8 +77,6 @@ public class MBusDiscovery implements MasterEventListener, TestingUtility {
                 LOG.info("Search finished!");
                 try {
                     master.close();
-                } catch (InterruptedException ex) {
-                    LOG.info("Interrupted)");
                 } catch (IOException ex) {
                     LOG.error("IO Ex)");
                 }

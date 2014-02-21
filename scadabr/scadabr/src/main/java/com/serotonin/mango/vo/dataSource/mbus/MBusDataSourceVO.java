@@ -44,7 +44,6 @@ import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
 import java.util.LinkedHashMap;
 import net.sf.mbus4j.Connection;
-import net.sf.mbus4j.AtModemConnection;
 import net.sf.mbus4j.SerialPortConnection;
 import net.sf.mbus4j.TcpIpConnection;
 import net.sf.mbus4j.dataframes.MBusMedium;
@@ -222,15 +221,6 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
      */
     public boolean isSerialDirect() {
         return SerialPortConnection.class.equals(connection.getClass());
-    }
-
-    /**
-     * Helper for JSP
-     * 
-     * @return
-     */
-    public boolean isSerialAtModem() {
-        return AtModemConnection.class.equals(connection.getClass());
     }
 
     /**
