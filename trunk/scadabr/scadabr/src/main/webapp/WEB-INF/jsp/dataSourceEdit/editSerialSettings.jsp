@@ -28,7 +28,7 @@
         <span class="formError">${commPortError}</span>
       </c:when>
       <c:otherwise>
-          <sst:select id="commPortId" value="${serialPortSettings != null ? serialPortSettings.commPortId : \"\"}">
+          <sst:select id="commPortId" value="${serialPortSettings != null ? serialPortSettings.commPortId : ''}">
           <c:forEach items="${commPorts}" var="port">
             <sst:option value="${port.name}">${port.name}</sst:option>
           </c:forEach>

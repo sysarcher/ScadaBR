@@ -44,7 +44,7 @@ abstract public class PollingDataSource extends DataSourceRT implements TimeoutC
     private long pollingPeriodMillis = 300000; // Default to 5 minutes just to have something here
     private boolean quantize;
     private TimerTask timerTask;
-    private volatile Thread jobThread;
+    private Thread jobThread;
     private long jobThreadStartTime;
 
     public PollingDataSource(DataSourceVO<?> vo) {
@@ -57,6 +57,7 @@ abstract public class PollingDataSource extends DataSourceRT implements TimeoutC
         this.quantize = quantize;
     }
 
+    @Override
     public void scheduleTimeout(long fireTime) {
         if (jobThread != null) {
             // There is another poll still running, so abort this one.
@@ -75,8 +76,9 @@ abstract public class PollingDataSource extends DataSourceRT implements TimeoutC
                 updateChangedPoints();
                 doPoll(fireTime);
             }
-        }
-        finally {
+        } catch (Throwable t) {
+            System.err.println(t);
+        } finally {
             jobThread = null;
         }
     }

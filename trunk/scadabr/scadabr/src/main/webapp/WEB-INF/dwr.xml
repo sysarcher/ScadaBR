@@ -194,7 +194,10 @@
     <convert converter="bean" match="net.sf.mbus4j.Connection">
       <param name="include" value="bitPerSecond,responseTimeOutOffset"/><!--copy to child classes-->
     </convert>
-    <convert converter="bean" match="net.sf.mbus4j.SerialPortConnection" javascript="SerialDirectConnection"/>
+    <convert converter="bean" match="net.sf.mbus4j.SerialPortConnection" javascript="SerialDirectConnection">
+      <param name="include" value="bitPerSecond,responseTimeOutOffset,portName"/>
+    </convert>
+        
     <convert converter="bean" match="net.sf.mbus4j.TcpIpConnection" javascript="TcpIpConnection">
       <param name="include" value="bitPerSecond,responseTimeOutOffset,host,port"/>
     </convert>

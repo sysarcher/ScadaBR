@@ -17,6 +17,7 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 --%>
 <%@include file="/WEB-INF/jsp/include/tech.jsp" %>
+<%@page import="com.serotonin.mango.Common"%>
 
 
 
@@ -41,45 +42,19 @@
         setDisabled("cancelSearchBtn", !searching);
     }
 
-    /*
-             SerialDirectConnectionData connData = new SerialDirectConnectionData();
-        connData.setBaudRate(baudRate);
-        connData.setResponseTimeoutOffset(responseTimeoutOffset);
-        connData.setFlowControlIn(flowControlIn);
-        connData.setFlowControlOut(flowControlOut);
-        connData.setDataBits(dataBits);
-        connData.setStopBits(stopBits);
-        connData.setParity(parity);
-        connData.setCommPortId(commPortId);
-
-
-        MBusDataSourceVO.SerialAtModemConnectionData connData = new MBusDataSourceVO.SerialAtModemConnectionData();
-        connData.setBaudRate(baudRate);
-        connData.setResponseTimeoutOffset(responseTimeoutOffset);
-        connData.setFlowControlIn(flowControlIn);
-        connData.setFlowControlOut(flowControlOut);
-        connData.setDataBits(dataBits);
-        connData.setStopBits(stopBits);
-        connData.setParity(parity);
-        connData.setCommPortId(commPortId);
-        connData.setPhonenumber(phonenumber);
-
-        MBusDataSourceVO.TcpIpConnectionData connData = new MBusDataSourceVO.TcpIpConnectionData();
-        connData.setBaudRate(baudRate);
-        connData.setResponseTimeoutOffset(responseTimeoutOffset);
-        connData.setIpAddressOrName(ipAddressOrName);
-        connData.setTcpIpPort(tcpIpPort);
-
-    */
-
     function getConnection() {
         conn = null;
         if ($get("connectionType") == "TCP_IP") {
             conn = new TcpIpConnection();
             conn.host = $get("ipAddressOrHostname");
             conn.port = $get("tcpPort");
-            conn.bitPerSecond = $get("tcpIpBitPerSecond");
+        } else if ($get("connectionType") == "SERIAL_DIRECT") {
+            conn = new SerialDirectConnection();
+            conn.portName = $get("commPortId");
+        } else {
+            //ERROR
         }
+        conn.bitPerSecond = $get("bitPerSecond");
         conn.responseTimeOutOffset = $get("responseTimeOutOffset");
         return conn;
     }
@@ -186,7 +161,7 @@
                     var funcOnClick = "addPoint({deviceIndex: " + result.deviceIndex + ", rsIndex: " + rsIndex + ", dbIndex: " + dbIndex + "})";
                     var mImage = writeImageSQuote(null, null,
                         "icon_comp_add", "<fmt:message key='dsEdit.mbus.addPoint'/>", funcOnClick);
-                    var mTitle = dataBlock.name + "(" + dataBlock.params  + ") " + mImage;
+                    var mTitle = dataBlock.uiName + " ( " + dataBlock.params  + ") " + mImage;
                         
                     var dataBlockNode = dojo.widget.createWidget("TreeNode", {
                         title: mTitle,
@@ -297,14 +272,6 @@
 
     //Apl neu
     function updateConnectionType() {
-        if($get("connectionType") == "SERIAL_AT_MODEM") {
-            document.getElementById("phoneNumber").disabled=false;
-            document.getElementById("phoneNumber").checked=false;
-        } else {
-            document.getElementById("phoneNumber").disabled=true;
-            document.getElementById("phoneNumber").checked=false;
-        }
-        updatePhoneNumber();
     }
 
     function updateAddressing() {
@@ -318,19 +285,39 @@
        setDisabled("secAddrVersion", $get("addressingType") != "SECONDARY");
     }
 
-    function updatePhoneNumber() {
-       setDisabled("phoneNumberText", !$get("phoneNumber"));
-    }
-
-</script>
+ </script>
 
 <c:set var="dsDesc"><fmt:message key="dsEdit.mbus.desc"/></c:set>
 <c:set var="dsHelpId" value="mbusDS"/>
 <%@include file="/WEB-INF/jsp/dataSourceEdit/dsHead.jspf" %>
-<!-- Disable modem for now-->
 <tr>
     <td colspan="2">
-        <input type="radio" name="connectionType" id="useTcpIpConnection" value="TCP_IP" <c:if test="${dataSource.tcpIp}">checked="checked"</c:if> onclick="updateConnetionType()" disabled="disabled">
+        <table>
+            <tr>
+                <td width="30" />
+                <td class="formLabelRequired"><fmt:message key="dsEdit.mbus.bitPerSecond"/></td>
+                <td class="formField">
+                    <sst:select id="bitPerSecond" value="${dataSource.connection.bitPerSecond}">
+                        <sst:option>300</sst:option>
+                        <sst:option>2400</sst:option>
+                        <sst:option>9600</sst:option>
+                    </sst:select>
+                </td>        
+            </tr>
+        </table>
+    </td>
+</tr>
+<tr>
+    <td colspan="3">
+        <label class="formLabelRequired" for="responseTimeOutOffset" ><fmt:message key="dsEdit.mbus.responseTimeOutOffset"/></label>
+        <input class="formShort" type="text" id="responseTimeOutOffset" value="${dataSource.connection.responseTimeOutOffset}" />
+        <label class="formLabelRequired">ms</label>
+    </td>
+</tr>
+
+<tr>
+    <td colspan="2">
+        <input type="radio" name="connectionType" id="useTcpIpConnection" value="TCP_IP" <c:if test="${dataSource.tcpIp}">checked="checked"</c:if> onclick="updateConnetionType()" >
         <label class="formLabelRequired" for="useDirectConnection"><fmt:message key="dsEdit.mbus.useTcpIpConnection"/></label>
     </td>
 </tr>
@@ -347,56 +334,36 @@
                 <td class="formLabelRequired"><fmt:message key="dsEdit.mbus.tcpPort"/>
                 <td class="formField"><input type="text" id="tcpPort" value="${dataSource.tcpIp ? dataSource.connection.port: ""}" /></td>
             </tr>
-            <tr>
-                <td width="30" />
-                <td class="formLabelRequired"><fmt:message key="dsEdit.mbus.tcpIpBitPerSecond"/></td>
-                <td class="formField"><input type="text" id="tcpIpBitPerSecond" value="${dataSource.tcpIp ? dataSource.connection.bitPerSecond: ""}" /></td>
-            </tr>
         </table>
     </td>
 </tr>
 <tr>
     <td colspan="2">
-        <input type="radio" name="connectionType" id="useDirectConnection" value="SERIAL_DIRECT" <c:if test="${dataSource.serialDirect}">checked="checked"</c:if> onclick="updateConnectionType()" disabled="disabled">
+        <input type="radio" name="connectionType" id="useDirectConnection" value="SERIAL_DIRECT" <c:if test="${dataSource.serialDirect}">checked="checked"</c:if> onclick="updateConnectionType()" >
         <label class="formLabelRequired" for="useDirectConnection"><fmt:message key="dsEdit.mbus.useDirectConnection"/></label>
     </td>
-    <td/>
-</tr>
+    <td>
 <tr>
-    <td colspan="2">
-        <table>
-            <tr>
-                <td width="30" />
-                <td colspan=""2">
-                    <input type="checkbox" name="phoneNumber" id="phoneNumber" <c:if test="${dataSource.serialAtModem}"> checked="checked"</c:if> onclick="updatePhoneNumber()" />
-                    <label class="formLabelRequired" for="phoneNumber"><fmt:message key="dsEdit.mbus.phoneNumber"/></label>
-                    <input type="text" id="phoneNumberText" value="${dataSource.serialAtModem ? dataSource.connection.phoneNumber : ""}" />
-                </td>
-            </tr>
-        </table>
-
-    </td>
-    <td/>
+  <td class="formLabelRequired"><fmt:message key="dsEdit.serial.port"/></td>
+  <td class="formField">
+    <c:choose>
+      <c:when test="${!empty commPortError}">
+        <input id="commPortId" type="hidden" value=""/>
+        <span class="formError">${commPortError}</span>
+      </c:when>
+      <c:otherwise>
+          <sst:select id="commPortId" value="${dataSource.serialDirect ? dataSource.connection.portName : ''}">
+          <c:forEach items="${commPorts}" var="port">
+            <sst:option value="${port.name}">${port.name}</sst:option>
+          </c:forEach>
+        </sst:select>
+      </c:otherwise>
+    </c:choose>
+  </td>
 </tr>
 
-<c:set var="serialPortSettings" value="${dataSource.serialAtModem || dataSource.serialDirect ? dataSource.connection : null}" />
-<c:set var="rxtxDefaultBaudrate" value="2400" />
-<c:set var="rxtxDefaultFlowControl" value="NONE" />
-<c:set var="rxtxDefaultInputBufferSize" value="512" />
-<c:set var="rxtxDefaultOutputBufferSize" value="512" />
-<c:set var="rxtxDefaultDataBits" value="8" />
-<c:set var="rxtxDefaultStopBits" value="1" />
-<c:set var="rxtxDefaultParity" value="NONE"/>
 
-<%@ include file="/WEB-INF/jsp/dataSourceEdit/editSerialSettings.jsp" %>
 
-<tr>
-    <td colspan="3">
-        <label class="formLabelRequired" for="responseTimeOutOffset" ><fmt:message key="dsEdit.mbus.responseTimeOutOffset"/></label>
-        <input class="formShort" type="text" id="responseTimeOutOffset" value="${dataSource.connection.responseTimeOutOffset}" />
-        <label class="formLabelRequired">ms</label>
-    </td>
-</tr>
 <tr>
     <td colspan="3">
         <label class="formLabelRequired" for="updatePeriods" ><fmt:message key="dsEdit.updatePeriod"/></label>

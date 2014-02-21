@@ -134,13 +134,13 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     public void validate(DwrResponseI18n response) {
         switch (getAddressing()) {
             case PRIMARY:
-                if ((address & 0xFF) > MBusUtils.LAST_REGULAR_PRIMARY_ADDRESS) {
+                if ((address & 0xFF) > (MBusUtils.LAST_REGULAR_PRIMARY_ADDRESS & 0xFF)) {
                     response.addContextualMessage("address >= 0xFD", "validate.required");
                 }
                 break;
             case SECONDARY:
-                if (((address & 0xFF) == MBusUtils.BROADCAST_NO_ANSWER_PRIMARY_ADDRESS)
-                        || ((address & 0xFF) == MBusUtils.BROADCAST_WITH_ANSWER_PRIMARY_ADDRESS)) {
+                if ((address == MBusUtils.BROADCAST_NO_ANSWER_PRIMARY_ADDRESS)
+                        || (address == MBusUtils.BROADCAST_WITH_ANSWER_PRIMARY_ADDRESS)) {
                         response.addContextualMessage("address", "validate.required");
                 }
                 break;

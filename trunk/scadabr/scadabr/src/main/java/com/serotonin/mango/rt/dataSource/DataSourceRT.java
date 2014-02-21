@@ -76,7 +76,7 @@ abstract public class DataSourceRT implements ILifecycle {
     /**
      * Access to either the addedPoints or removedPoints lists should be synchronized with this object's monitor.
      */
-    protected Boolean pointListChangeLock = new Boolean(false);
+    final protected Object pointListChangeLock = new Object();
 
     private final List<DataSourceEventType> eventTypes;
 

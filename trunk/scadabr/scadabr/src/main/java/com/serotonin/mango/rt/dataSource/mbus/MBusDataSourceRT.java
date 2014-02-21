@@ -172,7 +172,7 @@ public class MBusDataSourceRT extends PollingDataSource {
             master.setConnection(vo.getConnection());
             master.open();
             return true;
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             LOG.fatal("MBus Open serial port exception", ex);
             master.setConnection(null);
             raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
@@ -185,10 +185,6 @@ public class MBusDataSourceRT extends PollingDataSource {
         try {
             master.close();
         } catch (IOException ex) {
-            LOG.fatal("Close port", ex);
-            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
-                    "event.exception2", vo.getName(), ex.getMessage(), "closeConnection() Failed"));
-        } catch (InterruptedException ex) {
             LOG.fatal("Close port", ex);
             raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
                     "event.exception2", vo.getName(), ex.getMessage(), "closeConnection() Failed"));
