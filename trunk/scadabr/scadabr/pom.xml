@@ -4,7 +4,7 @@
     <groupId>br.org.scadabr</groupId>
     <artifactId>scadabr</artifactId>
     <packaging>war</packaging>
-    <version>0.9.2-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <name>ScadaBR</name>
     <url>http://www.scadabr.org.br</url>
     
@@ -32,18 +32,23 @@
         </repository>
         <repository>
             <id>scadabr-legacy-jarslib</id>
-                    <name>ScadaBR Legacy Maven Repository</name>  
-                    <url>file://${basedir}/lib</url>
-                    <layout>default</layout>  
-                    <releases>  
-                        <enabled>true</enabled>  
-                        <updatePolicy>never</updatePolicy>  
-                    </releases>  
+            <name>ScadaBR Legacy Maven Repository</name>  
+            <url>file://${basedir}/lib</url>
+            <layout>default</layout>  
+            <releases>  
+                <enabled>true</enabled>  
+                <updatePolicy>never</updatePolicy>  
+            </releases>  
         </repository>
     </repositories>
     
     <dependencies>
 
+        <dependency>
+            <groupId>net.sf.atmodem4j</groupId>
+            <artifactId>spsw-native-lib-resources</artifactId>
+            <version>0.0.4-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -336,10 +341,37 @@
             <version>2.4</version>
             <classifier>jdk15</classifier>
         </dependency>
+        
     </dependencies>
     <build>
     
-    <plugins>
+        <plugins>
+            <!-- use bundled resources How find the lib in WEB-INF/lib as resource ???  plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>net.sf.atmodem4j</groupId>
+                                    <artifactId>libspsw-Linux-amd64</artifactId>
+                                    <version>0.0.4-SNAPSHOT</version>
+                                    <type>so</type>
+                                    <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
+                                    <destFileName>${so.name}</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
