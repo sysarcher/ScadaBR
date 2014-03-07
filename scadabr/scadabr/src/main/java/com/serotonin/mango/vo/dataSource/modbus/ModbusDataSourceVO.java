@@ -204,7 +204,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<?>> extend
 
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, T from) {
-        final ModbusDataSourceVO fromVO = (ModbusIpDataSourceVO)from;
+        final ModbusDataSourceVO fromVO = (ModbusDataSourceVO)from;
         AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", fromVO.updatePeriodType,
                 fromVO.updatePeriods, updatePeriodType, updatePeriods);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.quantize", fromVO.quantize, quantize);
