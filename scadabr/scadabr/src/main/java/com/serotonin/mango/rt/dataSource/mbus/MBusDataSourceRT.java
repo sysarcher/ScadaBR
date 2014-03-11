@@ -91,7 +91,6 @@ public class MBusDataSourceRT extends PollingDataSource {
             try {
                 master.readValues(request);
                 for (ValueRequestPointLocator<DataPointRT> vr : request) {
-                    MBusPointLocatorRT locator = vr.getReference().getPointLocator();
                     try {
                         if (vr.getDb() == null) {
 

@@ -43,6 +43,8 @@ import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
 import java.util.LinkedHashMap;
+import java.util.Set;
+import net.sf.atmodem4j.spsw.SerialPortList;
 import net.sf.mbus4j.Connection;
 import net.sf.mbus4j.SerialPortConnection;
 import net.sf.mbus4j.TcpIpConnection;
@@ -234,6 +236,10 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
 
     public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    public Set<String> getCommPorts() {
+        return SerialPortList.getPortNames(false);
     }
 
     public Connection getConnection() {
