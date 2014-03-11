@@ -353,8 +353,8 @@
       </c:when>
       <c:otherwise>
           <sst:select id="commPortId" value="${dataSource.serialDirect ? dataSource.connection.portName : ''}">
-          <c:forEach items="${commPorts}" var="port">
-            <sst:option value="${port.name}">${port.name}</sst:option>
+          <c:forEach items="${dataSource.commPorts}" var="port">
+            <sst:option value="${port}">${port}</sst:option>
           </c:forEach>
         </sst:select>
       </c:otherwise>
