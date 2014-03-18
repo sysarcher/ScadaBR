@@ -54,7 +54,7 @@ import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.util.ColorUtils;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
@@ -63,6 +63,10 @@ import com.serotonin.web.i18n.LocalizableMessage;
 public class DataPointVO implements Serializable, Cloneable, JsonSerializable, ChangeComparable<DataPointVO> {
     private static final long serialVersionUID = -1;
     public static final String XID_PREFIX = "DP_";
+
+    public int getDataTypeId() {
+        return pointLocator.getDataTypeId();
+    }
 
     public interface LoggingTypes {
         int ON_CHANGE = 1;

@@ -31,7 +31,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.IntValuePair;
+import br.org.scadabr.db.IntValuePair;
 import com.serotonin.io.StreamUtils;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;

@@ -15,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.db.IntValuePair;
+import br.org.scadabr.db.IntValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.PointValueDao;
@@ -40,10 +40,11 @@ import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.mango.vo.hierarchy.PointFolder;
 import com.serotonin.mango.vo.hierarchy.PointHierarchy;
 import com.serotonin.util.ArrayUtils;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
 import com.serotonin.util.queue.ByteQueue;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.io.ByteArrayInputStream;
 
 public class PersistentDataSourceRT extends EventDataSource implements Runnable {
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
@@ -447,7 +448,7 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
 
         private DataPointVO unserialize(byte[] serializedData) throws DoAbortException {
             try {
-                return (DataPointVO) SerializationHelper.readObjectFromArray(serializedData);
+                return (DataPointVO) SerializationHelper.readObject(new ByteArrayInputStream(serializedData));
             }
             catch (Exception e) {
                 log.error("Point deserialization error", e);

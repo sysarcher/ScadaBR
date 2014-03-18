@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.db.dao;
 
@@ -39,10 +39,9 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.IntValuePair;
-import com.serotonin.db.spring.ExtendedJdbcTemplate;
-import com.serotonin.db.spring.GenericRowMapper;
+import br.org.scadabr.db.IntValuePair;
 import com.serotonin.mango.Common;
+import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
@@ -54,10 +53,18 @@ import com.serotonin.mango.vo.hierarchy.PointFolder;
 import com.serotonin.mango.vo.hierarchy.PointHierarchy;
 import com.serotonin.mango.vo.hierarchy.PointHierarchyEventDispatcher;
 import com.serotonin.mango.vo.link.PointLinkVO;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
 import com.serotonin.util.Tuple;
+import java.sql.Connection;
+import java.sql.Statement;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.RowMapper;
 
 public class DataPointDao extends BaseDao {
+
     public DataPointDao() {
         super();
     }
@@ -80,8 +87,9 @@ public class DataPointDao extends BaseDao {
 
     public String getExtendedPointName(int dataPointId) {
         DataPointVO vo = getDataPoint(dataPointId);
-        if (vo == null)
+        if (vo == null) {
             return "?";
+        }
         return vo.getExtendedName();
     }
 
@@ -90,44 +98,55 @@ public class DataPointDao extends BaseDao {
             + "from dataPoints dp join dataSources ds on ds.id = dp.dataSourceId ";
 
     public List<DataPointVO> getDataPoints(Comparator<DataPointVO> comparator, boolean includeRelationalData) {
-        List<DataPointVO> dps = query(DATA_POINT_SELECT, new DataPointRowMapper());
-        if (includeRelationalData)
+        List<DataPointVO> dps = ejt.query(DATA_POINT_SELECT, new DataPointRowMapper());
+        if (includeRelationalData) {
             setRelationalData(dps);
-        if (comparator != null)
+        }
+        if (comparator != null) {
             Collections.sort(dps, comparator);
+        }
         return dps;
     }
 
     public List<DataPointVO> getDataPoints(int dataSourceId, Comparator<DataPointVO> comparator) {
-        List<DataPointVO> dps = query(DATA_POINT_SELECT + " where dp.dataSourceId=?", new Object[] { dataSourceId },
-                new DataPointRowMapper());
+        List<DataPointVO> dps = ejt.query(DATA_POINT_SELECT + " where dp.dataSourceId=?", new DataPointRowMapper(), dataSourceId);
         setRelationalData(dps);
-        if (comparator != null)
+        if (comparator != null) {
             Collections.sort(dps, comparator);
+        }
         return dps;
     }
 
     public DataPointVO getDataPoint(int id) {
-        DataPointVO dp = queryForObject(DATA_POINT_SELECT + " where dp.id=?", new Object[] { id },
-                new DataPointRowMapper(), null);
+        DataPointVO dp;
+        try {
+            dp = ejt.queryForObject(DATA_POINT_SELECT + " where dp.id=?", new DataPointRowMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            dp = null;
+        }
         setRelationalData(dp);
         return dp;
     }
 
     public DataPointVO getDataPoint(String xid) {
-        DataPointVO dp = queryForObject(DATA_POINT_SELECT + " where dp.xid=?", new Object[] { xid },
-                new DataPointRowMapper(), null);
+        DataPointVO dp;
+        try {
+            dp = ejt.queryForObject(DATA_POINT_SELECT + " where dp.xid=?", new DataPointRowMapper(), xid);
+        } catch (EmptyResultDataAccessException e) {
+            dp = null;
+        }
         setRelationalData(dp);
         return dp;
     }
 
-    class DataPointRowMapper implements GenericRowMapper<DataPointVO> {
+    class DataPointRowMapper implements RowMapper<DataPointVO> {
+
+        @Override
         public DataPointVO mapRow(ResultSet rs, int rowNum) throws SQLException {
             DataPointVO dp;
             try {
                 dp = (DataPointVO) SerializationHelper.readObject(rs.getBlob(4).getBinaryStream());
-            }
-            catch (ShouldNeverHappenException e) {
+            } catch (ShouldNeverHappenException e) {
                 dp = new DataPointVO();
                 dp.setName("Point configuration lost. Please recreate.");
                 dp.defaultTextRenderer();
@@ -152,13 +171,15 @@ public class DataPointDao extends BaseDao {
     }
 
     private void setRelationalData(List<DataPointVO> dps) {
-        for (DataPointVO dp : dps)
+        for (DataPointVO dp : dps) {
             setRelationalData(dp);
+        }
     }
 
     private void setRelationalData(DataPointVO dp) {
-        if (dp == null)
+        if (dp == null) {
             return;
+        }
         setEventDetectors(dp);
         setPointComments(dp);
     }
@@ -172,23 +193,34 @@ public class DataPointDao extends BaseDao {
                     insertDataPoint(dp);
                     // Reset the point hierarchy so that the new point gets included.
                     cachedPointHierarchy = null;
-                }
-                else
+                } else {
                     updateDataPoint(dp);
+                }
             }
         });
     }
 
     void insertDataPoint(final DataPointVO dp) {
         // Create a default text renderer
-        if (dp.getTextRenderer() == null)
+        if (dp.getTextRenderer() == null) {
             dp.defaultTextRenderer();
+        }
 
         // Insert the main data point record.
-        dp.setId(doInsert("insert into dataPoints (xid, dataSourceId, data) values (?,?,?)", new Object[] {
-                dp.getXid(), dp.getDataSourceId(), SerializationHelper.writeObject(dp) }, new int[] { Types.VARCHAR,
-                Types.INTEGER, Types.BLOB }));
+        final int id = doInsert(new PreparedStatementCreator() {
 
+            final static String SQL_INSERT = "insert into dataPoints (xid, dataSourceId, data) values (?,?,?)";
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, dp.getXid());
+                ps.setInt(2, dp.getDataSourceId());
+                ps.setBlob(3, SerializationHelper.writeObject(dp));
+                return ps;
+            }
+        });
+        dp.setId(id);
         // Save the relational information.
         saveEventDetectors(dp);
 
@@ -198,11 +230,12 @@ public class DataPointDao extends BaseDao {
     void updateDataPoint(final DataPointVO dp) {
         DataPointVO old = getDataPoint(dp.getId());
 
-        if (old.getPointLocator().getDataTypeId() != dp.getPointLocator().getDataTypeId())
-            // Delete any point values where data type doesn't match the vo, just in case the data type was changed.
-            // Only do this if the data type has actually changed because it is just really slow if the database is
-            // big or busy.
+        if (old.getPointLocator().getDataTypeId() != dp.getPointLocator().getDataTypeId()) // Delete any point values where data type doesn't match the vo, just in case the data type was changed.
+        // Only do this if the data type has actually changed because it is just really slow if the database is
+        // big or busy.
+        {
             new PointValueDao().deletePointValuesWithMismatchedType(dp.getId(), dp.getPointLocator().getDataTypeId());
+        }
 
         // Save the VO information.
         updateDataPointShallow(dp);
@@ -214,32 +247,43 @@ public class DataPointDao extends BaseDao {
     }
 
     public void updateDataPointShallow(final DataPointVO dp) {
-        ejt.update("update dataPoints set xid=?, data=? where id=?",
-                new Object[] { dp.getXid(), SerializationHelper.writeObject(dp), dp.getId() }, new int[] {
-                        Types.VARCHAR, Types.BLOB, Types.INTEGER });
+        ejt.update(new PreparedStatementCreator() {
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement("update dataPoints set xid=?, data=? where id=?");
+                ps.setString(1, dp.getXid());
+                ps.setBlob(2, SerializationHelper.writeObject(dp));
+                ps.setInt(3, dp.getId());
+                return ps;
+            }
+        });
     }
 
     public void deleteDataPoints(final int dataSourceId) {
         List<DataPointVO> old = getDataPoints(dataSourceId, null);
-        for (DataPointVO dp : old)
+        for (DataPointVO dp : old) {
             beforePointDelete(dp.getId());
+        }
 
-        for (DataPointVO dp : old)
+        for (DataPointVO dp : old) {
             deletePointHistory(dp.getId());
+        }
 
         getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
             @SuppressWarnings("synthetic-access")
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
-                List<Integer> pointIds = queryForList("select id from dataPoints where dataSourceId=?",
-                        new Object[] { dataSourceId }, Integer.class);
-                if (pointIds.size() > 0)
+                List<Integer> pointIds = ejt.queryForList("select id from dataPoints where dataSourceId=?", Integer.class, dataSourceId);
+                if (pointIds.size() > 0) {
                     deleteDataPointImpl(createDelimitedList(new HashSet<Integer>(pointIds), ",", null));
+                }
             }
         });
 
-        for (DataPointVO dp : old)
+        for (DataPointVO dp : old) {
             AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_DATA_POINT, dp);
+        }
     }
 
     public void deleteDataPoint(final int dataPointId) {
@@ -259,12 +303,13 @@ public class DataPointDao extends BaseDao {
     }
 
     private void beforePointDelete(int dataPointId) {
-        for (PointLinkVO link : new PointLinkDao().getPointLinksForPoint(dataPointId))
+        for (PointLinkVO link : new PointLinkDao().getPointLinksForPoint(dataPointId)) {
             Common.ctx.getRuntimeManager().deletePointLink(link.getId());
+        }
     }
 
     void deletePointHistory(int dataPointId) {
-        Object[] p = new Object[] { dataPointId };
+        Object[] p = new Object[]{dataPointId};
         long min = ejt.queryForLong("select min(ts) from pointValues where dataPointId=?", p);
         long max = ejt.queryForLong("select max(ts) from pointValues where dataPointId=?", p);
         deletePointHistory(dataPointId, min, max);
@@ -273,17 +318,16 @@ public class DataPointDao extends BaseDao {
     void deletePointHistory(int dataPointId, long min, long max) {
         while (true) {
             try {
-                ejt.update("delete from pointValues where dataPointId=? and ts <= ?", new Object[] { dataPointId, max });
+                ejt.update("delete from pointValues where dataPointId=? and ts <= ?", new Object[]{dataPointId, max});
                 break;
-            }
-            catch (UncategorizedSQLException e) {
+            } catch (UncategorizedSQLException e) {
                 if ("The total number of locks exceeds the lock table size".equals(e.getSQLException().getMessage())) {
                     long mid = (min + max) >> 1;
                     deletePointHistory(dataPointId, min, mid);
                     min = mid;
-                }
-                else
+                } else {
                     throw e;
+                }
             }
         }
     }
@@ -306,29 +350,35 @@ public class DataPointDao extends BaseDao {
     // Event detectors
     //
     public int getDataPointIdFromDetectorId(int pedId) {
-        return ejt.queryForInt("select dataPointId from pointEventDetectors where id=?", new Object[] { pedId });
+        return ejt.queryForObject("select dataPointId from pointEventDetectors where id=?", Integer.class, pedId);
     }
 
     public String getDetectorXid(int pedId) {
-        return queryForObject("select xid from pointEventDetectors where id=?", new Object[] { pedId }, String.class,
-                null);
+        try {
+            return ejt.queryForObject("select xid from pointEventDetectors where id=?", String.class, pedId);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     public int getDetectorId(String pedXid, int dataPointId) {
-        return ejt.queryForInt("select id from pointEventDetectors where xid=? and dataPointId=?", new Object[] {
-                pedXid, dataPointId }, -1);
+        try {
+            return ejt.queryForObject("select id from pointEventDetectors where xid=? and dataPointId=?", Integer.class, pedXid, dataPointId);
+        } catch (EmptyResultDataAccessException e) {
+            return -1;
+        }
     }
 
     public String generateEventDetectorUniqueXid(int dataPointId) {
         String xid = Common.generateXid(PointEventDetectorVO.XID_PREFIX);
-        while (!isEventDetectorXidUnique(dataPointId, xid, -1))
+        while (!isEventDetectorXidUnique(dataPointId, xid, -1)) {
             xid = Common.generateXid(PointEventDetectorVO.XID_PREFIX);
+        }
         return xid;
     }
 
     public boolean isEventDetectorXidUnique(int dataPointId, String xid, int excludeId) {
-        return ejt.queryForInt("select count(*) from pointEventDetectors where dataPointId=? and xid=? and id<>?",
-                new Object[] { dataPointId, xid, excludeId }) == 0;
+        return ejt.queryForObject("select count(*) from pointEventDetectors where dataPointId=? and xid=? and id<>?", Integer.class, dataPointId, xid, excludeId) == 0;
     }
 
     private void setEventDetectors(DataPointVO dp) {
@@ -336,21 +386,24 @@ public class DataPointDao extends BaseDao {
     }
 
     private List<PointEventDetectorVO> getEventDetectors(DataPointVO dp) {
-        return query(
+        return ejt.query(
                 "select id, xid, alias, detectorType, alarmLevel, stateLimit, duration, durationType, binaryState, " //
-                        + "  multistateState, changeCount, alphanumericState, weight " //
-                        + "from pointEventDetectors " //
-                        + "where dataPointId=? " // 
-                        + "order by id", new Object[] { dp.getId() }, new EventDetectorRowMapper(dp));
+                + "  multistateState, changeCount, alphanumericState, weight " //
+                + "from pointEventDetectors " //
+                + "where dataPointId=? " // 
+                + "order by id",
+                new EventDetectorRowMapper(dp), dp.getId());
     }
 
-    class EventDetectorRowMapper implements GenericRowMapper<PointEventDetectorVO> {
+    class EventDetectorRowMapper implements RowMapper<PointEventDetectorVO> {
+
         private final DataPointVO dp;
 
         public EventDetectorRowMapper(DataPointVO dp) {
             this.dp = dp;
         }
 
+        @Override
         public PointEventDetectorVO mapRow(ResultSet rs, int rowNum) throws SQLException {
             PointEventDetectorVO detector = new PointEventDetectorVO();
             int i = 0;
@@ -372,41 +425,55 @@ public class DataPointDao extends BaseDao {
         }
     }
 
-    private void saveEventDetectors(DataPointVO dp) {
+    private void saveEventDetectors(final DataPointVO dp) {
         // Get the ids of the existing detectors for this point.
         final List<PointEventDetectorVO> existingDetectors = getEventDetectors(dp);
 
         // Insert or update each detector in the point.
-        for (PointEventDetectorVO ped : dp.getEventDetectors()) {
+        for (final PointEventDetectorVO ped : dp.getEventDetectors()) {
             if (ped.getId() < 0) {
                 // Insert the record.
-                ped.setId(doInsert(
-                        "insert into pointEventDetectors "
-                                + "  (xid, alias, dataPointId, detectorType, alarmLevel, stateLimit, duration, durationType, "
-                                + "  binaryState, multistateState, changeCount, alphanumericState, weight) "
-                                + "values (?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                        new Object[] { ped.getXid(), ped.getAlias(), dp.getId(), ped.getDetectorType(),
-                                ped.getAlarmLevel(), ped.getLimit(), ped.getDuration(), ped.getDurationType(),
-                                boolToChar(ped.isBinaryState()), ped.getMultistateState(), ped.getChangeCount(),
-                                ped.getAlphanumericState(), ped.getWeight() }, new int[] { Types.VARCHAR,
-                                Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.DOUBLE,
-                                Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
-                                Types.VARCHAR, Types.DOUBLE }));
+                final int id = doInsert(new PreparedStatementCreator() {
+
+                    final static String SQL_INSERT = "insert into pointEventDetectors "
+                            + "  (xid, alias, dataPointId, detectorType, alarmLevel, stateLimit, duration, durationType, "
+                            + "  binaryState, multistateState, changeCount, alphanumericState, weight) "
+                            + "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+                    @Override
+                    public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                        PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                        ps.setString(1, ped.getXid());
+                        ps.setString(2, ped.getAlias());
+                        ps.setInt(3, dp.getId());
+                        ps.setInt(4, ped.getDetectorType());
+                        ps.setInt(5, ped.getAlarmLevel());
+                        ps.setDouble(6, ped.getLimit());
+                        ps.setInt(7, ped.getDuration());
+                        ps.setInt(8, ped.getDurationType());
+                        ps.setString(9, boolToChar(ped.isBinaryState()));
+                        ps.setInt(10, ped.getMultistateState());
+                        ps.setInt(11, ped.getChangeCount());
+                        ps.setString(12, ped.getAlphanumericState());
+                        ps.setDouble(13, ped.getWeight());
+                        return ps;
+                    }
+                });
+                ped.setId(id);
                 AuditEventType.raiseAddedEvent(AuditEventType.TYPE_POINT_EVENT_DETECTOR, ped);
-            }
-            else {
+            } else {
                 PointEventDetectorVO old = removeFromList(existingDetectors, ped.getId());
 
                 ejt.update(
                         "update pointEventDetectors set xid=?, alias=?, alarmLevel=?, stateLimit=?, duration=?, "
-                                + "  durationType=?, binaryState=?, multistateState=?, changeCount=?, alphanumericState=?, "
-                                + "  weight=? " + "where id=?",
-                        new Object[] { ped.getXid(), ped.getAlias(), ped.getAlarmLevel(), ped.getLimit(),
-                                ped.getDuration(), ped.getDurationType(), boolToChar(ped.isBinaryState()),
-                                ped.getMultistateState(), ped.getChangeCount(), ped.getAlphanumericState(),
-                                ped.getWeight(), ped.getId() }, new int[] { Types.VARCHAR, Types.VARCHAR,
-                                Types.INTEGER, Types.DOUBLE, Types.INTEGER, Types.INTEGER, Types.VARCHAR,
-                                Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.DOUBLE, Types.INTEGER });
+                        + "  durationType=?, binaryState=?, multistateState=?, changeCount=?, alphanumericState=?, "
+                        + "  weight=? " + "where id=?",
+                        new Object[]{ped.getXid(), ped.getAlias(), ped.getAlarmLevel(), ped.getLimit(),
+                            ped.getDuration(), ped.getDurationType(), boolToChar(ped.isBinaryState()),
+                            ped.getMultistateState(), ped.getChangeCount(), ped.getAlphanumericState(),
+                            ped.getWeight(), ped.getId()}, new int[]{Types.VARCHAR, Types.VARCHAR,
+                            Types.INTEGER, Types.DOUBLE, Types.INTEGER, Types.INTEGER, Types.VARCHAR,
+                            Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.DOUBLE, Types.INTEGER});
 
                 AuditEventType.raiseChangedEvent(AuditEventType.TYPE_POINT_EVENT_DETECTOR, old, ped);
             }
@@ -415,8 +482,8 @@ public class DataPointDao extends BaseDao {
         // Delete detectors for any remaining ids in the list of existing detectors.
         for (PointEventDetectorVO ped : existingDetectors) {
             ejt.update("delete from eventHandlers " + "where eventTypeId=" + EventType.EventSources.DATA_POINT
-                    + " and eventTypeRef1=? and eventTypeRef2=?", new Object[] { dp.getId(), ped.getId() });
-            ejt.update("delete from pointEventDetectors where id=?", new Object[] { ped.getId() });
+                    + " and eventTypeRef1=? and eventTypeRef2=?", new Object[]{dp.getId(), ped.getId()});
+            ejt.update("delete from pointEventDetectors where id=?", new Object[]{ped.getId()});
 
             AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_POINT_EVENT_DETECTOR, ped);
         }
@@ -433,14 +500,14 @@ public class DataPointDao extends BaseDao {
     }
 
     public void copyPermissions(final int fromDataPointId, final int toDataPointId) {
-        final List<Tuple<Integer, Integer>> ups = query(
-                "select userId, permission from dataPointUsers where dataPointId=?", new Object[] { fromDataPointId },
-                new GenericRowMapper<Tuple<Integer, Integer>>() {
+        final List<Tuple<Integer, Integer>> ups = ejt.query(
+                "select userId, permission from dataPointUsers where dataPointId=?",
+                new RowMapper<Tuple<Integer, Integer>>() {
                     @Override
                     public Tuple<Integer, Integer> mapRow(ResultSet rs, int rowNum) throws SQLException {
                         return new Tuple<Integer, Integer>(rs.getInt(1), rs.getInt(2));
                     }
-                });
+                }, fromDataPointId);
 
         ejt.batchUpdate("insert into dataPointUsers values (?,?,?)", new BatchPreparedStatementSetter() {
             @Override
@@ -465,7 +532,7 @@ public class DataPointDao extends BaseDao {
             + "where uc.commentType= " + UserComment.TYPE_POINT + " and uc.typeKey=? " + "order by uc.ts";
 
     private void setPointComments(DataPointVO dp) {
-        dp.setComments(query(POINT_COMMENT_SELECT, new Object[] { dp.getId() }, new UserCommentRowMapper()));
+        dp.setComments(ejt.query(POINT_COMMENT_SELECT, new UserCommentRowMapper(), dp.getId()));
     }
 
     //
@@ -480,6 +547,7 @@ public class DataPointDao extends BaseDao {
 
             // Get the folder list.
             ejt.query("select id, parentId, name from pointHierarchy", new RowCallbackHandler() {
+                @Override
                 public void processRow(ResultSet rs) throws SQLException {
                     PointFolder f = new PointFolder(rs.getInt(1), rs.getString(3));
                     int parentId = rs.getInt(2);
@@ -498,8 +566,9 @@ public class DataPointDao extends BaseDao {
 
             // Add data points.
             List<DataPointVO> points = getDataPoints(DataPointExtendedNameComparator.instance, false);
-            for (DataPointVO dp : points)
+            for (DataPointVO dp : points) {
                 ph.addDataPoint(dp.getId(), dp.getPointFolderId(), dp.getExtendedName());
+            }
 
             cachedPointHierarchy = ph;
         }
@@ -509,8 +578,9 @@ public class DataPointDao extends BaseDao {
 
     private void addFoldersToHeirarchy(PointHierarchy ph, int parentId, Map<Integer, List<PointFolder>> folders) {
         List<PointFolder> folderList = folders.remove(parentId);
-        if (folderList == null)
+        if (folderList == null) {
             return;
+        }
 
         for (PointFolder f : folderList) {
             ph.addPointFolder(f, parentId);
@@ -519,7 +589,7 @@ public class DataPointDao extends BaseDao {
     }
 
     public void savePointHierarchy(final PointFolder root) {
-        final ExtendedJdbcTemplate ejt2 = ejt;
+        final JdbcTemplate ejt2 = ejt;
         getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
@@ -539,24 +609,37 @@ public class DataPointDao extends BaseDao {
         PointHierarchyEventDispatcher.firePointHierarchySaved(root);
     }
 
-    void savePointFolder(PointFolder folder, int parentId) {
+    void savePointFolder(final PointFolder folder, final int parentId) {
         // Save the folder.
-        if (folder.getId() == Common.NEW_ID)
-            folder.setId(doInsert("insert into pointHierarchy (parentId, name) values (?,?)", new Object[] { parentId,
-                    folder.getName() }));
-        else if (folder.getId() != 0)
-            ejt.update("insert into pointHierarchy (id, parentId, name) values (?,?,?)", new Object[] { folder.getId(),
-                    parentId, folder.getName() });
+        if (folder.getId() == Common.NEW_ID) {
+            final int id = doInsert(new PreparedStatementCreator() {
 
+                final static String SQL_INSERT = "insert into pointHierarchy (parentId, name) values (?,?)";
+
+                @Override
+                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                    PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                    ps.setInt(1, parentId);
+                    ps.setString(2, folder.getName());
+                    return ps;
+                }
+            });
+            folder.setId(id);
+        } else if (folder.getId() != 0) {
+            ejt.update("insert into pointHierarchy (id, parentId, name) values (?,?,?)", new Object[]{folder.getId(),
+                parentId, folder.getName()});
+        }
         // Save the subfolders
-        for (PointFolder sf : folder.getSubfolders())
+        for (PointFolder sf : folder.getSubfolders()) {
             savePointFolder(sf, folder.getId());
+        }
     }
 
     void savePointsInFolder(PointFolder folder) {
         // Save the points in the subfolders
-        for (PointFolder sf : folder.getSubfolders())
+        for (PointFolder sf : folder.getSubfolders()) {
             savePointsInFolder(sf);
+        }
 
         // Update the folder references in the points.
         DataPointVO dp;
@@ -571,9 +654,9 @@ public class DataPointDao extends BaseDao {
     }
 
     public List<PointHistoryCount> getTopPointHistoryCounts() {
-        List<PointHistoryCount> counts = query(
+        List<PointHistoryCount> counts = ejt.query(
                 "select dataPointId, count(*) from pointValues group by dataPointId order by 2 desc",
-                new GenericRowMapper<PointHistoryCount>() {
+                new RowMapper<PointHistoryCount>() {
                     @Override
                     public PointHistoryCount mapRow(ResultSet rs, int rowNum) throws SQLException {
                         PointHistoryCount c = new PointHistoryCount();

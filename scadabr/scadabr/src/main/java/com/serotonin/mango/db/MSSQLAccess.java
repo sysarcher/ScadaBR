@@ -23,8 +23,7 @@ import java.sql.SQLException;
 import javax.servlet.ServletContext;
 
 import org.springframework.dao.DataAccessException;
-
-import com.serotonin.db.spring.ExtendedJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 public class MSSQLAccess extends BasePooledAccess {
     public MSSQLAccess(ServletContext ctx) {
@@ -42,7 +41,7 @@ public class MSSQLAccess extends BasePooledAccess {
     }
 
     @Override
-    protected boolean newDatabaseCheck(ExtendedJdbcTemplate ejt) {
+    protected boolean newDatabaseCheck(JdbcTemplate ejt) {
         try {
             ejt.execute("select count(*) from users");
         }
@@ -73,7 +72,7 @@ public class MSSQLAccess extends BasePooledAccess {
     }
 
     @Override
-    public void executeCompress(ExtendedJdbcTemplate ejt) {
+    public void executeCompress(JdbcTemplate ejt) {
         // no op
     }
 }

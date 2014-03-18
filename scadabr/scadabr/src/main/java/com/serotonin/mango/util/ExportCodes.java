@@ -21,7 +21,7 @@ package com.serotonin.mango.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.serotonin.db.IntValuePair;
+import br.org.scadabr.db.IntValuePair;
 import com.serotonin.util.ArrayUtils;
 
 /**

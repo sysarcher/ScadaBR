@@ -36,7 +36,7 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparableObject;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.IntMessagePair;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
 import com.serotonin.web.i18n.LocalizableMessage;
 
 abstract public class ChangeTypeVO implements Serializable, JsonSerializable, ChangeComparableObject {

@@ -35,6 +35,7 @@ import com.serotonin.web.util.PaginatedListController;
 import com.serotonin.web.util.PagingDataForm;
 
 public class EventsController extends PaginatedListController {
+   
     @SuppressWarnings("unchecked")
     @Override
     protected PaginatedData getData(HttpServletRequest request, PagingDataForm paging, BindException errors)

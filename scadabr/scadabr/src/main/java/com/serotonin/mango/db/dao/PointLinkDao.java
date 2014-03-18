@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.db.dao;
 
@@ -22,15 +22,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
+import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.link.PointLinkVO;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.RowMapper;
 
 /**
  * @author Matthew Lohbihler
  */
 public class PointLinkDao extends BaseDao {
+
     public String generateUniqueXid() {
         return generateUniqueXid(PointLinkVO.XID_PREFIX, "pointLinks");
     }
@@ -42,23 +50,33 @@ public class PointLinkDao extends BaseDao {
     private static final String POINT_LINK_SELECT = "select id, xid, sourcePointId, targetPointId, script, eventType, disabled from pointLinks ";
 
     public List<PointLinkVO> getPointLinks() {
-        return query(POINT_LINK_SELECT, new PointLinkRowMapper());
+        return ejt.query(POINT_LINK_SELECT, new PointLinkRowMapper());
     }
 
     public List<PointLinkVO> getPointLinksForPoint(int dataPointId) {
-        return query(POINT_LINK_SELECT + "where sourcePointId=? or targetPointId=?", new Object[] { dataPointId,
-                dataPointId }, new PointLinkRowMapper());
+        return ejt.query(POINT_LINK_SELECT + "where sourcePointId=? or targetPointId=?",
+                new PointLinkRowMapper(), dataPointId, dataPointId);
     }
 
     public PointLinkVO getPointLink(int id) {
-        return queryForObject(POINT_LINK_SELECT + "where id=?", new Object[] { id }, new PointLinkRowMapper(), null);
+        try {
+            return ejt.queryForObject(POINT_LINK_SELECT + "where id=?", new PointLinkRowMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     public PointLinkVO getPointLink(String xid) {
-        return queryForObject(POINT_LINK_SELECT + "where xid=?", new Object[] { xid }, new PointLinkRowMapper(), null);
+        try {
+            return ejt.queryForObject(POINT_LINK_SELECT + "where xid=?", new PointLinkRowMapper(), xid);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
-    class PointLinkRowMapper implements GenericRowMapper<PointLinkVO> {
+    class PointLinkRowMapper implements RowMapper<PointLinkVO> {
+
+        @Override
         public PointLinkVO mapRow(ResultSet rs, int rowNum) throws SQLException {
             PointLinkVO pl = new PointLinkVO();
             int i = 0;
@@ -74,18 +92,31 @@ public class PointLinkDao extends BaseDao {
     }
 
     public void savePointLink(final PointLinkVO pl) {
-        if (pl.getId() == Common.NEW_ID)
+        if (pl.getId() == Common.NEW_ID) {
             insertPointLink(pl);
-        else
+        } else {
             updatePointLink(pl);
+        }
     }
 
-    private static final String POINT_LINK_INSERT = "insert into pointLinks (xid, sourcePointId, targetPointId, script, eventType, disabled) "
-            + "values (?,?,?,?,?,?)";
+    private void insertPointLink(final PointLinkVO pl) {
+        final int id = doInsert(new PreparedStatementCreator() {
 
-    private void insertPointLink(PointLinkVO pl) {
-        int id = doInsert(POINT_LINK_INSERT, new Object[] { pl.getXid(), pl.getSourcePointId(), pl.getTargetPointId(),
-                pl.getScript(), pl.getEvent(), boolToChar(pl.isDisabled()) });
+            final static String SQL_INSERT = "insert into pointLinks (xid, sourcePointId, targetPointId, script, eventType, disabled) "
+                    + "values (?,?,?,?,?,?)";
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, pl.getXid());
+                ps.setInt(2, pl.getSourcePointId());
+                ps.setInt(3, pl.getTargetPointId());
+                ps.setString(4, pl.getScript());
+                ps.setInt(5, pl.getEvent());
+                ps.setString(6, boolToChar(pl.isDisabled()));
+                return ps;
+            }
+        });
         pl.setId(id);
         AuditEventType.raiseAddedEvent(AuditEventType.TYPE_POINT_LINK, pl);
     }
@@ -96,9 +127,8 @@ public class PointLinkDao extends BaseDao {
     private void updatePointLink(PointLinkVO pl) {
         PointLinkVO old = getPointLink(pl.getId());
 
-        ejt.update(POINT_LINK_UPDATE,
-                new Object[] { pl.getXid(), pl.getSourcePointId(), pl.getTargetPointId(), pl.getScript(),
-                        pl.getEvent(), boolToChar(pl.isDisabled()), pl.getId() });
+        ejt.update(POINT_LINK_UPDATE, pl.getXid(), pl.getSourcePointId(), pl.getTargetPointId(), pl.getScript(),
+                    pl.getEvent(), boolToChar(pl.isDisabled()), pl.getId());
 
         AuditEventType.raiseChangedEvent(AuditEventType.TYPE_POINT_LINK, old, pl);
     }
@@ -106,7 +136,7 @@ public class PointLinkDao extends BaseDao {
     public void deletePointLink(final int pointLinkId) {
         PointLinkVO pl = getPointLink(pointLinkId);
         if (pl != null) {
-            ejt.update("delete from pointLinks where id=?", new Object[] { pointLinkId });
+            ejt.update("delete from pointLinks where id=?", pointLinkId);
             AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_POINT_LINK, pl);
         }
     }

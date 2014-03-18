@@ -21,7 +21,7 @@ package com.serotonin.mango.web.dwr;
 import java.util.Iterator;
 import java.util.List;
 
-import com.serotonin.db.KeyValuePair;
+import br.org.scadabr.db.KeyValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.DataPointDao;

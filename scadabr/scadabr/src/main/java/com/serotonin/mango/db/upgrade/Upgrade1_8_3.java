@@ -115,30 +115,30 @@ public class Upgrade1_8_3 extends DBUpgrade {
     private void xid() {
         // Default the xid values.
         ScheduledEventDao scheduledEventDao = new ScheduledEventDao();
-        List<Integer> ids = queryForList("select id from scheduledEvents", Integer.class);
+        List<Integer> ids = ejt.queryForList("select id from scheduledEvents", Integer.class);
         for (Integer id : ids)
             ejt.update("update scheduledEvents set xid=? where id=?", new Object[] {
                     scheduledEventDao.generateUniqueXid(), id });
 
         CompoundEventDetectorDao compoundEventDetectorDao = new CompoundEventDetectorDao();
-        ids = queryForList("select id from compoundEventDetectors", Integer.class);
+        ids = ejt.queryForList("select id from compoundEventDetectors", Integer.class);
         for (Integer id : ids)
             ejt.update("update compoundEventDetectors set xid=? where id=?", new Object[] {
                     compoundEventDetectorDao.generateUniqueXid(), id });
 
         MailingListDao mailingListDao = new MailingListDao();
-        ids = queryForList("select id from mailingLists", Integer.class);
+        ids = ejt.queryForList("select id from mailingLists", Integer.class);
         for (Integer id : ids)
             ejt.update("update mailingLists set xid=? where id=?", new Object[] { mailingListDao.generateUniqueXid(),
                     id });
 
         PublisherDao publisherDao = new PublisherDao();
-        ids = queryForList("select id from publishers", Integer.class);
+        ids = ejt.queryForList("select id from publishers", Integer.class);
         for (Integer id : ids)
             ejt.update("update publishers set xid=? where id=?", new Object[] { publisherDao.generateUniqueXid(), id });
 
         EventDao eventDao = new EventDao();
-        ids = queryForList("select id from eventHandlers", Integer.class);
+        ids = ejt.queryForList("select id from eventHandlers", Integer.class);
         for (Integer id : ids)
             ejt.update("update eventHandlers set xid=? where id=?", new Object[] { eventDao.generateUniqueXid(), id });
     }

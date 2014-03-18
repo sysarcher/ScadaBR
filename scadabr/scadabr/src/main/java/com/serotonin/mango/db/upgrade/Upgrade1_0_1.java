@@ -29,7 +29,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.view.PointView;
 import com.serotonin.mango.view.graphic.AnalogImageSetRenderer;
@@ -37,7 +36,8 @@ import com.serotonin.mango.view.graphic.BasicRenderer;
 import com.serotonin.mango.view.graphic.BinaryImageSetRenderer;
 import com.serotonin.mango.view.graphic.GraphicRenderer;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
+import org.springframework.jdbc.core.RowMapper;
 
 /**
  * @author Matthew Lohbihler
@@ -51,7 +51,7 @@ public class Upgrade1_0_1 extends DBUpgrade {
         OutputStream out = createUpdateLogOutputStream("1_0_1");
 
         // Get the point views from the field mapping version.
-        List<PointView> pointViews = query(POINT_VIEW_SELECT, new PointViewRowMapper());
+        List<PointView> pointViews = ejt.query(POINT_VIEW_SELECT, new PointViewRowMapper());
         for (PointView pv : pointViews) {
             DataPointVO dp = getDataPointFromPointViewId(pv.getId());
             pv.setDataPoint(dp);
@@ -100,7 +100,7 @@ public class Upgrade1_0_1 extends DBUpgrade {
             + "  grType, grImageSetId, grDisplayText, grBinaryZeroImage, grBinaryOneImage, grAnalogMin, grAnalogMax "
             + "from pointViews";
 
-    class PointViewRowMapper implements GenericRowMapper<PointView> {
+    class PointViewRowMapper implements RowMapper<PointView> {
         @SuppressWarnings("synthetic-access")
         public PointView mapRow(ResultSet rs, int rowNum) throws SQLException {
             PointView pv = new PointView();

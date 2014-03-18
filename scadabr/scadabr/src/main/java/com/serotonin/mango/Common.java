@@ -46,7 +46,7 @@ import org.directwebremoting.WebContextFactory;
 import org.joda.time.Period;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.KeyValuePair;
+import br.org.scadabr.db.KeyValuePair;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.util.BackgroundContext;
 import com.serotonin.mango.util.CommPortConfigException;

@@ -48,16 +48,27 @@
   </category>
   
   <category name="org">
-    <level value="@logThreshold@"/>
+    <level value="warn"/>
   </category>
   
-  <category name="org.springframework.web.servlet.FrameworkServlet"><level value="error"/></category>
-  <category name="com.serotonin.db.spring.ExtendedJdbcTemplate"><level value="error"/></category>
+  <category name="org.springframework.web.servlet.FrameworkServlet">
+      <level value="error"/>
+  </category>
   
-  <category name="com.serotonin.mango.rt.dataSource.viconics"><level value="info"/></category>
+  <category name="com.serotonin.db.spring.ExtendedJdbcTemplate">
+      <level value="error"/>
+  </category>
+  
+  <category name="net.sf.atmodem4j">
+      <level value="info"/>
+  </category>
+  
+  <category name="net.sf.mbus4j">
+      <level value="info"/>
+  </category>
   
   <category name="com.serotonin.mango">
-    <level value="@logThreshold@"/>
+    <level value="warn"/>
   </category>
   
   <root>

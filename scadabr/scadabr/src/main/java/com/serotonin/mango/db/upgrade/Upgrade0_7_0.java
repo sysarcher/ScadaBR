@@ -30,7 +30,6 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.view.chart.ChartRenderer;
 import com.serotonin.mango.view.chart.ImageChartRenderer;
@@ -51,8 +50,9 @@ import com.serotonin.mango.vo.dataSource.virtual.VirtualDataSourceVO;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualPointLocatorVO;
 import com.serotonin.modbus4j.code.DataType;
 import com.serotonin.modbus4j.code.RegisterRange;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
 import com.serotonin.util.queue.IntQueue;
+import org.springframework.jdbc.core.RowMapper;
 
 /**
  * @author Matthew Lohbihler
@@ -65,7 +65,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
         OutputStream out = createUpdateLogOutputStream("0_7_0");
 
         // Get the data sources from the field mapping version.
-        List<DataSourceVO<?>> dataSources = query(DATA_SOURCE_SELECT, new DataSourceRowMapper());
+        List<DataSourceVO<?>> dataSources = ejt.query(DATA_SOURCE_SELECT, new DataSourceRowMapper());
         log.info("Retrieved " + dataSources.size() + " data sources");
 
         // Get the data points from the field mapping version.
@@ -181,7 +181,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
             + "  left join dataSourceMbs mbs on mbs.dataSourceId = ds.id"
             + "  left join dataSourceMbi mbi on mbi.dataSourceId = ds.id";
 
-    class DataSourceRowMapper implements GenericRowMapper<DataSourceVO<?>> {
+    class DataSourceRowMapper implements RowMapper<DataSourceVO<?>> {
         @SuppressWarnings("synthetic-access")
         public DataSourceVO<?> mapRow(ResultSet rs, int rowNum) throws SQLException {
             int id = rs.getInt(1);
@@ -260,13 +260,13 @@ public class Upgrade0_7_0 extends DBUpgrade {
             + "  join dataSources ds on ds.id = dp.dataSourceId ";
 
     public List<DataPointVO> getDataPoints() {
-        List<DataPointVO> dps = query(DATA_POINT_SELECT, new DataPointRowMapper());
+        List<DataPointVO> dps = ejt.query(DATA_POINT_SELECT, new DataPointRowMapper());
         for (DataPointVO dp : dps)
             setRelationalData(dp);
         return dps;
     }
 
-    class DataPointRowMapper implements GenericRowMapper<DataPointVO> {
+    class DataPointRowMapper implements RowMapper<DataPointVO> {
         @SuppressWarnings("synthetic-access")
         public DataPointVO mapRow(ResultSet rs, int rowNum) throws SQLException {
             DataPointVO dp = new DataPointVO();
