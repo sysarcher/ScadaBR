@@ -72,7 +72,7 @@ public class Upgrade1_6_0 extends DBUpgrade {
     private void xid() {
         // Default the xid values.
         ViewDao viewDao = new ViewDao();
-        List<Integer> ids = queryForList("select id from mangoViews", Integer.class);
+        List<Integer> ids = ejt.queryForList("select id from mangoViews", Integer.class);
         for (Integer id : ids)
             ejt.update("update mangoViews set xid=? where id=?", new Object[] { viewDao.generateUniqueXid(), id });
     }

@@ -22,7 +22,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import com.serotonin.db.DaoUtils;
+import br.org.scadabr.db.DaoUtils;
 import com.serotonin.mango.Common;
 
 public class BaseDao extends DaoUtils {

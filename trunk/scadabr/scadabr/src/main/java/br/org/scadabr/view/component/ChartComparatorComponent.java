@@ -15,7 +15,7 @@ import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.component.HtmlComponent;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
 
 @JsonRemoteEntity
 public class ChartComparatorComponent extends HtmlComponent {

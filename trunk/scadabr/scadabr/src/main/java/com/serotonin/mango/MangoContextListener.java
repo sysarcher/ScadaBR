@@ -432,11 +432,17 @@ public class MangoContextListener implements ServletContextListener {
 	private void runtimeManagerInitialize(ServletContext ctx) {
 		RuntimeManager rtm = new RuntimeManager();
 		ctx.setAttribute(Common.ContextKeys.RUNTIME_MANAGER, rtm);
-
+                
+                File safeFile = null;
 		// Check for safe mode.
-		File safeFile = new File(ctx.getRealPath("SAFE"));
+                try {
+                    safeFile = new File(ctx.getRealPath("SAFE"));
+                } catch (Throwable t) {
+                    log.error("Save file ", t);
+                }
 		boolean safe = false;
-		if (safeFile.exists() && safeFile.isFile()) {
+		if (safeFile != null) {
+                if (safeFile.exists() && safeFile.isFile()) {
 			// Indicate that we're in safe mode.
 			StringBuilder sb = new StringBuilder();
 			sb.append("\r\n");
@@ -455,7 +461,7 @@ public class MangoContextListener implements ServletContextListener {
 			log.warn(sb.toString());
 			safe = true;
 		}
-
+                }
 		try {
 			if (safe)
 				BackgroundContext.set("common.safeMode");

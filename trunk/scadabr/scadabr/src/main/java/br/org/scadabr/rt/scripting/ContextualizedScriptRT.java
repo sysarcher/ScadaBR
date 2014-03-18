@@ -11,7 +11,7 @@ import br.org.scadabr.rt.scripting.context.ScriptContextObject;
 import br.org.scadabr.vo.scripting.ContextualizedScriptVO;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.IntValuePair;
+import br.org.scadabr.db.IntValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.UserDao;

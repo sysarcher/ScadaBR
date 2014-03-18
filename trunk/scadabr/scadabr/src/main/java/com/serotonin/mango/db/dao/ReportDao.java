@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.db.dao;
 
@@ -28,10 +28,10 @@ import java.util.ResourceBundle;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.DatabaseAccess;
+import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
@@ -50,15 +50,23 @@ import com.serotonin.mango.vo.report.ReportInstance;
 import com.serotonin.mango.vo.report.ReportPointInfo;
 import com.serotonin.mango.vo.report.ReportUserComment;
 import com.serotonin.mango.vo.report.ReportVO;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.i18n.I18NUtils;
 import com.serotonin.web.taglib.Functions;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.RowMapper;
 
 /**
  * @author Matthew Lohbihler
  */
 public class ReportDao extends BaseDao {
+
     //
     //
     // Report Templates
@@ -66,18 +74,24 @@ public class ReportDao extends BaseDao {
     private static final String REPORT_SELECT = "select data, id, userId, name from reports ";
 
     public List<ReportVO> getReports() {
-        return query(REPORT_SELECT, new ReportRowMapper());
+        return ejt.query(REPORT_SELECT, new ReportRowMapper());
     }
 
     public List<ReportVO> getReports(int userId) {
-        return query(REPORT_SELECT + "where userId=? order by name", new Object[] { userId }, new ReportRowMapper());
+        return ejt.query(REPORT_SELECT + "where userId=? order by name", new ReportRowMapper(), userId);
     }
 
     public ReportVO getReport(int id) {
-        return queryForObject(REPORT_SELECT + "where id=?", new Object[] { id }, new ReportRowMapper(), null);
+        try {
+            return ejt.queryForObject(REPORT_SELECT + "where id=?", new ReportRowMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
-    class ReportRowMapper implements GenericRowMapper<ReportVO> {
+    class ReportRowMapper implements RowMapper<ReportVO> {
+
+        @Override
         public ReportVO mapRow(ResultSet rs, int rowNum) throws SQLException {
             int i = 0;
             ReportVO report = (ReportVO) SerializationHelper.readObject(rs.getBlob(++i).getBinaryStream());
@@ -89,31 +103,49 @@ public class ReportDao extends BaseDao {
     }
 
     public void saveReport(ReportVO report) {
-        if (report.getId() == Common.NEW_ID)
+        if (report.getId() == Common.NEW_ID) {
             insertReport(report);
-        else
+        } else {
             updateReport(report);
+        }
     }
-
-    private static final String REPORT_INSERT = "insert into reports (userId, name, data) values (?,?,?)";
 
     private void insertReport(final ReportVO report) {
-        report.setId(doInsert(REPORT_INSERT,
-                new Object[] { report.getUserId(), report.getName(), SerializationHelper.writeObject(report) },
-                new int[] { Types.INTEGER, Types.VARCHAR, Types.BLOB }));
+        final int id = doInsert(new PreparedStatementCreator() {
+
+            final static String SQL_INSERT = "insert into reports (userId, name, data) values (?,?,?)";
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                ps.setInt(1, report.getUserId());
+                ps.setString(2, report.getName());
+                ps.setBlob(3, SerializationHelper.writeObject(report));
+                return ps;
+            }
+        });
+        report.setId(id);
     }
 
-    private static final String REPORT_UPDATE = "update reports set userId=?, name=?, data=? where id=?";
-
     private void updateReport(final ReportVO report) {
-        ejt.update(
-                REPORT_UPDATE,
-                new Object[] { report.getUserId(), report.getName(), SerializationHelper.writeObject(report),
-                        report.getId() }, new int[] { Types.INTEGER, Types.VARCHAR, Types.BLOB, Types.INTEGER });
+        ejt.update(new PreparedStatementCreator() {
+
+            final static String REPORT_UPDATE = "update reports set userId=?, name=?, data=? where id=?";
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                final PreparedStatement ps = con.prepareStatement(REPORT_UPDATE);
+                ps.setInt(1, report.getUserId());
+                ps.setString(2, report.getName());
+                ps.setBlob(3, SerializationHelper.writeObject(report));
+                ps.setInt(4, report.getId());
+                return ps;
+            }
+        });
     }
 
     public void deleteReport(int reportId) {
-        ejt.update("delete from reports where id=?", new Object[] { reportId });
+        ejt.update("delete from reports where id=?", new Object[]{reportId});
     }
 
     //
@@ -124,16 +156,20 @@ public class ReportDao extends BaseDao {
             + "  runEndTime, recordCount, preventPurge " + "from reportInstances ";
 
     public List<ReportInstance> getReportInstances(int userId) {
-        return query(REPORT_INSTANCE_SELECT + "where userId=? order by runStartTime desc", new Object[] { userId },
-                new ReportInstanceRowMapper());
+        return ejt.query(REPORT_INSTANCE_SELECT + "where userId=? order by runStartTime desc", new ReportInstanceRowMapper(), userId);
     }
 
     public ReportInstance getReportInstance(int id) {
-        return queryForObject(REPORT_INSTANCE_SELECT + "where id=?", new Object[] { id },
-                new ReportInstanceRowMapper(), null);
+        try {
+            return ejt.queryForObject(REPORT_INSTANCE_SELECT + "where id=?", new ReportInstanceRowMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
-    class ReportInstanceRowMapper implements GenericRowMapper<ReportInstance> {
+    class ReportInstanceRowMapper implements RowMapper<ReportInstance> {
+
+        @Override
         public ReportInstance mapRow(ResultSet rs, int rowNum) throws SQLException {
             int i = 0;
             ReportInstance ri = new ReportInstance();
@@ -153,52 +189,59 @@ public class ReportDao extends BaseDao {
     }
 
     public void deleteReportInstance(int id, int userId) {
-        ejt.update("delete from reportInstances where id=? and userId=?", new Object[] { id, userId });
+        ejt.update("delete from reportInstances where id=? and userId=?", new Object[]{id, userId});
     }
 
     public int purgeReportsBefore(final long time) {
-        return ejt.update("delete from reportInstances where runStartTime<? and preventPurge=?", new Object[] { time,
-                boolToChar(false) });
+        return ejt.update("delete from reportInstances where runStartTime<? and preventPurge=?", new Object[]{time,
+            boolToChar(false)});
     }
 
     public void setReportInstancePreventPurge(int id, boolean preventPurge, int userId) {
-        ejt.update("update reportInstances set preventPurge=? where id=? and userId=?", new Object[] {
-                boolToChar(preventPurge), id, userId });
+        ejt.update("update reportInstances set preventPurge=? where id=? and userId=?", new Object[]{
+            boolToChar(preventPurge), id, userId});
     }
 
-    /**
-     * This method should only be called by the ReportWorkItem.
-     */
-    private static final String REPORT_INSTANCE_INSERT = "insert into reportInstances "
-            + "  (userId, name, includeEvents, includeUserComments, reportStartTime, reportEndTime, runStartTime, "
-            + "     runEndTime, recordCount, preventPurge) " + "  values (?,?,?,?,?,?,?,?,?,?)";
     private static final String REPORT_INSTANCE_UPDATE = "update reportInstances set reportStartTime=?, reportEndTime=?, runStartTime=?, runEndTime=?, recordCount=? "
             + "where id=?";
 
-    public void saveReportInstance(ReportInstance instance) {
-        if (instance.getId() == Common.NEW_ID)
-            instance.setId(doInsert(
-                    REPORT_INSTANCE_INSERT,
-                    new Object[] { instance.getUserId(), instance.getName(), instance.getIncludeEvents(),
-                            boolToChar(instance.isIncludeUserComments()), instance.getReportStartTime(),
-                            instance.getReportEndTime(), instance.getRunStartTime(), instance.getRunEndTime(),
-                            instance.getRecordCount(), boolToChar(instance.isPreventPurge()) }));
-        else
+    public void saveReportInstance(final ReportInstance instance) {
+        if (instance.getId() == Common.NEW_ID) {
+            final int id = doInsert(new PreparedStatementCreator() {
+
+                final static String SQL_INSERT = "insert into reportInstances "
+                        + "  (userId, name, includeEvents, includeUserComments, reportStartTime, reportEndTime, runStartTime, "
+                        + "     runEndTime, recordCount, preventPurge) "
+                        + "  values (?,?,?,?,?,?,?,?,?,?)";
+
+                @Override
+                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                    PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                    ps.setInt(1, instance.getUserId());
+                    ps.setString(2, instance.getName());
+                    ps.setInt(3, instance.getIncludeEvents());
+                    ps.setString(4, boolToChar(instance.isIncludeUserComments()));
+                    ps.setLong(5, instance.getReportStartTime());
+                    ps.setLong(6, instance.getReportEndTime());
+                    ps.setLong(7, instance.getRunStartTime());
+                    ps.setLong(8, instance.getRunEndTime());
+                    ps.setInt(9, instance.getRecordCount());
+                    ps.setString(10, boolToChar(instance.isPreventPurge()));
+                    return ps;
+                }
+            });
+            instance.setId(id);
+        } else {
             ejt.update(
                     REPORT_INSTANCE_UPDATE,
-                    new Object[] { instance.getReportStartTime(), instance.getReportEndTime(),
-                            instance.getRunStartTime(), instance.getRunEndTime(), instance.getRecordCount(),
-                            instance.getId() });
+                    new Object[]{instance.getReportStartTime(), instance.getReportEndTime(),
+                        instance.getRunStartTime(), instance.getRunEndTime(), instance.getRecordCount(),
+                        instance.getId()});
+        }
     }
 
-    /**
-     * This method should only be called by the ReportWorkItem.
-     */
-    private static final String REPORT_INSTANCE_POINTS_INSERT = "insert into reportInstancePoints " //
-            + "(reportInstanceId, dataSourceName, pointName, dataType, startValue, textRenderer, colour, consolidatedChart) "
-            + "values (?,?,?,?,?,?,?,?)";
-
     public static class PointInfo {
+
         private final DataPointVO point;
         private final String colour;
         private final boolean consolidatedChart;
@@ -236,47 +279,60 @@ public class ReportDao extends BaseDao {
         if (instance.isFromInception() && instance.isToNow()) {
             timestampSql = "";
             timestampParams = new Object[0];
-        }
-        else if (instance.isFromInception()) {
+        } else if (instance.isFromInception()) {
             timestampSql = "and ${field}<?";
-            timestampParams = new Object[] { instance.getReportEndTime() };
-        }
-        else if (instance.isToNow()) {
+            timestampParams = new Object[]{instance.getReportEndTime()};
+        } else if (instance.isToNow()) {
             timestampSql = "and ${field}>=?";
-            timestampParams = new Object[] { instance.getReportStartTime() };
-        }
-        else {
+            timestampParams = new Object[]{instance.getReportStartTime()};
+        } else {
             timestampSql = "and ${field}>=? and ${field}<?";
-            timestampParams = new Object[] { instance.getReportStartTime(), instance.getReportEndTime() };
+            timestampParams = new Object[]{instance.getReportStartTime(), instance.getReportEndTime()};
         }
 
         // For each point.
-        for (PointInfo pointInfo : points) {
-            DataPointVO point = pointInfo.getPoint();
-            int dataType = point.getPointLocator().getDataTypeId();
+        for (final PointInfo pointInfo : points) {
+            final DataPointVO point = pointInfo.getPoint();
+            final int dataType = point.getDataTypeId();
 
             MangoValue startValue = null;
             if (!instance.isFromInception()) {
                 // Get the value just before the start of the report
                 PointValueTime pvt = pointValueDao.getPointValueBefore(point.getId(), instance.getReportStartTime());
-                if (pvt != null)
+                if (pvt != null) {
                     startValue = pvt.getValue();
+                }
 
                 // Make sure the data types match
-                if (DataTypes.getDataType(startValue) != dataType)
+                if (DataTypes.getDataType(startValue) != dataType) {
                     startValue = null;
+                }
             }
 
-            // Insert the reportInstancePoints record
-            String name = Functions.truncate(point.getName(), 100);
+            final MangoValue finalStartValue = startValue;
 
-            int reportPointId = doInsert(
-                    REPORT_INSTANCE_POINTS_INSERT,
-                    new Object[] { instance.getId(), point.getDeviceName(), name, dataType,
-                            DataTypes.valueToString(startValue),
-                            SerializationHelper.writeObject(point.getTextRenderer()), pointInfo.getColour(),
-                            boolToChar(pointInfo.isConsolidatedChart()) }, new int[] { Types.INTEGER, Types.VARCHAR,
-                            Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.BLOB, Types.VARCHAR, Types.CHAR });
+            final int reportPointId = doInsert(new PreparedStatementCreator() {
+
+                final static String SQL_INSERT = "insert into reportInstancePoints " //
+                        + "(reportInstanceId, dataSourceName, pointName, dataType, startValue, textRenderer, colour, consolidatedChart) "
+                        + "values (?,?,?,?,?,?,?,?)";
+
+                @Override
+                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                    PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                    // Insert the reportInstancePoints record
+                    final String name = Functions.truncate(point.getName(), 100);
+                    ps.setInt(1, instance.getId());
+                    ps.setString(2, point.getDeviceName());
+                    ps.setString(3, name);
+                    ps.setInt(4, point.getDataTypeId());
+                    ps.setString(5, DataTypes.valueToString(finalStartValue));
+                    ps.setBlob(6, SerializationHelper.writeObject(point.getTextRenderer()));
+                    ps.setString(7, pointInfo.getColour());
+                    ps.setString(8, boolToChar(pointInfo.isConsolidatedChart()));
+                    return ps;
+                }
+            });
 
             // Insert the reportInstanceData records
             String insertSQL = "insert into reportInstanceData " + "  select id, " + reportPointId
@@ -285,30 +341,31 @@ public class ReportDao extends BaseDao {
             count += ejt.update(insertSQL, appendParameters(timestampParams, point.getId(), dataType));
 
             String annoCase;
-            if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.DERBY)
+            if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.DERBY) {
                 annoCase = "    case when pva.sourceType=1 then '" + userLabel //
                         + ": ' || (case when u.username is null then '" + deletedLabel + "' else u.username end) " //
                         + "         when pva.sourceType=2 then '" + setPointLabel + "' " //
                         + "         when pva.sourceType=3 then '" + anonymousLabel + "' " //
                         + "         else 'Unknown source type: ' || cast(pva.sourceType as char(3)) " //
                         + "    end ";
-            else if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.MSSQL)
+            } else if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.MSSQL) {
                 annoCase = "    case pva.sourceType" //
                         + "        when 1 then '" + userLabel + ": ' + isnull(u.username, '" + deletedLabel + "') " //
                         + "        when 2 then '" + setPointLabel + "'" //
                         + "        when 3 then '" + anonymousLabel + "'" //
                         + "        else 'Unknown source type: ' + cast(pva.sourceType as nvarchar)" //
                         + "    end ";
-            else if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.MYSQL)
+            } else if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.MYSQL) {
                 annoCase = "    case pva.sourceType" //
                         + "      when 1 then concat('" + userLabel + ": ',ifnull(u.username,'" + deletedLabel + "')) " //
                         + "      when 2 then '" + setPointLabel + "'" //
                         + "      when 3 then '" + anonymousLabel + "'" //
                         + "      else concat('Unknown source type: ', pva.sourceType)" //
                         + "    end ";
-            else
+            } else {
                 throw new ShouldNeverHappenException("unhandled database type: "
                         + Common.ctx.getDatabaseAccess().getType());
+            }
 
             // Insert the reportInstanceDataAnnotations records
             ejt.update("insert into reportInstanceDataAnnotations " //
@@ -318,7 +375,7 @@ public class ReportDao extends BaseDao {
                     + "    join reportInstancePoints rp on rd.reportInstancePointId = rp.id " //
                     + "    join pointValueAnnotations pva on rd.pointValueId = pva.pointValueId " //
                     + "    left join users u on pva.sourceType=1 and pva.sourceId = u.id " //
-                    + "  where rp.id = ?", new Object[] { reportPointId });
+                    + "  where rp.id = ?", new Object[]{reportPointId});
 
             // Insert the reportInstanceEvents records for the point.
             if (instance.getIncludeEvents() != ReportVO.EVENTS_NONE) {
@@ -335,8 +392,9 @@ public class ReportDao extends BaseDao {
                         + EventType.EventSources.DATA_POINT //
                         + "    and e.typeRef1=? ";
 
-                if (instance.getIncludeEvents() == ReportVO.EVENTS_ALARMS)
+                if (instance.getIncludeEvents() == ReportVO.EVENTS_ALARMS) {
                     eventSQL += "and e.alarmLevel > 0 ";
+                }
 
                 eventSQL += StringUtils.replaceMacro(timestampSql, "field", "e.activeTs");
                 ejt.update(eventSQL, appendParameters(timestampParams, instance.getUserId(), point.getId()));
@@ -370,22 +428,24 @@ public class ReportDao extends BaseDao {
                     + "    join reportInstanceEvents re on re.eventId=uc.typeKey " //
                     + "  where uc.commentType=" + UserComment.TYPE_EVENT //
                     + "    and re.reportInstanceId=? ";
-            ejt.update(commentSQL, new Object[] { instance.getId() });
+            ejt.update(commentSQL, new Object[]{instance.getId()});
         }
 
         // If the report had undefined start or end times, update them with values from the data.
         if (instance.isFromInception() || instance.isToNow()) {
             ejt.query(
                     "select min(rd.ts), max(rd.ts) " //
-                            + "from reportInstancePoints rp "
-                            + "  join reportInstanceData rd on rp.id=rd.reportInstancePointId "
-                            + "where rp.reportInstanceId=?", new Object[] { instance.getId() },
+                    + "from reportInstancePoints rp "
+                    + "  join reportInstanceData rd on rp.id=rd.reportInstancePointId "
+                    + "where rp.reportInstanceId=?", new Object[]{instance.getId()},
                     new RowCallbackHandler() {
                         public void processRow(ResultSet rs) throws SQLException {
-                            if (instance.isFromInception())
+                            if (instance.isFromInception()) {
                                 instance.setReportStartTime(rs.getLong(1));
-                            if (instance.isToNow())
+                            }
+                            if (instance.isToNow()) {
                                 instance.setReportEndTime(rs.getLong(2));
+                            }
                         }
                     });
         }
@@ -394,10 +454,12 @@ public class ReportDao extends BaseDao {
     }
 
     private Object[] appendParameters(Object[] toAppend, Object... params) {
-        if (toAppend.length == 0)
+        if (toAppend.length == 0) {
             return params;
-        if (params.length == 0)
+        }
+        if (params.length == 0) {
             return toAppend;
+        }
 
         Object[] result = new Object[params.length + toAppend.length];
         System.arraycopy(params, 0, result, 0, params.length);
@@ -406,8 +468,9 @@ public class ReportDao extends BaseDao {
     }
 
     /**
-     * This method guarantees that the data is provided to the setData handler method grouped by point (points are not
-     * ordered), and sorted by time ascending.
+     * This method guarantees that the data is provided to the setData handler
+     * method grouped by point (points are not ordered), and sorted by time
+     * ascending.
      */
     private static final String REPORT_INSTANCE_POINT_SELECT = "select id, dataSourceName, pointName, dataType, " // 
             + "startValue, textRenderer, colour, consolidatedChart from reportInstancePoints ";
@@ -419,8 +482,8 @@ public class ReportDao extends BaseDao {
 
     public void reportInstanceData(int instanceId, final ReportDataStreamHandler handler) {
         // Retrieve point information.
-        List<ReportPointInfo> pointInfos = query(REPORT_INSTANCE_POINT_SELECT + "where reportInstanceId=?",
-                new Object[] { instanceId }, new GenericRowMapper<ReportPointInfo>() {
+        List<ReportPointInfo> pointInfos = ejt.query(REPORT_INSTANCE_POINT_SELECT + "where reportInstanceId=?",
+                new Object[]{instanceId}, new RowMapper<ReportPointInfo>() {
                     public ReportPointInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
                         ReportPointInfo rp = new ReportPointInfo();
                         rp.setReportPointId(rs.getInt(1));
@@ -428,10 +491,11 @@ public class ReportDao extends BaseDao {
                         rp.setPointName(rs.getString(3));
                         rp.setDataType(rs.getInt(4));
                         String startValue = rs.getString(5);
-                        if (startValue != null)
+                        if (startValue != null) {
                             rp.setStartValue(MangoValue.stringToValue(startValue, rp.getDataType()));
+                        }
                         rp.setTextRenderer((TextRenderer) SerializationHelper.readObject(rs.getBlob(6)
-                                .getBinaryStream()));
+                                        .getBinaryStream()));
                         rp.setColour(rs.getString(7));
                         rp.setConsolidatedChart(charToBool(rs.getString(8)));
                         return rp;
@@ -445,28 +509,29 @@ public class ReportDao extends BaseDao {
             rdv.setReportPointId(point.getReportPointId());
             final int dataType = point.getDataType();
             ejt.query(REPORT_INSTANCE_DATA_SELECT + "where rd.reportInstancePointId=? order by rd.ts",
-                    new Object[] { point.getReportPointId() }, new RowCallbackHandler() {
+                    new Object[]{point.getReportPointId()}, new RowCallbackHandler() {
                         public void processRow(ResultSet rs) throws SQLException {
                             switch (dataType) {
-                            case (DataTypes.NUMERIC):
-                                rdv.setValue(new NumericValue(rs.getDouble(1)));
-                                break;
-                            case (DataTypes.BINARY):
-                                rdv.setValue(new BinaryValue(rs.getDouble(1) == 1));
-                                break;
-                            case (DataTypes.MULTISTATE):
-                                rdv.setValue(new MultistateValue(rs.getInt(1)));
-                                break;
-                            case (DataTypes.ALPHANUMERIC):
-                                rdv.setValue(new AlphanumericValue(rs.getString(2)));
-                                if (rs.wasNull())
-                                    rdv.setValue(new AlphanumericValue(rs.getString(3)));
-                                break;
-                            case (DataTypes.IMAGE):
-                                rdv.setValue(new ImageValue(Integer.parseInt(rs.getString(2)), rs.getInt(1)));
-                                break;
-                            default:
-                                rdv.setValue(null);
+                                case (DataTypes.NUMERIC):
+                                    rdv.setValue(new NumericValue(rs.getDouble(1)));
+                                    break;
+                                case (DataTypes.BINARY):
+                                    rdv.setValue(new BinaryValue(rs.getDouble(1) == 1));
+                                    break;
+                                case (DataTypes.MULTISTATE):
+                                    rdv.setValue(new MultistateValue(rs.getInt(1)));
+                                    break;
+                                case (DataTypes.ALPHANUMERIC):
+                                    rdv.setValue(new AlphanumericValue(rs.getString(2)));
+                                    if (rs.wasNull()) {
+                                        rdv.setValue(new AlphanumericValue(rs.getString(3)));
+                                    }
+                                    break;
+                                case (DataTypes.IMAGE):
+                                    rdv.setValue(new ImageValue(Integer.parseInt(rs.getString(2)), rs.getInt(1)));
+                                    break;
+                                default:
+                                    rdv.setValue(null);
                             }
 
                             rdv.setTime(rs.getLong(4));
@@ -480,7 +545,7 @@ public class ReportDao extends BaseDao {
     }
 
     private static final String EVENT_SELECT = //
-    "select eventId, typeId, typeRef1, typeRef2, activeTs, rtnApplicable, rtnTs, rtnCause, alarmLevel, message, " //
+            "select eventId, typeId, typeRef1, typeRef2, activeTs, rtnApplicable, rtnTs, rtnCause, alarmLevel, message, " //
             + "ackTs, 0, ackUsername, alternateAckSource " //
             + "from reportInstanceEvents " //
             + "where reportInstanceId=? " //
@@ -492,10 +557,10 @@ public class ReportDao extends BaseDao {
 
     public List<EventInstance> getReportInstanceEvents(int instanceId) {
         // Get the events.
-        final List<EventInstance> events = query(EVENT_SELECT, new Object[] { instanceId },
+        final List<EventInstance> events = ejt.query(EVENT_SELECT, new Object[]{instanceId},
                 new EventDao.EventInstanceRowMapper());
         // Add in the comments.
-        ejt.query(EVENT_COMMENT_SELECT, new Object[] { instanceId, UserComment.TYPE_EVENT }, new RowCallbackHandler() {
+        ejt.query(EVENT_COMMENT_SELECT, new Object[]{instanceId, UserComment.TYPE_EVENT}, new RowCallbackHandler() {
             public void processRow(ResultSet rs) throws SQLException {
                 // Create the comment
                 UserComment c = new UserComment();
@@ -507,8 +572,9 @@ public class ReportDao extends BaseDao {
                 int eventId = rs.getInt(2);
                 for (EventInstance event : events) {
                     if (event.getId() == eventId) {
-                        if (event.getEventComments() == null)
+                        if (event.getEventComments() == null) {
                             event.setEventComments(new ArrayList<UserComment>());
+                        }
                         event.addEventComment(c);
                     }
                 }
@@ -526,10 +592,11 @@ public class ReportDao extends BaseDao {
             + " " + "where rc.reportInstanceId=? " + "order by rc.ts ";
 
     public List<ReportUserComment> getReportInstanceUserComments(int instanceId) {
-        return query(USER_COMMENT_SELECT, new Object[] { instanceId }, new ReportCommentRowMapper());
+        return ejt.query(USER_COMMENT_SELECT, new ReportCommentRowMapper(), instanceId);
     }
 
-    class ReportCommentRowMapper implements GenericRowMapper<ReportUserComment> {
+    class ReportCommentRowMapper implements RowMapper<ReportUserComment> {
+
         @Override
         public ReportUserComment mapRow(ResultSet rs, int rowNum) throws SQLException {
             ReportUserComment c = new ReportUserComment();

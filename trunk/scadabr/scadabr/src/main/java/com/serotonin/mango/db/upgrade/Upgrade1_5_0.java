@@ -52,7 +52,7 @@ import com.serotonin.mango.view.graphic.MultistateImageSetRenderer;
 import com.serotonin.mango.view.graphic.ScriptRenderer;
 import com.serotonin.mango.view.graphic.ThumbnailRenderer;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
 
 /**
  * @author Matthew Lohbihler
@@ -174,18 +174,18 @@ public class Upgrade1_5_0 extends DBUpgrade {
     private void xid() {
         // Default the xid values.
         DataSourceDao dataSourceDao = new DataSourceDao();
-        List<Integer> dsids = queryForList("select id from dataSources", Integer.class);
+        List<Integer> dsids = ejt.queryForList("select id from dataSources", Integer.class);
         for (Integer dsid : dsids)
             ejt.update("update dataSources set xid=? where id=?", new Object[] { dataSourceDao.generateUniqueXid(),
                     dsid });
 
         DataPointDao dataPointDao = new DataPointDao();
-        List<Integer> dpids = queryForList("select id from dataPoints", Integer.class);
+        List<Integer> dpids = ejt.queryForList("select id from dataPoints", Integer.class);
         for (Integer dpid : dpids)
             ejt.update("update dataPoints set xid=? where id=?",
                     new Object[] { dataPointDao.generateUniqueXid(), dpid });
 
-        List<Integer> pedids = queryForList("select id from pointEventDetectors", Integer.class);
+        List<Integer> pedids = ejt.queryForList("select id from pointEventDetectors", Integer.class);
         for (Integer pedid : pedids)
             ejt.update("update pointEventDetectors set xid=? where id=?", new Object[] {
                     Common.generateXid(PointEventDetectorVO.XID_PREFIX), pedid });

@@ -36,7 +36,7 @@ import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.DynamicImage;
 import com.serotonin.mango.view.ImplDefinition;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
 
 /**
  * @author Matthew Lohbihler

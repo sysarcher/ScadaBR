@@ -8,7 +8,7 @@ import java.net.URLEncoder;
 import com.serotonin.json.JsonRemoteProperty;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.component.HtmlComponent;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
 
 public class FlexBuilderComponent extends HtmlComponent {
 	public static ImplDefinition DEFINITION = new ImplDefinition("flexBuilder",

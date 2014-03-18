@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.db.dao;
 
@@ -29,15 +29,21 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import com.serotonin.db.IntValuePair;
-import com.serotonin.db.spring.GenericRowMapper;
-import com.serotonin.db.spring.IntValuePairRowMapper;
+import br.org.scadabr.db.IntValuePair;
+import br.org.scadabr.db.spring.IntValuePairRowMapper;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.view.ShareUser;
 import com.serotonin.mango.view.View;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
+import java.sql.Connection;
+import java.sql.Statement;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.RowMapper;
 
 public class ViewDao extends BaseDao {
+
     //
     // /
     // / Views
@@ -47,57 +53,61 @@ public class ViewDao extends BaseDao {
     private static final String USER_ID_COND = " where userId=? or id in (select mangoViewId from mangoViewUsers where userId=?)";
 
     public List<View> getViews() {
-        List<View> views = query(VIEW_SELECT, new ViewRowMapper());
+        List<View> views = ejt.query(VIEW_SELECT, new ViewRowMapper());
         setViewUsers(views);
         return views;
     }
 
     public List<View> getViews(int userId) {
-        List<View> views = query(VIEW_SELECT + USER_ID_COND, new Object[] { userId, userId }, new ViewRowMapper());
+        List<View> views = ejt.query(VIEW_SELECT + USER_ID_COND, new ViewRowMapper(), userId, userId);
         setViewUsers(views);
         return views;
     }
 
     public List<IntValuePair> getViewNames(int userId) {
-        return query("select id, name from mangoViews" + USER_ID_COND, new Object[] { userId, userId },
-                new IntValuePairRowMapper());
+        return ejt.query("select id, name from mangoViews" + USER_ID_COND, new IntValuePairRowMapper(), userId, userId);
     }
 
     private void setViewUsers(List<View> views) {
-        for (View view : views)
+        for (View view : views) {
             setViewUsers(view);
+        }
     }
 
     public View getView(int id) {
-        return getSingleView(VIEW_SELECT + " where id=?", new Object[] { id });
+        return getSingleView(VIEW_SELECT + " where id=?", id);
     }
 
     public View getViewByXid(String xid) {
-        return getSingleView(VIEW_SELECT + " where xid=?", new Object[] { xid });
+        return getSingleView(VIEW_SELECT + " where xid=?", xid);
     }
 
     public View getView(String name) {
-        return getSingleView(VIEW_SELECT + " where name=?", new Object[] { name });
+        return getSingleView(VIEW_SELECT + " where name=?", name);
     }
 
-    private View getSingleView(String sql, Object[] params) {
-        View view = queryForObject(sql, params, new ViewRowMapper(), null);
-        if (view == null)
+    private View getSingleView(String sql, Object... params) {
+        try {
+            View view = ejt.queryForObject(sql, new ViewRowMapper(), params);
+            setViewUsers(view);
+            return view;
+        } catch (EmptyResultDataAccessException e) {
             return null;
-
-        setViewUsers(view);
-        return view;
+        }
     }
 
-    class ViewRowMapper implements GenericRowMapper<View> {
+    class ViewRowMapper implements RowMapper<View> {
+
+        @Override
         public View mapRow(ResultSet rs, int rowNum) throws SQLException {
             View v;
             Blob blob = rs.getBlob(1);
-            if (blob == null)
-                // This can happen during upgrade
+            if (blob == null) // This can happen during upgrade
+            {
                 v = new View();
-            else
+            } else {
                 v = (View) SerializationHelper.readObject(blob.getBinaryStream());
+            }
 
             v.setId(rs.getInt(2));
             v.setXid(rs.getString(3));
@@ -110,7 +120,9 @@ public class ViewDao extends BaseDao {
         }
     }
 
-    class ViewNameRowMapper implements GenericRowMapper<View> {
+    class ViewNameRowMapper implements RowMapper<View> {
+
+        @Override
         public View mapRow(ResultSet rs, int rowNum) throws SQLException {
             View v = new View();
             v.setId(rs.getInt(1));
@@ -134,34 +146,57 @@ public class ViewDao extends BaseDao {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 // Decide whether to insert or update.
-                if (view.getId() == Common.NEW_ID)
+                if (view.getId() == Common.NEW_ID) {
                     insertView(view);
-                else
+                } else {
                     updateView(view);
+                }
 
                 saveViewUsers(view);
             }
         });
     }
 
-    void insertView(View view) {
-        view.setId(doInsert(
-                "insert into mangoViews (xid, name, background, userId, anonymousAccess, data) values (?,?,?,?,?,?)",
-                new Object[] { view.getXid(), view.getName(), view.getBackgroundFilename(), view.getUserId(),
-                        view.getAnonymousAccess(), SerializationHelper.writeObject(view) }, new int[] { Types.VARCHAR,
-                        Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.BLOB }));
+    void insertView(final View view) {
+        final int id = doInsert(new PreparedStatementCreator() {
+
+            final static String SQL_INSERT = "insert into mangoViews (xid, name, background, userId, anonymousAccess, data) values (?,?,?,?,?,?)";
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, view.getXid());
+                ps.setString(2, view.getName());
+                ps.setString(3, view.getBackgroundFilename());
+                ps.setInt(4, view.getUserId());
+                ps.setInt(5, view.getAnonymousAccess());
+                ps.setBlob(6, SerializationHelper.writeObject(view));
+                return ps;
+            }
+        });
+        view.setId(id);
     }
 
-    void updateView(View view) {
-        ejt.update("update mangoViews set xid=?, name=?, background=?, anonymousAccess=?, data=? where id=?",
-                new Object[] { view.getXid(), view.getName(), view.getBackgroundFilename(), view.getAnonymousAccess(),
-                        SerializationHelper.writeObject(view), view.getId() }, new int[] { Types.VARCHAR,
-                        Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.BLOB, Types.INTEGER });
+    void updateView(final View view) {
+        ejt.update(new PreparedStatementCreator() {
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement("update mangoViews set xid=?, name=?, background=?, anonymousAccess=?, data=? where id=?");
+                ps.setString(1, view.getXid());
+                ps.setString(2, view.getName());
+                ps.setString(3, view.getBackgroundFilename());
+                ps.setInt(4, view.getAnonymousAccess());
+                ps.setBlob(5, SerializationHelper.writeObject(view));
+                ps.setInt(6, view.getId());
+                return ps;
+            }
+        });
     }
 
     public void removeView(final int viewId) {
         deleteViewUsers(viewId);
-        ejt.update("delete from mangoViews where id=?", new Object[] { viewId });
+        ejt.update("delete from mangoViews where id=?", new Object[]{viewId});
     }
 
     //
@@ -170,11 +205,13 @@ public class ViewDao extends BaseDao {
     // /
     //
     private void setViewUsers(View view) {
-        view.setViewUsers(query("select userId, accessType from mangoViewUsers where mangoViewId=?",
-                new Object[] { view.getId() }, new ViewUserRowMapper()));
+        view.setViewUsers(ejt.query("select userId, accessType from mangoViewUsers where mangoViewId=?",
+                new ViewUserRowMapper(), view.getId()));
     }
 
-    class ViewUserRowMapper implements GenericRowMapper<ShareUser> {
+    class ViewUserRowMapper implements RowMapper<ShareUser> {
+
+        @Override
         public ShareUser mapRow(ResultSet rs, int rowNum) throws SQLException {
             ShareUser vu = new ShareUser();
             vu.setUserId(rs.getInt(1));
@@ -184,7 +221,7 @@ public class ViewDao extends BaseDao {
     }
 
     private void deleteViewUsers(int viewId) {
-        ejt.update("delete from mangoViewUsers where mangoViewId=?", new Object[] { viewId });
+        ejt.update("delete from mangoViewUsers where mangoViewId=?", viewId);
     }
 
     void saveViewUsers(final View view) {
@@ -209,6 +246,6 @@ public class ViewDao extends BaseDao {
     }
 
     public void removeUserFromView(int viewId, int userId) {
-        ejt.update("delete from mangoViewUsers where mangoViewId=? and userId=?", new Object[] { viewId, userId });
+        ejt.update("delete from mangoViewUsers where mangoViewId=? and userId=?", viewId, userId);
     }
 }

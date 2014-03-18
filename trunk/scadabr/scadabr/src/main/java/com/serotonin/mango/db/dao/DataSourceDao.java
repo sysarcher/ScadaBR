@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.db.dao;
 
@@ -34,10 +34,6 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import com.serotonin.db.spring.ExtendedJdbcTemplate;
-import com.serotonin.db.spring.GenericResultSetExtractor;
-import com.serotonin.db.spring.GenericRowMapper;
-import com.serotonin.db.spring.GenericTransactionCallback;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -45,37 +41,46 @@ import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
 import com.serotonin.util.StringUtils;
 import com.serotonin.web.i18n.LocalizableMessage;
+import java.sql.Connection;
+import java.sql.Statement;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.transaction.support.TransactionCallback;
 
 public class DataSourceDao extends BaseDao {
+
     private static final String DATA_SOURCE_SELECT = "select id, xid, name, data from dataSources ";
 
     public List<DataSourceVO<?>> getDataSources() {
-        List<DataSourceVO<?>> dss = query(DATA_SOURCE_SELECT, new DataSourceRowMapper());
-        Collections.sort(dss, new DataSourceNameComparator());
+        List<DataSourceVO<?>> dss = ejt.query(DATA_SOURCE_SELECT + " order by name asc", new DataSourceRowMapper());
         return dss;
     }
 
-    static class DataSourceNameComparator implements Comparator<DataSourceVO<?>> {
-        public int compare(DataSourceVO<?> ds1, DataSourceVO<?> ds2) {
-            if (StringUtils.isEmpty(ds1.getName()))
-                return -1;
-            return ds1.getName().compareToIgnoreCase(ds2.getName());
+    public DataSourceVO<?> getDataSource(int id) {
+        try {
+            return ejt.queryForObject(DATA_SOURCE_SELECT + " where id=?", new DataSourceRowMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
     }
 
-    public DataSourceVO<?> getDataSource(int id) {
-        return queryForObject(DATA_SOURCE_SELECT + " where id=?", new Object[] { id }, new DataSourceRowMapper(), null);
-    }
-
     public DataSourceVO<?> getDataSource(String xid) {
-        return queryForObject(DATA_SOURCE_SELECT + " where xid=?", new Object[] { xid }, new DataSourceRowMapper(),
-                null);
+        try {
+            return ejt.queryForObject(DATA_SOURCE_SELECT + " where xid=?", new DataSourceRowMapper(), xid);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
-    class DataSourceRowMapper implements GenericRowMapper<DataSourceVO<?>> {
+    class DataSourceRowMapper implements RowMapper<DataSourceVO<?>> {
+
+        @Override
         public DataSourceVO<?> mapRow(ResultSet rs, int rowNum) throws SQLException {
             DataSourceVO<?> ds = (DataSourceVO<?>) SerializationHelper.readObject(rs.getBlob(4).getBinaryStream());
             ds.setId(rs.getInt(1));
@@ -95,36 +100,59 @@ public class DataSourceDao extends BaseDao {
 
     public void saveDataSource(final DataSourceVO<?> vo) {
         // Decide whether to insert or update.
-        if (vo.getId() == Common.NEW_ID)
+        if (vo.getId() == Common.NEW_ID) {
             insertDataSource(vo);
-        else
+        } else {
             updateDataSource(vo);
+        }
     }
 
     private void insertDataSource(final DataSourceVO<?> vo) {
-        vo.setId(doInsert("insert into dataSources (xid, name, dataSourceType, data) values (?,?,?,?)", new Object[] {
-                vo.getXid(), vo.getName(), vo.getType().getId(), SerializationHelper.writeObject(vo) }, new int[] {
-                Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.BLOB }));
+        final int id = doInsert(new PreparedStatementCreator() {
 
+            final static String SQL_INSERT = "insert into dataSources (xid, name, dataSourceType, data) values (?,?,?,?)";
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, vo.getXid());
+                ps.setString(2, vo.getName());
+                ps.setInt(3, vo.getType().getId());
+                ps.setBlob(4, SerializationHelper.writeObject(vo));
+                return ps;
+            }
+        });
+        vo.setId(id);
         AuditEventType.raiseAddedEvent(AuditEventType.TYPE_DATA_SOURCE, vo);
     }
 
     @SuppressWarnings("unchecked")
     private void updateDataSource(final DataSourceVO<?> vo) {
         DataSourceVO<?> old = getDataSource(vo.getId());
-        ejt.update("update dataSources set xid=?, name=?, data=? where id=?", new Object[] { vo.getXid(), vo.getName(),
-                SerializationHelper.writeObject(vo), vo.getId() }, new int[] { Types.VARCHAR, Types.VARCHAR,
-                Types.BLOB, Types.INTEGER });
-        
+
+        ejt.update(new PreparedStatementCreator() {
+
+            final static String SQL_UPDATE = "update dataSources set xid=?, name=?, data=? where id=?";
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement(SQL_UPDATE);
+                ps.setString(1, vo.getXid());
+                ps.setString(2, vo.getName());
+                ps.setBlob(3, SerializationHelper.writeObject(vo));
+                ps.setInt(4, vo.getId());
+                return ps;
+            }
+        });
         //if datasource's name has changed, update datapoints 
-        if (!vo.getName().equals(old.getName())){
-        	List<DataPointVO> dpList = new DataPointDao().getDataPoints(vo.getId(), null);
-        	for (DataPointVO dp : dpList){
-        		dp.setDataSourceName(vo.getName());
-        		dp.setDeviceName(vo.getName());
-        		new DataPointDao().updateDataPoint(dp);
-        	}
-        		
+        if (!vo.getName().equals(old.getName())) {
+            List<DataPointVO> dpList = new DataPointDao().getDataPoints(vo.getId(), null);
+            for (DataPointVO dp : dpList) {
+                dp.setDataSourceName(vo.getName());
+                dp.setDeviceName(vo.getName());
+                new DataPointDao().updateDataPoint(dp);
+            }
+
         }
 
         AuditEventType.raiseChangedEvent(AuditEventType.TYPE_DATA_SOURCE, old, (ChangeComparable<DataSourceVO<?>>) vo);
@@ -132,7 +160,7 @@ public class DataSourceDao extends BaseDao {
 
     public void deleteDataSource(final int dataSourceId) {
         DataSourceVO<?> vo = getDataSource(dataSourceId);
-        final ExtendedJdbcTemplate ejt2 = ejt;
+        final JdbcTemplate ejt2 = ejt;
 
         new DataPointDao().deleteDataPoints(dataSourceId);
 
@@ -142,9 +170,9 @@ public class DataSourceDao extends BaseDao {
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
                     new MaintenanceEventDao().deleteMaintenanceEventsForDataSource(dataSourceId);
                     ejt2.update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.DATA_SOURCE
-                            + " and eventTypeRef1=?", new Object[] { dataSourceId });
-                    ejt2.update("delete from dataSourceUsers where dataSourceId=?", new Object[] { dataSourceId });
-                    ejt2.update("delete from dataSources where id=?", new Object[] { dataSourceId });
+                            + " and eventTypeRef1=?", new Object[]{dataSourceId});
+                    ejt2.update("delete from dataSourceUsers where dataSourceId=?", new Object[]{dataSourceId});
+                    ejt2.update("delete from dataSources where id=?", new Object[]{dataSourceId});
                 }
             });
 
@@ -153,8 +181,7 @@ public class DataSourceDao extends BaseDao {
     }
 
     public void copyPermissions(final int fromDataSourceId, final int toDataSourceId) {
-        final List<Integer> userIds = queryForList("select userId from dataSourceUsers where dataSourceId=?",
-                new Object[] { fromDataSourceId }, Integer.class);
+        final List<Integer> userIds = ejt.queryForList("select userId from dataSourceUsers where dataSourceId=?", Integer.class, fromDataSourceId);
 
         ejt.batchUpdate("insert into dataSourceUsers values (?,?)", new BatchPreparedStatementSetter() {
             @Override
@@ -171,7 +198,7 @@ public class DataSourceDao extends BaseDao {
     }
 
     public int copyDataSource(final int dataSourceId, final ResourceBundle bundle) {
-        return getTransactionTemplate().execute(new GenericTransactionCallback<Integer>() {
+        return getTransactionTemplate().execute(new TransactionCallback<Integer>() {
             @Override
             public Integer doInTransaction(TransactionStatus status) {
                 DataPointDao dataPointDao = new DataPointDao();
@@ -220,24 +247,34 @@ public class DataSourceDao extends BaseDao {
     }
 
     public Object getPersistentData(int id) {
-        return query("select rtdata from dataSources where id=?", new Object[] { id },
-                new GenericResultSetExtractor<Serializable>() {
+        return ejt.query("select rtdata from dataSources where id=?", new Object[]{id},
+                new ResultSetExtractor<Serializable>() {
                     @Override
                     public Serializable extractData(ResultSet rs) throws SQLException, DataAccessException {
-                        if (!rs.next())
+                        if (!rs.next()) {
                             return null;
+                        }
 
                         Blob blob = rs.getBlob(1);
-                        if (blob == null)
+                        if (blob == null) {
                             return null;
+                        }
 
-                        return (Serializable) SerializationHelper.readObjectInContext(blob.getBinaryStream());
+                        return (Serializable) SerializationHelper.readObject(blob.getBinaryStream());
                     }
                 });
     }
 
-    public void savePersistentData(int id, Object data) {
-        ejt.update("update dataSources set rtdata=? where id=?", new Object[] { SerializationHelper.writeObject(data),
-                id }, new int[] { Types.BLOB, Types.INTEGER });
+    public void savePersistentData(final int id, final Object data) {
+        ejt.update(new PreparedStatementCreator() {
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                final PreparedStatement ps = con.prepareStatement("update dataSources set rtdata=? where id=?");
+                ps.setBlob(1, SerializationHelper.writeObject(data));
+                ps.setInt(2, id);
+                return ps;
+            }
+        });
     }
 }

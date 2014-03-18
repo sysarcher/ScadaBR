@@ -26,7 +26,7 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 
-import com.serotonin.db.KeyValuePair;
+import br.org.scadabr.db.KeyValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.publish.httpSender.HttpSenderRT;
 import com.serotonin.web.http.HttpUtils;

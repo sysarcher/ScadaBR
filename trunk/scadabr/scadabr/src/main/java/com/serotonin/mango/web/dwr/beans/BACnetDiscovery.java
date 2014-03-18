@@ -46,7 +46,7 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.PropertyReferences;
 import com.serotonin.bacnet4j.util.PropertyValues;
-import com.serotonin.db.IntValuePair;
+import br.org.scadabr.db.IntValuePair;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.util.queue.ByteQueue;
 import com.serotonin.web.i18n.I18NUtils;

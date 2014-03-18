@@ -12,7 +12,7 @@ import br.org.scadabr.rt.scripting.ContextualizedScriptRT;
 import br.org.scadabr.rt.scripting.ScriptRT;
 import br.org.scadabr.rt.scripting.context.ScriptContextObject;
 
-import com.serotonin.db.IntValuePair;
+import br.org.scadabr.db.IntValuePair;
 import com.serotonin.json.JsonArray;
 import com.serotonin.json.JsonException;
 import com.serotonin.json.JsonObject;

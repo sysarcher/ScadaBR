@@ -29,7 +29,7 @@ import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.mango.rt.dataSource.galil.TellPositionPointTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
 import com.serotonin.web.dwr.DwrResponseI18n;
 import com.serotonin.web.i18n.LocalizableMessage;
 

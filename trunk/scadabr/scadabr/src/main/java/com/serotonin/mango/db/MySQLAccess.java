@@ -24,8 +24,8 @@ import javax.servlet.ServletContext;
 
 import org.springframework.dao.DataAccessException;
 
-import com.serotonin.db.spring.ExtendedJdbcTemplate;
 import com.serotonin.mango.Common;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 public class MySQLAccess extends BasePooledAccess {
     public MySQLAccess(ServletContext ctx) {
@@ -64,7 +64,7 @@ public class MySQLAccess extends BasePooledAccess {
     }
 
     @Override
-    protected boolean newDatabaseCheck(ExtendedJdbcTemplate ejt) {
+    protected boolean newDatabaseCheck(JdbcTemplate ejt) {
         try {
             ejt.execute("select count(*) from users");
         }
@@ -95,7 +95,7 @@ public class MySQLAccess extends BasePooledAccess {
     }
 
     @Override
-    public void executeCompress(ExtendedJdbcTemplate ejt) {
+    public void executeCompress(JdbcTemplate ejt) {
         // no op
     }
 }

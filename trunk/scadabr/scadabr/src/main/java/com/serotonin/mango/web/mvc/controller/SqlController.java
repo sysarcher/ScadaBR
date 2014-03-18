@@ -38,13 +38,13 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractFormController;
 import org.springframework.web.util.WebUtils;
 
-import com.serotonin.db.spring.ConnectionCallbackVoid;
-import com.serotonin.db.spring.ExtendedJdbcTemplate;
+import br.org.scadabr.db.spring.ConnectionCallbackVoid;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.mvc.form.SqlForm;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 public class SqlController extends AbstractFormController {
     private static final Log LOG = LogFactory.getLog(SqlController.class);
@@ -71,20 +71,21 @@ public class SqlController extends AbstractFormController {
         try {
             if (WebUtils.hasSubmitParameter(request, "query")) {
                 databaseAccess.doInConnection(new ConnectionCallbackVoid() {
+                    @Override
                     public void doInConnection(Connection conn) throws SQLException {
                         Statement stmt = conn.createStatement();
                         ResultSet rs = stmt.executeQuery(form.getSqlString());
 
                         ResultSetMetaData meta = rs.getMetaData();
                         int columns = meta.getColumnCount();
-                        List<String> headers = new ArrayList<String>(columns);
+                        List<String> headers = new ArrayList<>(columns);
                         for (int i = 0; i < columns; i++)
                             headers.add(meta.getColumnLabel(i + 1));
 
-                        List<List<Object>> data = new LinkedList<List<Object>>();
+                        List<List<Object>> data = new LinkedList<>();
                         List<Object> row;
                         while (rs.next()) {
-                            row = new ArrayList<Object>(columns);
+                            row = new ArrayList<>(columns);
                             data.add(row);
                             for (int i = 0; i < columns; i++) {
                                 if (meta.getColumnType(i + 1) == Types.CLOB)
@@ -105,7 +106,7 @@ public class SqlController extends AbstractFormController {
                 });
             }
             else if (WebUtils.hasSubmitParameter(request, "update")) {
-                ExtendedJdbcTemplate ejt = new ExtendedJdbcTemplate();
+                JdbcTemplate ejt = new JdbcTemplate();
                 ejt.setDataSource(databaseAccess.getDataSource());
                 int result = ejt.update(form.getSqlString());
                 form.setUpdateResult(result);

@@ -45,8 +45,8 @@ import br.org.scadabr.view.component.LinkComponent;
 import br.org.scadabr.view.component.ScriptButtonComponent;
 import br.org.scadabr.vo.scripting.ScriptVO;
 
-import com.serotonin.db.IntValuePair;
-import com.serotonin.db.KeyValuePair;
+import br.org.scadabr.db.IntValuePair;
+import br.org.scadabr.db.KeyValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.DataPointDao;

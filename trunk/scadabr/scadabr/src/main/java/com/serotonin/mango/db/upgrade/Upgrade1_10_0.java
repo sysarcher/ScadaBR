@@ -196,7 +196,7 @@ public class Upgrade1_10_0 extends DBUpgrade {
     private void xid() {
         // Default the xid values.
         WatchListDao watchListDao = new WatchListDao();
-        List<Integer> ids = queryForList("select id from watchLists", Integer.class);
+        List<Integer> ids = ejt.queryForList("select id from watchLists", Integer.class);
         for (Integer id : ids)
             ejt.update("update watchLists set xid=? where id=?", new Object[] { watchListDao.generateUniqueXid(), id });
     }

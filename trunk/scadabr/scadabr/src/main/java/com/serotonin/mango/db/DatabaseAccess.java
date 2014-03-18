@@ -34,14 +34,14 @@ import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.spring.ConnectionCallbackVoid;
-import com.serotonin.db.spring.ExtendedJdbcTemplate;
+import br.org.scadabr.db.spring.ConnectionCallbackVoid;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.DataPointAccess;
 import com.serotonin.util.StringUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 abstract public class DatabaseAccess {
 	public enum DatabaseType {
@@ -92,7 +92,7 @@ abstract public class DatabaseAccess {
 	public void initialize() {
 		initializeImpl("");
 
-		ExtendedJdbcTemplate ejt = new ExtendedJdbcTemplate();
+		JdbcTemplate ejt = new JdbcTemplate();
 		ejt.setDataSource(getDataSource());
 
 		try {
@@ -171,16 +171,16 @@ abstract public class DatabaseAccess {
 
 	abstract public File getDataDirectory();
 
-	abstract public void executeCompress(ExtendedJdbcTemplate ejt);
+	abstract public void executeCompress(JdbcTemplate ejt);
 
 	abstract protected void initializeImpl(String propertyPrefix);
 
 	protected void postInitialize(
-			@SuppressWarnings("unused") ExtendedJdbcTemplate ejt) {
+			@SuppressWarnings("unused") JdbcTemplate ejt) {
 		// no op - override as necessary
 	}
 
-	abstract protected boolean newDatabaseCheck(ExtendedJdbcTemplate ejt);
+	abstract protected boolean newDatabaseCheck(JdbcTemplate ejt);
 
 	abstract public void runScript(String[] script, final OutputStream out)
 			throws Exception;

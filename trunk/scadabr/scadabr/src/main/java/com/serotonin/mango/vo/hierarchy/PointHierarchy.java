@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.IntValuePair;
+import br.org.scadabr.db.IntValuePair;
 
 /**
  * @author Matthew Lohbihler

@@ -10,76 +10,96 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import br.org.scadabr.api.vo.FlexProject;
 
-import com.serotonin.db.spring.ExtendedJdbcTemplate;
-import com.serotonin.db.spring.GenericRowMapper;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.BaseDao;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.RowMapper;
 
 public class FlexProjectDao extends BaseDao {
-	private static final String FLEX_PROJECT_SELECT = "select id, name, description, xmlConfig from flexProjects ";
 
-	public int saveFlexProject(int id, String name, String description,
-			String xmlConfig) {
-		if (id == Common.NEW_ID)
-			return insertFlexProject(id, name, description, xmlConfig);
-		else
-			return updateFlexProject(id, name, description, xmlConfig);
-	}
+    private static final String FLEX_PROJECT_SELECT = "select id, name, description, xmlConfig from flexProjects ";
 
-	private int insertFlexProject(int id, String name, String description,
-			String xmlConfig) {
-		return doInsert(
-				"insert into flexProjects (name,  description, xmlConfig) values (?,?,?)",
-				new Object[] { name, description, xmlConfig }, new int[] {
-						Types.VARCHAR, Types.VARCHAR, Types.VARCHAR });
+    public int saveFlexProject(int id, String name, String description,
+            String xmlConfig) {
+        if (id == Common.NEW_ID) {
+            return insertFlexProject(name, description, xmlConfig);
+        } else {
+            return updateFlexProject(id, name, description, xmlConfig);
+        }
+    }
 
-	}
+    private int insertFlexProject(final String name, final String description, final String xmlConfig) {
+        return doInsert(new PreparedStatementCreator() {
 
-	private int updateFlexProject(int id, String name, String description,
-			String xmlConfig) {
-		ejt
-				.update(
-						"update flexProjects set name=?, description=?, xmlConfig=? where id=?",
-						new Object[] { name, description, xmlConfig, id },
-						new int[] { Types.VARCHAR, Types.VARCHAR,
-								Types.VARCHAR, Types.INTEGER });
-		return id;
+            final static String SQL_INSERT = "insert into flexProjects (name,  description, xmlConfig) values (?,?,?)";
 
-	}
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, name);
+                ps.setString(2, description);
+                ps.setString(3, xmlConfig);
+                return ps;
+            }
+        });
+    }
 
-	public void deleteFlexProject(final int flexProjectId) {
-		final ExtendedJdbcTemplate ejt2 = ejt;
-		getTransactionTemplate().execute(
-				new TransactionCallbackWithoutResult() {
-					@Override
-					protected void doInTransactionWithoutResult(
-							TransactionStatus status) {
-						ejt2.update("delete from flexProjects where id=?",
-								new Object[] { flexProjectId });
-					}
-				});
-	}
+    private int updateFlexProject(int id, String name, String description,
+            String xmlConfig) {
+        ejt
+                .update(
+                        "update flexProjects set name=?, description=?, xmlConfig=? where id=?",
+                        new Object[]{name, description, xmlConfig, id},
+                        new int[]{Types.VARCHAR, Types.VARCHAR,
+                            Types.VARCHAR, Types.INTEGER});
+        return id;
 
-	public FlexProject getFlexProject(int id) {
-		return queryForObject(FLEX_PROJECT_SELECT + " where id=?",
-				new Object[] { id }, new FlexProjectRowMapper(), null);
-	}
+    }
 
-	public List<FlexProject> getFlexProjects() {
-		List<FlexProject> flexProjects = query(FLEX_PROJECT_SELECT,
-				new FlexProjectRowMapper());
-		return flexProjects;
-	}
+    public void deleteFlexProject(final int flexProjectId) {
+        final JdbcTemplate ejt2 = ejt;
+        getTransactionTemplate().execute(
+                new TransactionCallbackWithoutResult() {
+                    @Override
+                    protected void doInTransactionWithoutResult(
+                            TransactionStatus status) {
+                                ejt2.update("delete from flexProjects where id=?",
+                                        new Object[]{flexProjectId});
+                            }
+                });
+    }
 
-	class FlexProjectRowMapper implements GenericRowMapper<FlexProject> {
-		public FlexProject mapRow(ResultSet rs, int rowNum) throws SQLException {
-			FlexProject project = new FlexProject();
-			project.setId(rs.getInt(1));
-			project.setName(rs.getString(2));
-			project.setDescription(rs.getString(3));
-			project.setXmlConfig(rs.getString(4));
-			return project;
-		}
-	}
+    public FlexProject getFlexProject(int id) {
+        try {
+        return ejt.queryForObject(FLEX_PROJECT_SELECT + " where id=?",new FlexProjectRowMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    public List<FlexProject> getFlexProjects() {
+        List<FlexProject> flexProjects = ejt.query(FLEX_PROJECT_SELECT,
+                new FlexProjectRowMapper());
+        return flexProjects;
+    }
+
+    class FlexProjectRowMapper implements RowMapper<FlexProject> {
+
+        @Override
+        public FlexProject mapRow(ResultSet rs, int rowNum) throws SQLException {
+            FlexProject project = new FlexProject();
+            project.setId(rs.getInt(1));
+            project.setName(rs.getString(2));
+            project.setDescription(rs.getString(3));
+            project.setXmlConfig(rs.getString(4));
+            return project;
+        }
+    }
 
 }

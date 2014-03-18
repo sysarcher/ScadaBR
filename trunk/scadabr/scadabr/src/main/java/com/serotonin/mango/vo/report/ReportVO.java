@@ -30,7 +30,7 @@ import org.joda.time.DateTime;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
-import com.serotonin.util.SerializationHelper;
+import br.org.scadabr.util.SerializationHelper;
 
 /**
  * @author Matthew Lohbihler

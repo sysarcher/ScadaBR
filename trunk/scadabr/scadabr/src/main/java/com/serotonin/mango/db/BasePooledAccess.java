@@ -35,8 +35,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.db.spring.ExtendedJdbcTemplate;
 import com.serotonin.mango.Common;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * @author Matthew Lohbihler
@@ -69,7 +69,7 @@ abstract public class BasePooledAccess extends DatabaseAccess {
 
     @Override
     public void runScript(String[] script, OutputStream out) {
-        ExtendedJdbcTemplate ejt = new ExtendedJdbcTemplate();
+        JdbcTemplate ejt = new JdbcTemplate();
         ejt.setDataSource(dataSource);
 
         StringBuilder statement = new StringBuilder();
