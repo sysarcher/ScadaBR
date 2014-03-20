@@ -10,196 +10,204 @@ import java.util.Map;
 
 import br.org.scadabr.rt.scripting.ScriptRT;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.vo.User;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
 
 public abstract class ScriptVO<T extends ScriptVO<?>> implements Serializable,
-		JsonSerializable {
-	abstract public Type getType();
+        JsonSerializable {
 
-	abstract public ScriptRT createScriptRT();
+    abstract public Type getType();
 
-	public static final String XID_PREFIX = "SC_";
+    abstract public ScriptRT createScriptRT();
 
-	public enum Type {
-		CONTEXTUALIZED_SCRIPT(1, "scripting.systemCommands", true) {
-			@Override
-			public ScriptVO<?> createScriptVO() {
-				return new ContextualizedScriptVO();
-			}
-		};
+    public static final String XID_PREFIX = "SC_";
 
-		private Type(int id, String key, boolean display) {
-			this.id = id;
-			this.key = key;
-			this.display = display;
-		}
+    public enum Type {
 
-		@JsonRemoteProperty
-		private final int id;
-		@JsonRemoteProperty
-		private final String key;
-		@JsonRemoteProperty
-		private final boolean display;
+        CONTEXTUALIZED_SCRIPT(1, "scripting.systemCommands", true) {
+                    @Override
+                    public ScriptVO<?> createScriptVO() {
+                        return new ContextualizedScriptVO();
+                    }
+                };
 
-		public int getId() {
-			return id;
-		}
+        private Type(int id, String key, boolean display) {
+            this.id = id;
+            this.key = key;
+            this.display = display;
+        }
 
-		public String getKey() {
-			return key;
-		}
+        @JsonRemoteProperty
+        private final int id;
+        @JsonRemoteProperty
+        private final String key;
+        @JsonRemoteProperty
+        private final boolean display;
 
-		public boolean isDisplay() {
-			return display;
-		}
+        public int getId() {
+            return id;
+        }
 
-		public abstract ScriptVO<?> createScriptVO();
+        public String getKey() {
+            return key;
+        }
 
-		public static Type valueOf(int id) {
-			for (Type type : values()) {
-				if (type.id == id)
-					return type;
-			}
-			return null;
-		}
+        public boolean isDisplay() {
+            return display;
+        }
 
-		public static Type valueOfIgnoreCase(String text) {
-			for (Type type : values()) {
-				if (type.name().equalsIgnoreCase(text))
-					return type;
-			}
-			return null;
-		}
+        public abstract ScriptVO<?> createScriptVO();
 
-		public static List<String> getTypeList() {
-			List<String> result = new ArrayList<String>();
-			for (Type type : values())
-				result.add(type.name());
-			return result;
-		}
-	}
+        public static Type valueOf(int id) {
+            for (Type type : values()) {
+                if (type.id == id) {
+                    return type;
+                }
+            }
+            return null;
+        }
 
-	private int id = Common.NEW_ID;
-	@JsonRemoteProperty
-	private String xid;
-	@JsonRemoteProperty
-	private String name;
-	@JsonRemoteProperty
-	private String script;
-	private int userId;
+        public static Type valueOfIgnoreCase(String text) {
+            for (Type type : values()) {
+                if (type.name().equalsIgnoreCase(text)) {
+                    return type;
+                }
+            }
+            return null;
+        }
 
-	public int getId() {
-		return id;
-	}
+        public static List<String> getTypeList() {
+            List<String> result = new ArrayList<String>();
+            for (Type type : values()) {
+                result.add(type.name());
+            }
+            return result;
+        }
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    private int id = Common.NEW_ID;
+    @JsonRemoteProperty
+    private String xid;
+    @JsonRemoteProperty
+    private String name;
+    @JsonRemoteProperty
+    private String script;
+    private int userId;
 
-	public String getXid() {
-		return xid;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setXid(String xid) {
-		this.xid = xid;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getXid() {
+        return xid;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setXid(String xid) {
+        this.xid = xid;
+    }
 
-	public void validate(DwrResponseI18n response) {
-		if (StringUtils.isEmpty(xid))
-			response.addContextualMessage("xid", "validate.required");
-		else if (!new DataSourceDao().isXidUnique(xid, id))
-			response.addContextualMessage("xid", "validate.xidUsed");
-		else if (StringUtils.isLengthGreaterThan(xid, 50))
-			response.addContextualMessage("xid", "validate.notLongerThan", 50);
+    public String getName() {
+        return name;
+    }
 
-		if (StringUtils.isEmpty(name))
-			response.addContextualMessage("name", "validate.nameRequired");
-		if (StringUtils.isLengthGreaterThan(name, 40))
-			response.addContextualMessage("name", "validate.nameTooLong");
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void validate(DwrResponseI18n response) {
+        if (StringUtils.isEmpty(xid)) {
+            response.addContextualMessage("xid", "validate.required");
+        } else if (!new DataSourceDao().isXidUnique(xid, id)) {
+            response.addContextualMessage("xid", "validate.xidUsed");
+        } else if (StringUtils.isLengthGreaterThan(xid, 50)) {
+            response.addContextualMessage("xid", "validate.notLongerThan", 50);
+        }
+
+        if (StringUtils.isEmpty(name)) {
+            response.addContextualMessage("name", "validate.nameRequired");
+        }
+        if (StringUtils.isLengthGreaterThan(name, 40)) {
+            response.addContextualMessage("name", "validate.nameTooLong");
+        }
+    }
 
 	//
-	// /
-	// / Serialization
-	// /
-	//
-	private static final long serialVersionUID = -1;
-	private static final int version = 1;
+    // /
+    // / Serialization
+    // /
+    //
+    private static final long serialVersionUID = -1;
+    private static final int version = 1;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
 		// out.writeInt(version);
-		// out.writeBoolean(enabled);
-	}
+        // out.writeBoolean(enabled);
+    }
 
-	@SuppressWarnings("unchecked")
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
+    @SuppressWarnings("unchecked")
+    private void readObject(ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
 		// int ver = in.readInt();
-		// Switch on the version of the class so that version changes can be
-		// elegantly handled.
-		// if (ver == 1) {
-		// enabled = in.readBoolean();
-		// }
-	}
+        // Switch on the version of the class so that version changes can be
+        // elegantly handled.
+        // if (ver == 1) {
+        // enabled = in.readBoolean();
+        // }
+    }
 
-	@Override
-	public void jsonDeserialize(JsonReader reader, JsonObject object)
-			throws JsonException {
-		String username = object.getString("user");
-		User user = new UserDao().getUser(username);
-		this.userId = user.getId();
-	}
+    @Override
+    public void jsonDeserialize(JsonReader reader, JsonObject object)
+            throws JsonException {
+        String username = object.getString("user");
+        User user = new UserDao().getUser(username);
+        this.userId = user.getId();
+    }
 
-	@Override
-	public void jsonSerialize(Map<String, Object> map) {
-		map.put("type", getType().name());
-		map.put("user", new UserDao().getUser(userId).getUsername());
-	}
+    @Override
+    public void jsonSerialize(Map<String, Object> map) {
+        map.put("type", getType().name());
+        map.put("user", new UserDao().getUser(userId).getUsername());
+    }
 
-	public static ScriptVO<?> createScriptVO(int typeId) {
-		return Type.valueOf(typeId).createScriptVO();
-	}
+    public static ScriptVO<?> createScriptVO(int typeId) {
+        return Type.valueOf(typeId).createScriptVO();
+    }
 
-	public static String generateXid() {
-		return Common.generateXid("SC_");
-	}
+    public static String generateXid() {
+        return Common.generateXid("SC_");
+    }
 
-	public void setScript(String script) {
-		this.script = script;
-	}
+    public void setScript(String script) {
+        this.script = script;
+    }
 
-	public String getScript() {
-		return script;
-	}
+    public String getScript() {
+        return script;
+    }
 
-	public void setUserId(int userId) {
-		this.userId = userId;
-	}
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
-	public int getUserId() {
-		return userId;
-	}
+    public int getUserId() {
+        return userId;
+    }
 
-	public boolean isNew() {
-		return id == Common.NEW_ID;
-	}
+    public boolean isNew() {
+        return id == Common.NEW_ID;
+    }
 
 }

@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.virtual;
 
@@ -25,11 +25,11 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.virtual.ChangeTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -37,10 +37,12 @@ import com.serotonin.mango.util.ChangeComparableObject;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.IntMessagePair;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessage;
 
 abstract public class ChangeTypeVO implements Serializable, JsonSerializable, ChangeComparableObject {
+
     public interface Types {
+
         public static final int ALTERNATE_BOOLEAN = 1;
         public static final int BROWNIAN = 2;
         public static final int INCREMENT_ANALOG = 3;
@@ -53,6 +55,7 @@ abstract public class ChangeTypeVO implements Serializable, JsonSerializable, Ch
     }
 
     public static final ExportCodes CHANGE_TYPE_CODES = new ExportCodes();
+
     static {
         CHANGE_TYPE_CODES.addElement(Types.ALTERNATE_BOOLEAN, "ALTERNATE_BOOLEAN",
                 "dsEdit.virtual.changeType.alternate");
@@ -69,25 +72,25 @@ abstract public class ChangeTypeVO implements Serializable, JsonSerializable, Ch
 
     public static IntMessagePair[] getChangeTypes(int dataTypeId) {
         switch (dataTypeId) {
-        case DataTypes.BINARY:
-            return new IntMessagePair[] { new IntMessagePair(Types.ALTERNATE_BOOLEAN, AlternateBooleanChangeVO.KEY),
+            case DataTypes.BINARY:
+                return new IntMessagePair[]{new IntMessagePair(Types.ALTERNATE_BOOLEAN, AlternateBooleanChangeVO.KEY),
                     new IntMessagePair(Types.NO_CHANGE, NoChangeVO.KEY),
-                    new IntMessagePair(Types.RANDOM_BOOLEAN, RandomBooleanChangeVO.KEY), };
-        case DataTypes.MULTISTATE:
-            return new IntMessagePair[] {
+                    new IntMessagePair(Types.RANDOM_BOOLEAN, RandomBooleanChangeVO.KEY),};
+            case DataTypes.MULTISTATE:
+                return new IntMessagePair[]{
                     new IntMessagePair(Types.INCREMENT_MULTISTATE, IncrementMultistateChangeVO.KEY),
                     new IntMessagePair(Types.NO_CHANGE, NoChangeVO.KEY),
-                    new IntMessagePair(Types.RANDOM_MULTISTATE, RandomMultistateChangeVO.KEY), };
-        case DataTypes.NUMERIC:
-            return new IntMessagePair[] { new IntMessagePair(Types.BROWNIAN, BrownianChangeVO.KEY),
+                    new IntMessagePair(Types.RANDOM_MULTISTATE, RandomMultistateChangeVO.KEY),};
+            case DataTypes.NUMERIC:
+                return new IntMessagePair[]{new IntMessagePair(Types.BROWNIAN, BrownianChangeVO.KEY),
                     new IntMessagePair(Types.INCREMENT_ANALOG, IncrementAnalogChangeVO.KEY),
                     new IntMessagePair(Types.NO_CHANGE, NoChangeVO.KEY),
                     new IntMessagePair(Types.RANDOM_ANALOG, RandomAnalogChangeVO.KEY),
-                    new IntMessagePair(Types.ANALOG_ATTRACTOR, AnalogAttractorChangeVO.KEY), };
-        case DataTypes.ALPHANUMERIC:
-            return new IntMessagePair[] { new IntMessagePair(Types.NO_CHANGE, NoChangeVO.KEY), };
+                    new IntMessagePair(Types.ANALOG_ATTRACTOR, AnalogAttractorChangeVO.KEY),};
+            case DataTypes.ALPHANUMERIC:
+                return new IntMessagePair[]{new IntMessagePair(Types.NO_CHANGE, NoChangeVO.KEY),};
         }
-        return new IntMessagePair[] {};
+        return new IntMessagePair[]{};
     }
 
     abstract public int typeId();

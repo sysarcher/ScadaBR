@@ -31,7 +31,7 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.vo.mailingList.AddressEntry;
 import com.serotonin.mango.vo.mailingList.EmailRecipient;

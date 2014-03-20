@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.pop3;
 
@@ -28,38 +28,43 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.pop3.Pop3PointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
-import com.serotonin.web.taglib.Functions;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.web.taglib.Functions;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+
+    @Override
     public boolean isSettable() {
         return false;
     }
 
+    @Override
     public PointLocatorRT createRuntime() {
         return new Pop3PointLocatorRT(this);
     }
 
+    @Override
     public LocalizableMessage getConfigurationDescription() {
-        return new LocalizableMessage("dsEdit.pop3.dpconn", Functions.escapeLessThan(valueRegex));
+        return new LocalizableMessageImpl("dsEdit.pop3.dpconn", Functions.escapeLessThan(valueRegex));
     }
 
     @JsonRemoteProperty
@@ -143,15 +148,15 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(valueRegex))
+        if (StringUtils.isEmpty(valueRegex)) {
             response.addContextualMessage("valueRegex", "validate.required");
-        else {
+        } else {
             try {
                 Pattern pattern = Pattern.compile(valueRegex);
-                if (pattern.matcher("").groupCount() < 1)
+                if (pattern.matcher("").groupCount() < 1) {
                     response.addContextualMessage("valueRegex", "validate.captureGroup");
-            }
-            catch (PatternSyntaxException e) {
+                }
+            } catch (PatternSyntaxException e) {
                 response.addContextualMessage("valueRegex", "common.default", e.getMessage());
             }
         }
@@ -159,32 +164,31 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         if (dataTypeId == DataTypes.NUMERIC && !StringUtils.isEmpty(valueFormat)) {
             try {
                 new DecimalFormat(valueFormat);
-            }
-            catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 response.addContextualMessage("valueFormat", "common.default", e.getMessage());
             }
         }
 
-        if (!DataTypes.CODES.isValidId(dataTypeId))
+        if (!DataTypes.CODES.isValidId(dataTypeId)) {
             response.addContextualMessage("dataTypeId", "validate.invalidValue");
+        }
 
         if (!StringUtils.isEmpty(timeRegex)) {
             try {
                 Pattern pattern = Pattern.compile(timeRegex);
-                if (pattern.matcher("").groupCount() < 1)
+                if (pattern.matcher("").groupCount() < 1) {
                     response.addContextualMessage("timeRegex", "validate.captureGroup");
-            }
-            catch (PatternSyntaxException e) {
+                }
+            } catch (PatternSyntaxException e) {
                 response.addContextualMessage("timeRegex", "common.default", e.getMessage());
             }
 
-            if (StringUtils.isEmpty(timeFormat))
+            if (StringUtils.isEmpty(timeFormat)) {
                 response.addContextualMessage("timeFormat", "validate.required");
-            else {
+            } else {
                 try {
                     new SimpleDateFormat(timeFormat);
-                }
-                catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException e) {
                     response.addContextualMessage("timeFormat", "common.default", e.getMessage());
                 }
             }
@@ -252,8 +256,7 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             useReceivedTime = in.readBoolean();
             timeRegex = SerializationHelper.readSafeUTF(in);
             timeFormat = SerializationHelper.readSafeUTF(in);
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             findInSubject = in.readBoolean();
             valueRegex = SerializationHelper.readSafeUTF(in);
             ignoreIfMissing = in.readBoolean();
@@ -268,8 +271,9 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         Integer value = deserializeDataType(json, DataTypes.IMAGE);
-        if (value != null)
+        if (value != null) {
             dataTypeId = value;
+        }
     }
 
     @Override

@@ -3,9 +3,10 @@ package com.serotonin.mango.rt.publish;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.util.ILifecycle;
+import br.org.scadabr.util.ILifecycle;
 
 abstract public class SendThread extends Thread implements ILifecycle {
+
     private static final Log LOG = LogFactory.getLog(SendThread.class);
     private boolean running;
 
@@ -32,8 +33,7 @@ abstract public class SendThread extends Thread implements ILifecycle {
     public void joinTermination() {
         try {
             this.join();
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             // no op
         }
     }
@@ -42,8 +42,7 @@ abstract public class SendThread extends Thread implements ILifecycle {
     public void run() {
         try {
             runImpl();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOG.error("Send thread " + getName() + " failed with an exception", e);
         }
     }
@@ -52,8 +51,7 @@ abstract public class SendThread extends Thread implements ILifecycle {
         synchronized (this) {
             try {
                 wait(time);
-            }
-            catch (InterruptedException e1) {
+            } catch (InterruptedException e1) {
                 // no op
             }
         }

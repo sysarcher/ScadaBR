@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr;
 
@@ -35,7 +35,7 @@ import org.directwebremoting.WebContextFactory;
 import org.joda.time.DateTime;
 import org.joda.time.IllegalFieldValueException;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
@@ -56,14 +56,15 @@ import com.serotonin.mango.web.dwr.beans.BasePointState;
 import com.serotonin.mango.web.dwr.beans.DataPointBean;
 import com.serotonin.mango.web.dwr.beans.WatchListState;
 import com.serotonin.mango.web.taglib.Functions;
-import com.serotonin.util.ObjectUtils;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.content.ContentGenerator;
-import com.serotonin.web.dwr.MethodFilter;
-import com.serotonin.web.i18n.I18NUtils;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.content.ContentGenerator;
+import br.org.scadabr.web.dwr.MethodFilter;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.l10n.Localizer;
+import java.util.Objects;
 
 abstract public class BaseDwr {
+
     public static final String MODEL_ATTR_EVENTS = "events";
     public static final String MODEL_ATTR_HAS_UNACKED_EVENT = "hasUnacknowledgedEvent";
     public static final String MODEL_ATTR_RESOURCE_BUNDLE = "bundle";
@@ -78,10 +79,11 @@ abstract public class BaseDwr {
     protected ResourceBundle chartSnippetMap = ResourceBundle.getBundle("chartSnippetMap");
 
     /**
-     * Base method for preparing information in a state object and returning a point value.
-     * 
-     * @param componentId
-     *            a unique id for the browser side component. Required for set point snippets.
+     * Base method for preparing information in a state object and returning a
+     * point value.
+     *
+     * @param componentId a unique id for the browser side component. Required
+     * for set point snippets.
      * @param state
      * @param point
      * @param status
@@ -97,12 +99,13 @@ abstract public class BaseDwr {
         model.put(MODEL_ATTR_RESOURCE_BUNDLE, getResourceBundle());
 
         PointValueTime pointValue = null;
-        if (point == null)
+        if (point == null) {
             model.put("disabled", "true");
-        else {
+        } else {
             pointValue = point.getPointValue();
-            if (pointValue != null)
+            if (pointValue != null) {
                 model.put("pointValue", pointValue);
+            }
         }
 
         return pointValue;
@@ -110,14 +113,16 @@ abstract public class BaseDwr {
 
     protected void setEvents(DataPointVO pointVO, User user, Map<String, Object> model) {
         int userId = 0;
-        if (user != null)
+        if (user != null) {
             userId = user.getId();
+        }
         List<EventInstance> events = EVENT_DAO.getPendingEventsForDataPoint(pointVO.getId(), userId);
         if (events != null) {
             model.put(MODEL_ATTR_EVENTS, events);
             for (EventInstance event : events) {
-                if (!event.isAcknowledged())
+                if (!event.isAcknowledged()) {
                     model.put(MODEL_ATTR_HAS_UNACKED_EVENT, true);
+                }
             }
         }
     }
@@ -126,26 +131,28 @@ abstract public class BaseDwr {
             PointValueTime pointValue) {
         String prettyText = Functions.getHtmlText(pointVO, pointValue);
         model.put("text", prettyText);
-        if (!ObjectUtils.isEqual(pointVO.lastValue(), pointValue)) {
+        if (!Objects.equals(pointVO.lastValue(), pointValue)) {
             state.setValue(prettyText);
-            if (pointValue != null)
+            if (pointValue != null) {
                 state.setTime(Functions.getTime(pointValue));
+            }
             pointVO.updateLastValue(pointValue);
         }
     }
 
     protected void setChange(DataPointVO pointVO, BasePointState state, DataPointRT point, HttpServletRequest request,
             Map<String, Object> model, User user) {
-        if (Permissions.hasDataPointSetPermission(user, pointVO))
+        if (Permissions.hasDataPointSetPermission(user, pointVO)) {
             setChange(pointVO, state, point, request, model);
+        }
     }
 
     protected void setChange(DataPointVO pointVO, BasePointState state, DataPointRT point, HttpServletRequest request,
             Map<String, Object> model) {
         if (pointVO.getPointLocator().isSettable()) {
-            if (point == null)
+            if (point == null) {
                 state.setChange(getMessage("common.pointDisabled"));
-            else {
+            } else {
                 String snippet = changeSnippetMap.getString(pointVO.getTextRenderer().getClass().getName());
                 state.setChange(generateContent(request, snippet, model));
             }
@@ -168,9 +175,10 @@ abstract public class BaseDwr {
     }
 
     /**
-     * Allows the setting of a given data point. Used by the watch list and point details pages. Views implement their
-     * own version to accommodate anonymous users.
-     * 
+     * Allows the setting of a given data point. Used by the watch list and
+     * point details pages. Views implement their own version to accommodate
+     * anonymous users.
+     *
      * @param pointId
      * @param valueStr
      * @return
@@ -188,12 +196,13 @@ abstract public class BaseDwr {
     }
 
     protected void setPointImpl(DataPointVO point, String valueStr, SetPointSource source) {
-        if (point == null)
+        if (point == null) {
             return;
+        }
 
-        if (valueStr == null)
+        if (valueStr == null) {
             Common.ctx.getRuntimeManager().relinquish(point.getId());
-        else {
+        } else {
             // Convert the string value into an object.
             MangoValue value = MangoValue.stringToValue(valueStr, point.getPointLocator().getDataTypeId());
             Common.ctx.getRuntimeManager().setDataPointValue(point.getId(), value, source);
@@ -213,14 +222,15 @@ abstract public class BaseDwr {
 
     /**
      * Logs a user comment after validation.
-     * 
+     *
      * @param eventId
      * @param comment
      * @return
      */
     public UserComment addUserComment(int typeId, int referenceId, String comment) {
-        if (StringUtils.isEmpty(comment))
+        if (StringUtils.isEmpty(comment)) {
             return null;
+        }
 
         User user = Common.getUser();
         UserComment c = new UserComment();
@@ -229,12 +239,13 @@ abstract public class BaseDwr {
         c.setUserId(user.getId());
         c.setUsername(user.getUsername());
 
-        if (typeId == UserComment.TYPE_EVENT)
+        if (typeId == UserComment.TYPE_EVENT) {
             EVENT_DAO.insertEventComment(referenceId, c);
-        else if (typeId == UserComment.TYPE_POINT)
+        } else if (typeId == UserComment.TYPE_POINT) {
             new UserDao().insertUserComment(UserComment.TYPE_POINT, referenceId, c);
-        else
+        } else {
             throw new ShouldNeverHappenException("Invalid comment type: " + typeId);
+        }
 
         return c;
     }
@@ -244,23 +255,25 @@ abstract public class BaseDwr {
 
         List<DataPointVO> points = new DataPointDao().getDataPoints(DataPointExtendedNameComparator.instance, false);
         if (!Permissions.hasAdmin(user)) {
-            List<DataPointVO> userPoints = new ArrayList<DataPointVO>();
+            List<DataPointVO> userPoints = new ArrayList<>();
             for (DataPointVO dp : points) {
-                if (Permissions.hasDataPointReadPermission(user, dp))
+                if (Permissions.hasDataPointReadPermission(user, dp)) {
                     userPoints.add(dp);
+                }
             }
             points = userPoints;
         }
 
-        List<DataPointBean> result = new ArrayList<DataPointBean>();
-        for (DataPointVO dp : points)
+        List<DataPointBean> result = new ArrayList<>();
+        for (DataPointVO dp : points) {
             result.add(new DataPointBean(dp));
+        }
 
         return result;
     }
 
     public Map<String, Object> getDateRangeDefaults(int periodType, int period) {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
 
         // Default the specific date fields.
         DateTime dt = new DateTime();
@@ -282,12 +295,12 @@ abstract public class BaseDwr {
         return result;
     }
 
-    protected String getMessage(String key) {
-        return I18NUtils.getMessage(getResourceBundle(), key);
+    protected String getMessage(String i18nKey, Object... args) {
+        return Localizer.localizeI18nKey(i18nKey, getResourceBundle(), args);
     }
 
     protected String getMessage(LocalizableMessage message) {
-        return message.getLocalizedMessage(getResourceBundle());
+        return Localizer.localizeMessage(message, getResourceBundle());
     }
 
     protected ResourceBundle getResourceBundle() {
@@ -300,20 +313,19 @@ abstract public class BaseDwr {
     public static String generateContent(HttpServletRequest request, String snippet, Map<String, Object> model) {
         try {
             return ContentGenerator.generateContent(request, "/WEB-INF/snippet/" + snippet, model);
-        }
-        catch (ServletException e) {
+        } catch (ServletException e) {
             throw new ShouldNeverHappenException(e);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ShouldNeverHappenException(e);
         }
     }
 
     protected List<User> getShareUsers(User excludeUser) {
-        List<User> users = new ArrayList<User>();
+        List<User> users = new ArrayList<>();
         for (User u : new UserDao().getUsers()) {
-            if (u.getId() != excludeUser.getId())
+            if (u.getId() != excludeUser.getId()) {
                 users.add(u);
+            }
         }
         return users;
     }
@@ -325,10 +337,10 @@ abstract public class BaseDwr {
     protected DateTime createDateTime(int year, int month, int day, int hour, int minute, int second, boolean none) {
         DateTime dt = null;
         try {
-            if (!none)
+            if (!none) {
                 dt = new DateTime(year, month, day, hour, minute, second, 0);
-        }
-        catch (IllegalFieldValueException e) {
+            }
+        } catch (IllegalFieldValueException e) {
             dt = new DateTime();
         }
         return dt;

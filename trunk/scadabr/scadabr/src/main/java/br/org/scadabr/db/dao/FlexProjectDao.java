@@ -77,7 +77,7 @@ public class FlexProjectDao extends BaseDao {
 
     public FlexProject getFlexProject(int id) {
         try {
-        return ejt.queryForObject(FLEX_PROJECT_SELECT + " where id=?",new FlexProjectRowMapper(), id);
+            return ejt.queryForObject(FLEX_PROJECT_SELECT + " where id=?", new FlexProjectRowMapper(), id);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }

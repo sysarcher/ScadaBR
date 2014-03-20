@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.mvc.controller;
 
@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.ParameterizableViewController;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
@@ -42,9 +42,10 @@ import com.serotonin.mango.view.chart.TableChartRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
-import com.serotonin.util.StringUtils;
+import br.org.scadabr.util.StringUtils;
 
 public class DataPointDetailsController extends ParameterizableViewController {
+
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
@@ -62,24 +63,25 @@ public class DataPointDetailsController extends ParameterizableViewController {
             if (pedStr == null) {
                 // Check if an XID was provided.
                 String xid = request.getParameter("dpxid");
-                if (xid == null)
+                if (xid == null) {
                     throw new ShouldNeverHappenException("One of dpid, dpxid, or pedid must be provided for this view");
+                }
 
                 model.put("currentXid", xid);
                 point = dataPointDao.getDataPoint(xid);
                 id = point == null ? -1 : point.getId();
-            }
-            else {
+            } else {
                 int pedid = Integer.parseInt(pedStr);
                 id = dataPointDao.getDataPointIdFromDetectorId(pedid);
             }
-        }
-        else
+        } else {
             id = Integer.parseInt(idStr);
+        }
 
         // Put the point in the model.
-        if (point == null)
+        if (point == null) {
             point = dataPointDao.getDataPoint(id);
+        }
 
         if (point != null) {
             Permissions.ensureDataPointReadPermission(user, point);
@@ -91,8 +93,9 @@ public class DataPointDetailsController extends ParameterizableViewController {
             List<View> views = new LinkedList<View>();
             for (View view : userViews) {
                 view.validateViewComponents(false);
-                if (view.containsValidVisibleDataPoint(id))
+                if (view.containsValidVisibleDataPoint(id)) {
                     views.add(view);
+                }
             }
             model.put("views", views);
 
@@ -120,10 +123,11 @@ public class DataPointDetailsController extends ParameterizableViewController {
 
             // Put the default history table count into the model. Default to 10.
             int historyLimit = 10;
-            if (point.getChartRenderer() instanceof TableChartRenderer)
+            if (point.getChartRenderer() instanceof TableChartRenderer) {
                 historyLimit = ((TableChartRenderer) point.getChartRenderer()).getLimit();
-            else if (point.getChartRenderer() instanceof ImageFlipbookRenderer)
+            } else if (point.getChartRenderer() instanceof ImageFlipbookRenderer) {
                 historyLimit = ((ImageFlipbookRenderer) point.getChartRenderer()).getLimit();
+            }
             model.put("historyLimit", historyLimit);
 
             // Determine our image chart rendering capabilities.
@@ -141,8 +145,9 @@ public class DataPointDetailsController extends ParameterizableViewController {
             }
 
             // Determine out flipbook rendering capabilities
-            if (ImageFlipbookRenderer.getDefinition().supports(point.getPointLocator().getDataTypeId()))
+            if (ImageFlipbookRenderer.getDefinition().supports(point.getPointLocator().getDataTypeId())) {
                 model.put("flipbookLimit", 10);
+            }
 
             model.put("currentXid", point.getXid());
         }

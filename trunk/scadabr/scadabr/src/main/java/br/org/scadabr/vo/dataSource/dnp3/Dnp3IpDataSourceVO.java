@@ -8,104 +8,108 @@ import java.util.Map;
 
 import br.org.scadabr.rt.dataSource.dnp3.Dnp3IpDataSource;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
 public class Dnp3IpDataSourceVO extends Dnp3DataSourceVO<Dnp3IpDataSourceVO> {
-	public static final Type TYPE = Type.DNP3_IP;
 
-	@Override
-	public LocalizableMessage getConnectionDescription() {
-		return new LocalizableMessage("common.default", host + ":" + port);
-	}
+    public static final Type TYPE = Type.DNP3_IP;
 
-	@Override
-	public Type getType() {
-		return TYPE;
-	}
+    @Override
+    public LocalizableMessage getConnectionDescription() {
+        return new LocalizableMessageImpl("common.default", host + ":" + port);
+    }
 
-	@Override
-	public DataSourceRT createDataSourceRT() {
-		return new Dnp3IpDataSource(this);
-	}
+    @Override
+    public Type getType() {
+        return TYPE;
+    }
 
-	@JsonRemoteProperty
-	private String host = "localhost";
-	@JsonRemoteProperty
-	private int port = 20000;
+    @Override
+    public DataSourceRT createDataSourceRT() {
+        return new Dnp3IpDataSource(this);
+    }
 
-	public String getHost() {
-		return host;
-	}
+    @JsonRemoteProperty
+    private String host = "localhost";
+    @JsonRemoteProperty
+    private int port = 20000;
 
-	public void setHost(String host) {
-		this.host = host;
-	}
+    public String getHost() {
+        return host;
+    }
 
-	public int getPort() {
-		return port;
-	}
+    public void setHost(String host) {
+        this.host = host;
+    }
 
-	public void setPort(int port) {
-		this.port = port;
-	}
+    public int getPort() {
+        return port;
+    }
 
-	@Override
-	public void validate(DwrResponseI18n response) {
-		super.validate(response);
-		if (StringUtils.isEmpty(host))
-			response.addContextualMessage("host", "validate.required");
-		if (port <= 0 || port > 0xffff)
-			response.addContextualMessage("port", "validate.invalidValue");
-	}
+    public void setPort(int port) {
+        this.port = port;
+    }
 
-	@Override
-	protected void addPropertyChangesImpl(List<LocalizableMessage> list,
-			Dnp3IpDataSourceVO from) {
-		// TODO Auto-generated method stub
+    @Override
+    public void validate(DwrResponseI18n response) {
+        super.validate(response);
+        if (StringUtils.isEmpty(host)) {
+            response.addContextualMessage("host", "validate.required");
+        }
+        if (port <= 0 || port > 0xffff) {
+            response.addContextualMessage("port", "validate.invalidValue");
+        }
+    }
 
-	}
+    @Override
+    protected void addPropertyChangesImpl(List<LocalizableMessage> list,
+            Dnp3IpDataSourceVO from) {
+        // TODO Auto-generated method stub
 
-	private static final long serialVersionUID = -1;
-	private static final int version = 1;
+    }
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(version);
-		SerializationHelper.writeSafeUTF(out, host);
-		out.writeInt(port);
-	}
+    private static final long serialVersionUID = -1;
+    private static final int version = 1;
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int ver = in.readInt();
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(version);
+        SerializationHelper.writeSafeUTF(out, host);
+        out.writeInt(port);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        int ver = in.readInt();
 		// Switch on the version of the class so that version changes can be
-		// elegantly handled.
-		if (ver == 1) {
-			host = SerializationHelper.readSafeUTF(in);
-			port = in.readInt();
-		}
-	}
+        // elegantly handled.
+        if (ver == 1) {
+            host = SerializationHelper.readSafeUTF(in);
+            port = in.readInt();
+        }
+    }
 
-	@Override
-	public void jsonDeserialize(JsonReader reader, JsonObject json)
-			throws JsonException {
-		super.jsonDeserialize(reader, json);
+    @Override
+    public void jsonDeserialize(JsonReader reader, JsonObject json)
+            throws JsonException {
+        super.jsonDeserialize(reader, json);
 
-	}
+    }
 
-	@Override
-	public void jsonSerialize(Map<String, Object> map) {
-		super.jsonSerialize(map);
+    @Override
+    public void jsonSerialize(Map<String, Object> map) {
+        super.jsonSerialize(map);
 
-	}
+    }
 
 }

@@ -1,13 +1,13 @@
 /**
  * ModbusPointConfig.java
  *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ * This file was auto-generated from WSDL by the Apache Axis 1.4 Apr 22, 2006
+ * (06:55:48 PDT) WSDL2Java emitter.
  */
-
 package br.org.scadabr.api.vo;
 
-public class ModbusPointConfig  implements java.io.Serializable {
+public class ModbusPointConfig implements java.io.Serializable {
+
     private int id;
 
     private boolean enabled;
@@ -32,222 +32,202 @@ public class ModbusPointConfig  implements java.io.Serializable {
     }
 
     public ModbusPointConfig(
-           int id,
-           boolean enabled,
-           java.lang.String name,
-           java.lang.Integer slaveId,
-           br.org.scadabr.api.constants.ModbusRegisterRange registerRange,
-           br.org.scadabr.api.constants.ModbusDataType dataType,
-           boolean settable,
-           java.lang.Integer offset,
-           java.lang.Integer multiplier,
-           java.lang.Integer aditive) {
-           this.id = id;
-           this.enabled = enabled;
-           this.name = name;
-           this.slaveId = slaveId;
-           this.registerRange = registerRange;
-           this.dataType = dataType;
-           this.settable = settable;
-           this.offset = offset;
-           this.multiplier = multiplier;
-           this.aditive = aditive;
+            int id,
+            boolean enabled,
+            java.lang.String name,
+            java.lang.Integer slaveId,
+            br.org.scadabr.api.constants.ModbusRegisterRange registerRange,
+            br.org.scadabr.api.constants.ModbusDataType dataType,
+            boolean settable,
+            java.lang.Integer offset,
+            java.lang.Integer multiplier,
+            java.lang.Integer aditive) {
+        this.id = id;
+        this.enabled = enabled;
+        this.name = name;
+        this.slaveId = slaveId;
+        this.registerRange = registerRange;
+        this.dataType = dataType;
+        this.settable = settable;
+        this.offset = offset;
+        this.multiplier = multiplier;
+        this.aditive = aditive;
     }
-
 
     /**
      * Gets the id value for this ModbusPointConfig.
-     * 
+     *
      * @return id
      */
     public int getId() {
         return id;
     }
 
-
     /**
      * Sets the id value for this ModbusPointConfig.
-     * 
+     *
      * @param id
      */
     public void setId(int id) {
         this.id = id;
     }
 
-
     /**
      * Gets the enabled value for this ModbusPointConfig.
-     * 
+     *
      * @return enabled
      */
     public boolean isEnabled() {
         return enabled;
     }
 
-
     /**
      * Sets the enabled value for this ModbusPointConfig.
-     * 
+     *
      * @param enabled
      */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
-
     /**
      * Gets the name value for this ModbusPointConfig.
-     * 
+     *
      * @return name
      */
     public java.lang.String getName() {
         return name;
     }
 
-
     /**
      * Sets the name value for this ModbusPointConfig.
-     * 
+     *
      * @param name
      */
     public void setName(java.lang.String name) {
         this.name = name;
     }
 
-
     /**
      * Gets the slaveId value for this ModbusPointConfig.
-     * 
+     *
      * @return slaveId
      */
     public java.lang.Integer getSlaveId() {
         return slaveId;
     }
 
-
     /**
      * Sets the slaveId value for this ModbusPointConfig.
-     * 
+     *
      * @param slaveId
      */
     public void setSlaveId(java.lang.Integer slaveId) {
         this.slaveId = slaveId;
     }
 
-
     /**
      * Gets the registerRange value for this ModbusPointConfig.
-     * 
+     *
      * @return registerRange
      */
     public br.org.scadabr.api.constants.ModbusRegisterRange getRegisterRange() {
         return registerRange;
     }
 
-
     /**
      * Sets the registerRange value for this ModbusPointConfig.
-     * 
+     *
      * @param registerRange
      */
     public void setRegisterRange(br.org.scadabr.api.constants.ModbusRegisterRange registerRange) {
         this.registerRange = registerRange;
     }
 
-
     /**
      * Gets the dataType value for this ModbusPointConfig.
-     * 
+     *
      * @return dataType
      */
     public br.org.scadabr.api.constants.ModbusDataType getDataType() {
         return dataType;
     }
 
-
     /**
      * Sets the dataType value for this ModbusPointConfig.
-     * 
+     *
      * @param dataType
      */
     public void setDataType(br.org.scadabr.api.constants.ModbusDataType dataType) {
         this.dataType = dataType;
     }
 
-
     /**
      * Gets the settable value for this ModbusPointConfig.
-     * 
+     *
      * @return settable
      */
     public boolean isSettable() {
         return settable;
     }
 
-
     /**
      * Sets the settable value for this ModbusPointConfig.
-     * 
+     *
      * @param settable
      */
     public void setSettable(boolean settable) {
         this.settable = settable;
     }
 
-
     /**
      * Gets the offset value for this ModbusPointConfig.
-     * 
+     *
      * @return offset
      */
     public java.lang.Integer getOffset() {
         return offset;
     }
 
-
     /**
      * Sets the offset value for this ModbusPointConfig.
-     * 
+     *
      * @param offset
      */
     public void setOffset(java.lang.Integer offset) {
         this.offset = offset;
     }
 
-
     /**
      * Gets the multiplier value for this ModbusPointConfig.
-     * 
+     *
      * @return multiplier
      */
     public java.lang.Integer getMultiplier() {
         return multiplier;
     }
 
-
     /**
      * Sets the multiplier value for this ModbusPointConfig.
-     * 
+     *
      * @param multiplier
      */
     public void setMultiplier(java.lang.Integer multiplier) {
         this.multiplier = multiplier;
     }
 
-
     /**
      * Gets the aditive value for this ModbusPointConfig.
-     * 
+     *
      * @return aditive
      */
     public java.lang.Integer getAditive() {
         return aditive;
     }
 
-
     /**
      * Sets the aditive value for this ModbusPointConfig.
-     * 
+     *
      * @param aditive
      */
     public void setAditive(java.lang.Integer aditive) {
@@ -255,46 +235,54 @@ public class ModbusPointConfig  implements java.io.Serializable {
     }
 
     private java.lang.Object __equalsCalc = null;
+
     public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof ModbusPointConfig)) return false;
+        if (!(obj instanceof ModbusPointConfig)) {
+            return false;
+        }
         ModbusPointConfig other = (ModbusPointConfig) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
+        if (obj == null) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
         if (__equalsCalc != null) {
             return (__equalsCalc == obj);
         }
         __equalsCalc = obj;
         boolean _equals;
-        _equals = true && 
-            this.id == other.getId() &&
-            this.enabled == other.isEnabled() &&
-            ((this.name==null && other.getName()==null) || 
-             (this.name!=null &&
-              this.name.equals(other.getName()))) &&
-            ((this.slaveId==null && other.getSlaveId()==null) || 
-             (this.slaveId!=null &&
-              this.slaveId.equals(other.getSlaveId()))) &&
-            ((this.registerRange==null && other.getRegisterRange()==null) || 
-             (this.registerRange!=null &&
-              this.registerRange.equals(other.getRegisterRange()))) &&
-            ((this.dataType==null && other.getDataType()==null) || 
-             (this.dataType!=null &&
-              this.dataType.equals(other.getDataType()))) &&
-            this.settable == other.isSettable() &&
-            ((this.offset==null && other.getOffset()==null) || 
-             (this.offset!=null &&
-              this.offset.equals(other.getOffset()))) &&
-            ((this.multiplier==null && other.getMultiplier()==null) || 
-             (this.multiplier!=null &&
-              this.multiplier.equals(other.getMultiplier()))) &&
-            ((this.aditive==null && other.getAditive()==null) || 
-             (this.aditive!=null &&
-              this.aditive.equals(other.getAditive())));
+        _equals = true
+                && this.id == other.getId()
+                && this.enabled == other.isEnabled()
+                && ((this.name == null && other.getName() == null)
+                || (this.name != null
+                && this.name.equals(other.getName())))
+                && ((this.slaveId == null && other.getSlaveId() == null)
+                || (this.slaveId != null
+                && this.slaveId.equals(other.getSlaveId())))
+                && ((this.registerRange == null && other.getRegisterRange() == null)
+                || (this.registerRange != null
+                && this.registerRange.equals(other.getRegisterRange())))
+                && ((this.dataType == null && other.getDataType() == null)
+                || (this.dataType != null
+                && this.dataType.equals(other.getDataType())))
+                && this.settable == other.isSettable()
+                && ((this.offset == null && other.getOffset() == null)
+                || (this.offset != null
+                && this.offset.equals(other.getOffset())))
+                && ((this.multiplier == null && other.getMultiplier() == null)
+                || (this.multiplier != null
+                && this.multiplier.equals(other.getMultiplier())))
+                && ((this.aditive == null && other.getAditive() == null)
+                || (this.aditive != null
+                && this.aditive.equals(other.getAditive())));
         __equalsCalc = null;
         return _equals;
     }
 
     private boolean __hashCodeCalc = false;
+
     public synchronized int hashCode() {
         if (__hashCodeCalc) {
             return 0;
@@ -330,8 +318,8 @@ public class ModbusPointConfig  implements java.io.Serializable {
     }
 
     // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(ModbusPointConfig.class, true);
+    private static org.apache.axis.description.TypeDesc typeDesc
+            = new org.apache.axis.description.TypeDesc(ModbusPointConfig.class, true);
 
     static {
         typeDesc.setXmlType(new javax.xml.namespace.QName("http://vo.api.scadabr.org.br", "ModbusPointConfig"));
@@ -408,24 +396,22 @@ public class ModbusPointConfig  implements java.io.Serializable {
      * Get Custom Serializer
      */
     public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
+            java.lang.String mechType,
+            java.lang.Class _javaType,
+            javax.xml.namespace.QName _xmlType) {
+        return new org.apache.axis.encoding.ser.BeanSerializer(
+                _javaType, _xmlType, typeDesc);
     }
 
     /**
      * Get Custom Deserializer
      */
     public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+            java.lang.String mechType,
+            java.lang.Class _javaType,
+            javax.xml.namespace.QName _xmlType) {
+        return new org.apache.axis.encoding.ser.BeanDeserializer(
+                _javaType, _xmlType, typeDesc);
     }
 
 }

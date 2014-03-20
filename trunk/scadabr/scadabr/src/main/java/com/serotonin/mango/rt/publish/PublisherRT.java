@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.publish;
 
@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.PublisherDao;
 import com.serotonin.mango.rt.RuntimeManager;
@@ -36,14 +36,16 @@ import com.serotonin.mango.util.timeout.TimeoutClient;
 import com.serotonin.mango.util.timeout.TimeoutTask;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
-import com.serotonin.timer.FixedRateTrigger;
-import com.serotonin.timer.TimerTask;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.timer.FixedRateTrigger;
+import br.org.scadabr.timer.TimerTask;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 abstract public class PublisherRT<T extends PublishedPointVO> implements TimeoutClient {
+
     public static final int POINT_DISABLED_EVENT = 1;
     public static final int QUEUE_SIZE_WARNING_EVENT = 2;
 
@@ -81,30 +83,37 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
     }
 
     /**
-     * This method is usable by subclasses to retrieve serializable data stored using the setPersistentData method.
+     * This method is usable by subclasses to retrieve serializable data stored
+     * using the setPersistentData method.
      */
     public Object getPersistentData(String key) {
         synchronized (persistentDataLock) {
             @SuppressWarnings("unchecked")
             Map<String, Object> map = (Map<String, Object>) new PublisherDao().getPersistentData(vo.getId());
-            if (map != null)
+            if (map != null) {
                 return map.get(key);
+            }
             return null;
         }
     }
 
     /**
-     * This method is usable by subclasses to store any type of serializable data. This intention is to provide a
-     * mechanism for publisher RTs to be able to persist data between runs. Normally this method would at least be
-     * called in the terminate method, but may also be called regularly for failover purposes.
+     * This method is usable by subclasses to store any type of serializable
+     * data. This intention is to provide a mechanism for publisher RTs to be
+     * able to persist data between runs. Normally this method would at least be
+     * called in the terminate method, but may also be called regularly for
+     * failover purposes.
+     *
+     * @param key
      */
     public void setPersistentData(String key, Object persistentData) {
         PublisherDao dao = new PublisherDao();
         synchronized (persistentDataLock) {
             @SuppressWarnings("unchecked")
             Map<String, Object> map = (Map<String, Object>) dao.getPersistentData(vo.getId());
-            if (map == null)
-                map = new HashMap<String, Object>();
+            if (map == null) {
+                map = new HashMap<>();
+            }
 
             map.put(key, persistentData);
 
@@ -147,19 +156,20 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
 
         if (pointDisabledEventActive != foundDisabledPoint) {
             pointDisabledEventActive = foundDisabledPoint;
-            if (pointDisabledEventActive)
-                // A published point has been terminated, was never enabled, or no longer exists.
+            if (pointDisabledEventActive) // A published point has been terminated, was never enabled, or no longer exists.
+            {
                 Common.ctx.getEventManager().raiseEvent(pointDisabledEventType, System.currentTimeMillis(), true,
-                        AlarmLevels.URGENT, new LocalizableMessage("event.publish.pointMissing"), createEventContext());
-            else
-                // Everything is good
+                        AlarmLevels.URGENT, new LocalizableMessageImpl("event.publish.pointMissing"), createEventContext());
+            } else // Everything is good
+            {
                 Common.ctx.getEventManager().returnToNormal(pointDisabledEventType, System.currentTimeMillis());
+            }
         }
     }
 
     void fireQueueSizeWarningEvent() {
         Common.ctx.getEventManager().raiseEvent(queueSizeWarningEventType, System.currentTimeMillis(), true,
-                AlarmLevels.URGENT, new LocalizableMessage("event.publish.queueSize", vo.getCacheWarningSize()),
+                AlarmLevels.URGENT, new LocalizableMessageImpl("event.publish.queueSize", vo.getCacheWarningSize()),
                 createEventContext());
     }
 
@@ -168,7 +178,7 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
     }
 
     protected Map<String, Object> createEventContext() {
-        Map<String, Object> context = new HashMap<String, Object>();
+        Map<String, Object> context = new HashMap<>();
         context.put("publisher", vo);
         return context;
     }
@@ -183,8 +193,9 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
         this.sendThread = sendThread;
         sendThread.initialize();
 
-        for (T p : vo.getPoints())
-            pointRTs.add(new PublishedPointRT<T>(p, this));
+        for (T p : vo.getPoints()) {
+            pointRTs.add(new PublishedPointRT<>(p, this));
+        }
 
         if (vo.isSendSnapshot()) {
             // Add a schedule to send the snapshot
@@ -200,12 +211,14 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
         sendThread.joinTermination();
 
         // Unschedule any job that is running.
-        if (snapshotTask != null)
+        if (snapshotTask != null) {
             snapshotTask.cancel();
+        }
 
         // Terminate the point listeners
-        for (PublishedPointRT<T> rt : pointRTs)
+        for (PublishedPointRT<T> rt : pointRTs) {
             rt.terminate();
+        }
 
         // Remove any outstanding events.
         Common.ctx.getEventManager().cancelEventsForPublisher(getId());
@@ -216,11 +229,12 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
         if (localThread != null) {
             try {
                 localThread.join(30000); // 30 seconds
+            } catch (InterruptedException e) { /* no op */
+
             }
-            catch (InterruptedException e) { /* no op */
-            }
-            if (jobThread != null)
+            if (jobThread != null) {
                 throw new ShouldNeverHappenException("Timeout waiting for publisher to stop: id=" + getId());
+            }
         }
     }
 
@@ -228,9 +242,11 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
     //
     // Scheduled snapshot send stuff
     //
+    @Override
     public void scheduleTimeout(long fireTime) {
-        if (jobThread != null)
+        if (jobThread != null) {
             return;
+        }
 
         jobThread = Thread.currentThread();
 
@@ -242,14 +258,14 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
                         DataPointRT dp = rm.getDataPoint(rt.getVo().getDataPointId());
                         if (dp != null) {
                             PointValueTime pvt = dp.getPointValue();
-                            if (pvt != null)
+                            if (pvt != null) {
                                 publish(rt.getVo(), pvt);
+                            }
                         }
                     }
                 }
             }
-        }
-        finally {
+        } finally {
             jobThread = null;
         }
     }

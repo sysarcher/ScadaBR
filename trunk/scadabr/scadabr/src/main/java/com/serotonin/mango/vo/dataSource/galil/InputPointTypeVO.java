@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.galil;
 
@@ -24,25 +24,27 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.galil.InputPointTypeRT;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.LocalizableJsonException;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class InputPointTypeVO extends PointTypeVO {
-    private static final int[] EXCLUDE_DATA_TYPES = { DataTypes.ALPHANUMERIC, DataTypes.IMAGE, DataTypes.MULTISTATE };
+
+    private static final int[] EXCLUDE_DATA_TYPES = {DataTypes.ALPHANUMERIC, DataTypes.IMAGE, DataTypes.MULTISTATE};
 
     private int dataTypeId = DataTypes.BINARY;
     @JsonRemoteProperty
@@ -73,7 +75,7 @@ public class InputPointTypeVO extends PointTypeVO {
 
     @Override
     public LocalizableMessage getDescription() {
-        return new LocalizableMessage("dsEdit.galil.pointType.input");
+        return new LocalizableMessageImpl("dsEdit.galil.pointType.input");
     }
 
     @Override
@@ -83,20 +85,24 @@ public class InputPointTypeVO extends PointTypeVO {
 
     @Override
     public void validate(DwrResponseI18n response) {
-        if (!DataTypes.CODES.isValidId(dataTypeId, EXCLUDE_DATA_TYPES))
+        if (!DataTypes.CODES.isValidId(dataTypeId, EXCLUDE_DATA_TYPES)) {
             response.addContextualMessage("dataTypeId", "validate.invalidValue");
+        }
 
         if (dataTypeId == DataTypes.BINARY) {
-            if (inputId < 1 || inputId > 96)
+            if (inputId < 1 || inputId > 96) {
                 response.addContextualMessage("inputPointType.inputId", "validate.1to96");
-        }
-        else {
-            if (inputId < 1 || inputId > 8)
+            }
+        } else {
+            if (inputId < 1 || inputId > 8) {
                 response.addContextualMessage("inputPointType.inputId", "validate.1to8");
-            if (scaleRawHigh <= scaleRawLow)
+            }
+            if (scaleRawHigh <= scaleRawLow) {
                 response.addContextualMessage("inputPointType.scaleRawHighId", "validate.greaterThanRawLow");
-            if (scaleEngHigh <= scaleEngLow)
+            }
+            if (scaleEngHigh <= scaleEngLow) {
                 response.addContextualMessage("inputPointType.scaleEngHighId", "validate.greaterThanEngLow");
+            }
         }
     }
 
@@ -204,9 +210,10 @@ public class InputPointTypeVO extends PointTypeVO {
         String text = json.getString("dataType");
         if (text != null) {
             dataTypeId = DataTypes.CODES.getId(text);
-            if (!DataTypes.CODES.isValidId(dataTypeId, EXCLUDE_DATA_TYPES))
+            if (!DataTypes.CODES.isValidId(dataTypeId, EXCLUDE_DATA_TYPES)) {
                 throw new LocalizableJsonException("emport.error.invalid", "dataType", text, DataTypes.CODES
                         .getCodeList(EXCLUDE_DATA_TYPES));
+            }
         }
     }
 

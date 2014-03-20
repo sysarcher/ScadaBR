@@ -1,12 +1,12 @@
 package com.serotonin.mango.db;
 
 public class DatabaseAccessUtils {
+
     public String decrypt(String input) {
         return input;
     }
 
     //  private static final String ALGORITHM = "Blowfish";
-
     //    public String decrypt(String input) {
     //        StringEncrypter se = new StringEncrypter("TR58yrqPswXJubYGiRdARw==", ALGORITHM);
     //        return se.decodeToString(input);

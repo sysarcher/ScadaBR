@@ -30,18 +30,19 @@ import net.sf.openv4j.DataPoint;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.openv4j.OpenV4JPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 // Container to move data with json and ajax so ony basic datatypes
 @JsonRemoteEntity
@@ -59,25 +60,25 @@ public class OpenV4JPointLocatorVO extends AbstractPointLocatorVO implements Jso
             return DataTypes.UNKNOWN;
         }
         switch (dataPoint.getType()) {
-        case BOOL:
-            return DataTypes.BINARY;
-        case SHORT_HEX:
-        case CYCLE_TIMES:
-        case ERROR_LIST_ENTRY:
-        case TIME_STAMP_8:
-            return DataTypes.ALPHANUMERIC;
-        case BYTE:
-        case SHORT:
-        case INTEGER:
-            return DataTypes.NUMERIC;
-        default:
-            return DataTypes.UNKNOWN;
+            case BOOL:
+                return DataTypes.BINARY;
+            case SHORT_HEX:
+            case CYCLE_TIMES:
+            case ERROR_LIST_ENTRY:
+            case TIME_STAMP_8:
+                return DataTypes.ALPHANUMERIC;
+            case BYTE:
+            case SHORT:
+            case INTEGER:
+                return DataTypes.NUMERIC;
+            default:
+                return DataTypes.UNKNOWN;
         }
     }
 
     @Override
     public LocalizableMessage getConfigurationDescription() {
-        return new LocalizableMessage("dsEdit.openv4j", "Something", "I dont know");
+        return new LocalizableMessageImpl("dsEdit.openv4j", "Something", "I dont know");
     }
 
     @Override
@@ -124,19 +125,18 @@ public class OpenV4JPointLocatorVO extends AbstractPointLocatorVO implements Jso
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         switch (ver) {
-        case 1:
-            String s = SerializationHelper.readSafeUTF(in);
-            try {
-                dataPoint = DataPoint.valueOf(s);
-            }
-            catch (IllegalArgumentException ex) {
-                LOG.fatal("UNKNOWN DataPoint: " + s);
+            case 1:
+                String s = SerializationHelper.readSafeUTF(in);
+                try {
+                    dataPoint = DataPoint.valueOf(s);
+                } catch (IllegalArgumentException ex) {
+                    LOG.fatal("UNKNOWN DataPoint: " + s);
+                    dataPoint = DataPoint.COMMON_CONFIG_DEVICE_TYPE_ID;
+                }
+                break;
+            default:
+                LOG.fatal("Version fall trough DataPoint unknown");
                 dataPoint = DataPoint.COMMON_CONFIG_DEVICE_TYPE_ID;
-            }
-            break;
-        default:
-            LOG.fatal("Version fall trough DataPoint unknown");
-            dataPoint = DataPoint.COMMON_CONFIG_DEVICE_TYPE_ID;
 
         }
     }
@@ -171,8 +171,7 @@ public class OpenV4JPointLocatorVO extends AbstractPointLocatorVO implements Jso
     }
 
     /**
-     * @param property
-     *            the dataPoint to set
+     * @param property the dataPoint to set
      */
     public void setDataPointName(String dataPointName) {
         dataPoint = DataPoint.valueOf(dataPointName);

@@ -11,121 +11,121 @@ import com.serotonin.mango.Common;
 
 public class ConfigurationDB {
 
-	public static void copy(File src, File dst) throws IOException {
-		InputStream in = new FileInputStream(src);
-		OutputStream out = new FileOutputStream(dst);
+    public static void copy(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
 
-		byte[] buf = new byte[2048];
-		int len;
-		while ((len = in.read(buf)) > 0) {
-			out.write(buf, 0, len);
-		}
-		in.close();
-		out.close();
-	}
+        byte[] buf = new byte[2048];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        in.close();
+        out.close();
+    }
 
-	public static void useDerbyDB() {
+    public static void useDerbyDB() {
 
-		String fileSeparator = System.getProperty("file.separator");
+        String fileSeparator = System.getProperty("file.separator");
 
-		String path = Common.ctx.getServletContext().getRealPath("");
+        String path = Common.ctx.getServletContext().getRealPath("");
 
-		boolean win = false;
+        boolean win = false;
 
-		File envFile = null;
+        File envFile = null;
 
-		if (fileSeparator.equals("\\")) {
-			path = path + "\\" + "WEB-INF" + "\\" + "classes" + "\\";
-			envFile = new File(path + "\\" + "env.properties");
-			win = true;
-		}
+        if (fileSeparator.equals("\\")) {
+            path = path + "\\" + "WEB-INF" + "\\" + "classes" + "\\";
+            envFile = new File(path + "\\" + "env.properties");
+            win = true;
+        }
 
-		if (fileSeparator.equals("/")) {
-			path = path + "/" + "WEB-INF" + "/" + "classes" + "/";
-			envFile = new File(path + "/" + "env.properties");
-		}
+        if (fileSeparator.equals("/")) {
+            path = path + "/" + "WEB-INF" + "/" + "classes" + "/";
+            envFile = new File(path + "/" + "env.properties");
+        }
 
-		System.out.println("envFile exists: " + envFile.exists());
+        System.out.println("envFile exists: " + envFile.exists());
 
-		if (envFile.exists()) {
+        if (envFile.exists()) {
 
-			if (win) {
-				File derbyFile = new File(path + "\\" + "env.properties.derby");
+            if (win) {
+                File derbyFile = new File(path + "\\" + "env.properties.derby");
 
-				if (derbyFile.exists()) {
-					try {
-						ConfigurationDB.copy(derbyFile, envFile);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
+                if (derbyFile.exists()) {
+                    try {
+                        ConfigurationDB.copy(derbyFile, envFile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
 
-			} else {
-				File derbyFile = new File(path + "/" + "env.properties.derby");
+            } else {
+                File derbyFile = new File(path + "/" + "env.properties.derby");
 
-				if (derbyFile.exists()) {
-					try {
-						ConfigurationDB.copy(derbyFile, envFile);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
+                if (derbyFile.exists()) {
+                    try {
+                        ConfigurationDB.copy(derbyFile, envFile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 
-		}
+        }
 
-	}
+    }
 
-	public static void useMysqlDB() {
+    public static void useMysqlDB() {
 
-		String fileSeparator = System.getProperty("file.separator");
+        String fileSeparator = System.getProperty("file.separator");
 
-		String path = Common.ctx.getServletContext().getRealPath("");
+        String path = Common.ctx.getServletContext().getRealPath("");
 
-		boolean win = false;
+        boolean win = false;
 
-		File envFile = null;
+        File envFile = null;
 
-		if (fileSeparator.equals("\\")) {
-			path = path + "\\" + "WEB-INF" + "\\" + "classes" + "\\";
-			envFile = new File(path + "\\" + "env.properties");
-			win = true;
-		}
+        if (fileSeparator.equals("\\")) {
+            path = path + "\\" + "WEB-INF" + "\\" + "classes" + "\\";
+            envFile = new File(path + "\\" + "env.properties");
+            win = true;
+        }
 
-		if (fileSeparator.equals("/")) {
-			path = path + "/" + "WEB-INF" + "/" + "classes" + "/";
-			envFile = new File(path + "/" + "env.properties");
-		}
+        if (fileSeparator.equals("/")) {
+            path = path + "/" + "WEB-INF" + "/" + "classes" + "/";
+            envFile = new File(path + "/" + "env.properties");
+        }
 
-		if (envFile.exists()) {
+        if (envFile.exists()) {
 
-			if (win) {
-				File mysqlFile = new File(path + "\\" + "env.properties.mysql");
+            if (win) {
+                File mysqlFile = new File(path + "\\" + "env.properties.mysql");
 
-				if (mysqlFile.exists()) {
-					try {
-						ConfigurationDB.copy(mysqlFile, envFile);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
+                if (mysqlFile.exists()) {
+                    try {
+                        ConfigurationDB.copy(mysqlFile, envFile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
 
-			} else {
-				File mysqlFile = new File(path + "/" + "env.properties.mysql");
+            } else {
+                File mysqlFile = new File(path + "/" + "env.properties.mysql");
 
-				if (mysqlFile.exists()) {
-					try {
-						ConfigurationDB.copy(mysqlFile, envFile);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
+                if (mysqlFile.exists()) {
+                    try {
+                        ConfigurationDB.copy(mysqlFile, envFile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 
-		}
-	}
+        }
+    }
 
-	public static void useMssqlDB() {
+    public static void useMssqlDB() {
 
-	}
+    }
 }

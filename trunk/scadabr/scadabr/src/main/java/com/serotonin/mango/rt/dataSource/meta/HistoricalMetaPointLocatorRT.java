@@ -11,10 +11,11 @@ import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
-import com.serotonin.timer.SimulationTimer;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.timer.SimulationTimer;
+import br.org.scadabr.web.i18n.LocalizableMessage;
 
 public class HistoricalMetaPointLocatorRT extends MetaPointLocatorRT {
+
     private long updates;
 
     public HistoricalMetaPointLocatorRT(MetaPointLocatorVO vo) {
@@ -27,7 +28,7 @@ public class HistoricalMetaPointLocatorRT extends MetaPointLocatorRT {
         initialized = true;
         initializeTimerTask();
 
-        context = new HashMap<String, IDataPoint>();
+        context = new HashMap<>();
         DataPointDao dataPointDao = new DataPointDao();
         PointValueDao pointValueDao = new PointValueDao();
         for (IntValuePair contextEntry : vo.getContext()) {
@@ -42,8 +43,9 @@ public class HistoricalMetaPointLocatorRT extends MetaPointLocatorRT {
     public void terminate() {
         synchronized (LOCK) {
             // Cancel scheduled job
-            if (timerTask != null)
+            if (timerTask != null) {
                 timerTask.cancel();
+            }
         }
     }
 

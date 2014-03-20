@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.view.chart;
 
@@ -23,14 +23,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.util.LocalizableJsonException;
 
 abstract public class TimePeriodChartRenderer extends BaseChartRenderer {
+
     private int timePeriod;
     @JsonRemoteProperty
     private int numberOfPeriods;
@@ -102,14 +103,16 @@ abstract public class TimePeriodChartRenderer extends BaseChartRenderer {
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
         String text = json.getString("timePeriodType");
-        if (text == null)
+        if (text == null) {
             throw new LocalizableJsonException("emport.error.chart.missing", "timePeriodType", Common.TIME_PERIOD_CODES
                     .getCodeList());
+        }
 
         timePeriod = Common.TIME_PERIOD_CODES.getId(text);
-        if (timePeriod == -1)
+        if (timePeriod == -1) {
             throw new LocalizableJsonException("emport.error.chart.invalid", "timePeriodType", text,
                     Common.TIME_PERIOD_CODES.getCodeList());
+        }
     }
 
     @Override

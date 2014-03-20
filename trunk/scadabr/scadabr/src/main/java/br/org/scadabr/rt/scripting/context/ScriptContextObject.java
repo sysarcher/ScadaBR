@@ -6,79 +6,84 @@ import java.util.List;
 import com.serotonin.mango.vo.User;
 
 public abstract class ScriptContextObject {
-	public enum Type {
-		DATASOURCE_COMMANDS(1, "script.dsCommands", "scriptDSObject") {
-			@Override
-			public ScriptContextObject createScriptContextObject() {
-				return new DSCommandsScriptContextObject();
-			}
-		},
-		DATAPOINT_COMMANDS(2, "script.dpCommands", "scriptDPObject") {
-			@Override
-			public ScriptContextObject createScriptContextObject() {
-				return new DPCommandsScriptContextObject();
-			}
-		};
 
-		private Type(int id, String key, String help) {
-			this.id = id;
-			this.key = key;
-			this.help = help;
-		}
+    public enum Type {
 
-		private final int id;
-		private final String key;
-		private final String help;
+        DATASOURCE_COMMANDS(1, "script.dsCommands", "scriptDSObject") {
+                    @Override
+                    public ScriptContextObject createScriptContextObject() {
+                        return new DSCommandsScriptContextObject();
+                    }
+                },
+        DATAPOINT_COMMANDS(2, "script.dpCommands", "scriptDPObject") {
+                    @Override
+                    public ScriptContextObject createScriptContextObject() {
+                        return new DPCommandsScriptContextObject();
+                    }
+                };
 
-		public int getId() {
-			return id;
-		}
+        private Type(int id, String key, String help) {
+            this.id = id;
+            this.key = key;
+            this.help = help;
+        }
 
-		public String getKey() {
-			return key;
-		}
+        private final int id;
+        private final String key;
+        private final String help;
 
-		public String getHelp() {
-			return help;
-		}
+        public int getId() {
+            return id;
+        }
 
-		public abstract ScriptContextObject createScriptContextObject();
+        public String getKey() {
+            return key;
+        }
 
-		public static Type valueOf(int id) {
-			for (Type type : values()) {
-				if (type.id == id)
-					return type;
-			}
-			return null;
-		}
+        public String getHelp() {
+            return help;
+        }
 
-		public static Type valueOfIgnoreCase(String text) {
-			for (Type type : values()) {
-				if (type.name().equalsIgnoreCase(text))
-					return type;
-			}
-			return null;
-		}
+        public abstract ScriptContextObject createScriptContextObject();
 
-		public static List<String> getTypeList() {
-			List<String> result = new ArrayList<String>();
-			for (Type type : values())
-				result.add(type.name());
-			return result;
-		}
+        public static Type valueOf(int id) {
+            for (Type type : values()) {
+                if (type.id == id) {
+                    return type;
+                }
+            }
+            return null;
+        }
 
-	}
+        public static Type valueOfIgnoreCase(String text) {
+            for (Type type : values()) {
+                if (type.name().equalsIgnoreCase(text)) {
+                    return type;
+                }
+            }
+            return null;
+        }
 
-	protected User user;
+        public static List<String> getTypeList() {
+            List<String> result = new ArrayList<String>();
+            for (Type type : values()) {
+                result.add(type.name());
+            }
+            return result;
+        }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    }
 
-	abstract public Type getType();
+    protected User user;
 
-	public void test() {
-		System.out.println("User: " + user.getUsername());
-		System.out.println("Testing " + getType().getKey() + " context object");
-	}
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    abstract public Type getType();
+
+    public void test() {
+        System.out.println("User: " + user.getUsername());
+        System.out.println("Testing " + getType().getKey() + " context object");
+    }
 }

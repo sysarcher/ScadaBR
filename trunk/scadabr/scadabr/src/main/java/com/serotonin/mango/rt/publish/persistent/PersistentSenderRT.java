@@ -18,10 +18,12 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.publish.persistent.PersistentPointVO;
 import com.serotonin.mango.vo.publish.persistent.PersistentSenderVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.queue.ByteQueue;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.queue.ByteQueue;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 public class PersistentSenderRT extends PublisherRT<PersistentPointVO> {
+
     static final Log LOG = LogFactory.getLog(PersistentSenderRT.class);
 
     public static final int CONNECTION_FAILED_EVENT = 11;
@@ -74,15 +76,17 @@ public class PersistentSenderRT extends PublisherRT<PersistentPointVO> {
 
     public int getSyncStatus() {
         SyncHandler syncHandler = sendThread.syncHandler;
-        if (syncHandler == null)
+        if (syncHandler == null) {
             return -1;
+        }
         return syncHandler.getPointsCompleted();
     }
 
     public int getSyncRequestsSent() {
         SyncHandler syncHandler = sendThread.syncHandler;
-        if (syncHandler == null)
+        if (syncHandler == null) {
             return -1;
+        }
         return syncHandler.getRequestsSent();
     }
 
@@ -133,10 +137,11 @@ public class PersistentSenderRT extends PublisherRT<PersistentPointVO> {
 
     void raiseConnectionEvent(EventType type, Exception e) {
         LocalizableMessage lm;
-        if (e instanceof PersistentAbortException)
+        if (e instanceof PersistentAbortException) {
             lm = ((PersistentAbortException) e).getLocalizableMessage();
-        else
-            lm = new LocalizableMessage("common.default", e.getMessage());
+        } else {
+            lm = new LocalizableMessageImpl("common.default", e.getMessage());
+        }
 
         raiseConnectionEvent(type, lm);
     }

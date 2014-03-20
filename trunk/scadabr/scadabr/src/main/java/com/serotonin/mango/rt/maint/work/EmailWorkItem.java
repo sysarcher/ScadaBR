@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.maint.work;
 
@@ -25,21 +25,23 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.web.email.MangoEmailContent;
-import com.serotonin.web.email.EmailContent;
-import com.serotonin.web.email.EmailSender;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.email.EmailContent;
+import br.org.scadabr.web.email.EmailSender;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
- * 
+ *
  */
 public class EmailWorkItem implements WorkItem {
+
+    @Override
     public int getPriority() {
         return WorkItem.PRIORITY_MEDIUM;
     }
 
     public static void queueEmail(String toAddr, MangoEmailContent content) throws AddressException {
-        queueEmail(new String[] { toAddr }, content);
+        queueEmail(new String[]{toAddr}, content);
     }
 
     public static void queueEmail(String[] toAddrs, MangoEmailContent content) throws AddressException {
@@ -56,8 +58,9 @@ public class EmailWorkItem implements WorkItem {
         EmailWorkItem item = new EmailWorkItem();
 
         item.toAddresses = new InternetAddress[toAddrs.length];
-        for (int i = 0; i < toAddrs.length; i++)
+        for (int i = 0; i < toAddrs.length; i++) {
             item.toAddresses[i] = new InternetAddress(toAddrs[i]);
+        }
 
         item.subject = subject;
         item.content = content;
@@ -72,6 +75,7 @@ public class EmailWorkItem implements WorkItem {
     private EmailContent content;
     private Runnable[] postSendExecution;
 
+    @Override
     public void execute() {
         try {
             if (fromAddress == null) {
@@ -88,22 +92,22 @@ public class EmailWorkItem implements WorkItem {
                     SystemSettingsDao.getBooleanValue(SystemSettingsDao.EMAIL_TLS));
 
             emailSender.send(fromAddress, toAddresses, subject, content);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             String to = "";
             for (InternetAddress addr : toAddresses) {
-                if (to.length() > 0)
+                if (to.length() > 0) {
                     to += ", ";
+                }
                 to += addr.getAddress();
             }
             SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_EMAIL_SEND_FAILURE),
                     System.currentTimeMillis(), false,
-                    new LocalizableMessage("event.email.failure", subject, to, e.getMessage()));
-        }
-        finally {
+                    new LocalizableMessageImpl("event.email.failure", subject, to, e.getMessage()));
+        } finally {
             if (postSendExecution != null) {
-                for (Runnable runnable : postSendExecution)
+                for (Runnable runnable : postSendExecution) {
                     runnable.run();
+                }
             }
         }
     }

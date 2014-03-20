@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.view.conversion;
 
@@ -27,9 +27,10 @@ import com.serotonin.mango.rt.dataImage.types.NumericValue;
 
 /**
  * @author Matthew Lohbihler
- * 
+ *
  */
 public class Conversions {
+
     private static final Map<ConversionType, Conversion> availableConversions = new HashMap<ConversionType, Conversion>();
 
     private static final LinearConversion DEGREES_CELSIUS_TO_DEGREES_FAHRENHEIT = new LinearConversion(1.8, 32);
@@ -68,8 +69,9 @@ public class Conversions {
 
     public static double convert(Integer from, Integer to, double value) {
         Conversion conversion = getConversion(from, to);
-        if (conversion == null)
+        if (conversion == null) {
             return Double.NaN;
+        }
         return conversion.convert(value);
     }
 
@@ -82,6 +84,7 @@ public class Conversions {
     }
 
     static class ConversionType {
+
         private final Integer from;
         private final Integer to;
 

@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.db.upgrade;
 
@@ -28,6 +28,7 @@ import com.serotonin.mango.db.DatabaseAccess;
  * @author Matthew Lohbihler
  */
 public class Upgrade1_12_3 extends DBUpgrade {
+
     @Override
     public void upgrade() throws Exception {
         OutputStream out = createUpdateLogOutputStream("1_12_3");
@@ -49,17 +50,17 @@ public class Upgrade1_12_3 extends DBUpgrade {
     }
 
     private final String[] derbyScript2 = { //
-    "alter table dataSources add column rtdata blob;", //
-            "alter table publishers add column rtdata blob;", //
+        "alter table dataSources add column rtdata blob;", //
+        "alter table publishers add column rtdata blob;", //
     };
 
     private final String[] mssqlScript2 = { //
-    "alter table dataSources add column rtdata image;", //
-            "alter table publishers add column rtdata image;", //
+        "alter table dataSources add column rtdata image;", //
+        "alter table publishers add column rtdata image;", //
     };
 
     private final String[] mysqlScript2 = { //
-    "alter table dataSources add column rtdata longblob;", //
-            "alter table publishers add column rtdata longblob;", //
+        "alter table dataSources add column rtdata longblob;", //
+        "alter table publishers add column rtdata longblob;", //
     };
 }

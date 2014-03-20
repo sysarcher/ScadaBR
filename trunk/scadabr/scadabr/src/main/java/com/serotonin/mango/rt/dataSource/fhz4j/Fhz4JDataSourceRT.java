@@ -42,9 +42,9 @@ import net.sf.fhz4j.FhzWriter;
 import com.serotonin.mango.vo.dataSource.fhz4j.Fhz4JDataSourceVO;
 
 /**
- * 
+ *
  * TODO datatype NUMERIC_INT is missing TODO Starttime for timpepoints ???
- * 
+ *
  */
 public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListener {
 
@@ -52,7 +52,7 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int POINT_READ_EXCEPTION_EVENT = 2;
     public static final int POINT_WRITE_EXCEPTION_EVENT = 3;
-    
+
     // private final long nextRescan = 0;
     private SerialPort sPort;
     private FhzParser parser;
@@ -114,64 +114,64 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
     @Override
     public void fhtDataParsed(FhtMessage fhtMessage) {
         final long time = System.currentTimeMillis();
-                for (DataPointRT point : dataPoints) {
-                    final Fhz4JPointLocatorRT locator = point.getPointLocator();
-                    if (locator.isMyFhtMessage(fhtMessage)) {
-        switch (fhtMessage.getCommand()) {
-            case VALVE:
-            case VALVE_1:
-            case VALVE_2:
-            case VALVE_3:
-            case VALVE_4:
-            case VALVE_5:
-            case VALVE_6:
-            case VALVE_7:
-            case VALVE_8:
-                point.updatePointValue(new PointValueTime(fhtMessage.getActuatorValue(), time));
-                break;
-            case DESIRED_TEMP:
-                point.updatePointValue(new PointValueTime(fhtMessage.getDesiredTempValue(), time));
-                break;
-            case MEASURED_LOW:
-                point.updatePointValue(new PointValueTime(fhtMessage.getLowTempValue() , time));
-            case MEASURED_HIGH:
-                point.updatePointValue(new PointValueTime(fhtMessage.getHighTempValue() , time));
-                break;
-            case MO_FROM_1:
-            case MO_TO_1:
-            case MO_FROM_2:
-            case MO_TO_2:
-            case TUE_FROM_1:
-            case TUE_TO_1:
-            case TUE_FROM_2:
-            case TUE_TO_2:
-            case WED_FROM_1:
-            case WED_TO_1:
-            case WED_FROM_2:
-            case WED_TO_2:
-            case THU_FROM_1:
-            case THU_TO_1:
-            case THU_FROM_2:
-            case THU_TO_2:
-            case FRI_FROM_1:
-            case FRI_TO_1:
-            case FRI_FROM_2:
-            case FRI_TO_2:
-            case SAT_FROM_1:
-            case SAT_TO_1:
-            case SAT_FROM_2:
-            case SAT_TO_2:
-            case SUN_FROM_1:
-            case SUN_TO_1:
-            case SUN_FROM_2:
-            case SUN_TO_2:
+        for (DataPointRT point : dataPoints) {
+            final Fhz4JPointLocatorRT locator = point.getPointLocator();
+            if (locator.isMyFhtMessage(fhtMessage)) {
+                switch (fhtMessage.getCommand()) {
+                    case VALVE:
+                    case VALVE_1:
+                    case VALVE_2:
+                    case VALVE_3:
+                    case VALVE_4:
+                    case VALVE_5:
+                    case VALVE_6:
+                    case VALVE_7:
+                    case VALVE_8:
+                        point.updatePointValue(new PointValueTime(fhtMessage.getActuatorValue(), time));
+                        break;
+                    case DESIRED_TEMP:
+                        point.updatePointValue(new PointValueTime(fhtMessage.getDesiredTempValue(), time));
+                        break;
+                    case MEASURED_LOW:
+                        point.updatePointValue(new PointValueTime(fhtMessage.getLowTempValue(), time));
+                    case MEASURED_HIGH:
+                        point.updatePointValue(new PointValueTime(fhtMessage.getHighTempValue(), time));
+                        break;
+                    case MO_FROM_1:
+                    case MO_TO_1:
+                    case MO_FROM_2:
+                    case MO_TO_2:
+                    case TUE_FROM_1:
+                    case TUE_TO_1:
+                    case TUE_FROM_2:
+                    case TUE_TO_2:
+                    case WED_FROM_1:
+                    case WED_TO_1:
+                    case WED_FROM_2:
+                    case WED_TO_2:
+                    case THU_FROM_1:
+                    case THU_TO_1:
+                    case THU_FROM_2:
+                    case THU_TO_2:
+                    case FRI_FROM_1:
+                    case FRI_TO_1:
+                    case FRI_FROM_2:
+                    case FRI_TO_2:
+                    case SAT_FROM_1:
+                    case SAT_TO_1:
+                    case SAT_FROM_2:
+                    case SAT_TO_2:
+                    case SUN_FROM_1:
+                    case SUN_TO_1:
+                    case SUN_FROM_2:
+                    case SUN_TO_2:
 //                point.updatePointValue(new PointValueTime(fhtMessage.getActuatorValue() , time));
-                break;
-            default:
-                point.updatePointValue(new PointValueTime(fhtMessage.getRawValue() , time));
-        }
-                    }
+                        break;
+                    default:
+                        point.updatePointValue(new PointValueTime(fhtMessage.getRawValue(), time));
                 }
+            }
+        }
     }
 
     private short[] getFhtDeviceHousecodes() {

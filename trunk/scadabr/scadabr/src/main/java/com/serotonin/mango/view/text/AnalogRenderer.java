@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.view.text;
 
@@ -23,8 +23,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.DecimalFormat;
 
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
@@ -33,8 +33,9 @@ import br.org.scadabr.util.SerializationHelper;
 
 @JsonRemoteEntity
 public class AnalogRenderer extends BaseTextRenderer {
+
     private static ImplDefinition definition = new ImplDefinition("textRendererAnalog", "ANALOG",
-            "textRenderer.analog", new int[] { DataTypes.NUMERIC });
+            "textRenderer.analog", new int[]{DataTypes.NUMERIC});
 
     public static ImplDefinition getDefinition() {
         return definition;
@@ -71,15 +72,17 @@ public class AnalogRenderer extends BaseTextRenderer {
 
     @Override
     protected String getTextImpl(MangoValue value, int hint) {
-        if (!(value instanceof NumericValue))
+        if (!(value instanceof NumericValue)) {
             return null;
+        }
         return getText(value.getDoubleValue(), hint);
     }
 
     @Override
     public String getText(double value, int hint) {
-        if (hint == HINT_RAW || suffix == null)
+        if (hint == HINT_RAW || suffix == null) {
             return formatInstance.format(value);
+        }
         return formatInstance.format(value) + suffix;
     }
 

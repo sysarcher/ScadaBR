@@ -25,10 +25,11 @@ import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 
 /**
- * 
+ *
  * @author aploese
  */
 public class MBusResponseFrameBean {
+
     private final String name;
 
     public MBusResponseFrameBean(Frame rsf, int devIndex, int frameIndex, String name) {

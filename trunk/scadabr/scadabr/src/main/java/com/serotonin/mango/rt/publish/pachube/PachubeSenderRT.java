@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.publish.pachube;
 
@@ -28,7 +28,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.pachube.PachubeDataSourceRT;
 import com.serotonin.mango.rt.event.AlarmLevels;
@@ -41,9 +41,11 @@ import com.serotonin.mango.rt.publish.SendThread;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import com.serotonin.mango.vo.publish.pachube.PachubePointVO;
 import com.serotonin.mango.vo.publish.pachube.PachubeSenderVO;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 public class PachubeSenderRT extends PublisherRT<PachubePointVO> {
+
     static final Log LOG = LogFactory.getLog(PachubeSenderRT.class);
     private static final int MAX_FAILURES = 5;
 
@@ -80,6 +82,7 @@ public class PachubeSenderRT extends PublisherRT<PachubePointVO> {
     }
 
     class PachubeSendThread extends SendThread {
+
         private int failureCount = 0;
         private LocalizableMessage failureMessage;
 
@@ -93,20 +96,19 @@ public class PachubeSenderRT extends PublisherRT<PachubePointVO> {
                 PublishQueueEntry<PachubePointVO> entry = getPublishQueue().next();
 
                 if (entry != null) {
-                    if (send(entry))
+                    if (send(entry)) {
                         getPublishQueue().remove(entry);
-                    else {
+                    } else {
                         // The send failed, so take a break so as not to over exert ourselves.
                         try {
                             Thread.sleep(2000);
-                        }
-                        catch (InterruptedException e1) {
+                        } catch (InterruptedException e1) {
                             // no op
                         }
                     }
-                }
-                else
+                } else {
                     waitImpl(10000);
+                }
             }
         }
 
@@ -122,8 +124,7 @@ public class PachubeSenderRT extends PublisherRT<PachubePointVO> {
             try {
                 method.setRequestEntity(new StringRequestEntity(entry.getPvt().getValue().toString(), "text/csv",
                         "UTF-8"));
-            }
-            catch (UnsupportedEncodingException e) {
+            } catch (UnsupportedEncodingException e) {
                 throw new ShouldNeverHappenException(e);
             }
 
@@ -133,35 +134,36 @@ public class PachubeSenderRT extends PublisherRT<PachubePointVO> {
             try {
                 int code = httpClient.executeMethod(method);
                 if (code != HttpStatus.SC_OK) {
-                    message = new LocalizableMessage("event.publish.invalidResponse", code);
+                    message = new LocalizableMessageImpl("event.publish.invalidResponse", code);
 
                     // 500-type errors are server side, and so may be recoverable.
                     permanentFailure = code < 500;
                 }
-            }
-            catch (Exception e) {
-                message = new LocalizableMessage("common.default", e.getMessage());
-            }
-            finally {
+            } catch (Exception e) {
+                message = new LocalizableMessageImpl("common.default", e.getMessage());
+            } finally {
                 method.releaseConnection();
             }
 
             // Check for failure.
             if (message != null) {
                 failureCount++;
-                if (failureMessage == null)
+                if (failureMessage == null) {
                     failureMessage = message;
+                }
 
-                if (failureCount == MAX_FAILURES + 1)
+                if (failureCount == MAX_FAILURES + 1) {
                     Common.ctx.getEventManager().raiseEvent(sendExceptionEventType, System.currentTimeMillis(), true,
                             AlarmLevels.URGENT, failureMessage, createEventContext());
+                }
 
                 return permanentFailure;
             }
 
             if (failureCount > 0) {
-                if (failureCount > MAX_FAILURES)
+                if (failureCount > MAX_FAILURES) {
                     Common.ctx.getEventManager().returnToNormal(sendExceptionEventType, System.currentTimeMillis());
+                }
 
                 failureCount = 0;
                 failureMessage = null;

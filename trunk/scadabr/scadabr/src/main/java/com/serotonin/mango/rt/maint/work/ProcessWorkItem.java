@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.maint.work;
 
@@ -26,17 +26,19 @@ import java.io.StringWriter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.io.StreamUtils;
+import br.org.scadabr.io.StreamUtils;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.BackgroundProcessing;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 public class ProcessWorkItem implements WorkItem {
+
     static final Log LOG = LogFactory.getLog(ProcessWorkItem.class);
     private static final int TIMEOUT = 15000; // 15 seconds
 
@@ -55,11 +57,10 @@ public class ProcessWorkItem implements WorkItem {
     public void execute() {
         try {
             executeProcessCommand(command);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_PROCESS_FAILURE),
                     System.currentTimeMillis(), false,
-                    new LocalizableMessage("event.process.failure", command, e.getMessage()));
+                    new LocalizableMessageImpl("event.process.failure", command, e.getMessage()));
         }
     }
 
@@ -87,14 +88,15 @@ public class ProcessWorkItem implements WorkItem {
             timeout.interrupt();
 
             String input = out.getInput();
-            if (!StringUtils.isEmpty(input))
+            if (!StringUtils.isEmpty(input)) {
                 LOG.info("Process output: '" + input + "'");
+            }
 
             input = err.getInput();
-            if (!StringUtils.isEmpty(input))
+            if (!StringUtils.isEmpty(input)) {
                 LOG.warn("Process error: '" + input + "'");
-        }
-        catch (InterruptedException e) {
+            }
+        } catch (InterruptedException e) {
             throw new IOException("Timeout while running command: '" + command + "'");
         }
     }
@@ -105,6 +107,7 @@ public class ProcessWorkItem implements WorkItem {
     }
 
     static class ProcessTimeout implements WorkItem {
+
         private final Process process;
         private final String command;
         private volatile boolean interrupted;
@@ -137,13 +140,14 @@ public class ProcessWorkItem implements WorkItem {
                     LOG.warn("Timeout waiting for process to end. command=" + command);
                     process.destroy();
                 }
-            }
-            catch (InterruptedException e) { /* no op */
+            } catch (InterruptedException e) { /* no op */
+
             }
         }
     }
 
     static class InputReader implements WorkItem {
+
         private final InputStreamReader reader;
         private final StringWriter writer = new StringWriter();
         private boolean done;
@@ -161,8 +165,7 @@ public class ProcessWorkItem implements WorkItem {
                 if (!done) {
                     try {
                         wait();
-                    }
-                    catch (InterruptedException e) {
+                    } catch (InterruptedException e) {
                         // no op
                     }
                 }
@@ -174,14 +177,13 @@ public class ProcessWorkItem implements WorkItem {
             return WorkItem.PRIORITY_HIGH;
         }
 
+        @Override
         public void execute() {
             try {
                 StreamUtils.transfer(reader, writer);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 LOG.error("Error in process input reader", e);
-            }
-            finally {
+            } finally {
                 synchronized (this) {
                     done = true;
                     notifyAll();

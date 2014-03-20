@@ -4,6 +4,7 @@ import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.persistent.PersistentPointLocatorVO;
 
 public class PersistentPointLocatorRT extends PointLocatorRT {
+
     private final PersistentPointLocatorVO vo;
 
     public PersistentPointLocatorRT(PersistentPointLocatorVO vo) {

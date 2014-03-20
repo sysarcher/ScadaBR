@@ -1,24 +1,25 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataImage;
 
 public class DataPointEventMulticaster implements DataPointListener {
+
     protected final DataPointListener a, b;
 
     protected DataPointEventMulticaster(DataPointListener a, DataPointListener b) {
@@ -27,10 +28,12 @@ public class DataPointEventMulticaster implements DataPointListener {
     }
 
     protected DataPointListener remove(DataPointListener oldl) {
-        if (oldl == a)
+        if (oldl == a) {
             return b;
-        if (oldl == b)
+        }
+        if (oldl == b) {
             return a;
+        }
         DataPointListener a2 = remove(a, oldl);
         DataPointListener b2 = remove(b, oldl);
         if (a2 == a && b2 == b) {
@@ -40,19 +43,23 @@ public class DataPointEventMulticaster implements DataPointListener {
     }
 
     public static DataPointListener add(DataPointListener a, DataPointListener b) {
-        if (a == null)
+        if (a == null) {
             return b;
-        if (b == null)
+        }
+        if (b == null) {
             return a;
+        }
         return new DataPointEventMulticaster(a, b);
     }
 
     public static DataPointListener remove(DataPointListener l, DataPointListener oldl) {
-        if (l == oldl || l == null)
+        if (l == oldl || l == null) {
             return null;
+        }
 
-        if (l instanceof DataPointEventMulticaster)
+        if (l instanceof DataPointEventMulticaster) {
             return ((DataPointEventMulticaster) l).remove(oldl);
+        }
 
         return l;
     }

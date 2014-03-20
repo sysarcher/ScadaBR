@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr;
 
@@ -40,15 +40,17 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.link.PointLinkVO;
 import com.serotonin.mango.vo.permission.Permissions;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
-import com.serotonin.web.taglib.DateFunctions;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.web.taglib.DateFunctions;
 
 /**
  * @author Matthew Lohbihler
  */
 public class PointLinksDwr extends BaseDwr {
+
     public Map<String, Object> init() {
         User user = Common.getUser();
         Map<String, Object> data = new HashMap<String, Object>();
@@ -58,10 +60,12 @@ public class PointLinksDwr extends BaseDwr {
         List<IntValuePair> sourcePoints = new ArrayList<IntValuePair>();
         List<IntValuePair> targetPoints = new ArrayList<IntValuePair>();
         for (DataPointVO point : allPoints) {
-            if (Permissions.hasDataPointReadPermission(user, point))
+            if (Permissions.hasDataPointReadPermission(user, point)) {
                 sourcePoints.add(new IntValuePair(point.getId(), point.getExtendedName()));
-            if (point.getPointLocator().isSettable() && Permissions.hasDataPointSetPermission(user, point))
+            }
+            if (point.getPointLocator().isSettable() && Permissions.hasDataPointSetPermission(user, point)) {
                 targetPoints.add(new IntValuePair(point.getId(), point.getExtendedName()));
+            }
         }
 
         data.put("sourcePoints", sourcePoints);
@@ -71,8 +75,9 @@ public class PointLinksDwr extends BaseDwr {
         List<PointLinkVO> pointLinks = new ArrayList<PointLinkVO>();
         for (PointLinkVO pointLink : new PointLinkDao().getPointLinks()) {
             if (containsPoint(sourcePoints, pointLink.getSourcePointId())
-                    && containsPoint(targetPoints, pointLink.getTargetPointId()))
+                    && containsPoint(targetPoints, pointLink.getTargetPointId())) {
                 pointLinks.add(pointLink);
+            }
         }
 
         data.put("pointLinks", pointLinks);
@@ -82,8 +87,9 @@ public class PointLinksDwr extends BaseDwr {
 
     private boolean containsPoint(List<IntValuePair> pointList, int pointId) {
         for (IntValuePair ivp : pointList) {
-            if (ivp.getKey() == pointId)
+            if (ivp.getKey() == pointId) {
                 return true;
+            }
         }
         return false;
     }
@@ -94,9 +100,9 @@ public class PointLinksDwr extends BaseDwr {
         if (id == Common.NEW_ID) {
             vo = new PointLinkVO();
             vo.setXid(pointLinkDao.generateUniqueXid());
-        }
-        else
+        } else {
             vo = pointLinkDao.getPointLink(id);
+        }
         return vo;
     }
 
@@ -115,16 +121,18 @@ public class PointLinksDwr extends BaseDwr {
         DwrResponseI18n response = new DwrResponseI18n();
         PointLinkDao pointLinkDao = new PointLinkDao();
 
-        if (StringUtils.isEmpty(xid))
+        if (StringUtils.isEmpty(xid)) {
             response.addContextualMessage("xid", "validate.required");
-        else if (!pointLinkDao.isXidUnique(xid, id))
+        } else if (!pointLinkDao.isXidUnique(xid, id)) {
             response.addContextualMessage("xid", "validate.xidUsed");
+        }
 
         vo.validate(response);
 
         // Save it
-        if (!response.getHasMessages())
+        if (!response.getHasMessages()) {
             Common.ctx.getRuntimeManager().savePointLink(vo);
+        }
 
         response.addData("plId", vo.getId());
 
@@ -141,9 +149,9 @@ public class PointLinksDwr extends BaseDwr {
         ScriptExecutor scriptExecutor = new ScriptExecutor();
 
         DataPointRT point = Common.ctx.getRuntimeManager().getDataPoint(sourcePointId);
-        if (point == null)
-            message = new LocalizableMessage("event.pointLink.sourceUnavailable");
-        else {
+        if (point == null) {
+            message = new LocalizableMessageImpl("event.pointLink.sourceUnavailable");
+        } else {
             Map<String, IDataPoint> context = new HashMap<String, IDataPoint>();
             context.put(PointLinkRT.CONTEXT_VAR_NAME, point);
             int targetDataType = new DataPointDao().getDataPoint(targetPointId).getPointLocator().getDataTypeId();
@@ -151,19 +159,18 @@ public class PointLinksDwr extends BaseDwr {
             try {
                 PointValueTime pvt = scriptExecutor.execute(script, context, System.currentTimeMillis(),
                         targetDataType, -1);
-                if (pvt.getValue() == null)
-                    message = new LocalizableMessage("event.pointLink.nullResult");
-                else if (pvt.getTime() == -1)
-                    message = new LocalizableMessage("pointLinks.validate.success", pvt.getValue());
-                else
-                    message = new LocalizableMessage("pointLinks.validate.successTs", pvt.getValue(),
+                if (pvt.getValue() == null) {
+                    message = new LocalizableMessageImpl("event.pointLink.nullResult");
+                } else if (pvt.getTime() == -1) {
+                    message = new LocalizableMessageImpl("pointLinks.validate.success", pvt.getValue());
+                } else {
+                    message = new LocalizableMessageImpl("pointLinks.validate.successTs", pvt.getValue(),
                             DateFunctions.getTime(pvt.getTime()));
-            }
-            catch (ScriptException e) {
-                message = new LocalizableMessage("common.default", e.getMessage());
-            }
-            catch (ResultTypeException e) {
-                message = e.getLocalizableMessage();
+                }
+            } catch (ScriptException e) {
+                message = new LocalizableMessageImpl("common.default", e.getMessage());
+            } catch (ResultTypeException e) {
+                message = e;
             }
         }
 

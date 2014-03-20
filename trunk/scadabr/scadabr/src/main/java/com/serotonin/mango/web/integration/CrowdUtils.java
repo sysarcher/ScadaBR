@@ -28,6 +28,7 @@ import com.atlassian.crowd.service.factory.CrowdClientFactory;
 import com.serotonin.mango.Common;
 
 public class CrowdUtils {
+
     private static final Log LOG = LogFactory.getLog(CrowdUtils.class);
     private static final String CROWD_AUTHENTICATED_KEY = CrowdUtils.class.getName() + "CROWD_AUTHENTICATED_KEY";
 
@@ -48,31 +49,25 @@ public class CrowdUtils {
         try {
             authenticator.authenticate(request, response, username, password);
             authenticated = true;
-        }
-        catch (ApplicationPermissionException e) {
+        } catch (ApplicationPermissionException e) {
             LOG.warn("Exception during Crowd authentication attempt", e);
-        }
-        catch (InvalidAuthenticationException e) {
+        } catch (InvalidAuthenticationException e) {
             // ignore
-        }
-        catch (OperationFailedException e) {
+        } catch (OperationFailedException e) {
             LOG.warn("Exception during Crowd authentication attempt", e);
-        }
-        catch (ExpiredCredentialException e) {
+        } catch (ExpiredCredentialException e) {
             LOG.warn("Exception during Crowd authentication attempt", e);
-        }
-        catch (InactiveAccountException e) {
+        } catch (InactiveAccountException e) {
             // ignore
-        }
-        catch (ApplicationAccessDeniedException e) {
+        } catch (ApplicationAccessDeniedException e) {
             LOG.warn("Exception during Crowd authentication attempt", e);
-        }
-        catch (InvalidTokenException e) {
+        } catch (InvalidTokenException e) {
             // ignore
         }
 
-        if (LOG.isDebugEnabled())
+        if (LOG.isDebugEnabled()) {
             LOG.debug("Authentication check took " + (System.currentTimeMillis() - start) + "ms");
+        }
 
         return authenticated;
     }
@@ -82,8 +77,7 @@ public class CrowdUtils {
 
         try {
             return authenticator.isAuthenticated(request, response);
-        }
-        catch (OperationFailedException e) {
+        } catch (OperationFailedException e) {
             LOG.warn("Exception during Crowd authentication attempt", e);
         }
 
@@ -95,19 +89,16 @@ public class CrowdUtils {
 
         try {
             User user = authenticator.getUser(request);
-            if (user != null)
+            if (user != null) {
                 return user.getName();
-        }
-        catch (ApplicationPermissionException e) {
+            }
+        } catch (ApplicationPermissionException e) {
             LOG.warn("Exception during Crowd authentication attempt", e);
-        }
-        catch (InvalidAuthenticationException e) {
+        } catch (InvalidAuthenticationException e) {
             // ignore
-        }
-        catch (OperationFailedException e) {
+        } catch (OperationFailedException e) {
             LOG.warn("Exception during Crowd authentication attempt", e);
-        }
-        catch (InvalidTokenException e) {
+        } catch (InvalidTokenException e) {
             // ignore
         }
 
@@ -119,14 +110,11 @@ public class CrowdUtils {
 
         try {
             authenticator.logout(request, response);
-        }
-        catch (ApplicationPermissionException e) {
+        } catch (ApplicationPermissionException e) {
             LOG.warn("Exception during Crowd authentication attempt", e);
-        }
-        catch (InvalidAuthenticationException e) {
+        } catch (InvalidAuthenticationException e) {
             // ignore
-        }
-        catch (OperationFailedException e) {
+        } catch (OperationFailedException e) {
             LOG.warn("Exception during Crowd authentication attempt", e);
         }
     }

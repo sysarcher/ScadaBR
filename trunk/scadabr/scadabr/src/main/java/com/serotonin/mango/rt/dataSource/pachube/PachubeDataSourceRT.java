@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource.pachube;
 
@@ -39,27 +39,28 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.json.JsonArray;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonValue;
+import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.json.JsonArray;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonValue;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.DataSourceUtils;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.vo.dataSource.pachube.PachubeDataSourceVO;
-import com.serotonin.util.ObjectUtils;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.http.HttpUtils;
-import com.serotonin.web.i18n.LocalizableException;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.http.HttpUtils;
+import br.org.scadabr.web.i18n.LocalizableException;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.Objects;
 
 public class PachubeDataSourceRT extends PollingDataSource {
+
     public static final int DATA_RETRIEVAL_FAILURE_EVENT = 1;
     public static final int PARSE_EXCEPTION_EVENT = 2;
     public static final int POINT_WRITE_EXCEPTION_EVENT = 3;
@@ -127,8 +128,9 @@ public class PachubeDataSourceRT extends PollingDataSource {
             }
         }
 
-        for (Map.Entry<Integer, List<DataPointRT>> entry : devicePoints.entrySet())
+        for (Map.Entry<Integer, List<DataPointRT>> entry : devicePoints.entrySet()) {
             pollFeed(entry.getKey(), entry.getValue(), time);
+        }
     }
 
     protected void pollFeed(int feedId, List<DataPointRT> points, long time) {
@@ -136,18 +138,19 @@ public class PachubeDataSourceRT extends PollingDataSource {
 
         try {
             data = getData(httpClient, feedId, vo.getApiKey());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LocalizableMessage lm;
-            if (e instanceof LocalizableException)
-                lm = ((LocalizableException) e).getLocalizableMessage();
-            else
-                lm = new LocalizableMessage("event.pachube.feed.retrievalError", feedId, e.getMessage());
+            if (e instanceof LocalizableException) {
+                lm = (LocalizableException) e;
+            } else {
+                lm = new LocalizableMessageImpl("event.pachube.feed.retrievalError", feedId, e.getMessage());
+            }
             raiseEvent(DATA_RETRIEVAL_FAILURE_EVENT, time, true, lm);
 
             // Mark points as unreliable.
-            for (DataPointRT point : points)
+            for (DataPointRT point : points) {
                 point.setAttribute(ATTR_UNRELIABLE_KEY, true);
+            }
 
             return;
         }
@@ -162,11 +165,10 @@ public class PachubeDataSourceRT extends PollingDataSource {
             PachubeValue dataValue = data.get(locator.getDataStreamId());
 
             if (dataValue == null) {
-                parseErrorMessage = new LocalizableMessage("event.pachube.dataStreamNotFound",
+                parseErrorMessage = new LocalizableMessageImpl("event.pachube.dataStreamNotFound",
                         locator.getDataStreamId(), feedId);
                 dp.setAttribute(ATTR_UNRELIABLE_KEY, true);
-            }
-            else {
+            } else {
                 try {
                     // Get the value
                     MangoValue value = DataSourceUtils.getValue(dataValue.getValue(), locator.getDataTypeId(),
@@ -174,37 +176,40 @@ public class PachubeDataSourceRT extends PollingDataSource {
 
                     // Get the time.
                     long valueTime;
-                    if (StringUtils.isEmpty(dataValue.getTimestamp()))
+                    if (StringUtils.isEmpty(dataValue.getTimestamp())) {
                         valueTime = time;
-                    else
+                    } else {
                         valueTime = sdf.parse(dataValue.getTimestamp()).getTime();
+                    }
 
                     // Create the pvt
                     PointValueTime pvt = new PointValueTime(value, valueTime);
 
                     // Save the new value if it is new
-                    if (!ObjectUtils.isEqual(dp.getPointValue(), pvt))
+                    if (!Objects.equals(dp.getPointValue(), pvt)) {
                         dp.updatePointValue(new PointValueTime(value, valueTime));
+                    }
                     dp.setAttribute(ATTR_UNRELIABLE_KEY, false);
-                }
-                catch (LocalizableException e) {
-                    if (parseErrorMessage == null)
-                        parseErrorMessage = e.getLocalizableMessage();
+                } catch (LocalizableException e) {
+                    if (parseErrorMessage == null) {
+                        parseErrorMessage = e;
+                    }
                     dp.setAttribute(ATTR_UNRELIABLE_KEY, true);
-                }
-                catch (ParseException e) {
-                    if (parseErrorMessage == null)
-                        parseErrorMessage = new LocalizableMessage("event.valueParse.timeParsePoint",
+                } catch (ParseException e) {
+                    if (parseErrorMessage == null) {
+                        parseErrorMessage = new LocalizableMessageImpl("event.valueParse.timeParsePoint",
                                 dataValue.getTimestamp(), dp.getVO().getName());
+                    }
                     dp.setAttribute(ATTR_UNRELIABLE_KEY, true);
                 }
             }
         }
 
-        if (parseErrorMessage != null)
+        if (parseErrorMessage != null) {
             raiseEvent(PARSE_EXCEPTION_EVENT, time, false, parseErrorMessage);
-        else
+        } else {
             returnToNormal(PARSE_EXCEPTION_EVENT, time);
+        }
     }
 
     public static Map<String, PachubeValue> getData(HttpClient client, int feedId, String apiKey)
@@ -217,13 +222,13 @@ public class PachubeDataSourceRT extends PollingDataSource {
             method.addRequestHeader("User-Agent", "Mango M2M Pachube data source");
 
             int responseCode = client.executeMethod(method);
-            if (responseCode != HttpStatus.SC_OK)
-                throw new LocalizableException(new LocalizableMessage("event.pachube.feed.response", feedId,
-                        responseCode));
+            if (responseCode != HttpStatus.SC_OK) {
+                throw new LocalizableException("event.pachube.feed.response", feedId, responseCode);
+            }
 
             String json = HttpUtils.readResponseBody(method);
 
-            Map<String, PachubeValue> result = new HashMap<String, PachubeValue>();
+            Map<String, PachubeValue> result = new HashMap<>();
 
             JsonReader reader = new JsonReader(json);
             JsonObject content = reader.inflate().toJsonObject();
@@ -241,16 +246,14 @@ public class PachubeDataSourceRT extends PollingDataSource {
             }
 
             return result;
-        }
-        catch (LocalizableException e) {
+        } catch (LocalizableException e) {
             throw e;
-        }
-        catch (Exception e) {
-            throw new LocalizableException(DataSourceRT.getExceptionMessage(e));
-        }
-        finally {
-            if (method != null)
+        } catch (Exception e) {
+            throw wrapException(e);
+        } finally {
+            if (method != null) {
                 method.releaseConnection();
+            }
         }
     }
 
@@ -265,8 +268,7 @@ public class PachubeDataSourceRT extends PollingDataSource {
 
             try {
                 method.setRequestEntity(new StringRequestEntity(valueTime.getValue().toString(), "text/csv", "UTF-8"));
-            }
-            catch (UnsupportedEncodingException e) {
+            } catch (UnsupportedEncodingException e) {
                 throw new ShouldNeverHappenException(e);
             }
 
@@ -275,10 +277,9 @@ public class PachubeDataSourceRT extends PollingDataSource {
 
             // Deactivate any existing event.
             returnToNormal(POINT_WRITE_EXCEPTION_EVENT, valueTime.getTime());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             // Raise an event.
-            raiseEvent(POINT_WRITE_EXCEPTION_EVENT, valueTime.getTime(), true, new LocalizableMessage(
+            raiseEvent(POINT_WRITE_EXCEPTION_EVENT, valueTime.getTime(), true, new LocalizableMessageImpl(
                     "event.exception2", dataPoint.getVO().getName(), e.getMessage()));
         }
     }

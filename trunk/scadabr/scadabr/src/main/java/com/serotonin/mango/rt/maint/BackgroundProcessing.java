@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.maint;
 
@@ -29,15 +29,17 @@ import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.maint.work.WorkItem;
-import com.serotonin.util.ILifecycle;
+import br.org.scadabr.util.ILifecycle;
 
 /**
- * A cheesy name for a class, i know, but it pretty much says it like it is. This class keeps an inbox of items to
- * process, and oddly enough, processes them. (Oh, and removes them from the inbox when it's done.)
- * 
+ * A cheesy name for a class, i know, but it pretty much says it like it is.
+ * This class keeps an inbox of items to process, and oddly enough, processes
+ * them. (Oh, and removes them from the inbox when it's done.)
+ *
  * @author Matthew Lohbihler
  */
 public class BackgroundProcessing implements ILifecycle {
+
     public static final String JOB_NAME = BackgroundProcessing.class.getName();
     public static final String JOB_GROUP = "maintenance";
 
@@ -51,23 +53,21 @@ public class BackgroundProcessing implements ILifecycle {
             public void run() {
                 try {
                     item.execute();
-                }
-                catch (Throwable t) {
+                } catch (Throwable t) {
                     try {
                         log.error("Error in work item", t);
-                    }
-                    catch (RuntimeException e) {
+                    } catch (RuntimeException e) {
                         t.printStackTrace();
                     }
                 }
             }
         };
 
-        if (item.getPriority() == WorkItem.PRIORITY_HIGH)
+        if (item.getPriority() == WorkItem.PRIORITY_HIGH) {
             Common.timer.execute(runnable);
-        else if (item.getPriority() == WorkItem.PRIORITY_MEDIUM)
+        } else if (item.getPriority() == WorkItem.PRIORITY_MEDIUM) {
             mediumPriorityService.execute(runnable);
-        else {
+        } else {
             lowPriorityService.execute(runnable);
         }
     }
@@ -98,27 +98,30 @@ public class BackgroundProcessing implements ILifecycle {
             // this thread will wait a maximum of 6 minutes.
             int rewaits = 36;
             while (rewaits > 0) {
-                if (!medDone && mediumPriorityService.awaitTermination(5, TimeUnit.SECONDS))
+                if (!medDone && mediumPriorityService.awaitTermination(5, TimeUnit.SECONDS)) {
                     medDone = true;
-                if (!lowDone && lowPriorityService.awaitTermination(5, TimeUnit.SECONDS))
+                }
+                if (!lowDone && lowPriorityService.awaitTermination(5, TimeUnit.SECONDS)) {
                     lowDone = true;
+                }
 
-                if (lowDone && medDone)
+                if (lowDone && medDone) {
                     break;
+                }
 
-                if (!lowDone && !medDone)
+                if (!lowDone && !medDone) {
                     log.info("BackgroundProcessing waiting for medium (" + mediumPriorityService.getQueue().size()
                             + ") and low priority tasks to complete");
-                else if (!medDone)
+                } else if (!medDone) {
                     log.info("BackgroundProcessing waiting for medium priority tasks ("
                             + mediumPriorityService.getQueue().size() + ") to complete");
-                else
+                } else {
                     log.info("BackgroundProcessing waiting for low priority tasks to complete");
+                }
 
                 rewaits--;
             }
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             log.info("", e);
         }
     }

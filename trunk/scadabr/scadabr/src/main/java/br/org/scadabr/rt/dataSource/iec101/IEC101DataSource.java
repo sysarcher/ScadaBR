@@ -16,122 +16,125 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 public class IEC101DataSource extends PollingDataSource {
-	private final Log LOG = LogFactory.getLog(IEC101DataSource.class);
 
-	public static final int POINT_READ_EXCEPTION_EVENT = 1;
-	public static final int POINT_WRITE_EXCEPTION_EVENT = 2;
-	public static final int DATA_SOURCE_EXCEPTION_EVENT = 3;
+    private final Log LOG = LogFactory.getLog(IEC101DataSource.class);
 
-	private IEC101Master iec101Master;
-	private final IEC101DataSourceVO<?> vo;
+    public static final int POINT_READ_EXCEPTION_EVENT = 1;
+    public static final int POINT_WRITE_EXCEPTION_EVENT = 2;
+    public static final int DATA_SOURCE_EXCEPTION_EVENT = 3;
 
-	public IEC101DataSource(IEC101DataSourceVO<?> vo) {
-		super(vo);
-		this.vo = vo;
-		setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), vo
-				.isQuantize());
-	}
+    private IEC101Master iec101Master;
+    private final IEC101DataSourceVO<?> vo;
 
-	@Override
-	protected void doPoll(long time) {
-		try {
-			iec101Master.doPoll();
-		} catch (Exception e) {
-			raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, new Date().getTime(), true,
-					new LocalizableMessage("event.exception2", vo.getName(), e
-							.getMessage()));
-			e.printStackTrace();
-		}
+    public IEC101DataSource(IEC101DataSourceVO<?> vo) {
+        super(vo);
+        this.vo = vo;
+        setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), vo
+                .isQuantize());
+    }
 
-		for (DataPointRT dataPoint : dataPoints) {
-			IEC101PointLocatorVO pointLocator = dataPoint.getVO()
-					.getPointLocator();
+    @Override
+    protected void doPoll(long time) {
+        try {
+            iec101Master.doPoll();
+        } catch (Exception e) {
+            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, new Date().getTime(), true,
+                    new LocalizableMessageImpl("event.exception2", vo.getName(), e
+                            .getMessage()));
+            e.printStackTrace();
+        }
 
-			List<DataElement> elements = iec101Master.read(pointLocator
-					.getObjectAddress(), pointLocator.getIec101DataType());
+        for (DataPointRT dataPoint : dataPoints) {
+            IEC101PointLocatorVO pointLocator = dataPoint.getVO()
+                    .getPointLocator();
 
-			for (DataElement dataElement : elements) {
-				MangoValue value = MangoValue.stringToValue(dataElement
-						.getValue(), pointLocator.getDataTypeId());
-				Calendar ts = Calendar.getInstance();
-				ts.setTimeInMillis(dataElement.getTimestamp());
-				dataPoint.updatePointValue(new PointValueTime(value, ts
-						.getTimeInMillis()));
-			}
-		}
-	}
+            List<DataElement> elements = iec101Master.read(pointLocator
+                    .getObjectAddress(), pointLocator.getIec101DataType());
 
-	@Override
-	public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime,
-			SetPointSource source) {
-		IEC101PointLocatorVO pointLocator = dataPoint.getVO().getPointLocator();
+            for (DataElement dataElement : elements) {
+                MangoValue value = MangoValue.stringToValue(dataElement
+                        .getValue(), pointLocator.getDataTypeId());
+                Calendar ts = Calendar.getInstance();
+                ts.setTimeInMillis(dataElement.getTimestamp());
+                dataPoint.updatePointValue(new PointValueTime(value, ts
+                        .getTimeInMillis()));
+            }
+        }
+    }
 
-		boolean select = false;
-		int ioa = pointLocator.getObjectAddress() + pointLocator.getOffset();
-		byte qualifier = (byte) pointLocator.getQualifier();
+    @Override
+    public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime,
+            SetPointSource source) {
+        IEC101PointLocatorVO pointLocator = dataPoint.getVO().getPointLocator();
 
-		try {
-			if (pointLocator.getIec101DataType() == IEC101Master.SINGLE_POINT_INFORMATION) {
-				iec101Master.singleCommand(ioa, select, qualifier, valueTime
-						.getBooleanValue());
-			} else if (pointLocator.getIec101DataType() == IEC101Master.DOUBLE_POINT_INFORMATION) {
-				String value = valueTime.getStringValue();
-				boolean val = parseDoubleToBoolean(value);
-				iec101Master.doubleCommand(ioa, select, qualifier, val);
-			} else if (pointLocator.getIec101DataType() == IEC101Master.NORMALIZED_MEASURE) {
-				iec101Master.setPointCommand(ioa, select, qualifier, valueTime
-						.getIntegerValue());
-			}
-		} catch (Exception e) {
-			raiseEvent(POINT_WRITE_EXCEPTION_EVENT, new Date().getTime(), true,
-					new LocalizableMessage("event.exception2", vo.getName(), e
-							.getMessage()));
-			e.printStackTrace();
-		}
-	}
+        boolean select = false;
+        int ioa = pointLocator.getObjectAddress() + pointLocator.getOffset();
+        byte qualifier = (byte) pointLocator.getQualifier();
 
-	private boolean parseDoubleToBoolean(String doubleValue) throws Exception {
-		if (doubleValue != null) {
-			if (doubleValue.trim().toLowerCase().equals("1")
-					|| doubleValue.trim().toLowerCase().equals("on"))
-				return true;
-			else if (doubleValue.trim().toLowerCase().equals("0")
-					|| doubleValue.trim().toLowerCase().equals("off"))
-				return false;
-			else
-				throw new Exception("Invalid Write Value!");
+        try {
+            if (pointLocator.getIec101DataType() == IEC101Master.SINGLE_POINT_INFORMATION) {
+                iec101Master.singleCommand(ioa, select, qualifier, valueTime
+                        .getBooleanValue());
+            } else if (pointLocator.getIec101DataType() == IEC101Master.DOUBLE_POINT_INFORMATION) {
+                String value = valueTime.getStringValue();
+                boolean val = parseDoubleToBoolean(value);
+                iec101Master.doubleCommand(ioa, select, qualifier, val);
+            } else if (pointLocator.getIec101DataType() == IEC101Master.NORMALIZED_MEASURE) {
+                iec101Master.setPointCommand(ioa, select, qualifier, valueTime
+                        .getIntegerValue());
+            }
+        } catch (Exception e) {
+            raiseEvent(POINT_WRITE_EXCEPTION_EVENT, new Date().getTime(), true,
+                    new LocalizableMessageImpl("event.exception2", vo.getName(), e
+                            .getMessage()));
+            e.printStackTrace();
+        }
+    }
 
-		}
-		throw new Exception("Invalid Write Value!");
-	}
+    private boolean parseDoubleToBoolean(String doubleValue) throws Exception {
+        if (doubleValue != null) {
+            if (doubleValue.trim().toLowerCase().equals("1")
+                    || doubleValue.trim().toLowerCase().equals("on")) {
+                return true;
+            } else if (doubleValue.trim().toLowerCase().equals("0")
+                    || doubleValue.trim().toLowerCase().equals("off")) {
+                return false;
+            } else {
+                throw new Exception("Invalid Write Value!");
+            }
 
-	protected void initialize(IEC101Master iec101Master) {
-		this.iec101Master = iec101Master;
-		try {
-			iec101Master.init(vo.getGiRelativePeriod());
-		} catch (Exception e) {
-			raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, new Date().getTime(), true,
-					new LocalizableMessage("event.exception2", vo.getName(), e
-							.getMessage()));
-			e.printStackTrace();
-		}
-		super.initialize();
-	}
+        }
+        throw new Exception("Invalid Write Value!");
+    }
 
-	@Override
-	public void terminate() {
-		super.terminate();
-		try {
-			iec101Master.terminate();
-		} catch (Exception e) {
-			raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, new Date().getTime(), true,
-					new LocalizableMessage("event.exception2", vo.getName(), e
-							.getMessage()));
-			e.printStackTrace();
-		}
-	}
+    protected void initialize(IEC101Master iec101Master) {
+        this.iec101Master = iec101Master;
+        try {
+            iec101Master.init(vo.getGiRelativePeriod());
+        } catch (Exception e) {
+            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, new Date().getTime(), true,
+                    new LocalizableMessageImpl("event.exception2", vo.getName(), e
+                            .getMessage()));
+            e.printStackTrace();
+        }
+        super.initialize();
+    }
+
+    @Override
+    public void terminate() {
+        super.terminate();
+        try {
+            iec101Master.terminate();
+        } catch (Exception e) {
+            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, new Date().getTime(), true,
+                    new LocalizableMessageImpl("event.exception2", vo.getName(), e
+                            .getMessage()));
+            e.printStackTrace();
+        }
+    }
 
 }

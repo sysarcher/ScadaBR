@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.modbus;
 
@@ -24,10 +24,10 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.modbus.ModbusDataSource;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -36,24 +36,27 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.modbus4j.Modbus;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<?>> extends DataSourceVO<T> {
+
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
-        ets.add(createEventType(ModbusDataSource.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessage(
+        ets.add(createEventType(ModbusDataSource.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.dataSource")));
-        ets.add(createEventType(ModbusDataSource.POINT_READ_EXCEPTION_EVENT, new LocalizableMessage(
+        ets.add(createEventType(ModbusDataSource.POINT_READ_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.pointRead")));
-        ets.add(createEventType(ModbusDataSource.POINT_WRITE_EXCEPTION_EVENT, new LocalizableMessage(
+        ets.add(createEventType(ModbusDataSource.POINT_WRITE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.pointWrite")));
     }
 
     private static final ExportCodes EVENT_CODES = new ExportCodes();
+
     static {
         EVENT_CODES.addElement(ModbusDataSource.DATA_SOURCE_EXCEPTION_EVENT, "DATA_SOURCE_EXCEPTION");
         EVENT_CODES.addElement(ModbusDataSource.POINT_READ_EXCEPTION_EVENT, "POINT_READ_EXCEPTION");
@@ -173,20 +176,27 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<?>> extend
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType))
+        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
             response.addContextualMessage("updatePeriodType", "validate.invalidValue");
-        if (updatePeriods <= 0)
+        }
+        if (updatePeriods <= 0) {
             response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
-        if (timeout <= 0)
+        }
+        if (timeout <= 0) {
             response.addContextualMessage("timeout", "validate.greaterThanZero");
-        if (retries < 0)
+        }
+        if (retries < 0) {
             response.addContextualMessage("retries", "validate.cannotBeNegative");
-        if (maxReadBitCount < 1)
+        }
+        if (maxReadBitCount < 1) {
             response.addContextualMessage("maxReadBitCount", "validate.greaterThanZero");
-        if (maxReadRegisterCount < 1)
+        }
+        if (maxReadRegisterCount < 1) {
             response.addContextualMessage("maxReadRegisterCount", "validate.greaterThanZero");
-        if (maxWriteRegisterCount < 1)
+        }
+        if (maxWriteRegisterCount < 1) {
             response.addContextualMessage("maxWriteRegisterCount", "validate.greaterThanZero");
+        }
     }
 
     @Override
@@ -204,7 +214,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<?>> extend
 
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, T from) {
-        final ModbusDataSourceVO fromVO = (ModbusDataSourceVO)from;
+        final ModbusDataSourceVO fromVO = (ModbusDataSourceVO) from;
         AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", fromVO.updatePeriodType,
                 fromVO.updatePeriods, updatePeriodType, updatePeriods);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.quantize", fromVO.quantize, quantize);
@@ -258,8 +268,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<?>> extend
             maxReadBitCount = Modbus.DEFAULT_MAX_READ_BIT_COUNT;
             maxReadRegisterCount = Modbus.DEFAULT_MAX_READ_REGISTER_COUNT;
             maxWriteRegisterCount = Modbus.DEFAULT_MAX_WRITE_REGISTER_COUNT;
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             updatePeriodType = in.readInt();
             updatePeriods = in.readInt();
             timeout = 500;
@@ -269,8 +278,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<?>> extend
             maxReadBitCount = Modbus.DEFAULT_MAX_READ_BIT_COUNT;
             maxReadRegisterCount = Modbus.DEFAULT_MAX_READ_REGISTER_COUNT;
             maxWriteRegisterCount = Modbus.DEFAULT_MAX_WRITE_REGISTER_COUNT;
-        }
-        else if (ver == 3) {
+        } else if (ver == 3) {
             updatePeriodType = in.readInt();
             updatePeriods = in.readInt();
             timeout = in.readInt();
@@ -280,8 +288,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<?>> extend
             maxReadBitCount = Modbus.DEFAULT_MAX_READ_BIT_COUNT;
             maxReadRegisterCount = Modbus.DEFAULT_MAX_READ_REGISTER_COUNT;
             maxWriteRegisterCount = Modbus.DEFAULT_MAX_WRITE_REGISTER_COUNT;
-        }
-        else if (ver == 4) {
+        } else if (ver == 4) {
             updatePeriodType = in.readInt();
             updatePeriods = in.readInt();
             timeout = in.readInt();
@@ -291,8 +298,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<?>> extend
             maxReadBitCount = Modbus.DEFAULT_MAX_READ_BIT_COUNT;
             maxReadRegisterCount = Modbus.DEFAULT_MAX_READ_REGISTER_COUNT;
             maxWriteRegisterCount = Modbus.DEFAULT_MAX_WRITE_REGISTER_COUNT;
-        }
-        else if (ver == 5) {
+        } else if (ver == 5) {
             updatePeriodType = in.readInt();
             updatePeriods = in.readInt();
             timeout = in.readInt();
@@ -302,8 +308,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<?>> extend
             maxReadBitCount = Modbus.DEFAULT_MAX_READ_BIT_COUNT;
             maxReadRegisterCount = Modbus.DEFAULT_MAX_READ_REGISTER_COUNT;
             maxWriteRegisterCount = Modbus.DEFAULT_MAX_WRITE_REGISTER_COUNT;
-        }
-        else if (ver == 6) {
+        } else if (ver == 6) {
             updatePeriodType = in.readInt();
             updatePeriods = in.readInt();
             quantize = in.readBoolean();
@@ -314,8 +319,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<?>> extend
             maxReadBitCount = Modbus.DEFAULT_MAX_READ_BIT_COUNT;
             maxReadRegisterCount = Modbus.DEFAULT_MAX_READ_REGISTER_COUNT;
             maxWriteRegisterCount = Modbus.DEFAULT_MAX_WRITE_REGISTER_COUNT;
-        }
-        else if (ver == 7) {
+        } else if (ver == 7) {
             updatePeriodType = in.readInt();
             updatePeriods = in.readInt();
             quantize = in.readBoolean();
@@ -333,8 +337,9 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<?>> extend
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
         Integer value = deserializeUpdatePeriodType(json);
-        if (value != null)
+        if (value != null) {
             updatePeriodType = value;
+        }
     }
 
     @Override

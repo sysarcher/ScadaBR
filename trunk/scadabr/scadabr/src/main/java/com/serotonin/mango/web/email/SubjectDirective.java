@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import com.serotonin.web.i18n.I18NUtils;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.I18NUtils;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.l10n.Localizer;
 
 import freemarker.core.Environment;
 import freemarker.ext.beans.BeanModel;
@@ -22,6 +23,7 @@ import freemarker.template.TemplateModelException;
 import freemarker.template.TemplateScalarModel;
 
 public class SubjectDirective implements TemplateDirectiveModel {
+
     private final ResourceBundle bundle;
     private String subject;
 
@@ -38,87 +40,82 @@ public class SubjectDirective implements TemplateDirectiveModel {
             TemplateDirectiveBody body) throws TemplateException {
         if (params.containsKey("message")) {
             BeanModel model = (BeanModel) params.get("message");
-            if (model == null)
+            if (model == null) {
                 subject = "";
-            else {
+            } else {
                 LocalizableMessage message = (LocalizableMessage) model.getWrappedObject();
-                if (message == null)
+                if (message == null) {
                     subject = "";
-                else
-                    subject = message.getLocalizedMessage(bundle);
+                } else {
+                    subject = Localizer.localizeMessage(message, bundle);
+                }
             }
-        }
-        else if (params.containsKey("key")) {
+        } else if (params.containsKey("key")) {
             TemplateModel key = (TemplateModel) params.get("key");
 
-            if (key == null)
+            if (key == null) {
                 subject = "";
-            else {
+            } else {
                 if (key instanceof TemplateScalarModel) {
                     String keyString = ((TemplateScalarModel) key).getAsString();
-                    Object[] keyParams = findParameters(params);
-                    if (keyParams == null)
-                        subject = I18NUtils.getMessage(bundle, keyString);
-                    else {
-                        LocalizableMessage m = new LocalizableMessage(keyString, keyParams);
-                        subject = m.getLocalizedMessage(bundle);
-                    }
-                }
-                else
+                    final Object[] keyParams = findParameters(params);
+                    subject = Localizer.localizeI18nKey(keyString, bundle, keyParams);
+                } else {
                     throw new TemplateModelException("key must be a string");
+                }
             }
-        }
-        else if (params.containsKey("value")) {
+        } else if (params.containsKey("value")) {
             TemplateModel value = (TemplateModel) params.get("value");
 
-            if (value == null)
+            if (value == null) {
                 subject = "";
-            else {
-                if (value instanceof TemplateScalarModel)
+            } else {
+                if (value instanceof TemplateScalarModel) {
                     subject = ((TemplateScalarModel) value).getAsString();
-                else
+                } else {
                     throw new TemplateModelException("value must be a string");
+                }
             }
-        }
-        else if (body != null) {
+        } else if (body != null) {
             StringWriter sw = new StringWriter();
             try {
                 body.render(sw);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new TemplateException(e, env);
             }
             subject = sw.toString();
-        }
-        else
-            // No usable parameter was given
+        } else // No usable parameter was given
+        {
             throw new TemplateModelException(
                     "A parameter named either 'key', 'message' or 'value' must be provided, or body content");
+        }
     }
 
     private Object[] findParameters(@SuppressWarnings("rawtypes") Map params) throws TemplateModelException {
-        List<Object> result = new ArrayList<Object>();
+        List<Object> result = new ArrayList<>();
 
         while (true) {
             String key = "param" + result.size();
             if (params.containsKey(key)) {
                 TemplateModel templateModel = (TemplateModel) params.get(key);
 
-                if (templateModel instanceof SimpleScalar)
+                if (templateModel instanceof SimpleScalar) {
                     result.add(((SimpleScalar) templateModel).getAsString());
-                else if (templateModel instanceof StringModel)
+                } else if (templateModel instanceof StringModel) {
                     result.add(((StringModel) templateModel).getWrappedObject());
-                else if (templateModel instanceof BeanModel)
+                } else if (templateModel instanceof BeanModel) {
                     result.add(((BeanModel) templateModel).getWrappedObject());
-                else
+                } else {
                     throw new TemplateModelException("key params must be BeanModels instead of " + templateModel);
-            }
-            else
+                }
+            } else {
                 break;
+            }
         }
 
-        if (result.isEmpty())
+        if (result.isEmpty()) {
             return null;
+        }
 
         return result.toArray(new Object[result.size()]);
     }

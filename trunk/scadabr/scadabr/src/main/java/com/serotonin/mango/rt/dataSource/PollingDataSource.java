@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource;
 
@@ -25,21 +25,22 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.util.timeout.TimeoutClient;
 import com.serotonin.mango.util.timeout.TimeoutTask;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.timer.FixedRateTrigger;
-import com.serotonin.timer.TimerTask;
-import com.serotonin.web.taglib.DateFunctions;
+import br.org.scadabr.timer.FixedRateTrigger;
+import br.org.scadabr.timer.TimerTask;
+import br.org.scadabr.web.taglib.DateFunctions;
 
 abstract public class PollingDataSource extends DataSourceRT implements TimeoutClient {
+
     private final Log LOG = LogFactory.getLog(PollingDataSource.class);
 
     private final DataSourceVO<?> vo;
-    protected List<DataPointRT> dataPoints = new ArrayList<DataPointRT>();
+    protected List<DataPointRT> dataPoints = new ArrayList<>();
     protected boolean pointListChanged = false;
     private long pollingPeriodMillis = 300000; // Default to 5 minutes just to have something here
     private boolean quantize;
@@ -110,16 +111,18 @@ abstract public class PollingDataSource extends DataSourceRT implements TimeoutC
     public void beginPolling() {
         // Quantize the start.
         long delay = 0;
-        if (quantize)
+        if (quantize) {
             delay = pollingPeriodMillis - (System.currentTimeMillis() % pollingPeriodMillis);
+        }
         timerTask = new TimeoutTask(new FixedRateTrigger(delay, pollingPeriodMillis), this);
         super.beginPolling();
     }
 
     @Override
     public void terminate() {
-        if (timerTask != null)
+        if (timerTask != null) {
             timerTask.cancel();
+        }
         super.terminate();
     }
 
@@ -131,8 +134,8 @@ abstract public class PollingDataSource extends DataSourceRT implements TimeoutC
         if (localThread != null) {
             try {
                 localThread.join(30000); // 30 seconds
-            }
-            catch (InterruptedException e) { /* no op */
+            } catch (InterruptedException e) { /* no op */
+
             }
             if (jobThread != null) {
                 throw new ShouldNeverHappenException("Timeout waiting for data source to stop: id=" + getId()

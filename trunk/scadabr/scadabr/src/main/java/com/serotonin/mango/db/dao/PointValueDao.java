@@ -39,11 +39,11 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.transaction.TransactionStatus;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.db.RowCallback;
 import br.org.scadabr.db.spring.IntValuePairRowMapper;
-import com.serotonin.io.StreamUtils;
+import br.org.scadabr.io.StreamUtils;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.ImageSaveException;
@@ -61,11 +61,10 @@ import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.rt.maint.work.WorkItem;
 import com.serotonin.mango.vo.AnonymousUser;
 import com.serotonin.mango.vo.bean.LongPair;
-import com.serotonin.monitor.IntegerMonitor;
-import com.serotonin.util.queue.ObjectQueue;
+import br.org.scadabr.monitor.IntegerMonitor;
+import br.org.scadabr.util.queue.ObjectQueue;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.Arrays;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -74,7 +73,7 @@ import org.springframework.transaction.support.TransactionCallback;
 
 public class PointValueDao extends BaseDao {
 
-    private static List<UnsavedPointValue> UNSAVED_POINT_VALUES = new ArrayList<UnsavedPointValue>();
+    private static List<UnsavedPointValue> UNSAVED_POINT_VALUES = new ArrayList<>();
 
     private static final String POINT_VALUE_INSERT_START = "insert into pointValues (dataPointId, dataType, pointValue, ts) values ";
     private static final String POINT_VALUE_INSERT_VALUES = "(?,?,?,?)";
@@ -775,9 +774,9 @@ public class PointValueDao extends BaseDao {
 
     static class BatchWriteBehind implements WorkItem {
 
-        private static final ObjectQueue<BatchWriteBehindEntry> ENTRIES = new ObjectQueue<PointValueDao.BatchWriteBehindEntry>();
-        private static final CopyOnWriteArrayList<BatchWriteBehind> instances = new CopyOnWriteArrayList<BatchWriteBehind>();
-        private static Log LOG = LogFactory.getLog(BatchWriteBehind.class);
+        private static final ObjectQueue<BatchWriteBehindEntry> ENTRIES = new ObjectQueue<>();
+        private static final CopyOnWriteArrayList<BatchWriteBehind> instances = new CopyOnWriteArrayList<>();
+        private static final Log LOG = LogFactory.getLog(BatchWriteBehind.class);
         private static final int SPAWN_THRESHOLD = 10000;
         private static final int MAX_INSTANCES = 5;
         private static int MAX_ROWS = 1000;
@@ -834,6 +833,7 @@ public class PointValueDao extends BaseDao {
             this.ejt = ejt;
         }
 
+        @Override
         public void execute() {
             try {
                 BatchWriteBehindEntry[] inserts;

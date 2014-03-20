@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataImage.types;
 
@@ -24,14 +24,17 @@ import com.serotonin.mango.DataTypes;
  * @author Matthew Lohbihler
  */
 public class BinaryValue extends MangoValue implements Comparable<BinaryValue> {
+
     public static final BinaryValue ZERO = new BinaryValue(false);
     public static final BinaryValue ONE = new BinaryValue(true);
 
     public static BinaryValue parseBinary(String s) {
-        if (s == null || "0".equals(s))
+        if (s == null || "0".equals(s)) {
             return ZERO;
-        if ("1".equals(s) || Boolean.parseBoolean(s))
+        }
+        if ("1".equals(s) || Boolean.parseBoolean(s)) {
             return ONE;
+        }
         return ZERO;
     }
 
@@ -96,15 +99,19 @@ public class BinaryValue extends MangoValue implements Comparable<BinaryValue> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         final BinaryValue other = (BinaryValue) obj;
-        if (value != other.value)
+        if (value != other.value) {
             return false;
+        }
         return true;
     }
 

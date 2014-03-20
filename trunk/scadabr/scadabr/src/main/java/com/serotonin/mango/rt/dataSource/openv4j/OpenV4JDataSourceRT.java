@@ -32,18 +32,19 @@ import net.sf.openv4j.protocolhandlers.SimpleDataContainer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
- * 
+ *
  * TODO datatype NUMERIC_INT is missing TODO Starttime for timpepoints ???
- * 
+ *
  */
 public class OpenV4JDataSourceRT extends PollingDataSource {
 
@@ -88,10 +89,9 @@ public class OpenV4JDataSourceRT extends PollingDataSource {
                 synchronized (dc) {
                     try {
                         dc.wait(4000 * dc.getDataBlockCount());
-                    }
-                    catch (InterruptedException ex) {
+                    } catch (InterruptedException ex) {
                         raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true,
-                                new LocalizableMessage("event.exception2", vo.getName(), ex.getMessage(), "HALLO"));
+                                new LocalizableMessageImpl("event.exception2", vo.getName(), ex.getMessage(), "HALLO"));
                     }
                 }
                 for (DataPointRT point : dataPoints) {
@@ -101,36 +101,27 @@ public class OpenV4JDataSourceRT extends PollingDataSource {
                         if (decodedValue == null) {
                             throw new ShouldNeverHappenException("Got null value from "
                                     + locator.getVo().getDataPointName());
-                        }
-                        else if (decodedValue instanceof Number) {
+                        } else if (decodedValue instanceof Number) {
                             if (decodedValue instanceof Double) {
                                 point.updatePointValue(new PointValueTime((Double) decodedValue, time));
-                            }
-                            else if (decodedValue instanceof Byte) {
+                            } else if (decodedValue instanceof Byte) {
                                 point.updatePointValue(new PointValueTime(((Byte) decodedValue).doubleValue(), time));
-                            }
-                            else if (decodedValue instanceof Short) {
+                            } else if (decodedValue instanceof Short) {
                                 point.updatePointValue(new PointValueTime(((Short) decodedValue).doubleValue(), time));
-                            }
-                            else if (decodedValue instanceof Integer) {
+                            } else if (decodedValue instanceof Integer) {
                                 point.updatePointValue(new PointValueTime(((Integer) decodedValue).doubleValue(), time));
                             }
-                        }
-                        else if (decodedValue instanceof Boolean) {
+                        } else if (decodedValue instanceof Boolean) {
                             point.updatePointValue(new PointValueTime((Boolean) decodedValue, time));
-                        }
-                        else if (decodedValue instanceof CycleTimes) {
+                        } else if (decodedValue instanceof CycleTimes) {
                             point.updatePointValue(new PointValueTime(decodedValue.toString(), time));
-                        }
-                        else if (decodedValue instanceof ErrorListEntry) {
+                        } else if (decodedValue instanceof ErrorListEntry) {
                             point.updatePointValue(new PointValueTime(decodedValue.toString(), time));
-                        }
-                        else if (decodedValue instanceof Date) {
+                        } else if (decodedValue instanceof Date) {
                             point.updatePointValue(new PointValueTime(decodedValue.toString(), time));
                         }
 
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         LOG.fatal("Error during saving: " + locator.getDataPoint(), ex);
                     }
 
@@ -138,8 +129,7 @@ public class OpenV4JDataSourceRT extends PollingDataSource {
                 returnToNormal(POINT_READ_EXCEPTION_EVENT, time);
                 returnToNormal(DATA_SOURCE_EXCEPTION_EVENT, time);
 
-            }
-            finally {
+            } finally {
                 closePort();
             }
         }
@@ -154,8 +144,7 @@ public class OpenV4JDataSourceRT extends PollingDataSource {
         if (locator.getVo().getDataTypeId() == DataTypes.NUMERIC) {
             locator.getDataPoint().encode(dc, valueTime.getValue().getDoubleValue());
             dataPoint.setPointValue(valueTime, source);
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Only Numeric datatypes are supported");
         }
 
@@ -165,16 +154,14 @@ public class OpenV4JDataSourceRT extends PollingDataSource {
                 synchronized (dc) {
                     try {
                         dc.wait(5000 * dc.getDataBlockCount());
-                    }
-                    catch (InterruptedException ex) {
+                    } catch (InterruptedException ex) {
                         raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), true,
-                                new LocalizableMessage("openv4j.interrupted"));
+                                new LocalizableMessageImpl("openv4j.interrupted"));
                     }
                 }
                 returnToNormal(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis());
                 returnToNormal(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis());
-            }
-            finally {
+            } finally {
                 closePort();
             }
         }
@@ -187,12 +174,11 @@ public class OpenV4JDataSourceRT extends PollingDataSource {
             sPort = ProtocolHandler.openPort(vo.getCommPortId());
             protocolHandler.setStreams(sPort.getInputStream(), sPort.getOutputStream());
             return true;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             LOG.fatal("OpenV4J Open serial port exception", ex);
             // Raise an event.
             raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true,
-                    getSerialExceptionMessage(ex, vo.getCommPortId()));
+                    wrapSerialException(ex, vo.getCommPortId()));
             return false;
         }
     }
@@ -200,10 +186,9 @@ public class OpenV4JDataSourceRT extends PollingDataSource {
     private void closePort() {
         try {
             protocolHandler.close();
-        }
-        catch (InterruptedException ex) {
+        } catch (InterruptedException ex) {
             LOG.fatal("Close port", ex);
-            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
+            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
                     "event.exception2", vo.getName(), ex.getMessage(), "HALLO3"));
         }
         if (sPort != null) {

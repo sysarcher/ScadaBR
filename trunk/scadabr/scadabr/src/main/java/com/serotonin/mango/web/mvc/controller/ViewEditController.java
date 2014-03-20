@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.mvc.controller;
 
@@ -30,7 +30,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.ViewDao;
 import com.serotonin.mango.view.View;
@@ -38,10 +38,11 @@ import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.mvc.SimpleFormRedirectController;
 import com.serotonin.mango.web.mvc.form.ViewEditForm;
-import com.serotonin.util.ValidationUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
+import br.org.scadabr.util.ValidationUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
 
 public class ViewEditController extends SimpleFormRedirectController {
+
     private static final String SUBMIT_UPLOAD = "upload";
     private static final String SUBMIT_CLEAR_IMAGE = "clearImage";
     private static final String SUBMIT_SAVE = "save";
@@ -67,8 +68,7 @@ public class ViewEditController extends SimpleFormRedirectController {
                 // An existing view.
                 view = new ViewDao().getView(Integer.parseInt(viewIdStr));
                 Permissions.ensureViewEditPermission(user, view);
-            }
-            else {
+            } else {
                 // A new view.
                 view = new View();
                 view.setId(Common.NEW_ID);
@@ -77,9 +77,9 @@ public class ViewEditController extends SimpleFormRedirectController {
             }
             user.setView(view);
             view.validateViewComponents(false);
-        }
-        else
+        } else {
             view = user.getView();
+        }
 
         ViewEditForm form = new ViewEditForm();
         form.setView(view);
@@ -115,8 +115,9 @@ public class ViewEditController extends SimpleFormRedirectController {
                     // Create the image file name.
                     String filename = Integer.toString(imageId);
                     int dot = form.getBackgroundImageMP().getOriginalFilename().lastIndexOf('.');
-                    if (dot != -1)
+                    if (dot != -1) {
                         filename += form.getBackgroundImageMP().getOriginalFilename().substring(dot);
+                    }
 
                     // Save the file.
                     FileOutputStream fos = new FileOutputStream(new File(dir, filename));
@@ -128,8 +129,9 @@ public class ViewEditController extends SimpleFormRedirectController {
             }
         }
 
-        if (hasSubmitParameter(request, SUBMIT_CLEAR_IMAGE))
+        if (hasSubmitParameter(request, SUBMIT_CLEAR_IMAGE)) {
             form.getView().setBackgroundFilename(null);
+        }
 
         if (hasSubmitParameter(request, SUBMIT_SAVE)) {
             DwrResponseI18n response = new DwrResponseI18n();
@@ -149,8 +151,9 @@ public class ViewEditController extends SimpleFormRedirectController {
         ViewEditForm form = (ViewEditForm) command;
         ViewDao viewDao = new ViewDao();
 
-        if (hasSubmitParameter(request, SUBMIT_CANCEL))
+        if (hasSubmitParameter(request, SUBMIT_CANCEL)) {
             return getSuccessRedirectView("viewId=" + form.getView().getId());
+        }
 
         if (hasSubmitParameter(request, SUBMIT_DELETE)) {
             viewDao.removeView(form.getView().getId());
@@ -180,14 +183,16 @@ public class ViewEditController extends SimpleFormRedirectController {
                     for (int i = 0; i < names.length; i++) {
                         dot = names[i].lastIndexOf('.');
                         try {
-                            if (dot == -1)
+                            if (dot == -1) {
                                 index = Integer.parseInt(names[i]);
-                            else
+                            } else {
                                 index = Integer.parseInt(names[i].substring(0, dot));
-                            if (index >= nextImageId)
+                            }
+                            if (index >= nextImageId) {
                                 nextImageId = index + 1;
-                        }
-                        catch (NumberFormatException e) { /* no op */
+                            }
+                        } catch (NumberFormatException e) { /* no op */
+
                         }
                     }
                 }

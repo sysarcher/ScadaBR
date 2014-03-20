@@ -37,7 +37,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -54,9 +54,12 @@ import com.serotonin.mango.vo.event.EventHandlerVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.mango.web.dwr.EventsDwr;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.i18n.LocalizableMessage;
-import com.serotonin.web.i18n.LocalizableMessageParseException;
+import br.org.scadabr.web.i18n.I18NUtils;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.web.i18n.LocalizableMessageParseException;
+import br.org.scadabr.web.l10n.Localizer;
 import java.sql.Connection;
 import java.sql.Statement;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -104,7 +107,7 @@ public class EventDao extends BaseDao {
                     ps.setNull(7, Types.INTEGER);
                 }
                 ps.setInt(8, event.getAlarmLevel());
-                ps.setString(9, event.getMessage().serialize());
+                ps.setString(9, I18NUtils.serialize(event.getMessage()));
                 if (!event.isAlarm()) {
                     event.setAcknowledgedTimestamp(event.getActiveTimestamp());
                     ps.setLong(10, event.getAcknowledgedTimestamp());
@@ -306,9 +309,9 @@ public class EventDao extends BaseDao {
 
             LocalizableMessage message;
             try {
-                message = LocalizableMessage.deserialize(rs.getString(10));
+                message = I18NUtils.deserialize(rs.getString(10));
             } catch (LocalizableMessageParseException e) {
-                message = new LocalizableMessage("common.default",
+                message = new LocalizableMessageImpl("common.default",
                         rs.getString(10));
             }
 
@@ -521,7 +524,7 @@ public class EventDao extends BaseDao {
                         // Do the text search. If the instance has a match, put
                         // it in the result. Otherwise ignore.
                         StringBuilder text = new StringBuilder();
-                        text.append(e.getMessage().getLocalizedMessage(bundle));
+                        text.append(Localizer.localizeMessage(e.getMessage(), bundle));
                         for (UserComment comment : e.getEventComments()) {
                             text.append(' ').append(comment.getComment());
                         }
@@ -729,7 +732,7 @@ public class EventDao extends BaseDao {
 
     void updateEventHandler(final EventHandlerVO handler) {
         EventHandlerVO old = getEventHandler(handler.getId());
-        
+
         ejt.update(new PreparedStatementCreator() {
 
             @Override

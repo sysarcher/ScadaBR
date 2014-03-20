@@ -16,11 +16,13 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.publish.PublishedPointRT;
 import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.vo.publish.persistent.PersistentPointVO;
-import com.serotonin.sync.Synchronizer;
-import com.serotonin.util.queue.ByteQueue;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.sync.Synchronizer;
+import br.org.scadabr.util.queue.ByteQueue;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 class SyncHandler implements Runnable {
+
     static final Log LOG = LogFactory.getLog(SyncHandler.class);
     private static final String START_TIMES_KEY = "startTimes";
 
@@ -64,12 +66,13 @@ class SyncHandler implements Runnable {
         }
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     @Override
     public void run() {
         startTimes = (Map<Integer, Long>) sendThread.publisher.getPersistentData(START_TIMES_KEY);
-        if (startTimes == null)
+        if (startTimes == null) {
             startTimes = new HashMap<Integer, Long>();
+        }
 
         long start = System.currentTimeMillis();
 
@@ -79,28 +82,28 @@ class SyncHandler implements Runnable {
             LOG.info("Sync handler running with cutoff: " + cutoff);
 
             // Create the list of points to be checked.
-            pointsToCheck = new ArrayList<PublishedPointRT<PersistentPointVO>>(sendThread.publisher.getPointRTs());
+            pointsToCheck = new ArrayList<>(sendThread.publisher.getPointRTs());
 
             // The top byte of the request id int is the id of the point sync class that sent it, so there can not be 
             // more than 128 tasks.
             int tasks = 10;
-            if (pointsToCheck.size() < tasks)
+            if (pointsToCheck.size() < tasks) {
                 tasks = pointsToCheck.size();
+            }
 
-            Synchronizer<PointSync> sync = new Synchronizer<PointSync>();
+            Synchronizer<PointSync> sync = new Synchronizer<>();
             pointSyncs = new PointSync[tasks];
             for (int i = 0; i < tasks; i++) {
                 pointSyncs[i] = new PointSync(i);
                 sync.addTask(pointSyncs[i]);
             }
             sync.executeAndWait(Common.timer.getExecutorService());
-        }
-        finally {
+        } finally {
             sendThread.endSyncHandler();
             LOG.info("Sync handler run completed");
         }
 
-        LocalizableMessage lm = new LocalizableMessage("event.pb.persistent.syncCompleted.details",
+        LocalizableMessage lm = new LocalizableMessageImpl("event.pb.persistent.syncCompleted.details",
                 sendThread.publisher.getPointRTs().size(), requestsSent, recordsSynced, targetOvercountPoints.size(),
                 responseErrors, DateUtils.getDuration(System.currentTimeMillis() - start));
         sendThread.publisher.raiseSyncCompletionEvent(lm);
@@ -111,10 +114,11 @@ class SyncHandler implements Runnable {
         int syncId = (responseId >> 16) & 0xFF;
 
         // Find the point sync to dispatch this to.
-        if (syncId < 0 || syncId >= pointSyncs.length)
+        if (syncId < 0 || syncId >= pointSyncs.length) {
             LOG.info("Invalid sync id " + syncId);
-        else
+        } else {
             pointSyncs[syncId].responseReceived(responseId & 0xFFFF, packet.popLong());
+        }
     }
 
     void sendRequest(int id, int requestId, int pointIndex, long from, long to) {
@@ -131,6 +135,7 @@ class SyncHandler implements Runnable {
     }
 
     class PointSync implements Runnable {
+
         private final int id;
 
         private int nextRequestId;
@@ -146,19 +151,22 @@ class SyncHandler implements Runnable {
             LOG.info("PointSync " + id + " started");
 
             while (true) {
-                if (cancelled || !sendThread.isConnected())
+                if (cancelled || !sendThread.isConnected()) {
                     break;
+                }
 
                 PublishedPointRT<PersistentPointVO> point;
                 synchronized (pointsToCheck) {
-                    if (pointsToCheck.isEmpty())
+                    if (pointsToCheck.isEmpty()) {
                         break;
+                    }
 
                     point = pointsToCheck.remove(0);
                 }
 
-                if (point.isPointEnabled())
+                if (point.isPointEnabled()) {
                     checkPoint(point.getVo(), cutoff);
+                }
             }
 
             LOG.info("PointSync " + id + " completed");
@@ -175,13 +183,15 @@ class SyncHandler implements Runnable {
                 updatePointStartTime(point, from);
             }
 
-            if (from == -1)
-                // There are no values for this point yet, so ignore.
+            if (from == -1) // There are no values for this point yet, so ignore.
+            {
                 return;
+            }
 
-            if (from > to)
-                // Nothing in the range we're interested in, so ignore.
+            if (from > to) // Nothing in the range we're interested in, so ignore.
+            {
                 return;
+            }
 
             // Start recursing through the range
             pointUpdated = false;
@@ -191,7 +201,8 @@ class SyncHandler implements Runnable {
         }
 
         /**
-         * The recursive method that synchronizes range counts on both sides of the connection.
+         * The recursive method that synchronizes range counts on both sides of
+         * the connection.
          */
         void checkRangeImpl(PersistentPointVO point, long from, long to) {
             // Send the packet
@@ -199,12 +210,14 @@ class SyncHandler implements Runnable {
 
             // Send the range check request.
             int requestId = nextRequestId++;
-            if (nextRequestId > 0xFFFF)
+            if (nextRequestId > 0xFFFF) {
                 nextRequestId = 0;
+            }
 
-            if (!sendThread.isConnected())
-                // If we've lost the connection, give up.
+            if (!sendThread.isConnected()) // If we've lost the connection, give up.
+            {
                 return;
+            }
 
             // Create the request.
             sendRequest(id, requestId, point.getIndex(), from, to);
@@ -216,33 +229,35 @@ class SyncHandler implements Runnable {
             // Wait for the response ...
             synchronized (this) {
                 // Just check to see if we should wait.
-                if (cancelled)
+                if (cancelled) {
                     return;
+                }
 
                 // ... if we haven't received it already.
                 if (responseId == -1) {
                     try {
                         // Wait up to 20 minutes
                         wait(20 * 60 * 1000);
-                    }
-                    catch (InterruptedException e) {
+                    } catch (InterruptedException e) {
                         // no op
                     }
                 }
 
                 // Check to see if we were canceled.
-                if (cancelled)
+                if (cancelled) {
                     return;
+                }
             }
 
             // Check for a bad response id.
             if (responseId != requestId) {
-                if (responseId == -1)
-                    // This really shouldn't happen. At least, we'd like to prevent it from happening as much as
-                    // possible, so let's make sure we know about it.
+                if (responseId == -1) // This really shouldn't happen. At least, we'd like to prevent it from happening as much as
+                // possible, so let's make sure we know about it.
+                {
                     LOG.error("No response received for request id " + requestId);
-                else
+                } else {
                     LOG.error("Request/response id mismatch: " + requestId);
+                }
 
                 responseErrors++;
                 pointUpdated = true;
@@ -257,8 +272,9 @@ class SyncHandler implements Runnable {
 
             if (count == responseCount) {
                 // Counts match. Done here.
-                if (!pointUpdated)
+                if (!pointUpdated) {
                     updatePointStartTime(point, to + 1);
+                }
                 return;
             }
 
@@ -266,9 +282,10 @@ class SyncHandler implements Runnable {
                 // None of the records in this range exist in the target. So, send them by adding them to the send
                 // queue.
                 List<PointValueTime> pvts = pointValueDao.getPointValuesBetween(point.getDataPointId(), from, to + 1);
-                if (LOG.isInfoEnabled())
+                if (LOG.isInfoEnabled()) {
                     LOG.info("Syncing records: count=" + count + ", queried=" + pvts.size() + ", point="
                             + point.getXid() + ", from=" + from + ", to=" + to);
+                }
                 sendThread.publisher.publish(point, pvts);
                 recordsSynced += pvts.size();
                 pointUpdated = true;
@@ -276,21 +293,24 @@ class SyncHandler implements Runnable {
             }
 
             if (count == 0) {
-                if (LOG.isInfoEnabled())
+                if (LOG.isInfoEnabled()) {
                     LOG.info("Overcount detected: local=" + count + ", target=" + responseCount + ", point="
                             + point.getXid() + ", from=" + from + ", to=" + to);
+                }
                 return;
             }
 
-            if (count < responseCount)
-                // This can happen if the source is only logging changes but sending updates, and the target is 
-                // logging all. Reconciliation in this case means checking every record, so this is not a condition 
-                // that is handled. Just noted.
+            if (count < responseCount) // This can happen if the source is only logging changes but sending updates, and the target is 
+            // logging all. Reconciliation in this case means checking every record, so this is not a condition 
+            // that is handled. Just noted.
+            {
                 targetOvercountPoints.add(point.getDataPointId());
+            }
 
-            if (from == to)
-                // An overcount on the target. Most likely duplicate records. Ignore.
+            if (from == to) // An overcount on the target. Most likely duplicate records. Ignore.
+            {
                 return;
+            }
 
             // There are differences in this range. Split the range and recurse to find them.
             long mid = ((to - from) >> 1) + from;

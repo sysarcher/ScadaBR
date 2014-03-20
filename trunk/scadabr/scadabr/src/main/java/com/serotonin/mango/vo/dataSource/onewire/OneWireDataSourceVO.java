@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.onewire;
 
@@ -25,11 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.onewire.OneWireDataSourceRT;
@@ -39,30 +39,33 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class OneWireDataSourceVO extends DataSourceVO<OneWireDataSourceVO> {
+
     public static final Type TYPE = Type.ONE_WIRE;
     public static final int RESCAN_NONE = 0;
     public static final String RESCAN_NONE_TEXT = "NONE";
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
-        ets.add(createEventType(OneWireDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessage(
+        ets.add(createEventType(OneWireDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.dataSource")));
-        ets.add(createEventType(OneWireDataSourceRT.POINT_READ_EXCEPTION_EVENT, new LocalizableMessage(
+        ets.add(createEventType(OneWireDataSourceRT.POINT_READ_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.pointRead")));
-        ets.add(createEventType(OneWireDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, new LocalizableMessage(
+        ets.add(createEventType(OneWireDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.pointWrite")));
     }
 
     private static final ExportCodes EVENT_CODES = new ExportCodes();
+
     static {
         EVENT_CODES.addElement(OneWireDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, "DATA_SOURCE_EXCEPTION");
         EVENT_CODES.addElement(OneWireDataSourceRT.POINT_READ_EXCEPTION_EVENT, "POINT_READ_EXCEPTION");
@@ -76,7 +79,7 @@ public class OneWireDataSourceVO extends DataSourceVO<OneWireDataSourceVO> {
 
     @Override
     public LocalizableMessage getConnectionDescription() {
-        return new LocalizableMessage("common.default", commPortId);
+        return new LocalizableMessageImpl("common.default", commPortId);
     }
 
     @Override
@@ -147,25 +150,30 @@ public class OneWireDataSourceVO extends DataSourceVO<OneWireDataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
 
-        if (StringUtils.isEmpty(commPortId))
+        if (StringUtils.isEmpty(commPortId)) {
             response.addContextualMessage("commPortId", "validate.required");
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType))
+        }
+        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
             response.addContextualMessage("updatePeriodType", "validate.invalidValue");
-        if (updatePeriods <= 0)
+        }
+        if (updatePeriods <= 0) {
             response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
-        if (rescanPeriodType != RESCAN_NONE && rescanPeriods <= 0)
+        }
+        if (rescanPeriodType != RESCAN_NONE && rescanPeriods <= 0) {
             response.addContextualMessage("rescanPeriods", "validate.greaterThanZero");
+        }
     }
 
     @Override
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.1wire.port", commPortId);
         AuditEventType.addPeriodMessage(list, "dsEdit.updatePeriod", updatePeriodType, updatePeriods);
-        if (rescanPeriodType == RESCAN_NONE)
-            AuditEventType.addPropertyMessage(list, "dsEdit.1wire.scheduledRescan", new LocalizableMessage(
+        if (rescanPeriodType == RESCAN_NONE) {
+            AuditEventType.addPropertyMessage(list, "dsEdit.1wire.scheduledRescan", new LocalizableMessageImpl(
                     "dsEdit.1wire.none"));
-        else
+        } else {
             AuditEventType.addPeriodMessage(list, "dsEdit.1wire.scheduledRescan", rescanPeriodType, rescanPeriods);
+        }
     }
 
     @Override
@@ -175,16 +183,18 @@ public class OneWireDataSourceVO extends DataSourceVO<OneWireDataSourceVO> {
                 from.updatePeriods, updatePeriodType, updatePeriods);
         if (from.rescanPeriodType != rescanPeriodType || from.rescanPeriods != rescanPeriods) {
             LocalizableMessage fromMessage;
-            if (from.rescanPeriodType == RESCAN_NONE)
-                fromMessage = new LocalizableMessage("dsEdit.1wire.none");
-            else
+            if (from.rescanPeriodType == RESCAN_NONE) {
+                fromMessage = new LocalizableMessageImpl("dsEdit.1wire.none");
+            } else {
                 fromMessage = Common.getPeriodDescription(from.rescanPeriodType, from.rescanPeriods);
+            }
 
             LocalizableMessage toMessage;
-            if (rescanPeriodType == RESCAN_NONE)
-                toMessage = new LocalizableMessage("dsEdit.1wire.none");
-            else
+            if (rescanPeriodType == RESCAN_NONE) {
+                toMessage = new LocalizableMessageImpl("dsEdit.1wire.none");
+            } else {
                 toMessage = Common.getPeriodDescription(rescanPeriodType, rescanPeriods);
+            }
 
             AuditEventType.addPropertyChangeMessage(list, "dsEdit.1wire.scheduledRescan", fromMessage, toMessage);
         }
@@ -217,8 +227,7 @@ public class OneWireDataSourceVO extends DataSourceVO<OneWireDataSourceVO> {
             updatePeriods = in.readInt();
             rescanPeriodType = RESCAN_NONE;
             rescanPeriods = 1;
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             commPortId = SerializationHelper.readSafeUTF(in);
             updatePeriodType = in.readInt();
             updatePeriods = in.readInt();
@@ -232,14 +241,15 @@ public class OneWireDataSourceVO extends DataSourceVO<OneWireDataSourceVO> {
         super.jsonDeserialize(reader, json);
 
         Integer value = deserializeUpdatePeriodType(json);
-        if (value != null)
+        if (value != null) {
             updatePeriodType = value;
+        }
 
         String text = json.getString("rescanPeriodType");
         if (text != null) {
-            if (RESCAN_NONE_TEXT.equalsIgnoreCase(text))
+            if (RESCAN_NONE_TEXT.equalsIgnoreCase(text)) {
                 rescanPeriodType = RESCAN_NONE;
-            else {
+            } else {
                 rescanPeriodType = Common.TIME_PERIOD_CODES.getId(text);
                 if (rescanPeriodType == -1) {
                     List<String> result = new ArrayList<String>();
@@ -256,9 +266,10 @@ public class OneWireDataSourceVO extends DataSourceVO<OneWireDataSourceVO> {
         super.jsonSerialize(map);
         serializeUpdatePeriodType(map, updatePeriodType);
 
-        if (rescanPeriodType == RESCAN_NONE)
+        if (rescanPeriodType == RESCAN_NONE) {
             map.put("rescanPeriodType", RESCAN_NONE_TEXT);
-        else
+        } else {
             map.put("rescanPeriodType", Common.TIME_PERIOD_CODES.getCode(rescanPeriodType));
+        }
     }
 }

@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.event.handlers;
 
@@ -38,12 +38,15 @@ import com.serotonin.mango.util.timeout.ModelTimeoutTask;
 import com.serotonin.mango.vo.event.EventHandlerVO;
 import com.serotonin.mango.web.email.MangoEmailContent;
 import com.serotonin.mango.web.email.UsedImagesDirective;
-import com.serotonin.timer.TimerTask;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.email.EmailInline;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.timer.TimerTask;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.email.EmailInline;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.web.l10n.Localizer;
 
 public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient<EventInstance> {
+
     private static final Log LOG = LogFactory.getLog(EmailHandlerRT.class);
 
     private TimerTask escalationTask;
@@ -51,6 +54,7 @@ public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient
     private Set<String> activeRecipients;
 
     private enum NotificationType {
+
         ACTIVE("active", "ftl.subject.active"), //
         ESCALATION("escalation", "ftl.subject.escalation"), //
         INACTIVE("inactive", "ftl.subject.inactive");
@@ -73,7 +77,8 @@ public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient
     }
 
     /**
-     * The list of all of the recipients - active and escalation - for sending upon inactive if configured to do so.
+     * The list of all of the recipients - active and escalation - for sending
+     * upon inactive if configured to do so.
      */
     private Set<String> inactiveRecipients;
 
@@ -96,11 +101,12 @@ public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient
 
         // If an inactive notification is to be sent, save the active recipients.
         if (vo.isSendInactive()) {
-            if (vo.isInactiveOverride())
+            if (vo.isInactiveOverride()) {
                 inactiveRecipients = new MailingListDao().getRecipientAddresses(vo.getInactiveRecipients(),
                         new DateTime(evt.getActiveTimestamp()));
-            else
+            } else {
                 inactiveRecipients = activeRecipients;
+            }
         }
 
         // If an escalation is to be sent, set up timeout to trigger it.
@@ -123,19 +129,22 @@ public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient
 
         // If an inactive notification is to be sent, save the escalation recipients, but only if inactive recipients
         // have not been overridden.
-        if (vo.isSendInactive() && !vo.isInactiveOverride())
+        if (vo.isSendInactive() && !vo.isInactiveOverride()) {
             inactiveRecipients.addAll(addresses);
+        }
     }
 
     @Override
     synchronized public void eventInactive(EventInstance evt) {
         // Cancel the escalation job in case it's there
-        if (escalationTask != null)
+        if (escalationTask != null) {
             escalationTask.cancel();
+        }
 
-        if (inactiveRecipients != null && inactiveRecipients.size() > 0)
-            // Send an email to the inactive recipients.
+        if (inactiveRecipients != null && inactiveRecipients.size() > 0) // Send an email to the inactive recipients.
+        {
             sendEmail(evt, NotificationType.INACTIVE, inactiveRecipients);
+        }
     }
 
     public static void sendActiveEmail(EventInstance evt, Set<String> addresses) {
@@ -160,42 +169,44 @@ public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient
 
         // Determine the subject to use.
         LocalizableMessage subjectMsg;
-        LocalizableMessage notifTypeMsg = new LocalizableMessage(notificationType.getKey());
+        LocalizableMessage notifTypeMsg = new LocalizableMessageImpl(notificationType.getKey());
         if (StringUtils.isEmpty(alias)) {
-            if (evt.getId() == Common.NEW_ID)
-                subjectMsg = new LocalizableMessage("ftl.subject.default", notifTypeMsg);
-            else
-                subjectMsg = new LocalizableMessage("ftl.subject.default.id", notifTypeMsg, evt.getId());
-        }
-        else {
-            if (evt.getId() == Common.NEW_ID)
-                subjectMsg = new LocalizableMessage("ftl.subject.alias", alias, notifTypeMsg);
-            else
-                subjectMsg = new LocalizableMessage("ftl.subject.alias.id", alias, notifTypeMsg, evt.getId());
+            if (evt.getId() == Common.NEW_ID) {
+                subjectMsg = new LocalizableMessageImpl("ftl.subject.default", notifTypeMsg);
+            } else {
+                subjectMsg = new LocalizableMessageImpl("ftl.subject.default.id", notifTypeMsg, evt.getId());
+            }
+        } else {
+            if (evt.getId() == Common.NEW_ID) {
+                subjectMsg = new LocalizableMessageImpl("ftl.subject.alias", alias, notifTypeMsg);
+            } else {
+                subjectMsg = new LocalizableMessageImpl("ftl.subject.alias.id", alias, notifTypeMsg, evt.getId());
+            }
         }
 
-        String subject = subjectMsg.getLocalizedMessage(bundle);
+        String subject = Localizer.localizeMessage(subjectMsg, bundle);
 
         try {
             String[] toAddrs = addresses.toArray(new String[0]);
             UsedImagesDirective inlineImages = new UsedImagesDirective();
 
             // Send the email.
-            Map<String, Object> model = new HashMap<String, Object>();
+            Map<String, Object> model = new HashMap<>();
             model.put("evt", evt);
-            if (evt.getContext() != null)
+            if (evt.getContext() != null) {
                 model.putAll(evt.getContext());
+            }
             model.put("img", inlineImages);
             model.put("instanceDescription", SystemSettingsDao.getValue(SystemSettingsDao.INSTANCE_DESCRIPTION));
             MangoEmailContent content = new MangoEmailContent(notificationType.getFile(), model, bundle, subject,
                     Common.UTF8);
 
-            for (String s : inlineImages.getImageList())
+            for (String s : inlineImages.getImageList()) {
                 content.addInline(new EmailInline.FileInline(s, Common.ctx.getServletContext().getRealPath(s)));
+            }
 
             EmailWorkItem.queueEmail(toAddrs, content);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOG.error("", e);
         }
     }

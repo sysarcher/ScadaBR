@@ -23,45 +23,45 @@
     Context parameters.
    -->
   <context-param>
-    <param-name>com.serotonin.web.taglib.ListSortTag.styleClass</param-name>
+    <param-name>br.org.scadabr.web.taglib.ListSortTag.styleClass</param-name>
     <param-value>rowHeaderLink</param-value>
   </context-param>
   <context-param>
-    <param-name>com.serotonin.web.taglib.ListSortTag.imageAlign</param-name>
+    <param-name>br.org.scadabr.web.taglib.ListSortTag.imageAlign</param-name>
     <param-value>top</param-value>
   </context-param>
   
   <context-param>
-    <param-name>com.serotonin.web.taglib.ListSortTag.upImage.src</param-name>
+    <param-name>br.org.scadabr.web.taglib.ListSortTag.upImage.src</param-name>
     <param-value>images/icon_arrow_up.png</param-value>
   </context-param>
   <context-param>
-    <param-name>com.serotonin.web.taglib.ListSortTag.upImage.width</param-name>
+    <param-name>br.org.scadabr.web.taglib.ListSortTag.upImage.width</param-name>
     <param-value>16</param-value>
   </context-param>
   <context-param>
-    <param-name>com.serotonin.web.taglib.ListSortTag.upImage.height</param-name>
+    <param-name>br.org.scadabr.web.taglib.ListSortTag.upImage.height</param-name>
     <param-value>16</param-value>
   </context-param>
   <context-param>
-    <param-name>com.serotonin.web.taglib.ListSortTag.upImage.altKey</param-name>
+    <param-name>br.org.scadabr.web.taglib.ListSortTag.upImage.altKey</param-name>
     <param-value>pagination.ascending</param-value>
   </context-param>
   
   <context-param>
-    <param-name>com.serotonin.web.taglib.ListSortTag.downImage.src</param-name>
+    <param-name>br.org.scadabr.web.taglib.ListSortTag.downImage.src</param-name>
     <param-value>images/icon_arrow_down.png</param-value>
   </context-param>
   <context-param>
-    <param-name>com.serotonin.web.taglib.ListSortTag.downImage.width</param-name>
+    <param-name>br.org.scadabr.web.taglib.ListSortTag.downImage.width</param-name>
     <param-value>16</param-value>
   </context-param>
   <context-param>
-    <param-name>com.serotonin.web.taglib.ListSortTag.downImage.height</param-name>
+    <param-name>br.org.scadabr.web.taglib.ListSortTag.downImage.height</param-name>
     <param-value>16</param-value>
   </context-param>
   <context-param>
-    <param-name>com.serotonin.web.taglib.ListSortTag.downImage.altKey</param-name>
+    <param-name>br.org.scadabr.web.taglib.ListSortTag.downImage.altKey</param-name>
     <param-value>pagination.descending</param-value>
   </context-param>
   
@@ -71,7 +71,7 @@
    -->
   <filter>
     <filter-name>CharacterSet</filter-name>
-    <filter-class>com.serotonin.web.filter.CharacterSetFilter</filter-class>
+    <filter-class>br.org.scadabr.web.filter.CharacterSetFilter</filter-class>
     <init-param>
       <param-name>charset</param-name>
       <param-value>UTF-8</param-value>

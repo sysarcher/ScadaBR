@@ -38,33 +38,33 @@ public class SecondaryAddressingSearch extends MBusSearchByAddressing {
 
     public int maskedId() {
         if ((id == null) || (id.length() == 0)) {
-            return (int)0xFFFFFFFF;
+            return (int) 0xFFFFFFFF;
         } else {
-            return (int)Long.parseLong(id, 16);
+            return (int) Long.parseLong(id, 16);
         }
     }
 
     public byte maskedVersion() {
         if ((version == null) || (version.length() == 0)) {
-            return (byte)0xFF;
+            return (byte) 0xFF;
         } else {
-            return (byte)Short.parseShort(version, 16);
+            return (byte) Short.parseShort(version, 16);
         }
     }
 
     public byte maskedMedium() {
         if ((medium == null) || (medium.length() == 0)) {
-            return (byte)0xFF;
+            return (byte) 0xFF;
         } else {
-             return (byte)MBusMedium.fromLabel(medium).getId();
+            return (byte) MBusMedium.fromLabel(medium).getId();
         }
     }
 
     public short maskedManufacturer() {
         if ((manufacturer == null) || (manufacturer.length() == 0)) {
-            return (short)0xFFFF;
+            return (short) 0xFFFF;
         } else {
-             return MBusUtils.man2Short(manufacturer);
+            return MBusUtils.man2Short(manufacturer);
         }
     }
 

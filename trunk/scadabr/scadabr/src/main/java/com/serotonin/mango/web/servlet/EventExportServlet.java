@@ -16,17 +16,20 @@ import com.serotonin.mango.vo.report.EventCsvStreamer;
 import com.serotonin.mango.web.dwr.beans.EventExportDefinition;
 
 public class EventExportServlet extends HttpServlet {
+
     private static final long serialVersionUID = 1L;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         User user = Common.getUser(request);
-        if (user == null)
+        if (user == null) {
             return;
+        }
 
         EventExportDefinition def = user.getEventExportDefinition();
-        if (def == null)
+        if (def == null) {
             return;
+        }
 
         final ResourceBundle bundle = Common.getBundle();
         List<EventInstance> events = new EventDao().search(def.getEventId(), def.getEventSourceType(), def.getStatus(),

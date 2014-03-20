@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr.beans;
 
@@ -29,12 +29,13 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import br.org.scadabr.db.KeyValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.publish.httpSender.HttpSenderRT;
-import com.serotonin.web.http.HttpUtils;
+import br.org.scadabr.web.http.HttpUtils;
 
 /**
  * @author Matthew Lohbihler
  */
 public class HttpSenderTester extends Thread implements TestingUtility {
+
     private final String url;
     private final boolean usePost;
     private final List<KeyValuePair> staticHeaders;
@@ -58,8 +59,7 @@ public class HttpSenderTester extends Thread implements TestingUtility {
             PostMethod post = new PostMethod(url);
             post.addParameters(convertToNVPs(staticParameters));
             method = post;
-        }
-        else {
+        } else {
             GetMethod get = new GetMethod(url);
             get.setQueryString(convertToNVPs(staticParameters));
             method = get;
@@ -69,20 +69,20 @@ public class HttpSenderTester extends Thread implements TestingUtility {
         method.addRequestHeader("User-Agent", HttpSenderRT.USER_AGENT);
 
         // Add the user-defined headers.
-        for (KeyValuePair kvp : staticHeaders)
+        for (KeyValuePair kvp : staticHeaders) {
             method.addRequestHeader(kvp.getKey(), kvp.getValue());
+        }
 
         try {
             int code = Common.getHttpClient().executeMethod(method);
-            if (code != HttpStatus.SC_OK)
+            if (code != HttpStatus.SC_OK) {
                 result = "ERROR: Invalid response code: " + code;
-            else
+            } else {
                 result = HttpUtils.readResponseBody(method, 1024);
-        }
-        catch (Exception e) {
+            }
+        } catch (Exception e) {
             result = "ERROR: " + e.getMessage();
-        }
-        finally {
+        } finally {
             method.releaseConnection();
         }
     }

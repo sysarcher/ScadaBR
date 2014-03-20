@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.view.stats;
 
@@ -29,13 +29,14 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
-import com.serotonin.util.ObjectUtils;
+import java.util.Objects;
 
 /**
  * @author Matthew Lohbihler
  */
 public class StartsAndRuntimeList implements StatisticsGenerator {
-    private final List<StartsAndRuntime> data = new ArrayList<StartsAndRuntime>();
+
+    private final List<StartsAndRuntime> data = new ArrayList<>();
 
     public StartsAndRuntimeList(PointValueTime startValue, List<? extends IValueTime> values, long start, long end) {
         this(startValue == null ? null : startValue.getValue(), values, start, end);
@@ -43,8 +44,9 @@ public class StartsAndRuntimeList implements StatisticsGenerator {
 
     public StartsAndRuntimeList(MangoValue startValue, List<? extends IValueTime> values, long start, long end) {
         this(startValue, start, end);
-        for (IValueTime vt : values)
+        for (IValueTime vt : values) {
             addValueTime(vt);
+        }
         done();
     }
 
@@ -63,17 +65,21 @@ public class StartsAndRuntimeList implements StatisticsGenerator {
         }
     }
 
+    @Override
     public void addValueTime(IValueTime vt) {
-        if (lastTime == -1)
+        if (lastTime == -1) {
             lastTime = vt.getTime();
+        }
 
-        if (realStart == -1)
+        if (realStart == -1) {
             realStart = lastTime;
+        }
 
-        if (!ObjectUtils.isEqual(vt.getValue(), lastValue)) {
+        if (!Objects.equals(vt.getValue(), lastValue)) {
             // Update the last value stats, if any.
-            if (sar != null)
+            if (sar != null) {
                 sar.runtime += vt.getTime() - lastTime;
+            }
 
             lastValue = vt.getValue();
             lastTime = vt.getTime();
@@ -83,16 +89,20 @@ public class StartsAndRuntimeList implements StatisticsGenerator {
         }
     }
 
+    @Override
     public void done() {
-        if (sar != null)
+        if (sar != null) {
             sar.runtime += end - lastTime;
+        }
 
-        if (realStart == -1)
+        if (realStart == -1) {
             realStart = lastTime;
+        }
 
         // Calculate runtime percentages.
-        for (StartsAndRuntime s : data)
+        for (StartsAndRuntime s : data) {
             s.calculateRuntimePercentage(end - realStart);
+        }
 
         // Sort by value.
         Collections.sort(data, new Comparator<StartsAndRuntime>() {
@@ -111,9 +121,10 @@ public class StartsAndRuntimeList implements StatisticsGenerator {
     }
 
     public Map<Object, StartsAndRuntime> getStartsAndRuntime() {
-        Map<Object, StartsAndRuntime> result = new HashMap<Object, StartsAndRuntime>();
-        for (StartsAndRuntime sar : data)
+        Map<Object, StartsAndRuntime> result = new HashMap<>();
+        for (StartsAndRuntime sar : data) {
             result.put(sar.getValue(), sar);
+        }
         return result;
     }
 
@@ -127,8 +138,9 @@ public class StartsAndRuntimeList implements StatisticsGenerator {
 
     public StartsAndRuntime get(MangoValue value) {
         for (StartsAndRuntime sar : data) {
-            if (ObjectUtils.isEqual(sar.value, value))
+            if (Objects.equals(sar.value, value)) {
                 return sar;
+            }
         }
 
         StartsAndRuntime sar = new StartsAndRuntime();
@@ -150,7 +162,7 @@ public class StartsAndRuntimeList implements StatisticsGenerator {
     public static void main(String[] args) {
         {
             MultistateValue startValue = new MultistateValue(3);
-            List<PointValueTime> values = new ArrayList<PointValueTime>();
+            List<PointValueTime> values = new ArrayList<>();
             values.add(new PointValueTime(1, 2000));
             values.add(new PointValueTime(2, 3000));
             values.add(new PointValueTime(2, 5000));

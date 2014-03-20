@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2009 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2009 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.mvc.controller;
 
@@ -30,12 +30,12 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.web.comparators.EventInstanceComparator;
-import com.serotonin.web.util.PaginatedData;
-import com.serotonin.web.util.PaginatedListController;
-import com.serotonin.web.util.PagingDataForm;
+import br.org.scadabr.web.util.PaginatedData;
+import br.org.scadabr.web.util.PaginatedListController;
+import br.org.scadabr.web.util.PagingDataForm;
 
 public class EventsController extends PaginatedListController {
-   
+
     @SuppressWarnings("unchecked")
     @Override
     protected PaginatedData getData(HttpServletRequest request, PagingDataForm paging, BindException errors)
@@ -55,14 +55,15 @@ public class EventsController extends PaginatedListController {
 //            data = Common.ctx.getEventManager().getActiveEvents(Common.getUser(request));
         List<EventInstance> data = new EventDao().getPendingEvents(Common.getUser(request).getId());
         sortData(bundle, data, paging);
-        return new PaginatedData<EventInstance>(data, data.size());
+        return new PaginatedData<>(data, data.size());
     }
-    
+
     @SuppressWarnings("unchecked")
     private void sortData(ResourceBundle bundle, List<EventInstance> data, final PagingDataForm paging) {
         EventInstanceComparator comp = new EventInstanceComparator(bundle, paging.getSortField(), paging.getSortDesc());
-        if (!comp.canSort())
+        if (!comp.canSort()) {
             return;
+        }
         Collections.sort(data, comp);
     }
 }

@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.view.chart;
 
@@ -25,20 +25,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonSerializable;
-import com.serotonin.json.JsonValue;
-import com.serotonin.json.TypeFactory;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonSerializable;
+import br.org.scadabr.json.JsonValue;
+import br.org.scadabr.json.TypeFactory;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImplDefinition;
 
 abstract public class BaseChartRenderer implements ChartRenderer, JsonSerializable {
+
     private static ImplDefinition noneDefinition = new ImplDefinition("chartRendererNone", "NONE",
-            "chartRenderer.none", new int[] { DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE,
-                    DataTypes.NUMERIC, DataTypes.IMAGE });
+            "chartRenderer.none", new int[]{DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE,
+                DataTypes.NUMERIC, DataTypes.IMAGE});
 
     static List<ImplDefinition> definitions;
 
@@ -58,8 +59,9 @@ abstract public class BaseChartRenderer implements ChartRenderer, JsonSerializab
         ensureDefinitions();
         List<ImplDefinition> impls = new ArrayList<ImplDefinition>();
         for (ImplDefinition def : definitions) {
-            if (def.supports(dataType))
+            if (def.supports(dataType)) {
                 impls.add(def);
+            }
         }
         return impls;
     }
@@ -67,8 +69,9 @@ abstract public class BaseChartRenderer implements ChartRenderer, JsonSerializab
     public static List<String> getExportTypes() {
         ensureDefinitions();
         List<String> result = new ArrayList<String>(definitions.size());
-        for (ImplDefinition def : definitions)
+        for (ImplDefinition def : definitions) {
             result.add(def.getExportName());
+        }
         return result;
     }
 
@@ -102,16 +105,19 @@ abstract public class BaseChartRenderer implements ChartRenderer, JsonSerializab
     }
 
     public static class Factory implements TypeFactory {
+
         @Override
         public Class<?> getType(JsonValue jsonValue) throws JsonException {
-            if (jsonValue.isNull())
+            if (jsonValue.isNull()) {
                 return null;
+            }
 
             JsonObject json = jsonValue.toJsonObject();
 
             String type = json.getString("type");
-            if (type == null)
+            if (type == null) {
                 throw new LocalizableJsonException("emport.error.chart.missing", "type", getExportTypes());
+            }
 
             ImplDefinition def = null;
             ensureDefinitions();
@@ -122,16 +128,18 @@ abstract public class BaseChartRenderer implements ChartRenderer, JsonSerializab
                 }
             }
 
-            if (def == null)
+            if (def == null) {
                 throw new LocalizableJsonException("emport.error.chart.invalid", "type", type, getExportTypes());
+            }
 
             Class<? extends ChartRenderer> clazz = null;
-            if (def == TableChartRenderer.getDefinition())
+            if (def == TableChartRenderer.getDefinition()) {
                 clazz = TableChartRenderer.class;
-            else if (def == ImageChartRenderer.getDefinition())
+            } else if (def == ImageChartRenderer.getDefinition()) {
                 clazz = ImageChartRenderer.class;
-            else if (def == StatisticsChartRenderer.getDefinition())
+            } else if (def == StatisticsChartRenderer.getDefinition()) {
                 clazz = StatisticsChartRenderer.class;
+            }
 
             return clazz;
         }

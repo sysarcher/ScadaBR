@@ -13,8 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;
 
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.rt.event.AlarmLevels;
@@ -25,186 +25,187 @@ import com.serotonin.mango.web.dwr.BaseDwr;
 @JsonRemoteEntity
 public class AlarmListComponent extends CustomComponent {
 
-	public static ImplDefinition DEFINITION = new ImplDefinition("alarmlist",
-			"ALARMLIST", "graphic.alarmlist", new int[] {});
+    public static ImplDefinition DEFINITION = new ImplDefinition("alarmlist",
+            "ALARMLIST", "graphic.alarmlist", new int[]{});
 
-	@JsonRemoteProperty
-	private int minAlarmLevel = 1;
-	@JsonRemoteProperty
-	private int maxListSize = 5;
-	@JsonRemoteProperty
-	private int width = 500;
+    @JsonRemoteProperty
+    private int minAlarmLevel = 1;
+    @JsonRemoteProperty
+    private int maxListSize = 5;
+    @JsonRemoteProperty
+    private int width = 500;
 
-	private boolean hideIdColumn = true;
-	private boolean hideAlarmLevelColumn = false;
-	private boolean hideTimestampColumn = false;
-	private boolean hideInactivityColumn = true;
-	private boolean hideAckColumn = false;
+    private boolean hideIdColumn = true;
+    private boolean hideAlarmLevelColumn = false;
+    private boolean hideTimestampColumn = false;
+    private boolean hideInactivityColumn = true;
+    private boolean hideAckColumn = false;
 
-	@Override
-	public String generateContent() {
-		Map<String, Object> model = new HashMap<String, Object>();
-		WebContext webContext = WebContextFactory.get();
-		HttpServletRequest request = webContext.getHttpServletRequest();
-		List<EventInstance> events = new EventDao().getPendingEvents(Common
-				.getUser().getId());
+    @Override
+    public String generateContent() {
+        Map<String, Object> model = new HashMap<String, Object>();
+        WebContext webContext = WebContextFactory.get();
+        HttpServletRequest request = webContext.getHttpServletRequest();
+        List<EventInstance> events = new EventDao().getPendingEvents(Common
+                .getUser().getId());
 
-		filter(events, minAlarmLevel);
+        filter(events, minAlarmLevel);
 
-		int max = events.size() > maxListSize ? maxListSize : events.size();
+        int max = events.size() > maxListSize ? maxListSize : events.size();
 
-		model.put("nome", "marlon");
-		model.put("events", events.subList(0, max));
-		model.put("width", width > 0 ? width : 500);
-		model.put("hideIdColumn", hideIdColumn);
-		model.put("hideAlarmLevelColumn", hideAlarmLevelColumn);
-		model.put("hideTimestampColumn", hideTimestampColumn);
-		model.put("hideInactivityColumn", hideInactivityColumn);
-		model.put("hideAckColumn", hideAckColumn);
+        model.put("nome", "marlon");
+        model.put("events", events.subList(0, max));
+        model.put("width", width > 0 ? width : 500);
+        model.put("hideIdColumn", hideIdColumn);
+        model.put("hideAlarmLevelColumn", hideAlarmLevelColumn);
+        model.put("hideTimestampColumn", hideTimestampColumn);
+        model.put("hideInactivityColumn", hideInactivityColumn);
+        model.put("hideAckColumn", hideAckColumn);
 
-		String content = BaseDwr.generateContent(request, "alarmList.jsp",
-				model);
-		return content;
-	}
+        String content = BaseDwr.generateContent(request, "alarmList.jsp",
+                model);
+        return content;
+    }
 
-	private void filter(List<EventInstance> list, int alarmLevel) {
+    private void filter(List<EventInstance> list, int alarmLevel) {
 
-		if (AlarmLevels.URGENT == alarmLevel) {
-			removeAlarmLevel(list, AlarmLevels.INFORMATION);
-		}
-		if (AlarmLevels.CRITICAL == alarmLevel) {
-			removeAlarmLevel(list, AlarmLevels.INFORMATION);
-			removeAlarmLevel(list, AlarmLevels.URGENT);
-		}
-		if (AlarmLevels.LIFE_SAFETY == alarmLevel) {
-			removeAlarmLevel(list, AlarmLevels.INFORMATION);
-			removeAlarmLevel(list, AlarmLevels.URGENT);
-			removeAlarmLevel(list, AlarmLevels.CRITICAL);
-		}
-	}
+        if (AlarmLevels.URGENT == alarmLevel) {
+            removeAlarmLevel(list, AlarmLevels.INFORMATION);
+        }
+        if (AlarmLevels.CRITICAL == alarmLevel) {
+            removeAlarmLevel(list, AlarmLevels.INFORMATION);
+            removeAlarmLevel(list, AlarmLevels.URGENT);
+        }
+        if (AlarmLevels.LIFE_SAFETY == alarmLevel) {
+            removeAlarmLevel(list, AlarmLevels.INFORMATION);
+            removeAlarmLevel(list, AlarmLevels.URGENT);
+            removeAlarmLevel(list, AlarmLevels.CRITICAL);
+        }
+    }
 
-	private void removeAlarmLevel(List<EventInstance> source, int alarmLevel) {
-		List<EventInstance> copy = new ArrayList<EventInstance>();
+    private void removeAlarmLevel(List<EventInstance> source, int alarmLevel) {
+        List<EventInstance> copy = new ArrayList<EventInstance>();
 
-		for (EventInstance eventInstance : source) {
-			if (eventInstance.getAlarmLevel() == alarmLevel)
-				copy.add(eventInstance);
-		}
+        for (EventInstance eventInstance : source) {
+            if (eventInstance.getAlarmLevel() == alarmLevel) {
+                copy.add(eventInstance);
+            }
+        }
 
-		source.removeAll(copy);
+        source.removeAll(copy);
 
-	}
+    }
 
-	@Override
-	public boolean containsValidVisibleDataPoint(int dataPointId) {
-		return false;
-	}
+    @Override
+    public boolean containsValidVisibleDataPoint(int dataPointId) {
+        return false;
+    }
 
-	@Override
-	public ImplDefinition definition() {
-		return DEFINITION;
-	}
+    @Override
+    public ImplDefinition definition() {
+        return DEFINITION;
+    }
 
-	@Override
-	public String generateInfoContent() {
-		return "<b> info content</b>";
-	}
+    @Override
+    public String generateInfoContent() {
+        return "<b> info content</b>";
+    }
 
-	public int getMaxListSize() {
-		return maxListSize;
-	}
+    public int getMaxListSize() {
+        return maxListSize;
+    }
 
-	public void setMaxListSize(int maxListSize) {
-		this.maxListSize = maxListSize;
-	}
+    public void setMaxListSize(int maxListSize) {
+        this.maxListSize = maxListSize;
+    }
 
-	public int getWidth() {
-		return width;
-	}
+    public int getWidth() {
+        return width;
+    }
 
-	public void setWidth(int width) {
-		this.width = width;
-	}
+    public void setWidth(int width) {
+        this.width = width;
+    }
 
-	public boolean isHideIdColumn() {
-		return hideIdColumn;
-	}
+    public boolean isHideIdColumn() {
+        return hideIdColumn;
+    }
 
-	public void setHideIdColumn(boolean hideIdColumn) {
-		this.hideIdColumn = hideIdColumn;
-	}
+    public void setHideIdColumn(boolean hideIdColumn) {
+        this.hideIdColumn = hideIdColumn;
+    }
 
-	public boolean isHideTimestampColumn() {
-		return hideTimestampColumn;
-	}
+    public boolean isHideTimestampColumn() {
+        return hideTimestampColumn;
+    }
 
-	public void setHideTimestampColumn(boolean hideTimestampColumn) {
-		this.hideTimestampColumn = hideTimestampColumn;
-	}
+    public void setHideTimestampColumn(boolean hideTimestampColumn) {
+        this.hideTimestampColumn = hideTimestampColumn;
+    }
 
-	public boolean isHideAlarmLevelColumn() {
-		return hideAlarmLevelColumn;
-	}
+    public boolean isHideAlarmLevelColumn() {
+        return hideAlarmLevelColumn;
+    }
 
-	public void setHideAlarmLevelColumn(boolean hideAlarmLevelColumn) {
-		this.hideAlarmLevelColumn = hideAlarmLevelColumn;
-	}
+    public void setHideAlarmLevelColumn(boolean hideAlarmLevelColumn) {
+        this.hideAlarmLevelColumn = hideAlarmLevelColumn;
+    }
 
-	public boolean isHideInactivityColumn() {
-		return hideInactivityColumn;
-	}
+    public boolean isHideInactivityColumn() {
+        return hideInactivityColumn;
+    }
 
-	public void setHideInactivityColumn(boolean hideInactivityColumn) {
-		this.hideInactivityColumn = hideInactivityColumn;
-	}
+    public void setHideInactivityColumn(boolean hideInactivityColumn) {
+        this.hideInactivityColumn = hideInactivityColumn;
+    }
 
-	private static final long serialVersionUID = -1;
-	private static final int version = 1;
+    private static final long serialVersionUID = -1;
+    private static final int version = 1;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(version);
-		out.writeInt(minAlarmLevel);
-		out.writeInt(maxListSize);
-		out.writeInt(width);
-		out.writeBoolean(hideIdColumn);
-		out.writeBoolean(hideAlarmLevelColumn);
-		out.writeBoolean(hideTimestampColumn);
-		out.writeBoolean(hideInactivityColumn);
-		out.writeBoolean(hideAckColumn);
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(version);
+        out.writeInt(minAlarmLevel);
+        out.writeInt(maxListSize);
+        out.writeInt(width);
+        out.writeBoolean(hideIdColumn);
+        out.writeBoolean(hideAlarmLevelColumn);
+        out.writeBoolean(hideTimestampColumn);
+        out.writeBoolean(hideInactivityColumn);
+        out.writeBoolean(hideAckColumn);
 
-	}
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException {
-		int ver = in.readInt();
+    private void readObject(ObjectInputStream in) throws IOException {
+        int ver = in.readInt();
 		// Switch on the version of the class so that version changes can be
-		// elegantly handled.
-		if (ver == 1) {
-			minAlarmLevel = in.readInt();
-			maxListSize = in.readInt();
-			width = in.readInt();
-			hideIdColumn = in.readBoolean();
-			hideAlarmLevelColumn = in.readBoolean();
-			hideTimestampColumn = in.readBoolean();
-			hideInactivityColumn = in.readBoolean();
-			hideAckColumn = in.readBoolean();
-		}
+        // elegantly handled.
+        if (ver == 1) {
+            minAlarmLevel = in.readInt();
+            maxListSize = in.readInt();
+            width = in.readInt();
+            hideIdColumn = in.readBoolean();
+            hideAlarmLevelColumn = in.readBoolean();
+            hideTimestampColumn = in.readBoolean();
+            hideInactivityColumn = in.readBoolean();
+            hideAckColumn = in.readBoolean();
+        }
 
-	}
+    }
 
-	public void setHideAckColumn(boolean hideAckColumn) {
-		this.hideAckColumn = hideAckColumn;
-	}
+    public void setHideAckColumn(boolean hideAckColumn) {
+        this.hideAckColumn = hideAckColumn;
+    }
 
-	public boolean isHideAckColumn() {
-		return hideAckColumn;
-	}
+    public boolean isHideAckColumn() {
+        return hideAckColumn;
+    }
 
-	public void setMinAlarmLevel(int minAlarmLevel) {
-		this.minAlarmLevel = minAlarmLevel;
-	}
+    public void setMinAlarmLevel(int minAlarmLevel) {
+        this.minAlarmLevel = minAlarmLevel;
+    }
 
-	public int getMinAlarmLevel() {
-		return minAlarmLevel;
-	}
+    public int getMinAlarmLevel() {
+        return minAlarmLevel;
+    }
 
 }

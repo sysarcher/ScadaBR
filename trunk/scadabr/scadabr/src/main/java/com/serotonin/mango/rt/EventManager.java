@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt;
 
@@ -42,13 +42,16 @@ import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.event.EventHandlerVO;
 import com.serotonin.mango.vo.permission.Permissions;
-import com.serotonin.util.ILifecycle;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.ILifecycle;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.web.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
  */
 public class EventManager implements ILifecycle {
+
     private final Log log = LogFactory.getLog(EventManager.class);
 
     private final List<EventInstance> activeEvents = new CopyOnWriteArrayList<EventInstance>();
@@ -71,21 +74,23 @@ public class EventManager implements ILifecycle {
             if (dh == EventType.DuplicateHandling.DO_NOT_ALLOW) {
                 // Create a log error...
                 log.error("An event was raised for a type that is already active: type=" + type + ", message="
-                        + message.getKey());
+                        + message.getI18nKey());
                 // ... but ultimately just ignore the thing.
                 return;
             }
 
-            if (dh == EventType.DuplicateHandling.IGNORE)
-                // Safely return.
+            if (dh == EventType.DuplicateHandling.IGNORE) // Safely return.
+            {
                 return;
+            }
 
             if (dh == EventType.DuplicateHandling.IGNORE_SAME_MESSAGE) {
                 // Ignore only if the message is the same. There may be events of this type with different messages,
                 // so look through them all for a match.
                 for (EventInstance e : getAll(type)) {
-                    if (e.getMessage().equals(message))
+                    if (e.getMessage().equals(message)) {
                         return;
+                    }
                 }
             }
 
@@ -97,8 +102,9 @@ public class EventManager implements ILifecycle {
 
         EventInstance evt = new EventInstance(type, time, rtnApplicable, alarmLevel, message, context);
 
-        if (!suppressed)
+        if (!suppressed) {
             setHandlers(evt);
+        }
 
         // Get id from database by inserting event immediately.
         eventDao.saveEvent(evt);
@@ -109,28 +115,32 @@ public class EventManager implements ILifecycle {
 
         for (User user : userDao.getActiveUsers()) {
             // Do not create an event for this user if the event type says the user should be skipped.
-            if (type.excludeUser(user))
+            if (type.excludeUser(user)) {
                 continue;
+            }
 
             if (Permissions.hasEventTypePermission(user, type)) {
                 eventUserIds.add(user.getId());
-                if (evt.isAlarm() && user.getReceiveAlarmEmails() > 0 && alarmLevel >= user.getReceiveAlarmEmails())
+                if (evt.isAlarm() && user.getReceiveAlarmEmails() > 0 && alarmLevel >= user.getReceiveAlarmEmails()) {
                     emailUsers.add(user.getEmail());
+                }
             }
         }
 
         if (eventUserIds.size() > 0) {
             eventDao.insertUserEvents(evt.getId(), eventUserIds, evt.isAlarm());
-            if (!suppressed && evt.isAlarm())
+            if (!suppressed && evt.isAlarm()) {
                 lastAlarmTimestamp = System.currentTimeMillis();
+            }
         }
 
-        if (evt.isRtnApplicable())
+        if (evt.isRtnApplicable()) {
             activeEvents.add(evt);
+        }
 
-        if (suppressed)
+        if (suppressed) {
             eventDao.ackEvent(evt.getId(), time, 0, EventInstance.AlternateAcknowledgementSources.MAINTENANCE_MODE);
-        else {
+        } else {
             if (evt.isRtnApplicable()) {
                 if (alarmLevel > highestActiveAlarmLevel) {
                     int oldValue = highestActiveAlarmLevel;
@@ -143,8 +153,9 @@ public class EventManager implements ILifecycle {
             // Call raiseEvent handlers.
             handleRaiseEvent(evt, emailUsers);
 
-            if (log.isDebugEnabled())
-                log.debug("Event raised: type=" + type + ", message=" + message.getLocalizedMessage(Common.getBundle()));
+            if (log.isDebugEnabled()) {
+                log.debug("Event raised: type=" + type + ", message=" + Localizer.localizeMessage(message, Common.getBundle()));
+            }
         }
     }
 
@@ -169,8 +180,9 @@ public class EventManager implements ILifecycle {
             evt = remove(type);
         }
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("Event returned to normal: type=" + type);
+        }
     }
 
     private void deactivateEvent(EventInstance evt, long time, int inactiveCause) {
@@ -193,30 +205,34 @@ public class EventManager implements ILifecycle {
     //
     public void cancelEventsForDataPoint(int dataPointId) {
         for (EventInstance e : activeEvents) {
-            if (e.getEventType().getDataPointId() == dataPointId)
+            if (e.getEventType().getDataPointId() == dataPointId) {
                 deactivateEvent(e, System.currentTimeMillis(), EventInstance.RtnCauses.SOURCE_DISABLED);
+            }
         }
     }
 
     public void cancelEventsForDataSource(int dataSourceId) {
         for (EventInstance e : activeEvents) {
-            if (e.getEventType().getDataSourceId() == dataSourceId)
+            if (e.getEventType().getDataSourceId() == dataSourceId) {
                 deactivateEvent(e, System.currentTimeMillis(), EventInstance.RtnCauses.SOURCE_DISABLED);
+            }
         }
     }
 
     public void cancelEventsForPublisher(int publisherId) {
         for (EventInstance e : activeEvents) {
-            if (e.getEventType().getPublisherId() == publisherId)
+            if (e.getEventType().getPublisherId() == publisherId) {
                 deactivateEvent(e, System.currentTimeMillis(), EventInstance.RtnCauses.SOURCE_DISABLED);
+            }
         }
     }
 
     private void resetHighestAlarmLevel(long time, boolean init) {
         int max = 0;
         for (EventInstance e : activeEvents) {
-            if (e.getAlarmLevel() > max)
+            if (e.getAlarmLevel() > max) {
                 max = e.getAlarmLevel();
+            }
         }
 
         if (!init) {
@@ -225,8 +241,7 @@ public class EventManager implements ILifecycle {
                 highestActiveAlarmLevel = max;
                 SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED), time,
                         false, getAlarmLevelChangeMessage("event.alarmMaxIncreased", oldValue));
-            }
-            else if (max < highestActiveAlarmLevel) {
+            } else if (max < highestActiveAlarmLevel) {
                 int oldValue = highestActiveAlarmLevel;
                 highestActiveAlarmLevel = max;
                 SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED), time,
@@ -236,7 +251,7 @@ public class EventManager implements ILifecycle {
     }
 
     private LocalizableMessage getAlarmLevelChangeMessage(String key, int oldValue) {
-        return new LocalizableMessage(key, AlarmLevels.getAlarmLevelMessage(oldValue),
+        return new LocalizableMessageImpl(key, AlarmLevels.getAlarmLevelMessage(oldValue),
                 AlarmLevels.getAlarmLevelMessage(highestActiveAlarmLevel));
     }
 
@@ -267,12 +282,14 @@ public class EventManager implements ILifecycle {
     // Convenience
     //
     /**
-     * Returns the first event instance with the given type, or null is there is none.
+     * Returns the first event instance with the given type, or null is there is
+     * none.
      */
     private EventInstance get(EventType type) {
         for (EventInstance e : activeEvents) {
-            if (e.getEventType().equals(type))
+            if (e.getEventType().equals(type)) {
                 return e;
+            }
         }
         return null;
     }
@@ -280,15 +297,17 @@ public class EventManager implements ILifecycle {
     private List<EventInstance> getAll(EventType type) {
         List<EventInstance> result = new ArrayList<EventInstance>();
         for (EventInstance e : activeEvents) {
-            if (e.getEventType().equals(type))
+            if (e.getEventType().equals(type)) {
                 result.add(e);
+            }
         }
         return result;
     }
 
     /**
-     * Finds and removes the first event instance with the given type. Returns null if there is none.
-     * 
+     * Finds and removes the first event instance with the given type. Returns
+     * null if there is none.
+     *
      * @param type
      * @return
      */
@@ -307,13 +326,15 @@ public class EventManager implements ILifecycle {
         List<EventHandlerRT> rts = null;
         for (EventHandlerVO vo : vos) {
             if (!vo.isDisabled()) {
-                if (rts == null)
+                if (rts == null) {
                     rts = new ArrayList<EventHandlerRT>();
+                }
                 rts.add(vo.createRuntime());
             }
         }
-        if (rts != null)
+        if (rts != null) {
             evt.setHandlers(rts);
+        }
     }
 
     private void handleRaiseEvent(EventInstance evt, Set<String> defaultAddresses) {
@@ -324,8 +345,9 @@ public class EventManager implements ILifecycle {
                 // If this is an email handler, remove any addresses to which it was sent from the default addresses
                 // so that the default users do not receive multiple notifications.
                 if (h instanceof EmailHandlerRT) {
-                    for (String addr : ((EmailHandlerRT) h).getActiveRecipients())
+                    for (String addr : ((EmailHandlerRT) h).getActiveRecipients()) {
                         defaultAddresses.remove(addr);
+                    }
                 }
             }
         }
@@ -338,19 +360,22 @@ public class EventManager implements ILifecycle {
 
     private void handleInactiveEvent(EventInstance evt) {
         if (evt.getHandlers() != null) {
-            for (EventHandlerRT h : evt.getHandlers())
+            for (EventHandlerRT h : evt.getHandlers()) {
                 h.eventInactive(evt);
+            }
         }
     }
 
     private boolean isSuppressed(EventType eventType) {
-        if (eventType instanceof DataSourceEventType)
-            // Data source events can be suppressed by maintenance events.
+        if (eventType instanceof DataSourceEventType) // Data source events can be suppressed by maintenance events.
+        {
             return Common.ctx.getRuntimeManager().isActiveMaintenanceEvent(eventType.getDataSourceId());
+        }
 
-        if (eventType instanceof DataPointEventType)
-            // Data point events can be suppressed by maintenance events on their data sources.
+        if (eventType instanceof DataPointEventType) // Data point events can be suppressed by maintenance events on their data sources.
+        {
             return Common.ctx.getRuntimeManager().isActiveMaintenanceEvent(eventType.getDataSourceId());
+        }
 
         return false;
     }

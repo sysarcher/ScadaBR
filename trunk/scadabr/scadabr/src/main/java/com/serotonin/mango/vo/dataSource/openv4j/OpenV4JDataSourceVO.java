@@ -32,11 +32,11 @@ import net.sf.openv4j.Protocol;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.openv4j.OpenV4JDataSourceRT;
@@ -46,9 +46,10 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
 public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
@@ -78,17 +79,17 @@ public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
 
     @Override
     protected void addEventTypes(List<EventTypeVO> eventTypes) {
-        eventTypes.add(createEventType(OpenV4JDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessage(
+        eventTypes.add(createEventType(OpenV4JDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.dataSource")));
-        eventTypes.add(createEventType(OpenV4JDataSourceRT.POINT_READ_EXCEPTION_EVENT, new LocalizableMessage(
+        eventTypes.add(createEventType(OpenV4JDataSourceRT.POINT_READ_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.pointRead")));
-        eventTypes.add(createEventType(OpenV4JDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, new LocalizableMessage(
+        eventTypes.add(createEventType(OpenV4JDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.pointWrite")));
     }
 
     @Override
     public LocalizableMessage getConnectionDescription() {
-        return new LocalizableMessage("common.default", commPortId);
+        return new LocalizableMessageImpl("common.default", commPortId);
     }
 
     @Override
@@ -181,20 +182,20 @@ public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         switch (ver) {
-        case 1:
-            updatePeriodType = in.readInt();
-            updatePeriods = in.readInt();
-            commPortId = SerializationHelper.readSafeUTF(in);
-            device = Devices.valueOf(SerializationHelper.readSafeUTF(in));
-            protocol = Protocol.valueOf(SerializationHelper.readSafeUTF(in));
-            break;
-        case 2:
-            updatePeriodType = in.readInt();
-            updatePeriods = in.readInt();
-            commPortId = SerializationHelper.readSafeUTF(in);
-            device = Devices.valueOf(SerializationHelper.readSafeUTF(in));
-            protocol = Protocol.valueOf(SerializationHelper.readSafeUTF(in));
-            break;
+            case 1:
+                updatePeriodType = in.readInt();
+                updatePeriods = in.readInt();
+                commPortId = SerializationHelper.readSafeUTF(in);
+                device = Devices.valueOf(SerializationHelper.readSafeUTF(in));
+                protocol = Protocol.valueOf(SerializationHelper.readSafeUTF(in));
+                break;
+            case 2:
+                updatePeriodType = in.readInt();
+                updatePeriods = in.readInt();
+                commPortId = SerializationHelper.readSafeUTF(in);
+                device = Devices.valueOf(SerializationHelper.readSafeUTF(in));
+                protocol = Protocol.valueOf(SerializationHelper.readSafeUTF(in));
+                break;
         }
     }
 
@@ -224,8 +225,7 @@ public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
     }
 
     /**
-     * @param device
-     *            the device to set
+     * @param device the device to set
      */
     public void setDevice(Devices device) {
         this.device = device;
@@ -253,8 +253,7 @@ public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
     }
 
     /**
-     * @param protocol
-     *            the protocol to set
+     * @param protocol the protocol to set
      */
     public void setProtocol(Protocol protocol) {
         this.protocol = protocol;

@@ -6,20 +6,20 @@ import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 
 public class DrStorageHt5bPointLocatorRT extends PointLocatorRT {
 
-	private final DrStorageHt5bPointLocatorVO vo;
+    private final DrStorageHt5bPointLocatorVO vo;
 
-	public DrStorageHt5bPointLocatorRT(DrStorageHt5bPointLocatorVO vo) {
-		this.vo = vo;
-	}
+    public DrStorageHt5bPointLocatorRT(DrStorageHt5bPointLocatorVO vo) {
+        this.vo = vo;
+    }
 
-	@Override
-	public boolean isSettable() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public boolean isSettable() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-	public DrStorageHt5bPointLocatorVO getVo() {
-		return vo;
-	}
+    public DrStorageHt5bPointLocatorVO getVo() {
+        return vo;
+    }
 
 }

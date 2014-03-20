@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.db;
 
@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Matthew Lohbihler
  */
 public class DBConvert {
+
     private static final Log LOG = LogFactory.getLog(DBConvert.class);
 
     private DatabaseAccess source;
@@ -54,8 +55,9 @@ public class DBConvert {
         Connection targetConn = target.getDataSource().getConnection();
         targetConn.setAutoCommit(false);
 
-        for (String tableName : getTableNames())
+        for (String tableName : getTableNames()) {
             copyTable(sourceConn, targetConn, tableName);
+        }
 
         sourceConn.close();
         targetConn.close();
@@ -64,41 +66,41 @@ public class DBConvert {
     }
 
     private String[] getTableNames() {
-        return new String[] { "systemSettings", //
-                "users", //
-                "userComments", //
-                "mailingLists", //
-                "mailingListInactive", //
-                "mailingListMembers", //
-                "dataSources", //
-                "dataSourceUsers", //
-                "dataPoints", //
-                "dataPointUsers", //
-                "mangoViews", //
-                "mangoViewUsers", //
-                "pointValues", // 
-                "pointValueAnnotations", //
-                "watchLists", //
-                "watchListPoints", //
-                "watchListUsers", //
-                "pointEventDetectors", // 
-                "events", //
-                "userEvents", //
-                "eventHandlers", //
-                "scheduledEvents", //
-                "pointHierarchy", //
-                "compoundEventDetectors", //
-                "reports", //
-                "reportInstances", //
-                "reportInstancePoints", //
-                "reportInstanceData", //
-                "reportInstanceDataAnnotations", //
-                "reportInstanceEvents", //
-                "reportInstanceUserComments", //
-                "publishers", //
-                "pointLinks",//
-                "maintenanceEvents",//
-        };
+        return new String[]{"systemSettings", //
+            "users", //
+            "userComments", //
+            "mailingLists", //
+            "mailingListInactive", //
+            "mailingListMembers", //
+            "dataSources", //
+            "dataSourceUsers", //
+            "dataPoints", //
+            "dataPointUsers", //
+            "mangoViews", //
+            "mangoViewUsers", //
+            "pointValues", // 
+            "pointValueAnnotations", //
+            "watchLists", //
+            "watchListPoints", //
+            "watchListUsers", //
+            "pointEventDetectors", // 
+            "events", //
+            "userEvents", //
+            "eventHandlers", //
+            "scheduledEvents", //
+            "pointHierarchy", //
+            "compoundEventDetectors", //
+            "reports", //
+            "reportInstances", //
+            "reportInstancePoints", //
+            "reportInstanceData", //
+            "reportInstanceDataAnnotations", //
+            "reportInstanceEvents", //
+            "reportInstanceUserComments", //
+            "publishers", //
+            "pointLinks",//
+            "maintenanceEvents",//
+    };
     }
 
     private void copyTable(Connection sourceConn, Connection targetConn, String tableName) throws SQLException {
@@ -114,14 +116,16 @@ public class DBConvert {
         int columns = meta.getColumnCount();
         sb.append("insert into ").append(tableName).append(" (");
         for (int i = 1; i <= columns; i++) {
-            if (i > 1)
+            if (i > 1) {
                 sb.append(",");
+            }
             sb.append(meta.getColumnName(i));
         }
         sb.append(") values (");
         for (int i = 1; i <= columns; i++) {
-            if (i > 1)
+            if (i > 1) {
                 sb.append(",");
+            }
             sb.append("?");
         }
         sb.append(")");
@@ -133,8 +137,9 @@ public class DBConvert {
         int maxCnt = 1000;
         while (rs.next()) {
             PreparedStatement targetStmt = targetConn.prepareStatement(insert);
-            for (int i = 1; i <= columns; i++)
+            for (int i = 1; i <= columns; i++) {
                 targetStmt.setObject(i, rs.getObject(i), meta.getColumnType(i));
+            }
             targetStmt.executeUpdate();
 
             cnt++;

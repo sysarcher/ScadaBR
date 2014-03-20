@@ -31,308 +31,311 @@ import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.dwr.EmportDwr;
 
 public class ZIPProjectManager {
-	private static final String JSON_FILE_NAME = "json_project.txt";
-	private static final String PROJECT_DESCRIPTION_FILE_NAME = "project_description.txt";
 
-	private static final String FILE_SEPARATOR = System
-			.getProperty("file.separator");
+    private static final String JSON_FILE_NAME = "json_project.txt";
+    private static final String PROJECT_DESCRIPTION_FILE_NAME = "project_description.txt";
 
-	private static final String uploadsFolder = "uploads" + FILE_SEPARATOR;
-	private static final String graphicsFolder = "graphics" + FILE_SEPARATOR;
+    private static final String FILE_SEPARATOR = System
+            .getProperty("file.separator");
 
-	private ZipFile zipFile;
+    private static final String uploadsFolder = "uploads" + FILE_SEPARATOR;
+    private static final String graphicsFolder = "graphics" + FILE_SEPARATOR;
 
-	private String projectName;
-	private String projectDescription;
-	private boolean includePointValues;
-	private int maxPointValues;
-	private boolean includeUploadsFolder;
-	private boolean includeGraphicsFolder;
+    private ZipFile zipFile;
 
-	public void exportProject(HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+    private String projectName;
+    private String projectDescription;
+    private boolean includePointValues;
+    private int maxPointValues;
+    private boolean includeUploadsFolder;
+    private boolean includeGraphicsFolder;
 
-		extractExportParametersFromRequest(request);
+    public void exportProject(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
 
-		response.setHeader("Content-Disposition", "attachment; filename="
-				+ projectName.replaceAll(" ", "") + ".zip");
+        extractExportParametersFromRequest(request);
 
-		List<FileToPack> filesToZip = new ArrayList<FileToPack>();
+        response.setHeader("Content-Disposition", "attachment; filename="
+                + projectName.replaceAll(" ", "") + ".zip");
 
-		filesToZip.add(buildProjectDescriptionFile(projectName,
-				projectDescription));
+        List<FileToPack> filesToZip = new ArrayList<FileToPack>();
 
-		filesToZip.add(buildJSONFile(JSON_FILE_NAME, includePointValues));
+        filesToZip.add(buildProjectDescriptionFile(projectName,
+                projectDescription));
 
-		if (includeUploadsFolder)
-			filesToZip.addAll(getUploadsFolderFiles());
+        filesToZip.add(buildJSONFile(JSON_FILE_NAME, includePointValues));
 
-		if (includeGraphicsFolder)
-			filesToZip.addAll(getGraphicsFolderFiles());
+        if (includeUploadsFolder) {
+            filesToZip.addAll(getUploadsFolderFiles());
+        }
 
-		ServletOutputStream out = response.getOutputStream();
-		FileUtil.compactFiles(out,
-				filesToZip.toArray(new FileToPack[filesToZip.size()]));
+        if (includeGraphicsFolder) {
+            filesToZip.addAll(getGraphicsFolderFiles());
+        }
 
-	}
+        ServletOutputStream out = response.getOutputStream();
+        FileUtil.compactFiles(out,
+                filesToZip.toArray(new FileToPack[filesToZip.size()]));
 
-	public ModelAndView setupToImportProject(HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+    }
 
-		Map<String, Object> model = new HashMap<String, Object>();
-		List<String> errorList = new ArrayList<String>();
-		model.put("errorMessages", errorList);
+    public ModelAndView setupToImportProject(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
 
-		try {
-			extractImportParametersFromRequest(request);
-		} catch (Exception e) {
-			e.printStackTrace();
-			errorList.add(Common.getMessage("emport.uploadError",
-					e.getMessage()));
-			return new ModelAndView("import_result", model);
-		}
+        Map<String, Object> model = new HashMap<String, Object>();
+        List<String> errorList = new ArrayList<String>();
+        model.put("errorMessages", errorList);
 
-		try {
-			getProjectDescription(zipFile, model);
-		} catch (Exception e) {
-			e.printStackTrace();
-			errorList.add(Common.getMessage("emport.invalidFile",
-					e.getMessage()));
-			return new ModelAndView("import_result", model);
-		}
+        try {
+            extractImportParametersFromRequest(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            errorList.add(Common.getMessage("emport.uploadError",
+                    e.getMessage()));
+            return new ModelAndView("import_result", model);
+        }
+
+        try {
+            getProjectDescription(zipFile, model);
+        } catch (Exception e) {
+            e.printStackTrace();
+            errorList.add(Common.getMessage("emport.invalidFile",
+                    e.getMessage()));
+            return new ModelAndView("import_result", model);
+        }
 
 		// TODO atualizar sistema de upgrade mango -> scadabr
-		// String version = (String) model.get("projectServerVersion");
-		// if (DBUpgrade.isUpgradeNeeded(version)) {
-		// errorList.add(Common.getMessage("emport.versionError", version,
-		// Common.getVersion()));
-		// return new ModelAndView("import_result", model);
-		// }
+        // String version = (String) model.get("projectServerVersion");
+        // if (DBUpgrade.isUpgradeNeeded(version)) {
+        // errorList.add(Common.getMessage("emport.versionError", version,
+        // Common.getVersion()));
+        // return new ModelAndView("import_result", model);
+        // }
+        User user = Common.getUser(request);
+        user.setUploadedProject(this);
+        return new ModelAndView("import_result", model);
 
-		User user = Common.getUser(request);
-		user.setUploadedProject(this);
-		return new ModelAndView("import_result", model);
+    }
 
-	}
+    public void importProject() throws Exception {
 
-	public void importProject() throws Exception {
+        List<ZipEntry> graphicsFiles = getGraphicsFiles();
+        restoreFiles(graphicsFiles);
 
-		List<ZipEntry> graphicsFiles = getGraphicsFiles();
-		restoreFiles(graphicsFiles);
+        List<ZipEntry> uploadFiles = getUploadFiles();
+        restoreFiles(uploadFiles);
 
-		List<ZipEntry> uploadFiles = getUploadFiles();
-		restoreFiles(uploadFiles);
+        String jsonContent = getJsonContent();
 
-		String jsonContent = getJsonContent();
+        EmportDwr.importDataImpl(jsonContent, Common.getBundle(),
+                Common.getUser());
 
-		EmportDwr.importDataImpl(jsonContent, Common.getBundle(),
-				Common.getUser());
+    }
 
-	}
+    private void restoreFiles(List<ZipEntry> uploadFiles) {
+        String appPath = Common.ctx.getServletContext().getRealPath(
+                FILE_SEPARATOR);
 
-	private void restoreFiles(List<ZipEntry> uploadFiles) {
-		String appPath = Common.ctx.getServletContext().getRealPath(
-				FILE_SEPARATOR);
+        byte[] buf = new byte[1024];
+        try {
+            for (ZipEntry zipEntry : uploadFiles) {
+                InputStream zipinputstream;
 
-		byte[] buf = new byte[1024];
-		try {
-			for (ZipEntry zipEntry : uploadFiles) {
-				InputStream zipinputstream;
+                zipinputstream = this.zipFile.getInputStream(zipEntry);
 
-				zipinputstream = this.zipFile.getInputStream(zipEntry);
+                String entryName = zipEntry.getName();
 
-				String entryName = zipEntry.getName();
+                int n;
 
-				int n;
+                String fileName = zipEntry.getName();
 
-				String fileName = zipEntry.getName();
+                File f = new File(appPath + fileName);
 
-				File f = new File(appPath + fileName);
+                File newFile = new File(entryName);
 
-				File newFile = new File(entryName);
+                String directory = newFile.getParent();
 
-				String directory = newFile.getParent();
+                if (directory != null) {
+                    if (newFile.isDirectory()) {
+                        break;
+                    }
+                    File dirFile = new File(appPath + directory);
+                    dirFile.mkdir();
+                }
 
-				if (directory != null) {
-					if (newFile.isDirectory()) {
-						break;
-					}
-					File dirFile = new File(appPath + directory);
-					dirFile.mkdir();
-				}
+                FileOutputStream out = new FileOutputStream(f);
 
-				FileOutputStream out = new FileOutputStream(f);
+                while ((n = zipinputstream.read(buf, 0, 1024)) > -1) {
+                    out.write(buf, 0, n);
+                }
 
-				while ((n = zipinputstream.read(buf, 0, 1024)) > -1)
-					out.write(buf, 0, n);
+                out.close();
+                zipinputstream.close();
+            }
 
-				out.close();
-				zipinputstream.close();
-			}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    private List<ZipEntry> getUploadFiles() {
+        return filterZipFiles(uploadsFolder);
+    }
 
-	private List<ZipEntry> getUploadFiles() {
-		return filterZipFiles(uploadsFolder);
-	}
+    private List<ZipEntry> getGraphicsFiles() {
+        return filterZipFiles(graphicsFolder);
+    }
 
-	private List<ZipEntry> getGraphicsFiles() {
-		return filterZipFiles(graphicsFolder);
-	}
+    private List<ZipEntry> filterZipFiles(String startsWith) {
+        List<ZipEntry> result = new ArrayList<ZipEntry>();
 
-	private List<ZipEntry> filterZipFiles(String startsWith) {
-		List<ZipEntry> result = new ArrayList<ZipEntry>();
+        Enumeration entries = zipFile.entries();
 
-		Enumeration entries = zipFile.entries();
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = (ZipEntry) entries.nextElement();
 
-		while (entries.hasMoreElements()) {
-			ZipEntry entry = (ZipEntry) entries.nextElement();
+            if (entry.getName().startsWith(startsWith)) {
+                result.add(entry);
+            }
+        }
 
-			if (entry.getName().startsWith(startsWith)) {
-				result.add(entry);
-			}
-		}
+        return result;
+    }
 
-		return result;
-	}
+    private FileToPack buildJSONFile(String packAs, boolean includePointValues) {
+        String jsonToExport = EmportDwr.createExportJSON(3, true, true, true,
+                true, true, true, true, true, true, true, true, true, true,
+                true, includePointValues, maxPointValues, true);
+        FileToPack file = new FileToPack(packAs, FileUtil.createTxtTempFile(
+                packAs, jsonToExport));
+        return file;
+    }
 
-	private FileToPack buildJSONFile(String packAs, boolean includePointValues) {
-		String jsonToExport = EmportDwr.createExportJSON(3, true, true, true,
-				true, true, true, true, true, true, true, true, true, true,
-				true, includePointValues, maxPointValues, true);
-		FileToPack file = new FileToPack(packAs, FileUtil.createTxtTempFile(
-				packAs, jsonToExport));
-		return file;
-	}
+    private List<FileToPack> getUploadsFolderFiles() {
+        String uploadFolder = Common.ctx.getServletContext().getRealPath(
+                FILE_SEPARATOR)
+                + "uploads";
 
-	private List<FileToPack> getUploadsFolderFiles() {
-		String uploadFolder = Common.ctx.getServletContext().getRealPath(
-				FILE_SEPARATOR)
-				+ "uploads";
+        List<File> files = FileUtil.getFilesOnDirectory(uploadFolder);
 
-		List<File> files = FileUtil.getFilesOnDirectory(uploadFolder);
+        List<FileToPack> pack = new ArrayList<FileToPack>();
+        for (File file : files) {
 
-		List<FileToPack> pack = new ArrayList<FileToPack>();
-		for (File file : files) {
+            String filePartialPath = uploadsFolder + file.getName();
 
-			String filePartialPath = uploadsFolder + file.getName();
+            pack.add(new FileToPack(filePartialPath.substring(0, 7)
+                    + FILE_SEPARATOR + filePartialPath.substring(8), file));
+        }
+        return pack;
+    }
 
-			pack.add(new FileToPack(filePartialPath.substring(0, 7)
-					+ FILE_SEPARATOR + filePartialPath.substring(8), file));
-		}
-		return pack;
-	}
+    private List<FileToPack> getGraphicsFolderFiles() {
+        String graphicFolder = Common.ctx.getServletContext().getRealPath(
+                FILE_SEPARATOR)
+                + "graphics";
 
-	private List<FileToPack> getGraphicsFolderFiles() {
-		String graphicFolder = Common.ctx.getServletContext().getRealPath(
-				FILE_SEPARATOR)
-				+ "graphics";
+        List<File> files = FileUtil.getFilesOnDirectory(graphicFolder);
 
-		List<File> files = FileUtil.getFilesOnDirectory(graphicFolder);
+        List<FileToPack> pack = new ArrayList<FileToPack>();
 
-		List<FileToPack> pack = new ArrayList<FileToPack>();
+        for (File file : files) {
 
-		for (File file : files) {
+            String[] pathDivided = null;
 
-			String[] pathDivided = null;
+            pathDivided = file.getAbsolutePath().split("graphics");
 
-			pathDivided = file.getAbsolutePath().split("graphics");
+            String filePartialPath = "graphics" + pathDivided[1];
 
-			String filePartialPath = "graphics" + pathDivided[1];
+            pack.add(new FileToPack(filePartialPath, file));
+        }
 
-			pack.add(new FileToPack(filePartialPath, file));
-		}
+        return pack;
+    }
 
-		return pack;
-	}
+    private void getProjectDescription(ZipFile zipFile,
+            Map<String, Object> model) throws IOException {
+        ZipEntry jsonFile = zipFile
+                .getEntry(ProjectExporterController.PROJECT_DESCRIPTION_FILE_NAME);
 
-	private void getProjectDescription(ZipFile zipFile,
-			Map<String, Object> model) throws IOException {
-		ZipEntry jsonFile = zipFile
-				.getEntry(ProjectExporterController.PROJECT_DESCRIPTION_FILE_NAME);
+        DataInputStream in = new DataInputStream(
+                zipFile.getInputStream(jsonFile));
 
-		DataInputStream in = new DataInputStream(
-				zipFile.getInputStream(jsonFile));
+        model.put("projectName", in.readLine());
+        model.put("projectDescription", in.readLine());
+        model.put("projectServerVersion", in.readLine());
+        model.put("exportDate", in.readLine());
 
-		model.put("projectName", in.readLine());
-		model.put("projectDescription", in.readLine());
-		model.put("projectServerVersion", in.readLine());
-		model.put("exportDate", in.readLine());
+        in.close();
+    }
 
-		in.close();
-	}
+    private void extractExportParametersFromRequest(HttpServletRequest request) {
+        this.projectName = request.getParameter("projectName");
+        this.projectDescription = request.getParameter("projectDescription");
+        this.includePointValues = Boolean.parseBoolean(request
+                .getParameter("includePointValues"));
+        this.maxPointValues = Integer.parseInt(request
+                .getParameter("pointValuesMaxZip"));
 
-	private void extractExportParametersFromRequest(HttpServletRequest request) {
-		this.projectName = request.getParameter("projectName");
-		this.projectDescription = request.getParameter("projectDescription");
-		this.includePointValues = Boolean.parseBoolean(request
-				.getParameter("includePointValues"));
-		this.maxPointValues = Integer.parseInt(request
-				.getParameter("pointValuesMaxZip"));
+        System.out.println(this.maxPointValues);
+        this.includeUploadsFolder = Boolean.parseBoolean(request
+                .getParameter("includeUploadsFolder"));
+        this.includeGraphicsFolder = Boolean.parseBoolean(request
+                .getParameter("includeGraphicsFolder"));
 
-		System.out.println(this.maxPointValues);
-		this.includeUploadsFolder = Boolean.parseBoolean(request
-				.getParameter("includeUploadsFolder"));
-		this.includeGraphicsFolder = Boolean.parseBoolean(request
-				.getParameter("includeGraphicsFolder"));
+    }
 
-	}
+    private void extractImportParametersFromRequest(HttpServletRequest request)
+            throws Exception {
+        MultipartHttpServletRequest mpRequest = (MultipartHttpServletRequest) request;
 
-	private void extractImportParametersFromRequest(HttpServletRequest request)
-			throws Exception {
-		MultipartHttpServletRequest mpRequest = (MultipartHttpServletRequest) request;
+        MultipartFile multipartFile = mpRequest.getFile("importFile");
 
-		MultipartFile multipartFile = mpRequest.getFile("importFile");
+        File projectFile = File.createTempFile("temp", "");
+        FileOutputStream fos = new FileOutputStream(projectFile);
+        fos.write(multipartFile.getBytes());
+        fos.close();
+        projectFile.deleteOnExit();
 
-		File projectFile = File.createTempFile("temp", "");
-		FileOutputStream fos = new FileOutputStream(projectFile);
-		fos.write(multipartFile.getBytes());
-		fos.close();
-		projectFile.deleteOnExit();
+        this.zipFile = toZipFile(projectFile);
+    }
 
-		this.zipFile = toZipFile(projectFile);
-	}
+    private ZipFile toZipFile(File file) throws Exception {
+        ZipFile zipFile = new ZipFile(file);
+        return zipFile;
+    }
 
-	private ZipFile toZipFile(File file) throws Exception {
-		ZipFile zipFile = new ZipFile(file);
-		return zipFile;
-	}
+    private FileToPack buildProjectDescriptionFile(String projectName,
+            String projectDescription) {
+        projectName = projectName + "\n";
 
-	private FileToPack buildProjectDescriptionFile(String projectName,
-			String projectDescription) {
-		projectName = projectName + "\n";
+        projectName += projectDescription + "\n";
+        projectName += Common.getVersion() + "\n";
+        projectName += new Date().toLocaleString();
 
-		projectName += projectDescription + "\n";
-		projectName += Common.getVersion() + "\n";
-		projectName += new Date().toLocaleString();
+        File file = FileUtil.createTxtTempFile("tempprojectdescription",
+                projectName);
 
-		File file = FileUtil.createTxtTempFile("tempprojectdescription",
-				projectName);
+        return new FileToPack(PROJECT_DESCRIPTION_FILE_NAME, file);
+    }
 
-		return new FileToPack(PROJECT_DESCRIPTION_FILE_NAME, file);
-	}
+    private String getJsonContent() throws Exception {
+        ZipEntry jsonFile = zipFile
+                .getEntry(ProjectExporterController.JSON_FILE_NAME);
+        zipFile.getInputStream(jsonFile);
 
-	private String getJsonContent() throws Exception {
-		ZipEntry jsonFile = zipFile
-				.getEntry(ProjectExporterController.JSON_FILE_NAME);
-		zipFile.getInputStream(jsonFile);
+        return convertContentToString(zipFile.getInputStream(jsonFile));
+    }
 
-		return convertContentToString(zipFile.getInputStream(jsonFile));
-	}
+    private String convertContentToString(InputStream inputStream)
+            throws Exception {
+        DataInputStream in = new DataInputStream(inputStream);
+        String strLine;
+        String file = "";
 
-	private String convertContentToString(InputStream inputStream)
-			throws Exception {
-		DataInputStream in = new DataInputStream(inputStream);
-		String strLine;
-		String file = "";
-
-		while ((strLine = in.readLine()) != null) {
-			file += strLine + "\n";
-		}
-		in.close();
-		return file;
-	}
+        while ((strLine = in.readLine()) != null) {
+            file += strLine + "\n";
+        }
+        in.close();
+        return file;
+    }
 }

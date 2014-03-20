@@ -1,13 +1,13 @@
 /**
  * ConfigureDataSourceParams.java
  *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ * This file was auto-generated from WSDL by the Apache Axis 1.4 Apr 22, 2006
+ * (06:55:48 PDT) WSDL2Java emitter.
  */
-
 package br.org.scadabr.api.config;
 
-public class ConfigureDataSourceParams  implements java.io.Serializable {
+public class ConfigureDataSourceParams implements java.io.Serializable {
+
     private br.org.scadabr.api.constants.DataSourceType type;
 
     private java.lang.Object dataSource;
@@ -16,46 +16,42 @@ public class ConfigureDataSourceParams  implements java.io.Serializable {
     }
 
     public ConfigureDataSourceParams(
-           br.org.scadabr.api.constants.DataSourceType type,
-           java.lang.Object dataSource) {
-           this.type = type;
-           this.dataSource = dataSource;
+            br.org.scadabr.api.constants.DataSourceType type,
+            java.lang.Object dataSource) {
+        this.type = type;
+        this.dataSource = dataSource;
     }
-
 
     /**
      * Gets the type value for this ConfigureDataSourceParams.
-     * 
+     *
      * @return type
      */
     public br.org.scadabr.api.constants.DataSourceType getType() {
         return type;
     }
 
-
     /**
      * Sets the type value for this ConfigureDataSourceParams.
-     * 
+     *
      * @param type
      */
     public void setType(br.org.scadabr.api.constants.DataSourceType type) {
         this.type = type;
     }
 
-
     /**
      * Gets the dataSource value for this ConfigureDataSourceParams.
-     * 
+     *
      * @return dataSource
      */
     public java.lang.Object getDataSource() {
         return dataSource;
     }
 
-
     /**
      * Sets the dataSource value for this ConfigureDataSourceParams.
-     * 
+     *
      * @param dataSource
      */
     public void setDataSource(java.lang.Object dataSource) {
@@ -63,28 +59,36 @@ public class ConfigureDataSourceParams  implements java.io.Serializable {
     }
 
     private java.lang.Object __equalsCalc = null;
+
     public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof ConfigureDataSourceParams)) return false;
+        if (!(obj instanceof ConfigureDataSourceParams)) {
+            return false;
+        }
         ConfigureDataSourceParams other = (ConfigureDataSourceParams) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
+        if (obj == null) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
         if (__equalsCalc != null) {
             return (__equalsCalc == obj);
         }
         __equalsCalc = obj;
         boolean _equals;
-        _equals = true && 
-            ((this.type==null && other.getType()==null) || 
-             (this.type!=null &&
-              this.type.equals(other.getType()))) &&
-            ((this.dataSource==null && other.getDataSource()==null) || 
-             (this.dataSource!=null &&
-              this.dataSource.equals(other.getDataSource())));
+        _equals = true
+                && ((this.type == null && other.getType() == null)
+                || (this.type != null
+                && this.type.equals(other.getType())))
+                && ((this.dataSource == null && other.getDataSource() == null)
+                || (this.dataSource != null
+                && this.dataSource.equals(other.getDataSource())));
         __equalsCalc = null;
         return _equals;
     }
 
     private boolean __hashCodeCalc = false;
+
     public synchronized int hashCode() {
         if (__hashCodeCalc) {
             return 0;
@@ -102,8 +106,8 @@ public class ConfigureDataSourceParams  implements java.io.Serializable {
     }
 
     // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(ConfigureDataSourceParams.class, true);
+    private static org.apache.axis.description.TypeDesc typeDesc
+            = new org.apache.axis.description.TypeDesc(ConfigureDataSourceParams.class, true);
 
     static {
         typeDesc.setXmlType(new javax.xml.namespace.QName("http://config.api.scadabr.org.br", ">ConfigureDataSourceParams"));
@@ -132,24 +136,22 @@ public class ConfigureDataSourceParams  implements java.io.Serializable {
      * Get Custom Serializer
      */
     public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
+            java.lang.String mechType,
+            java.lang.Class _javaType,
+            javax.xml.namespace.QName _xmlType) {
+        return new org.apache.axis.encoding.ser.BeanSerializer(
+                _javaType, _xmlType, typeDesc);
     }
 
     /**
      * Get Custom Deserializer
      */
     public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+            java.lang.String mechType,
+            java.lang.Class _javaType,
+            javax.xml.namespace.QName _xmlType) {
+        return new org.apache.axis.encoding.ser.BeanDeserializer(
+                _javaType, _xmlType, typeDesc);
     }
 
 }

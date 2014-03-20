@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.report;
 
@@ -41,17 +41,18 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.ui.TextAnchor;
 
-import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.io.StreamUtils;
+import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.io.StreamUtils;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.util.mindprod.StripEntities;
-import com.serotonin.util.StringUtils;
+import br.org.scadabr.util.StringUtils;
 
 /**
  * @author Matthew Lohbihler
  */
 public class ImageChartUtils {
+
     private static final int NUMERIC_DATA_INDEX = 0;
     private static final int DISCRETE_DATA_INDEX = 1;
 
@@ -70,8 +71,7 @@ public class ImageChartUtils {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             writeChart(pointTimeSeriesCollection, showLegend, out, width, height);
             return out.toByteArray();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ShouldNeverHappenException(e);
         }
     }
@@ -100,8 +100,9 @@ public class ImageChartUtils {
 
             for (int i = 0; i < pointTimeSeriesCollection.getNumericPaint().size(); i++) {
                 Paint paint = pointTimeSeriesCollection.getNumericPaint().get(i);
-                if (paint != null)
+                if (paint != null) {
                     numericRenderer.setSeriesPaint(i, paint, false);
+                }
             }
 
             numericMin = plot.getRangeAxis().getLowerBound();
@@ -117,9 +118,9 @@ public class ImageChartUtils {
                     plot.getRangeAxis().setLabel(desc);
                 }
             }
-        }
-        else
+        } else {
             plot.getRangeAxis().setVisible(false);
+        }
 
         if (pointTimeSeriesCollection.hasDiscreteData()) {
             XYStepRenderer discreteRenderer = new XYStepRenderer();
@@ -135,9 +136,10 @@ public class ImageChartUtils {
                 DiscreteTimeSeries dts = pointTimeSeriesCollection.getDiscreteTimeSeries(i);
                 TimeSeries ts = new TimeSeries(dts.getName(), null, null, Second.class);
 
-                for (PointValueTime pvt : dts.getValueTimes())
+                for (PointValueTime pvt : dts.getValueTimes()) {
                     ImageChartUtils.addSecond(ts, pvt.getTime(),
                             numericMin + (interval * (dts.getValueIndex(pvt.getValue()) + intervalIndex)));
+                }
 
                 timeSeriesCollection.addSeries(ts);
 
@@ -151,17 +153,19 @@ public class ImageChartUtils {
             intervalIndex = 1;
             for (int i = 0; i < pointTimeSeriesCollection.getDiscreteSeriesCount(); i++) {
                 DiscreteTimeSeries dts = pointTimeSeriesCollection.getDiscreteTimeSeries(i);
-                if (dts.getPaint() != null)
+                if (dts.getPaint() != null) {
                     discreteRenderer.setSeriesPaint(i, dts.getPaint());
+                }
 
                 for (int j = 0; j < dts.getDiscreteValueCount(); j++) {
                     XYTextAnnotation anno = new XYTextAnnotation(" " + dts.getValueText(j), annoX, numericMin
                             + (interval * (j + intervalIndex)));
-                    if (!pointTimeSeriesCollection.hasNumericData() && intervalIndex + j == discreteValueCount)
-                        // This prevents the top label from getting cut off
+                    if (!pointTimeSeriesCollection.hasNumericData() && intervalIndex + j == discreteValueCount) // This prevents the top label from getting cut off
+                    {
                         anno.setTextAnchor(TextAnchor.TOP_LEFT);
-                    else
+                    } else {
                         anno.setTextAnchor(TextAnchor.BOTTOM_LEFT);
+                    }
                     anno.setPaint(discreteRenderer.lookupSeriesPaint(i));
                     plot.addAnnotation(anno);
                 }
@@ -193,7 +197,6 @@ public class ImageChartUtils {
     // // Return the image.
     // ChartUtilities.writeChartAsPNG(out, chart, width, height);
     // }
-
     public static void writeChart(HttpServletResponse response, byte[] chartData) throws IOException {
         response.setContentType(getContentType());
         StreamUtils.transfer(new ByteArrayInputStream(chartData), response.getOutputStream());
@@ -206,8 +209,8 @@ public class ImageChartUtils {
     public static void addSecond(TimeSeries timeSeries, long time, Number value) {
         try {
             timeSeries.add(new Second(new Date(time)), value);
-        }
-        catch (SeriesException e) { /* duplicate Second. Ignore. */
+        } catch (SeriesException e) { /* duplicate Second. Ignore. */
+
         }
     }
 }

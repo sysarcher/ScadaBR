@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr.beans;
 
@@ -23,13 +23,14 @@ import java.util.ResourceBundle;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.http.HttpMulticastListener;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverData;
-import com.serotonin.web.i18n.I18NUtils;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.I18NUtils;
+import br.org.scadabr.web.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
  */
 public class HttpReceiverDataListener implements HttpMulticastListener, TestingUtility {
+
     final ResourceBundle bundle;
     private final String[] ipWhiteList;
     private final String[] deviceIdWhiteList;
@@ -41,7 +42,7 @@ public class HttpReceiverDataListener implements HttpMulticastListener, TestingU
 
     public HttpReceiverDataListener(ResourceBundle bundle, String[] ipWhiteList, String[] deviceIdWhiteList) {
         this.bundle = bundle;
-        message = I18NUtils.getMessage(bundle, "dsEdit.httpReceiver.tester.listening");
+        message = Localizer.localizeI18nKey("dsEdit.httpReceiver.tester.listening", bundle);
 
         this.ipWhiteList = ipWhiteList;
         this.deviceIdWhiteList = deviceIdWhiteList;
@@ -50,7 +51,7 @@ public class HttpReceiverDataListener implements HttpMulticastListener, TestingU
         autoShutOff = new AutoShutOff() {
             @Override
             void shutOff() {
-                message = I18NUtils.getMessage(HttpReceiverDataListener.this.bundle, "dsEdit.httpReceiver.tester.auto");
+                message = Localizer.localizeI18nKey("dsEdit.httpReceiver.tester.auto", HttpReceiverDataListener.this.bundle);
                 HttpReceiverDataListener.this.cancel();
             }
         };
@@ -66,6 +67,7 @@ public class HttpReceiverDataListener implements HttpMulticastListener, TestingU
         return message;
     }
 
+    @Override
     public void cancel() {
         autoShutOff.cancel();
         Common.ctx.getHttpReceiverMulticaster().removeListener(this);
@@ -76,20 +78,24 @@ public class HttpReceiverDataListener implements HttpMulticastListener, TestingU
     // / HttpMulticastListener
     // /
     //
+    @Override
     public String[] getDeviceIdWhiteList() {
         return deviceIdWhiteList;
     }
 
+    @Override
     public String[] getIpWhiteList() {
         return ipWhiteList;
     }
 
+    @Override
     public void ipWhiteListError(String message) {
-        message = new LocalizableMessage("dsEdit.httpReceiver.tester.whiteList", message).getLocalizedMessage(bundle);
+        this.message = Localizer.localizeI18nKey("dsEdit.httpReceiver.tester.whiteList", bundle, message);
     }
 
+    @Override
     public void data(HttpReceiverData data) {
-        message = I18NUtils.getMessage(bundle, "dsEdit.httpReceiver.tester.data");
+        message = Localizer.localizeI18nKey("dsEdit.httpReceiver.tester.data", bundle);
         this.data = data;
     }
 }

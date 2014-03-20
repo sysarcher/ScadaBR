@@ -2,11 +2,12 @@ package com.serotonin.mango.rt.dataImage;
 
 import java.util.List;
 
-import com.serotonin.NotImplementedException;
+import br.org.scadabr.NotImplementedException;
 import com.serotonin.mango.db.dao.PointValueDao;
-import com.serotonin.timer.SimulationTimer;
+import br.org.scadabr.timer.SimulationTimer;
 
 public class HistoricalDataPoint implements IDataPoint {
+
     private final int id;
     private final int dataTypeId;
     private final PointValueDao pointValueDao;

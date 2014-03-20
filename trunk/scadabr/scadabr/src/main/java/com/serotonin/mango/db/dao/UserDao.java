@@ -34,12 +34,11 @@ import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.vo.permission.DataPointAccess;
-import com.serotonin.web.taglib.Functions;
+import br.org.scadabr.web.taglib.Functions;
 import java.sql.Connection;
 import java.sql.Statement;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
 public class UserDao extends BaseDao {

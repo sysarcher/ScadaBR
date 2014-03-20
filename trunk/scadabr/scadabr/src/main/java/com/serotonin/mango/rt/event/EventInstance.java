@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.event;
 
@@ -25,16 +25,20 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.handlers.EventHandlerRT;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.UserComment;
-import com.serotonin.web.i18n.LocalizableMessage;
-import com.serotonin.web.taglib.DateFunctions;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.web.taglib.DateFunctions;
 
 public class EventInstance {
+
     public interface RtnCauses {
+
         int RETURN_TO_NORMAL = 1;
         int SOURCE_DISABLED = 4;
     }
 
     public interface AlternateAcknowledgementSources {
+
         int DELETED_USER = 1;
         int MAINTENANCE_MODE = 2;
     }
@@ -45,7 +49,8 @@ public class EventInstance {
     private int id = Common.NEW_ID;
 
     /**
-     * Configuration field. Provided by the event producer. Identifies where the event came from and what it means.
+     * Configuration field. Provided by the event producer. Identifies where the
+     * event came from and what it means.
      */
     private final EventType eventType;
 
@@ -55,7 +60,8 @@ public class EventInstance {
     private final long activeTimestamp;
 
     /**
-     * Configuration field. Is this type of event capable of returning to normal (true), or is it stateless (false).
+     * Configuration field. Is this type of event capable of returning to normal
+     * (true), or is it stateless (false).
      */
     private final boolean rtnApplicable;
 
@@ -65,13 +71,14 @@ public class EventInstance {
     private long rtnTimestamp;
 
     /**
-     * State field. The action that caused the event to RTN. One of {@link RtnCauses}
+     * State field. The action that caused the event to RTN. One of
+     * {@link RtnCauses}
      */
     private int rtnCause;
 
     /**
      * Configuration field. The alarm level assigned to the event.
-     * 
+     *
      * @see AlarmLevels
      */
     private final int alarmLevel;
@@ -82,7 +89,8 @@ public class EventInstance {
     private final LocalizableMessage message;
 
     /**
-     * User comments on the event. Added in the events interface after the event has been raised.
+     * User comments on the event. Added in the events interface after the event
+     * has been raised.
      */
     private List<UserComment> eventComments;
 
@@ -110,10 +118,11 @@ public class EventInstance {
         this.activeTimestamp = activeTimestamp;
         this.rtnApplicable = rtnApplicable;
         this.alarmLevel = alarmLevel;
-        if (message == null)
-            this.message = new LocalizableMessage("common.noMessage");
-        else
+        if (message == null) {
+            this.message = new LocalizableMessageImpl("common.noMessage");
+        } else {
             this.message = message;
+        }
         this.context = context;
     }
 
@@ -121,22 +130,23 @@ public class EventInstance {
         LocalizableMessage rtnKey = null;
 
         if (!isActive()) {
-            if (rtnCause == RtnCauses.RETURN_TO_NORMAL)
-                rtnKey = new LocalizableMessage("event.rtn.rtn");
-            else if (rtnCause == RtnCauses.SOURCE_DISABLED) {
-                if (eventType.getEventSourceId() == EventType.EventSources.DATA_POINT)
-                    rtnKey = new LocalizableMessage("event.rtn.pointDisabled");
-                else if (eventType.getEventSourceId() == EventType.EventSources.DATA_SOURCE)
-                    rtnKey = new LocalizableMessage("event.rtn.dsDisabled");
-                else if (eventType.getEventSourceId() == EventType.EventSources.PUBLISHER)
-                    rtnKey = new LocalizableMessage("event.rtn.pubDisabled");
-                else if (eventType.getEventSourceId() == EventType.EventSources.MAINTENANCE)
-                    rtnKey = new LocalizableMessage("event.rtn.maintDisabled");
-                else
-                    rtnKey = new LocalizableMessage("event.rtn.shutdown");
+            if (rtnCause == RtnCauses.RETURN_TO_NORMAL) {
+                rtnKey = new LocalizableMessageImpl("event.rtn.rtn");
+            } else if (rtnCause == RtnCauses.SOURCE_DISABLED) {
+                if (eventType.getEventSourceId() == EventType.EventSources.DATA_POINT) {
+                    rtnKey = new LocalizableMessageImpl("event.rtn.pointDisabled");
+                } else if (eventType.getEventSourceId() == EventType.EventSources.DATA_SOURCE) {
+                    rtnKey = new LocalizableMessageImpl("event.rtn.dsDisabled");
+                } else if (eventType.getEventSourceId() == EventType.EventSources.PUBLISHER) {
+                    rtnKey = new LocalizableMessageImpl("event.rtn.pubDisabled");
+                } else if (eventType.getEventSourceId() == EventType.EventSources.MAINTENANCE) {
+                    rtnKey = new LocalizableMessageImpl("event.rtn.maintDisabled");
+                } else {
+                    rtnKey = new LocalizableMessageImpl("event.rtn.shutdown");
+                }
+            } else {
+                rtnKey = new LocalizableMessageImpl("event.rtn.unknown");
             }
-            else
-                rtnKey = new LocalizableMessage("event.rtn.unknown");
         }
 
         return rtnKey;
@@ -144,12 +154,15 @@ public class EventInstance {
 
     public LocalizableMessage getAckMessage() {
         if (isAcknowledged()) {
-            if (acknowledgedByUserId != 0)
-                return new LocalizableMessage("events.ackedByUser", acknowledgedByUsername);
-            if (alternateAckSource == AlternateAcknowledgementSources.DELETED_USER)
-                return new LocalizableMessage("events.ackedByDeletedUser");
-            if (alternateAckSource == AlternateAcknowledgementSources.MAINTENANCE_MODE)
-                return new LocalizableMessage("events.ackedByMaintenance");
+            if (acknowledgedByUserId != 0) {
+                return new LocalizableMessageImpl("events.ackedByUser", acknowledgedByUsername);
+            }
+            if (alternateAckSource == AlternateAcknowledgementSources.DELETED_USER) {
+                return new LocalizableMessageImpl("events.ackedByDeletedUser");
+            }
+            if (alternateAckSource == AlternateAcknowledgementSources.MAINTENANCE_MODE) {
+                return new LocalizableMessageImpl("events.ackedByMaintenance");
+            }
         }
 
         return null;
@@ -157,12 +170,15 @@ public class EventInstance {
 
     public LocalizableMessage getExportAckMessage() {
         if (isAcknowledged()) {
-            if (acknowledgedByUserId != 0)
-                return new LocalizableMessage("events.export.ackedByUser", acknowledgedByUsername);
-            if (alternateAckSource == AlternateAcknowledgementSources.DELETED_USER)
-                return new LocalizableMessage("events.export.ackedByDeletedUser");
-            if (alternateAckSource == AlternateAcknowledgementSources.MAINTENANCE_MODE)
-                return new LocalizableMessage("events.export.ackedByMaintenance");
+            if (acknowledgedByUserId != 0) {
+                return new LocalizableMessageImpl("events.export.ackedByUser", acknowledgedByUsername);
+            }
+            if (alternateAckSource == AlternateAcknowledgementSources.DELETED_USER) {
+                return new LocalizableMessageImpl("events.export.ackedByDeletedUser");
+            }
+            if (alternateAckSource == AlternateAcknowledgementSources.MAINTENANCE_MODE) {
+                return new LocalizableMessageImpl("events.export.ackedByMaintenance");
+            }
         }
 
         return null;
@@ -193,8 +209,9 @@ public class EventInstance {
     }
 
     /**
-     * This method should only be used by the EventDao for creating and updating.
-     * 
+     * This method should only be used by the EventDao for creating and
+     * updating.
+     *
      * @param id
      */
     public void setId(int id) {

@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.virtual;
 
@@ -24,22 +24,24 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataSource.virtual.AnalogAttractorChangeRT;
 import com.serotonin.mango.rt.dataSource.virtual.ChangeTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
 public class AnalogAttractorChangeVO extends ChangeTypeVO {
-    public static final LocalizableMessage KEY = new LocalizableMessage("dsEdit.virtual.changeType.attractor");
+
+    public static final LocalizableMessage KEY = new LocalizableMessageImpl("dsEdit.virtual.changeType.attractor");
 
     @JsonRemoteProperty
     private double maxChange;
@@ -106,8 +108,9 @@ public class AnalogAttractorChangeVO extends ChangeTypeVO {
 
     private String getAttractionPointName() {
         DataPointVO dp = new DataPointDao().getDataPoint(attractionPointId);
-        if (dp == null)
+        if (dp == null) {
             return "";
+        }
         return dp.getName();
     }
 
@@ -143,8 +146,9 @@ public class AnalogAttractorChangeVO extends ChangeTypeVO {
         String text = json.getString("attractionPointId");
         if (text != null) {
             DataPointVO dp = new DataPointDao().getDataPoint(text);
-            if (dp == null)
+            if (dp == null) {
                 throw new LocalizableJsonException("emport.error.attractor.missingPoint", "attractionPointId", text);
+            }
             attractionPointId = dp.getId();
         }
     }
@@ -153,9 +157,10 @@ public class AnalogAttractorChangeVO extends ChangeTypeVO {
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
         DataPointVO dp = new DataPointDao().getDataPoint(attractionPointId);
-        if (dp == null)
+        if (dp == null) {
             map.put("attractionPointId", null);
-        else
+        } else {
             map.put("attractionPointId", dp.getXid());
+        }
     }
 }

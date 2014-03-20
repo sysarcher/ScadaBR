@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.bacnet;
 
@@ -30,12 +30,12 @@ import com.serotonin.bacnet4j.obj.ObjectProperties;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.bacnet.BACnetIPPointLocatorRT;
@@ -43,23 +43,27 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
-import com.serotonin.util.IpAddressUtils;
+import br.org.scadabr.util.IpAddressUtils;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+
+    @Override
     public PointLocatorRT createRuntime() {
         return new BACnetIPPointLocatorRT(this);
     }
 
+    @Override
     public LocalizableMessage getConfigurationDescription() {
-        return new LocalizableMessage("common.default", remoteDeviceIp);
+        return new LocalizableMessageImpl("common.default", remoteDeviceIp);
     }
 
     @JsonRemoteProperty
@@ -189,51 +193,53 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
     public void validate(DwrResponseI18n response) {
         try {
             IpAddressUtils.toIpAddress(remoteDeviceIp);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             response.addContextualMessage("remoteDeviceIp", "common.default", e.getMessage());
         }
 
-        if (remoteDevicePort < 0 || remoteDevicePort > 65535)
+        if (remoteDevicePort < 0 || remoteDevicePort > 65535) {
             response.addContextualMessage("remoteDevicePort", "validate.illegalValue");
+        }
 
         if (!StringUtils.isEmpty(networkAddress)) {
-            if (networkNumber < 0)
+            if (networkNumber < 0) {
                 response.addContextualMessage("networkNumber", "validate.illegalValue");
+            }
 
             try {
                 BACnetUtils.dottedStringToBytes(networkAddress);
-            }
-            catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 response.addContextualMessage("networkAddress", "validate.illegalValue");
             }
         }
 
         try {
             new ObjectIdentifier(null, remoteDeviceInstanceNumber);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             response.addContextualMessage("remoteDeviceInstanceNumber", "validate.illegalValue");
         }
 
-        if (!OBJECT_TYPE_CODES.isValidId(objectTypeId))
+        if (!OBJECT_TYPE_CODES.isValidId(objectTypeId)) {
             response.addContextualMessage("objectTypeId", "validate.invalidValue");
+        }
 
-        if (!PROPERTY_TYPE_CODES.isValidId(propertyIdentifierId))
+        if (!PROPERTY_TYPE_CODES.isValidId(propertyIdentifierId)) {
             response.addContextualMessage("propertyIdentifierId", "validate.invalidValue");
+        }
 
         try {
             new ObjectIdentifier(null, objectInstanceNumber);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             response.addContextualMessage("objectInstanceNumber", "validate.illegalValue");
         }
 
-        if (!DataTypes.CODES.isValidId(dataTypeId))
+        if (!DataTypes.CODES.isValidId(dataTypeId)) {
             response.addContextualMessage("dataTypeId", "validate.invalidValue");
+        }
 
-        if (writePriority < 1 || writePriority > 16)
+        if (writePriority < 1 || writePriority > 16) {
             response.addContextualMessage("writePriority", "validate.illegalValue");
+        }
     }
 
     @Override
@@ -320,8 +326,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
             settable = in.readBoolean();
             dataTypeId = in.readInt();
             writePriority = 16;
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             remoteDeviceIp = SerializationHelper.readSafeUTF(in);
             remoteDevicePort = in.readInt();
             networkNumber = 0;
@@ -334,8 +339,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
             settable = in.readBoolean();
             dataTypeId = in.readInt();
             writePriority = in.readInt();
-        }
-        else if (ver == 3) {
+        } else if (ver == 3) {
             remoteDeviceIp = SerializationHelper.readSafeUTF(in);
             remoteDevicePort = in.readInt();
             networkNumber = 0;
@@ -348,8 +352,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
             settable = in.readBoolean();
             dataTypeId = in.readInt();
             writePriority = in.readInt();
-        }
-        else if (ver == 4) {
+        } else if (ver == 4) {
             remoteDeviceIp = SerializationHelper.readSafeUTF(in);
             remoteDevicePort = in.readInt();
             networkNumber = in.readInt();
@@ -368,23 +371,26 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         Integer value = deserializeDataType(json, DataTypes.IMAGE);
-        if (value != null)
+        if (value != null) {
             dataTypeId = value;
+        }
 
         String text = json.getString("objectType");
         if (text != null) {
             objectTypeId = OBJECT_TYPE_CODES.getId(text);
-            if (objectTypeId == -1)
+            if (objectTypeId == -1) {
                 throw new LocalizableJsonException("emport.error.invalid", "objectType", text,
                         OBJECT_TYPE_CODES.getCodeList());
+            }
         }
 
         text = json.getString("propertyIdentifier");
         if (text != null) {
             propertyIdentifierId = PROPERTY_TYPE_CODES.getId(text);
-            if (propertyIdentifierId == -1)
+            if (propertyIdentifierId == -1) {
                 throw new LocalizableJsonException("emport.error.invalid", "propertyIdentifier", text,
                         PROPERTY_TYPE_CODES.getCodeList());
+            }
         }
     }
 
@@ -396,6 +402,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
     }
 
     private static ExportCodes OBJECT_TYPE_CODES = new ExportCodes();
+
     static {
         OBJECT_TYPE_CODES.addElement(ObjectType.analogInput.intValue(), "ANALOG_INPUT",
                 "dsEdit.bacnetIp.objectType.analogInput");
@@ -452,6 +459,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
     }
 
     private static ExportCodes PROPERTY_TYPE_CODES = new ExportCodes();
+
     static {
         PROPERTY_TYPE_CODES.addElement(PropertyIdentifier.ackedTransitions.intValue(), "ACKED_TRANSITIONS");
         PROPERTY_TYPE_CODES.addElement(PropertyIdentifier.ackRequired.intValue(), "ACK_REQUIRED");

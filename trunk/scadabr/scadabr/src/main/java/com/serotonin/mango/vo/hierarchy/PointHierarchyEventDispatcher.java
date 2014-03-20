@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PointHierarchyEventDispatcher {
+
     private final static List<PointHierarchyListener> LISTENERS = new CopyOnWriteArrayList<PointHierarchyListener>();
 
     public static void addListener(PointHierarchyListener l) {
@@ -15,7 +16,8 @@ public class PointHierarchyEventDispatcher {
     }
 
     public static void firePointHierarchySaved(PointFolder root) {
-        for (PointHierarchyListener l : LISTENERS)
+        for (PointHierarchyListener l : LISTENERS) {
             l.pointHierarchySaved(root);
+        }
     }
 }

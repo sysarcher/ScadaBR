@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.report;
 
@@ -31,6 +31,7 @@ import com.serotonin.mango.view.text.TextRenderer;
  * @author Matthew Lohbihler
  */
 public class DiscreteTimeSeries {
+
     private final String name;
     private final TextRenderer textRenderer;
     private final Paint paint;
@@ -50,17 +51,19 @@ public class DiscreteTimeSeries {
     @SuppressWarnings("unchecked")
     public void addValueTime(PointValueTime pvt) {
         MangoValue value = pvt.getValue();
-        if (value == null)
+        if (value == null) {
             return;
+        }
 
         valueTimes.add(pvt);
 
         if (getValueIndex(value) == -1) {
             String text;
-            if (textRenderer == null)
+            if (textRenderer == null) {
                 text = value.toString();
-            else
+            } else {
                 text = textRenderer.getText(value, TextRenderer.HINT_FULL);
+            }
 
             ValueDescription vd = new ValueDescription((Comparable<Object>) value, text);
 
@@ -87,8 +90,9 @@ public class DiscreteTimeSeries {
 
     public int getValueIndex(MangoValue value) {
         for (int i = 0; i < valueDescriptions.size(); i++) {
-            if (valueDescriptions.get(i).getValue().equals(value))
+            if (valueDescriptions.get(i).getValue().equals(value)) {
                 return i;
+            }
         }
         return -1;
     }
@@ -98,6 +102,7 @@ public class DiscreteTimeSeries {
     }
 
     class ValueDescription implements Comparable<ValueDescription> {
+
         private final Comparable<Object> value;
         private final String description;
 

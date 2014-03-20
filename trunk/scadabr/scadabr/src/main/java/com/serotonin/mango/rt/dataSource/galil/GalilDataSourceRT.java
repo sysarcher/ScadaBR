@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource.galil;
 
@@ -35,13 +35,15 @@ import com.serotonin.mango.vo.dataSource.galil.GalilDataSourceVO;
 import com.serotonin.messaging.MessageControl;
 import com.serotonin.messaging.MessagingExceptionHandler;
 import com.serotonin.messaging.StreamTransport;
-import com.serotonin.web.i18n.LocalizableException;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableException;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 public class GalilDataSourceRT extends PollingDataSource implements MessagingExceptionHandler {
+
     public static final Charset CHARSET = Charset.forName("US-ASCII");
 
     private final Log LOG = LogFactory.getLog(GalilDataSourceRT.class);
@@ -65,8 +67,7 @@ public class GalilDataSourceRT extends PollingDataSource implements MessagingExc
         if (socket == null) {
             try {
                 openConnection();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 return;
             }
         }
@@ -83,61 +84,60 @@ public class GalilDataSourceRT extends PollingDataSource implements MessagingExc
 
                 try {
                     sendMsg = sendRequest(request, dataPoint, locator, time);
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     // The connection may have been reset, so try to reopen it and attempt the message again.
                     try {
                         LOG.debug("Keep-alive connection may have been reset. Attempting to re-open.");
                         closeConnection();
                         openConnection();
                         sendMsg = sendRequest(request, dataPoint, locator, time);
-                    }
-                    catch (Exception e2) {
+                    } catch (Exception e2) {
                         messageException = e2;
                         closeConnection();
                         break;
                     }
                 }
 
-                if (sendMsg != null && pointError == null)
+                if (sendMsg != null && pointError == null) {
                     pointError = sendMsg;
+                }
             }
         }
 
         if (messageException != null) {
             // Raise an event.
-            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, time, true, new LocalizableMessage("event.pollingError",
+            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, time, true, new LocalizableMessageImpl("event.pollingError",
                     messageException.getMessage()));
             LOG.info("Error while polling Galil device", messageException);
-        }
-        else
-            // Deactivate any existing event.
+        } else // Deactivate any existing event.
+        {
             returnToNormal(DATA_SOURCE_EXCEPTION_EVENT, time);
+        }
 
         if (pointError != null) {
             // Raise an event.
             raiseEvent(POINT_READ_EXCEPTION_EVENT, time, true, pointError);
-        }
-        else
-            // Deactivate any existing event.
+        } else // Deactivate any existing event.
+        {
             returnToNormal(POINT_READ_EXCEPTION_EVENT, time);
+        }
     }
 
     private LocalizableMessage sendRequest(GalilRequest request, DataPointRT dataPoint, GalilPointLocatorRT locator,
             long time) throws IOException {
         GalilResponse response = (GalilResponse) conn.send(request);
 
-        if (response.isErrorResponse())
-            return new LocalizableMessage("event.galil.errorResponse", dataPoint.getVO().getName());
+        if (response.isErrorResponse()) {
+            return new LocalizableMessageImpl("event.galil.errorResponse", dataPoint.getVO().getName());
+        }
 
         try {
             MangoValue value = locator.parsePollResponse(response.getResponseData(), dataPoint.getVO().getName());
 
             // Update the data image with the new value.
             dataPoint.updatePointValue(new PointValueTime(value, time));
-        }
-        catch (LocalizableException e) {
-            return new LocalizableMessage("event.galil.parsingError", dataPoint.getVO().getName(),
+        } catch (LocalizableException e) {
+            return new LocalizableMessageImpl("event.galil.parsingError", dataPoint.getVO().getName(),
                     response.getResponseData());
         }
 
@@ -154,12 +154,10 @@ public class GalilDataSourceRT extends PollingDataSource implements MessagingExc
         try {
             openConnection();
             returnToNormal(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis());
-        }
-        catch (Exception e) {
-            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
+        } catch (Exception e) {
+            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
                     "event.initializationError", e.getMessage()));
             LOG.debug("Error while initializing data source", e);
-            return;
         }
     }
 
@@ -181,9 +179,8 @@ public class GalilDataSourceRT extends PollingDataSource implements MessagingExc
         if (socket == null) {
             try {
                 openConnection();
-            }
-            catch (IOException e) {
-                raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
+            } catch (IOException e) {
+                raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
                         "event.galil.setPointFailed", dataPoint.getVO().getName(), e.getMessage()));
                 LOG.debug("Error while initializing data source", e);
                 return;
@@ -194,35 +191,34 @@ public class GalilDataSourceRT extends PollingDataSource implements MessagingExc
         GalilPointLocatorRT locator = dataPoint.getPointLocator();
 
         GalilRequest request = locator.getSetRequest(valueTime.getValue());
-        if (request == null)
-            raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), false, new LocalizableMessage(
+        if (request == null) {
+            raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), false, new LocalizableMessageImpl(
                     "event.galil.setRequest", dataPoint.getVO().getName(), valueTime.getValue()));
-        else {
+        } else {
             try {
                 GalilResponse response = (GalilResponse) conn.send(request);
 
-                if (response.isErrorResponse())
-                    raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), false, new LocalizableMessage(
+                if (response.isErrorResponse()) {
+                    raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), false, new LocalizableMessageImpl(
                             "event.galil.setResponse", dataPoint.getVO().getName()));
-                else {
+                } else {
                     try {
                         // Update the data image with the new value.
                         dataPoint.updatePointValue(new PointValueTime(valueTime.getValue(), valueTime.getTime()));
 
                         MangoValue value = locator.parseSetResponse(response.getResponseData());
-                        if (value != null)
-                            // Update the data image with the newer value.
+                        if (value != null) // Update the data image with the newer value.
+                        {
                             dataPoint.updatePointValue(new PointValueTime(value, System.currentTimeMillis()));
-                    }
-                    catch (LocalizableException e) {
+                        }
+                    } catch (LocalizableException e) {
                         raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), false,
-                                new LocalizableMessage("event.galil.parsingError", dataPoint.getVO().getName(),
+                                new LocalizableMessageImpl("event.galil.parsingError", dataPoint.getVO().getName(),
                                         response.getResponseData()));
                     }
                 }
-            }
-            catch (IOException e) {
-                raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), false, new LocalizableMessage(
+            } catch (IOException e) {
+                raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), false, new LocalizableMessageImpl(
                         "event.galil.sendError", dataPoint.getVO().getName(), e.getMessage()));
             }
         }
@@ -236,17 +232,17 @@ public class GalilDataSourceRT extends PollingDataSource implements MessagingExc
     //
     //
     public void receivedException(Exception e) {
-        raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
+        raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
                 "event.galil.connectionError", e.getMessage()));
     }
 
     public void receivedMessageMismatchException(Exception e) {
-        raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
+        raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
                 "event.galil.connectionError", e.getMessage()));
     }
 
     public void receivedResponseException(Exception e) {
-        raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
+        raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
                 "event.galil.connectionError", e.getMessage()));
     }
 
@@ -265,20 +261,19 @@ public class GalilDataSourceRT extends PollingDataSource implements MessagingExc
                 socket.connect(new InetSocketAddress(vo.getHost(), vo.getPort()), vo.getTimeout());
                 transport = new StreamTransport(socket.getInputStream(), socket.getOutputStream());
                 break;
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 closeConnection();
 
-                if (retries <= 0)
+                if (retries <= 0) {
                     throw e;
+                }
                 LOG.warn("Open connection failed, trying again.");
                 retries--;
 
                 // Add a small delay
                 try {
                     Thread.sleep(500);
-                }
-                catch (InterruptedException e1) {
+                } catch (InterruptedException e1) {
                     // no op
                 }
             }
@@ -293,14 +288,15 @@ public class GalilDataSourceRT extends PollingDataSource implements MessagingExc
     }
 
     private void closeConnection() {
-        if (conn != null)
+        if (conn != null) {
             conn.close();
+        }
 
         try {
-            if (socket != null)
+            if (socket != null) {
                 socket.close();
-        }
-        catch (IOException e) {
+            }
+        } catch (IOException e) {
             receivedException(e);
         }
 

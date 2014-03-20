@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource.nmea;
 
@@ -40,6 +40,7 @@ import com.serotonin.util.queue.ByteQueue;
  * @author Matthew Lohbihler
  */
 public class NmeaReceiver implements RequestHandler, MessageParser {
+
     private static final Log LOG = LogFactory.getLog(NmeaReceiver.class);
 
     private static final Charset CHARSET = Charset.forName("US-ASCII");
@@ -72,8 +73,9 @@ public class NmeaReceiver implements RequestHandler, MessageParser {
     }
 
     public void terminate() {
-        if (conn != null)
+        if (conn != null) {
             conn.close();
+        }
         SerialUtils.close(serialPort);
     }
 
@@ -101,9 +103,10 @@ public class NmeaReceiver implements RequestHandler, MessageParser {
 
         // Look for an end indicator.
         int endPos = queue.indexOf(MESSAGE_END);
-        if (endPos == -1)
-            // There is no end indicator yet, so wait for the next set of data.
+        if (endPos == -1) // There is no end indicator yet, so wait for the next set of data.
+        {
             return null;
+        }
 
         // Dump the start indicator.
         queue.pop(MESSAGE_START.length);
@@ -121,8 +124,9 @@ public class NmeaReceiver implements RequestHandler, MessageParser {
             int checksum = Integer.parseInt(data.substring(data.length() - 2, data.length()), 16);
 
             int sum = 0;
-            for (int i = 0; i < dataArr.length - 3; i++)
+            for (int i = 0; i < dataArr.length - 3; i++) {
                 sum ^= dataArr[i];
+            }
             sum &= 0xff;
 
             if (checksum != sum) {

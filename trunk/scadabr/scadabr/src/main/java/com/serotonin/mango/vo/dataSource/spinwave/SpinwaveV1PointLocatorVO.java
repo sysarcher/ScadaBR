@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.spinwave;
 
@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.serotonin.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteEntity;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -36,7 +36,9 @@ import com.serotonin.spinwave.v1.SwMessageV1;
  */
 @JsonRemoteEntity
 public class SpinwaveV1PointLocatorVO extends BaseSpinwavePointLocatorVO {
+
     public interface AttributeTypes {
+
         int TEMPURATURE = 1;
         int SET_POINT = 2;
         int BATTERY = 3;
@@ -44,20 +46,25 @@ public class SpinwaveV1PointLocatorVO extends BaseSpinwavePointLocatorVO {
     }
 
     public static String getAttributeDescription(int attributeId) {
-        if (attributeId == AttributeTypes.TEMPURATURE)
+        if (attributeId == AttributeTypes.TEMPURATURE) {
             return "dsEdit.spinwave.v1Attr.temp";
-        if (attributeId == AttributeTypes.SET_POINT)
+        }
+        if (attributeId == AttributeTypes.SET_POINT) {
             return "dsEdit.spinwave.v1Attr.setPoint";
-        if (attributeId == AttributeTypes.BATTERY)
+        }
+        if (attributeId == AttributeTypes.BATTERY) {
             return "dsEdit.spinwave.v1Attr.battery";
-        if (attributeId == AttributeTypes.OVERRIDE)
+        }
+        if (attributeId == AttributeTypes.OVERRIDE) {
             return "dsEdit.spinwave.v1Attr.override";
+        }
         return "Unknown";
     }
 
     public static int getAttributeDataType(int attributeId) {
-        if (attributeId == AttributeTypes.OVERRIDE)
+        if (attributeId == AttributeTypes.OVERRIDE) {
             return DataTypes.BINARY;
+        }
         return DataTypes.NUMERIC;
     }
 
@@ -75,22 +82,26 @@ public class SpinwaveV1PointLocatorVO extends BaseSpinwavePointLocatorVO {
         SwMessageV1 message = (SwMessageV1) msg;
 
         if (getAttributeId() == AttributeTypes.TEMPURATURE) {
-            if (isConvertToCelsius())
+            if (isConvertToCelsius()) {
                 return new NumericValue(Conversions.fahrenheitToCelsius(message.getTemperature()));
+            }
             return new NumericValue(message.getTemperature());
         }
 
         if (getAttributeId() == AttributeTypes.SET_POINT) {
-            if (isConvertToCelsius())
+            if (isConvertToCelsius()) {
                 return new NumericValue(Conversions.fahrenheitToCelsius(message.getSetPoint()));
+            }
             return new NumericValue(message.getSetPoint());
         }
 
-        if (getAttributeId() == AttributeTypes.BATTERY)
+        if (getAttributeId() == AttributeTypes.BATTERY) {
             return new NumericValue(message.getBatteryVoltage());
+        }
 
-        if (getAttributeId() == AttributeTypes.OVERRIDE)
+        if (getAttributeId() == AttributeTypes.OVERRIDE) {
             return new BinaryValue(message.isOverride());
+        }
 
         return null;
     }

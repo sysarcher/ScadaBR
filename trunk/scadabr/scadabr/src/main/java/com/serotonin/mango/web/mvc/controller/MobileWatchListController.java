@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.mvc.controller;
 
@@ -45,6 +45,7 @@ import com.serotonin.mango.web.taglib.Functions;
  * @author Matthew Lohbihler
  */
 public class MobileWatchListController extends WatchListController {
+
     public static final String KEY_WATCHLIST_DATA = "watchListData";
 
     @Override
@@ -60,8 +61,7 @@ public class MobileWatchListController extends WatchListController {
             Permissions.ensureWatchListPermission(user, watchList);
             user.setSelectedWatchList(watchListId);
             watchListDao.saveSelectedWatchList(user.getId(), watchList.getId());
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             // no op
         }
 
@@ -90,9 +90,9 @@ public class MobileWatchListController extends WatchListController {
 
         // Get the data point status from the data image.
         DataPointRT pointRT = rtm.getDataPoint(pointVO.getId());
-        if (pointRT == null)
+        if (pointRT == null) {
             state.setDisabled(true);
-        else {
+        } else {
             PointValueTime pvt = pointRT.getPointValue();
             state.setTime(Functions.getTime(pvt));
 
@@ -102,9 +102,9 @@ public class MobileWatchListController extends WatchListController {
                 model.put("point", pointVO);
                 model.put("pointValue", pvt);
                 state.setValue(BaseDwr.generateContent(request, "imageValueThumbnail.jsp", model));
-            }
-            else
+            } else {
                 state.setValue(Functions.getHtmlText(pointVO, pvt));
+            }
         }
 
         return state;

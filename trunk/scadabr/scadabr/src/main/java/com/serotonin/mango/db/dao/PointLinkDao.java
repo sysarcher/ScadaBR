@@ -128,7 +128,7 @@ public class PointLinkDao extends BaseDao {
         PointLinkVO old = getPointLink(pl.getId());
 
         ejt.update(POINT_LINK_UPDATE, pl.getXid(), pl.getSourcePointId(), pl.getTargetPointId(), pl.getScript(),
-                    pl.getEvent(), boolToChar(pl.isDisabled()), pl.getId());
+                pl.getEvent(), boolToChar(pl.isDisabled()), pl.getId());
 
         AuditEventType.raiseChangedEvent(AuditEventType.TYPE_POINT_LINK, old, pl);
     }

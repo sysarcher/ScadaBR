@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.http;
 
@@ -24,37 +24,42 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+
+    @Override
     public boolean isSettable() {
         return false;
     }
 
+    @Override
     public PointLocatorRT createRuntime() {
         return new HttpReceiverPointLocatorRT(this);
     }
 
+    @Override
     public LocalizableMessage getConfigurationDescription() {
-        return new LocalizableMessage("dsEdit.httpReceiver.dpconn", parameterName);
+        return new LocalizableMessageImpl("dsEdit.httpReceiver.dpconn", parameterName);
     }
 
     @JsonRemoteProperty
@@ -63,6 +68,7 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
     @JsonRemoteProperty
     private String binary0Value;
 
+    @Override
     public int getDataTypeId() {
         return dataTypeId;
     }
@@ -88,10 +94,12 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(parameterName))
+        if (StringUtils.isEmpty(parameterName)) {
             response.addContextualMessage("parameterName", "validate.required");
-        if (!DataTypes.CODES.isValidId(dataTypeId))
+        }
+        if (!DataTypes.CODES.isValidId(dataTypeId)) {
             response.addContextualMessage("dataTypeId", "validate.invalidValue");
+        }
     }
 
     @Override
@@ -140,8 +148,9 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         Integer value = deserializeDataType(json, DataTypes.IMAGE);
-        if (value != null)
+        if (value != null) {
             dataTypeId = value;
+        }
     }
 
     @Override

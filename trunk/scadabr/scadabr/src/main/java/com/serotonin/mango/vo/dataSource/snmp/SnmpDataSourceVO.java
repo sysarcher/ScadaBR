@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.snmp;
 
@@ -28,11 +28,11 @@ import java.util.Map;
 
 import org.snmp4j.mp.SnmpConstants;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.snmp.SnmpDataSourceRT;
@@ -41,25 +41,29 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
- * 
+ *
  */
 @JsonRemoteEntity
 public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
+
     public static final Type TYPE = Type.SNMP;
 
     public interface AuthProtocols {
+
         String NONE = "";
         String MD5 = "MD5";
         String SHA = "SHA";
     }
 
     public interface PrivProtocols {
+
         String NONE = "";
         String DES = "DES";
         String AES128 = "AES128";
@@ -69,12 +73,13 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
-        ets.add(createEventType(SnmpDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessage(
+        ets.add(createEventType(SnmpDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.dataSource")));
-        ets.add(createEventType(SnmpDataSourceRT.PDU_EXCEPTION_EVENT, new LocalizableMessage("event.ds.pdu")));
+        ets.add(createEventType(SnmpDataSourceRT.PDU_EXCEPTION_EVENT, new LocalizableMessageImpl("event.ds.pdu")));
     }
 
     private static final ExportCodes EVENT_CODES = new ExportCodes();
+
     static {
         EVENT_CODES.addElement(SnmpDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, "DATA_SOURCE_EXCEPTION");
         EVENT_CODES.addElement(SnmpDataSourceRT.PDU_EXCEPTION_EVENT, "PDU_EXCEPTION");
@@ -87,7 +92,7 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
 
     @Override
     public LocalizableMessage getConnectionDescription() {
-        return new LocalizableMessage("common.default", host);
+        return new LocalizableMessageImpl("common.default", host);
     }
 
     @Override
@@ -288,34 +293,41 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType))
+        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
             response.addContextualMessage("updatePeriodType", "validate.invalidValue");
-        if (updatePeriods <= 0)
+        }
+        if (updatePeriods <= 0) {
             response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
+        }
 
-        if (port <= 0 || port > 65535)
+        if (port <= 0 || port > 65535) {
             response.addContextualMessage("port", "validate.invalidValue");
+        }
 
-        if (trapPort <= 0 || trapPort > 65535)
+        if (trapPort <= 0 || trapPort > 65535) {
             response.addContextualMessage("trapPort", "validate.invalidValue");
+        }
 
-        if (StringUtils.isEmpty(host))
+        if (StringUtils.isEmpty(host)) {
             response.addContextualMessage("host", "validate.required");
+        }
 
         try {
             InetAddress.getByName(host);
-        }
-        catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
             response.addContextualMessage("host", "validate.invalidValue");
         }
 
         if (snmpVersion != SnmpConstants.version1 && snmpVersion != SnmpConstants.version2c
-                && snmpVersion != SnmpConstants.version3)
+                && snmpVersion != SnmpConstants.version3) {
             response.addContextualMessage("snmpVersion", "validate.invalidValue");
-        if (timeout <= 0)
+        }
+        if (timeout <= 0) {
             response.addContextualMessage("timeout", "validate.greaterThanZero");
-        if (retries < 0)
+        }
+        if (retries < 0) {
             response.addContextualMessage("retries", "validate.cannotBeNegative");
+        }
     }
 
     @Override
@@ -417,8 +429,7 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
             updatePeriods = in.readInt();
             trapPort = in.readInt();
             localAddress = "";
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             host = SerializationHelper.readSafeUTF(in);
             port = in.readInt();
             snmpVersion = in.readInt();
@@ -444,8 +455,9 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
         Integer value = deserializeUpdatePeriodType(json);
-        if (value != null)
+        if (value != null) {
             updatePeriodType = value;
+        }
     }
 
     @Override

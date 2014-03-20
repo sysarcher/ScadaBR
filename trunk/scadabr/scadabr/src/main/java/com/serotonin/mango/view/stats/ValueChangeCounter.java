@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.view.stats;
 
@@ -24,12 +24,13 @@ import java.util.List;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import com.serotonin.util.ObjectUtils;
+import java.util.Objects;
 
 /**
  * @author Matthew Lohbihler
  */
 public class ValueChangeCounter implements StatisticsGenerator {
+
     // Calculated values.
     private int changes;
 
@@ -42,8 +43,9 @@ public class ValueChangeCounter implements StatisticsGenerator {
 
     public ValueChangeCounter(MangoValue startValue, List<? extends IValueTime> values) {
         this(startValue);
-        for (IValueTime p : values)
+        for (IValueTime p : values) {
             addValueTime(p);
+        }
         done();
     }
 
@@ -51,13 +53,15 @@ public class ValueChangeCounter implements StatisticsGenerator {
         lastValue = startValue;
     }
 
+    @Override
     public void addValueTime(IValueTime vt) {
-        if (!ObjectUtils.isEqual(lastValue, vt.getValue())) {
+        if (!Objects.equals(lastValue, vt.getValue())) {
             changes++;
             lastValue = vt.getValue();
         }
     }
 
+    @Override
     public void done() {
         // no op
     }
@@ -77,7 +81,7 @@ public class ValueChangeCounter implements StatisticsGenerator {
 
     public static void main(String[] args) {
         AlphanumericValue startValue = new AlphanumericValue("asdf");
-        List<PointValueTime> values = new ArrayList<PointValueTime>();
+        List<PointValueTime> values = new ArrayList<>();
         values.add(new PointValueTime("asdf", 2000));
         values.add(new PointValueTime("zxcv", 3000));
         values.add(new PointValueTime("qwer", 4000));

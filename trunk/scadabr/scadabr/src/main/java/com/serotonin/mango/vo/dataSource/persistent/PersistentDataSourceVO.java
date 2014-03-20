@@ -5,8 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.persistent.PersistentDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -14,20 +14,23 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
 public class PersistentDataSourceVO extends DataSourceVO<PersistentDataSourceVO> {
+
     public static final Type TYPE = Type.PERSISTENT;
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
-        ets.add(createEventType(PersistentDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessage(
+        ets.add(createEventType(PersistentDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.dataSource")));
     }
 
     private static final ExportCodes EVENT_CODES = new ExportCodes();
+
     static {
         EVENT_CODES.addElement(PersistentDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, "DATA_SOURCE_EXCEPTION_EVENT");
     }
@@ -39,7 +42,7 @@ public class PersistentDataSourceVO extends DataSourceVO<PersistentDataSourceVO>
 
     @Override
     public LocalizableMessage getConnectionDescription() {
-        return new LocalizableMessage("dsEdit.persistent.dsconn", port);
+        return new LocalizableMessageImpl("dsEdit.persistent.dsconn", port);
     }
 
     @Override
@@ -91,8 +94,9 @@ public class PersistentDataSourceVO extends DataSourceVO<PersistentDataSourceVO>
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (port <= 0 || port > 65535)
+        if (port <= 0 || port > 65535) {
             response.addContextualMessage("port", "validate.invalidValue");
+        }
     }
 
     @Override
@@ -131,8 +135,7 @@ public class PersistentDataSourceVO extends DataSourceVO<PersistentDataSourceVO>
             port = in.readInt();
             authorizationKey = SerializationHelper.readSafeUTF(in);
             acceptPointUpdates = false;
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             port = in.readInt();
             authorizationKey = SerializationHelper.readSafeUTF(in);
             acceptPointUpdates = in.readBoolean();

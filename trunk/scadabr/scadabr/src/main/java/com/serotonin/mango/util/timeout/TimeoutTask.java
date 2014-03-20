@@ -3,11 +3,12 @@ package com.serotonin.mango.util.timeout;
 import java.util.Date;
 
 import com.serotonin.mango.Common;
-import com.serotonin.timer.OneTimeTrigger;
-import com.serotonin.timer.TimerTask;
-import com.serotonin.timer.TimerTrigger;
+import br.org.scadabr.timer.OneTimeTrigger;
+import br.org.scadabr.timer.TimerTask;
+import br.org.scadabr.timer.TimerTrigger;
 
 public class TimeoutTask extends TimerTask {
+
     private final TimeoutClient client;
 
     public TimeoutTask(long delay, TimeoutClient client) {

@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.report;
 
@@ -36,6 +36,7 @@ import br.org.scadabr.util.SerializationHelper;
  * @author Matthew Lohbihler
  */
 public class ReportVO implements Serializable {
+
     public static final int DATE_RANGE_TYPE_RELATIVE = 1;
     public static final int DATE_RANGE_TYPE_SPECIFIC = 2;
 
@@ -441,8 +442,7 @@ public class ReportVO implements Serializable {
             recipients = (List<RecipientListEntryBean>) in.readObject();
             includeData = in.readBoolean();
             zipData = false;
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             points = convertToReportPointVOs((List<Integer>) in.readObject());
             includeEvents = EVENTS_ALARMS;
             includeUserComments = true;
@@ -475,8 +475,7 @@ public class ReportVO implements Serializable {
             recipients = (List<RecipientListEntryBean>) in.readObject();
             includeData = in.readBoolean();
             zipData = false;
-        }
-        else if (ver == 3) {
+        } else if (ver == 3) {
             points = convertToReportPointVOs((List<Integer>) in.readObject());
             includeEvents = in.readInt();
             includeUserComments = true;
@@ -509,8 +508,7 @@ public class ReportVO implements Serializable {
             recipients = (List<RecipientListEntryBean>) in.readObject();
             includeData = in.readBoolean();
             zipData = false;
-        }
-        else if (ver == 4) {
+        } else if (ver == 4) {
             points = convertToReportPointVOs((List<Integer>) in.readObject());
             includeEvents = in.readInt();
             includeUserComments = in.readBoolean();
@@ -543,8 +541,7 @@ public class ReportVO implements Serializable {
             recipients = (List<RecipientListEntryBean>) in.readObject();
             includeData = in.readBoolean();
             zipData = false;
-        }
-        else if (ver == 5) {
+        } else if (ver == 5) {
             points = (List<ReportPointVO>) in.readObject();
             includeEvents = in.readInt();
             includeUserComments = in.readBoolean();
@@ -577,8 +574,7 @@ public class ReportVO implements Serializable {
             recipients = (List<RecipientListEntryBean>) in.readObject();
             includeData = in.readBoolean();
             zipData = false;
-        }
-        else if (ver == 6) {
+        } else if (ver == 6) {
             points = (List<ReportPointVO>) in.readObject();
             includeEvents = in.readInt();
             includeUserComments = in.readBoolean();

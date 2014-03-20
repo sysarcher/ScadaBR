@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.spinwave;
 
@@ -24,8 +24,8 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.spinwave.SpinwaveDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -34,28 +34,31 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.spinwave.SpinwaveReceiver;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class SpinwaveDataSourceVO extends DataSourceVO<SpinwaveDataSourceVO> {
+
     public static final Type TYPE = Type.SPINWAVE;
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
-        ets.add(createEventType(SpinwaveDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessage(
+        ets.add(createEventType(SpinwaveDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.dataSource")));
-        ets.add(createEventType(SpinwaveDataSourceRT.SENSOR_HEARTBEAT_EVENT, new LocalizableMessage(
+        ets.add(createEventType(SpinwaveDataSourceRT.SENSOR_HEARTBEAT_EVENT, new LocalizableMessageImpl(
                 "event.ds.heartbeat")));
-        ets.add(createEventType(SpinwaveDataSourceRT.UNKNOWN_SENSOR_EVENT, new LocalizableMessage(
+        ets.add(createEventType(SpinwaveDataSourceRT.UNKNOWN_SENSOR_EVENT, new LocalizableMessageImpl(
                 "event.ds.unknownSensor")));
     }
 
     private static final ExportCodes EVENT_CODES = new ExportCodes();
+
     static {
         EVENT_CODES.addElement(SpinwaveDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, "DATA_SOURCE_EXCEPTION");
         EVENT_CODES.addElement(SpinwaveDataSourceRT.SENSOR_HEARTBEAT_EVENT, "SENSOR_HEARTBEAT");
@@ -69,7 +72,7 @@ public class SpinwaveDataSourceVO extends DataSourceVO<SpinwaveDataSourceVO> {
 
     @Override
     public LocalizableMessage getConnectionDescription() {
-        return new LocalizableMessage("common.default", commPortId);
+        return new LocalizableMessageImpl("common.default", commPortId);
     }
 
     @Override
@@ -84,8 +87,9 @@ public class SpinwaveDataSourceVO extends DataSourceVO<SpinwaveDataSourceVO> {
 
     @Override
     public BaseSpinwavePointLocatorVO createPointLocator() {
-        if (messageVersion == SpinwaveReceiver.VERSION_2)
+        if (messageVersion == SpinwaveReceiver.VERSION_2) {
             return new SpinwaveV2PointLocatorVO();
+        }
         return new SpinwaveV1PointLocatorVO();
     }
 
@@ -133,16 +137,20 @@ public class SpinwaveDataSourceVO extends DataSourceVO<SpinwaveDataSourceVO> {
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (messageVersion != SpinwaveReceiver.VERSION_1 && messageVersion != SpinwaveReceiver.VERSION_2)
+        if (messageVersion != SpinwaveReceiver.VERSION_1 && messageVersion != SpinwaveReceiver.VERSION_2) {
             response.addContextualMessage("messageVersion", "validate.invalidValue");
-        if (StringUtils.isEmpty(commPortId))
-            response.addContextualMessage("commPortId", "validate.required");
-        for (long addr : sensorAddresses) {
-            if (addr <= 0)
-                response.addContextualMessage("sensorAddresses", "validate.invalidAddress", addr);
         }
-        if (heartbeatTimeout < 30)
+        if (StringUtils.isEmpty(commPortId)) {
+            response.addContextualMessage("commPortId", "validate.required");
+        }
+        for (long addr : sensorAddresses) {
+            if (addr <= 0) {
+                response.addContextualMessage("sensorAddresses", "validate.invalidAddress", addr);
+            }
+        }
+        if (heartbeatTimeout < 30) {
             response.addContextualMessage("heartbeatTimeout", "validate.notLessThan30s");
+        }
     }
 
     @Override
@@ -160,9 +168,10 @@ public class SpinwaveDataSourceVO extends DataSourceVO<SpinwaveDataSourceVO> {
                 heartbeatTimeout);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.spinwave.version", from.messageVersion,
                 messageVersion);
-        if (Arrays.equals(from.sensorAddresses, sensorAddresses))
+        if (Arrays.equals(from.sensorAddresses, sensorAddresses)) {
             AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.spinwave.sensorAddresses", Arrays
                     .toString(from.sensorAddresses), Arrays.toString(sensorAddresses));
+        }
     }
 
     //
@@ -189,24 +198,22 @@ public class SpinwaveDataSourceVO extends DataSourceVO<SpinwaveDataSourceVO> {
             commPortId = SerializationHelper.readSafeUTF(in);
             int[] old = (int[]) in.readObject();
             sensorAddresses = new long[old.length];
-            for (int i = 0; i < old.length; i++)
+            for (int i = 0; i < old.length; i++) {
                 sensorAddresses[i] = old[i];
+            }
             messageVersion = SpinwaveReceiver.VERSION_1;
             heartbeatTimeout = 30;
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             commPortId = SerializationHelper.readSafeUTF(in);
             sensorAddresses = (long[]) in.readObject();
             messageVersion = SpinwaveReceiver.VERSION_1;
             heartbeatTimeout = 30;
-        }
-        else if (ver == 3) {
+        } else if (ver == 3) {
             commPortId = SerializationHelper.readSafeUTF(in);
             sensorAddresses = (long[]) in.readObject();
             messageVersion = in.readInt();
             heartbeatTimeout = 30;
-        }
-        else if (ver == 4) {
+        } else if (ver == 4) {
             commPortId = SerializationHelper.readSafeUTF(in);
             sensorAddresses = (long[]) in.readObject();
             messageVersion = in.readInt();

@@ -10,107 +10,108 @@ import org.apache.commons.lang3.StringUtils;
 
 import br.org.scadabr.rt.dataSource.drStorageHt5b.DrStorageHt5bPointLocatorRT;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
 
 @JsonRemoteEntity
 public class DrStorageHt5bPointLocatorVO extends AbstractPointLocatorVO
-		implements JsonSerializable {
+        implements JsonSerializable {
 
-	@JsonRemoteProperty
-	private String pointType;
-	@JsonRemoteProperty
-	private boolean settable;
+    @JsonRemoteProperty
+    private String pointType;
+    @JsonRemoteProperty
+    private boolean settable;
 
-	private int dataType = DataTypes.ALPHANUMERIC;
+    private int dataType = DataTypes.ALPHANUMERIC;
 
-	@Override
-	public void validate(DwrResponseI18n response) {
-		if (StringUtils.isEmpty(pointType))
-			response.addContextualMessage("pointType", "validate.required");
-	}
+    @Override
+    public void validate(DwrResponseI18n response) {
+        if (StringUtils.isEmpty(pointType)) {
+            response.addContextualMessage("pointType", "validate.required");
+        }
+    }
 
-	public String getPointType() {
-		return pointType;
-	}
+    public String getPointType() {
+        return pointType;
+    }
 
-	public void setPointType(String pointType) {
-		this.pointType = pointType;
-	}
+    public void setPointType(String pointType) {
+        this.pointType = pointType;
+    }
 
-	public void setSettable(boolean settable) {
-		this.settable = settable;
-	}
+    public void setSettable(boolean settable) {
+        this.settable = settable;
+    }
 
-	@Override
-	public boolean isSettable() {
-		return settable;
-	}
+    @Override
+    public boolean isSettable() {
+        return settable;
+    }
 
-	private static final long serialVersionUID = -1;
-	private static final int version = 1;
+    private static final long serialVersionUID = -1;
+    private static final int version = 1;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(version);
-		SerializationHelper.writeSafeUTF(out, pointType);
-		out.writeBoolean(settable);
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(version);
+        SerializationHelper.writeSafeUTF(out, pointType);
+        out.writeBoolean(settable);
 
-	}
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int ver = in.readInt();
-		if (ver == 1) {
-			pointType = SerializationHelper.readSafeUTF(in);
-			settable = in.readBoolean();
-		}
-	}
+    private void readObject(ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        int ver = in.readInt();
+        if (ver == 1) {
+            pointType = SerializationHelper.readSafeUTF(in);
+            settable = in.readBoolean();
+        }
+    }
 
-	@Override
-	public void jsonDeserialize(JsonReader arg0, JsonObject arg1)
-			throws JsonException {
+    @Override
+    public void jsonDeserialize(JsonReader arg0, JsonObject arg1)
+            throws JsonException {
 
-	}
+    }
 
-	@Override
-	public void jsonSerialize(Map<String, Object> arg0) {
+    @Override
+    public void jsonSerialize(Map<String, Object> arg0) {
 
-	}
+    }
 
-	@Override
-	public PointLocatorRT createRuntime() {
-		return new DrStorageHt5bPointLocatorRT(this);
-	}
+    @Override
+    public PointLocatorRT createRuntime() {
+        return new DrStorageHt5bPointLocatorRT(this);
+    }
 
-	@Override
-	public LocalizableMessage getConfigurationDescription() {
-		return null;
-	}
+    @Override
+    public LocalizableMessage getConfigurationDescription() {
+        return null;
+    }
 
-	@Override
-	public void addProperties(List<LocalizableMessage> list) {
+    @Override
+    public void addProperties(List<LocalizableMessage> list) {
 
-	}
+    }
 
-	@Override
-	public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
+    @Override
+    public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
 
-	}
+    }
 
-	@Override
-	public int getDataTypeId() {
-		// TODO Auto-generated method stub
-		return 4;
-	}
+    @Override
+    public int getDataTypeId() {
+        // TODO Auto-generated method stub
+        return 4;
+    }
 
 }

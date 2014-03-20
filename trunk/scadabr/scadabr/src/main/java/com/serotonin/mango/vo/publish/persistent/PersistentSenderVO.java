@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.publish.persistent;
 
@@ -24,11 +24,11 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.publish.PublisherRT;
@@ -38,32 +38,35 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
 public class PersistentSenderVO extends PublisherVO<PersistentPointVO> {
+
     @Override
     protected void getEventTypesImpl(List<EventTypeVO> eventTypes) {
         eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(),
-                PersistentSenderRT.CONNECTION_FAILED_EVENT, new LocalizableMessage(
+                PersistentSenderRT.CONNECTION_FAILED_EVENT, new LocalizableMessageImpl(
                         "event.pb.persistent.connectionFailed"), AlarmLevels.URGENT));
         eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(),
                 PersistentSenderRT.PROTOCOL_FAILURE_EVENT,
-                new LocalizableMessage("event.pb.persistent.protocolFailure"), AlarmLevels.URGENT));
+                new LocalizableMessageImpl("event.pb.persistent.protocolFailure"), AlarmLevels.URGENT));
         eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(),
-                PersistentSenderRT.CONNECTION_ABORTED_EVENT, new LocalizableMessage(
+                PersistentSenderRT.CONNECTION_ABORTED_EVENT, new LocalizableMessageImpl(
                         "event.pb.persistent.connectionAborted"), AlarmLevels.URGENT));
         eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(),
-                PersistentSenderRT.CONNECTION_LOST_EVENT, new LocalizableMessage("event.pb.persistent.connectionLost"),
+                PersistentSenderRT.CONNECTION_LOST_EVENT, new LocalizableMessageImpl("event.pb.persistent.connectionLost"),
                 AlarmLevels.URGENT));
         eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(),
-                PersistentSenderRT.SYNC_COMPLETION_EVENT, new LocalizableMessage("event.pb.persistent.syncCompleted"),
+                PersistentSenderRT.SYNC_COMPLETION_EVENT, new LocalizableMessageImpl("event.pb.persistent.syncCompleted"),
                 AlarmLevels.NONE));
     }
 
     private static final ExportCodes EVENT_CODES = new ExportCodes();
+
     static {
         PublisherVO.addDefaultEventCodes(EVENT_CODES);
         EVENT_CODES.addElement(PersistentSenderRT.CONNECTION_FAILED_EVENT, "CONNECTION_FAILED_EVENT");
@@ -79,6 +82,7 @@ public class PersistentSenderVO extends PublisherVO<PersistentPointVO> {
     public static final int SYNC_TYPE_MONTHLY = 3;
 
     private static ExportCodes SYNC_TYPE_CODES = new ExportCodes();
+
     static {
         SYNC_TYPE_CODES.addElement(SYNC_TYPE_NONE, "SYNC_TYPE_NONE", "publisherEdit.persistent.sync.none");
         SYNC_TYPE_CODES.addElement(SYNC_TYPE_DAILY, "SYNC_TYPE_DAILY", "publisherEdit.persistent.sync.daily");
@@ -93,7 +97,7 @@ public class PersistentSenderVO extends PublisherVO<PersistentPointVO> {
 
     @Override
     public LocalizableMessage getConfigDescription() {
-        return new LocalizableMessage("common.default", host);
+        return new LocalizableMessageImpl("common.default", host);
     }
 
     @Override
@@ -165,13 +169,16 @@ public class PersistentSenderVO extends PublisherVO<PersistentPointVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
 
-        if (StringUtils.isEmpty(host))
+        if (StringUtils.isEmpty(host)) {
             response.addContextualMessage("host", "validate.required");
-        if (port <= 0 || port >= 65536)
+        }
+        if (port <= 0 || port >= 65536) {
             response.addContextualMessage("port", "validate.illegalValue");
+        }
 
-        if (!SYNC_TYPE_CODES.isValidId(syncType))
+        if (!SYNC_TYPE_CODES.isValidId(syncType)) {
             response.addContextualMessage("syncType", "validate.invalidValue");
+        }
     }
 
     //
@@ -201,8 +208,7 @@ public class PersistentSenderVO extends PublisherVO<PersistentPointVO> {
             authorizationKey = SerializationHelper.readSafeUTF(in);
             xidPrefix = "";
             syncType = in.readInt();
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             host = SerializationHelper.readSafeUTF(in);
             port = in.readInt();
             authorizationKey = SerializationHelper.readSafeUTF(in);
@@ -224,9 +230,10 @@ public class PersistentSenderVO extends PublisherVO<PersistentPointVO> {
         String text = json.getString("syncType");
         if (text != null) {
             syncType = SYNC_TYPE_CODES.getId(text);
-            if (syncType == -1)
+            if (syncType == -1) {
                 throw new LocalizableJsonException("emport.error.invalid", "syncType", text,
                         SYNC_TYPE_CODES.getCodeList());
+            }
         }
     }
 }

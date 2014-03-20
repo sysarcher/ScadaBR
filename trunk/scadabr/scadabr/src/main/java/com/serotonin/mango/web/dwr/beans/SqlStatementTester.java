@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr.beans;
 
@@ -29,12 +29,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import com.serotonin.web.i18n.I18NUtils;
+import br.org.scadabr.web.i18n.I18NUtils;
+import br.org.scadabr.web.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
  */
 public class SqlStatementTester extends Thread implements TestingUtility {
+
     private static final int MAX_ROWS = 50;
 
     private final ResourceBundle bundle;
@@ -47,7 +49,7 @@ public class SqlStatementTester extends Thread implements TestingUtility {
 
     private boolean done;
     private String errorMessage;
-    private final List<List<String>> resultTable = new ArrayList<List<String>>();
+    private final List<List<String>> resultTable = new ArrayList<>();
 
     public SqlStatementTester(ResourceBundle bundle, String driverClassname, String connectionUrl, String username,
             String password, String selectStatement, boolean rowBasedQuery) {
@@ -71,22 +73,21 @@ public class SqlStatementTester extends Thread implements TestingUtility {
             PreparedStatement stmt = conn.prepareStatement(selectStatement);
             ResultSet rs = stmt.executeQuery();
 
-            if (rowBasedQuery)
+            if (rowBasedQuery) {
                 getRowData(rs);
-            else
+            } else {
                 getColumnData(rs);
+            }
 
             rs.close();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             errorMessage = e.getClass() + ": " + e.getMessage();
-        }
-        finally {
+        } finally {
             try {
-                if (conn != null)
+                if (conn != null) {
                     conn.close();
-            }
-            catch (SQLException e) {
+                }
+            } catch (SQLException e) {
                 // no op
             }
         }
@@ -105,6 +106,7 @@ public class SqlStatementTester extends Thread implements TestingUtility {
         return resultTable;
     }
 
+    @Override
     public void cancel() {
         // no op
     }
@@ -114,21 +116,24 @@ public class SqlStatementTester extends Thread implements TestingUtility {
         ResultSetMetaData meta = rs.getMetaData();
         int columns = meta.getColumnCount();
 
-        List<String> row = new ArrayList<String>();
-        for (int i = 1; i <= columns; i++)
+        List<String> row = new ArrayList<>();
+        for (int i = 1; i <= columns; i++) {
             row.add(meta.getColumnLabel(i) + " (" + meta.getColumnTypeName(i) + ")");
+        }
         resultTable.add(row);
 
         while (rs.next()) {
-            row = new ArrayList<String>();
+            row = new ArrayList<>();
 
-            for (int i = 1; i <= columns; i++)
+            for (int i = 1; i <= columns; i++) {
                 row.add(rs.getString(i));
+            }
 
             resultTable.add(row);
-            if (resultTable.size() > MAX_ROWS)
-                // Seriously, that ought to be enough
+            if (resultTable.size() > MAX_ROWS) // Seriously, that ought to be enough
+            {
                 break;
+            }
         }
     }
 
@@ -139,22 +144,23 @@ public class SqlStatementTester extends Thread implements TestingUtility {
         boolean data = rs.next();
 
         // Add the headers.
-        List<String> row = new ArrayList<String>();
-        row.add(I18NUtils.getMessage(bundle, "dsEdit.sql.tester.columnName"));
-        row.add(I18NUtils.getMessage(bundle, "dsEdit.sql.tester.columnType"));
-        row.add(I18NUtils.getMessage(bundle, "dsEdit.sql.tester.value"));
+        List<String> row = new ArrayList<>();
+        row.add(Localizer.localizeI18nKey("dsEdit.sql.tester.columnName", bundle));
+        row.add(Localizer.localizeI18nKey("dsEdit.sql.tester.columnType", bundle));
+        row.add(Localizer.localizeI18nKey("dsEdit.sql.tester.value", bundle));
         resultTable.add(row);
 
         for (int i = 1; i <= columns; i++) {
-            row = new ArrayList<String>();
+            row = new ArrayList<>();
             row.add(meta.getColumnLabel(i));
             row.add(meta.getColumnTypeName(i));
 
             String value;
-            if (data)
+            if (data) {
                 value = rs.getString(i);
-            else
-                value = I18NUtils.getMessage(bundle, "common.noData");
+            } else {
+                value = Localizer.localizeI18nKey("common.noData", bundle);
+            }
 
             row.add(value);
             resultTable.add(row);

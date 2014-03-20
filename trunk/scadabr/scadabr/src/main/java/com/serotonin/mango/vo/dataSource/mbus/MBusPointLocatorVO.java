@@ -31,19 +31,20 @@ import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
 
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.mbus.MBusPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
 public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
@@ -117,7 +118,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     @Override
     public LocalizableMessage getConfigurationDescription() {
-        return new LocalizableMessage("common.default", address + " " + manufacturer);
+        return new LocalizableMessageImpl("common.default", address + " " + manufacturer);
     }
 
     @Override
@@ -141,7 +142,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             case SECONDARY:
                 if ((address == MBusUtils.BROADCAST_NO_ANSWER_PRIMARY_ADDRESS)
                         || (address == MBusUtils.BROADCAST_WITH_ANSWER_PRIMARY_ADDRESS)) {
-                        response.addContextualMessage("address", "validate.required");
+                    response.addContextualMessage("address", "validate.required");
                 }
                 break;
 
@@ -363,16 +364,14 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     /**
-     * @param address
-     *            the address to set
+     * @param address the address to set
      */
     public void setAddress(byte address) {
         this.address = address;
     }
 
     /**
-     * @param address
-     *            the address to set
+     * @param address the address to set
      */
     public void setAddressHex(String address) {
         this.address = (byte) Integer.parseInt(address.substring(2), 16);
@@ -406,8 +405,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     /**
-     * @param deviceUnit
-     *            the deviceUnit to set
+     * @param deviceUnit the deviceUnit to set
      */
     public void setDeviceUnit(int deviceUnit) {
         this.deviceUnit = deviceUnit;
@@ -421,8 +419,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     /**
-     * @param tariff
-     *            the tariff to set
+     * @param tariff the tariff to set
      */
     public void setTariff(int tariff) {
         this.tariff = tariff;
@@ -436,8 +433,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     /**
-     * @param storageNumber
-     *            the storageNumber to set
+     * @param storageNumber the storageNumber to set
      */
     public void setStorageNumber(long storageNumber) {
         this.storageNumber = storageNumber;
@@ -486,8 +482,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     /**
-     * @param difCode
-     *            the difCode to set
+     * @param difCode the difCode to set
      */
     public void setDifCode(String difCode) {
         this.difCode = difCode;
@@ -501,8 +496,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     /**
-     * @param functionField
-     *            the functionField to set
+     * @param functionField the functionField to set
      */
     public void setFunctionField(String functionField) {
         this.functionField = functionField;
@@ -516,8 +510,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     /**
-     * @param vifLabel
-     *            the vifLabel to set
+     * @param vifLabel the vifLabel to set
      */
     public void setVifLabel(String vifLabel) {
         this.vifLabel = vifLabel;
@@ -531,8 +524,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     /**
-     * @param unitOfMeasurement
-     *            the unitOfMeasurement to set
+     * @param unitOfMeasurement the unitOfMeasurement to set
      */
     public void setUnitOfMeasurement(String unitOfMeasurement) {
         this.unitOfMeasurement = unitOfMeasurement;
@@ -546,8 +538,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     /**
-     * @param siPrefix
-     *            the siPrefix to set
+     * @param siPrefix the siPrefix to set
      */
     public void setSiPrefix(String siPrefix) {
         this.siPrefix = siPrefix;
@@ -561,8 +552,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     /**
-     * @param exponent
-     *            the exponent to set
+     * @param exponent the exponent to set
      */
     public void setExponent(Integer exponent) {
         this.exponent = exponent;
@@ -576,8 +566,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     /**
-     * @param vifeLabel
-     *            the vifeLabel to set
+     * @param vifeLabel the vifeLabel to set
      */
     public void setVifeLabels(String[] vifeLabel) {
         vifeLabels = vifeLabel;
@@ -591,8 +580,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     /**
-     * @param medium
-     *            the medium to set
+     * @param medium the medium to set
      */
     public void setMedium(String medium) {
         this.medium = medium;
@@ -607,8 +595,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     /**
-     * @param addressing
-     *            the addressing to set
+     * @param addressing the addressing to set
      */
     public void setAddressing(MBusAddressing addressing) {
         this.addressing = addressing;
@@ -616,7 +603,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     /**
      * Helper for JSP
-     * 
+     *
      * @return
      */
     public boolean isPrimaryAddressing() {
@@ -625,7 +612,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     /**
      * Helper for JSP
-     * 
+     *
      * @return
      */
     public boolean isSecondaryAddressing() {
@@ -640,8 +627,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     /**
-     * @param vifType
-     *            the vifType to set
+     * @param vifType the vifType to set
      */
     public void setVifType(String vifType) {
         this.vifType = vifType;
@@ -655,8 +641,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     /**
-     * @param vifeTypes
-     *            the vifeTypes to set
+     * @param vifeTypes the vifeTypes to set
      */
     public void setVifeTypes(String[] vifeTypes) {
         this.vifeTypes = vifeTypes;
@@ -675,11 +660,11 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     public void setCorrectionFactor(double correctionFactor) {
         this.correctionFactor = correctionFactor;
     }
-    
+
     public String getDeviceName() {
         return String.format("%s %s 0x%02X %08d @0x%02X", getManufacturer(), getMedium(), getVersion(), getIdentNumber(), getAddress());
     }
-    
+
     public String getParams() {
         StringBuilder sb = new StringBuilder();
         sb.append("<b>dataType = </b> \"").append(difCode).append("\"<br>");
@@ -692,5 +677,5 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         sb.append("<b>functionField =</b> \"").append(functionField).append("\"<br>");
         return sb.toString();
     }
-    
+
 }

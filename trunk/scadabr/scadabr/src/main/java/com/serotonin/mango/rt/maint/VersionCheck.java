@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.maint;
 
@@ -46,17 +46,19 @@ import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
-import com.serotonin.timer.FixedRateTrigger;
-import com.serotonin.timer.TimerTask;
-import com.serotonin.util.queue.ByteQueue;
-import com.serotonin.web.http.HttpUtils;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.timer.FixedRateTrigger;
+import br.org.scadabr.timer.TimerTask;
+import br.org.scadabr.util.queue.ByteQueue;
+import br.org.scadabr.web.http.HttpUtils;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
- * 
+ *
  */
 public class VersionCheck extends TimerTask {
+
     private static final long TIMEOUT = 1000 * 60 * 60 * 24 * 2; // Run every other day.
     private static final String INSTANCE_ID_FILE = "WEB-INF/instance.txt";
 
@@ -64,8 +66,8 @@ public class VersionCheck extends TimerTask {
     private static String instanceId;
 
     /**
-     * This method will set up the version checking job. It assumes that the corresponding system setting for running
-     * this job is true.
+     * This method will set up the version checking job. It assumes that the
+     * corresponding system setting for running this job is true.
      */
     public static void start() {
         synchronized (INSTANCE_ID_FILE) {
@@ -89,8 +91,9 @@ public class VersionCheck extends TimerTask {
     }
 
     public static String getInstanceId() {
-        if (instanceId == null)
+        if (instanceId == null) {
             instanceId = calcMachineId();
+        }
         return instanceId;
     }
 
@@ -99,12 +102,10 @@ public class VersionCheck extends TimerTask {
         try {
             String notifLevel = SystemSettingsDao.getValue(SystemSettingsDao.NEW_VERSION_NOTIFICATION_LEVEL);
             newVersionCheck(fireTime, notifLevel);
-        }
-        catch (SocketTimeoutException e) {
+        } catch (SocketTimeoutException e) {
             // Ignore
-        }
-        catch (Exception e) {
-            SystemEventType.raiseEvent(getEventType(), fireTime, true, new LocalizableMessage("event.version.error", e
+        } catch (Exception e) {
+            SystemEventType.raiseEvent(getEventType(), fireTime, true, new LocalizableMessageImpl("event.version.error", e
                     .getClass().getName(), e.getMessage()));
         }
     }
@@ -123,11 +124,11 @@ public class VersionCheck extends TimerTask {
         if (result == null) {
             // If the version matches, clear any outstanding event.
             SystemEventType.returnToNormal(getEventType(), fireTime);
-            return new LocalizableMessage("event.version.uptodate");
+            return new LocalizableMessageImpl("event.version.uptodate");
         }
 
         // If the version doesn't match this version, raise an event.
-        LocalizableMessage message = new LocalizableMessage("event.version.available", result);
+        LocalizableMessage message = new LocalizableMessageImpl("event.version.available", result);
         SystemEventType.raiseEvent(getEventType(), fireTime, true, message);
         return message;
     }
@@ -141,8 +142,7 @@ public class VersionCheck extends TimerTask {
         postMethod.addParameter("instanceName", SystemSettingsDao.getValue(SystemSettingsDao.INSTANCE_DESCRIPTION));
         try {
             postMethod.addParameter("instanceIp", InetAddress.getLocalHost().getHostAddress());
-        }
-        catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
             postMethod.addParameter("instanceIp", "unknown");
         }
 
@@ -154,12 +154,14 @@ public class VersionCheck extends TimerTask {
             if (config.isEnabled()) {
                 int points = 0;
                 for (DataPointVO point : dataPointDao.getDataPoints(config.getId(), null)) {
-                    if (point.isEnabled())
+                    if (point.isEnabled()) {
                         points++;
+                    }
                 }
 
-                if (datasourceTypes.length() > 0)
+                if (datasourceTypes.length() > 0) {
                     datasourceTypes.append(',');
+                }
                 datasourceTypes.append(config.getType().getId()).append(':').append(points);
             }
         }
@@ -168,16 +170,18 @@ public class VersionCheck extends TimerTask {
         StringBuilder publisherTypes = new StringBuilder();
         for (PublisherVO<?> config : new PublisherDao().getPublishers()) {
             if (config.isEnabled()) {
-                if (publisherTypes.length() > 0)
+                if (publisherTypes.length() > 0) {
                     publisherTypes.append(',');
+                }
                 publisherTypes.append(config.getType().getId()).append(':').append(config.getPoints().size());
             }
         }
         postMethod.addParameter("publisherTypes", publisherTypes.toString());
 
         int responseCode = httpClient.executeMethod(postMethod);
-        if (responseCode != HttpStatus.SC_OK)
+        if (responseCode != HttpStatus.SC_OK) {
             throw new HttpException("Invalid response code: " + responseCode);
+        }
 
         Header devHeader = postMethod.getResponseHeader("Mango-dev");
         if (devHeader != null) {
@@ -186,33 +190,37 @@ public class VersionCheck extends TimerTask {
             devVersion = devVersion.substring(0, devVersion.length() - 1);
 
             // There is a new version development version. Check if we're interested.
-            if (Common.getVersion().equals(devVersion))
-                // We already have it. Never mind.
+            if (Common.getVersion().equals(devVersion)) // We already have it. Never mind.
+            {
                 return null;
+            }
 
             // Beta?
             if (SystemSettingsDao.NOTIFICATION_LEVEL_BETA.equals(stage)
-                    && SystemSettingsDao.NOTIFICATION_LEVEL_BETA.equals(notifLevel))
+                    && SystemSettingsDao.NOTIFICATION_LEVEL_BETA.equals(notifLevel)) {
                 return devVersion + " beta";
+            }
 
             // Release candidate?
             if (SystemSettingsDao.NOTIFICATION_LEVEL_RC.equals(stage)
                     && (SystemSettingsDao.NOTIFICATION_LEVEL_BETA.equals(notifLevel) || SystemSettingsDao.NOTIFICATION_LEVEL_RC
-                            .equals(notifLevel)))
+                    .equals(notifLevel))) {
                 return devVersion + " release candidate";
+            }
         }
 
         // Either there is no dev version available or we're not interested in it. Check the stable version
         String stableVersion = HttpUtils.readResponseBody(postMethod);
 
-        if (Common.getVersion().equals(stableVersion))
+        if (Common.getVersion().equals(stableVersion)) {
             return null;
+        }
 
         return stableVersion;
     }
 
     private static String calcMachineId() {
-        List<NI> nis = new ArrayList<NI>();
+        List<NI> nis = new ArrayList<>();
 
         try {
             Enumeration<NetworkInterface> eni = NetworkInterface.getNetworkInterfaces();
@@ -222,21 +230,21 @@ public class VersionCheck extends TimerTask {
                 ni.name = netint.getName();
                 try {
                     ni.hwAddress = netint.getHardwareAddress();
-                }
-                catch (SocketException e) {
+                } catch (SocketException e) {
                     // ignore this too
                 }
-                if (ni.name != null && ni.hwAddress != null)
-                    // Should be for real.
+                if (ni.name != null && ni.hwAddress != null) // Should be for real.
+                {
                     nis.add(ni);
+                }
             }
-        }
-        catch (SocketException e) {
+        } catch (SocketException e) {
             // ignore
         }
 
-        if (nis.isEmpty())
+        if (nis.isEmpty()) {
             return null;
+        }
 
         // Sort the NIs just to make sure we always add them in the same order.
         Collections.sort(nis, new Comparator<NI>() {
@@ -257,6 +265,7 @@ public class VersionCheck extends TimerTask {
     }
 
     static class NI {
+
         String name;
         byte[] hwAddress;
     }

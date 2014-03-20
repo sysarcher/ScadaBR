@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr;
 
@@ -42,12 +42,15 @@ import com.serotonin.mango.vo.permission.DataPointAccess;
 import com.serotonin.mango.vo.permission.PermissionException;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.email.MangoEmailContent;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.I18NUtils;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.I18NUtils;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.web.l10n.Localizer;
 
 public class UsersDwr extends BaseDwr {
+
     public Map<String, Object> getInitData() {
         Map<String, Object> initData = new HashMap<String, Object>();
 
@@ -59,17 +62,17 @@ public class UsersDwr extends BaseDwr {
 
             // Data sources
             List<DataSourceVO<?>> dataSourceVOs = new DataSourceDao().getDataSources();
-            List<Map<String, Object>> dataSources = new ArrayList<Map<String, Object>>(dataSourceVOs.size());
+            List<Map<String, Object>> dataSources = new ArrayList<>(dataSourceVOs.size());
             Map<String, Object> ds, dp;
             List<Map<String, Object>> points;
             DataPointDao dataPointDao = new DataPointDao();
             for (DataSourceVO<?> dsvo : dataSourceVOs) {
-                ds = new HashMap<String, Object>();
+                ds = new HashMap<>();
                 ds.put("id", dsvo.getId());
                 ds.put("name", dsvo.getName());
-                points = new LinkedList<Map<String, Object>>();
+                points = new LinkedList<>();
                 for (DataPointVO dpvo : dataPointDao.getDataPoints(dsvo.getId(), DataPointNameComparator.instance)) {
-                    dp = new HashMap<String, Object>();
+                    dp = new HashMap<>();
                     dp.put("id", dpvo.getId());
                     dp.put("name", dpvo.getName());
                     dp.put("settable", dpvo.getPointLocator().isSettable());
@@ -79,9 +82,9 @@ public class UsersDwr extends BaseDwr {
                 dataSources.add(ds);
             }
             initData.put("dataSources", dataSources);
-        }
-        else
+        } else {
             initData.put("user", user);
+        }
 
         return initData;
     }
@@ -108,13 +111,15 @@ public class UsersDwr extends BaseDwr {
         UserDao userDao = new UserDao();
 
         User user;
-        if (id == Common.NEW_ID)
+        if (id == Common.NEW_ID) {
             user = new User();
-        else
+        } else {
             user = userDao.getUser(id);
+        }
         user.setUsername(username);
-        if (!StringUtils.isEmpty(password))
+        if (!StringUtils.isEmpty(password)) {
             user.setPassword(Common.encrypt(password));
+        }
         user.setEmail(email);
         user.setPhone(phone);
         user.setAdmin(admin);
@@ -129,25 +134,29 @@ public class UsersDwr extends BaseDwr {
 
         // Check if the username is unique.
         User dupUser = userDao.getUser(username);
-        if (id == Common.NEW_ID && dupUser != null)
-            response.addMessage(new LocalizableMessage("users.validate.usernameUnique"));
-        else if (dupUser != null && id != dupUser.getId())
-            response.addMessage(new LocalizableMessage("users.validate.usernameInUse"));
+        if (id == Common.NEW_ID && dupUser != null) {
+            response.addMessage("users.validate.usernameUnique");
+        } else if (dupUser != null && id != dupUser.getId()) {
+            response.addMessage("users.validate.usernameInUse");
+        }
 
         // Cannot make yourself disabled or not admin
         if (currentUser.getId() == id) {
-            if (!admin)
-                response.addMessage(new LocalizableMessage("users.validate.adminInvalid"));
-            if (disabled)
-                response.addMessage(new LocalizableMessage("users.validate.adminDisable"));
+            if (!admin) {
+                response.addMessage("users.validate.adminInvalid");
+            }
+            if (disabled) {
+                response.addMessage("users.validate.adminDisable");
+            }
         }
 
         if (!response.getHasMessages()) {
             userDao.saveUser(user);
 
-            if (currentUser.getId() == id)
-                // Update the user object in session too. Why not?
+            if (currentUser.getId() == id) // Update the user object in session too. Why not?
+            {
                 Common.setUser(request, user);
+            }
 
             response.addData("userId", user.getId());
         }
@@ -159,13 +168,15 @@ public class UsersDwr extends BaseDwr {
             boolean receiveOwnAuditEvents) {
         HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
         User user = Common.getUser(request);
-        if (user.getId() != id)
+        if (user.getId() != id) {
             throw new PermissionException("Cannot update a different user", user);
+        }
 
         UserDao userDao = new UserDao();
         User updateUser = userDao.getUser(id);
-        if (!StringUtils.isEmpty(password))
+        if (!StringUtils.isEmpty(password)) {
             updateUser.setPassword(Common.encrypt(password));
+        }
         updateUser.setEmail(email);
         updateUser.setPhone(phone);
         updateUser.setReceiveAlarmEmails(receiveAlarmEmails);
@@ -186,17 +197,15 @@ public class UsersDwr extends BaseDwr {
 
     public Map<String, Object> sendTestEmail(String email, String username) {
         Permissions.ensureAdmin();
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
         try {
             ResourceBundle bundle = Common.getBundle();
-            Map<String, Object> model = new HashMap<String, Object>();
-            model.put("message", new LocalizableMessage("ftl.userTestEmail", username));
-            MangoEmailContent cnt = new MangoEmailContent("testEmail", model, bundle, I18NUtils.getMessage(bundle,
-                    "ftl.testEmail"), Common.UTF8);
+            Map<String, Object> model = new HashMap<>();
+            model.put("message", new LocalizableMessageImpl("ftl.userTestEmail", username));
+            MangoEmailContent cnt = new MangoEmailContent("testEmail", model, bundle, Localizer.localizeI18nKey("ftl.testEmail", bundle), Common.UTF8);
             EmailWorkItem.queueEmail(email, cnt);
-            result.put("message", new LocalizableMessage("common.testEmailSent", email));
-        }
-        catch (Exception e) {
+            result.put("message", new LocalizableMessageImpl("common.testEmailSent", email));
+        } catch (Exception e) {
             result.put("exception", e.getMessage());
         }
         return result;
@@ -207,11 +216,12 @@ public class UsersDwr extends BaseDwr {
         DwrResponseI18n response = new DwrResponseI18n();
         User currentUser = Common.getUser();
 
-        if (currentUser.getId() == id)
-            // You can't delete yourself.
-            response.addMessage(new LocalizableMessage("users.validate.badDelete"));
-        else
+        if (currentUser.getId() == id) // You can't delete yourself.
+        {
+            response.addMessage("users.validate.badDelete");
+        } else {
             new UserDao().deleteUser(id);
+        }
 
         return response;
     }

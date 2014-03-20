@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.publish;
 
@@ -26,13 +26,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonArray;
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
-import com.serotonin.json.JsonValue;
+import br.org.scadabr.json.JsonArray;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
+import br.org.scadabr.json.JsonValue;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.PublisherDao;
 import com.serotonin.mango.rt.event.AlarmLevels;
@@ -45,33 +45,36 @@ import com.serotonin.mango.vo.publish.httpSender.HttpSenderVO;
 import com.serotonin.mango.vo.publish.pachube.PachubeSenderVO;
 import com.serotonin.mango.vo.publish.persistent.PersistentSenderVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 abstract public class PublisherVO<T extends PublishedPointVO> implements Serializable, JsonSerializable {
+
     public enum Type {
+
         HTTP_SENDER(1, "publisherEdit.httpSender") {
-            @Override
-            public PublisherVO<?> createPublisherVO() {
-                return new HttpSenderVO();
-            }
-        },
+                    @Override
+                    public PublisherVO<?> createPublisherVO() {
+                        return new HttpSenderVO();
+                    }
+                },
         PACHUBE(2, "publisherEdit.pachube") {
-            @Override
-            public PublisherVO<?> createPublisherVO() {
-                return new PachubeSenderVO();
-            }
-        },
+                    @Override
+                    public PublisherVO<?> createPublisherVO() {
+                        return new PachubeSenderVO();
+                    }
+                },
         PERSISTENT(3, "publisherEdit.persistent") {
-            @Override
-            public PublisherVO<?> createPublisherVO() {
-                return new PersistentSenderVO();
-            }
-        };
+                    @Override
+                    public PublisherVO<?> createPublisherVO() {
+                        return new PersistentSenderVO();
+                    }
+                };
 
         private Type(int id, String key) {
             this.id = id;
@@ -93,24 +96,27 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
 
         public static Type valueOf(int id) {
             for (Type type : values()) {
-                if (type.id == id)
+                if (type.id == id) {
                     return type;
+                }
             }
             return null;
         }
 
         public static Type valueOfIgnoreCase(String text) {
             for (Type type : values()) {
-                if (type.name().equalsIgnoreCase(text))
+                if (type.name().equalsIgnoreCase(text)) {
                     return type;
+                }
             }
             return null;
         }
 
         public static List<String> getTypeList() {
-            List<String> result = new ArrayList<String>();
-            for (Type type : values())
+            List<String> result = new ArrayList<>();
+            for (Type type : values()) {
                 result.add(type.name());
+            }
             return result;
         }
     }
@@ -128,15 +134,15 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
     abstract public PublisherRT<T> createPublisherRT();
 
     public LocalizableMessage getTypeMessage() {
-        return new LocalizableMessage(getType().getKey());
+        return new LocalizableMessageImpl(getType().getKey());
     }
 
     public List<EventTypeVO> getEventTypes() {
         List<EventTypeVO> eventTypes = new ArrayList<EventTypeVO>();
         eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(), PublisherRT.POINT_DISABLED_EVENT,
-                new LocalizableMessage("event.pb.pointMissing"), AlarmLevels.URGENT));
+                new LocalizableMessageImpl("event.pb.pointMissing"), AlarmLevels.URGENT));
         eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(), PublisherRT.QUEUE_SIZE_WARNING_EVENT,
-                new LocalizableMessage("event.pb.queueSize"), AlarmLevels.URGENT));
+                new LocalizableMessageImpl("event.pb.queueSize"), AlarmLevels.URGENT));
 
         getEventTypesImpl(eventTypes);
 
@@ -164,7 +170,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
     private String name;
     @JsonRemoteProperty
     private boolean enabled;
-    protected List<T> points = new ArrayList<T>();
+    protected List<T> points = new ArrayList<>();
     @JsonRemoteProperty
     private boolean changesOnly;
     @JsonRemoteProperty
@@ -256,25 +262,30 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(name))
+        if (StringUtils.isEmpty(name)) {
             response.addContextualMessage("name", "validate.required");
-        if (StringUtils.isLengthGreaterThan(name, 40))
+        }
+        if (StringUtils.isLengthGreaterThan(name, 40)) {
             response.addContextualMessage("name", "validate.nameTooLong");
-
-        if (StringUtils.isEmpty(xid))
-            response.addContextualMessage("xid", "validate.required");
-        else if (!new PublisherDao().isXidUnique(xid, id))
-            response.addContextualMessage("xid", "validate.xidUsed");
-        else if (StringUtils.isLengthGreaterThan(xid, 50))
-            response.addContextualMessage("xid", "validate.notLongerThan", 50);
-
-        if (sendSnapshot) {
-            if (snapshotSendPeriods <= 0)
-                response.addContextualMessage("snapshotSendPeriods", "validate.greaterThanZero");
         }
 
-        if (cacheWarningSize < 1)
+        if (StringUtils.isEmpty(xid)) {
+            response.addContextualMessage("xid", "validate.required");
+        } else if (!new PublisherDao().isXidUnique(xid, id)) {
+            response.addContextualMessage("xid", "validate.xidUsed");
+        } else if (StringUtils.isLengthGreaterThan(xid, 50)) {
+            response.addContextualMessage("xid", "validate.notLongerThan", 50);
+        }
+
+        if (sendSnapshot) {
+            if (snapshotSendPeriods <= 0) {
+                response.addContextualMessage("snapshotSendPeriods", "validate.greaterThanZero");
+            }
+        }
+
+        if (cacheWarningSize < 1) {
             response.addContextualMessage("cacheWarningSize", "validate.greaterThanZero");
+        }
 
     }
 
@@ -312,8 +323,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
             sendSnapshot = false;
             snapshotSendPeriodType = Common.TimePeriods.MINUTES;
             snapshotSendPeriods = 5;
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             name = SerializationHelper.readSafeUTF(in);
             enabled = in.readBoolean();
             points = (List<T>) in.readObject();
@@ -325,6 +335,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
         }
     }
 
+    @Override
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
         map.put("type", getType().name());
@@ -332,6 +343,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
         map.put("snapshotSendPeriodType", Common.TIME_PERIOD_CODES.getCode(snapshotSendPeriodType));
     }
 
+    @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException, LocalizableJsonException {
         JsonArray arr = json.getJsonArray("points");
         if (arr != null) {
@@ -346,9 +358,10 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
         String text = json.getString("snapshotSendPeriodType");
         if (text != null) {
             snapshotSendPeriodType = Common.TIME_PERIOD_CODES.getId(text);
-            if (snapshotSendPeriodType == -1)
+            if (snapshotSendPeriodType == -1) {
                 throw new LocalizableJsonException("emport.error.invalid", "snapshotSendPeriodType", text,
                         Common.TIME_PERIOD_CODES.getCodeList());
+            }
         }
     }
 }

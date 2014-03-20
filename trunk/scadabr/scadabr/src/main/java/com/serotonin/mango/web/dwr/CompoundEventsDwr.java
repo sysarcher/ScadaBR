@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr;
 
@@ -36,14 +36,16 @@ import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.dwr.beans.EventSourceBean;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 public class CompoundEventsDwr extends BaseDwr {
+
     //
     // /
     // / Public methods
@@ -62,27 +64,31 @@ public class CompoundEventsDwr extends BaseDwr {
         List<EventSourceBean> dataPoints = new LinkedList<EventSourceBean>();
         EventSourceBean source;
         for (DataPointVO dp : new DataPointDao().getDataPoints(DataPointExtendedNameComparator.instance, true)) {
-            if (!Permissions.hasDataSourcePermission(user, dp.getDataSourceId()))
+            if (!Permissions.hasDataSourcePermission(user, dp.getDataSourceId())) {
                 continue;
+            }
 
             source = new EventSourceBean();
             source.setId(dp.getId());
             source.setName(dp.getExtendedName());
             for (PointEventDetectorVO ped : dp.getEventDetectors()) {
-                if (ped.isRtnApplicable())
+                if (ped.isRtnApplicable()) {
                     source.getEventTypes().add(ped.getEventType());
+                }
             }
 
-            if (source.getEventTypes().size() > 0)
+            if (source.getEventTypes().size() > 0) {
                 dataPoints.add(source);
+            }
         }
         model.put("dataPoints", dataPoints);
 
         // Get the scheduled events
         List<EventTypeVO> scheduledEvents = new LinkedList<EventTypeVO>();
         List<ScheduledEventVO> ses = new ScheduledEventDao().getScheduledEvents();
-        for (ScheduledEventVO se : ses)
+        for (ScheduledEventVO se : ses) {
             scheduledEvents.add(se.getEventType());
+        }
         model.put("scheduledEvents", scheduledEvents);
 
         return model;
@@ -118,10 +124,11 @@ public class CompoundEventsDwr extends BaseDwr {
 
         CompoundEventDetectorDao compoundEventDetectorDao = new CompoundEventDetectorDao();
 
-        if (StringUtils.isEmpty(xid))
+        if (StringUtils.isEmpty(xid)) {
             response.addContextualMessage("xid", "validate.required");
-        else if (!compoundEventDetectorDao.isXidUnique(xid, id))
+        } else if (!compoundEventDetectorDao.isXidUnique(xid, id)) {
             response.addContextualMessage("xid", "validate.xidUsed");
+        }
 
         ced.validate(response);
 
@@ -129,8 +136,9 @@ public class CompoundEventsDwr extends BaseDwr {
         if (!response.getHasMessages()) {
             boolean success = Common.ctx.getRuntimeManager().saveCompoundEventDetector(ced);
 
-            if (!success)
-                response.addData("warning", new LocalizableMessage("compoundDetectors.validation.initError"));
+            if (!success) {
+                response.addData("warning", new LocalizableMessageImpl("compoundDetectors.validation.initError"));
+            }
         }
 
         response.addData("cedId", ced.getId());

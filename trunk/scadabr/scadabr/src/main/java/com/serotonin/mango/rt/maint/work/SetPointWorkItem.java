@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.maint.work;
 
@@ -29,6 +29,7 @@ import com.serotonin.mango.rt.dataImage.SetPointSource;
  * @author Matthew Lohbihler
  */
 public class SetPointWorkItem implements WorkItem {
+
     private static final ThreadLocal<List<String>> threadLocal = new ThreadLocal<List<String>>();
     private static final int MAX_RECURSION = 10;
 
@@ -42,10 +43,11 @@ public class SetPointWorkItem implements WorkItem {
         this.pvt = pvt;
         this.source = source;
 
-        if (threadLocal.get() == null)
+        if (threadLocal.get() == null) {
             sourceIds = new ArrayList<String>();
-        else
+        } else {
             sourceIds = threadLocal.get();
+        }
     }
 
     @Override
@@ -56,8 +58,9 @@ public class SetPointWorkItem implements WorkItem {
         // Check if we've reached the maximum number of hits for this point
         int count = 0;
         for (String id : sourceIds) {
-            if (id.equals(sourceId))
+            if (id.equals(sourceId)) {
                 count++;
+            }
         }
 
         if (count > MAX_RECURSION) {
@@ -69,8 +72,7 @@ public class SetPointWorkItem implements WorkItem {
         threadLocal.set(sourceIds);
         try {
             Common.ctx.getRuntimeManager().setDataPointValue(targetPointId, pvt, source);
-        }
-        finally {
+        } finally {
             threadLocal.remove();
         }
     }

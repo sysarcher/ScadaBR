@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.report;
 
@@ -32,6 +32,7 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
  * @author Matthew Lohbihler
  */
 public class PointTimeSeriesCollection {
+
     private TimeSeriesCollection numericTimeSeriesCollection;
     private List<Paint> numericPaint;
     private List<DiscreteTimeSeries> discreteTimeSeriesCollection;
@@ -50,8 +51,9 @@ public class PointTimeSeriesCollection {
     }
 
     public void addDiscreteTimeSeries(DiscreteTimeSeries discreteTimeSeries) {
-        if (discreteTimeSeriesCollection == null)
+        if (discreteTimeSeriesCollection == null) {
             discreteTimeSeriesCollection = new ArrayList<DiscreteTimeSeries>();
+        }
         discreteTimeSeriesCollection.add(discreteTimeSeries);
     }
 
@@ -69,10 +71,12 @@ public class PointTimeSeriesCollection {
 
     public boolean hasMultiplePoints() {
         int count = 0;
-        if (numericTimeSeriesCollection != null)
+        if (numericTimeSeriesCollection != null) {
             count += numericTimeSeriesCollection.getSeriesCount();
-        if (discreteTimeSeriesCollection != null)
+        }
+        if (discreteTimeSeriesCollection != null) {
             count += discreteTimeSeriesCollection.size();
+        }
         return count > 1;
     }
 
@@ -88,8 +92,9 @@ public class PointTimeSeriesCollection {
         int count = 0;
 
         if (discreteTimeSeriesCollection != null) {
-            for (DiscreteTimeSeries dts : discreteTimeSeriesCollection)
+            for (DiscreteTimeSeries dts : discreteTimeSeriesCollection) {
                 count += dts.getDiscreteValueCount();
+            }
         }
 
         return count;
@@ -102,9 +107,10 @@ public class PointTimeSeriesCollection {
         for (DiscreteTimeSeries dts : discreteTimeSeriesCollection) {
             TimeSeries ts = new TimeSeries(dts.getName(), null, null, Second.class);
 
-            for (PointValueTime pvt : dts.getValueTimes())
+            for (PointValueTime pvt : dts.getValueTimes()) {
                 ImageChartUtils.addSecond(ts, pvt.getTime(), numericMin
                         + (spacingInterval * (dts.getValueIndex(pvt.getValue()) + intervalIndex)));
+            }
 
             timeSeriesCollection.addSeries(ts);
 

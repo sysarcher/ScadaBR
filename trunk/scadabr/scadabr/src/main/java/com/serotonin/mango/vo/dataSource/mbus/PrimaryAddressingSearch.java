@@ -30,11 +30,11 @@ public class PrimaryAddressingSearch extends MBusSearchByAddressing {
     private String firstPrimaryAddress;
 
     public byte firstAddr() {
-        return (byte)Short.parseShort(firstPrimaryAddress, 16);
+        return (byte) Short.parseShort(firstPrimaryAddress, 16);
     }
 
     public byte lastAddr() {
-        return (byte)Short.parseShort(lastPrimaryAddress, 16);
+        return (byte) Short.parseShort(lastPrimaryAddress, 16);
     }
 
     /**

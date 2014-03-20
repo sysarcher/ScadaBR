@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource.onewire;
 
@@ -31,10 +31,15 @@ import com.dalsemi.onewire.container.SwitchContainer;
  * @author Matthew Lohbihler
  */
 public class NetworkPath {
-    /** Elements of the path */
+
+    /**
+     * Elements of the path
+     */
     private final List<NetworkPathElement> elements = new ArrayList<NetworkPathElement>();
 
-    /** Network where this path is based */
+    /**
+     * Network where this path is based
+     */
     private final Network network;
 
     private final OneWireContainer target;
@@ -78,8 +83,9 @@ public class NetworkPath {
     }
 
     public NetworkPathElement getTail() {
-        if (elements.size() == 0)
+        if (elements.size() == 0) {
             return null;
+        }
         return elements.get(elements.size() - 1);
     }
 
@@ -91,8 +97,7 @@ public class NetworkPath {
         try {
             String portName = network.getPortName();
             sb.append('_').append(portName);
-        }
-        catch (OneWireException e) {
+        } catch (OneWireException e) {
             // no op
         }
         sb.append('/');
@@ -115,14 +120,15 @@ public class NetworkPath {
     }
 
     /**
-     * Close the path elements in the last path following the common elements of this and the last path, and open the
-     * same in this path.
+     * Close the path elements in the last path following the common elements of
+     * this and the last path, and open the same in this path.
      */
     public void open(NetworkPath lastPath) throws OneWireException, OneWireIOException {
         // Check if no depth in path, do a reset so a resetless search will work
         if (elements.size() == 0) {
-            if (lastPath != null)
+            if (lastPath != null) {
                 lastPath.close();
+            }
             network.reset();
             return;
         }
@@ -132,12 +138,14 @@ public class NetworkPath {
             // Determine the index at which uncommon-ness begins
             List<NetworkPathElement> lastElements = lastPath.elements;
             int minSize = lastElements.size();
-            if (elements.size() < minSize)
+            if (elements.size() < minSize) {
                 minSize = elements.size();
+            }
 
             for (int i = 0; i < minSize; i++) {
-                if (!lastElements.get(i).equals(elements.get(i)))
+                if (!lastElements.get(i).equals(elements.get(i))) {
                     break;
+                }
                 uncommonIndex++;
             }
 
@@ -166,7 +174,8 @@ public class NetworkPath {
     }
 
     /**
-     * Only close elements following the common elements in the next path, so as to avoid having to reopen them again.
+     * Only close elements following the common elements in the next path, so as
+     * to avoid having to reopen them again.
      */
     private void close(int downToInclusive) throws OneWireException, OneWireIOException {
         NetworkPathElement element;

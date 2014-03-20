@@ -8,44 +8,45 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.permission.Permissions;
 
 public class DPCommandsScriptContextObject extends ScriptContextObject {
-	public static final Type TYPE = Type.DATAPOINT_COMMANDS;
 
-	@Override
-	public Type getType() {
-		return TYPE;
-	}
+    public static final Type TYPE = Type.DATAPOINT_COMMANDS;
 
-	public void writeDataPoint(String xid, String stringValue) {
-		DataPointVO dataPoint = new DataPointDao().getDataPoint(xid);
-		if (dataPoint != null) {
-			Permissions.ensureDataPointSetPermission(user, dataPoint);
-			RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
-			MangoValue value = MangoValue.stringToValue(stringValue, dataPoint
-					.getPointLocator().getDataTypeId());
-			runtimeManager.setDataPointValue(dataPoint.getId(), value,
-					this.user);
-		}
-	}
+    @Override
+    public Type getType() {
+        return TYPE;
+    }
 
-	public void enableDataPoint(String xid) {
-		DataPointVO dataPoint = new DataPointDao().getDataPoint(xid);
-		if (dataPoint != null) {
-			Permissions.ensureDataPointReadPermission(user, dataPoint);
-			RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
-			dataPoint.setEnabled(true);
-			runtimeManager.saveDataPoint(dataPoint);
-		}
+    public void writeDataPoint(String xid, String stringValue) {
+        DataPointVO dataPoint = new DataPointDao().getDataPoint(xid);
+        if (dataPoint != null) {
+            Permissions.ensureDataPointSetPermission(user, dataPoint);
+            RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
+            MangoValue value = MangoValue.stringToValue(stringValue, dataPoint
+                    .getPointLocator().getDataTypeId());
+            runtimeManager.setDataPointValue(dataPoint.getId(), value,
+                    this.user);
+        }
+    }
 
-	}
+    public void enableDataPoint(String xid) {
+        DataPointVO dataPoint = new DataPointDao().getDataPoint(xid);
+        if (dataPoint != null) {
+            Permissions.ensureDataPointReadPermission(user, dataPoint);
+            RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
+            dataPoint.setEnabled(true);
+            runtimeManager.saveDataPoint(dataPoint);
+        }
 
-	public void disableDataPoint(String xid) {
-		DataPointVO dataPoint = new DataPointDao().getDataPoint(xid);
-		if (dataPoint != null) {
-			Permissions.ensureDataPointReadPermission(user, dataPoint);
-			RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
-			dataPoint.setEnabled(false);
-			runtimeManager.saveDataPoint(dataPoint);
-		}
+    }
 
-	}
+    public void disableDataPoint(String xid) {
+        DataPointVO dataPoint = new DataPointDao().getDataPoint(xid);
+        if (dataPoint != null) {
+            Permissions.ensureDataPointReadPermission(user, dataPoint);
+            RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
+            dataPoint.setEnabled(false);
+            runtimeManager.saveDataPoint(dataPoint);
+        }
+
+    }
 }

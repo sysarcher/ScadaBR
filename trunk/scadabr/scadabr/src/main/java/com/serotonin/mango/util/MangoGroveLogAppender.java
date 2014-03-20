@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.util;
 
@@ -37,18 +37,20 @@ import com.serotonin.mango.rt.maint.VersionCheck;
  * @author Matthew Lohbihler
  */
 public class MangoGroveLogAppender extends AppenderSkeleton {
+
     @Override
     protected void append(LoggingEvent event) {
         // In spite of what the configuration file says, we don't care about anything less than an error.
-        if (!event.getLevel().isGreaterOrEqual(Level.ERROR))
+        if (!event.getLevel().isGreaterOrEqual(Level.ERROR)) {
             return;
+        }
 
         // Check the logging property setting.
         try {
-            if (!SystemSettingsDao.getBooleanValue(SystemSettingsDao.GROVE_LOGGING, false))
+            if (!SystemSettingsDao.getBooleanValue(SystemSettingsDao.GROVE_LOGGING, false)) {
                 return;
-        }
-        catch (Throwable t) {
+            }
+        } catch (Throwable t) {
             // If anything bad happens while trying to figure out if we should log, just fuggetabowit.
             return;
         }
@@ -64,8 +66,9 @@ public class MangoGroveLogAppender extends AppenderSkeleton {
         String[] throwableStrRep = event.getThrowableStrRep();
         if (throwableStrRep != null) {
             StringBuilder throwable = new StringBuilder();
-            for (String s : throwableStrRep)
+            for (String s : throwableStrRep) {
                 throwable.append(s).append("\r\n");
+            }
             method.addParameter("throwable", throwable.toString());
         }
 
@@ -76,13 +79,12 @@ public class MangoGroveLogAppender extends AppenderSkeleton {
 
         try {
             int responseCode = client.executeMethod(method);
-            if (responseCode != HttpStatus.SC_OK)
+            if (responseCode != HttpStatus.SC_OK) {
                 LogLog.error("Invalid response code: " + responseCode);
-        }
-        catch (HttpException e) {
+            }
+        } catch (HttpException e) {
             LogLog.error("Error sending log event to grove", e);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             LogLog.error("Error sending log event to grove", e);
         }
     }

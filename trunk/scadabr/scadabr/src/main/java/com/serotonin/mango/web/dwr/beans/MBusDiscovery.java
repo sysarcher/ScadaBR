@@ -29,7 +29,8 @@ import net.sf.mbus4j.master.MasterEventListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.web.i18n.I18NUtils;
+import br.org.scadabr.web.i18n.I18NUtils;
+import br.org.scadabr.web.l10n.Localizer;
 import net.sf.mbus4j.Connection;
 import com.serotonin.mango.vo.dataSource.mbus.MBusSearchByAddressing;
 import com.serotonin.mango.vo.dataSource.mbus.PrimaryAddressingSearch;
@@ -45,7 +46,6 @@ public class MBusDiscovery implements MasterEventListener, TestingUtility {
     public void start() {
         searchThread.start();
     }
-
 
     public MBusResponseFramesContainer getDevice(int deviceIndex) {
         return master.getDevice(deviceIndex);
@@ -99,7 +99,7 @@ public class MBusDiscovery implements MasterEventListener, TestingUtility {
 
             @Override
             void shutOff() {
-                message = I18NUtils.getMessage(MBusDiscovery.this.bundle, "dsEdit.mbus.tester.autoShutOff");
+                message = Localizer.localizeI18nKey("dsEdit.mbus.tester.autoShutOff", MBusDiscovery.this.bundle);
                 MBusDiscovery.this.cleanup();
             }
         };
@@ -108,7 +108,7 @@ public class MBusDiscovery implements MasterEventListener, TestingUtility {
         master = new MBusMaster();
         master.setConnection(connection);
         this.searchByAddressing = searchByAddressing;
-        message = I18NUtils.getMessage(bundle, "dsEdit.mbus.tester.searchingDevices");
+        message = Localizer.localizeI18nKey("dsEdit.mbus.tester.searchingDevices", bundle);
         searchThread = new SearchThread();
     }
 
@@ -130,7 +130,7 @@ public class MBusDiscovery implements MasterEventListener, TestingUtility {
     @Override
     public void cancel() {
         LOG.info("cancel()");
-        message = I18NUtils.getMessage(bundle, "dsEdit.mbus.tester.cancelled");
+        message = Localizer.localizeI18nKey("dsEdit.mbus.tester.cancelled", bundle);
         cleanup();
     }
 

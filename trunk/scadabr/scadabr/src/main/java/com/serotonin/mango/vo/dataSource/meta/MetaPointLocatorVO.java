@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.meta;
 
@@ -27,14 +27,14 @@ import java.util.List;
 import java.util.Map;
 
 import br.org.scadabr.db.IntValuePair;
-import com.serotonin.json.JsonArray;
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
-import com.serotonin.json.JsonValue;
+import br.org.scadabr.json.JsonArray;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
+import br.org.scadabr.json.JsonValue;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.Common.TimePeriods;
 import com.serotonin.mango.DataTypes;
@@ -46,21 +46,24 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
-import com.serotonin.timer.CronTimerTrigger;
+import br.org.scadabr.timer.CronTimerTrigger;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+
     public static final int UPDATE_EVENT_CONTEXT_UPDATE = 0;
     public static final int UPDATE_EVENT_CRON = 100;
 
     public static ExportCodes UPDATE_EVENT_CODES = new ExportCodes();
+
     static {
         UPDATE_EVENT_CODES.addElement(UPDATE_EVENT_CONTEXT_UPDATE, "CONTEXT_UPDATE", "dsEdit.meta.event.context");
         UPDATE_EVENT_CODES.addElement(TimePeriods.MINUTES, "MINUTES", "dsEdit.meta.event.minute");
@@ -84,12 +87,14 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @JsonRemoteProperty
     private int executionDelaySeconds;
 
+    @Override
     public PointLocatorRT createRuntime() {
         return new MetaPointLocatorRT(this);
     }
 
+    @Override
     public LocalizableMessage getConfigurationDescription() {
-        return new LocalizableMessage("common.default", "'" + StringUtils.truncate(script, 40) + "'");
+        return new LocalizableMessageImpl("common.default", "'" + StringUtils.truncate(script, 40) + "'");
     }
 
     public List<IntValuePair> getContext() {
@@ -116,6 +121,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         this.executionDelaySeconds = executionDelaySeconds;
     }
 
+    @Override
     public int getDataTypeId() {
         return dataTypeId;
     }
@@ -124,6 +130,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         this.dataTypeId = dataTypeId;
     }
 
+    @Override
     public boolean isSettable() {
         return settable;
     }
@@ -148,11 +155,13 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         this.updateCronPattern = updateCronPattern;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(script))
+        if (StringUtils.isEmpty(script)) {
             response.addContextualMessage("script", "validate.required");
+        }
 
-        List<String> varNameSpace = new ArrayList<String>();
+        List<String> varNameSpace = new ArrayList<>();
         for (IntValuePair point : context) {
             String varName = point.getValue();
             if (StringUtils.isEmpty(varName)) {
@@ -173,32 +182,35 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             varNameSpace.add(varName);
         }
 
-        if (!DataTypes.CODES.isValidId(dataTypeId))
+        if (!DataTypes.CODES.isValidId(dataTypeId)) {
             response.addContextualMessage("dataTypeId", "validate.invalidValue");
+        }
 
         if (updateEvent == UPDATE_EVENT_CRON) {
             try {
                 new CronTimerTrigger(updateCronPattern);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 response.addContextualMessage("updateCronPattern", "validate.invalidCron", updateCronPattern);
             }
-        }
-        else if (updateEvent != UPDATE_EVENT_CONTEXT_UPDATE && !Common.TIME_PERIOD_CODES.isValidId(updateEvent))
+        } else if (updateEvent != UPDATE_EVENT_CONTEXT_UPDATE && !Common.TIME_PERIOD_CODES.isValidId(updateEvent)) {
             response.addContextualMessage("updateEvent", "validate.invalidValue");
+        }
 
-        if (executionDelaySeconds < 0)
+        if (executionDelaySeconds < 0) {
             response.addContextualMessage("executionDelaySeconds", "validate.cannotBeNegative");
+        }
     }
 
     private boolean validateVarName(String varName) {
         char ch = varName.charAt(0);
-        if (!Character.isLetter(ch) && ch != '_')
+        if (!Character.isLetter(ch) && ch != '_') {
             return false;
+        }
         for (int i = 1; i < varName.length(); i++) {
             ch = varName.charAt(i);
-            if (!Character.isLetterOrDigit(ch) && ch != '_')
+            if (!Character.isLetterOrDigit(ch) && ch != '_') {
                 return false;
+            }
         }
         return true;
     }
@@ -210,8 +222,9 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         AuditEventType.addPropertyMessage(list, "dsEdit.meta.scriptContext", contextToString());
         AuditEventType.addPropertyMessage(list, "dsEdit.meta.script", script);
         AuditEventType.addExportCodeMessage(list, "dsEdit.meta.event", UPDATE_EVENT_CODES, updateEvent);
-        if (updateEvent == UPDATE_EVENT_CRON)
+        if (updateEvent == UPDATE_EVENT_CRON) {
             AuditEventType.addPropertyMessage(list, "dsEdit.meta.event.cron", updateCronPattern);
+        }
         AuditEventType.addPropertyMessage(list, "dsEdit.meta.delay", executionDelaySeconds);
     }
 
@@ -220,9 +233,10 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         MetaPointLocatorVO from = (MetaPointLocatorVO) o;
         AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.settable", from.settable, settable);
-        if (!context.equals(context))
+        if (!context.equals(context)) {
             AuditEventType.addPropertyChangeMessage(list, "dsEdit.meta.scriptContext", from.contextToString(),
                     contextToString());
+        }
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.meta.script", from.script, script);
         AuditEventType.maybeAddExportCodeChangeMessage(list, "dsEdit.meta.event", UPDATE_EVENT_CODES, from.updateEvent,
                 updateEvent);
@@ -238,15 +252,17 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         boolean first = true;
         for (IntValuePair ivp : context) {
             DataPointVO dp = dataPointDao.getDataPoint(ivp.getKey());
-            if (first)
+            if (first) {
                 first = false;
-            else
+            } else {
                 sb.append(", ");
+            }
 
-            if (dp == null)
+            if (dp == null) {
                 sb.append("?=");
-            else
+            } else {
                 sb.append(dp.getName()).append("=");
+            }
             sb.append(ivp.getValue());
         }
         return sb.toString();
@@ -276,10 +292,11 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            context = new ArrayList<IntValuePair>();
+            context = new ArrayList<>();
             Map<Integer, String> ctxMap = (Map<Integer, String>) in.readObject();
-            for (Map.Entry<Integer, String> point : ctxMap.entrySet())
+            for (Map.Entry<Integer, String> point : ctxMap.entrySet()) {
                 context.add(new IntValuePair(point.getKey(), point.getValue()));
+            }
 
             script = SerializationHelper.readSafeUTF(in);
             dataTypeId = in.readInt();
@@ -287,8 +304,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             updateEvent = in.readInt();
             updateCronPattern = "";
             executionDelaySeconds = in.readInt();
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             context = (List<IntValuePair>) in.readObject();
             script = SerializationHelper.readSafeUTF(in);
             dataTypeId = in.readInt();
@@ -296,8 +312,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             updateEvent = in.readInt();
             updateCronPattern = "";
             executionDelaySeconds = in.readInt();
-        }
-        else if (ver == 3) {
+        } else if (ver == 3) {
             context = (List<IntValuePair>) in.readObject();
             script = SerializationHelper.readSafeUTF(in);
             dataTypeId = in.readInt();
@@ -305,8 +320,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             updateEvent = in.readInt();
             updateCronPattern = SerializationHelper.readSafeUTF(in);
             executionDelaySeconds = in.readInt();
-        }
-        else if (ver == 4) {
+        } else if (ver == 4) {
             context = (List<IntValuePair>) in.readObject();
             script = SerializationHelper.readSafeUTF(in);
             dataTypeId = in.readInt();
@@ -320,15 +334,17 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         Integer value = deserializeDataType(json, DataTypes.IMAGE);
-        if (value != null)
+        if (value != null) {
             dataTypeId = value;
+        }
 
         String text = json.getString("updateEvent");
         if (text != null) {
             updateEvent = UPDATE_EVENT_CODES.getId(text);
-            if (updateEvent == -1)
+            if (updateEvent == -1) {
                 throw new LocalizableJsonException("emport.error.invalid", "updateEvent", text,
                         UPDATE_EVENT_CODES.getCodeList());
+            }
         }
 
         JsonArray jsonContext = json.getJsonArray("context");
@@ -339,16 +355,19 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             for (JsonValue jv : jsonContext.getElements()) {
                 JsonObject jo = jv.toJsonObject();
                 String xid = jo.getString("dataPointXid");
-                if (xid == null)
+                if (xid == null) {
                     throw new LocalizableJsonException("emport.error.meta.missing", "dataPointXid");
+                }
 
                 DataPointVO dp = dataPointDao.getDataPoint(xid);
-                if (dp == null)
+                if (dp == null) {
                     throw new LocalizableJsonException("emport.error.missingPoint", xid);
+                }
 
                 String var = jo.getString("varName");
-                if (var == null)
+                if (var == null) {
                     throw new LocalizableJsonException("emport.error.meta.missing", "varName");
+                }
 
                 context.add(new IntValuePair(dp.getId(), var));
             }
@@ -362,11 +381,11 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         map.put("updateEvent", UPDATE_EVENT_CODES.getCode(updateEvent));
 
         DataPointDao dataPointDao = new DataPointDao();
-        List<Map<String, Object>> pointList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> pointList = new ArrayList<>();
         for (IntValuePair p : context) {
             DataPointVO dp = dataPointDao.getDataPoint(p.getKey());
             if (dp != null) {
-                Map<String, Object> point = new HashMap<String, Object>();
+                Map<String, Object> point = new HashMap<>();
                 pointList.add(point);
                 point.put("varName", p.getValue());
                 point.put("dataPointXid", dp.getXid());

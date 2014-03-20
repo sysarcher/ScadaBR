@@ -25,6 +25,7 @@ import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 
 // No need to encapsulate as string like vo
 public class OpenV4JPointLocatorRT extends PointLocatorRT {
+
     private final OpenV4JPointLocatorVO vo;
     private final DataPoint dataPoint;
 

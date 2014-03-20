@@ -36,7 +36,7 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
+import br.org.scadabr.util.StringUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;

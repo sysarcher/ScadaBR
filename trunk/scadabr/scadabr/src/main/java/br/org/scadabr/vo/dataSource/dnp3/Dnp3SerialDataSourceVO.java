@@ -8,231 +8,232 @@ import java.util.Map;
 
 import br.org.scadabr.rt.dataSource.dnp3.Dnp3SerialDataSource;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
 public class Dnp3SerialDataSourceVO extends
-		Dnp3DataSourceVO<Dnp3SerialDataSourceVO> {
-	public static final Type TYPE = Type.DNP3_SERIAL;
+        Dnp3DataSourceVO<Dnp3SerialDataSourceVO> {
 
-	@Override
-	public LocalizableMessage getConnectionDescription() {
-		return new LocalizableMessage("common.default", commPortId);
-	}
+    public static final Type TYPE = Type.DNP3_SERIAL;
 
-	@Override
-	public Type getType() {
-		return TYPE;
-	}
+    @Override
+    public LocalizableMessage getConnectionDescription() {
+        return new LocalizableMessageImpl("common.default", commPortId);
+    }
 
-	@Override
-	public DataSourceRT createDataSourceRT() {
-		return new Dnp3SerialDataSource(this);
-	}
+    @Override
+    public Type getType() {
+        return TYPE;
+    }
 
-	@JsonRemoteProperty
-	private String commPortId;
-	@JsonRemoteProperty
-	private int baudRate = 9600;
-	@JsonRemoteProperty
-	private int dataBits = 8;
-	@JsonRemoteProperty
-	private int stopBits = 1;
-	@JsonRemoteProperty
-	private int parity = 0;
-	@JsonRemoteProperty
-	private boolean echo = false;
+    @Override
+    public DataSourceRT createDataSourceRT() {
+        return new Dnp3SerialDataSource(this);
+    }
 
-	/**
-	 * @return the commPortId
-	 */
-	public String getCommPortId() {
-		return commPortId;
-	}
+    @JsonRemoteProperty
+    private String commPortId;
+    @JsonRemoteProperty
+    private int baudRate = 9600;
+    @JsonRemoteProperty
+    private int dataBits = 8;
+    @JsonRemoteProperty
+    private int stopBits = 1;
+    @JsonRemoteProperty
+    private int parity = 0;
+    @JsonRemoteProperty
+    private boolean echo = false;
 
-	/**
-	 * @param commPortId
-	 *            the commPortId to set
-	 */
-	public void setCommPortId(String commPortId) {
-		this.commPortId = commPortId;
-	}
+    /**
+     * @return the commPortId
+     */
+    public String getCommPortId() {
+        return commPortId;
+    }
 
-	/**
-	 * @return the baudRate
-	 */
-	public int getBaudRate() {
-		return baudRate;
-	}
+    /**
+     * @param commPortId the commPortId to set
+     */
+    public void setCommPortId(String commPortId) {
+        this.commPortId = commPortId;
+    }
 
-	/**
-	 * @param baudRate
-	 *            the baudRate to set
-	 */
-	public void setBaudRate(int baudRate) {
-		this.baudRate = baudRate;
-	}
+    /**
+     * @return the baudRate
+     */
+    public int getBaudRate() {
+        return baudRate;
+    }
 
-	/**
-	 * @return the dataBits
-	 */
-	public int getDataBits() {
-		return dataBits;
-	}
+    /**
+     * @param baudRate the baudRate to set
+     */
+    public void setBaudRate(int baudRate) {
+        this.baudRate = baudRate;
+    }
 
-	/**
-	 * @param dataBits
-	 *            the dataBits to set
-	 */
-	public void setDataBits(int dataBits) {
-		this.dataBits = dataBits;
-	}
+    /**
+     * @return the dataBits
+     */
+    public int getDataBits() {
+        return dataBits;
+    }
 
-	/**
-	 * @return the stopBits
-	 */
-	public int getStopBits() {
-		return stopBits;
-	}
+    /**
+     * @param dataBits the dataBits to set
+     */
+    public void setDataBits(int dataBits) {
+        this.dataBits = dataBits;
+    }
 
-	/**
-	 * @param stopBits
-	 *            the stopBits to set
-	 */
-	public void setStopBits(int stopBits) {
-		this.stopBits = stopBits;
-	}
+    /**
+     * @return the stopBits
+     */
+    public int getStopBits() {
+        return stopBits;
+    }
 
-	/**
-	 * @return the parity
-	 */
-	public int getParity() {
-		return parity;
-	}
+    /**
+     * @param stopBits the stopBits to set
+     */
+    public void setStopBits(int stopBits) {
+        this.stopBits = stopBits;
+    }
 
-	/**
-	 * @param parity
-	 *            the parity to set
-	 */
-	public void setParity(int parity) {
-		this.parity = parity;
-	}
+    /**
+     * @return the parity
+     */
+    public int getParity() {
+        return parity;
+    }
 
-	/**
-	 * @return the echo
-	 */
-	public boolean isEcho() {
-		return echo;
-	}
+    /**
+     * @param parity the parity to set
+     */
+    public void setParity(int parity) {
+        this.parity = parity;
+    }
 
-	/**
-	 * @param echo
-	 *            the echo to set
-	 */
-	public void setEcho(boolean echo) {
-		this.echo = echo;
-	}
+    /**
+     * @return the echo
+     */
+    public boolean isEcho() {
+        return echo;
+    }
 
-	@Override
-	public void validate(DwrResponseI18n response) {
-		super.validate(response);
-		if (StringUtils.isEmpty(commPortId))
-			response.addContextualMessage("commPortId", "validate.required");
-		if (baudRate <= 0)
-			response.addContextualMessage("baudRate", "validate.invalidValue");
-		if (dataBits < 5 || dataBits > 8)
-			response.addContextualMessage("dataBits", "validate.invalidValue");
-		if (stopBits < 1 || stopBits > 3)
-			response.addContextualMessage("stopBits", "validate.invalidValue");
-		if (parity < 0 || parity > 4)
-			response
-					.addContextualMessage("parityBits", "validate.invalidValue");
-	}
+    /**
+     * @param echo the echo to set
+     */
+    public void setEcho(boolean echo) {
+        this.echo = echo;
+    }
 
-	@Override
-	protected void addPropertiesImpl(List<LocalizableMessage> list) {
-		super.addPropertiesImpl(list);
+    @Override
+    public void validate(DwrResponseI18n response) {
+        super.validate(response);
+        if (StringUtils.isEmpty(commPortId)) {
+            response.addContextualMessage("commPortId", "validate.required");
+        }
+        if (baudRate <= 0) {
+            response.addContextualMessage("baudRate", "validate.invalidValue");
+        }
+        if (dataBits < 5 || dataBits > 8) {
+            response.addContextualMessage("dataBits", "validate.invalidValue");
+        }
+        if (stopBits < 1 || stopBits > 3) {
+            response.addContextualMessage("stopBits", "validate.invalidValue");
+        }
+        if (parity < 0 || parity > 4) {
+            response
+                    .addContextualMessage("parityBits", "validate.invalidValue");
+        }
+    }
 
-		AuditEventType.addPropertyMessage(list, "dsEdit.dnp3Serial.port",
-				commPortId);
-		AuditEventType.addPropertyMessage(list, "dsEdit.dnp3Serial.baud",
-				baudRate);
-		AuditEventType.addPropertyMessage(list, "dsEdit.dnp3Serial.dataBits",
-				dataBits);
-		AuditEventType.addPropertyMessage(list, "dsEdit.dnp3Serial.stopBits",
-				stopBits);
-		AuditEventType.addPropertyMessage(list, "dsEdit.dnp3Serial.parity",
-				parity);
-		AuditEventType.addPropertyMessage(list, "dsEdit.dnp3Serial.echo", echo);
-	}
+    @Override
+    protected void addPropertiesImpl(List<LocalizableMessage> list) {
+        super.addPropertiesImpl(list);
 
-	@Override
-	protected void addPropertyChangesImpl(List<LocalizableMessage> list,
-			Dnp3SerialDataSourceVO from) {
-		super.addPropertyChangesImpl(list, from);
-		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.dnp3Serial.port", from.commPortId, commPortId);
-		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.dnp3Serial.baud", from.baudRate, baudRate);
-		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.dnp3Serial.dataBits", from.dataBits, dataBits);
-		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.dnp3Serial.stopBits", from.stopBits, stopBits);
-		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.dnp3Serial.parity", from.parity, parity);
-		AuditEventType.maybeAddPropertyChangeMessage(list,
-				"dsEdit.dnp3Serial.echo", from.echo, echo);
-	}
+        AuditEventType.addPropertyMessage(list, "dsEdit.dnp3Serial.port",
+                commPortId);
+        AuditEventType.addPropertyMessage(list, "dsEdit.dnp3Serial.baud",
+                baudRate);
+        AuditEventType.addPropertyMessage(list, "dsEdit.dnp3Serial.dataBits",
+                dataBits);
+        AuditEventType.addPropertyMessage(list, "dsEdit.dnp3Serial.stopBits",
+                stopBits);
+        AuditEventType.addPropertyMessage(list, "dsEdit.dnp3Serial.parity",
+                parity);
+        AuditEventType.addPropertyMessage(list, "dsEdit.dnp3Serial.echo", echo);
+    }
 
-	private static final long serialVersionUID = -1;
-	private static final int version = 1;
+    @Override
+    protected void addPropertyChangesImpl(List<LocalizableMessage> list,
+            Dnp3SerialDataSourceVO from) {
+        super.addPropertyChangesImpl(list, from);
+        AuditEventType.maybeAddPropertyChangeMessage(list,
+                "dsEdit.dnp3Serial.port", from.commPortId, commPortId);
+        AuditEventType.maybeAddPropertyChangeMessage(list,
+                "dsEdit.dnp3Serial.baud", from.baudRate, baudRate);
+        AuditEventType.maybeAddPropertyChangeMessage(list,
+                "dsEdit.dnp3Serial.dataBits", from.dataBits, dataBits);
+        AuditEventType.maybeAddPropertyChangeMessage(list,
+                "dsEdit.dnp3Serial.stopBits", from.stopBits, stopBits);
+        AuditEventType.maybeAddPropertyChangeMessage(list,
+                "dsEdit.dnp3Serial.parity", from.parity, parity);
+        AuditEventType.maybeAddPropertyChangeMessage(list,
+                "dsEdit.dnp3Serial.echo", from.echo, echo);
+    }
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(version);
-		SerializationHelper.writeSafeUTF(out, commPortId);
-		out.writeInt(baudRate);
-		out.writeInt(dataBits);
-		out.writeInt(stopBits);
-		out.writeInt(parity);
-		out.writeBoolean(echo);
+    private static final long serialVersionUID = -1;
+    private static final int version = 1;
 
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(version);
+        SerializationHelper.writeSafeUTF(out, commPortId);
+        out.writeInt(baudRate);
+        out.writeInt(dataBits);
+        out.writeInt(stopBits);
+        out.writeInt(parity);
+        out.writeBoolean(echo);
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int ver = in.readInt();
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        int ver = in.readInt();
 
 		// Switch on the version of the class so that version changes can be
-		// elegantly handled.
-		if (ver == 1) {
-			commPortId = SerializationHelper.readSafeUTF(in);
-			baudRate = in.readInt();
-			dataBits = in.readInt();
-			stopBits = in.readInt();
-			parity = in.readInt();
-			echo = in.readBoolean();
-		}
-	}
+        // elegantly handled.
+        if (ver == 1) {
+            commPortId = SerializationHelper.readSafeUTF(in);
+            baudRate = in.readInt();
+            dataBits = in.readInt();
+            stopBits = in.readInt();
+            parity = in.readInt();
+            echo = in.readBoolean();
+        }
+    }
 
-	@Override
-	public void jsonDeserialize(JsonReader reader, JsonObject json)
-			throws JsonException {
-		super.jsonDeserialize(reader, json);
+    @Override
+    public void jsonDeserialize(JsonReader reader, JsonObject json)
+            throws JsonException {
+        super.jsonDeserialize(reader, json);
 
-	}
+    }
 
-	@Override
-	public void jsonSerialize(Map<String, Object> map) {
-		super.jsonSerialize(map);
-	}
+    @Override
+    public void jsonSerialize(Map<String, Object> map) {
+        super.jsonSerialize(map);
+    }
 }

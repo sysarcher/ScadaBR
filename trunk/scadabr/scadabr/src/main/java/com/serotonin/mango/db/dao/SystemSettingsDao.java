@@ -25,10 +25,10 @@ import java.util.Map;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import com.serotonin.InvalidArgumentException;
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.InvalidArgumentException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.util.ColorUtils;
+import br.org.scadabr.util.ColorUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 

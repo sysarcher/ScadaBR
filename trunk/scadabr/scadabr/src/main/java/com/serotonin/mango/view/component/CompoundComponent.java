@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.view.component;
 
@@ -27,22 +27,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonValue;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonValue;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.web.i18n.I18NUtils;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.I18NUtils;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.web.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
  */
 abstract public class CompoundComponent extends ViewComponent {
+
     @JsonRemoteProperty
     private String name;
     private List<CompoundChild> children = new ArrayList<CompoundChild>();
@@ -83,7 +86,7 @@ abstract public class CompoundComponent extends ViewComponent {
     private void addChildImpl(String id, String descriptionKey, ViewComponent viewComponent, int[] dataTypesOverride) {
         viewComponent.setIndex(getIndex());
         viewComponent.setIdSuffix("-" + id);
-        children.add(new CompoundChild(id, new LocalizableMessage(descriptionKey), viewComponent, dataTypesOverride));
+        children.add(new CompoundChild(id, new LocalizableMessageImpl(descriptionKey), viewComponent, dataTypesOverride));
     }
 
     @Override
@@ -103,12 +106,14 @@ abstract public class CompoundComponent extends ViewComponent {
 
     @Override
     public boolean containsValidVisibleDataPoint(int dataPointId) {
-        if (!visible)
+        if (!visible) {
             return false;
+        }
 
         for (CompoundChild child : children) {
-            if (child.getViewComponent().containsValidVisibleDataPoint(dataPointId))
+            if (child.getViewComponent().containsValidVisibleDataPoint(dataPointId)) {
                 return true;
+            }
         }
 
         return false;
@@ -117,8 +122,9 @@ abstract public class CompoundComponent extends ViewComponent {
     public PointComponent findPointComponent(String viewComponentId) {
         for (CompoundChild child : children) {
             ViewComponent vc = child.getViewComponent();
-            if (vc.isPointComponent() && vc.getId().equals(viewComponentId))
+            if (vc.isPointComponent() && vc.getId().equals(viewComponentId)) {
                 return (PointComponent) vc;
+            }
         }
         return null;
     }
@@ -133,8 +139,9 @@ abstract public class CompoundComponent extends ViewComponent {
             vc.validateDataPoint(user, makeReadOnly);
 
             // If any child component is visible, this is visible.
-            if (vc.isVisible())
+            if (vc.isVisible()) {
                 visible = true;
+            }
         }
     }
 
@@ -142,27 +149,31 @@ abstract public class CompoundComponent extends ViewComponent {
     public void setIndex(int index) {
         super.setIndex(index);
         // Make sure the child components have the same id.
-        for (CompoundChild child : children)
+        for (CompoundChild child : children) {
             child.getViewComponent().setIndex(index);
+        }
     }
 
     public void setDataPoint(String childId, DataPointVO dataPoint) {
         CompoundChild child = getChild(childId);
-        if (child != null && child.getViewComponent().isPointComponent())
+        if (child != null && child.getViewComponent().isPointComponent()) {
             ((PointComponent) child.getViewComponent()).tsetDataPoint(dataPoint);
+        }
     }
 
     public ViewComponent getChildComponent(String childId) {
         CompoundChild child = getChild(childId);
-        if (child == null)
+        if (child == null) {
             return null;
+        }
         return child.getViewComponent();
     }
 
     private CompoundChild getChild(String childId) {
         for (CompoundChild child : children) {
-            if (child.getId().equals(childId))
+            if (child.getId().equals(childId)) {
                 return child;
+            }
         }
         return null;
     }
@@ -178,8 +189,9 @@ abstract public class CompoundComponent extends ViewComponent {
             PointComponent comp = (PointComponent) getChild(childId).getViewComponent();
             if (comp.isValid() && comp.isVisible() && comp.tgetDataPoint().lastValue() != null) {
                 long cts = comp.tgetDataPoint().lastValue().getTime();
-                if (ts < cts)
+                if (ts < cts) {
                     ts = cts;
+                }
             }
         }
 
@@ -203,7 +215,7 @@ abstract public class CompoundComponent extends ViewComponent {
         htmlData.append(height);
 
         htmlData.append(".png");
-        htmlData.append("\" alt=\"" + I18NUtils.getMessage(bundle, "common.imageChart") + "\"/>");
+        htmlData.append("\" alt=\"").append(Localizer.localizeI18nKey("common.imageChart", bundle)).append("\"/>");
 
         return htmlData.toString();
     }
@@ -222,8 +234,9 @@ abstract public class CompoundComponent extends ViewComponent {
 
         int len = 0;
         for (CompoundChild child : children) {
-            if (child.getViewComponent().isPointComponent())
+            if (child.getViewComponent().isPointComponent()) {
                 len++;
+            }
         }
         out.writeInt(len);
 
@@ -238,7 +251,7 @@ abstract public class CompoundComponent extends ViewComponent {
     private void readObject(ObjectInputStream in) throws IOException {
         int ver = in.readInt();
 
-        children = new ArrayList<CompoundChild>();
+        children = new ArrayList<>();
         initialize();
 
         // Switch on the version of the class so that version changes can be elegantly handled.
@@ -262,19 +275,21 @@ abstract public class CompoundComponent extends ViewComponent {
         if (jsonChildren != null) {
             for (Map.Entry<String, JsonValue> jsonChild : jsonChildren.getProperties().entrySet()) {
                 CompoundChild child = getChild(jsonChild.getKey());
-                if (child == null || !child.getViewComponent().isPointComponent())
+                if (child == null || !child.getViewComponent().isPointComponent()) {
                     throw new LocalizableJsonException("emport.error.compound.invalidChildId", jsonChild.getKey(),
                             definition().getId(), getPointComponentChildIds());
+                }
                 jsonDeserializeDataPoint(jsonChild.getValue(), (PointComponent) child.getViewComponent());
             }
         }
     }
 
     private List<String> getPointComponentChildIds() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (CompoundChild child : children) {
-            if (child.getViewComponent().isPointComponent())
+            if (child.getViewComponent().isPointComponent()) {
                 result.add(child.getId());
+            }
         }
         return result;
     }
@@ -283,10 +298,11 @@ abstract public class CompoundComponent extends ViewComponent {
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
 
-        Map<String, Object> jsonChildren = new HashMap<String, Object>();
+        Map<String, Object> jsonChildren = new HashMap<>();
         for (CompoundChild child : children) {
-            if (child.getViewComponent().isPointComponent())
+            if (child.getViewComponent().isPointComponent()) {
                 jsonSerializeDataPoint(jsonChildren, child.getId(), (PointComponent) child.getViewComponent());
+            }
         }
         map.put("children", jsonChildren);
     }

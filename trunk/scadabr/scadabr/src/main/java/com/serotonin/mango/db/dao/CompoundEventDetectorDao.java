@@ -65,7 +65,7 @@ public class CompoundEventDetectorDao extends BaseDao {
 
     public CompoundEventDetectorVO getCompoundEventDetector(String xid) {
         try {
-        return ejt.queryForObject(COMPOUND_EVENT_DETECTOR_SELECT + "where xid=?", new CompoundEventDetectorRowMapper(), xid);
+            return ejt.queryForObject(COMPOUND_EVENT_DETECTOR_SELECT + "where xid=?", new CompoundEventDetectorRowMapper(), xid);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }

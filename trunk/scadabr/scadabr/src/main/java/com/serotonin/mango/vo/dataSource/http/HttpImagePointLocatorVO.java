@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.http;
 
@@ -24,12 +24,12 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.http.HttpImagePointLocatorRT;
@@ -38,36 +38,42 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class HttpImagePointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+
     public static final int SCALE_TYPE_NONE = 0;
     public static final int SCALE_TYPE_PERCENT = 1;
     public static final int SCALE_TYPE_BOX = 2;
 
     private static final ExportCodes SCALE_TYPE_CODES = new ExportCodes();
+
     static {
         SCALE_TYPE_CODES.addElement(SCALE_TYPE_NONE, "SCALE_TYPE_NONE", "dsEdit.httpImage.scalingType.none");
         SCALE_TYPE_CODES.addElement(SCALE_TYPE_PERCENT, "SCALE_TYPE_PERCENT", "dsEdit.httpImage.scalingType.percent");
         SCALE_TYPE_CODES.addElement(SCALE_TYPE_BOX, "SCALE_TYPE_BOX", "dsEdit.httpImage.scalingType.box");
     }
 
+    @Override
     public boolean isSettable() {
         return false;
     }
 
+    @Override
     public PointLocatorRT createRuntime() {
         return new HttpImagePointLocatorRT(this);
     }
 
+    @Override
     public LocalizableMessage getConfigurationDescription() {
-        return new LocalizableMessage("common.default", url);
+        return new LocalizableMessageImpl("common.default", url);
     }
 
     @JsonRemoteProperty
@@ -165,28 +171,35 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO implements J
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(url))
+        if (StringUtils.isEmpty(url)) {
             response.addContextualMessage("url", "validate.required");
-        if (timeoutSeconds <= 0)
+        }
+        if (timeoutSeconds <= 0) {
             response.addContextualMessage("timeoutSeconds", "validate.greaterThanZero");
-        if (retries < 0)
+        }
+        if (retries < 0) {
             response.addContextualMessage("retries", "validate.cannotBeNegative");
-        if (!SCALE_TYPE_CODES.isValidId(scaleType))
+        }
+        if (!SCALE_TYPE_CODES.isValidId(scaleType)) {
             response.addContextualMessage("scaleType", "validate.invalidValue");
+        }
         if (scaleType == SCALE_TYPE_PERCENT) {
-            if (scalePercent <= 0)
+            if (scalePercent <= 0) {
                 response.addContextualMessage("scalePercent", "validate.greaterThanZero");
-            else if (scalePercent > 100)
+            } else if (scalePercent > 100) {
                 response.addContextualMessage("scalePercent", "validate.lessThan100");
-        }
-        else if (scaleType == SCALE_TYPE_BOX) {
-            if (scaleWidth <= 0)
+            }
+        } else if (scaleType == SCALE_TYPE_BOX) {
+            if (scaleWidth <= 0) {
                 response.addContextualMessage("scaleWidth", "validate.greaterThanZero");
-            if (scaleHeight <= 0)
+            }
+            if (scaleHeight <= 0) {
                 response.addContextualMessage("scaleHeight", "validate.greaterThanZero");
+            }
         }
-        if (readLimit <= 0)
+        if (readLimit <= 0) {
             response.addContextualMessage("readLimit", "validate.greaterThanZero");
+        }
     }
 
     @Override
@@ -264,8 +277,9 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO implements J
         String text = json.getString("scaleType");
         if (text != null) {
             scaleType = SCALE_TYPE_CODES.getId(text);
-            if (scaleType == -1)
+            if (scaleType == -1) {
                 throw new LocalizableJsonException("emport.error.invalid", "scaleType", text, SCALE_TYPE_CODES);
+            }
         }
     }
 

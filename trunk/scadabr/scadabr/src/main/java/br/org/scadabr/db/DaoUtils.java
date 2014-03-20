@@ -1,12 +1,10 @@
 package br.org.scadabr.db;
 
-import br.org.scadabr.ImplementMeException;
 import java.util.Collection;
 import java.util.List;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -39,7 +37,7 @@ public class DaoUtils {
 
     protected String createDelimitedList(List<?> values, int from, int to, String delimeter, String quote) {
         final StringBuilder sb = new StringBuilder();
-            sb.append(quote).append(values.get(from)).append(quote);
+        sb.append(quote).append(values.get(from)).append(quote);
         for (int i = from + 1; i < to; i++) {
             sb.append(delimeter).append(quote).append(values.get(i)).append(quote);
         }
