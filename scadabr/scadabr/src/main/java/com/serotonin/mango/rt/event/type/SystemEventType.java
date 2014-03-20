@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.event.type;
 
@@ -22,19 +22,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.event.EventTypeVO;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
 public class SystemEventType extends EventType {
+
     //
     // /
     // / Static stuff
@@ -54,6 +56,7 @@ public class SystemEventType extends EventType {
     public static final int TYPE_PROCESS_FAILURE = 10;
 
     public static final ExportCodes TYPE_CODES = new ExportCodes();
+
     static {
         TYPE_CODES.addElement(TYPE_SYSTEM_STARTUP, "SYSTEM_STARTUP");
         TYPE_CODES.addElement(TYPE_SYSTEM_SHUTDOWN, "SYSTEM_SHUTDOWN");
@@ -88,14 +91,15 @@ public class SystemEventType extends EventType {
     }
 
     private static void addEventTypeVO(int type, String key, int defaultAlarmLevel) {
-        systemEventTypes.add(new EventTypeVO(EventType.EventSources.SYSTEM, type, 0, new LocalizableMessage(key),
+        systemEventTypes.add(new EventTypeVO(EventType.EventSources.SYSTEM, type, 0, new LocalizableMessageImpl(key),
                 SystemSettingsDao.getIntValue(SYSTEM_SETTINGS_PREFIX + type, defaultAlarmLevel)));
     }
 
     public static EventTypeVO getEventType(int type) {
         for (EventTypeVO et : getSystemEventTypes()) {
-            if (et.getTypeRef1() == type)
+            if (et.getTypeRef1() == type) {
                 return et;
+            }
         }
         return null;
     }
@@ -191,17 +195,22 @@ public class SystemEventType extends EventType {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         SystemEventType other = (SystemEventType) obj;
-        if (refId2 != other.refId2)
+        if (refId2 != other.refId2) {
             return false;
-        if (systemEventTypeId != other.systemEventTypeId)
+        }
+        if (systemEventTypeId != other.systemEventTypeId) {
             return false;
+        }
         return true;
     }
 

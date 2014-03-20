@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.modbus;
 
@@ -24,12 +24,12 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.modbus.ModbusSerialDataSource;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -37,15 +37,18 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.modbus4j.serial.SerialMaster;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
 public class ModbusSerialDataSourceVO extends ModbusDataSourceVO<ModbusSerialDataSourceVO> implements JsonSerializable {
+
     public static final Type TYPE = Type.MODBUS_SERIAL;
 
     public enum EncodingType {
+
         RTU("dsEdit.modbusSerial.encoding.rtu"), //
         @Deprecated
         RTU_REVERSE_CRC("dsEdit.modbusSerial.encoding.rtuReverseCrc"), //
@@ -63,17 +66,20 @@ public class ModbusSerialDataSourceVO extends ModbusDataSourceVO<ModbusSerialDat
     }
 
     private static ExportCodes CONCURRENCY_CODES = new ExportCodes();
+
     static {
         CONCURRENCY_CODES.addElement(SerialMaster.SYNC_TRANSPORT, "SYNC_TRANSPORT",
                 "dsEdit.modbusSerial.concurrency.transport");
         CONCURRENCY_CODES.addElement(SerialMaster.SYNC_SLAVE, "SYNC_SLAVE", "dsEdit.modbusSerial.concurrency.slave");
         CONCURRENCY_CODES.addElement(SerialMaster.SYNC_FUNCTION, "SYNC_FUNCTION",
                 "dsEdit.modbusSerial.concurrency.function");
-    };
+    }
+
+    ;
 
     @Override
     public LocalizableMessage getConnectionDescription() {
-        return new LocalizableMessage("common.default", commPortId);
+        return new LocalizableMessageImpl("common.default", commPortId);
     }
 
     @Override
@@ -107,14 +113,16 @@ public class ModbusSerialDataSourceVO extends ModbusDataSourceVO<ModbusSerialDat
     private int concurrency = SerialMaster.SYNC_FUNCTION;
 
     public String getEncodingStr() {
-        if (encoding == null)
+        if (encoding == null) {
             return null;
+        }
         return encoding.toString();
     }
 
     public void setEncodingStr(String encoding) {
-        if (encoding != null)
+        if (encoding != null) {
             this.encoding = EncodingType.valueOf(encoding);
+        }
     }
 
     public int getBaudRate() {
@@ -200,25 +208,34 @@ public class ModbusSerialDataSourceVO extends ModbusDataSourceVO<ModbusSerialDat
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (StringUtils.isEmpty(commPortId))
+        if (StringUtils.isEmpty(commPortId)) {
             response.addContextualMessage("commPortId", "validate.required");
-        if (baudRate <= 0)
+        }
+        if (baudRate <= 0) {
             response.addContextualMessage("baudRate", "validate.invalidValue");
-        if (!(flowControlIn == 0 || flowControlIn == 1 || flowControlIn == 4))
+        }
+        if (!(flowControlIn == 0 || flowControlIn == 1 || flowControlIn == 4)) {
             response.addContextualMessage("flowControlIn", "validate.invalidValue");
-        if (!(flowControlOut == 0 || flowControlOut == 2 || flowControlOut == 8))
+        }
+        if (!(flowControlOut == 0 || flowControlOut == 2 || flowControlOut == 8)) {
             response.addContextualMessage("flowControlOut", "validate.invalidValue");
-        if (dataBits < 5 || dataBits > 8)
+        }
+        if (dataBits < 5 || dataBits > 8) {
             response.addContextualMessage("dataBits", "validate.invalidValue");
-        if (stopBits < 1 || stopBits > 3)
+        }
+        if (stopBits < 1 || stopBits > 3) {
             response.addContextualMessage("stopBits", "validate.invalidValue");
-        if (parity < 0 || parity > 4)
+        }
+        if (parity < 0 || parity > 4) {
             response.addContextualMessage("parityBits", "validate.invalidValue");
-        if (encoding == null)
+        }
+        if (encoding == null) {
             response.addContextualMessage("encodingBits", "validate.required");
+        }
 
-        if (!CONCURRENCY_CODES.isValidId(concurrency))
+        if (!CONCURRENCY_CODES.isValidId(concurrency)) {
             response.addContextualMessage("concurrency", "validate.invalidValue");
+        }
     }
 
     @Override
@@ -291,8 +308,7 @@ public class ModbusSerialDataSourceVO extends ModbusDataSourceVO<ModbusSerialDat
             encoding = (EncodingType) in.readObject();
             echo = in.readBoolean();
             concurrency = SerialMaster.SYNC_FUNCTION;
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             commPortId = SerializationHelper.readSafeUTF(in);
             baudRate = in.readInt();
             flowControlIn = in.readInt();
@@ -312,12 +328,14 @@ public class ModbusSerialDataSourceVO extends ModbusDataSourceVO<ModbusSerialDat
 
         // Concurrency
         String text = json.getString("concurrency");
-        if (text == null)
+        if (text == null) {
             throw new LocalizableJsonException("emport.error.missing", "concurrency", CONCURRENCY_CODES.getCodeList());
+        }
         concurrency = CONCURRENCY_CODES.getId(text);
-        if (!CONCURRENCY_CODES.isValidId(concurrency))
+        if (!CONCURRENCY_CODES.isValidId(concurrency)) {
             throw new LocalizableJsonException("emport.error.invalid", "concurrency", text,
                     CONCURRENCY_CODES.getCodeList());
+        }
     }
 
     @Override

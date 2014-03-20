@@ -1,23 +1,24 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource.modbus;
 
+import br.org.scadabr.web.i18n.LocalizableException;
 import java.net.ConnectException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -51,9 +52,10 @@ import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.exception.ErrorResponseException;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.locator.BaseLocator;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 abstract public class ModbusDataSource extends PollingDataSource implements MessagingExceptionHandler {
+
     private final Log LOG = LogFactory.getLog(ModbusDataSource.class);
 
     public static final int POINT_READ_EXCEPTION_EVENT = 1;
@@ -63,7 +65,7 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
     private ModbusMaster modbusMaster;
     private BatchRead<ModbusPointLocatorRT> batchRead;
     private final ModbusDataSourceVO<?> vo;
-    private final Map<Integer, DataPointRT> slaveMonitors = new HashMap<Integer, DataPointRT>();
+    private final Map<Integer, DataPointRT> slaveMonitors = new HashMap<>();
 
     public ModbusDataSource(ModbusDataSourceVO<?> vo) {
         super(vo);
@@ -77,17 +79,18 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
 
         // Mark the point as unreliable.
         ModbusPointLocatorVO locatorVO = dataPoint.getVO().getPointLocator();
-        if (!locatorVO.isSlaveMonitor())
+        if (!locatorVO.isSlaveMonitor()) {
             dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
+        }
 
         // Slave monitor points.
         if (vo.isCreateSlaveMonitorPoints()) {
             int slaveId = locatorVO.getSlaveId();
 
-            if (locatorVO.isSlaveMonitor())
-                // The monitor for this slave. Set it in the map.
+            if (locatorVO.isSlaveMonitor()) // The monitor for this slave. Set it in the map.
+            {
                 slaveMonitors.put(slaveId, dataPoint);
-            else if (!slaveMonitors.containsKey(slaveId)) {
+            } else if (!slaveMonitors.containsKey(slaveId)) {
                 // A new slave. Add null to the map to ensure we don't do this check again.
                 slaveMonitors.put(slaveId, null);
 
@@ -133,8 +136,9 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
 
             // If this is a slave monitor point being removed, also remove it from the map.
             ModbusPointLocatorVO locatorVO = dataPoint.getVO().getPointLocator();
-            if (locatorVO.isSlaveMonitor())
+            if (locatorVO.isSlaveMonitor()) {
                 slaveMonitors.put(locatorVO.getSlaveId(), null);
+            }
         }
     }
 
@@ -146,8 +150,9 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
                 for (DataPointRT monitor : slaveMonitors.values()) {
                     if (monitor != null) {
                         PointValueTime oldValue = monitor.getPointValue();
-                        if (oldValue == null || oldValue.getBooleanValue())
+                        if (oldValue == null || oldValue.getBooleanValue()) {
                             monitor.setPointValue(new PointValueTime(false, time), null);
+                        }
                     }
                 }
             }
@@ -161,7 +166,7 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
 
         if (batchRead == null || pointListChanged) {
             pointListChanged = false;
-            batchRead = new BatchRead<ModbusPointLocatorRT>();
+            batchRead = new BatchRead<>();
             batchRead.setContiguousRequests(vo.isContiguousBatches());
             batchRead.setErrorsInResults(true);
             batchRead.setExceptionsInResults(true);
@@ -178,13 +183,14 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
         try {
             BatchResults<ModbusPointLocatorRT> results = modbusMaster.send(batchRead);
 
-            Map<Integer, Boolean> slaveStatuses = new HashMap<Integer, Boolean>();
+            Map<Integer, Boolean> slaveStatuses = new HashMap<>();
             boolean dataSourceExceptions = false;
 
             for (DataPointRT dataPoint : dataPoints) {
                 locator = dataPoint.getPointLocator();
-                if (locator.getVO().isSlaveMonitor())
+                if (locator.getVO().isSlaveMonitor()) {
                     continue;
+                }
 
                 result = results.getValue(locator);
 
@@ -192,28 +198,27 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
                     ExceptionResult exceptionResult = (ExceptionResult) result;
 
                     // Raise an event.
-                    raiseEvent(POINT_READ_EXCEPTION_EVENT, time, true, new LocalizableMessage("event.exception2",
+                    raiseEvent(POINT_READ_EXCEPTION_EVENT, time, true, new LocalizableMessageImpl("event.exception2",
                             dataPoint.getVO().getName(), exceptionResult.getExceptionMessage()));
 
                     dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
 
                     // A response, albeit an undesirable one, was received from the slave, so it is online.
                     slaveStatuses.put(locator.getVO().getSlaveId(), true);
-                }
-                else if (result instanceof ModbusTransportException) {
+                } else if (result instanceof ModbusTransportException) {
                     ModbusTransportException e = (ModbusTransportException) result;
 
                     // Update the slave status. Only set to false if it is not true already.
-                    if (!slaveStatuses.containsKey(locator.getVO().getSlaveId()))
+                    if (!slaveStatuses.containsKey(locator.getVO().getSlaveId())) {
                         slaveStatuses.put(locator.getVO().getSlaveId(), false);
+                    }
 
                     // Raise an event.
-                    raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, time, true, getLocalExceptionMessage(e));
+                    raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, time, true, wrapException(e));
                     dataSourceExceptions = true;
 
                     dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
-                }
-                else {
+                } else {
                     // Deactivate any existing event.
                     returnToNormal(POINT_READ_EXCEPTION_EVENT, time);
                     dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, false);
@@ -226,31 +231,32 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
                 for (Map.Entry<Integer, Boolean> status : slaveStatuses.entrySet()) {
                     DataPointRT monitor = slaveMonitors.get(status.getKey());
                     if (monitor != null) {
-                        boolean oldOnline = false;
+                        boolean oldOnline;
                         boolean newOnline = status.getValue();
 
                         PointValueTime oldValue = monitor.getPointValue();
-                        if (oldValue != null)
+                        if (oldValue != null) {
                             oldOnline = oldValue.getBooleanValue();
-                        else
-                            // Make sure it gets set.
+                        } else // Make sure it gets set.
+                        {
                             oldOnline = !newOnline;
+                        }
 
-                        if (oldOnline != newOnline)
+                        if (oldOnline != newOnline) {
                             monitor.setPointValue(new PointValueTime(newOnline, time), null);
+                        }
                     }
                 }
             }
 
-            if (!dataSourceExceptions)
-                // Deactivate any existing event.
+            if (!dataSourceExceptions) // Deactivate any existing event.
+            {
                 returnToNormal(DATA_SOURCE_EXCEPTION_EVENT, time);
-        }
-        catch (ErrorResponseException e) {
+            }
+        } catch (ErrorResponseException e) {
             // Should never happen because we set "errorsInResults" to true.
             throw new ShouldNeverHappenException(e);
-        }
-        catch (ModbusTransportException e) {
+        } catch (ModbusTransportException e) {
             // Should never happen because we set "exceptionsInResults" to true.
             throw new ShouldNeverHappenException(e);
         }
@@ -272,9 +278,8 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
 
             // Deactivate any existing event.
             returnToNormal(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis());
-        }
-        catch (Exception e) {
-            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, getLocalExceptionMessage(e));
+        } catch (Exception e) {
+            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, wrapException(e));
             LOG.debug("Error while initializing data source", e);
             return;
         }
@@ -285,9 +290,10 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
     @Override
     public void forcePointRead(DataPointRT dataPoint) {
         ModbusPointLocatorRT pl = dataPoint.getPointLocator();
-        if (pl.getVO().isSlaveMonitor())
-            // Nothing to do
+        if (pl.getVO().isSlaveMonitor()) // Nothing to do
+        {
             return;
+        }
 
         BaseLocator<?> ml = createModbusLocator(pl.getVO());
         long time = System.currentTimeMillis();
@@ -300,13 +306,11 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
                 dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, false);
 
                 updatePointValue(dataPoint, pl, value, time);
-            }
-            catch (ErrorResponseException e) {
-                raiseEvent(POINT_READ_EXCEPTION_EVENT, time, true, new LocalizableMessage("event.exception2", dataPoint
+            } catch (ErrorResponseException e) {
+                raiseEvent(POINT_READ_EXCEPTION_EVENT, time, true, new LocalizableMessageImpl("event.exception2", dataPoint
                         .getVO().getName(), e.getMessage()));
                 dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
-            }
-            catch (ModbusTransportException e) {
+            } catch (ModbusTransportException e) {
                 // Don't raise a data source exception. Polling should do that.
                 LOG.warn("Error during forcePointRead", e);
                 dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
@@ -315,11 +319,11 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
     }
 
     private void updatePointValue(DataPointRT dataPoint, ModbusPointLocatorRT pl, Object value, long time) {
-        if (pl.getVO().getDataTypeId() == DataTypes.BINARY)
+        if (pl.getVO().getDataTypeId() == DataTypes.BINARY) {
             dataPoint.updatePointValue(new PointValueTime((Boolean) value, time));
-        else if (pl.getVO().getDataTypeId() == DataTypes.ALPHANUMERIC)
+        } else if (pl.getVO().getDataTypeId() == DataTypes.ALPHANUMERIC) {
             dataPoint.updatePointValue(new PointValueTime((String) value, time));
-        else {
+        } else {
             // Apply arithmetic conversions.
             double newValue = ((Number) value).doubleValue();
             newValue *= pl.getVO().getMultiplier();
@@ -350,24 +354,22 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
                 convertedValue -= pl.getVO().getAdditive();
                 convertedValue /= pl.getVO().getMultiplier();
                 modbusMaster.setValue(ml, convertedValue);
-            }
-            else if (dataPoint.getDataTypeId() == DataTypes.ALPHANUMERIC)
+            } else if (dataPoint.getDataTypeId() == DataTypes.ALPHANUMERIC) {
                 modbusMaster.setValue(ml, valueTime.getStringValue());
-            else
+            } else {
                 modbusMaster.setValue(ml, valueTime.getBooleanValue());
+            }
             dataPoint.setPointValue(valueTime, source);
 
             // Deactivate any existing event.
             returnToNormal(POINT_WRITE_EXCEPTION_EVENT, valueTime.getTime());
-        }
-        catch (ModbusTransportException e) {
+        } catch (ModbusTransportException e) {
             // Raise an event.
-            raiseEvent(POINT_WRITE_EXCEPTION_EVENT, valueTime.getTime(), true, new LocalizableMessage(
+            raiseEvent(POINT_WRITE_EXCEPTION_EVENT, valueTime.getTime(), true, new LocalizableMessageImpl(
                     "event.exception2", dataPoint.getVO().getName(), e.getMessage()));
             LOG.info("Error setting point value", e);
-        }
-        catch (ErrorResponseException e) {
-            raiseEvent(POINT_WRITE_EXCEPTION_EVENT, valueTime.getTime(), true, new LocalizableMessage(
+        } catch (ErrorResponseException e) {
+            raiseEvent(POINT_WRITE_EXCEPTION_EVENT, valueTime.getTime(), true, new LocalizableMessageImpl(
                     "event.exception2", dataPoint.getVO().getName(), e.getErrorResponse().getExceptionMessage()));
             LOG.info("Error setting point value", e);
         }
@@ -378,20 +380,18 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
                 vo.getBit(), vo.getRegisterCount(), Charset.forName(vo.getCharset()));
     }
 
-    public static LocalizableMessage localExceptionMessage(Exception e) {
+    public static LocalizableException wrapException(Exception e) {
         if (e instanceof ModbusTransportException) {
             Throwable cause = e.getCause();
-            if (cause instanceof TimeoutException)
-                return new LocalizableMessage("event.modbus.noResponse", ((ModbusTransportException) e).getSlaveId());
-            if (cause instanceof ConnectException)
-                return new LocalizableMessage("common.default", e.getMessage());
+            if (cause instanceof TimeoutException) {
+                return new LocalizableException("event.modbus.noResponse", ((ModbusTransportException) e).getSlaveId());
+            }
+            if (cause instanceof ConnectException) {
+                return new LocalizableException("common.default", e.getMessage());
+            }
         }
 
-        return DataSourceRT.getExceptionMessage(e);
-    }
-
-    protected LocalizableMessage getLocalExceptionMessage(Exception e) {
-        return localExceptionMessage(e);
+        return DataSourceRT.wrapException(e);
     }
 
     //
@@ -400,7 +400,7 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
     //
     public void receivedException(Exception e) {
         LOG.warn("Modbus exception", e);
-        raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
+        raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
                 "event.modbus.master", e.getMessage()));
     }
 }

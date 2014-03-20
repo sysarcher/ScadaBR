@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.pop3;
 
@@ -24,11 +24,11 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.pop3.Pop3DataSourceRT;
@@ -37,26 +37,29 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class Pop3DataSourceVO extends DataSourceVO<Pop3DataSourceVO> {
+
     public static final Type TYPE = Type.POP3;
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
-        ets.add(createEventType(Pop3DataSourceRT.INBOX_EXCEPTION_EVENT, new LocalizableMessage("event.ds.emailInbox")));
-        ets.add(createEventType(Pop3DataSourceRT.MESSAGE_READ_EXCEPTION_EVENT, new LocalizableMessage(
+        ets.add(createEventType(Pop3DataSourceRT.INBOX_EXCEPTION_EVENT, new LocalizableMessageImpl("event.ds.emailInbox")));
+        ets.add(createEventType(Pop3DataSourceRT.MESSAGE_READ_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.emailRead")));
-        ets.add(createEventType(Pop3DataSourceRT.PARSE_EXCEPTION_EVENT, new LocalizableMessage("event.ds.emailParse")));
+        ets.add(createEventType(Pop3DataSourceRT.PARSE_EXCEPTION_EVENT, new LocalizableMessageImpl("event.ds.emailParse")));
     }
 
     private static final ExportCodes EVENT_CODES = new ExportCodes();
+
     static {
         EVENT_CODES.addElement(Pop3DataSourceRT.INBOX_EXCEPTION_EVENT, "INBOX_EXCEPTION");
         EVENT_CODES.addElement(Pop3DataSourceRT.MESSAGE_READ_EXCEPTION_EVENT, "MESSAGE_READ_EXCEPTION");
@@ -70,7 +73,7 @@ public class Pop3DataSourceVO extends DataSourceVO<Pop3DataSourceVO> {
 
     @Override
     public LocalizableMessage getConnectionDescription() {
-        return new LocalizableMessage("common.default", username);
+        return new LocalizableMessageImpl("common.default", username);
     }
 
     @Override
@@ -141,16 +144,21 @@ public class Pop3DataSourceVO extends DataSourceVO<Pop3DataSourceVO> {
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (StringUtils.isEmpty(pop3Server))
+        if (StringUtils.isEmpty(pop3Server)) {
             response.addContextualMessage("pop3Server", "validate.required");
-        if (StringUtils.isEmpty(username))
+        }
+        if (StringUtils.isEmpty(username)) {
             response.addContextualMessage("username", "validate.required");
-        if (StringUtils.isEmpty(password))
+        }
+        if (StringUtils.isEmpty(password)) {
             response.addContextualMessage("password", "validate.required");
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType))
+        }
+        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
             response.addContextualMessage("updatePeriodType", "validate.invalidValue");
-        if (updatePeriods <= 0)
+        }
+        if (updatePeriods <= 0) {
             response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
+        }
     }
 
     @Override
@@ -204,8 +212,9 @@ public class Pop3DataSourceVO extends DataSourceVO<Pop3DataSourceVO> {
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
         Integer value = deserializeUpdatePeriodType(json);
-        if (value != null)
+        if (value != null) {
             updatePeriodType = value;
+        }
     }
 
     @Override

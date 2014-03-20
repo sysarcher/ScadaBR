@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.ebro;
 
@@ -24,12 +24,12 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.ebro.EBI25Constants;
@@ -40,19 +40,22 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import com.serotonin.mango.vo.dataSource.DataPointSaveHandler;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class EBI25PointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+
     public static final int TYPE_VALUE = 1;
     public static final int TYPE_BATTERY = 2;
     public static final int TYPE_SIGNAL = 3;
 
     private static final ExportCodes TYPE_CODES = new ExportCodes();
+
     static {
         TYPE_CODES.addElement(TYPE_VALUE, "VALUE");
         TYPE_CODES.addElement(TYPE_BATTERY, "BATTERY");
@@ -63,6 +66,7 @@ public class EBI25PointLocatorVO extends AbstractPointLocatorVO implements JsonS
         return new EBI25PointLocatorRT(this);
     }
 
+    @Override
     public int getDataTypeId() {
         return DataTypes.NUMERIC;
     }
@@ -72,28 +76,29 @@ public class EBI25PointLocatorVO extends AbstractPointLocatorVO implements JsonS
         return false;
     }
 
+    @Override
     public LocalizableMessage getConfigurationDescription() {
         switch (type) {
-        case TYPE_VALUE:
-            switch (unit) {
-            case EBI25Constants.UNIT_TYPE_TEMPERATURE:
-                return new LocalizableMessage("dsEdit.ebi25.unit.temperature");
-            case EBI25Constants.UNIT_TYPE_PRESSURE:
-                return new LocalizableMessage("dsEdit.ebi25.unit.pressure");
-            case EBI25Constants.UNIT_TYPE_HUMIDITY:
-                return new LocalizableMessage("dsEdit.ebi25.unit.humidity");
-            case EBI25Constants.UNIT_TYPE_VOLTAGE:
-                return new LocalizableMessage("dsEdit.ebi25.unit.voltage");
-            case EBI25Constants.UNIT_TYPE_CURRENT:
-                return new LocalizableMessage("dsEdit.ebi25.unit.current");
-            case EBI25Constants.UNIT_TYPE_PH:
-                return new LocalizableMessage("dsEdit.ebi25.unit.ph");
-            case EBI25Constants.UNIT_TYPE_CONDUCTIVITY:
-                return new LocalizableMessage("dsEdit.ebi25.unit.conductivity");
-            }
+            case TYPE_VALUE:
+                switch (unit) {
+                    case EBI25Constants.UNIT_TYPE_TEMPERATURE:
+                        return new LocalizableMessageImpl("dsEdit.ebi25.unit.temperature");
+                    case EBI25Constants.UNIT_TYPE_PRESSURE:
+                        return new LocalizableMessageImpl("dsEdit.ebi25.unit.pressure");
+                    case EBI25Constants.UNIT_TYPE_HUMIDITY:
+                        return new LocalizableMessageImpl("dsEdit.ebi25.unit.humidity");
+                    case EBI25Constants.UNIT_TYPE_VOLTAGE:
+                        return new LocalizableMessageImpl("dsEdit.ebi25.unit.voltage");
+                    case EBI25Constants.UNIT_TYPE_CURRENT:
+                        return new LocalizableMessageImpl("dsEdit.ebi25.unit.current");
+                    case EBI25Constants.UNIT_TYPE_PH:
+                        return new LocalizableMessageImpl("dsEdit.ebi25.unit.ph");
+                    case EBI25Constants.UNIT_TYPE_CONDUCTIVITY:
+                        return new LocalizableMessageImpl("dsEdit.ebi25.unit.conductivity");
+                }
         }
 
-        return new LocalizableMessage("common.noMessage");
+        return new LocalizableMessageImpl("common.noMessage");
     }
 
     @JsonRemoteProperty
@@ -198,10 +203,12 @@ public class EBI25PointLocatorVO extends AbstractPointLocatorVO implements JsonS
     }
 
     public void validate(DwrResponseI18n response) {
-        if (!TYPE_CODES.isValidId(type))
+        if (!TYPE_CODES.isValidId(type)) {
             response.addContextualMessage("type", "validate.invalidValue");
-        if (type == TYPE_VALUE && !EBI25Constants.UNIT_CODES.isValidId(unit))
+        }
+        if (type == TYPE_VALUE && !EBI25Constants.UNIT_CODES.isValidId(unit)) {
             response.addContextualMessage("unit", "validate.invalidValue");
+        }
     }
 
     @Override
@@ -212,8 +219,8 @@ public class EBI25PointLocatorVO extends AbstractPointLocatorVO implements JsonS
     public double translateFromRawValue(int rawValue) {
         if (type == TYPE_VALUE) {
             switch (unit) {
-            case EBI25Constants.UNIT_TYPE_TEMPERATURE:
-                return ((double) rawValue) / 10;
+                case EBI25Constants.UNIT_TYPE_TEMPERATURE:
+                    return ((double) rawValue) / 10;
             }
         }
 
@@ -223,8 +230,8 @@ public class EBI25PointLocatorVO extends AbstractPointLocatorVO implements JsonS
     public int translateToRawValue(double value) {
         if (type == TYPE_VALUE) {
             switch (unit) {
-            case EBI25Constants.UNIT_TYPE_TEMPERATURE:
-                return (int) value * 10;
+                case EBI25Constants.UNIT_TYPE_TEMPERATURE:
+                    return (int) value * 10;
             }
         }
 
@@ -233,16 +240,16 @@ public class EBI25PointLocatorVO extends AbstractPointLocatorVO implements JsonS
 
     public String getSuffix() {
         switch (unit) {
-        case EBI25Constants.UNIT_TYPE_TEMPERATURE:
-            return "&deg;C";
-        case EBI25Constants.UNIT_TYPE_PRESSURE:
-            return "kp";
-        case EBI25Constants.UNIT_TYPE_HUMIDITY:
-            return "%";
-        case EBI25Constants.UNIT_TYPE_VOLTAGE:
-            return "v";
-        case EBI25Constants.UNIT_TYPE_CURRENT:
-            return "a";
+            case EBI25Constants.UNIT_TYPE_TEMPERATURE:
+                return "&deg;C";
+            case EBI25Constants.UNIT_TYPE_PRESSURE:
+                return "kp";
+            case EBI25Constants.UNIT_TYPE_HUMIDITY:
+                return "%";
+            case EBI25Constants.UNIT_TYPE_VOLTAGE:
+                return "v";
+            case EBI25Constants.UNIT_TYPE_CURRENT:
+                return "a";
         }
 
         return "";
@@ -250,40 +257,40 @@ public class EBI25PointLocatorVO extends AbstractPointLocatorVO implements JsonS
 
     public LocalizableMessage getPrettyType() {
         switch (type) {
-        case TYPE_VALUE:
-            return new LocalizableMessage("dsEdit.ebi25.type.value");
-        case TYPE_BATTERY:
-            return new LocalizableMessage("dsEdit.ebi25.type.battery");
-        case TYPE_SIGNAL:
-            return new LocalizableMessage("dsEdit.ebi25.type.signal");
+            case TYPE_VALUE:
+                return new LocalizableMessageImpl("dsEdit.ebi25.type.value");
+            case TYPE_BATTERY:
+                return new LocalizableMessageImpl("dsEdit.ebi25.type.battery");
+            case TYPE_SIGNAL:
+                return new LocalizableMessageImpl("dsEdit.ebi25.type.signal");
         }
-        return new LocalizableMessage("common.unknown");
+        return new LocalizableMessageImpl("common.unknown");
     }
 
     public LocalizableMessage getPrettyUnit() {
         switch (type) {
-        case TYPE_VALUE:
-            switch (unit) {
-            case EBI25Constants.UNIT_TYPE_TEMPERATURE:
-                return new LocalizableMessage("dsEdit.ebi25.unit.temperature");
-            case EBI25Constants.UNIT_TYPE_PRESSURE:
-                return new LocalizableMessage("dsEdit.ebi25.unit.pressure");
-            case EBI25Constants.UNIT_TYPE_HUMIDITY:
-                return new LocalizableMessage("dsEdit.ebi25.unit.humidity");
-            case EBI25Constants.UNIT_TYPE_VOLTAGE:
-                return new LocalizableMessage("dsEdit.ebi25.unit.voltage");
-            case EBI25Constants.UNIT_TYPE_CURRENT:
-                return new LocalizableMessage("dsEdit.ebi25.unit.current");
-            case EBI25Constants.UNIT_TYPE_PH:
-                return new LocalizableMessage("dsEdit.ebi25.unit.ph");
-            case EBI25Constants.UNIT_TYPE_CONDUCTIVITY:
-                return new LocalizableMessage("dsEdit.ebi25.unit.conductivity");
-            default:
-                return new LocalizableMessage("common.unknown");
-            }
+            case TYPE_VALUE:
+                switch (unit) {
+                    case EBI25Constants.UNIT_TYPE_TEMPERATURE:
+                        return new LocalizableMessageImpl("dsEdit.ebi25.unit.temperature");
+                    case EBI25Constants.UNIT_TYPE_PRESSURE:
+                        return new LocalizableMessageImpl("dsEdit.ebi25.unit.pressure");
+                    case EBI25Constants.UNIT_TYPE_HUMIDITY:
+                        return new LocalizableMessageImpl("dsEdit.ebi25.unit.humidity");
+                    case EBI25Constants.UNIT_TYPE_VOLTAGE:
+                        return new LocalizableMessageImpl("dsEdit.ebi25.unit.voltage");
+                    case EBI25Constants.UNIT_TYPE_CURRENT:
+                        return new LocalizableMessageImpl("dsEdit.ebi25.unit.current");
+                    case EBI25Constants.UNIT_TYPE_PH:
+                        return new LocalizableMessageImpl("dsEdit.ebi25.unit.ph");
+                    case EBI25Constants.UNIT_TYPE_CONDUCTIVITY:
+                        return new LocalizableMessageImpl("dsEdit.ebi25.unit.conductivity");
+                    default:
+                        return new LocalizableMessageImpl("common.unknown");
+                }
         }
 
-        return new LocalizableMessage("common.noMessage");
+        return new LocalizableMessageImpl("common.noMessage");
     }
 
     @Override
@@ -346,29 +353,34 @@ public class EBI25PointLocatorVO extends AbstractPointLocatorVO implements JsonS
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("type");
-        if (text == null)
+        if (text == null) {
             throw new LocalizableJsonException("emport.error.missing", "type", TYPE_CODES.getCodeList());
+        }
         type = TYPE_CODES.getId(text);
-        if (!TYPE_CODES.isValidId(type))
+        if (!TYPE_CODES.isValidId(type)) {
             throw new LocalizableJsonException("emport.error.invalid", "range", text, TYPE_CODES.getCodeList());
+        }
 
         if (type == TYPE_VALUE) {
             text = json.getString("unit");
-            if (text == null)
+            if (text == null) {
                 throw new LocalizableJsonException("emport.error.missing", "unit", EBI25Constants.UNIT_CODES
                         .getCodeList());
+            }
 
             unit = EBI25Constants.UNIT_CODES.getId(text);
-            if (!EBI25Constants.UNIT_CODES.isValidId(unit))
+            if (!EBI25Constants.UNIT_CODES.isValidId(unit)) {
                 throw new LocalizableJsonException("emport.error.invalid", "unit", text, EBI25Constants.UNIT_CODES
                         .getCodeList());
+            }
         }
     }
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         map.put("type", TYPE_CODES.getCode(type));
-        if (type == TYPE_VALUE)
+        if (type == TYPE_VALUE) {
             map.put("unit", EBI25Constants.UNIT_CODES.getCode(unit));
+        }
     }
 }

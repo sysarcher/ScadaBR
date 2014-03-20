@@ -5,20 +5,21 @@ import br.org.scadabr.vo.dataSource.opc.OPCPointLocatorVO;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 
 public class OPCPointLocatorRT extends PointLocatorRT {
-	private final OPCPointLocatorVO vo;
 
-	public OPCPointLocatorRT(OPCPointLocatorVO vo) {
-		this.vo = vo;
-	}
+    private final OPCPointLocatorVO vo;
 
-	@Override
-	public boolean isSettable() {
-		// TODO Auto-generated method stub
-		return vo.isSettable();
-	}
+    public OPCPointLocatorRT(OPCPointLocatorVO vo) {
+        this.vo = vo;
+    }
 
-	public OPCPointLocatorVO getVo() {
-		return vo;
-	}
+    @Override
+    public boolean isSettable() {
+        // TODO Auto-generated method stub
+        return vo.isSettable();
+    }
+
+    public OPCPointLocatorVO getVo() {
+        return vo;
+    }
 
 }

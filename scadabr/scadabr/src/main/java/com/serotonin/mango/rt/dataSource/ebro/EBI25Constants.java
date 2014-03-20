@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource.ebro;
 
@@ -40,6 +40,7 @@ import com.serotonin.modbus4j.locator.NumericLocator;
  * @author Matthew Lohbihler
  */
 public class EBI25Constants {
+
     public static final int SLAVE_NODE = 1;
     public static final int RANGE = RegisterRange.HOLDING_REGISTER;
     public static final int MAX_DATA_LOGGERS = 250;
@@ -74,6 +75,7 @@ public class EBI25Constants {
     public static final int UNIT_TYPE_CONDUCTIVITY = 7;
 
     public static final ExportCodes UNIT_CODES = new ExportCodes();
+
     static {
         UNIT_CODES.addElement(UNIT_TYPE_TEMPERATURE, "TEMPERATURE");
         UNIT_CODES.addElement(UNIT_TYPE_PRESSURE, "PRESSURE");
@@ -110,8 +112,9 @@ public class EBI25Constants {
 
     private static Object getResult(BatchResults<String> results, String key) throws ExceptionResultException {
         Object o = results.getValue(key);
-        if (o instanceof ExceptionResult)
+        if (o instanceof ExceptionResult) {
             throw new ExceptionResultException(key, (ExceptionResult) o);
+        }
         return o;
     }
 
@@ -142,8 +145,9 @@ public class EBI25Constants {
         ModbusMaster modbusMaster = new ModbusFactory().createTcpMaster(params, keepAlive);
         modbusMaster.setTimeout(timeout);
         modbusMaster.setRetries(retries);
-        if (exceptionListener != null)
-            modbusMaster.setExceptionHandler(exceptionListener);
+        if (exceptionListener != null) {
+            modbusMaster.setExceptionHandler((MessagingExceptionHandler) exceptionListener);
+        }
 
         modbusMaster.init();
 
@@ -151,16 +155,19 @@ public class EBI25Constants {
     }
 
     public static void destroyModbusMaster(ModbusMaster modbusMaster) {
-        if (modbusMaster != null)
+        if (modbusMaster != null) {
             modbusMaster.destroy();
+        }
     }
 
     public static PointEventDetectorVO findDetector(List<PointEventDetectorVO> eventDetectors, boolean high) {
         for (PointEventDetectorVO ped : eventDetectors) {
-            if (high && ped.getDetectorType() == PointEventDetectorVO.TYPE_ANALOG_HIGH_LIMIT)
+            if (high && ped.getDetectorType() == PointEventDetectorVO.TYPE_ANALOG_HIGH_LIMIT) {
                 return ped;
-            if (!high && ped.getDetectorType() == PointEventDetectorVO.TYPE_ANALOG_LOW_LIMIT)
+            }
+            if (!high && ped.getDetectorType() == PointEventDetectorVO.TYPE_ANALOG_LOW_LIMIT) {
                 return ped;
+            }
         }
         return null;
     }

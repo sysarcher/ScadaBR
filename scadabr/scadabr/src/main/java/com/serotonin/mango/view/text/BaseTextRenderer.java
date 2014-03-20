@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.view.text;
 
@@ -25,19 +25,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonSerializable;
-import com.serotonin.json.JsonValue;
-import com.serotonin.json.TypeFactory;
+import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonSerializable;
+import br.org.scadabr.json.JsonValue;
+import br.org.scadabr.json.TypeFactory;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImplDefinition;
 
 abstract public class BaseTextRenderer implements TextRenderer, JsonSerializable {
+
     static List<ImplDefinition> definitions;
 
     static void ensureDefinitions() {
@@ -58,8 +59,9 @@ abstract public class BaseTextRenderer implements TextRenderer, JsonSerializable
         ensureDefinitions();
         List<ImplDefinition> impls = new ArrayList<ImplDefinition>(definitions.size());
         for (ImplDefinition def : definitions) {
-            if (def.supports(dataType))
+            if (def.supports(dataType)) {
                 impls.add(def);
+            }
         }
         return impls;
     }
@@ -67,26 +69,30 @@ abstract public class BaseTextRenderer implements TextRenderer, JsonSerializable
     public static List<String> getExportTypes() {
         ensureDefinitions();
         List<String> result = new ArrayList<String>(definitions.size());
-        for (ImplDefinition def : definitions)
+        for (ImplDefinition def : definitions) {
             result.add(def.getExportName());
+        }
         return result;
     }
 
     public String getText(int hint) {
-        if (hint == HINT_RAW)
+        if (hint == HINT_RAW) {
             return "";
+        }
         return UNKNOWN_VALUE;
     }
 
     public String getText(PointValueTime valueTime, int hint) {
-        if (valueTime == null)
+        if (valueTime == null) {
             return getText(hint);
+        }
         return getText(valueTime.getValue(), hint);
     }
 
     public String getText(MangoValue value, int hint) {
-        if (value == null)
+        if (value == null) {
             return getText(hint);
+        }
         return getTextImpl(value, hint);
     }
 
@@ -121,14 +127,16 @@ abstract public class BaseTextRenderer implements TextRenderer, JsonSerializable
     }
 
     public String getColour(PointValueTime valueTime) {
-        if (valueTime == null)
+        if (valueTime == null) {
             return getColour();
+        }
         return getColour(valueTime.getValue());
     }
 
     public String getColour(MangoValue value) {
-        if (value == null)
+        if (value == null) {
             return getColour();
+        }
         return getColourImpl(value);
     }
 
@@ -177,13 +185,15 @@ abstract public class BaseTextRenderer implements TextRenderer, JsonSerializable
     }
 
     public static class Factory implements TypeFactory {
+
         @Override
         public Class<?> getType(JsonValue jsonValue) throws JsonException {
             JsonObject json = jsonValue.toJsonObject();
 
             String type = json.getString("type");
-            if (type == null)
+            if (type == null) {
                 throw new LocalizableJsonException("emport.error.text.missing", "type", getExportTypes());
+            }
 
             ImplDefinition def = null;
             ensureDefinitions();
@@ -194,26 +204,28 @@ abstract public class BaseTextRenderer implements TextRenderer, JsonSerializable
                 }
             }
 
-            if (def == null)
+            if (def == null) {
                 throw new LocalizableJsonException("emport.error.text.invalid", "type", type, getExportTypes());
+            }
 
             Class<? extends TextRenderer> clazz = null;
-            if (def == AnalogRenderer.getDefinition())
+            if (def == AnalogRenderer.getDefinition()) {
                 clazz = AnalogRenderer.class;
-            else if (def == BinaryTextRenderer.getDefinition())
+            } else if (def == BinaryTextRenderer.getDefinition()) {
                 clazz = BinaryTextRenderer.class;
-            else if (def == MultistateRenderer.getDefinition())
+            } else if (def == MultistateRenderer.getDefinition()) {
                 clazz = MultistateRenderer.class;
-            else if (def == NoneRenderer.getDefinition())
+            } else if (def == NoneRenderer.getDefinition()) {
                 clazz = NoneRenderer.class;
-            else if (def == PlainRenderer.getDefinition())
+            } else if (def == PlainRenderer.getDefinition()) {
                 clazz = PlainRenderer.class;
-            else if (def == RangeRenderer.getDefinition())
+            } else if (def == RangeRenderer.getDefinition()) {
                 clazz = RangeRenderer.class;
-            else if (def == TimeRenderer.getDefinition())
+            } else if (def == TimeRenderer.getDefinition()) {
                 clazz = TimeRenderer.class;
-            else
+            } else {
                 throw new ShouldNeverHappenException("What's this?: " + def.getName());
+            }
 
             return clazz;
         }

@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc. All rights reserved.
-    @author Matthew Lohbihler
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc. All rights reserved.
+ @author Matthew Lohbihler
  */
 package com.serotonin.mango.web.servlet;
 
@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 
-import com.serotonin.InvalidArgumentException;
+import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.db.RowCallback;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
@@ -33,26 +33,29 @@ import com.serotonin.mango.vo.bean.LongPair;
 import com.serotonin.mango.vo.report.DiscreteTimeSeries;
 import com.serotonin.mango.vo.report.ImageChartUtils;
 import com.serotonin.mango.vo.report.PointTimeSeriesCollection;
-import com.serotonin.sync.Synchronizer;
-import com.serotonin.util.ColorUtils;
-import com.serotonin.util.StringUtils;
+import br.org.scadabr.sync.Synchronizer;
+import br.org.scadabr.util.ColorUtils;
+import br.org.scadabr.util.StringUtils;
 
 public class AsyncImageChartServlet extends BaseInfoServlet {
+
     private static final long serialVersionUID = -1;
 
     final DataPointDao dataPointDao = new DataPointDao();
     final PointValueDao pointValueDao = new PointValueDao();
 
     /**
-     * @TODO(security): Validate the point access against the user. If anonymous, make sure the view allows public
-     *                  access to the point. (Need to add view id.)
+     * @TODO(security): Validate the point access against the user. If
+     * anonymous, make sure the view allows public access to the point. (Need to
+     * add view id.)
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String imageInfo = request.getPathInfo();
         byte[] data = getImageData(imageInfo, request);
-        if (data != null)
+        if (data != null) {
             ImageChartUtils.writeChart(response, data);
+        }
     }
 
     private byte[] getImageData(String imageInfo, HttpServletRequest request) throws IOException {
@@ -82,8 +85,7 @@ public class AsyncImageChartServlet extends BaseInfoServlet {
                 from = Long.parseLong(imageBits[2]);
                 to = Long.parseLong(imageBits[3]);
                 pointIdStart = 4;
-            }
-            else {
+            } else {
                 from = System.currentTimeMillis() - Long.parseLong(imageBits[1]);
                 to = -1;
                 pointIdStart = 2;
@@ -96,26 +98,26 @@ public class AsyncImageChartServlet extends BaseInfoServlet {
             Synchronizer<PointDataRetriever> tasks = new Synchronizer<PointDataRetriever>();
             List<Integer> dataPointIds = new ArrayList<Integer>();
             for (int i = pointIdStart; i < imageBits.length; i++) {
-                if (imageBits[i].startsWith("w"))
+                if (imageBits[i].startsWith("w")) {
                     width = StringUtils.parseInt(imageBits[i].substring(1), width);
-                else if (imageBits[i].startsWith("h"))
+                } else if (imageBits[i].startsWith("h")) {
                     height = StringUtils.parseInt(imageBits[i].substring(1), height);
-                else {
+                } else {
                     String dataPointStr = imageBits[i];
                     Color colour = null;
                     int dataPointId;
 
                     int pipe = dataPointStr.indexOf('|');
-                    if (pipe == -1)
+                    if (pipe == -1) {
                         dataPointId = Integer.parseInt(dataPointStr);
-                    else {
+                    } else {
                         try {
                             String colourStr = dataPointStr.substring(pipe + 1);
-                            if (colourStr.startsWith("0x"))
+                            if (colourStr.startsWith("0x")) {
                                 colourStr = "#" + colourStr.substring(2);
+                            }
                             colour = ColorUtils.toColor(colourStr);
-                        }
-                        catch (InvalidArgumentException e) {
+                        } catch (InvalidArgumentException e) {
                             throw new IOException(e);
                         }
                         dataPointId = Integer.parseInt(dataPointStr.substring(0, pipe));
@@ -127,37 +129,37 @@ public class AsyncImageChartServlet extends BaseInfoServlet {
                 }
             }
 
-            if (tasks.getSize() == 0)
+            if (tasks.getSize() == 0) {
                 return null;
+            }
 
             if (from == -1 && to == -1) {
                 LongPair sae = pointValueDao.getStartAndEndTime(dataPointIds);
                 from = sae.getL1();
                 to = sae.getL2();
-            }
-            else if (from == -1)
+            } else if (from == -1) {
                 from = pointValueDao.getStartTime(dataPointIds);
-            else if (to == -1)
+            } else if (to == -1) {
                 to = pointValueDao.getEndTime(dataPointIds);
+            }
 
-            for (PointDataRetriever pdr : tasks.getTasks())
+            for (PointDataRetriever pdr : tasks.getTasks()) {
                 pdr.setRange(from, to);
+            }
 
             tasks.executeAndWait(Common.timer.getExecutorService());
 
             PointTimeSeriesCollection ptsc = new PointTimeSeriesCollection();
-            for (PointDataRetriever pdr : tasks.getTasks())
+            for (PointDataRetriever pdr : tasks.getTasks()) {
                 pdr.addToCollection(ptsc);
+            }
 
             return ImageChartUtils.getChartData(ptsc, width, height);
-        }
-        catch (StringIndexOutOfBoundsException e) {
+        } catch (StringIndexOutOfBoundsException e) {
             // no op
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             // no op
-        }
-        catch (ArrayIndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             // no op
         }
 
@@ -165,6 +167,7 @@ public class AsyncImageChartServlet extends BaseInfoServlet {
     }
 
     class PointDataRetriever implements Runnable, RowCallback<PointValueTime>, DataQuantizerCallback {
+
         private final int dataPointId;
         private Color colour;
         private final int imageWidth;
@@ -189,10 +192,10 @@ public class AsyncImageChartServlet extends BaseInfoServlet {
         public void run() {
             DataPointVO dp = dataPointDao.getDataPoint(dataPointId);
             try {
-                if (colour == null && !StringUtils.isEmpty(dp.getChartColour()))
+                if (colour == null && !StringUtils.isEmpty(dp.getChartColour())) {
                     colour = ColorUtils.toColor(dp.getChartColour());
-            }
-            catch (InvalidArgumentException e) {
+                }
+            } catch (InvalidArgumentException e) {
                 // no op
             }
 
@@ -201,12 +204,10 @@ public class AsyncImageChartServlet extends BaseInfoServlet {
             if (dataType == DataTypes.NUMERIC) {
                 ts = new TimeSeries(dp.getName(), null, null, Second.class);
                 quantizer = new NumericDataQuantizer(from, to, imageWidth, this);
-            }
-            else if (dataType == DataTypes.MULTISTATE) {
+            } else if (dataType == DataTypes.MULTISTATE) {
                 quantizer = new MultistateDataQuantizer(from, to, imageWidth, this);
                 dts = new DiscreteTimeSeries(dp.getName(), dp.getTextRenderer(), colour);
-            }
-            else if (dataType == DataTypes.BINARY) {
+            } else if (dataType == DataTypes.BINARY) {
                 quantizer = new BinaryDataQuantizer(from, to, imageWidth, this);
                 dts = new DiscreteTimeSeries(dp.getName(), dp.getTextRenderer(), colour);
             }
@@ -217,23 +218,26 @@ public class AsyncImageChartServlet extends BaseInfoServlet {
 
         @Override
         public void row(PointValueTime pvt, int rowNum) {
-            if (quantizer != null)
+            if (quantizer != null) {
                 quantizer.data(pvt.getValue(), pvt.getTime());
+            }
         }
 
         @Override
         public void quantizedData(MangoValue value, long time) {
-            if (ts != null)
+            if (ts != null) {
                 ImageChartUtils.addSecond(ts, time, MangoValue.numberValue(value));
-            else if (dts != null)
+            } else if (dts != null) {
                 dts.addValueTime(new PointValueTime(value, time));
+            }
         }
 
         public void addToCollection(PointTimeSeriesCollection ptsc) {
-            if (ts != null)
+            if (ts != null) {
                 ptsc.addNumericTimeSeries(ts, colour);
-            else
+            } else {
                 ptsc.addDiscreteTimeSeries(dts);
+            }
         }
     }
 }

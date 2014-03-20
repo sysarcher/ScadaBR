@@ -40,7 +40,8 @@ import net.sf.openv4j.protocolhandlers.SegmentedDataContainer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.web.i18n.I18NUtils;
+import br.org.scadabr.web.i18n.I18NUtils;
+import br.org.scadabr.web.l10n.Localizer;
 
 /**
  * @author aploese
@@ -66,11 +67,9 @@ public class OpenV4JDiscovery implements TestingUtility {
                     dc.wait(4000 * dc.getDataBlockCount());
                 }
 
-            }
-            catch (InterruptedException ex) {
+            } catch (InterruptedException ex) {
                 LOG.info("Interrupted)");
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 LOG.warn("SearchThread.run", ex);
             }
             LOG.info("Search finished!");
@@ -80,8 +79,7 @@ public class OpenV4JDiscovery implements TestingUtility {
                 if (sPort != null) {
                     sPort.close();
                 }
-            }
-            catch (InterruptedException ex) {
+            } catch (InterruptedException ex) {
                 LOG.info("Interrupted)");
             }
         }
@@ -104,7 +102,7 @@ public class OpenV4JDiscovery implements TestingUtility {
 
             @Override
             void shutOff() {
-                message = I18NUtils.getMessage(OpenV4JDiscovery.this.bundle, "dsEdit.mbus.tester.auto");
+                message = Localizer.localizeI18nKey("dsEdit.mbus.tester.auto", OpenV4JDiscovery.this.bundle);
                 OpenV4JDiscovery.this.cleanup();
             }
         };
@@ -119,7 +117,7 @@ public class OpenV4JDiscovery implements TestingUtility {
             result.addToDataContainer(dp);
         }
         result.start(commPortId);
-        result.setMessage(I18NUtils.getMessage(bundle, "dsEdit.openv4j.tester.searchingDataPoints"));
+        result.setMessage(Localizer.localizeI18nKey("dsEdit.openv4j.tester.searchingDataPoints", bundle));
         return result;
     }
 
@@ -127,7 +125,7 @@ public class OpenV4JDiscovery implements TestingUtility {
         OpenV4JDiscovery result = new OpenV4JDiscovery(bundle);
         result.addToDataContainer(DataPoint.COMMON_CONFIG_DEVICE_TYPE_ID);
         result.start(commPortId);
-        result.setMessage(I18NUtils.getMessage(bundle, "dsEdit.openv4j.tester.detectingDevice"));
+        result.setMessage(Localizer.localizeI18nKey("dsEdit.openv4j.tester.detectingDevice", bundle));
         return result;
     }
 
@@ -135,17 +133,13 @@ public class OpenV4JDiscovery implements TestingUtility {
         try {
             sPort = ProtocolHandler.openPort(commPortId);
             protocolHandler.setStreams(sPort.getInputStream(), sPort.getOutputStream());
-        }
-        catch (NoSuchPortException ex) {
+        } catch (NoSuchPortException ex) {
             Logger.getLogger(OpenV4JDiscovery.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (PortInUseException ex) {
+        } catch (PortInUseException ex) {
             Logger.getLogger(OpenV4JDiscovery.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (UnsupportedCommOperationException ex) {
+        } catch (UnsupportedCommOperationException ex) {
             Logger.getLogger(OpenV4JDiscovery.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(OpenV4JDiscovery.class.getName()).log(Level.SEVERE, null, ex);
         }
         searchThread = new SearchThread();
@@ -168,7 +162,7 @@ public class OpenV4JDiscovery implements TestingUtility {
         autoShutOff.update();
 
         DataPoint[] p = DataPoint.values();
-        List<OpenV4JDataPointBean> values = new ArrayList<OpenV4JDataPointBean>(p.length);
+        List<OpenV4JDataPointBean> values = new ArrayList<>(p.length);
         DataPoint[] sortedPoints = DataPoint.getSortedPoints();
         for (Group g : Group.values()) {
             for (DataPoint pr : sortedPoints) {
@@ -186,7 +180,7 @@ public class OpenV4JDiscovery implements TestingUtility {
     @Override
     public void cancel() {
         LOG.info("cancel()");
-        message = I18NUtils.getMessage(bundle, "dsEdit.openv4j.tester.cancelled");
+        message = Localizer.localizeI18nKey("dsEdit.openv4j.tester.cancelled", bundle);
         cleanup();
     }
 
@@ -196,8 +190,7 @@ public class OpenV4JDiscovery implements TestingUtility {
             finished = true;
             try {
                 protocolHandler.close();
-            }
-            catch (InterruptedException ex) {
+            } catch (InterruptedException ex) {
                 LOG.error("Shutdown comport", ex);
             }
             autoShutOff.cancel();

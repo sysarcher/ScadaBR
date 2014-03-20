@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr.beans;
 
@@ -49,12 +49,13 @@ import com.serotonin.bacnet4j.util.PropertyValues;
 import br.org.scadabr.db.IntValuePair;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.util.queue.ByteQueue;
-import com.serotonin.web.i18n.I18NUtils;
+import br.org.scadabr.web.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
  */
 public class BACnetDiscovery extends DefaultDeviceEventListener implements TestingUtility, ExceptionListener {
+
     private static final Log LOG = LogFactory.getLog(BACnetDiscovery.class);
 
     final ResourceBundle bundle;
@@ -76,7 +77,7 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
         autoShutOff = new AutoShutOff() {
             @Override
             void shutOff() {
-                message = I18NUtils.getMessage(BACnetDiscovery.this.bundle, "dsEdit.bacnetIp.tester.auto");
+                message = Localizer.localizeI18nKey("dsEdit.bacnetIp.tester.auto", BACnetDiscovery.this.bundle);
                 BACnetDiscovery.this.cleanup();
             }
         };
@@ -95,29 +96,28 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
 
         try {
             localDevice.initialize();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOG.warn("", e);
             message = e.getMessage();
             cleanup();
             return;
         }
 
-        if (whoIsPort == 0)
+        if (whoIsPort == 0) {
             whoIsPort = port;
+        }
 
         WhoIsRequest whoIs = new WhoIsRequest();
         try {
             localDevice.sendBroadcast(whoIsPort, whoIs);
-        }
-        catch (BACnetException e) {
+        } catch (BACnetException e) {
             LOG.warn("", e);
             message = e.getMessage();
             cleanup();
             return;
         }
 
-        message = I18NUtils.getMessage(bundle, "dsEdit.bacnetIp.tester.listening");
+        message = Localizer.localizeI18nKey("dsEdit.bacnetIp.tester.listening", bundle);
     }
 
     public void addUpdateInfo(Map<String, Object> result) {
@@ -151,8 +151,9 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
         }
     }
 
+    @Override
     public void cancel() {
-        message = I18NUtils.getMessage(bundle, "dsEdit.bacnetIp.tester.cancelled");
+        message = Localizer.localizeI18nKey("dsEdit.bacnetIp.tester.cancelled", bundle);
         cleanup();
     }
 
@@ -165,11 +166,13 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
         }
     }
 
+    @Override
     public void receivedException(Exception e) {
         message = e.getMessage();
         // cleanup();
     }
 
+    @Override
     public void receivedThrowable(Throwable t) {
         message = t.getMessage();
         // cleanup();
@@ -194,9 +197,10 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
 
     public static String getDeviceDescription(RemoteDevice d) {
         String description = d.getAddress().toIpString();
-        if (d.getNetwork() != null)
+        if (d.getNetwork() != null) {
             description += " - " + d.getNetwork().getNetworkNumber() + "/"
                     + d.getNetwork().getNetworkAddressDottedString();
+        }
         return description;
     }
 
@@ -210,8 +214,7 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
         deviceDetails = null;
         try {
             deviceDetails = getDetails(index);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOG.warn("", e);
             message = e.getMessage();
         }
@@ -219,8 +222,9 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
 
     private List<BACnetObjectBean> getDetails(int index) throws Exception {
         RemoteDevice d = localDevice.getRemoteDeviceByUserData(index);
-        if (d == null)
-            throw new Exception(I18NUtils.getMessage(bundle, "dsEdit.bacnetIp.tester.indexNotFound"));
+        if (d == null) {
+            throw new Exception(Localizer.localizeI18nKey("dsEdit.bacnetIp.tester.indexNotFound", bundle));
+        }
 
         deviceDetailsIndex = index;
 
@@ -237,9 +241,8 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
 
         // ReadPropertyRequest read = new ReadPropertyRequest(new ObjectIdentifier(ObjectType.device, deviceId),
         // PropertyIdentifier.objectList);
-
         PropertyReferences refs = new PropertyReferences();
-        Map<ObjectIdentifier, BACnetObjectBean> objectProperties = new HashMap<ObjectIdentifier, BACnetObjectBean>();
+        Map<ObjectIdentifier, BACnetObjectBean> objectProperties = new HashMap<>();
         for (ObjectIdentifier oid : oids) {
             addPropertyReferences(refs, oid);
 
@@ -256,16 +259,15 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
                 bean.setDataTypeId(DataTypes.BINARY);
                 bean.getUnitsDescription().add("");
                 bean.getUnitsDescription().add("");
-            }
-            else if (ObjectType.multiStateInput.equals(oid.getObjectType())
+            } else if (ObjectType.multiStateInput.equals(oid.getObjectType())
                     || ObjectType.multiStateOutput.equals(oid.getObjectType())
                     || ObjectType.multiStateValue.equals(oid.getObjectType())
                     || ObjectType.lifeSafetyPoint.equals(oid.getObjectType())
                     || ObjectType.lifeSafetyZone.equals(oid.getObjectType())) {
                 bean.setDataTypeId(DataTypes.MULTISTATE);
-            }
-            else
+            } else {
                 bean.setDataTypeId(DataTypes.NUMERIC);
+            }
 
             objectProperties.put(oid, bean);
         }
@@ -277,29 +279,27 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
             PropertyIdentifier pid = value.getPropertyIdentifier();
 
             BACnetObjectBean bean = objectProperties.get(oid);
-            if (pid.equals(PropertyIdentifier.objectName))
+            if (pid.equals(PropertyIdentifier.objectName)) {
                 bean.setObjectName(values.getString(oid, pid));
-            else if (pid.equals(PropertyIdentifier.presentValue))
+            } else if (pid.equals(PropertyIdentifier.presentValue)) {
                 bean.setPresentValue(values.getString(oid, pid));
-            else if (pid.equals(PropertyIdentifier.units))
+            } else if (pid.equals(PropertyIdentifier.units)) {
                 bean.getUnitsDescription().add(values.getString(oid, pid));
-            else if (pid.equals(PropertyIdentifier.inactiveText)) {
+            } else if (pid.equals(PropertyIdentifier.inactiveText)) {
                 Encodable e = values.getNullOnError(oid, pid);
                 bean.getUnitsDescription().set(0, e == null ? "0" : e.toString());
-            }
-            else if (pid.equals(PropertyIdentifier.activeText)) {
+            } else if (pid.equals(PropertyIdentifier.activeText)) {
                 Encodable e = values.getNullOnError(oid, pid);
                 bean.getUnitsDescription().set(1, e == null ? "1" : e.toString());
-            }
-            else if (pid.equals(PropertyIdentifier.outputUnits))
+            } else if (pid.equals(PropertyIdentifier.outputUnits)) {
                 bean.getUnitsDescription().add(values.getString(oid, pid));
-            else if (pid.equals(PropertyIdentifier.stateText)) {
+            } else if (pid.equals(PropertyIdentifier.stateText)) {
                 try {
                     SequenceOf<CharacterString> states = (SequenceOf<CharacterString>) values.get(oid, pid);
-                    for (CharacterString state : states)
+                    for (CharacterString state : states) {
                         bean.getUnitsDescription().add(state.toString());
-                }
-                catch (PropertyValueException e) {
+                    }
+                } catch (PropertyValueException e) {
                     LOG.warn("Error in stateText result: " + e.getError());
                 }
             }
@@ -314,28 +314,23 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
         ObjectType type = oid.getObjectType();
         if (ObjectType.accumulator.equals(type)) {
             refs.add(oid, PropertyIdentifier.units);
-        }
-        else if (ObjectType.analogInput.equals(type) || ObjectType.analogOutput.equals(type)
+        } else if (ObjectType.analogInput.equals(type) || ObjectType.analogOutput.equals(type)
                 || ObjectType.analogValue.equals(type) || ObjectType.pulseConverter.equals(type)) {
             refs.add(oid, PropertyIdentifier.units);
-        }
-        else if (ObjectType.binaryInput.equals(type) || ObjectType.binaryOutput.equals(type)
+        } else if (ObjectType.binaryInput.equals(type) || ObjectType.binaryOutput.equals(type)
                 || ObjectType.binaryValue.equals(type)) {
             refs.add(oid, PropertyIdentifier.inactiveText);
             refs.add(oid, PropertyIdentifier.activeText);
-        }
-        else if (ObjectType.lifeSafetyPoint.equals(type)) {
+        } else if (ObjectType.lifeSafetyPoint.equals(type)) {
             refs.add(oid, PropertyIdentifier.units);
-        }
-        else if (ObjectType.loop.equals(type)) {
+        } else if (ObjectType.loop.equals(type)) {
             refs.add(oid, PropertyIdentifier.outputUnits);
-        }
-        else if (ObjectType.multiStateInput.equals(type) || ObjectType.multiStateOutput.equals(type)
+        } else if (ObjectType.multiStateInput.equals(type) || ObjectType.multiStateOutput.equals(type)
                 || ObjectType.multiStateValue.equals(type)) {
             refs.add(oid, PropertyIdentifier.stateText);
-        }
-        else
+        } else {
             return;
+        }
 
         refs.add(oid, PropertyIdentifier.presentValue);
     }

@@ -1,23 +1,24 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.report;
 
+import br.org.scadabr.web.l10n.Localizer;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileWriter;
@@ -36,8 +37,8 @@ import org.apache.commons.logging.LogFactory;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 
-import com.serotonin.InvalidArgumentException;
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.InvalidArgumentException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.ReportDao;
@@ -58,8 +59,8 @@ import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.web.email.MessageFormatDirective;
 import com.serotonin.mango.web.email.UsedImagesDirective;
-import com.serotonin.util.ColorUtils;
-import com.serotonin.web.taglib.DateFunctions;
+import br.org.scadabr.util.ColorUtils;
+import br.org.scadabr.web.taglib.DateFunctions;
 
 import freemarker.template.Template;
 
@@ -67,11 +68,13 @@ import freemarker.template.Template;
  * @author Matthew Lohbihler
  */
 public class ReportChartCreator {
+
     static final Log LOG = LogFactory.getLog(ReportChartCreator.class);
 
     private static final String IMAGE_SERVLET = "reportImageChart/";
     /**
-     * This image width is specifically chosen such that the report will print on a single page width in landscape.
+     * This image width is specifically chosen such that the report will print
+     * on a single page width in landscape.
      */
     private static final int IMAGE_WIDTH = 930;
     private static final int IMAGE_HEIGHT = 400;
@@ -97,13 +100,14 @@ public class ReportChartCreator {
     }
 
     /**
-     * Uses the given parameters to create the data for the fields of this class. Once the content has been created the
-     * getters for the fields can be used to retrieve.
-     * 
+     * Uses the given parameters to create the data for the fields of this
+     * class. Once the content has been created the getters for the fields can
+     * be used to retrieve.
+     *
      * @param reportInstance
      * @param reportDao
-     * @param inlinePrefix
-     *            if this is non-null, it implies that the content should be inline.
+     * @param inlinePrefix if this is non-null, it implies that the content
+     * should be inline.
      * @param createExportFile
      */
     public void createContent(ReportInstance reportInstance, ReportDao reportDao, String inlinePrefix,
@@ -139,23 +143,25 @@ public class ReportChartCreator {
         for (PointStatistics pointStat : pointStatistics) {
             PointTimeSeriesCollection ptsc = new PointTimeSeriesCollection();
 
-            if (pointStat.getNumericTimeSeries() != null)
+            if (pointStat.getNumericTimeSeries() != null) {
                 ptsc.addNumericTimeSeries(pointStat.getNumericTimeSeries(), pointStat.getNumericTimeSeriesColor());
-            else if (pointStat.getDiscreteTimeSeries() != null)
+            } else if (pointStat.getDiscreteTimeSeries() != null) {
                 ptsc.addDiscreteTimeSeries(pointStat.getDiscreteTimeSeries());
+            }
 
             if (ptsc.hasData()) {
-                if (inlinePrefix != null)
+                if (inlinePrefix != null) {
                     model.put("chartName", inlinePrefix + pointStat.getChartName());
+                }
                 pointStat.setImageData(ImageChartUtils.getChartData(ptsc, POINT_IMAGE_WIDTH, POINT_IMAGE_HEIGHT));
             }
         }
 
         PointTimeSeriesCollection ptsc = handler.getPointTimeSeriesCollection();
         if (ptsc.hasData()) {
-            if (inlinePrefix != null)
+            if (inlinePrefix != null) {
                 model.put("chartName", inlinePrefix + IMAGE_CONTENT_ID);
-            else {
+            } else {
                 chartName = "r" + reportInstance.getId() + ".png";
                 // The path comes from the servlet path definition in web.xml.
                 model.put("chartName", IMAGE_SERVLET + chartName);
@@ -169,9 +175,9 @@ public class ReportChartCreator {
             events = reportDao.getReportInstanceEvents(reportInstance.getId());
             model.put("includeEvents", true);
             model.put("events", events);
-        }
-        else
+        } else {
             model.put("includeEvents", false);
+        }
 
         List<ReportUserComment> comments = null;
         if (reportInstance.isIncludeUserComments()) {
@@ -179,24 +185,24 @@ public class ReportChartCreator {
 
             // Only provide the list of point comments to the report. The event comments have already be correlated
             // into the events list.
-            List<ReportUserComment> pointComments = new ArrayList<ReportUserComment>();
+            List<ReportUserComment> pointComments = new ArrayList<>();
             for (ReportUserComment c : comments) {
-                if (c.getCommentType() == UserComment.TYPE_POINT)
+                if (c.getCommentType() == UserComment.TYPE_POINT) {
                     pointComments.add(c);
+                }
             }
 
             model.put("includeUserComments", true);
             model.put("userComments", pointComments);
-        }
-        else
+        } else {
             model.put("includeUserComments", false);
+        }
 
         // Create the template.
         Template template;
         try {
             template = Common.ctx.getFreemarkerConfig().getTemplate("report/reportChart.ftl");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             // Couldn't load the template?
             throw new ShouldNeverHappenException(e);
         }
@@ -205,8 +211,7 @@ public class ReportChartCreator {
         StringWriter writer = new StringWriter();
         try {
             template.process(model, writer);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // Couldn't process the template?
             throw new ShouldNeverHappenException(e);
         }
@@ -222,8 +227,7 @@ public class ReportChartCreator {
             try {
                 eventFile = File.createTempFile("tempEventCSV", ".csv");
                 new EventCsvStreamer(new PrintWriter(new FileWriter(eventFile)), events, bundle);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 LOG.error("Failed to create temp event file", e);
             }
         }
@@ -232,8 +236,7 @@ public class ReportChartCreator {
             try {
                 commentFile = File.createTempFile("tempCommentCSV", ".csv");
                 new UserCommentCsvStreamer(new PrintWriter(new FileWriter(commentFile)), comments, bundle);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 LOG.error("Failed to create temp comment file", e);
             }
         }
@@ -272,6 +275,7 @@ public class ReportChartCreator {
     }
 
     public class PointStatistics {
+
         private final int reportPointId;
         private String name;
         private int dataType;
@@ -399,8 +403,9 @@ public class ReportChartCreator {
         public List<StartsAndRuntimeWrapper> getStartsAndRuntimes() {
             List<StartsAndRuntime> original = ((StartsAndRuntimeList) stats).getData();
             List<StartsAndRuntimeWrapper> result = new ArrayList<StartsAndRuntimeWrapper>(original.size());
-            for (StartsAndRuntime sar : original)
+            for (StartsAndRuntime sar : original) {
                 result.add(new StartsAndRuntimeWrapper(sar, textRenderer));
+            }
             return result;
         }
 
@@ -413,8 +418,9 @@ public class ReportChartCreator {
         }
 
         public String getChartPath() {
-            if (inlinePrefix != null)
+            if (inlinePrefix != null) {
                 return inlinePrefix + getChartName();
+            }
             return IMAGE_SERVLET + getChartName();
         }
 
@@ -424,6 +430,7 @@ public class ReportChartCreator {
     }
 
     public static class StartsAndRuntimeWrapper {
+
         private static DecimalFormat percFormat = new DecimalFormat("0.#%");
         private final StartsAndRuntime sar;
         private final TextRenderer textRenderer;
@@ -447,6 +454,7 @@ public class ReportChartCreator {
     }
 
     class StreamHandler implements ReportDataStreamHandler, DataQuantizerCallback {
+
         private final long start;
         private final long end;
         private final int imageWidth;
@@ -463,7 +471,7 @@ public class ReportChartCreator {
         private AbstractDataQuantizer quantizer;
 
         public StreamHandler(long start, long end, int imageWidth, boolean createExportFile, ResourceBundle bundle) {
-            pointStatistics = new ArrayList<PointStatistics>();
+            pointStatistics = new ArrayList<>();
             pointTimeSeriesCollection = new PointTimeSeriesCollection();
 
             this.start = start;
@@ -474,8 +482,7 @@ public class ReportChartCreator {
                     exportFile = File.createTempFile("tempCSV", ".csv");
                     reportCsvStreamer = new ReportCsvStreamer(new PrintWriter(new FileWriter(exportFile)), bundle);
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 LOG.error("Failed to create temp file", e);
             }
         }
@@ -488,26 +495,27 @@ public class ReportChartCreator {
             return pointTimeSeriesCollection;
         }
 
+        @Override
         public void startPoint(ReportPointInfo pointInfo) {
             donePoint();
 
             point = new PointStatistics(pointInfo.getReportPointId());
             point.setName(pointInfo.getExtendedName());
             point.setDataType(pointInfo.getDataType());
-            point.setDataTypeDescription(DataTypes.getDataTypeMessage(pointInfo.getDataType()).getLocalizedMessage(
-                    bundle));
+            point.setDataTypeDescription(Localizer.localizeMessage(DataTypes.getDataTypeMessage(pointInfo.getDataType()), bundle));
             point.setTextRenderer(pointInfo.getTextRenderer());
-            if (pointInfo.getStartValue() != null)
+            if (pointInfo.getStartValue() != null) {
                 point.setStartValue(pointInfo.getTextRenderer().getText(pointInfo.getStartValue(),
                         TextRenderer.HINT_FULL));
+            }
             pointStatistics.add(point);
 
             Color colour = null;
             try {
-                if (pointInfo.getColour() != null)
+                if (pointInfo.getColour() != null) {
                     colour = ColorUtils.toColor("#" + pointInfo.getColour());
-            }
-            catch (InvalidArgumentException e) {
+                }
+            } catch (InvalidArgumentException e) {
                 // Should never happen, but leave the color null in case it does.
             }
 
@@ -521,77 +529,86 @@ public class ReportChartCreator {
                 numericTimeSeries.setRangeDescription(point.getTextRenderer().getMetaText());
                 point.setNumericTimeSeries(numericTimeSeries);
                 point.setNumericTimeSeriesColor(colour);
-                if (pointInfo.isConsolidatedChart())
+                if (pointInfo.isConsolidatedChart()) {
                     pointTimeSeriesCollection.addNumericTimeSeries(numericTimeSeries, colour);
-            }
-            else if (pointInfo.getDataType() == DataTypes.MULTISTATE) {
+                }
+            } else if (pointInfo.getDataType() == DataTypes.MULTISTATE) {
                 point.setStats(new StartsAndRuntimeList(pointInfo.getStartValue(), start, end));
                 quantizer = new MultistateDataQuantizer(start, end, imageWidth, this);
 
                 discreteTimeSeries = new DiscreteTimeSeries(pointInfo.getExtendedName(), pointInfo.getTextRenderer(),
                         colour);
                 point.setDiscreteTimeSeries(discreteTimeSeries);
-                if (pointInfo.isConsolidatedChart())
+                if (pointInfo.isConsolidatedChart()) {
                     pointTimeSeriesCollection.addDiscreteTimeSeries(discreteTimeSeries);
+                }
                 numericTimeSeries = null;
-            }
-            else if (pointInfo.getDataType() == DataTypes.BINARY) {
+            } else if (pointInfo.getDataType() == DataTypes.BINARY) {
                 point.setStats(new StartsAndRuntimeList(pointInfo.getStartValue(), start, end));
                 quantizer = new BinaryDataQuantizer(start, end, imageWidth, this);
 
                 discreteTimeSeries = new DiscreteTimeSeries(pointInfo.getExtendedName(), pointInfo.getTextRenderer(),
                         colour);
                 point.setDiscreteTimeSeries(discreteTimeSeries);
-                if (pointInfo.isConsolidatedChart())
+                if (pointInfo.isConsolidatedChart()) {
                     pointTimeSeriesCollection.addDiscreteTimeSeries(discreteTimeSeries);
+                }
                 numericTimeSeries = null;
-            }
-            else if (pointInfo.getDataType() == DataTypes.ALPHANUMERIC) {
+            } else if (pointInfo.getDataType() == DataTypes.ALPHANUMERIC) {
+                point.setStats(new ValueChangeCounter(pointInfo.getStartValue()));
+                quantizer = null;
+
+                discreteTimeSeries = null;
+                numericTimeSeries = null;
+            } else if (pointInfo.getDataType() == DataTypes.IMAGE) {
                 point.setStats(new ValueChangeCounter(pointInfo.getStartValue()));
                 quantizer = null;
 
                 discreteTimeSeries = null;
                 numericTimeSeries = null;
             }
-            else if (pointInfo.getDataType() == DataTypes.IMAGE) {
-                point.setStats(new ValueChangeCounter(pointInfo.getStartValue()));
-                quantizer = null;
 
-                discreteTimeSeries = null;
-                numericTimeSeries = null;
-            }
-
-            if (reportCsvStreamer != null)
+            if (reportCsvStreamer != null) {
                 reportCsvStreamer.startPoint(pointInfo);
+            }
         }
 
+        @Override
         public void pointData(ReportDataValue rdv) {
-            if (quantizer != null)
+            if (quantizer != null) {
                 quantizer.data(rdv.getValue(), rdv.getTime());
+            }
             point.getStats().addValueTime(rdv);
-            if (reportCsvStreamer != null)
+            if (reportCsvStreamer != null) {
                 reportCsvStreamer.pointData(rdv);
+            }
         }
 
         private void donePoint() {
-            if (quantizer != null)
+            if (quantizer != null) {
                 quantizer.done();
-            if (point != null)
+            }
+            if (point != null) {
                 point.getStats().done();
+            }
         }
 
+        @Override
         public void done() {
             donePoint();
-            if (reportCsvStreamer != null)
+            if (reportCsvStreamer != null) {
                 reportCsvStreamer.done();
+            }
         }
 
         // Callback
+        @Override
         public void quantizedData(MangoValue value, long time) {
-            if (numericTimeSeries != null)
+            if (numericTimeSeries != null) {
                 ImageChartUtils.addSecond(numericTimeSeries, time, MangoValue.numberValue(value));
-            else if (discreteTimeSeries != null)
+            } else if (discreteTimeSeries != null) {
                 discreteTimeSeries.addValueTime(new PointValueTime(value, time));
+            }
         }
     }
 }

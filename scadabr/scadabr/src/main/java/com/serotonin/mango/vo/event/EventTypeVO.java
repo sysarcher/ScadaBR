@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.event;
 
@@ -29,20 +29,22 @@ import com.serotonin.mango.rt.event.type.MaintenanceEventType;
 import com.serotonin.mango.rt.event.type.PublisherEventType;
 import com.serotonin.mango.rt.event.type.ScheduledEventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessage;
 
 public class EventTypeVO {
+
     /**
      * The type of event. @see EventType.EventSources
      */
     private int typeId;
     /**
-     * For data point event, the data point id For data source event, the data source id For system event, the type id
+     * For data point event, the data point id For data source event, the data
+     * source id For system event, the type id
      */
     private int typeRef1;
     /**
-     * For data point event, the point event detector id For data source event, the data source event type For system
-     * event, undefined
+     * For data point event, the point event detector id For data source event,
+     * the data source event type For system event, undefined
      */
     private int typeRef2;
     private LocalizableMessage description;
@@ -78,22 +80,30 @@ public class EventTypeVO {
     }
 
     public EventType createEventType() {
-        if (typeId == EventType.EventSources.DATA_POINT)
+        if (typeId == EventType.EventSources.DATA_POINT) {
             return new DataPointEventType(typeRef1, typeRef2);
-        if (typeId == EventType.EventSources.DATA_SOURCE)
+        }
+        if (typeId == EventType.EventSources.DATA_SOURCE) {
             return new DataSourceEventType(typeRef1, typeRef2, alarmLevel, duplicateHandling);
-        if (typeId == EventType.EventSources.SYSTEM)
+        }
+        if (typeId == EventType.EventSources.SYSTEM) {
             return new SystemEventType(typeRef1, typeRef2);
-        if (typeId == EventType.EventSources.COMPOUND)
+        }
+        if (typeId == EventType.EventSources.COMPOUND) {
             return new CompoundDetectorEventType(typeRef1);
-        if (typeId == EventType.EventSources.SCHEDULED)
+        }
+        if (typeId == EventType.EventSources.SCHEDULED) {
             return new ScheduledEventType(typeRef1);
-        if (typeId == EventType.EventSources.PUBLISHER)
+        }
+        if (typeId == EventType.EventSources.PUBLISHER) {
             return new PublisherEventType(typeRef1, typeRef2);
-        if (typeId == EventType.EventSources.AUDIT)
+        }
+        if (typeId == EventType.EventSources.AUDIT) {
             return new AuditEventType(typeRef1, typeRef2);
-        if (typeId == EventType.EventSources.MAINTENANCE)
+        }
+        if (typeId == EventType.EventSources.MAINTENANCE) {
             return new MaintenanceEventType(typeRef1);
+        }
         return null;
     }
 

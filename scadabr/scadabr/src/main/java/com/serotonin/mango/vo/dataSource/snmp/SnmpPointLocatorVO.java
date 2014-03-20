@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.snmp;
 
@@ -26,29 +26,32 @@ import java.util.Map;
 
 import org.snmp4j.smi.OID;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.snmp.SnmpPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
- * 
+ *
  */
 @JsonRemoteEntity
 public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+
     public interface SetTypes {
+
         int NONE = 0;
         int INTEGER_32 = 1;
         int OCTET_STRING = 2;
@@ -61,14 +64,17 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         int COUNTER_64 = 9;
     }
 
+    @Override
     public LocalizableMessage getConfigurationDescription() {
-        return new LocalizableMessage("common.default", oid);
+        return new LocalizableMessageImpl("common.default", oid);
     }
 
+    @Override
     public boolean isSettable() {
         return setType != SetTypes.NONE;
     }
 
+    @Override
     public PointLocatorRT createRuntime() {
         return new SnmpPointLocatorRT(this);
     }
@@ -124,20 +130,20 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(oid))
+        if (StringUtils.isEmpty(oid)) {
             response.addContextualMessage("oid", "validate.required");
-        else {
+        } else {
             oid = oid.trim();
             try {
                 new OID(oid);
-            }
-            catch (RuntimeException e) {
+            } catch (RuntimeException e) {
                 response.addContextualMessage("oid", "validate.parseError", e.getMessage());
             }
         }
 
-        if (!DataTypes.CODES.isValidId(dataTypeId))
+        if (!DataTypes.CODES.isValidId(dataTypeId)) {
             response.addContextualMessage("dataTypeId", "validate.invalidValue");
+        }
     }
 
     @Override
@@ -186,15 +192,13 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             binary0Value = "0";
             setType = in.readInt();
             trapOnly = false;
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             oid = SerializationHelper.readSafeUTF(in);
             dataTypeId = in.readInt();
             binary0Value = "0";
             setType = in.readInt();
             trapOnly = in.readBoolean();
-        }
-        else if (ver == 3) {
+        } else if (ver == 3) {
             oid = SerializationHelper.readSafeUTF(in);
             dataTypeId = in.readInt();
             binary0Value = SerializationHelper.readSafeUTF(in);
@@ -206,8 +210,9 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         Integer value = deserializeDataType(json, DataTypes.IMAGE);
-        if (value != null)
+        if (value != null) {
             dataTypeId = value;
+        }
     }
 
     @Override

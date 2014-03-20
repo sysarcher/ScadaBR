@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.onewire;
 
@@ -24,12 +24,12 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.onewire.OneWirePointLocatorRT;
@@ -38,16 +38,19 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+
     public interface AttributeTypes {
+
         int TEMPURATURE = 1;
         int HUMIDITY = 2;
         int AD_VOLTAGE = 3;
@@ -57,6 +60,7 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
     }
 
     private static final ExportCodes ATTRIBUTE_CODES = new ExportCodes();
+
     static {
         ATTRIBUTE_CODES.addElement(AttributeTypes.TEMPURATURE, "TEMPURATURE", "dsEdit.1wire.attr.temperature");
         ATTRIBUTE_CODES.addElement(AttributeTypes.HUMIDITY, "HUMIDITY", "dsEdit.1wire.attr.humidity");
@@ -67,26 +71,34 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
     }
 
     public static String getAttributeDescription(int attributeId) {
-        if (attributeId == AttributeTypes.TEMPURATURE)
+        if (attributeId == AttributeTypes.TEMPURATURE) {
             return "Temperature";
-        if (attributeId == AttributeTypes.HUMIDITY)
+        }
+        if (attributeId == AttributeTypes.HUMIDITY) {
             return "Humidity";
-        if (attributeId == AttributeTypes.AD_VOLTAGE)
+        }
+        if (attributeId == AttributeTypes.AD_VOLTAGE) {
             return "AD voltage";
-        if (attributeId == AttributeTypes.LATCH_STATE)
+        }
+        if (attributeId == AttributeTypes.LATCH_STATE) {
             return "Latch state";
-        if (attributeId == AttributeTypes.WIPER_POSITION)
+        }
+        if (attributeId == AttributeTypes.WIPER_POSITION) {
             return "Wiper position";
-        if (attributeId == AttributeTypes.COUNTER)
+        }
+        if (attributeId == AttributeTypes.COUNTER) {
             return "Counter";
+        }
         return "Unknown";
     }
 
     public static int getAttributeDataType(int attributeId) {
-        if (attributeId == AttributeTypes.LATCH_STATE)
+        if (attributeId == AttributeTypes.LATCH_STATE) {
             return DataTypes.BINARY;
-        if (attributeId == AttributeTypes.WIPER_POSITION)
+        }
+        if (attributeId == AttributeTypes.WIPER_POSITION) {
             return DataTypes.MULTISTATE;
+        }
         return DataTypes.NUMERIC;
     }
 
@@ -100,8 +112,9 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
      */
     private int attributeId;
     /**
-     * The index of the attribute within the container. This applies to ad voltages and latch states (channel), wiper
-     * positions (potentiometer), and pages (counters).
+     * The index of the attribute within the container. This applies to ad
+     * voltages and latch states (channel), wiper positions (potentiometer), and
+     * pages (counters).
      */
     @JsonRemoteProperty
     private int index;
@@ -117,8 +130,9 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
     public String getAttributeIndexDescription() {
         String s = getAttributeDescription();
         if (attributeId == AttributeTypes.AD_VOLTAGE || attributeId == AttributeTypes.LATCH_STATE
-                || attributeId == AttributeTypes.WIPER_POSITION || attributeId == AttributeTypes.COUNTER)
+                || attributeId == AttributeTypes.WIPER_POSITION || attributeId == AttributeTypes.COUNTER) {
             s += " " + index;
+        }
         return s;
     }
 
@@ -131,7 +145,7 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
     }
 
     public LocalizableMessage getConfigurationDescription() {
-        return new LocalizableMessage("dsEdit.1wire.dpconn", address, getAttributeIndexDescription());
+        return new LocalizableMessageImpl("dsEdit.1wire.dpconn", address, getAttributeIndexDescription());
     }
 
     public int getAttributeId() {
@@ -159,10 +173,12 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(address))
+        if (StringUtils.isEmpty(address)) {
             response.addContextualMessage("address", "validate.required");
-        if (!ATTRIBUTE_CODES.isValidId(attributeId))
+        }
+        if (!ATTRIBUTE_CODES.isValidId(attributeId)) {
             response.addContextualMessage("attributeId", "validate.invalidValue");
+        }
     }
 
     @Override
@@ -210,12 +226,14 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("attributeType");
-        if (text == null)
+        if (text == null) {
             throw new LocalizableJsonException("emport.error.missing", "attributeType", ATTRIBUTE_CODES.getCodeList());
+        }
         int id = ATTRIBUTE_CODES.getId(text);
-        if (id == -1)
+        if (id == -1) {
             throw new LocalizableJsonException("emport.error.invalid", "attributeType", text, ATTRIBUTE_CODES
                     .getCodeList());
+        }
         attributeId = id;
     }
 

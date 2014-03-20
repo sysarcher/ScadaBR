@@ -1,23 +1,24 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource.ebro;
 
+import br.org.scadabr.web.i18n.LocalizableException;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.NotImplementedException;
+import br.org.scadabr.NotImplementedException;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -39,12 +40,14 @@ import com.serotonin.modbus4j.BatchRead;
 import com.serotonin.modbus4j.BatchResults;
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 public class EBI25DataSourceRT extends PollingDataSource implements MessagingExceptionHandler {
+
     private final Log LOG = LogFactory.getLog(EBI25DataSourceRT.class);
 
     // public static final int POINT_READ_EXCEPTION_EVENT = 1;
@@ -62,16 +65,18 @@ public class EBI25DataSourceRT extends PollingDataSource implements MessagingExc
 
     @Override
     protected void doPoll(long time) {
-        if (modbusMaster == null)
+        if (modbusMaster == null) {
             return;
+        }
 
         // Get a list of logger indices. The list of points does not include disabled points, so completely disabled
         // loggers will not be in the index list.
         List<Integer> loggerIndices = new ArrayList<Integer>();
         for (DataPointRT dp : dataPoints) {
             int index = ((EBI25PointLocatorRT) dp.getPointLocator()).getVO().getIndex();
-            if (!loggerIndices.contains(index))
+            if (!loggerIndices.contains(index)) {
                 loggerIndices.add(index);
+            }
         }
 
         try {
@@ -131,31 +136,33 @@ public class EBI25DataSourceRT extends PollingDataSource implements MessagingExc
                     // Back out the sample rate for use with the battery and signal points.
                     valueTime += sampleRateSeconds * 1000;
 
-                    if (batteryPoint != null)
-                        // Battery point is enabled
+                    if (batteryPoint != null) // Battery point is enabled
+                    {
                         batteryPoint.updatePointValue(new PointValueTime(EBI25Constants.getDoubleResult(results,
                                 "battery"), valueTime));
+                    }
 
-                    if (signalPoint != null)
-                        // Battery point is enabled
+                    if (signalPoint != null) // Battery point is enabled
+                    {
                         signalPoint.updatePointValue(new PointValueTime(EBI25Constants.getDoubleResult(results,
                                 "signal"), valueTime));
+                    }
                 }
             }
 
             // Deactivate any existing event.
             returnToNormal(DATA_SOURCE_EXCEPTION_EVENT, time);
-        }
-        catch (Exception e) {
-            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, time, true, getLocalExceptionMessage(e));
+        } catch (Exception e) {
+            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, time, true, wrapException(e));
         }
     }
 
     private DataPointRT getLoggerPoint(int index, int type) {
         for (DataPointRT dp : dataPoints) {
             EBI25PointLocatorRT locator = dp.getPointLocator();
-            if (locator.getVO().getIndex() == index && locator.getVO().getType() == type)
+            if (locator.getVO().getIndex() == index && locator.getVO().getType() == type) {
                 return dp;
+            }
         }
         return null;
     }
@@ -173,9 +180,8 @@ public class EBI25DataSourceRT extends PollingDataSource implements MessagingExc
 
             // Deactivate any existing event.
             returnToNormal(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis());
-        }
-        catch (Exception e) {
-            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, getLocalExceptionMessage(e));
+        } catch (Exception e) {
+            raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, wrapException(e));
             LOG.debug("Error while initializing data source", e);
             return;
         }
@@ -201,22 +207,24 @@ public class EBI25DataSourceRT extends PollingDataSource implements MessagingExc
         throw new NotImplementedException();
     }
 
-    protected LocalizableMessage getLocalExceptionMessage(Exception e) {
+    public static LocalizableException wrapException(Exception e) {
         if (e instanceof ExceptionResultException) {
             ExceptionResultException ere = (ExceptionResultException) e;
-            return new LocalizableMessage("event.ebi25.readError", ere.getKey(), ere.getExceptionResult()
+            return new LocalizableException("event.ebi25.readError", ere.getKey(), ere.getExceptionResult()
                     .getExceptionMessage());
         }
 
         if (e instanceof ModbusTransportException) {
             Throwable cause = e.getCause();
-            if (cause instanceof TimeoutException)
-                return new LocalizableMessage("event.modbus.noResponse");
-            if (cause instanceof ConnectException)
-                return new LocalizableMessage("common.default", e.getMessage());
+            if (cause instanceof TimeoutException) {
+                return new LocalizableException("event.modbus.noResponse");
+            }
+            if (cause instanceof ConnectException) {
+                return new LocalizableException("common.default", e.getMessage());
+            }
         }
 
-        return DataSourceRT.getExceptionMessage(e);
+        return DataSourceRT.wrapException(e);
     }
 
     //
@@ -226,8 +234,8 @@ public class EBI25DataSourceRT extends PollingDataSource implements MessagingExc
     // /
     //
     //
+    @Override
     public void receivedException(Exception e) {
-        raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessage(
-                "event.ebi25.master", e.getMessage()));
+        raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl("event.ebi25.master", e.getMessage()));
     }
 }

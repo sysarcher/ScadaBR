@@ -1,32 +1,32 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.event;
 
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.event.AlarmLevels;
@@ -40,15 +40,17 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDetectorVO>, JsonSerializable {
+
     public static final String XID_PREFIX = "CED_";
 
     private int id = Common.NEW_ID;
@@ -68,7 +70,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
     }
 
     public EventTypeVO getEventType() {
-        return new EventTypeVO(EventType.EventSources.COMPOUND, id, 0, new LocalizableMessage("common.default", name),
+        return new EventTypeVO(EventType.EventSources.COMPOUND, id, 0, new LocalizableMessageImpl("common.default", name),
                 alarmLevel);
     }
 
@@ -77,8 +79,9 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(name))
+        if (StringUtils.isEmpty(name)) {
             response.addContextualMessage("name", "compoundDetectors.validation.nameRequired");
+        }
 
         validate(condition, response);
     }
@@ -95,13 +98,15 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
             List<DataPointVO> dataPoints = new DataPointDao().getDataPoints(null, true);
 
             for (String key : keys) {
-                if (!key.startsWith(SimpleEventDetectorVO.POINT_EVENT_DETECTOR_PREFIX))
+                if (!key.startsWith(SimpleEventDetectorVO.POINT_EVENT_DETECTOR_PREFIX)) {
                     continue;
+                }
 
                 boolean found = false;
                 for (DataPointVO dp : dataPoints) {
-                    if (!Permissions.hasDataSourcePermission(user, dp.getDataSourceId()))
+                    if (!Permissions.hasDataSourcePermission(user, dp.getDataSourceId())) {
                         continue;
+                    }
 
                     for (PointEventDetectorVO ped : dp.getEventDetectors()) {
                         if (ped.getEventDetectorKey().equals(key) && ped.isRtnApplicable()) {
@@ -110,16 +115,17 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
                         }
                     }
 
-                    if (found)
+                    if (found) {
                         break;
+                    }
                 }
 
-                if (!found)
-                    throw new ConditionParseException(new LocalizableMessage("compoundDetectors.validation.invalidKey"));
+                if (!found) {
+                    throw new ConditionParseException("compoundDetectors.validation.invalidKey");
+                }
             }
-        }
-        catch (ConditionParseException e) {
-            response.addMessage("condition", e.getLocalizableMessage());
+        } catch (ConditionParseException e) {
+            response.addMessage("condition", e);
             if (e.isRange()) {
                 response.addData("range", true);
                 response.addData("from", e.getFrom());
@@ -152,6 +158,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
         return new CompoundEventDetectorRT(this);
     }
 
+    @Override
     public int getId() {
         return id;
     }
@@ -213,18 +220,21 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
     // / Serialization
     // /
     //
+    @Override
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
         map.put("alarmLevel", AlarmLevels.CODES.getCode(alarmLevel));
     }
 
+    @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("alarmLevel");
         if (text != null) {
             alarmLevel = AlarmLevels.CODES.getId(text);
-            if (!AlarmLevels.CODES.isValidId(alarmLevel))
+            if (!AlarmLevels.CODES.isValidId(alarmLevel)) {
                 throw new LocalizableJsonException("emport.error.scheduledEvent.invalid", "alarmLevel", text,
                         AlarmLevels.CODES.getCodeList());
+            }
         }
     }
 }

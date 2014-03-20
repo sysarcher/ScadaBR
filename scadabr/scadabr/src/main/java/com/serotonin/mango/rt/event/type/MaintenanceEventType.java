@@ -2,12 +2,13 @@ package com.serotonin.mango.rt.event.type;
 
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
 import com.serotonin.mango.db.dao.MaintenanceEventDao;
 
 public class MaintenanceEventType extends EventType {
+
     private int maintenanceId;
 
     public MaintenanceEventType() {
@@ -57,15 +58,19 @@ public class MaintenanceEventType extends EventType {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         MaintenanceEventType other = (MaintenanceEventType) obj;
-        if (maintenanceId != other.maintenanceId)
+        if (maintenanceId != other.maintenanceId) {
             return false;
+        }
         return true;
     }
 

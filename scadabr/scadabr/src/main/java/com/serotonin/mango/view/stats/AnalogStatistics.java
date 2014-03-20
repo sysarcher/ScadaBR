@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.view.stats;
 
@@ -27,6 +27,7 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
  * @author Matthew Lohbihler
  */
 public class AnalogStatistics implements StatisticsGenerator {
+
     // Calculated values.
     private double minimum = Double.MAX_VALUE;
     private long minTime;
@@ -50,8 +51,9 @@ public class AnalogStatistics implements StatisticsGenerator {
 
     public AnalogStatistics(Double startValue, List<? extends IValueTime> values, long start, long end) {
         this(startValue, start, end);
-        for (IValueTime p : values)
+        for (IValueTime p : values) {
             addValueTime(p);
+        }
         done();
     }
 
@@ -68,22 +70,25 @@ public class AnalogStatistics implements StatisticsGenerator {
     }
 
     public void addValueTime(IValueTime vt) {
-        if (vt.getValue() == null)
+        if (vt.getValue() == null) {
             return;
+        }
 
         count++;
         noData = false;
 
-        if (lastTime == -1)
+        if (lastTime == -1) {
             lastTime = vt.getTime();
+        }
 
         if (realDuration == -1) {
             realStart = lastTime;
             realDuration = end - lastTime;
         }
 
-        if (realDuration < 0)
+        if (realDuration < 0) {
             return;
+        }
 
         if (realDuration == 0) {
             // We assume that this point is the only point in the data set.
@@ -113,9 +118,9 @@ public class AnalogStatistics implements StatisticsGenerator {
             if (realDuration == -1) {
                 realStart = lastTime;
                 average += lastValue;
-            }
-            else
+            } else {
                 average += lastValue * (((double) (end - lastTime)) / realDuration);
+            }
 
             if (lastValue > maximum) {
                 maximum = lastValue;
@@ -125,8 +130,7 @@ public class AnalogStatistics implements StatisticsGenerator {
                 minimum = lastValue;
                 minTime = lastTime;
             }
-        }
-        else {
+        } else {
             minimum = maximum = 0;
         }
     }

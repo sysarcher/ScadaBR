@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource.snmp;
 
@@ -39,13 +39,14 @@ import org.snmp4j.security.UsmUser;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 
-import com.serotonin.util.StringUtils;
+import br.org.scadabr.util.StringUtils;
 
 /**
  * @author Matthew Lohbihler
- * 
+ *
  */
 public class Version3 extends Version {
+
     private final OctetString securityName;
     private OID authProtocol;
     private final OctetString authPassphrase;
@@ -60,27 +61,29 @@ public class Version3 extends Version {
         this.securityName = SnmpUtils.createOctetString(securityName);
 
         if (!StringUtils.isEmpty(authProtocol)) {
-            if (authProtocol.equals("MD5"))
+            if (authProtocol.equals("MD5")) {
                 this.authProtocol = AuthMD5.ID;
-            else if (authProtocol.equals("SHA"))
+            } else if (authProtocol.equals("SHA")) {
                 this.authProtocol = AuthSHA.ID;
-            else
+            } else {
                 throw new IllegalArgumentException("Authentication protocol unsupported: " + authProtocol);
+            }
         }
 
         this.authPassphrase = SnmpUtils.createOctetString(authPassphrase);
 
         if (!StringUtils.isEmpty(privProtocol)) {
-            if (privProtocol.equals("DES"))
+            if (privProtocol.equals("DES")) {
                 this.privProtocol = PrivDES.ID;
-            else if ((privProtocol.equals("AES128")) || (privProtocol.equals("AES")))
+            } else if ((privProtocol.equals("AES128")) || (privProtocol.equals("AES"))) {
                 this.privProtocol = PrivAES128.ID;
-            else if (privProtocol.equals("AES192"))
+            } else if (privProtocol.equals("AES192")) {
                 this.privProtocol = PrivAES192.ID;
-            else if (privProtocol.equals("AES256"))
+            } else if (privProtocol.equals("AES256")) {
                 this.privProtocol = PrivAES256.ID;
-            else
+            } else {
                 throw new IllegalArgumentException("Privacy protocol " + privProtocol + " not supported");
+            }
         }
 
         this.privPassphrase = SnmpUtils.createOctetString(privPassphrase);
@@ -98,8 +101,9 @@ public class Version3 extends Version {
     public void addUser(Snmp snmp) {
         USM usm = new USM(SecurityProtocols.getInstance(), new OctetString(MPv3.createLocalEngineID()), 0);
         SecurityModels.getInstance().addSecurityModel(usm);
-        if (engineId != null)
+        if (engineId != null) {
             snmp.setLocalEngine(engineId.getValue(), 0, 0);
+        }
         snmp.getUSM().addUser(securityName,
                 new UsmUser(securityName, authProtocol, authPassphrase, privProtocol, privPassphrase));
     }
@@ -108,13 +112,14 @@ public class Version3 extends Version {
     public Target getTarget() {
         UserTarget target = new UserTarget();
         if (authPassphrase != null) {
-            if (privPassphrase != null)
+            if (privPassphrase != null) {
                 target.setSecurityLevel(SecurityLevel.AUTH_PRIV);
-            else
+            } else {
                 target.setSecurityLevel(SecurityLevel.AUTH_NOPRIV);
-        }
-        else
+            }
+        } else {
             target.setSecurityLevel(SecurityLevel.NOAUTH_NOPRIV);
+        }
 
         target.setSecurityName(securityName);
         return target;
@@ -123,10 +128,12 @@ public class Version3 extends Version {
     @Override
     public PDU createPDU() {
         ScopedPDU scopedPDU = new ScopedPDU();
-        if (contextEngineId != null)
+        if (contextEngineId != null) {
             scopedPDU.setContextEngineID(contextEngineId);
-        if (contextName != null)
+        }
+        if (contextName != null) {
             scopedPDU.setContextName(contextName);
+        }
         return scopedPDU;
     }
 }

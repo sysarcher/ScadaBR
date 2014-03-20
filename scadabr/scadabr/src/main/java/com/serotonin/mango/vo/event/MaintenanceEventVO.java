@@ -5,13 +5,13 @@ import java.util.Map;
 
 import org.joda.time.DateTime;
 
-import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.event.AlarmLevels;
@@ -22,14 +22,16 @@ import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.timer.CronTimerTrigger;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
-import com.serotonin.web.taglib.DateFunctions;
+import br.org.scadabr.timer.CronTimerTrigger;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.web.taglib.DateFunctions;
 
 @JsonRemoteEntity
 public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>, JsonSerializable {
+
     public static final String XID_PREFIX = "ME_";
 
     public static final int TYPE_MANUAL = 1;
@@ -42,6 +44,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     public static final int TYPE_CRON = 8;
 
     public static ExportCodes TYPE_CODES = new ExportCodes();
+
     static {
         TYPE_CODES.addElement(TYPE_MANUAL, "MANUAL", "maintenanceEvents.type.manual");
         TYPE_CODES.addElement(TYPE_HOURLY, "HOURLY", "maintenanceEvents.type.hour");
@@ -302,62 +305,61 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     public LocalizableMessage getDescription() {
         LocalizableMessage message;
 
-        if (!StringUtils.isEmpty(alias))
-            message = new LocalizableMessage("common.default", alias);
-        else if (scheduleType == TYPE_MANUAL)
-            message = new LocalizableMessage("maintenanceEvents.schedule.manual", dataSourceName);
-        else if (scheduleType == TYPE_ONCE) {
-            message = new LocalizableMessage("maintenanceEvents.schedule.onceUntil", dataSourceName,
+        if (!StringUtils.isEmpty(alias)) {
+            message = new LocalizableMessageImpl("common.default", alias);
+        } else if (scheduleType == TYPE_MANUAL) {
+            message = new LocalizableMessageImpl("maintenanceEvents.schedule.manual", dataSourceName);
+        } else if (scheduleType == TYPE_ONCE) {
+            message = new LocalizableMessageImpl("maintenanceEvents.schedule.onceUntil", dataSourceName,
                     DateFunctions.getTime(new DateTime(activeYear, activeMonth, activeDay, activeHour, activeMinute,
-                            activeSecond, 0).getMillis()), DateFunctions.getTime(new DateTime(inactiveYear,
-                            inactiveMonth, inactiveDay, inactiveHour, inactiveMinute, inactiveSecond, 0).getMillis()));
-        }
-        else if (scheduleType == TYPE_HOURLY) {
+                                    activeSecond, 0).getMillis()), DateFunctions.getTime(new DateTime(inactiveYear,
+                                    inactiveMonth, inactiveDay, inactiveHour, inactiveMinute, inactiveSecond, 0).getMillis()));
+        } else if (scheduleType == TYPE_HOURLY) {
             String activeTime = StringUtils.pad(Integer.toString(activeMinute), '0', 2) + ":"
                     + StringUtils.pad(Integer.toString(activeSecond), '0', 2);
-            message = new LocalizableMessage("maintenanceEvents.schedule.hoursUntil", dataSourceName, activeTime,
+            message = new LocalizableMessageImpl("maintenanceEvents.schedule.hoursUntil", dataSourceName, activeTime,
                     StringUtils.pad(Integer.toString(inactiveMinute), '0', 2) + ":"
-                            + StringUtils.pad(Integer.toString(inactiveSecond), '0', 2));
-        }
-        else if (scheduleType == TYPE_DAILY)
-            message = new LocalizableMessage("maintenanceEvents.schedule.dailyUntil", dataSourceName, activeTime(),
+                    + StringUtils.pad(Integer.toString(inactiveSecond), '0', 2));
+        } else if (scheduleType == TYPE_DAILY) {
+            message = new LocalizableMessageImpl("maintenanceEvents.schedule.dailyUntil", dataSourceName, activeTime(),
                     inactiveTime());
-        else if (scheduleType == TYPE_WEEKLY)
-            message = new LocalizableMessage("maintenanceEvents.schedule.weeklyUntil", dataSourceName, weekday(true),
+        } else if (scheduleType == TYPE_WEEKLY) {
+            message = new LocalizableMessageImpl("maintenanceEvents.schedule.weeklyUntil", dataSourceName, weekday(true),
                     activeTime(), weekday(false), inactiveTime());
-        else if (scheduleType == TYPE_MONTHLY)
-            message = new LocalizableMessage("maintenanceEvents.schedule.monthlyUntil", dataSourceName, monthday(true),
+        } else if (scheduleType == TYPE_MONTHLY) {
+            message = new LocalizableMessageImpl("maintenanceEvents.schedule.monthlyUntil", dataSourceName, monthday(true),
                     activeTime(), monthday(false), inactiveTime());
-        else if (scheduleType == TYPE_YEARLY)
-            message = new LocalizableMessage("maintenanceEvents.schedule.yearlyUntil", dataSourceName, monthday(true),
+        } else if (scheduleType == TYPE_YEARLY) {
+            message = new LocalizableMessageImpl("maintenanceEvents.schedule.yearlyUntil", dataSourceName, monthday(true),
                     month(true), activeTime(), monthday(false), month(false), inactiveTime());
-        else if (scheduleType == TYPE_CRON)
-            message = new LocalizableMessage("maintenanceEvents.schedule.cronUntil", dataSourceName, activeCron,
+        } else if (scheduleType == TYPE_CRON) {
+            message = new LocalizableMessageImpl("maintenanceEvents.schedule.cronUntil", dataSourceName, activeCron,
                     inactiveCron);
-        else
+        } else {
             throw new ShouldNeverHappenException("Unknown schedule type: " + scheduleType);
+        }
 
         return message;
     }
 
     private LocalizableMessage getTypeMessage() {
         switch (scheduleType) {
-        case TYPE_MANUAL:
-            return new LocalizableMessage("maintenanceEvents.type.manual");
-        case TYPE_HOURLY:
-            return new LocalizableMessage("maintenanceEvents.type.hour");
-        case TYPE_DAILY:
-            return new LocalizableMessage("maintenanceEvents.type.day");
-        case TYPE_WEEKLY:
-            return new LocalizableMessage("maintenanceEvents.type.week");
-        case TYPE_MONTHLY:
-            return new LocalizableMessage("maintenanceEvents.type.month");
-        case TYPE_YEARLY:
-            return new LocalizableMessage("maintenanceEvents.type.year");
-        case TYPE_ONCE:
-            return new LocalizableMessage("maintenanceEvents.type.once");
-        case TYPE_CRON:
-            return new LocalizableMessage("maintenanceEvents.type.cron");
+            case TYPE_MANUAL:
+                return new LocalizableMessageImpl("maintenanceEvents.type.manual");
+            case TYPE_HOURLY:
+                return new LocalizableMessageImpl("maintenanceEvents.type.hour");
+            case TYPE_DAILY:
+                return new LocalizableMessageImpl("maintenanceEvents.type.day");
+            case TYPE_WEEKLY:
+                return new LocalizableMessageImpl("maintenanceEvents.type.week");
+            case TYPE_MONTHLY:
+                return new LocalizableMessageImpl("maintenanceEvents.type.month");
+            case TYPE_YEARLY:
+                return new LocalizableMessageImpl("maintenanceEvents.type.year");
+            case TYPE_ONCE:
+                return new LocalizableMessageImpl("maintenanceEvents.type.once");
+            case TYPE_CRON:
+                return new LocalizableMessageImpl("maintenanceEvents.type.cron");
         }
         return null;
     }
@@ -374,46 +376,55 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
                 + StringUtils.pad(Integer.toString(inactiveSecond), '0', 2);
     }
 
-    private static final String[] weekdays = { "", "common.day.mon", "common.day.tue", "common.day.wed",
-            "common.day.thu", "common.day.fri", "common.day.sat", "common.day.sun" };
+    private static final String[] weekdays = {"", "common.day.mon", "common.day.tue", "common.day.wed",
+        "common.day.thu", "common.day.fri", "common.day.sat", "common.day.sun"};
 
     private LocalizableMessage weekday(boolean active) {
         int day = activeDay;
-        if (!active)
+        if (!active) {
             day = inactiveDay;
-        return new LocalizableMessage(weekdays[day]);
+        }
+        return new LocalizableMessageImpl(weekdays[day]);
     }
 
     private LocalizableMessage monthday(boolean active) {
         int day = activeDay;
 
-        if (!active)
+        if (!active) {
             day = inactiveDay;
+        }
 
-        if (day == -3)
-            return new LocalizableMessage("common.day.thirdLast");
-        if (day == -2)
-            return new LocalizableMessage("common.day.secondLastLast");
-        if (day == -1)
-            return new LocalizableMessage("common.day.last");
-        if (day != 11 && day % 10 == 1)
-            return new LocalizableMessage("common.counting.st", Integer.toString(day));
-        if (day != 12 && day % 10 == 2)
-            return new LocalizableMessage("common.counting.nd", Integer.toString(day));
-        if (day != 13 && day % 10 == 3)
-            return new LocalizableMessage("common.counting.rd", Integer.toString(day));
-        return new LocalizableMessage("common.counting.th", Integer.toString(day));
+        if (day == -3) {
+            return new LocalizableMessageImpl("common.day.thirdLast");
+        }
+        if (day == -2) {
+            return new LocalizableMessageImpl("common.day.secondLastLast");
+        }
+        if (day == -1) {
+            return new LocalizableMessageImpl("common.day.last");
+        }
+        if (day != 11 && day % 10 == 1) {
+            return new LocalizableMessageImpl("common.counting.st", Integer.toString(day));
+        }
+        if (day != 12 && day % 10 == 2) {
+            return new LocalizableMessageImpl("common.counting.nd", Integer.toString(day));
+        }
+        if (day != 13 && day % 10 == 3) {
+            return new LocalizableMessageImpl("common.counting.rd", Integer.toString(day));
+        }
+        return new LocalizableMessageImpl("common.counting.th", Integer.toString(day));
     }
 
-    private static final String[] months = { "", "common.month.jan", "common.month.feb", "common.month.mar",
-            "common.month.apr", "common.month.may", "common.month.jun", "common.month.jul", "common.month.aug",
-            "common.month.sep", "common.month.oct", "common.month.nov", "common.month.dec" };
+    private static final String[] months = {"", "common.month.jan", "common.month.feb", "common.month.mar",
+        "common.month.apr", "common.month.may", "common.month.jun", "common.month.jul", "common.month.aug",
+        "common.month.sep", "common.month.oct", "common.month.nov", "common.month.dec"};
 
     private LocalizableMessage month(boolean active) {
         int day = activeDay;
-        if (!active)
+        if (!active) {
             day = inactiveDay;
-        return new LocalizableMessage(months[day]);
+        }
+        return new LocalizableMessageImpl(months[day]);
     }
 
     @Override
@@ -422,25 +433,25 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isLengthGreaterThan(alias, 50))
+        if (StringUtils.isLengthGreaterThan(alias, 50)) {
             response.addContextualMessage("alias", "maintenanceEvents.validate.aliasTooLong");
+        }
 
-        if (dataSourceId <= 0)
+        if (dataSourceId <= 0) {
             response.addContextualMessage("dataSourceId", "validate.invalidValue");
+        }
 
         // Check that cron patterns are ok.
         if (scheduleType == TYPE_CRON) {
             try {
                 new CronTimerTrigger(activeCron);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 response.addContextualMessage("activeCron", "maintenanceEvents.validate.activeCron", e.getMessage());
             }
 
             try {
                 new CronTimerTrigger(inactiveCron);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 response.addContextualMessage("inactiveCron", "maintenanceEvents.validate.inactiveCron", e.getMessage());
             }
         }
@@ -449,15 +460,13 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
         MaintenanceEventRT rt = new MaintenanceEventRT(this);
         try {
             rt.createTrigger(true);
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             response.addContextualMessage("activeCron", "maintenanceEvents.validate.activeTrigger", e.getMessage());
         }
 
         try {
             rt.createTrigger(false);
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             response.addContextualMessage("inactiveCron", "maintenanceEvents.validate.inactiveTrigger", e.getMessage());
         }
 
@@ -466,8 +475,9 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
             DateTime adt = new DateTime(activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0);
             DateTime idt = new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute,
                     inactiveSecond, 0);
-            if (idt.getMillis() <= adt.getMillis())
+            if (idt.getMillis() <= adt.getMillis()) {
                 response.addContextualMessage("scheduleType", "maintenanceEvents.validate.invalidRtn");
+            }
         }
     }
 
@@ -489,25 +499,28 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
                 dataSourceId);
         AuditEventType.maybeAddPropertyChangeMessage(list, "maintenanceEvents.alias", from.alias, alias);
         AuditEventType.maybeAddAlarmLevelChangeMessage(list, "common.alarmLevel", from.alarmLevel, alarmLevel);
-        if (from.scheduleType != scheduleType)
+        if (from.scheduleType != scheduleType) {
             AuditEventType.addPropertyChangeMessage(list, "maintenanceEvents.type", from.getTypeMessage(),
                     getTypeMessage());
+        }
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.disabled", from.disabled, disabled);
         if (from.activeYear != activeYear || from.activeMonth != activeMonth || from.activeDay != activeDay
                 || from.activeHour != activeHour || from.activeMinute != activeMinute
-                || from.activeSecond != activeSecond || from.activeCron != activeCron
+                || from.activeSecond != activeSecond || (from.activeCron == null ? activeCron != null : !from.activeCron.equals(activeCron))
                 || from.inactiveYear != inactiveYear || from.inactiveMonth != inactiveMonth
                 || from.inactiveDay != inactiveDay || from.inactiveHour != inactiveHour
                 || from.inactiveMinute != inactiveMinute || from.inactiveSecond != inactiveSecond
-                || from.inactiveCron != inactiveCron)
+                || (from.inactiveCron == null ? inactiveCron != null : !from.inactiveCron.equals(inactiveCron))) {
             AuditEventType.maybeAddPropertyChangeMessage(list, "common.configuration", from.getDescription(),
                     getDescription());
+        }
     }
 
     //
     //
     // Serialization
     //
+    @Override
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
         map.put("dataSourceXid", dataSourceXid);
@@ -515,29 +528,33 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
         map.put("scheduleType", TYPE_CODES.getCode(scheduleType));
     }
 
+    @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("dataSourceXid");
         if (text != null) {
             DataSourceVO<?> ds = new DataSourceDao().getDataSource(text);
-            if (ds == null)
+            if (ds == null) {
                 throw new LocalizableJsonException("emport.error.maintenanceEvent.invalid", "dataSourceXid", text);
+            }
             dataSourceId = ds.getId();
         }
 
         text = json.getString("alarmLevel");
         if (text != null) {
             alarmLevel = AlarmLevels.CODES.getId(text);
-            if (!AlarmLevels.CODES.isValidId(alarmLevel))
+            if (!AlarmLevels.CODES.isValidId(alarmLevel)) {
                 throw new LocalizableJsonException("emport.error.maintenanceEvent.invalid", "alarmLevel", text,
                         AlarmLevels.CODES.getCodeList());
+            }
         }
 
         text = json.getString("scheduleType");
         if (text != null) {
             scheduleType = TYPE_CODES.getId(text);
-            if (!TYPE_CODES.isValidId(scheduleType))
+            if (!TYPE_CODES.isValidId(scheduleType)) {
                 throw new LocalizableJsonException("emport.error.maintenanceEvent.invalid", "scheduleType", text,
                         TYPE_CODES.getCodeList());
+            }
         }
     }
 }

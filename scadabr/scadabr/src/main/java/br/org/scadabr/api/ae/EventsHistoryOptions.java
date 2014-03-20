@@ -1,13 +1,13 @@
 /**
  * EventsHistoryOptions.java
  *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ * This file was auto-generated from WSDL by the Apache Axis 1.4 Apr 22, 2006
+ * (06:55:48 PDT) WSDL2Java emitter.
  */
-
 package br.org.scadabr.api.ae;
 
-public class EventsHistoryOptions  implements java.io.Serializable {
+public class EventsHistoryOptions implements java.io.Serializable {
+
     private br.org.scadabr.api.constants.AlarmLevel alarmLevel;
 
     private java.util.Calendar initialDate;
@@ -20,90 +20,82 @@ public class EventsHistoryOptions  implements java.io.Serializable {
     }
 
     public EventsHistoryOptions(
-           br.org.scadabr.api.constants.AlarmLevel alarmLevel,
-           java.util.Calendar initialDate,
-           java.util.Calendar finalDate,
-           int maxReturn) {
-           this.alarmLevel = alarmLevel;
-           this.initialDate = initialDate;
-           this.finalDate = finalDate;
-           this.maxReturn = maxReturn;
+            br.org.scadabr.api.constants.AlarmLevel alarmLevel,
+            java.util.Calendar initialDate,
+            java.util.Calendar finalDate,
+            int maxReturn) {
+        this.alarmLevel = alarmLevel;
+        this.initialDate = initialDate;
+        this.finalDate = finalDate;
+        this.maxReturn = maxReturn;
     }
-
 
     /**
      * Gets the alarmLevel value for this EventsHistoryOptions.
-     * 
+     *
      * @return alarmLevel
      */
     public br.org.scadabr.api.constants.AlarmLevel getAlarmLevel() {
         return alarmLevel;
     }
 
-
     /**
      * Sets the alarmLevel value for this EventsHistoryOptions.
-     * 
+     *
      * @param alarmLevel
      */
     public void setAlarmLevel(br.org.scadabr.api.constants.AlarmLevel alarmLevel) {
         this.alarmLevel = alarmLevel;
     }
 
-
     /**
      * Gets the initialDate value for this EventsHistoryOptions.
-     * 
+     *
      * @return initialDate
      */
     public java.util.Calendar getInitialDate() {
         return initialDate;
     }
 
-
     /**
      * Sets the initialDate value for this EventsHistoryOptions.
-     * 
+     *
      * @param initialDate
      */
     public void setInitialDate(java.util.Calendar initialDate) {
         this.initialDate = initialDate;
     }
 
-
     /**
      * Gets the finalDate value for this EventsHistoryOptions.
-     * 
+     *
      * @return finalDate
      */
     public java.util.Calendar getFinalDate() {
         return finalDate;
     }
 
-
     /**
      * Sets the finalDate value for this EventsHistoryOptions.
-     * 
+     *
      * @param finalDate
      */
     public void setFinalDate(java.util.Calendar finalDate) {
         this.finalDate = finalDate;
     }
 
-
     /**
      * Gets the maxReturn value for this EventsHistoryOptions.
-     * 
+     *
      * @return maxReturn
      */
     public int getMaxReturn() {
         return maxReturn;
     }
 
-
     /**
      * Sets the maxReturn value for this EventsHistoryOptions.
-     * 
+     *
      * @param maxReturn
      */
     public void setMaxReturn(int maxReturn) {
@@ -111,32 +103,40 @@ public class EventsHistoryOptions  implements java.io.Serializable {
     }
 
     private java.lang.Object __equalsCalc = null;
+
     public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof EventsHistoryOptions)) return false;
+        if (!(obj instanceof EventsHistoryOptions)) {
+            return false;
+        }
         EventsHistoryOptions other = (EventsHistoryOptions) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
+        if (obj == null) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
         if (__equalsCalc != null) {
             return (__equalsCalc == obj);
         }
         __equalsCalc = obj;
         boolean _equals;
-        _equals = true && 
-            ((this.alarmLevel==null && other.getAlarmLevel()==null) || 
-             (this.alarmLevel!=null &&
-              this.alarmLevel.equals(other.getAlarmLevel()))) &&
-            ((this.initialDate==null && other.getInitialDate()==null) || 
-             (this.initialDate!=null &&
-              this.initialDate.equals(other.getInitialDate()))) &&
-            ((this.finalDate==null && other.getFinalDate()==null) || 
-             (this.finalDate!=null &&
-              this.finalDate.equals(other.getFinalDate()))) &&
-            this.maxReturn == other.getMaxReturn();
+        _equals = true
+                && ((this.alarmLevel == null && other.getAlarmLevel() == null)
+                || (this.alarmLevel != null
+                && this.alarmLevel.equals(other.getAlarmLevel())))
+                && ((this.initialDate == null && other.getInitialDate() == null)
+                || (this.initialDate != null
+                && this.initialDate.equals(other.getInitialDate())))
+                && ((this.finalDate == null && other.getFinalDate() == null)
+                || (this.finalDate != null
+                && this.finalDate.equals(other.getFinalDate())))
+                && this.maxReturn == other.getMaxReturn();
         __equalsCalc = null;
         return _equals;
     }
 
     private boolean __hashCodeCalc = false;
+
     public synchronized int hashCode() {
         if (__hashCodeCalc) {
             return 0;
@@ -158,8 +158,8 @@ public class EventsHistoryOptions  implements java.io.Serializable {
     }
 
     // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(EventsHistoryOptions.class, true);
+    private static org.apache.axis.description.TypeDesc typeDesc
+            = new org.apache.axis.description.TypeDesc(EventsHistoryOptions.class, true);
 
     static {
         typeDesc.setXmlType(new javax.xml.namespace.QName("http://ae.api.scadabr.org.br", "EventsHistoryOptions"));
@@ -200,24 +200,22 @@ public class EventsHistoryOptions  implements java.io.Serializable {
      * Get Custom Serializer
      */
     public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
+            java.lang.String mechType,
+            java.lang.Class _javaType,
+            javax.xml.namespace.QName _xmlType) {
+        return new org.apache.axis.encoding.ser.BeanSerializer(
+                _javaType, _xmlType, typeDesc);
     }
 
     /**
      * Get Custom Deserializer
      */
     public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+            java.lang.String mechType,
+            java.lang.Class _javaType,
+            javax.xml.namespace.QName _xmlType) {
+        return new org.apache.axis.encoding.ser.BeanDeserializer(
+                _javaType, _xmlType, typeDesc);
     }
 
 }

@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource.nmea;
 
@@ -30,14 +30,16 @@ import com.serotonin.mango.rt.dataSource.EventDataSource;
 import com.serotonin.mango.util.timeout.TimeoutClient;
 import com.serotonin.mango.util.timeout.TimeoutTask;
 import com.serotonin.mango.vo.dataSource.nmea.NmeaDataSourceVO;
-import com.serotonin.timer.TimerTask;
-import com.serotonin.web.i18n.LocalizableException;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.timer.TimerTask;
+import br.org.scadabr.web.i18n.LocalizableException;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageListener, TimeoutClient {
+
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int PARSE_EXCEPTION_EVENT = 2;
 
@@ -85,9 +87,8 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
 
             // Deactivate any existing event.
             returnToNormal(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis());
-        }
-        catch (Exception e) {
-            LocalizableMessage message = getSerialExceptionMessage(e, vo.getCommPortId());
+        } catch (Exception e) {
+            LocalizableMessage message = wrapSerialException(e, vo.getCommPortId());
             raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, message);
             log.debug("Error while initializing data source", e);
             return false;
@@ -105,10 +106,12 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
     // / MessagingConnectionListener
     // /
     //
+    @Override
     public void receivedException(Exception e) {
         log.error("Exception from nmea receiver", e);
     }
 
+    @Override
     public void receivedMessage(NmeaMessage message) {
         long time = System.currentTimeMillis();
 
@@ -121,28 +124,30 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
             for (DataPointRT dp : dataPoints) {
                 try {
                     receivedMessageImpl(dp, message, time);
-                }
-                catch (LocalizableException e) {
-                    if (parseError == null)
-                        parseError = e.getLocalizableMessage();
-                }
-                catch (Exception e) {
-                    if (parseError == null)
-                        parseError = new LocalizableMessage("event.exception2", dp.getVO().getName(), e.getMessage());
+                } catch (LocalizableException e) {
+                    if (parseError == null) {
+                        parseError = e;
+                    }
+                } catch (Exception e) {
+                    if (parseError == null) {
+                        parseError = new LocalizableMessageImpl("event.exception2", dp.getVO().getName(), e.getMessage());
+                    }
                 }
             }
         }
 
-        if (parseError != null)
+        if (parseError != null) {
             raiseEvent(PARSE_EXCEPTION_EVENT, time, false, parseError);
+        }
     }
 
     private void receivedMessageImpl(DataPointRT dp, NmeaMessage message, long time) throws Exception {
         NmeaPointLocatorRT locator = dp.getPointLocator();
 
         String messageName = message.getName();
-        if (messageName == null)
+        if (messageName == null) {
             return;
+        }
 
         if (messageName.equals(locator.getMessageName())) {
             // Message name match. Check if the field index is in bounds.
@@ -156,10 +161,10 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
 
                 // Save the new value
                 dp.updatePointValue(new PointValueTime(value, time));
-            }
-            else
+            } else {
                 throw new Exception("Field index " + locator.getFieldIndex()
                         + " is out of bounds. Message field count is " + message.getFieldCount());
+            }
         }
     }
 
@@ -168,11 +173,13 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
     // / TimeoutClient
     // /
     //
+    @Override
     public void scheduleTimeout(long fireTime) {
         // We haven't heard from the device for too long. Restart the listener.
         termNmea();
-        if (initNmea())
+        if (initNmea()) {
             scheduleTimeout();
+        }
     }
 
     private void scheduleTimeout() {
@@ -181,7 +188,8 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
 
     private void unscheduleTimeout() {
         TimerTask tt = resetTask;
-        if (tt != null)
+        if (tt != null) {
             tt.cancel();
+        }
     }
 }

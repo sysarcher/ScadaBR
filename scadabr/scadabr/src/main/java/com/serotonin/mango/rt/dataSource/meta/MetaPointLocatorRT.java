@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
@@ -26,7 +26,7 @@ import java.util.Map;
 
 import javax.script.ScriptException;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.IntValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.RuntimeManager;
@@ -37,20 +37,22 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
-import com.serotonin.timer.AbstractTimer;
-import com.serotonin.timer.CronExpression;
-import com.serotonin.timer.OneTimeTrigger;
-import com.serotonin.timer.TimerTask;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.timer.AbstractTimer;
+import br.org.scadabr.timer.CronExpression;
+import br.org.scadabr.timer.OneTimeTrigger;
+import br.org.scadabr.timer.TimerTask;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListener {
-    private static final ThreadLocal<List<Integer>> threadLocal = new ThreadLocal<List<Integer>>();
+
+    private static final ThreadLocal<List<Integer>> threadLocal = new ThreadLocal<>();
     private static final int MAX_RECURSION = 10;
 
-    final Boolean LOCK = new Boolean(false);
+    final Object LOCK = new Object();
 
     final MetaPointLocatorVO vo;
     AbstractTimer timer;
@@ -93,8 +95,9 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
         RuntimeManager rm = Common.ctx.getRuntimeManager();
         for (IntValuePair contextKey : vo.getContext()) {
             // Points shouldn't listen for their own updates.
-            if (dataPoint.getId() != contextKey.getKey())
+            if (dataPoint.getId() != contextKey.getKey()) {
                 rm.addDataPointListener(contextKey.getKey(), this);
+            }
         }
 
         initialized = true;
@@ -104,21 +107,24 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
 
     protected void initializeTimerTask() {
         int updateEventId = vo.getUpdateEvent();
-        if (updateEventId != MetaPointLocatorVO.UPDATE_EVENT_CONTEXT_UPDATE)
-            // Scheduled update. Create the timeout that will update this point.
+        if (updateEventId != MetaPointLocatorVO.UPDATE_EVENT_CONTEXT_UPDATE) // Scheduled update. Create the timeout that will update this point.
+        {
             timerTask = new ScheduledUpdateTimeout(calculateTimeout(timer.currentTimeMillis()));
+        }
     }
 
     public void terminate() {
         synchronized (LOCK) {
             // Remove listener registrations
             RuntimeManager rm = Common.ctx.getRuntimeManager();
-            for (IntValuePair contextKey : vo.getContext())
+            for (IntValuePair contextKey : vo.getContext()) {
                 rm.removeDataPointListener(contextKey.getKey(), this);
+            }
 
             // Cancel scheduled job
-            if (timerTask != null)
+            if (timerTask != null) {
                 timerTask.cancel();
+            }
 
             initialized = false;
         }
@@ -127,32 +133,37 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
     //
     // / DataPointListener
     //
+    @Override
     public void pointChanged(PointValueTime oldValue, PointValueTime newValue) {
         // No op. Events are covered in pointUpdated.
     }
 
+    @Override
     public void pointSet(PointValueTime oldValue, PointValueTime newValue) {
         // No op. Events are covered in pointUpdated.
     }
 
+    @Override
     public void pointUpdated(PointValueTime newValue) {
         // Ignore if this is not a context update.
         if (vo.getUpdateEvent() == MetaPointLocatorVO.UPDATE_EVENT_CONTEXT_UPDATE) {
             // Check for infinite loops
             List<Integer> sourceIds;
-            if (threadLocal.get() == null)
-                sourceIds = new ArrayList<Integer>();
-            else
+            if (threadLocal.get() == null) {
+                sourceIds = new ArrayList<>();
+            } else {
                 sourceIds = threadLocal.get();
+            }
 
             long time = newValue.getTime();
-            if (vo.getExecutionDelaySeconds() == 0)
+            if (vo.getExecutionDelaySeconds() == 0) {
                 execute(time, sourceIds);
-            else {
+            } else {
                 synchronized (LOCK) {
                     if (initialized) {
-                        if (timerTask != null)
+                        if (timerTask != null) {
                             timerTask.cancel();
+                        }
                         timerTask = new ExecutionDelayTimeout(time, sourceIds);
                     }
                 }
@@ -160,15 +171,18 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
         }
     }
 
+    @Override
     public void pointBackdated(PointValueTime value) {
         // No op.
     }
 
+    @Override
     public void pointInitialized() {
         createContext();
         dataSource.checkForDisabledPoints();
     }
 
+    @Override
     public void pointTerminated() {
         createContext();
         dataSource.checkForDisabledPoints();
@@ -179,6 +193,7 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
     // TimeoutClient
     //
     class ScheduledUpdateTimeout extends TimerTask {
+
         ScheduledUpdateTimeout(long fireTime) {
             super(new OneTimeTrigger(new Date(fireTime)));
             timer.schedule(this);
@@ -191,8 +206,9 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
 
             // Schedule the next timeout.
             synchronized (LOCK) {
-                if (initialized)
+                if (initialized) {
                     timerTask = new ScheduledUpdateTimeout(calculateTimeout(fireTime));
+                }
             }
         }
     }
@@ -204,17 +220,17 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
             try {
                 CronExpression ce = new CronExpression(vo.getUpdateCronPattern());
                 timeout = ce.getNextValidTimeAfter(new Date(time)).getTime();
-            }
-            catch (ParseException e) {
+            } catch (ParseException e) {
                 throw new ShouldNeverHappenException(e);
             }
-        }
-        else
+        } else {
             timeout = DateUtils.next(time, updateEventId);
+        }
         return timeout + vo.getExecutionDelaySeconds() * 1000;
     }
 
     class ExecutionDelayTimeout extends TimerTask {
+
         private final long updateTime;
         private final List<Integer> sourceIds;
 
@@ -234,18 +250,20 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
     }
 
     void execute(long runtime, List<Integer> sourceIds) {
-        if (context == null)
+        if (context == null) {
             return;
+        }
 
         // Check if we've reached the maximum number of recursions for this point
         int count = 0;
         for (Integer id : sourceIds) {
-            if (id.intValue() == dataPoint.getId())
+            if (id == dataPoint.getId()) {
                 count++;
+            }
         }
 
         if (count > MAX_RECURSION) {
-            handleError(runtime, new LocalizableMessage("event.meta.recursionFailure"));
+            handleError(runtime, new LocalizableMessageImpl("event.meta.recursionFailure"));
             return;
         }
 
@@ -256,19 +274,17 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
             try {
                 PointValueTime pvt = executor.execute(vo.getScript(), context, timer.currentTimeMillis(),
                         vo.getDataTypeId(), runtime);
-                if (pvt.getValue() == null)
-                    handleError(runtime, new LocalizableMessage("event.meta.nullResult"));
-                else
+                if (pvt.getValue() == null) {
+                    handleError(runtime, new LocalizableMessageImpl("event.meta.nullResult"));
+                } else {
                     updatePoint(pvt);
+                }
+            } catch (ScriptException e) {
+                handleError(runtime, new LocalizableMessageImpl("common.default", e.getMessage()));
+            } catch (ResultTypeException e) {
+                handleError(runtime, e);
             }
-            catch (ScriptException e) {
-                handleError(runtime, new LocalizableMessage("common.default", e.getMessage()));
-            }
-            catch (ResultTypeException e) {
-                handleError(runtime, e.getLocalizableMessage());
-            }
-        }
-        finally {
+        } finally {
             threadLocal.remove();
         }
     }
@@ -278,8 +294,7 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
         try {
             ScriptExecutor scriptExecutor = new ScriptExecutor();
             context = scriptExecutor.convertContext(vo.getContext());
-        }
-        catch (DataPointStateException e) {
+        } catch (DataPointStateException e) {
             // no op
         }
     }

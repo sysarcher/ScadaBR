@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr;
 
@@ -37,13 +37,15 @@ import com.serotonin.mango.vo.publish.pachube.PachubeSenderVO;
 import com.serotonin.mango.vo.publish.persistent.PersistentPointVO;
 import com.serotonin.mango.vo.publish.persistent.PersistentSenderVO;
 import com.serotonin.mango.web.dwr.beans.HttpSenderTester;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 public class PublisherEditDwr extends BaseDwr {
+
     private DwrResponseI18n trySave(PublisherVO<? extends PublishedPointVO> p) {
         DwrResponseI18n response = new DwrResponseI18n();
 
@@ -67,8 +69,9 @@ public class PublisherEditDwr extends BaseDwr {
         Iterator<DataPointVO> iter = allPoints.iterator();
         while (iter.hasNext()) {
             DataPointVO dp = iter.next();
-            if (dp.getPointLocator().getDataTypeId() == DataTypes.IMAGE)
+            if (dp.getPointLocator().getDataTypeId() == DataTypes.IMAGE) {
                 iter.remove();
+            }
         }
 
         DwrResponseI18n response = new DwrResponseI18n();
@@ -113,8 +116,9 @@ public class PublisherEditDwr extends BaseDwr {
 
     public String httpSenderTestUpdate() {
         HttpSenderTester test = Common.getUser().getTestingUtility(HttpSenderTester.class);
-        if (test == null)
+        if (test == null) {
             return null;
+        }
         return test.getResult();
     }
 
@@ -176,28 +180,30 @@ public class PublisherEditDwr extends BaseDwr {
         PersistentSenderRT rt = (PersistentSenderRT) Common.ctx.getRuntimeManager().getRunningPublisher(p.getId());
 
         DwrResponseI18n response = new DwrResponseI18n();
-        if (rt == null)
+        if (rt == null) {
             response.addGenericMessage("publisherEdit.persistent.status.notEnabled");
-        else {
+        } else {
             response.addGenericMessage("publisherEdit.persistent.status.pointCount", rt.getPointCount());
             response.addGenericMessage("publisherEdit.persistent.status.queueSize", rt.getQueueSize());
-            if (rt.getConnectingIndex() != -1)
-                response.addGenericMessage("publisherEdit.persistent.status.connectionState", new LocalizableMessage(
+            if (rt.getConnectingIndex() != -1) {
+                response.addGenericMessage("publisherEdit.persistent.status.connectionState", new LocalizableMessageImpl(
                         "publisherEdit.persistent.status.connecting", rt.getConnectingIndex(), rt.getPointCount()));
-            else if (rt.isConnected())
-                response.addGenericMessage("publisherEdit.persistent.status.connectionState", new LocalizableMessage(
+            } else if (rt.isConnected()) {
+                response.addGenericMessage("publisherEdit.persistent.status.connectionState", new LocalizableMessageImpl(
                         "publisherEdit.persistent.status.connected"));
-            else
-                response.addGenericMessage("publisherEdit.persistent.status.connectionState", new LocalizableMessage(
+            } else {
+                response.addGenericMessage("publisherEdit.persistent.status.connectionState", new LocalizableMessageImpl(
                         "publisherEdit.persistent.status.notConnected"));
+            }
             response.addGenericMessage("publisherEdit.persistent.status.packetQueueSize", rt.getPacketsToSend());
 
             int syncStatus = rt.getSyncStatus();
-            if (syncStatus == -1)
+            if (syncStatus == -1) {
                 response.addGenericMessage("publisherEdit.persistent.status.syncNotRunning");
-            else
+            } else {
                 response.addGenericMessage("publisherEdit.persistent.status.syncStatus", syncStatus,
                         rt.getPointCount(), rt.getSyncRequestsSent());
+            }
         }
 
         return response;
@@ -208,12 +214,13 @@ public class PublisherEditDwr extends BaseDwr {
         PersistentSenderRT rt = (PersistentSenderRT) Common.ctx.getRuntimeManager().getRunningPublisher(p.getId());
 
         DwrResponseI18n response = new DwrResponseI18n();
-        if (rt == null)
+        if (rt == null) {
             response.addGenericMessage("publisherEdit.persistent.status.notEnabled");
-        else if (rt.startSync())
+        } else if (rt.startSync()) {
             response.addGenericMessage("publisherEdit.persistent.syncStarted");
-        else
+        } else {
             response.addGenericMessage("publisherEdit.persistent.syncNotStarted");
+        }
 
         return response;
     }

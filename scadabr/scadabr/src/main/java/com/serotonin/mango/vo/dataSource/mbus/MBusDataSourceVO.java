@@ -27,11 +27,11 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.mbus.MBusDataSourceRT;
@@ -40,8 +40,9 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import net.sf.atmodem4j.spsw.SerialPortList;
@@ -52,7 +53,7 @@ import net.sf.mbus4j.dataframes.MBusMedium;
 
 @JsonRemoteEntity
 public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
-    
+
     private final static Log LOG = LogFactory.getLog(MBusDataSourceVO.class);
 
     public static MBusDataSourceVO createNewDataSource() {
@@ -63,6 +64,7 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
     }
     private static final ExportCodes EVENT_CODES = new ExportCodes();
 //TODO more events???
+
     static {
         EVENT_CODES.addElement(MBusDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, "DATA_SOURCE_EXCEPTION");
         EVENT_CODES.addElement(MBusDataSourceRT.POINT_READ_EXCEPTION_EVENT, "POINT_READ_EXCEPTION");
@@ -82,17 +84,17 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
 
     @Override
     protected void addEventTypes(List<EventTypeVO> eventTypes) {
-        eventTypes.add(createEventType(MBusDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessage(
+        eventTypes.add(createEventType(MBusDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.dataSource")));
-        eventTypes.add(createEventType(MBusDataSourceRT.POINT_READ_EXCEPTION_EVENT, new LocalizableMessage(
+        eventTypes.add(createEventType(MBusDataSourceRT.POINT_READ_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.pointRead")));
-        eventTypes.add(createEventType(MBusDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, new LocalizableMessage(
+        eventTypes.add(createEventType(MBusDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.pointWrite")));
     }
 
     @Override
     public LocalizableMessage getConnectionDescription() {
-        return new LocalizableMessage("common.default", connection.getClass().getSimpleName());
+        return new LocalizableMessageImpl("common.default", connection.getClass().getSimpleName());
     }
 
     @Override
@@ -172,7 +174,7 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
     private void readObject(ObjectInputStream in) throws IOException {
         int ver = in.readInt();
         try {
-            switch ( ver) {
+            switch (ver) {
                 case 1:
                     readObjectVer1(in);
                     break;
@@ -194,7 +196,7 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
             tcpConnection.setPort(jsonConnection.getInt("port"));
             connection = tcpConnection;
         } else {
-              LOG.fatal("NO TCP FROM JSON");
+            LOG.fatal("NO TCP FROM JSON");
         }
         //TODO serial stuff
         connection.setBitPerSecond(jsonConnection.getInt("bitPerSecond"));
@@ -218,7 +220,7 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
 
     /**
      * Helper for JSP
-     * 
+     *
      * @return
      */
     public boolean isSerialDirect() {

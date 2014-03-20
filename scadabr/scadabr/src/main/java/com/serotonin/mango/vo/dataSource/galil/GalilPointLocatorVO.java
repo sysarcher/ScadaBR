@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.galil;
 
@@ -27,45 +27,53 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.galil.GalilPointLocatorRT;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class GalilPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+
     private static final Log LOG = LogFactory.getLog(GalilPointLocatorVO.class);
 
     public LocalizableMessage getConfigurationDescription() {
         PointTypeVO pointType = getPointType();
-        if (pointType == null)
-            return new LocalizableMessage("common.unknown");
+        if (pointType == null) {
+            return new LocalizableMessageImpl("common.unknown");
+        }
         return pointType.getDescription();
     }
 
     private PointTypeVO getPointType() {
-        if (pointTypeId == PointTypeVO.Types.COMMAND)
+        if (pointTypeId == PointTypeVO.Types.COMMAND) {
             return commandPointType;
-        if (pointTypeId == PointTypeVO.Types.INPUT)
+        }
+        if (pointTypeId == PointTypeVO.Types.INPUT) {
             return inputPointType;
-        if (pointTypeId == PointTypeVO.Types.OUTPUT)
+        }
+        if (pointTypeId == PointTypeVO.Types.OUTPUT) {
             return outputPointType;
-        if (pointTypeId == PointTypeVO.Types.TELL_POSITION)
+        }
+        if (pointTypeId == PointTypeVO.Types.TELL_POSITION) {
             return tellPositionPointType;
-        if (pointTypeId == PointTypeVO.Types.VARIABLE)
+        }
+        if (pointTypeId == PointTypeVO.Types.VARIABLE) {
             return variablePointType;
+        }
         LOG.error("Failed to resolve pointTypeId " + pointTypeId + " for Galil point locator");
         return null;
     }
@@ -78,10 +86,11 @@ public class GalilPointLocatorVO extends AbstractPointLocatorVO implements JsonS
     public void validate(DwrResponseI18n response) {
         // Command
         PointTypeVO pointType = getPointType();
-        if (pointType == null)
+        if (pointType == null) {
             response.addContextualMessage("pointTypeId", "validate.invalidChoice");
-        else
+        } else {
             pointType.validate(response);
+        }
     }
 
     public int getDataTypeId() {
@@ -158,10 +167,11 @@ public class GalilPointLocatorVO extends AbstractPointLocatorVO implements JsonS
         GalilPointLocatorVO from = (GalilPointLocatorVO) o;
         AuditEventType.maybeAddExportCodeChangeMessage(list, "dsEdit.galil.pointType", PointTypeVO.POINT_TYPE_CODES,
                 from.pointTypeId, pointTypeId);
-        if (from.pointTypeId == pointTypeId)
+        if (from.pointTypeId == pointTypeId) {
             getPointType().addPropertyChanges(list, from.getPointType());
-        else
+        } else {
             getPointType().addProperties(list);
+        }
     }
 
     //
@@ -199,18 +209,21 @@ public class GalilPointLocatorVO extends AbstractPointLocatorVO implements JsonS
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         JsonObject ptjson = json.getJsonObject("pointType");
-        if (ptjson == null)
+        if (ptjson == null) {
             throw new LocalizableJsonException("emport.error.missingObject", "pointType");
+        }
 
         String text = ptjson.getString("type");
-        if (text == null)
+        if (text == null) {
             throw new LocalizableJsonException("emport.error.pointType.missing", "type", PointTypeVO.POINT_TYPE_CODES
                     .getCodeList());
+        }
 
         pointTypeId = PointTypeVO.POINT_TYPE_CODES.getId(text);
-        if (pointTypeId == -1)
+        if (pointTypeId == -1) {
             throw new LocalizableJsonException("emport.error.pointType.invalid", "pointType", text,
                     PointTypeVO.POINT_TYPE_CODES.getCodeList());
+        }
 
         reader.populateObject(getPointType(), ptjson);
     }

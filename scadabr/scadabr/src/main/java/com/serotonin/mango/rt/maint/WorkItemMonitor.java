@@ -4,16 +4,17 @@ import java.util.Collection;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import com.serotonin.mango.Common;
-import com.serotonin.monitor.IntegerMonitor;
-import com.serotonin.timer.FixedRateTrigger;
-import com.serotonin.timer.TimerTask;
+import br.org.scadabr.monitor.IntegerMonitor;
+import br.org.scadabr.timer.FixedRateTrigger;
+import br.org.scadabr.timer.TimerTask;
 
 public class WorkItemMonitor extends TimerTask {
+
     private static final long TIMEOUT = 1000 * 10; // Run every ten seconds.
 
     /**
-     * This method will set up the memory checking job. It assumes that the corresponding system setting for running
-     * this job is true.
+     * This method will set up the memory checking job. It assumes that the
+     * corresponding system setting for running this job is true.
      */
     public static void start() {
         Common.timer.schedule(new WorkItemMonitor());
@@ -52,8 +53,9 @@ public class WorkItemMonitor extends TimerTask {
         Collection<StackTraceElement[]> stacks = Thread.getAllStackTraces().values();
         threadCount.setValue(stacks.size());
         for (StackTraceElement[] stack : stacks) {
-            if (max < stack.length)
+            if (max < stack.length) {
                 max = stack.length;
+            }
         }
         maxStackHeight.setValue(max);
     }

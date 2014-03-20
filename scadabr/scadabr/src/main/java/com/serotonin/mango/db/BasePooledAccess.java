@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.db;
 
@@ -34,7 +34,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -42,6 +42,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author Matthew Lohbihler
  */
 abstract public class BasePooledAccess extends DatabaseAccess {
+
     private final Log log = LogFactory.getLog(BasePooledAccess.class);
     protected BasicDataSource dataSource;
 
@@ -79,8 +80,9 @@ abstract public class BasePooledAccess extends DatabaseAccess {
             line = line.trim();
 
             // Skip comments
-            if (line.startsWith("--"))
+            if (line.startsWith("--")) {
                 continue;
+            }
 
             statement.append(line);
             statement.append(" ");
@@ -98,21 +100,19 @@ abstract public class BasePooledAccess extends DatabaseAccess {
         List<String> lines = new ArrayList<String>();
         try {
             String line;
-            while ((line = in.readLine()) != null)
+            while ((line = in.readLine()) != null) {
                 lines.add(line);
+            }
 
             String[] script = new String[lines.size()];
             lines.toArray(script);
             runScript(script, null);
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             throw new ShouldNeverHappenException(ioe);
-        }
-        finally {
+        } finally {
             try {
                 in.close();
-            }
-            catch (IOException ioe) {
+            } catch (IOException ioe) {
                 log.warn("", ioe);
             }
         }
@@ -123,8 +123,7 @@ abstract public class BasePooledAccess extends DatabaseAccess {
         log.info("Stopping database");
         try {
             dataSource.close();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             log.warn("", e);
         }
     }

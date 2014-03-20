@@ -1,26 +1,28 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr.beans;
 
-import com.serotonin.util.StringUtils;
+import br.org.scadabr.util.StringUtils;
+import java.util.Objects;
 
 abstract public class BasePointState implements Cloneable {
+
     private String id;
     private String change;
     private String chart;
@@ -59,12 +61,15 @@ abstract public class BasePointState implements Cloneable {
     }
 
     public void removeEqualValue(BasePointState that) {
-        if (StringUtils.isEqual(change, that.change))
+        if (Objects.equals(change, that.change)) {
             change = null;
-        if (StringUtils.isEqual(chart, that.chart))
+        }
+        if (Objects.equals(chart, that.chart)) {
             chart = null;
-        if (StringUtils.isEqual(messages, that.messages))
+        }
+        if (Objects.equals(messages, that.messages)) {
             messages = null;
+        }
     }
 
     public boolean isEmpty() {

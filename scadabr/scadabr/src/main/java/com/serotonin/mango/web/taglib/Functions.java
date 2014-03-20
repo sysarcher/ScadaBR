@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.taglib;
 
@@ -27,48 +27,56 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.taglib.DateFunctions;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.taglib.DateFunctions;
 
 public class Functions {
+
     public static String getHtmlText(DataPointVO point, PointValueTime pointValue) {
-        if (point == null)
+        if (point == null) {
             return "-";
+        }
         String text = point.getTextRenderer().getText(pointValue, TextRenderer.HINT_FULL);
         String colour = point.getTextRenderer().getColour(pointValue);
         return getHtml(colour, text, point.getPointLocator().getDataTypeId() == DataTypes.ALPHANUMERIC);
     }
 
     public static String getRenderedText(DataPointVO point, PointValueTime pointValue) {
-        if (point == null)
+        if (point == null) {
             return "-";
+        }
         return point.getTextRenderer().getText(pointValue, TextRenderer.HINT_FULL);
     }
 
     public static String getRawText(DataPointVO point, PointValueTime pointValue) {
-        if (point == null)
+        if (point == null) {
             return "-";
+        }
         String result = point.getTextRenderer().getText(pointValue, TextRenderer.HINT_RAW);
-        if (!StringUtils.isEmpty(result))
+        if (!StringUtils.isEmpty(result)) {
             return encodeDQuot(result);
+        }
         return result;
     }
 
     public static String getHtmlTextValue(DataPointVO point, MangoValue value) {
-        if (point == null)
+        if (point == null) {
             return "-";
+        }
         return getHtmlTextValue(point, value, TextRenderer.HINT_FULL);
     }
 
     public static String getSpecificHtmlTextValue(DataPointVO point, double value) {
-        if (point == null)
+        if (point == null) {
             return "-";
+        }
         return getHtmlTextValue(point, new NumericValue(value), TextRenderer.HINT_SPECIFIC);
     }
 
     private static String getHtmlTextValue(DataPointVO point, MangoValue value, int hint) {
-        if (point == null)
+        if (point == null) {
             return "-";
+        }
         String text = point.getTextRenderer().getText(value, hint);
         String colour = point.getTextRenderer().getColour(value);
         return getHtml(colour, text, point.getPointLocator().getDataTypeId() == DataTypes.ALPHANUMERIC);
@@ -79,25 +87,27 @@ public class Functions {
 
         if (text != null && detectOverflow && text.length() > 30) {
             text = encodeDQuot(text);
-            if (StringUtils.isEmpty(colour))
+            if (StringUtils.isEmpty(colour)) {
                 result = "<input type='text' readonly='readonly' class='ovrflw' value=\"" + text + "\"/>";
-            else
+            } else {
                 result = "<input type='text' readonly='readonly' class='ovrflw' style='color:" + colour + ";' value=\""
                         + text + "\"/>";
-        }
-        else {
-            if (StringUtils.isEmpty(colour))
+            }
+        } else {
+            if (StringUtils.isEmpty(colour)) {
                 result = text;
-            else
+            } else {
                 result = "<span style='color:" + colour + ";'>" + text + "</span>";
+            }
         }
 
         return result;
     }
 
     public static String getTime(PointValueTime pointValue) {
-        if (pointValue != null)
+        if (pointValue != null) {
             return DateFunctions.getTime(pointValue.getTime());
+        }
         return null;
     }
 

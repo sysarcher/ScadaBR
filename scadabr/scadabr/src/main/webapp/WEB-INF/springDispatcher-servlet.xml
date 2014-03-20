@@ -33,7 +33,7 @@
   </bean>
   
   <!-- Default message code resolver -->
-  <bean id="defaultMessageCodeResolver" class="com.serotonin.propertyEditor.DefaultMessageCodesResolver"/>
+  <bean id="defaultMessageCodeResolver" class="br.org.scadabr.propertyEditor.DefaultMessageCodesResolver"/>
   
   <!-- 
       URL mappings to controllers
@@ -121,7 +121,7 @@
   <bean id="dataSourceListController" class="com.serotonin.mango.web.mvc.controller.DataSourceListController">
     <property name="viewName"><value>dataSourceList</value></property>
     <property name="commandName"><value>paging</value></property>
-    <property name="commandClass"><value>com.serotonin.web.util.PagingDataForm</value></property>
+    <property name="commandClass"><value>br.org.scadabr.web.util.PagingDataForm</value></property>
   </bean>
   
   <bean id="emportController" class="org.springframework.web.servlet.mvc.ParameterizableViewController">

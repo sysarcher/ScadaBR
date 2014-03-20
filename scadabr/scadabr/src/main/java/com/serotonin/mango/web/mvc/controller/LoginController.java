@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.mvc.controller;
 
@@ -35,10 +35,11 @@ import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.integration.CrowdUtils;
 import com.serotonin.mango.web.mvc.form.LoginForm;
-import com.serotonin.util.StringUtils;
-import com.serotonin.util.ValidationUtils;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.util.ValidationUtils;
 
 public class LoginController extends SimpleFormController {
+
     private static final Log logger = LogFactory.getLog(LoginController.class);
 
     private boolean mobile;
@@ -69,13 +70,13 @@ public class LoginController extends SimpleFormController {
 
                 // The user is logged into Crowd. Make sure the username is valid in this instance.
                 User user = new UserDao().getUser(username);
-                if (user == null)
+                if (user == null) {
                     ValidationUtils.rejectValue(errors, "username", "login.validation.noSuchUser");
-                else {
+                } else {
                     // Validate some stuff about the user.
-                    if (user.isDisabled())
+                    if (user.isDisabled()) {
                         ValidationUtils.reject(errors, "login.validation.accountDisabled");
-                    else {
+                    } else {
                         if (CrowdUtils.isAuthenticated(request, response)) {
                             ModelAndView mav = performLogin(request, username);
                             CrowdUtils.setCrowdAuthenticated(Common.getUser(request));
@@ -93,12 +94,14 @@ public class LoginController extends SimpleFormController {
         LoginForm login = (LoginForm) command;
 
         // Make sure there is a username
-        if (StringUtils.isEmpty(login.getUsername()))
+        if (StringUtils.isEmpty(login.getUsername())) {
             ValidationUtils.rejectValue(errors, "username", "login.validation.noUsername");
+        }
 
         // Make sure there is a password
-        if (StringUtils.isEmpty(login.getPassword()))
+        if (StringUtils.isEmpty(login.getPassword())) {
             ValidationUtils.rejectValue(errors, "password", "login.validation.noPassword");
+        }
     }
 
     @Override
@@ -110,31 +113,35 @@ public class LoginController extends SimpleFormController {
 
         // Check if the user exists
         User user = new UserDao().getUser(login.getUsername());
-        if (user == null)
+        if (user == null) {
             ValidationUtils.rejectValue(errors, "username", "login.validation.noSuchUser");
-        else if (user.isDisabled())
+        } else if (user.isDisabled()) {
             ValidationUtils.reject(errors, "login.validation.accountDisabled");
-        else {
-            if (CrowdUtils.isCrowdEnabled())
-                // First attempt authentication with Crowd.
+        } else {
+            if (CrowdUtils.isCrowdEnabled()) // First attempt authentication with Crowd.
+            {
                 crowdAuthenticated = CrowdUtils.authenticate(request, response, login.getUsername(),
                         login.getPassword());
+            }
 
             if (!crowdAuthenticated) {
                 String passwordHash = Common.encrypt(login.getPassword());
 
                 // Validating the password against the database.
-                if (!passwordHash.equals(user.getPassword()))
+                if (!passwordHash.equals(user.getPassword())) {
                     ValidationUtils.reject(errors, "login.validation.invalidLogin");
+                }
             }
         }
 
-        if (errors.hasErrors())
+        if (errors.hasErrors()) {
             return showForm(request, response, errors);
+        }
 
         ModelAndView mav = performLogin(request, login.getUsername());
-        if (crowdAuthenticated)
+        if (crowdAuthenticated) {
             CrowdUtils.setCrowdAuthenticated(Common.getUser(request));
+        }
         return mav;
     }
 
@@ -143,10 +150,10 @@ public class LoginController extends SimpleFormController {
         User user = Common.getUser(request);
         if (user != null && user.getUsername().equals(username)) {
             // The user is already logged in. Nothing to do.
-            if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled()) {
                 logger.debug("User is already logged in, not relogging in");
-        }
-        else {
+            }
+        } else {
             UserDao userDao = new UserDao();
             // Get the user data from the app server.
             user = new UserDao().getUser(username);
@@ -157,15 +164,18 @@ public class LoginController extends SimpleFormController {
             // Add the user object to the session. This indicates to the rest
             // of the application whether the user is logged in or not.
             Common.setUser(request, user);
-            if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled()) {
                 logger.debug("User object added to session");
+            }
         }
 
         if (!mobile) {
-            if (user.isFirstLogin())
+            if (user.isFirstLogin()) {
                 return new ModelAndView(new RedirectView(newUserUrl));
-            if (!StringUtils.isEmpty(user.getHomeUrl()))
+            }
+            if (!StringUtils.isEmpty(user.getHomeUrl())) {
                 return new ModelAndView(new RedirectView(user.getHomeUrl()));
+            }
         }
 
         return new ModelAndView(new RedirectView(successUrl));

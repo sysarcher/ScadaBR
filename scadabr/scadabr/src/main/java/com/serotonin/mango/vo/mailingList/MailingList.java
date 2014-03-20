@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.mailingList;
 
@@ -25,16 +25,17 @@ import java.util.TreeSet;
 
 import org.joda.time.DateTime;
 
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
 
 @JsonRemoteEntity
 public class MailingList extends EmailRecipient {
+
     public static final String XID_PREFIX = "ML_";
 
     private int id = Common.NEW_ID;
@@ -45,9 +46,10 @@ public class MailingList extends EmailRecipient {
     private List<EmailRecipient> entries;
 
     /**
-     * Integers that are present in the inactive intervals set are times at which the mailing list schedule is not to be
-     * sent to. Intervals are split into 15 minutes, starting at [00:00 to 00:15) on Monday. Thus, there are 4 * 24 * 7
-     * = 672 individual periods.
+     * Integers that are present in the inactive intervals set are times at
+     * which the mailing list schedule is not to be sent to. Intervals are split
+     * into 15 minutes, starting at [00:00 to 00:15) on Monday. Thus, there are
+     * 4 * 24 * 7 = 672 individual periods.
      */
     @JsonRemoteProperty(innerType = Integer.class)
     private Set<Integer> inactiveIntervals = new TreeSet<Integer>();
@@ -109,15 +111,17 @@ public class MailingList extends EmailRecipient {
 
     @Override
     public void appendAddresses(Set<String> addresses, DateTime sendTime) {
-        if (sendTime != null && inactiveIntervals.contains(getIntervalIdAt(sendTime)))
+        if (sendTime != null && inactiveIntervals.contains(getIntervalIdAt(sendTime))) {
             return;
+        }
         appendAllAddresses(addresses);
     }
 
     @Override
     public void appendAllAddresses(Set<String> addresses) {
-        for (EmailRecipient e : entries)
+        for (EmailRecipient e : entries) {
             e.appendAddresses(addresses, null);
+        }
     }
 
     private static int getIntervalIdAt(DateTime dt) {
@@ -130,16 +134,19 @@ public class MailingList extends EmailRecipient {
 
     public void validate(DwrResponseI18n response) {
         // Check that required fields are present.
-        if (StringUtils.isEmpty(name))
+        if (StringUtils.isEmpty(name)) {
             response.addContextualMessage("name", "mailingLists.validate.nameRequired");
+        }
 
         // Check field lengths
-        if (StringUtils.isLengthGreaterThan(name, 40))
+        if (StringUtils.isLengthGreaterThan(name, 40)) {
             response.addContextualMessage("name", "mailingLists.validate.nameGreaterThan40");
+        }
 
         // Check for entries.
-        if (entries.size() == 0)
+        if (entries.size() == 0) {
             response.addGenericMessage("mailingLists.validate.entries");
+        }
     }
 
     @Override

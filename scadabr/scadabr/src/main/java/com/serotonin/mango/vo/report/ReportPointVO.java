@@ -8,6 +8,7 @@ import java.io.Serializable;
 import br.org.scadabr.util.SerializationHelper;
 
 public class ReportPointVO implements Serializable {
+
     private int pointId;
     private String colour;
     private boolean consolidatedChart;
@@ -59,8 +60,7 @@ public class ReportPointVO implements Serializable {
             pointId = in.readInt();
             colour = SerializationHelper.readSafeUTF(in);
             consolidatedChart = true;
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             pointId = in.readInt();
             colour = SerializationHelper.readSafeUTF(in);
             consolidatedChart = in.readBoolean();

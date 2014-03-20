@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.virtual;
 
@@ -27,13 +27,13 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
@@ -47,40 +47,51 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.IntMessagePair;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
 
 @JsonRemoteEntity
 public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+
     private static final Log LOG = LogFactory.getLog(VirtualPointLocatorVO.class);
 
     public LocalizableMessage getConfigurationDescription() {
         ChangeTypeVO changeType = getChangeType();
-        if (changeType == null)
+        if (changeType == null) {
             throw new ShouldNeverHappenException("unknown change type");
+        }
         return changeType.getDescription();
     }
 
     private ChangeTypeVO getChangeType() {
-        if (changeTypeId == ChangeTypeVO.Types.ALTERNATE_BOOLEAN)
+        if (changeTypeId == ChangeTypeVO.Types.ALTERNATE_BOOLEAN) {
             return alternateBooleanChange;
-        if (changeTypeId == ChangeTypeVO.Types.BROWNIAN)
+        }
+        if (changeTypeId == ChangeTypeVO.Types.BROWNIAN) {
             return brownianChange;
-        if (changeTypeId == ChangeTypeVO.Types.INCREMENT_ANALOG)
+        }
+        if (changeTypeId == ChangeTypeVO.Types.INCREMENT_ANALOG) {
             return incrementAnalogChange;
-        if (changeTypeId == ChangeTypeVO.Types.INCREMENT_MULTISTATE)
+        }
+        if (changeTypeId == ChangeTypeVO.Types.INCREMENT_MULTISTATE) {
             return incrementMultistateChange;
-        if (changeTypeId == ChangeTypeVO.Types.NO_CHANGE)
+        }
+        if (changeTypeId == ChangeTypeVO.Types.NO_CHANGE) {
             return noChange;
-        if (changeTypeId == ChangeTypeVO.Types.RANDOM_ANALOG)
+        }
+        if (changeTypeId == ChangeTypeVO.Types.RANDOM_ANALOG) {
             return randomAnalogChange;
-        if (changeTypeId == ChangeTypeVO.Types.RANDOM_BOOLEAN)
+        }
+        if (changeTypeId == ChangeTypeVO.Types.RANDOM_BOOLEAN) {
             return randomBooleanChange;
-        if (changeTypeId == ChangeTypeVO.Types.RANDOM_MULTISTATE)
+        }
+        if (changeTypeId == ChangeTypeVO.Types.RANDOM_MULTISTATE) {
             return randomMultistateChange;
-        if (changeTypeId == ChangeTypeVO.Types.ANALOG_ATTRACTOR)
+        }
+        if (changeTypeId == ChangeTypeVO.Types.ANALOG_ATTRACTOR) {
             return analogAttractorChange;
+        }
 
         LOG.error("Failed to resolve changeTypeId " + changeTypeId + " for virtual point locator");
         return alternateBooleanChange;
@@ -90,113 +101,113 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
         ChangeTypeRT changeType = getChangeType().createRuntime();
         String startValue = getChangeType().getStartValue();
         MangoValue startObject;
-        if (dataTypeId == DataTypes.BINARY)
+        if (dataTypeId == DataTypes.BINARY) {
             startObject = BinaryValue.parseBinary(startValue);
-        else if (dataTypeId == DataTypes.MULTISTATE) {
+        } else if (dataTypeId == DataTypes.MULTISTATE) {
             try {
                 startObject = MultistateValue.parseMultistate(startValue);
-            }
-            catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 startObject = new MultistateValue(0);
             }
-        }
-        else if (dataTypeId == DataTypes.NUMERIC) {
+        } else if (dataTypeId == DataTypes.NUMERIC) {
             try {
                 startObject = NumericValue.parseNumeric(startValue);
-            }
-            catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 startObject = new NumericValue(0);
             }
-        }
-        else {
-            if (startValue == null)
+        } else {
+            if (startValue == null) {
                 startObject = new AlphanumericValue("");
-            else
+            } else {
                 startObject = new AlphanumericValue(startValue);
+            }
         }
         return new VirtualPointLocatorRT(changeType, startObject, isSettable());
     }
 
     public void validate(DwrResponseI18n response) {
-        if (!DataTypes.CODES.isValidId(dataTypeId))
+        if (!DataTypes.CODES.isValidId(dataTypeId)) {
             response.addContextualMessage("dataTypeId", "validate.invalidValue");
+        }
 
         // Alternate boolean
         if (changeTypeId == ChangeTypeVO.Types.ALTERNATE_BOOLEAN) {
-            if (StringUtils.isEmpty(alternateBooleanChange.getStartValue()))
+            if (StringUtils.isEmpty(alternateBooleanChange.getStartValue())) {
                 response.addContextualMessage("alternateBooleanChange.startValue", "validate.required");
-        }
-
-        // Brownian
+            }
+        } // Brownian
         else if (changeTypeId == ChangeTypeVO.Types.BROWNIAN) {
-            if (brownianChange.getMin() >= brownianChange.getMax())
+            if (brownianChange.getMin() >= brownianChange.getMax()) {
                 response.addContextualMessage("brownianChange.max", "validate.maxGreaterThanMin");
-            if (brownianChange.getMaxChange() <= 0)
+            }
+            if (brownianChange.getMaxChange() <= 0) {
                 response.addContextualMessage("brownianChange.maxChange", "validate.greaterThanZero");
-            if (StringUtils.isEmpty(brownianChange.getStartValue()))
+            }
+            if (StringUtils.isEmpty(brownianChange.getStartValue())) {
                 response.addContextualMessage("brownianChange.startValue", "validate.required");
-        }
-
-        // Increment analog
+            }
+        } // Increment analog
         else if (changeTypeId == ChangeTypeVO.Types.INCREMENT_ANALOG) {
-            if (incrementAnalogChange.getMin() >= incrementAnalogChange.getMax())
+            if (incrementAnalogChange.getMin() >= incrementAnalogChange.getMax()) {
                 response.addContextualMessage("incrementAnalogChange.max", "validate.maxGreaterThanMin");
-            if (incrementAnalogChange.getChange() <= 0)
+            }
+            if (incrementAnalogChange.getChange() <= 0) {
                 response.addContextualMessage("incrementAnalogChange.change", "validate.greaterThanZero");
-            if (StringUtils.isEmpty(incrementAnalogChange.getStartValue()))
+            }
+            if (StringUtils.isEmpty(incrementAnalogChange.getStartValue())) {
                 response.addContextualMessage("incrementAnalogChange.startValue", "validate.required");
-        }
-
-        // Increment multistate
+            }
+        } // Increment multistate
         else if (changeTypeId == ChangeTypeVO.Types.INCREMENT_MULTISTATE) {
-            if (StringUtils.isEmpty(incrementMultistateChange.getValues()))
+            if (StringUtils.isEmpty(incrementMultistateChange.getValues())) {
                 response.addContextualMessage("incrementMultistateChange.values", "validate.atLeast1");
-            if (StringUtils.isEmpty(incrementMultistateChange.getStartValue()))
+            }
+            if (StringUtils.isEmpty(incrementMultistateChange.getStartValue())) {
                 response.addContextualMessage("incrementMultistateChange.startValue", "validate.required");
-        }
-
-        // No change
+            }
+        } // No change
         else if (changeTypeId == ChangeTypeVO.Types.NO_CHANGE) {
-            if (StringUtils.isEmpty(noChange.getStartValue()) && dataTypeId != DataTypes.ALPHANUMERIC)
+            if (StringUtils.isEmpty(noChange.getStartValue()) && dataTypeId != DataTypes.ALPHANUMERIC) {
                 response.addContextualMessage("noChange.startValue", "validate.required");
-        }
-
-        // Random analog
+            }
+        } // Random analog
         else if (changeTypeId == ChangeTypeVO.Types.RANDOM_ANALOG) {
-            if (randomAnalogChange.getMin() >= randomAnalogChange.getMax())
+            if (randomAnalogChange.getMin() >= randomAnalogChange.getMax()) {
                 response.addContextualMessage("randomAnalogChange.max", "validate.maxGreaterThanMin");
-            if (StringUtils.isEmpty(randomAnalogChange.getStartValue()))
+            }
+            if (StringUtils.isEmpty(randomAnalogChange.getStartValue())) {
                 response.addContextualMessage("randomAnalogChange.startValue", "validate.required");
-        }
-
-        // Random boolean
+            }
+        } // Random boolean
         else if (changeTypeId == ChangeTypeVO.Types.RANDOM_BOOLEAN) {
-            if (StringUtils.isEmpty(randomBooleanChange.getStartValue()))
+            if (StringUtils.isEmpty(randomBooleanChange.getStartValue())) {
                 response.addContextualMessage("randomBooleanChange.startValue", "validate.required");
-        }
-
-        // Random multistate
+            }
+        } // Random multistate
         else if (changeTypeId == ChangeTypeVO.Types.RANDOM_MULTISTATE) {
-            if (StringUtils.isEmpty(randomMultistateChange.getValues()))
+            if (StringUtils.isEmpty(randomMultistateChange.getValues())) {
                 response.addContextualMessage("randomMultistateChange.values", "validate.atLeast1");
-            if (StringUtils.isEmpty(randomMultistateChange.getStartValue()))
+            }
+            if (StringUtils.isEmpty(randomMultistateChange.getStartValue())) {
                 response.addContextualMessage("randomMultistateChange.startValue", "validate.required");
-        }
-
-        // Analog attractor
+            }
+        } // Analog attractor
         else if (changeTypeId == ChangeTypeVO.Types.ANALOG_ATTRACTOR) {
-            if (analogAttractorChange.getMaxChange() <= 0)
+            if (analogAttractorChange.getMaxChange() <= 0) {
                 response.addContextualMessage("analogAttractorChange.maxChange", "validate.greaterThanZero");
-            if (analogAttractorChange.getVolatility() < 0)
+            }
+            if (analogAttractorChange.getVolatility() < 0) {
                 response.addContextualMessage("analogAttractorChange.volatility", "validate.cannotBeNegative");
-            if (analogAttractorChange.getAttractionPointId() < 1)
+            }
+            if (analogAttractorChange.getAttractionPointId() < 1) {
                 response.addContextualMessage("analogAttractorChange.attractionPointId", "validate.required");
-            if (StringUtils.isEmpty(analogAttractorChange.getStartValue()))
+            }
+            if (StringUtils.isEmpty(analogAttractorChange.getStartValue())) {
                 response.addContextualMessage("analogAttractorChange.startValue", "validate.required");
-        }
-
-        else
+            }
+        } else {
             response.addContextualMessage("changeTypeId", "validate.invalidChoice");
+        }
 
         ChangeTypeVO changeType = getChangeType();
         if (changeType != null) {
@@ -208,8 +219,9 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
                 }
             }
 
-            if (!found)
+            if (!found) {
                 response.addGenericMessage("validate.changeType.incompatible");
+            }
         }
     }
 
@@ -339,10 +351,11 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
         AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
         AuditEventType.maybeAddExportCodeChangeMessage(list, "dsEdit.virtual.changeType",
                 ChangeTypeVO.CHANGE_TYPE_CODES, from.changeTypeId, changeTypeId);
-        if (from.changeTypeId == changeTypeId)
+        if (from.changeTypeId == changeTypeId) {
             getChangeType().addPropertyChanges(list, from.getChangeType());
-        else
+        } else {
             getChangeType().addProperties(list);
+        }
     }
 
     //
@@ -392,22 +405,26 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         Integer value = deserializeDataType(json, DataTypes.IMAGE);
-        if (value != null)
+        if (value != null) {
             dataTypeId = value;
+        }
 
         JsonObject ctjson = json.getJsonObject("changeType");
-        if (ctjson == null)
+        if (ctjson == null) {
             throw new LocalizableJsonException("emport.error.missingObject", "changeType");
+        }
 
         String text = ctjson.getString("type");
-        if (text == null)
+        if (text == null) {
             throw new LocalizableJsonException("emport.error.missing", "type", ChangeTypeVO.CHANGE_TYPE_CODES
                     .getCodeList());
+        }
 
         changeTypeId = ChangeTypeVO.CHANGE_TYPE_CODES.getId(text);
-        if (changeTypeId == -1)
+        if (changeTypeId == -1) {
             throw new LocalizableJsonException("emport.error.invalid", "changeType", text,
                     ChangeTypeVO.CHANGE_TYPE_CODES.getCodeList());
+        }
 
         reader.populateObject(getChangeType(), ctjson);
     }

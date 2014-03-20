@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.viconics;
 
@@ -23,8 +23,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.viconics.ViconicsDataSourceRT;
 import com.serotonin.mango.rt.event.AlarmLevels;
@@ -34,37 +34,40 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
- * To display in the add list, run this: insert into systemSettings (settingName, settingValue) values
- * ('VICONICS.display', 'Y')
- * 
+ * To display in the add list, run this: insert into systemSettings
+ * (settingName, settingValue) values ('VICONICS.display', 'Y')
+ *
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class ViconicsDataSourceVO extends DataSourceVO<ViconicsDataSourceVO> {
+
     public static final Type TYPE = Type.VICONICS;
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
-        ets.add(createEventType(ViconicsDataSourceRT.INITIALIZATION_EXCEPTION_EVENT, new LocalizableMessage(
+        ets.add(createEventType(ViconicsDataSourceRT.INITIALIZATION_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.initialization")));
         ets
-                .add(createEventType(ViconicsDataSourceRT.MESSAGE_EXCEPTION_EVENT, new LocalizableMessage(
-                        "event.ds.message"), EventType.DuplicateHandling.IGNORE, AlarmLevels.INFORMATION));
-        ets.add(createEventType(ViconicsDataSourceRT.DEVICE_OFFLINE_EVENT, new LocalizableMessage("event.ds.device"),
+                .add(createEventType(ViconicsDataSourceRT.MESSAGE_EXCEPTION_EVENT, new LocalizableMessageImpl(
+                                        "event.ds.message"), EventType.DuplicateHandling.IGNORE, AlarmLevels.INFORMATION));
+        ets.add(createEventType(ViconicsDataSourceRT.DEVICE_OFFLINE_EVENT, new LocalizableMessageImpl("event.ds.device"),
                 EventType.DuplicateHandling.IGNORE, AlarmLevels.INFORMATION));
         ets
-                .add(createEventType(ViconicsDataSourceRT.NETWORK_OFFLINE_EVENT, new LocalizableMessage(
-                        "event.ds.network")));
-        ets.add(createEventType(ViconicsDataSourceRT.DUPLICATE_COMM_ADDRESS_EVENT, new LocalizableMessage(
+                .add(createEventType(ViconicsDataSourceRT.NETWORK_OFFLINE_EVENT, new LocalizableMessageImpl(
+                                        "event.ds.network")));
+        ets.add(createEventType(ViconicsDataSourceRT.DUPLICATE_COMM_ADDRESS_EVENT, new LocalizableMessageImpl(
                 "event.ds.duplicateComm")));
     }
 
     private static final ExportCodes EVENT_CODES = new ExportCodes();
+
     static {
         EVENT_CODES.addElement(ViconicsDataSourceRT.INITIALIZATION_EXCEPTION_EVENT, "INITIALIZATION_EXCEPTION");
         EVENT_CODES.addElement(ViconicsDataSourceRT.MESSAGE_EXCEPTION_EVENT, "MESSAGE_EXCEPTION");
@@ -80,7 +83,7 @@ public class ViconicsDataSourceVO extends DataSourceVO<ViconicsDataSourceVO> {
 
     @Override
     public LocalizableMessage getConnectionDescription() {
-        return new LocalizableMessage("dsEdit.viconics.dpconn", commPortId, panId, channel);
+        return new LocalizableMessageImpl("dsEdit.viconics.dpconn", commPortId, panId, channel);
     }
 
     @Override
@@ -203,24 +206,33 @@ public class ViconicsDataSourceVO extends DataSourceVO<ViconicsDataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
 
-        if (StringUtils.isEmpty(commPortId))
+        if (StringUtils.isEmpty(commPortId)) {
             response.addContextualMessage("commPortId", "validate.required");
-        if (panId < 0 || panId > 66535)
+        }
+        if (panId < 0 || panId > 66535) {
             response.addContextualMessage("panId", "validate.between", 0, 66535);
-        if (channel < 0 || channel > 255)
+        }
+        if (channel < 0 || channel > 255) {
             response.addContextualMessage("channel", "validate.between", 0, 255);
-        if (timeout <= 0)
+        }
+        if (timeout <= 0) {
             response.addContextualMessage("timeout", "validate.greaterThanZero");
-        if (retries <= 0)
+        }
+        if (retries <= 0) {
             response.addContextualMessage("retries", "validate.greaterThanZero");
-        if (networkTimeoutSeconds <= 0)
+        }
+        if (networkTimeoutSeconds <= 0) {
             response.addContextualMessage("networkTimeoutSeconds", "validate.greaterThanZero");
-        if (deviceWarningTimeoutSeconds <= 0)
+        }
+        if (deviceWarningTimeoutSeconds <= 0) {
             response.addContextualMessage("deviceWarningTimeoutSeconds", "validate.greaterThanZero");
-        if (deviceRemoveTimeoutSeconds <= 0)
+        }
+        if (deviceRemoveTimeoutSeconds <= 0) {
             response.addContextualMessage("deviceRemoveTimeoutSeconds", "validate.greaterThanZero");
-        if (pointValueMinimumFreshnessSeconds <= 0)
+        }
+        if (pointValueMinimumFreshnessSeconds <= 0) {
             response.addContextualMessage("pointValueMinimumFreshnessSeconds", "validate.greaterThanZero");
+        }
     }
 
     @Override

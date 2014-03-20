@@ -1,5 +1,6 @@
 package com.serotonin.mango.rt.publish.persistent;
 
+import br.org.scadabr.web.i18n.I18NUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,13 +10,15 @@ import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 
-import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.io.StreamUtils;
-import com.serotonin.util.queue.ByteQueue;
-import com.serotonin.web.i18n.LocalizableMessage;
-import com.serotonin.web.i18n.LocalizableMessageParseException;
+import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.io.StreamUtils;
+import br.org.scadabr.util.queue.ByteQueue;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.web.i18n.LocalizableMessageParseException;
 
 public class Packet {
+
     public static final int PUBLISHER_SOCKET_TIMEOUT = 30000;
     public static final int DATA_SOURCE_SOCKET_TIMEOUT = 5000;
     public static final int TEST_PACKET_SEND_DELAY = 60000;
@@ -43,8 +46,7 @@ public class Packet {
             packet.type = type;
             packet.payload.push(payload);
             return packet;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ShouldNeverHappenException(e);
         }
     }
@@ -55,8 +57,9 @@ public class Packet {
     //
     public static Packet readPacketNoBlock(InputStream in, int version) throws IOException, PersistentAbortException,
             PersistentProtocolException {
-        if (in.available() > 0)
+        if (in.available() > 0) {
             return readPacket(in, version);
+        }
         return null;
     }
 
@@ -71,96 +74,97 @@ public class Packet {
             if (version == 1) {
                 length = StreamUtils.read4ByteSigned(in);
                 packetType = PacketType.getPacketType(StreamUtils.readByte(in));
-            }
-            else if (version >= 2) {
+            } else if (version >= 2) {
                 int i;
                 while (true) {
                     // First byte must be DA
                     i = in.read();
-                    if (i == -1)
+                    if (i == -1) {
                         throw new IOException("EOS");
-                    if (i != 0xda)
+                    }
+                    if (i != 0xda) {
                         continue;
+                    }
 
                     // Second byte must start with D
                     i = in.read();
-                    if (i == -1)
+                    if (i == -1) {
                         throw new IOException("EOS");
-                    if ((i >> 4) != 0xd)
+                    }
+                    if ((i >> 4) != 0xd) {
                         continue;
+                    }
 
                     // The rest of the second byte is the packet type
                     packetType = PacketType.getPacketType((byte) (i & 0xf));
                     length = read4ByteSigned(in);
                     break;
                 }
-            }
-            else
+            } else {
                 throw new PersistentProtocolException("Unknown version " + version);
+            }
 
             // Create the packet.
             try {
                 packet = (Packet) packetPool.borrowObject();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new ShouldNeverHappenException(e);
             }
             packet.type = packetType;
 
-            if (length > 0)
+            if (length > 0) {
                 readPayload(in, packet, length);
+            }
 
             if (packet.type == PacketType.ABORT) {
                 String message = packet.popString();
                 try {
-                    throw new PersistentAbortException(LocalizableMessage.deserialize(message));
-                }
-                catch (LocalizableMessageParseException e) {
-                    throw new PersistentAbortException(new LocalizableMessage("common.default", message));
+                    throw new PersistentAbortException(I18NUtils.deserialize(message));
+                } catch (LocalizableMessageParseException e) {
+                    throw new PersistentAbortException(new LocalizableMessageImpl("common.default", message));
                 }
             }
 
             return packet;
-        }
-        catch (IOException e) {
-            if (packet != null)
+        } catch (IOException e) {
+            if (packet != null) {
                 packet.release();
+            }
             throw e;
-        }
-        catch (PersistentAbortException e) {
-            if (packet != null)
+        } catch (PersistentAbortException e) {
+            if (packet != null) {
                 packet.release();
+            }
             throw e;
         }
     }
 
     /**
-     * Data may be getting sent very regularly from the publisher, so if there is corruption in the stream an SO timeout
-     * may not get thrown. Having a payload read timeout ensures that unusually long read times - such as when the
-     * length is suspiciously long - don't cause the communication to cease up, at least not for very long.
-     * 
-     * @param in
-     *            the socket input stream
-     * @param packet
-     *            the packet we're trying to read
-     * @param length
-     *            the length of the payload to read
-     * @throws IOException
-     *             if a read error occurs, including an SO timeout
-     * @throws PayloadReadTimeoutException
-     *             if a payload read timeout occurs
+     * Data may be getting sent very regularly from the publisher, so if there
+     * is corruption in the stream an SO timeout may not get thrown. Having a
+     * payload read timeout ensures that unusually long read times - such as
+     * when the length is suspiciously long - don't cause the communication to
+     * cease up, at least not for very long.
+     *
+     * @param in the socket input stream
+     * @param packet the packet we're trying to read
+     * @param length the length of the payload to read
+     * @throws IOException if a read error occurs, including an SO timeout
+     * @throws PayloadReadTimeoutException if a payload read timeout occurs
      */
     private static void readPayload(InputStream in, Packet packet, int length) throws IOException,
             PayloadReadTimeoutException {
         long timeout = System.currentTimeMillis() + PAYLOAD_READ_TIMEOUT;
 
         while (length > 0) {
-            if (System.currentTimeMillis() > timeout)
+            if (System.currentTimeMillis() > timeout) {
                 throw new PayloadReadTimeoutException(packet.getType(), length, packet.payload.popAll());
+            }
 
             int readLen = length;
-            if (readLen > PAYLOAD_READ_BUFFER.length)
+            if (readLen > PAYLOAD_READ_BUFFER.length) {
                 readLen = PAYLOAD_READ_BUFFER.length;
+            }
 
             int readCount = in.read(PAYLOAD_READ_BUFFER, 0, readLen);
             packet.payload.push(PAYLOAD_READ_BUFFER, 0, readCount);
@@ -192,8 +196,7 @@ public class Packet {
         if (version == 1) {
             StreamUtils.write4ByteSigned(out, length);
             StreamUtils.writeByte(out, type.getId());
-        }
-        else if (version >= 2) {
+        } else if (version >= 2) {
             out.write(0xda);
             out.write(0xd0 | type.getId());
             write4ByteSigned(out, length);
@@ -261,8 +264,7 @@ public class Packet {
         payload.clear();
         try {
             packetPool.returnObject(this);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ShouldNeverHappenException(e);
         }
     }

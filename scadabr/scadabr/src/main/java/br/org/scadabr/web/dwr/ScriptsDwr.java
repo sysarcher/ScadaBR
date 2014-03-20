@@ -13,72 +13,73 @@ import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.web.dwr.BaseDwr;
-import com.serotonin.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
 
 public class ScriptsDwr extends BaseDwr {
 
-	public List<DataPointVO> getPoints() {
-		List<DataPointVO> allPoints = new DataPointDao().getDataPoints(
-				DataPointExtendedNameComparator.instance, false);
-		return allPoints;
-	}
+    public List<DataPointVO> getPoints() {
+        List<DataPointVO> allPoints = new DataPointDao().getDataPoints(
+                DataPointExtendedNameComparator.instance, false);
+        return allPoints;
+    }
 
-	public List<ScriptVO<?>> getScripts() {
-		List<ScriptVO<?>> scripts = new ScriptDao().getScripts();
-		return scripts;
-	}
+    public List<ScriptVO<?>> getScripts() {
+        List<ScriptVO<?>> scripts = new ScriptDao().getScripts();
+        return scripts;
+    }
 
-	public ScriptVO<?> getScript(int id) {
-		if (id == Common.NEW_ID) {
-			ContextualizedScriptVO vo = new ContextualizedScriptVO();
-			vo.setXid(new ScriptDao().generateUniqueXid());
-			return vo;
-		}
+    public ScriptVO<?> getScript(int id) {
+        if (id == Common.NEW_ID) {
+            ContextualizedScriptVO vo = new ContextualizedScriptVO();
+            vo.setXid(new ScriptDao().generateUniqueXid());
+            return vo;
+        }
 
-		return new ScriptDao().getScript(id);
-	}
+        return new ScriptDao().getScript(id);
+    }
 
-	public DwrResponseI18n saveScript(int id, String xid, String name,
-			String script, List<IntValuePair> pointsOnContext,
-			List<IntValuePair> objectsOnContext) {
+    public DwrResponseI18n saveScript(int id, String xid, String name,
+            String script, List<IntValuePair> pointsOnContext,
+            List<IntValuePair> objectsOnContext) {
 
-		ContextualizedScriptVO vo = new ContextualizedScriptVO();
-		vo.setId(id);
-		vo.setXid(xid);
-		vo.setName(name);
-		vo.setScript(script);
-		vo.setPointsOnContext(pointsOnContext);
-		vo.setObjectsOnContext(objectsOnContext);
-		vo.setUserId(Common.getUser().getId());
+        ContextualizedScriptVO vo = new ContextualizedScriptVO();
+        vo.setId(id);
+        vo.setXid(xid);
+        vo.setName(name);
+        vo.setScript(script);
+        vo.setPointsOnContext(pointsOnContext);
+        vo.setObjectsOnContext(objectsOnContext);
+        vo.setUserId(Common.getUser().getId());
 
-		DwrResponseI18n response = new DwrResponseI18n();
+        DwrResponseI18n response = new DwrResponseI18n();
 
-		vo.validate(response);
+        vo.validate(response);
 
-		if (!response.getHasMessages())
-			new ScriptDao().saveScript(vo);
+        if (!response.getHasMessages()) {
+            new ScriptDao().saveScript(vo);
+        }
 
-		response.addData("seId", vo.getId());
-		return response;
-	}
+        response.addData("seId", vo.getId());
+        return response;
+    }
 
-	public void deleteScript(int scriptId) {
-		new ScriptDao().deleteScript(scriptId);
-	}
+    public void deleteScript(int scriptId) {
+        new ScriptDao().deleteScript(scriptId);
+    }
 
-	public boolean executeScript(int scriptId) {
-		ScriptVO<?> script = new ScriptDao().getScript(scriptId);
+    public boolean executeScript(int scriptId) {
+        ScriptVO<?> script = new ScriptDao().getScript(scriptId);
 
-		try {
-			if (script != null) {
-				ScriptRT rt = script.createScriptRT();
-				rt.execute();
-				return true;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        try {
+            if (script != null) {
+                ScriptRT rt = script.createScriptRT();
+                rt.execute();
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		return false;
-	}
+        return false;
+    }
 }

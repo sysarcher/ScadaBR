@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.servlet;
 
@@ -37,6 +37,7 @@ import com.serotonin.mango.vo.report.UserCommentCsvStreamer;
  * @author Matthew Lohbihler
  */
 abstract public class ReportExportBase extends HttpServlet {
+
     private static final long serialVersionUID = 1L;
 
     protected static final int CONTENT_REPORT = 1;
@@ -61,11 +62,11 @@ abstract public class ReportExportBase extends HttpServlet {
         if (content == CONTENT_REPORT) {
             ReportCsvStreamer creator = new ReportCsvStreamer(response.getWriter(), bundle);
             reportDao.reportInstanceData(instanceId, creator);
-        }
-        else if (content == CONTENT_EVENTS)
+        } else if (content == CONTENT_EVENTS) {
             new EventCsvStreamer(response.getWriter(), reportDao.getReportInstanceEvents(instanceId), bundle);
-        else if (content == CONTENT_COMMENTS)
+        } else if (content == CONTENT_COMMENTS) {
             new UserCommentCsvStreamer(response.getWriter(), reportDao.getReportInstanceUserComments(instanceId),
                     bundle);
+        }
     }
 }

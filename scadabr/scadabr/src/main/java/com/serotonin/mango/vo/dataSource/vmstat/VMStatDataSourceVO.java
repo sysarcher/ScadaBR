@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.vmstat;
 
@@ -23,8 +23,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.vmstat.VMStatDataSourceRT;
 import com.serotonin.mango.rt.event.AlarmLevels;
@@ -33,26 +33,29 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class VMStatDataSourceVO extends DataSourceVO<VMStatDataSourceVO> {
+
     public static final Type TYPE = Type.VMSTAT;
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
-        ets.add(createEventType(VMStatDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessage(
+        ets.add(createEventType(VMStatDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.dataSource"), EventType.DuplicateHandling.IGNORE_SAME_MESSAGE, AlarmLevels.URGENT));
         ets
-                .add(createEventType(VMStatDataSourceRT.PARSE_EXCEPTION_EVENT, new LocalizableMessage(
-                        "event.ds.dataParse")));
+                .add(createEventType(VMStatDataSourceRT.PARSE_EXCEPTION_EVENT, new LocalizableMessageImpl(
+                                        "event.ds.dataParse")));
     }
 
     private static final ExportCodes EVENT_CODES = new ExportCodes();
+
     static {
         EVENT_CODES.addElement(VMStatDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, "DATA_SOURCE_EXCEPTION");
         EVENT_CODES.addElement(VMStatDataSourceRT.PARSE_EXCEPTION_EVENT, "PARSE_EXCEPTION");
@@ -64,6 +67,7 @@ public class VMStatDataSourceVO extends DataSourceVO<VMStatDataSourceVO> {
     }
 
     public interface OutputScale {
+
         int NONE = 1;
         int LOWER_K = 2;
         int UPPER_K = 3;
@@ -72,6 +76,7 @@ public class VMStatDataSourceVO extends DataSourceVO<VMStatDataSourceVO> {
     }
 
     public static final ExportCodes OUTPUT_SCALE_CODES = new ExportCodes();
+
     static {
         OUTPUT_SCALE_CODES.addElement(OutputScale.NONE, "NONE", "dsEdit.vmstat.scale.none");
         OUTPUT_SCALE_CODES.addElement(OutputScale.LOWER_K, "LOWER_K", "dsEdit.vmstat.scale.k");
@@ -87,7 +92,7 @@ public class VMStatDataSourceVO extends DataSourceVO<VMStatDataSourceVO> {
 
     @Override
     public LocalizableMessage getConnectionDescription() {
-        return new LocalizableMessage("dsEdit.vmstat.dsconn", pollSeconds);
+        return new LocalizableMessageImpl("dsEdit.vmstat.dsconn", pollSeconds);
     }
 
     @Override
@@ -125,11 +130,13 @@ public class VMStatDataSourceVO extends DataSourceVO<VMStatDataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
 
-        if (pollSeconds < 1)
+        if (pollSeconds < 1) {
             response.addContextualMessage("pollSeconds", "validate.greaterThanZero", pollSeconds);
+        }
 
-        if (!OUTPUT_SCALE_CODES.isValidId(outputScale))
+        if (!OUTPUT_SCALE_CODES.isValidId(outputScale)) {
             response.addContextualMessage("outputScale", "validate.invalidValue");
+        }
     }
 
     @Override

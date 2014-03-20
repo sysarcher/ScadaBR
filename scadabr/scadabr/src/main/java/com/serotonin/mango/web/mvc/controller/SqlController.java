@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.mvc.controller;
 
@@ -47,6 +47,7 @@ import br.org.scadabr.util.SerializationHelper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class SqlController extends AbstractFormController {
+
     private static final Log LOG = LogFactory.getLog(SqlController.class);
     private String formView;
 
@@ -79,8 +80,9 @@ public class SqlController extends AbstractFormController {
                         ResultSetMetaData meta = rs.getMetaData();
                         int columns = meta.getColumnCount();
                         List<String> headers = new ArrayList<>(columns);
-                        for (int i = 0; i < columns; i++)
+                        for (int i = 0; i < columns; i++) {
                             headers.add(meta.getColumnLabel(i + 1));
+                        }
 
                         List<List<Object>> data = new LinkedList<>();
                         List<Object> row;
@@ -88,15 +90,15 @@ public class SqlController extends AbstractFormController {
                             row = new ArrayList<>(columns);
                             data.add(row);
                             for (int i = 0; i < columns; i++) {
-                                if (meta.getColumnType(i + 1) == Types.CLOB)
+                                if (meta.getColumnType(i + 1) == Types.CLOB) {
                                     row.add(rs.getString(i + 1));
-                                else if (meta.getColumnType(i + 1) == Types.LONGVARBINARY
+                                } else if (meta.getColumnType(i + 1) == Types.LONGVARBINARY
                                         || meta.getColumnType(i + 1) == Types.BLOB) {
                                     Object o = SerializationHelper.readObject(rs.getBlob(i + 1).getBinaryStream());
                                     row.add("Serialized data(" + o + ")");
-                                }
-                                else
+                                } else {
                                     row.add(rs.getObject(i + 1));
+                                }
                             }
                         }
 
@@ -104,15 +106,13 @@ public class SqlController extends AbstractFormController {
                         form.setData(data);
                     }
                 });
-            }
-            else if (WebUtils.hasSubmitParameter(request, "update")) {
+            } else if (WebUtils.hasSubmitParameter(request, "update")) {
                 JdbcTemplate ejt = new JdbcTemplate();
                 ejt.setDataSource(databaseAccess.getDataSource());
                 int result = ejt.update(form.getSqlString());
                 form.setUpdateResult(result);
             }
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             errors.rejectValue("sqlString", "", e.getMessage());
             LOG.debug(e);
         }

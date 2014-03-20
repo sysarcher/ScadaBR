@@ -1,28 +1,30 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.event;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 public class AlarmLevels {
+
     public static final int NONE = 0;
     public static final int INFORMATION = 1;
     public static final int URGENT = 2;
@@ -36,6 +38,7 @@ public class AlarmLevels {
     public static final String LIFE_SAFETY_DESCRIPTION = "common.alarmLevel.lifeSafety";
 
     public static final ExportCodes CODES = new ExportCodes();
+
     static {
         CODES.addElement(NONE, "NONE");
         CODES.addElement(INFORMATION, "INFORMATION");
@@ -46,21 +49,21 @@ public class AlarmLevels {
 
     public static String getAlarmLevelDescription(int alarmLevel) {
         switch (alarmLevel) {
-        case NONE:
-            return NONE_DESCRIPTION;
-        case INFORMATION:
-            return INFORMATION_DESCRIPTION;
-        case URGENT:
-            return URGENT_DESCRIPTION;
-        case CRITICAL:
-            return CRITICAL_DESCRIPTION;
-        case LIFE_SAFETY:
-            return LIFE_SAFETY_DESCRIPTION;
+            case NONE:
+                return NONE_DESCRIPTION;
+            case INFORMATION:
+                return INFORMATION_DESCRIPTION;
+            case URGENT:
+                return URGENT_DESCRIPTION;
+            case CRITICAL:
+                return CRITICAL_DESCRIPTION;
+            case LIFE_SAFETY:
+                return LIFE_SAFETY_DESCRIPTION;
         }
         throw new ShouldNeverHappenException("(unknown level " + alarmLevel + ")");
     }
 
     public static LocalizableMessage getAlarmLevelMessage(int alarmLevel) {
-        return new LocalizableMessage(getAlarmLevelDescription(alarmLevel));
+        return new LocalizableMessageImpl(getAlarmLevelDescription(alarmLevel));
     }
 }

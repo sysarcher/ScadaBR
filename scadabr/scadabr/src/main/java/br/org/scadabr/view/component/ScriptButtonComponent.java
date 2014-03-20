@@ -4,80 +4,81 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.component.HtmlComponent;
 import br.org.scadabr.util.SerializationHelper;
 
 @JsonRemoteEntity
 public class ScriptButtonComponent extends HtmlComponent {
-	public static ImplDefinition DEFINITION = new ImplDefinition(
-			"scriptButton", "SCRIPT_BUTTON", "graphic.scriptButton", null);
 
-	@JsonRemoteProperty
-	private String scriptXid;
+    public static ImplDefinition DEFINITION = new ImplDefinition(
+            "scriptButton", "SCRIPT_BUTTON", "graphic.scriptButton", null);
 
-	@JsonRemoteProperty
-	private String text;
+    @JsonRemoteProperty
+    private String scriptXid;
 
-	@Override
-	public ImplDefinition definition() {
-		return DEFINITION;
-	}
+    @JsonRemoteProperty
+    private String text;
 
-	private void createScriptButton() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("<button onclick='mango.view.executeScript(\"" + scriptXid
-				+ "\");'>");
-		sb.append(text);
-		sb.append("</button>");
-		setContent(sb.toString());
-	}
+    @Override
+    public ImplDefinition definition() {
+        return DEFINITION;
+    }
+
+    private void createScriptButton() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<button onclick='mango.view.executeScript(\"" + scriptXid
+                + "\");'>");
+        sb.append(text);
+        sb.append("</button>");
+        setContent(sb.toString());
+    }
 
 	//
-	// /
-	// / Serialization
-	// /
-	//
-	private static final long serialVersionUID = -1;
-	private static final int version = 1;
+    // /
+    // / Serialization
+    // /
+    //
+    private static final long serialVersionUID = -1;
+    private static final int version = 1;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(version);
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(version);
 
-		createScriptButton();
+        createScriptButton();
 
-		SerializationHelper.writeSafeUTF(out, getContent());
-		SerializationHelper.writeSafeUTF(out, scriptXid);
-		SerializationHelper.writeSafeUTF(out, text);
-	}
+        SerializationHelper.writeSafeUTF(out, getContent());
+        SerializationHelper.writeSafeUTF(out, scriptXid);
+        SerializationHelper.writeSafeUTF(out, text);
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException {
-		int ver = in.readInt();
+    private void readObject(ObjectInputStream in) throws IOException {
+        int ver = in.readInt();
 
 		// Switch on the version of the class so that version changes can be
-		// elegantly handled.
-		if (ver == 1) {
-			setContent(SerializationHelper.readSafeUTF(in));
-			scriptXid = SerializationHelper.readSafeUTF(in);
-			text = SerializationHelper.readSafeUTF(in);
-		}
-	}
+        // elegantly handled.
+        if (ver == 1) {
+            setContent(SerializationHelper.readSafeUTF(in));
+            scriptXid = SerializationHelper.readSafeUTF(in);
+            text = SerializationHelper.readSafeUTF(in);
+        }
+    }
 
-	public String getScriptXid() {
-		return scriptXid;
-	}
+    public String getScriptXid() {
+        return scriptXid;
+    }
 
-	public void setScriptXid(String scriptXid) {
-		this.scriptXid = scriptXid;
-	}
+    public void setScriptXid(String scriptXid) {
+        this.scriptXid = scriptXid;
+    }
 
-	public void setText(String text) {
-		this.text = text;
-	}
+    public void setText(String text) {
+        this.text = text;
+    }
 
-	public String getText() {
-		return text;
-	}
+    public String getText() {
+        return text;
+    }
 }

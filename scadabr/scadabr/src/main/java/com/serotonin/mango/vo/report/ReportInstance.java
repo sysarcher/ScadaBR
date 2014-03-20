@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.report;
 
@@ -24,13 +24,15 @@ import org.joda.time.DateTime;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.util.DateUtils;
-import com.serotonin.web.i18n.I18NUtils;
-import com.serotonin.web.taglib.DateFunctions;
+import br.org.scadabr.web.i18n.I18NUtils;
+import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.web.taglib.DateFunctions;
 
 /**
  * @author Matthew Lohbihler
  */
 public class ReportInstance {
+
     public static final int STATE_NOT_STARTED = 1;
     public static final int STATE_STARTED = 2;
     public static final int STATE_FINISHED = 3;
@@ -66,15 +68,13 @@ public class ReportInstance {
                 reportEndTime = date.getMillis();
                 date = DateUtils.minus(date, template.getPreviousPeriodType(), template.getPreviousPeriodCount());
                 reportStartTime = date.getMillis();
-            }
-            else {
+            } else {
                 DateTime date = new DateTime();
                 reportEndTime = date.getMillis();
                 date = DateUtils.minus(date, template.getPastPeriodType(), template.getPastPeriodCount());
                 reportStartTime = date.getMillis();
             }
-        }
-        else {
+        } else {
             if (!template.isFromNone()) {
                 DateTime date = new DateTime(template.getFromYear(), template.getFromMonth(), template.getFromDay(),
                         template.getFromHour(), template.getFromMinute(), 0, 0);
@@ -90,12 +90,15 @@ public class ReportInstance {
     }
 
     public int getState() {
-        if (runStartTime == -1)
+        if (runStartTime == -1) {
             return STATE_NOT_STARTED;
-        if (runEndTime == -1)
+        }
+        if (runEndTime == -1) {
             return STATE_STARTED;
-        if (recordCount == -1)
+        }
+        if (recordCount == -1) {
             return STATE_FAILED;
+        }
         return STATE_FINISHED;
     }
 
@@ -112,46 +115,56 @@ public class ReportInstance {
     }
 
     public String getPrettyReportStartTime() {
-        if (reportStartTime == -1)
-            return I18NUtils.getMessage(bundle, "common.inception");
+        if (reportStartTime == -1) {
+            return Localizer.localizeI18nKey("common.inception", bundle);
+        }
         return DateFunctions.getFullMinuteTime(reportStartTime);
     }
 
     public String getPrettyReportEndTime() {
-        if (reportEndTime == -1)
-            return I18NUtils.getMessage(bundle, "reports.now");
+        if (reportEndTime == -1) {
+            return Localizer.localizeI18nKey("reports.now", bundle);
+        }
         return DateFunctions.getFullMinuteTime(reportEndTime);
     }
 
     public String getPrettyRunStartTime() {
-        if (runStartTime == -1)
-            return I18NUtils.getMessage(bundle, "reports.notStarted");
+        if (runStartTime == -1) {
+            return Localizer.localizeI18nKey("reports.notStarted", bundle);
+        }
         return DateFunctions.getFullMinuteTime(runStartTime);
     }
 
     public String getPrettyRunEndTime() {
-        if (runStartTime == -1)
+        if (runStartTime == -1) {
             return "";
-        if (runEndTime == -1)
-            return I18NUtils.getMessage(bundle, "reports.inProgress");
+        }
+        if (runEndTime == -1) {
+            return Localizer.localizeI18nKey("reports.inProgress", bundle);
+        }
         return DateFunctions.getFullMinuteTime(runEndTime);
     }
 
     public String getPrettyRunDuration() {
-        if (runStartTime == -1)
+        if (runStartTime == -1) {
             return "";
-        if (runEndTime == -1)
-            return I18NUtils.getMessage(bundle, "reports.inProgress");
-        return DateUtils.getDuration(runEndTime - runStartTime).getLocalizedMessage(bundle);
+        }
+        if (runEndTime == -1) {
+            return Localizer.localizeI18nKey("reports.inProgress", bundle);
+        }
+        return Localizer.localizeMessage(DateUtils.getDuration(runEndTime - runStartTime), bundle);
     }
 
     public String getPrettyRecordCount() {
-        if (runStartTime == -1)
+        if (runStartTime == -1) {
             return "";
-        if (runEndTime == -1)
+        }
+        if (runEndTime == -1) {
             return "";
-        if (recordCount == -1)
-            return I18NUtils.getMessage(bundle, "reports.failed");
+        }
+        if (recordCount == -1) {
+            return Localizer.localizeI18nKey("reports.failed", bundle);
+        }
         return Integer.toString(recordCount);
     }
 

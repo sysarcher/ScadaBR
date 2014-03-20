@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.modbus;
 
@@ -25,26 +25,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.modbus.ModbusIpDataSource;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.modbus4j.base.ModbusUtils;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
 public class ModbusIpDataSourceVO extends ModbusDataSourceVO<ModbusIpDataSourceVO> {
+
     public static final Type TYPE = Type.MODBUS_IP;
 
     public enum TransportType {
+
         TCP("dsEdit.modbusIp.transportType.tcp"), TCP_KEEP_ALIVE("dsEdit.modbusIp.transportType.tcpKA"), UDP(
                 "dsEdit.modbusIp.transportType.udp");
 
@@ -56,16 +59,18 @@ public class ModbusIpDataSourceVO extends ModbusDataSourceVO<ModbusIpDataSourceV
 
         public static TransportType valueOfIgnoreCase(String text) {
             for (TransportType type : values()) {
-                if (type.name().equalsIgnoreCase(text))
+                if (type.name().equalsIgnoreCase(text)) {
                     return type;
+                }
             }
             return null;
         }
 
         public static List<String> getTypeList() {
             List<String> result = new ArrayList<String>();
-            for (TransportType type : values())
+            for (TransportType type : values()) {
                 result.add(type.name());
+            }
             return result;
         }
 
@@ -76,7 +81,7 @@ public class ModbusIpDataSourceVO extends ModbusDataSourceVO<ModbusIpDataSourceV
 
     @Override
     public LocalizableMessage getConnectionDescription() {
-        return new LocalizableMessage("common.default", host + ":" + port);
+        return new LocalizableMessageImpl("common.default", host + ":" + port);
     }
 
     @Override
@@ -130,25 +135,30 @@ public class ModbusIpDataSourceVO extends ModbusDataSourceVO<ModbusIpDataSourceV
     }
 
     public String getTransportTypeStr() {
-        if (transportType == null)
+        if (transportType == null) {
             return null;
+        }
         return transportType.toString();
     }
 
     public void setTransportTypeStr(String transportType) {
-        if (transportType != null)
+        if (transportType != null) {
             this.transportType = TransportType.valueOf(transportType);
+        }
     }
 
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (transportType == null)
+        if (transportType == null) {
             response.addContextualMessage("transportType", "validate.required");
-        if (StringUtils.isEmpty(host))
+        }
+        if (StringUtils.isEmpty(host)) {
             response.addContextualMessage("host", "validate.required");
-        if (port <= 0 || port > 0xffff)
+        }
+        if (port <= 0 || port > 0xffff) {
             response.addContextualMessage("port", "validate.invalidValue");
+        }
     }
 
     @Override
@@ -163,9 +173,10 @@ public class ModbusIpDataSourceVO extends ModbusDataSourceVO<ModbusIpDataSourceV
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, ModbusIpDataSourceVO from) {
         super.addPropertyChangesImpl(list, from);
-        if (from.transportType != transportType)
+        if (from.transportType != transportType) {
             AuditEventType.addPropertyChangeMessage(list, "dsEdit.modbusIp.transportType", from.transportType.getKey(),
                     transportType.getKey());
+        }
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbusIp.host", from.host, host);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbusIp.port", from.port, port);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbusIp.encapsulated", from.encapsulated,
@@ -197,8 +208,7 @@ public class ModbusIpDataSourceVO extends ModbusDataSourceVO<ModbusIpDataSourceV
             host = SerializationHelper.readSafeUTF(in);
             port = in.readInt();
             encapsulated = false;
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             transportType = (TransportType) in.readObject();
             host = SerializationHelper.readSafeUTF(in);
             port = in.readInt();
@@ -212,9 +222,10 @@ public class ModbusIpDataSourceVO extends ModbusDataSourceVO<ModbusIpDataSourceV
         String text = json.getString("transportType");
         if (text != null) {
             transportType = TransportType.valueOfIgnoreCase(text);
-            if (transportType == null)
+            if (transportType == null) {
                 throw new LocalizableJsonException("emport.error.invalid", "transportType", text,
                         TransportType.getTypeList());
+            }
         }
     }
 

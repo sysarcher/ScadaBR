@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.view.text;
 
@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -31,16 +31,18 @@ import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
 
 /**
- * This class is called "binary" so that we can refer to values as 0 and 1, which is the actual representation in most
- * BA systems. However, the render method actually expects a boolean value which (arbitrarily) maps 0 to false and 1 to
- * true.
- * 
+ * This class is called "binary" so that we can refer to values as 0 and 1,
+ * which is the actual representation in most BA systems. However, the render
+ * method actually expects a boolean value which (arbitrarily) maps 0 to false
+ * and 1 to true.
+ *
  * @author mlohbihler
  */
 @JsonRemoteEntity
 public class BinaryTextRenderer extends BaseTextRenderer {
+
     private static ImplDefinition definition = new ImplDefinition("textRendererBinary", "BINARY",
-            "textRenderer.binary", new int[] { DataTypes.BINARY });
+            "textRenderer.binary", new int[]{DataTypes.BINARY});
 
     public static ImplDefinition getDefinition() {
         return definition;
@@ -76,22 +78,25 @@ public class BinaryTextRenderer extends BaseTextRenderer {
 
     @Override
     protected String getTextImpl(MangoValue value, int hint) {
-        if (!(value instanceof BinaryValue))
+        if (!(value instanceof BinaryValue)) {
             return null;
+        }
         return getText(value.getBooleanValue(), hint);
     }
 
     @Override
     protected String getColourImpl(MangoValue value) {
-        if (!(value instanceof BinaryValue))
+        if (!(value instanceof BinaryValue)) {
             return null;
+        }
         return getColour(value.getBooleanValue());
     }
 
     @Override
     public String getColour(boolean value) {
-        if (value)
+        if (value) {
             return oneColour;
+        }
         return zeroColour;
     }
 
@@ -129,10 +134,12 @@ public class BinaryTextRenderer extends BaseTextRenderer {
 
     @Override
     public String getText(boolean value, int hint) {
-        if (hint == TextRenderer.HINT_RAW)
+        if (hint == TextRenderer.HINT_RAW) {
             return value ? "1" : "0";
-        if (value)
+        }
+        if (value) {
             return oneLabel;
+        }
         return zeroLabel;
     }
 

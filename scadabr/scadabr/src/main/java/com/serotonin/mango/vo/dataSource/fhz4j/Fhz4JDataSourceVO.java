@@ -27,11 +27,11 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.fhz4j.Fhz4JDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -39,9 +39,10 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import net.sf.fhz4j.Fhz1000;
 import net.sf.fhz4j.FhzDeviceTypes;
 
@@ -71,17 +72,17 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
 
     @Override
     protected void addEventTypes(List<EventTypeVO> eventTypes) {
-        eventTypes.add(createEventType(Fhz4JDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessage(
+        eventTypes.add(createEventType(Fhz4JDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.dataSource")));
-        eventTypes.add(createEventType(Fhz4JDataSourceRT.POINT_READ_EXCEPTION_EVENT, new LocalizableMessage(
+        eventTypes.add(createEventType(Fhz4JDataSourceRT.POINT_READ_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.pointRead")));
-        eventTypes.add(createEventType(Fhz4JDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, new LocalizableMessage(
+        eventTypes.add(createEventType(Fhz4JDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.pointWrite")));
     }
 
     @Override
     public LocalizableMessage getConnectionDescription() {
-        return new LocalizableMessage("common.default", commPortId);
+        return new LocalizableMessageImpl("common.default", commPortId);
     }
 
     @Override
@@ -183,7 +184,6 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
     public String getFhzHousecodeStr() {
         return Fhz1000.houseCodeToString(fhzHousecode);
     }
-
 
     /**
      * @param fhzHousecode the housecode ot this FHZ to set

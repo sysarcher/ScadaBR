@@ -5,26 +5,31 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import com.serotonin.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteEntity;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.persistent.PersistentPointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
 public class PersistentPointLocatorVO extends AbstractPointLocatorVO {
+
+    @Override
     public PointLocatorRT createRuntime() {
         return new PersistentPointLocatorRT(this);
     }
 
+    @Override
     public LocalizableMessage getConfigurationDescription() {
-        return new LocalizableMessage("common.noMessage");
+        return new LocalizableMessageImpl("common.noMessage");
     }
 
     private int dataTypeId;
 
+    @Override
     public int getDataTypeId() {
         return dataTypeId;
     }
@@ -33,13 +38,16 @@ public class PersistentPointLocatorVO extends AbstractPointLocatorVO {
         this.dataTypeId = dataTypeId;
     }
 
+    @Override
     public boolean isSettable() {
         return false;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
-        if (!DataTypes.CODES.isValidId(dataTypeId))
+        if (!DataTypes.CODES.isValidId(dataTypeId)) {
             response.addContextualMessage("dataTypeId", "validate.invalidValue");
+        }
     }
 
     @Override

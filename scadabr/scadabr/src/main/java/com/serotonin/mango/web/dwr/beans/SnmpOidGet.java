@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr.beans;
 
@@ -28,13 +28,15 @@ import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
 import com.serotonin.mango.rt.dataSource.snmp.Version;
-import com.serotonin.web.i18n.I18NUtils;
+import br.org.scadabr.web.i18n.I18NUtils;
+import br.org.scadabr.web.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
- * 
+ *
  */
 public class SnmpOidGet extends Thread implements TestingUtility {
+
     private final ResourceBundle bundle;
     private final String host;
     private final int port;
@@ -69,20 +71,19 @@ public class SnmpOidGet extends Thread implements TestingUtility {
             pdu.add(new VariableBinding(new OID(oid)));
 
             PDU response = snmp.send(pdu, version.getTarget(host, port, retries, timeout)).getResponse();
-            if (response == null)
-                result = I18NUtils.getMessage(bundle, "dsEdit.snmp.tester.noResponse");
-            else
+            if (response == null) {
+                result = Localizer.localizeI18nKey("dsEdit.snmp.tester.noResponse", bundle);
+            } else {
                 result = response.get(0).getVariable().toString();
-        }
-        catch (IOException e) {
-            result = e.getMessage();
-        }
-        finally {
-            try {
-                if (snmp != null)
-                    snmp.close();
             }
-            catch (IOException e) {
+        } catch (IOException e) {
+            result = e.getMessage();
+        } finally {
+            try {
+                if (snmp != null) {
+                    snmp.close();
+                }
+            } catch (IOException e) {
                 // no op
             }
         }

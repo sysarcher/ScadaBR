@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.event;
 
@@ -23,13 +23,13 @@ import java.util.Map;
 
 import org.joda.time.DateTime;
 
-import com.serotonin.ShouldNeverHappenException;
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.schedule.ScheduledEventRT;
@@ -38,19 +38,21 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
-import com.serotonin.timer.CronTimerTrigger;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
-import com.serotonin.web.taglib.DateFunctions;
+import br.org.scadabr.timer.CronTimerTrigger;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.web.taglib.DateFunctions;
 
 /**
  * @author Matthew Lohbihler
- * 
+ *
  */
 @JsonRemoteEntity
 public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeComparable<ScheduledEventVO>,
         JsonSerializable {
+
     public static final String XID_PREFIX = "SE_";
 
     public static String getEventDetectorKey(int id) {
@@ -66,6 +68,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     public static final int TYPE_CRON = 7;
 
     public static ExportCodes TYPE_CODES = new ExportCodes();
+
     static {
         TYPE_CODES.addElement(TYPE_HOURLY, "HOURLY", "scheduledEvents.type.hour");
         TYPE_CODES.addElement(TYPE_DAILY, "DAILY", "scheduledEvents.type.day");
@@ -136,83 +139,84 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     public LocalizableMessage getDescription() {
         LocalizableMessage message;
 
-        if (!StringUtils.isEmpty(alias))
-            message = new LocalizableMessage("common.default", alias);
-        else if (scheduleType == TYPE_ONCE) {
-            if (returnToNormal)
-                message = new LocalizableMessage("event.schedule.onceUntil", DateFunctions.getTime(new DateTime(
+        if (!StringUtils.isEmpty(alias)) {
+            message = new LocalizableMessageImpl("common.default", alias);
+        } else if (scheduleType == TYPE_ONCE) {
+            if (returnToNormal) {
+                message = new LocalizableMessageImpl("event.schedule.onceUntil", DateFunctions.getTime(new DateTime(
                         activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0).getMillis()),
                         DateFunctions.getTime(new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour,
-                                inactiveMinute, inactiveSecond, 0).getMillis()));
-            else
-                message = new LocalizableMessage("event.schedule.onceAt", DateFunctions.getTime(new DateTime(
+                                        inactiveMinute, inactiveSecond, 0).getMillis()));
+            } else {
+                message = new LocalizableMessageImpl("event.schedule.onceAt", DateFunctions.getTime(new DateTime(
                         activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0).getMillis()));
-        }
-        else if (scheduleType == TYPE_HOURLY) {
+            }
+        } else if (scheduleType == TYPE_HOURLY) {
             String activeTime = StringUtils.pad(Integer.toString(activeMinute), '0', 2) + ":"
                     + StringUtils.pad(Integer.toString(activeSecond), '0', 2);
-            if (returnToNormal)
-                message = new LocalizableMessage("event.schedule.hoursUntil", activeTime, StringUtils.pad(
+            if (returnToNormal) {
+                message = new LocalizableMessageImpl("event.schedule.hoursUntil", activeTime, StringUtils.pad(
                         Integer.toString(inactiveMinute), '0', 2)
                         + ":" + StringUtils.pad(Integer.toString(inactiveSecond), '0', 2));
-            else
-                message = new LocalizableMessage("event.schedule.hoursAt", activeTime);
-        }
-        else if (scheduleType == TYPE_DAILY) {
-            if (returnToNormal)
-                message = new LocalizableMessage("event.schedule.dailyUntil", activeTime(), inactiveTime());
-            else
-                message = new LocalizableMessage("event.schedule.dailyAt", activeTime());
-        }
-        else if (scheduleType == TYPE_WEEKLY) {
-            if (returnToNormal)
-                message = new LocalizableMessage("event.schedule.weeklyUntil", weekday(true), activeTime(),
+            } else {
+                message = new LocalizableMessageImpl("event.schedule.hoursAt", activeTime);
+            }
+        } else if (scheduleType == TYPE_DAILY) {
+            if (returnToNormal) {
+                message = new LocalizableMessageImpl("event.schedule.dailyUntil", activeTime(), inactiveTime());
+            } else {
+                message = new LocalizableMessageImpl("event.schedule.dailyAt", activeTime());
+            }
+        } else if (scheduleType == TYPE_WEEKLY) {
+            if (returnToNormal) {
+                message = new LocalizableMessageImpl("event.schedule.weeklyUntil", weekday(true), activeTime(),
                         weekday(false), inactiveTime());
-            else
-                message = new LocalizableMessage("event.schedule.weeklyAt", weekday(true), activeTime());
-        }
-        else if (scheduleType == TYPE_MONTHLY) {
-            if (returnToNormal)
-                message = new LocalizableMessage("event.schedule.monthlyUntil", monthday(true), activeTime(),
+            } else {
+                message = new LocalizableMessageImpl("event.schedule.weeklyAt", weekday(true), activeTime());
+            }
+        } else if (scheduleType == TYPE_MONTHLY) {
+            if (returnToNormal) {
+                message = new LocalizableMessageImpl("event.schedule.monthlyUntil", monthday(true), activeTime(),
                         monthday(false), inactiveTime());
-            else
-                message = new LocalizableMessage("event.schedule.monthlyAt", monthday(true), activeTime());
-        }
-        else if (scheduleType == TYPE_YEARLY) {
-            if (returnToNormal)
-                message = new LocalizableMessage("event.schedule.yearlyUntil", monthday(true), month(true),
+            } else {
+                message = new LocalizableMessageImpl("event.schedule.monthlyAt", monthday(true), activeTime());
+            }
+        } else if (scheduleType == TYPE_YEARLY) {
+            if (returnToNormal) {
+                message = new LocalizableMessageImpl("event.schedule.yearlyUntil", monthday(true), month(true),
                         activeTime(), monthday(false), month(false), inactiveTime());
-            else
-                message = new LocalizableMessage("event.schedule.yearlyAt", monthday(true), month(true), activeTime());
-        }
-        else if (scheduleType == TYPE_CRON) {
-            if (returnToNormal)
-                message = new LocalizableMessage("event.schedule.cronUntil", activeCron, inactiveCron);
-            else
-                message = new LocalizableMessage("event.schedule.cronAt", activeCron);
-        }
-        else
+            } else {
+                message = new LocalizableMessageImpl("event.schedule.yearlyAt", monthday(true), month(true), activeTime());
+            }
+        } else if (scheduleType == TYPE_CRON) {
+            if (returnToNormal) {
+                message = new LocalizableMessageImpl("event.schedule.cronUntil", activeCron, inactiveCron);
+            } else {
+                message = new LocalizableMessageImpl("event.schedule.cronAt", activeCron);
+            }
+        } else {
             throw new ShouldNeverHappenException("Unknown schedule type: " + scheduleType);
+        }
 
         return message;
     }
 
     private LocalizableMessage getTypeMessage() {
         switch (scheduleType) {
-        case TYPE_HOURLY:
-            return new LocalizableMessage("scheduledEvents.type.hour");
-        case TYPE_DAILY:
-            return new LocalizableMessage("scheduledEvents.type.day");
-        case TYPE_WEEKLY:
-            return new LocalizableMessage("scheduledEvents.type.week");
-        case TYPE_MONTHLY:
-            return new LocalizableMessage("scheduledEvents.type.month");
-        case TYPE_YEARLY:
-            return new LocalizableMessage("scheduledEvents.type.year");
-        case TYPE_ONCE:
-            return new LocalizableMessage("scheduledEvents.type.once");
-        case TYPE_CRON:
-            return new LocalizableMessage("scheduledEvents.type.cron");
+            case TYPE_HOURLY:
+                return new LocalizableMessageImpl("scheduledEvents.type.hour");
+            case TYPE_DAILY:
+                return new LocalizableMessageImpl("scheduledEvents.type.day");
+            case TYPE_WEEKLY:
+                return new LocalizableMessageImpl("scheduledEvents.type.week");
+            case TYPE_MONTHLY:
+                return new LocalizableMessageImpl("scheduledEvents.type.month");
+            case TYPE_YEARLY:
+                return new LocalizableMessageImpl("scheduledEvents.type.year");
+            case TYPE_ONCE:
+                return new LocalizableMessageImpl("scheduledEvents.type.once");
+            case TYPE_CRON:
+                return new LocalizableMessageImpl("scheduledEvents.type.cron");
         }
         return null;
     }
@@ -229,46 +233,55 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
                 + StringUtils.pad(Integer.toString(inactiveSecond), '0', 2);
     }
 
-    private static final String[] weekdays = { "", "common.day.mon", "common.day.tue", "common.day.wed",
-            "common.day.thu", "common.day.fri", "common.day.sat", "common.day.sun" };
+    private static final String[] weekdays = {"", "common.day.mon", "common.day.tue", "common.day.wed",
+        "common.day.thu", "common.day.fri", "common.day.sat", "common.day.sun"};
 
     private LocalizableMessage weekday(boolean active) {
         int day = activeDay;
-        if (!active)
+        if (!active) {
             day = inactiveDay;
-        return new LocalizableMessage(weekdays[day]);
+        }
+        return new LocalizableMessageImpl(weekdays[day]);
     }
 
     private LocalizableMessage monthday(boolean active) {
         int day = activeDay;
 
-        if (!active)
+        if (!active) {
             day = inactiveDay;
+        }
 
-        if (day == -3)
-            return new LocalizableMessage("common.day.thirdLast");
-        if (day == -2)
-            return new LocalizableMessage("common.day.secondLastLast");
-        if (day == -1)
-            return new LocalizableMessage("common.day.last");
-        if (day != 11 && day % 10 == 1)
-            return new LocalizableMessage("common.counting.st", Integer.toString(day));
-        if (day != 12 && day % 10 == 2)
-            return new LocalizableMessage("common.counting.nd", Integer.toString(day));
-        if (day != 13 && day % 10 == 3)
-            return new LocalizableMessage("common.counting.rd", Integer.toString(day));
-        return new LocalizableMessage("common.counting.th", Integer.toString(day));
+        if (day == -3) {
+            return new LocalizableMessageImpl("common.day.thirdLast");
+        }
+        if (day == -2) {
+            return new LocalizableMessageImpl("common.day.secondLastLast");
+        }
+        if (day == -1) {
+            return new LocalizableMessageImpl("common.day.last");
+        }
+        if (day != 11 && day % 10 == 1) {
+            return new LocalizableMessageImpl("common.counting.st", Integer.toString(day));
+        }
+        if (day != 12 && day % 10 == 2) {
+            return new LocalizableMessageImpl("common.counting.nd", Integer.toString(day));
+        }
+        if (day != 13 && day % 10 == 3) {
+            return new LocalizableMessageImpl("common.counting.rd", Integer.toString(day));
+        }
+        return new LocalizableMessageImpl("common.counting.th", Integer.toString(day));
     }
 
-    private static final String[] months = { "", "common.month.jan", "common.month.feb", "common.month.mar",
-            "common.month.apr", "common.month.may", "common.month.jun", "common.month.jul", "common.month.aug",
-            "common.month.sep", "common.month.oct", "common.month.nov", "common.month.dec" };
+    private static final String[] months = {"", "common.month.jan", "common.month.feb", "common.month.mar",
+        "common.month.apr", "common.month.may", "common.month.jun", "common.month.jul", "common.month.aug",
+        "common.month.sep", "common.month.oct", "common.month.nov", "common.month.dec"};
 
     private LocalizableMessage month(boolean active) {
         int day = activeDay;
-        if (!active)
+        if (!active) {
             day = inactiveDay;
-        return new LocalizableMessage(months[day]);
+        }
+        return new LocalizableMessageImpl(months[day]);
     }
 
     @Override
@@ -277,23 +290,22 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isLengthGreaterThan(alias, 50))
+        if (StringUtils.isLengthGreaterThan(alias, 50)) {
             response.addContextualMessage("alias", "scheduledEvents.validate.aliasTooLong");
+        }
 
         // Check that cron patterns are ok.
         if (scheduleType == TYPE_CRON) {
             try {
                 new CronTimerTrigger(activeCron);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 response.addContextualMessage("activeCron", "scheduledEvents.validate.activeCron", e.getMessage());
             }
 
             if (returnToNormal) {
                 try {
                     new CronTimerTrigger(inactiveCron);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     response.addContextualMessage("inactiveCron", "scheduledEvents.validate.inactiveCron",
                             e.getMessage());
                 }
@@ -304,16 +316,14 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         ScheduledEventRT rt = createRuntime();
         try {
             rt.createTrigger(true);
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             response.addContextualMessage("activeCron", "scheduledEvents.validate.activeTrigger", e.getMessage());
         }
 
         if (returnToNormal) {
             try {
                 rt.createTrigger(false);
-            }
-            catch (RuntimeException e) {
+            } catch (RuntimeException e) {
                 response.addContextualMessage("inactiveCron", "scheduledEvents.validate.inactiveTrigger",
                         e.getMessage());
             }
@@ -324,8 +334,9 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
             DateTime adt = new DateTime(activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0);
             DateTime idt = new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute,
                     inactiveSecond, 0);
-            if (idt.getMillis() <= adt.getMillis())
+            if (idt.getMillis() <= adt.getMillis()) {
                 response.addContextualMessage("scheduleType", "scheduledEvents.validate.invalidRtn");
+            }
         }
     }
 
@@ -345,22 +356,25 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.xid", from.xid, xid);
         AuditEventType.maybeAddPropertyChangeMessage(list, "scheduledEvents.alias", from.alias, alias);
         AuditEventType.maybeAddAlarmLevelChangeMessage(list, "common.alarmLevel", from.alarmLevel, alarmLevel);
-        if (from.scheduleType != scheduleType)
+        if (from.scheduleType != scheduleType) {
             AuditEventType.addPropertyChangeMessage(list, "scheduledEvents.type", from.getTypeMessage(),
                     getTypeMessage());
+        }
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.rtn", from.returnToNormal, returnToNormal);
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.disabled", from.disabled, disabled);
         if (from.activeYear != activeYear || from.activeMonth != activeMonth || from.activeDay != activeDay
                 || from.activeHour != activeHour || from.activeMinute != activeMinute
-                || from.activeSecond != activeSecond || from.activeCron != activeCron
+                || from.activeSecond != activeSecond || (from.activeCron == null ? activeCron != null : !from.activeCron.equals(activeCron))
                 || from.inactiveYear != inactiveYear || from.inactiveMonth != inactiveMonth
                 || from.inactiveDay != inactiveDay || from.inactiveHour != inactiveHour
                 || from.inactiveMinute != inactiveMinute || from.inactiveSecond != inactiveSecond
-                || from.inactiveCron != inactiveCron)
+                || (from.inactiveCron == null ? inactiveCron != null : !from.inactiveCron.equals(inactiveCron))) {
             AuditEventType.maybeAddPropertyChangeMessage(list, "common.configuration", from.getDescription(),
                     getDescription());
+        }
     }
 
+    @Override
     public int getId() {
         return id;
     }
@@ -544,17 +558,19 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         String text = json.getString("alarmLevel");
         if (text != null) {
             alarmLevel = AlarmLevels.CODES.getId(text);
-            if (!AlarmLevels.CODES.isValidId(alarmLevel))
+            if (!AlarmLevels.CODES.isValidId(alarmLevel)) {
                 throw new LocalizableJsonException("emport.error.scheduledEvent.invalid", "alarmLevel", text,
                         AlarmLevels.CODES.getCodeList());
+            }
         }
 
         text = json.getString("scheduleType");
         if (text != null) {
             scheduleType = TYPE_CODES.getId(text);
-            if (!TYPE_CODES.isValidId(scheduleType))
+            if (!TYPE_CODES.isValidId(scheduleType)) {
                 throw new LocalizableJsonException("emport.error.scheduledEvent.invalid", "scheduleType", text,
                         TYPE_CODES.getCodeList());
+            }
         }
     }
 }

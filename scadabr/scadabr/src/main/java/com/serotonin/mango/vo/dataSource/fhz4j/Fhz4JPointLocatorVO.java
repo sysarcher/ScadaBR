@@ -27,17 +27,18 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import net.sf.fhz4j.Fhz1000;
 import net.sf.fhz4j.FhzDeviceTypes;
 import net.sf.fhz4j.FhzProperty;
@@ -124,7 +125,7 @@ public class Fhz4JPointLocatorVO extends AbstractPointLocatorVO implements JsonS
 
     @Override
     public LocalizableMessage getConfigurationDescription() {
-        return new LocalizableMessage("dsEdit.openv4j", "Something", "I dont know");
+        return new LocalizableMessageImpl("dsEdit.openv4j", "Something", "I dont know");
     }
 
     public void setSettable(boolean settable) {

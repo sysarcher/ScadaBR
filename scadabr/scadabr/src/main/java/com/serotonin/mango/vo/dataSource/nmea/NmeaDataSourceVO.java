@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.nmea;
 
@@ -23,8 +23,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.nmea.NmeaDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -32,25 +32,28 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class NmeaDataSourceVO extends DataSourceVO<NmeaDataSourceVO> {
+
     public static final Type TYPE = Type.NMEA;
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
-        ets.add(createEventType(NmeaDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessage(
+        ets.add(createEventType(NmeaDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.dataSource")));
-        ets.add(createEventType(NmeaDataSourceRT.PARSE_EXCEPTION_EVENT, new LocalizableMessage("event.ds.dataParse")));
+        ets.add(createEventType(NmeaDataSourceRT.PARSE_EXCEPTION_EVENT, new LocalizableMessageImpl("event.ds.dataParse")));
     }
 
     private static final ExportCodes EVENT_CODES = new ExportCodes();
+
     static {
         EVENT_CODES.addElement(NmeaDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, "DATA_SOURCE_EXCEPTION");
         EVENT_CODES.addElement(NmeaDataSourceRT.PARSE_EXCEPTION_EVENT, "PARSE_EXCEPTION");
@@ -63,7 +66,7 @@ public class NmeaDataSourceVO extends DataSourceVO<NmeaDataSourceVO> {
 
     @Override
     public LocalizableMessage getConnectionDescription() {
-        return new LocalizableMessage("common.default", commPortId);
+        return new LocalizableMessageImpl("common.default", commPortId);
     }
 
     @Override
@@ -115,10 +118,12 @@ public class NmeaDataSourceVO extends DataSourceVO<NmeaDataSourceVO> {
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (StringUtils.isEmpty(commPortId))
+        if (StringUtils.isEmpty(commPortId)) {
             response.addContextualMessage("commPortId", "validate.required");
-        if (resetTimeout < 2)
+        }
+        if (resetTimeout < 2) {
             response.addContextualMessage("resetTimeout", "validate.greaterThan1s");
+        }
     }
 
     @Override
@@ -158,8 +163,7 @@ public class NmeaDataSourceVO extends DataSourceVO<NmeaDataSourceVO> {
             commPortId = SerializationHelper.readSafeUTF(in);
             baudRate = in.readInt();
             resetTimeout = 30;
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             commPortId = SerializationHelper.readSafeUTF(in);
             baudRate = in.readInt();
             resetTimeout = in.readInt();

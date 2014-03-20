@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.maint;
 
@@ -27,7 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
@@ -38,10 +38,11 @@ import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.timer.CronTimerTrigger;
-import com.serotonin.timer.TimerTask;
+import br.org.scadabr.timer.CronTimerTrigger;
+import br.org.scadabr.timer.TimerTask;
 
 public class DataPurge {
+
     private final Log log = LogFactory.getLog(DataPurge.class);
     private long runtime;
 
@@ -50,8 +51,7 @@ public class DataPurge {
     public static void schedule() {
         try {
             Common.timer.schedule(new DataPurgeTask());
-        }
-        catch (ParseException e) {
+        } catch (ParseException e) {
             throw new ShouldNeverHappenException(e);
         }
     }
@@ -68,8 +68,9 @@ public class DataPurge {
         DataPointDao dataPointDao = new DataPointDao();
         List<DataPointVO> dataPoints = dataPointDao.getDataPoints(null, false);
         int deleteCount = 0;
-        for (DataPointVO dataPoint : dataPoints)
+        for (DataPointVO dataPoint : dataPoints) {
             deleteCount += purgePoint(dataPoint);
+        }
         // if (deleteCount > 0)
         // new PointValueDao().compressTables();
 
@@ -86,10 +87,11 @@ public class DataPurge {
     }
 
     private long purgePoint(DataPointVO dataPoint) {
-        if (dataPoint.getLoggingType() == DataPointVO.LoggingTypes.NONE)
-            // If there is no logging, then there should be no data, unless logging was just changed to none. In either
-            // case, it's ok to delete everything.
+        if (dataPoint.getLoggingType() == DataPointVO.LoggingTypes.NONE) // If there is no logging, then there should be no data, unless logging was just changed to none. In either
+        // case, it's ok to delete everything.
+        {
             return rm.purgeDataPointValues(dataPoint.getId());
+        }
 
         // No matter when this purge actually runs, we want it to act like it's midnight.
         DateTime cutoff = new DateTime(runtime);
@@ -119,8 +121,9 @@ public class DataPurge {
             }
         }
 
-        if (deleteCount > 0)
+        if (deleteCount > 0) {
             log.info("Filedata purge ended, " + deleteCount + " files deleted");
+        }
     }
 
     private void eventPurge() {
@@ -129,8 +132,9 @@ public class DataPurge {
                 SystemSettingsDao.getIntValue(SystemSettingsDao.EVENT_PURGE_PERIODS));
 
         int deleteCount = new EventDao().purgeEventsBefore(cutoff.getMillis());
-        if (deleteCount > 0)
+        if (deleteCount > 0) {
             log.info("Event purge ended, " + deleteCount + " events deleted");
+        }
     }
 
     private void reportPurge() {
@@ -139,11 +143,13 @@ public class DataPurge {
                 SystemSettingsDao.getIntValue(SystemSettingsDao.REPORT_PURGE_PERIODS));
 
         int deleteCount = new ReportDao().purgeReportsBefore(cutoff.getMillis());
-        if (deleteCount > 0)
+        if (deleteCount > 0) {
             log.info("Report purge ended, " + deleteCount + " report instances deleted");
+        }
     }
 
     static class DataPurgeTask extends TimerTask {
+
         DataPurgeTask() throws ParseException {
             // Test trigger for running every 5 minutes.
             //super(new CronTimerTrigger("0 0/5 * * * ?"));

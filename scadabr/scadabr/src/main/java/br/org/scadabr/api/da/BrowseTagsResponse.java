@@ -1,13 +1,13 @@
 /**
  * BrowseTagsResponse.java
  *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ * This file was auto-generated from WSDL by the Apache Axis 1.4 Apr 22, 2006
+ * (06:55:48 PDT) WSDL2Java emitter.
  */
-
 package br.org.scadabr.api.da;
 
-public class BrowseTagsResponse  implements java.io.Serializable {
+public class BrowseTagsResponse implements java.io.Serializable {
+
     private br.org.scadabr.api.vo.APIError[] errors;
 
     private br.org.scadabr.api.vo.ItemInfo[] itemsList;
@@ -18,28 +18,26 @@ public class BrowseTagsResponse  implements java.io.Serializable {
     }
 
     public BrowseTagsResponse(
-           br.org.scadabr.api.vo.APIError[] errors,
-           br.org.scadabr.api.vo.ItemInfo[] itemsList,
-           br.org.scadabr.api.vo.ReplyBase replyBase) {
-           this.errors = errors;
-           this.itemsList = itemsList;
-           this.replyBase = replyBase;
+            br.org.scadabr.api.vo.APIError[] errors,
+            br.org.scadabr.api.vo.ItemInfo[] itemsList,
+            br.org.scadabr.api.vo.ReplyBase replyBase) {
+        this.errors = errors;
+        this.itemsList = itemsList;
+        this.replyBase = replyBase;
     }
-
 
     /**
      * Gets the errors value for this BrowseTagsResponse.
-     * 
+     *
      * @return errors
      */
     public br.org.scadabr.api.vo.APIError[] getErrors() {
         return errors;
     }
 
-
     /**
      * Sets the errors value for this BrowseTagsResponse.
-     * 
+     *
      * @param errors
      */
     public void setErrors(br.org.scadabr.api.vo.APIError[] errors) {
@@ -54,20 +52,18 @@ public class BrowseTagsResponse  implements java.io.Serializable {
         this.errors[i] = _value;
     }
 
-
     /**
      * Gets the itemsList value for this BrowseTagsResponse.
-     * 
+     *
      * @return itemsList
      */
     public br.org.scadabr.api.vo.ItemInfo[] getItemsList() {
         return itemsList;
     }
 
-
     /**
      * Sets the itemsList value for this BrowseTagsResponse.
-     * 
+     *
      * @param itemsList
      */
     public void setItemsList(br.org.scadabr.api.vo.ItemInfo[] itemsList) {
@@ -82,20 +78,18 @@ public class BrowseTagsResponse  implements java.io.Serializable {
         this.itemsList[i] = _value;
     }
 
-
     /**
      * Gets the replyBase value for this BrowseTagsResponse.
-     * 
+     *
      * @return replyBase
      */
     public br.org.scadabr.api.vo.ReplyBase getReplyBase() {
         return replyBase;
     }
 
-
     /**
      * Sets the replyBase value for this BrowseTagsResponse.
-     * 
+     *
      * @param replyBase
      */
     public void setReplyBase(br.org.scadabr.api.vo.ReplyBase replyBase) {
@@ -103,31 +97,39 @@ public class BrowseTagsResponse  implements java.io.Serializable {
     }
 
     private java.lang.Object __equalsCalc = null;
+
     public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof BrowseTagsResponse)) return false;
+        if (!(obj instanceof BrowseTagsResponse)) {
+            return false;
+        }
         BrowseTagsResponse other = (BrowseTagsResponse) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
+        if (obj == null) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
         if (__equalsCalc != null) {
             return (__equalsCalc == obj);
         }
         __equalsCalc = obj;
         boolean _equals;
-        _equals = true && 
-            ((this.errors==null && other.getErrors()==null) || 
-             (this.errors!=null &&
-              java.util.Arrays.equals(this.errors, other.getErrors()))) &&
-            ((this.itemsList==null && other.getItemsList()==null) || 
-             (this.itemsList!=null &&
-              java.util.Arrays.equals(this.itemsList, other.getItemsList()))) &&
-            ((this.replyBase==null && other.getReplyBase()==null) || 
-             (this.replyBase!=null &&
-              this.replyBase.equals(other.getReplyBase())));
+        _equals = true
+                && ((this.errors == null && other.getErrors() == null)
+                || (this.errors != null
+                && java.util.Arrays.equals(this.errors, other.getErrors())))
+                && ((this.itemsList == null && other.getItemsList() == null)
+                || (this.itemsList != null
+                && java.util.Arrays.equals(this.itemsList, other.getItemsList())))
+                && ((this.replyBase == null && other.getReplyBase() == null)
+                || (this.replyBase != null
+                && this.replyBase.equals(other.getReplyBase())));
         __equalsCalc = null;
         return _equals;
     }
 
     private boolean __hashCodeCalc = false;
+
     public synchronized int hashCode() {
         if (__hashCodeCalc) {
             return 0;
@@ -135,23 +137,23 @@ public class BrowseTagsResponse  implements java.io.Serializable {
         __hashCodeCalc = true;
         int _hashCode = 1;
         if (getErrors() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getErrors());
-                 i++) {
+            for (int i = 0;
+                    i < java.lang.reflect.Array.getLength(getErrors());
+                    i++) {
                 java.lang.Object obj = java.lang.reflect.Array.get(getErrors(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
+                if (obj != null
+                        && !obj.getClass().isArray()) {
                     _hashCode += obj.hashCode();
                 }
             }
         }
         if (getItemsList() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getItemsList());
-                 i++) {
+            for (int i = 0;
+                    i < java.lang.reflect.Array.getLength(getItemsList());
+                    i++) {
                 java.lang.Object obj = java.lang.reflect.Array.get(getItemsList(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
+                if (obj != null
+                        && !obj.getClass().isArray()) {
                     _hashCode += obj.hashCode();
                 }
             }
@@ -164,8 +166,8 @@ public class BrowseTagsResponse  implements java.io.Serializable {
     }
 
     // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(BrowseTagsResponse.class, true);
+    private static org.apache.axis.description.TypeDesc typeDesc
+            = new org.apache.axis.description.TypeDesc(BrowseTagsResponse.class, true);
 
     static {
         typeDesc.setXmlType(new javax.xml.namespace.QName("http://da.api.scadabr.org.br", ">BrowseTagsResponse"));
@@ -204,24 +206,22 @@ public class BrowseTagsResponse  implements java.io.Serializable {
      * Get Custom Serializer
      */
     public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
+            java.lang.String mechType,
+            java.lang.Class _javaType,
+            javax.xml.namespace.QName _xmlType) {
+        return new org.apache.axis.encoding.ser.BeanSerializer(
+                _javaType, _xmlType, typeDesc);
     }
 
     /**
      * Get Custom Deserializer
      */
     public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+            java.lang.String mechType,
+            java.lang.Class _javaType,
+            javax.xml.namespace.QName _xmlType) {
+        return new org.apache.axis.encoding.ser.BeanDeserializer(
+                _javaType, _xmlType, typeDesc);
     }
 
 }

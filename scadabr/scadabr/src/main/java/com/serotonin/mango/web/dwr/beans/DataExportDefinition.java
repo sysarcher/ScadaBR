@@ -3,6 +3,7 @@ package com.serotonin.mango.web.dwr.beans;
 import org.joda.time.DateTime;
 
 public class DataExportDefinition {
+
     private final int[] pointIds;
     private final DateTime from;
     private final DateTime to;

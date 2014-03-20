@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.bacnet;
 
@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.serotonin.bacnet4j.LocalDevice;
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.bacnet.BACnetIPDataSourceRT;
@@ -38,30 +38,33 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
-import com.serotonin.util.IpAddressUtils;
+import br.org.scadabr.util.IpAddressUtils;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
+
     public static final Type TYPE = Type.BACNET;
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
-        ets.add(createEventType(BACnetIPDataSourceRT.INITIALIZATION_EXCEPTION_EVENT, new LocalizableMessage(
+        ets.add(createEventType(BACnetIPDataSourceRT.INITIALIZATION_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.initialization")));
         ets.add(createEventType(BACnetIPDataSourceRT.MESSAGE_EXCEPTION_EVENT,
-                new LocalizableMessage("event.ds.message")));
+                new LocalizableMessageImpl("event.ds.message")));
         ets
-                .add(createEventType(BACnetIPDataSourceRT.DEVICE_EXCEPTION_EVENT, new LocalizableMessage(
-                        "event.ds.device")));
+                .add(createEventType(BACnetIPDataSourceRT.DEVICE_EXCEPTION_EVENT, new LocalizableMessageImpl(
+                                        "event.ds.device")));
     }
 
     private static final ExportCodes EVENT_CODES = new ExportCodes();
+
     static {
         EVENT_CODES.addElement(BACnetIPDataSourceRT.INITIALIZATION_EXCEPTION_EVENT, "INITIALIZATION_EXCEPTION");
         EVENT_CODES.addElement(BACnetIPDataSourceRT.MESSAGE_EXCEPTION_EVENT, "MESSAGE_EXCEPTION");
@@ -75,7 +78,7 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
 
     @Override
     public LocalizableMessage getConnectionDescription() {
-        return new LocalizableMessage("dsEdit.bacnetIp.dsconn", deviceId);
+        return new LocalizableMessageImpl("dsEdit.bacnetIp.dsconn", deviceId);
     }
 
     @Override
@@ -228,50 +231,57 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
 
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType))
+        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
             response.addContextualMessage("updatePeriodType", "validate.invalidValue");
+        }
 
-        if (updatePeriods <= 0)
+        if (updatePeriods <= 0) {
             response.addContextualMessage("updatePeriods", "validate.cannotBeNegative");
+        }
 
         try {
             new LocalDevice(deviceId, broadcastAddress);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             response.addContextualMessage("deviceId", "validate.illegalValue");
         }
 
         try {
             IpAddressUtils.toIpAddress(broadcastAddress);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             response.addContextualMessage("broadcastAddress", "common.default", e.getMessage());
         }
 
         try {
             new InetSocketAddress(broadcastAddress, port);
-        }
-        catch (IllegalArgumentException e) {
-            if (e.getMessage().startsWith("port"))
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage().startsWith("port")) {
                 response.addContextualMessage("port", "validate.illegalValue");
-            else
+            } else {
                 response.addContextualMessage("broadcastAddress", "validate.illegalValue");
+            }
         }
 
-        if (timeout < 0)
+        if (timeout < 0) {
             response.addContextualMessage("timeout", "validate.cannotBeNegative");
-        if (segTimeout < 0)
+        }
+        if (segTimeout < 0) {
             response.addContextualMessage("segTimeout", "validate.cannotBeNegative");
-        if (segWindow < 1)
+        }
+        if (segWindow < 1) {
             response.addContextualMessage("segWindow", "validate.greaterThanZero");
-        if (retries < 0)
+        }
+        if (retries < 0) {
             response.addContextualMessage("retries", "validate.cannotBeNegative");
-        if (covSubscriptionTimeoutMinutes < 1)
+        }
+        if (covSubscriptionTimeoutMinutes < 1) {
             response.addContextualMessage("covSubscriptionTimeoutMinutes", "validate.greaterThanZero");
-        if (maxReadMultipleReferencesSegmented < 1)
+        }
+        if (maxReadMultipleReferencesSegmented < 1) {
             response.addContextualMessage("maxReadMultipleReferencesSegmented", "validate.greaterThanZero");
-        if (maxReadMultipleReferencesNonsegmented < 1)
+        }
+        if (maxReadMultipleReferencesNonsegmented < 1) {
             response.addContextualMessage("maxReadMultipleReferencesNonsegmented", "validate.greaterThanZero");
+        }
     }
 
     @Override
@@ -352,8 +362,7 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
             covSubscriptionTimeoutMinutes = in.readInt();
             maxReadMultipleReferencesSegmented = 200;
             maxReadMultipleReferencesNonsegmented = 20;
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             updatePeriodType = in.readInt();
             updatePeriods = in.readInt();
             deviceId = in.readInt();
@@ -373,8 +382,9 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
         Integer value = deserializeUpdatePeriodType(json);
-        if (value != null)
+        if (value != null) {
             updatePeriodType = value;
+        }
     }
 
     @Override

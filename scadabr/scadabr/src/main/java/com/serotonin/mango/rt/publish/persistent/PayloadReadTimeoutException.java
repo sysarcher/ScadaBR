@@ -3,6 +3,7 @@ package com.serotonin.mango.rt.publish.persistent;
 import java.io.IOException;
 
 public class PayloadReadTimeoutException extends IOException {
+
     private static final long serialVersionUID = 1L;
 
     private final PacketType type;

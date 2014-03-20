@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.web.dwr.longPoll;
 
@@ -33,6 +33,7 @@ import com.serotonin.mango.web.dwr.beans.WatchListState;
  * @author Matthew Lohbihler
  */
 public class LongPollState implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private int maxAlarmLevel = -1;
@@ -53,16 +54,18 @@ public class LongPollState implements Serializable {
 
     public CustomComponentState getCustomViewState(int id) {
         for (CustomComponentState state : customViewStates) {
-            if (state.getId() == id)
+            if (state.getId() == id) {
                 return state;
+            }
         }
         return null;
     }
 
     private BasePointState getBasePointState(String id, List<? extends BasePointState> list) {
         for (BasePointState state : list) {
-            if (state.getId().equals(id))
+            if (state.getId().equals(id)) {
                 return state;
+            }
         }
         return null;
     }
@@ -124,16 +127,14 @@ public class LongPollState implements Serializable {
     }
 
     /**
-     * @param out
-     *            required by the serialization API.
+     * @param out required by the serialization API.
      */
     private void writeObject(ObjectOutputStream out) {
         // no op
     }
 
     /**
-     * @param in
-     *            required by the serialization API.
+     * @param in required by the serialization API.
      */
     private void readObject(ObjectInputStream in) {
         maxAlarmLevel = -1;

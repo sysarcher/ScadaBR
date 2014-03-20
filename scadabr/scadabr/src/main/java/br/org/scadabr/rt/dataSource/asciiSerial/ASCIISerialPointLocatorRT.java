@@ -5,19 +5,20 @@ import br.org.scadabr.vo.dataSource.asciiSerial.ASCIISerialPointLocatorVO;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 
 public class ASCIISerialPointLocatorRT extends PointLocatorRT {
-	private final ASCIISerialPointLocatorVO vo;
 
-	public ASCIISerialPointLocatorRT(ASCIISerialPointLocatorVO vo) {
-		this.vo = vo;
-	}
+    private final ASCIISerialPointLocatorVO vo;
 
-	@Override
-	public boolean isSettable() {
-		return vo.isSettable();
-	}
+    public ASCIISerialPointLocatorRT(ASCIISerialPointLocatorVO vo) {
+        this.vo = vo;
+    }
 
-	public ASCIISerialPointLocatorVO getVo() {
-		return vo;
-	}
+    @Override
+    public boolean isSettable() {
+        return vo.isSettable();
+    }
+
+    public ASCIISerialPointLocatorVO getVo() {
+        return vo;
+    }
 
 }

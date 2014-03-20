@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.galil;
 
@@ -23,21 +23,23 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.mango.rt.dataSource.galil.TellPositionPointTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class TellPositionPointTypeVO extends PointTypeVO {
+
     @JsonRemoteProperty
     private String axis;
     @JsonRemoteProperty
@@ -68,7 +70,7 @@ public class TellPositionPointTypeVO extends PointTypeVO {
 
     @Override
     public LocalizableMessage getDescription() {
-        return new LocalizableMessage("dsEdit.galil.pointType.tellPosition");
+        return new LocalizableMessageImpl("dsEdit.galil.pointType.tellPosition");
     }
 
     @Override
@@ -79,12 +81,15 @@ public class TellPositionPointTypeVO extends PointTypeVO {
     @Override
     public void validate(DwrResponseI18n response) {
         if (!"A".equals(axis) && !"B".equals(axis) && !"C".equals(axis) && !"D".equals(axis) && !"E".equals(axis)
-                && !"F".equals(axis) && !"G".equals(axis) && !"H".equals(axis))
+                && !"F".equals(axis) && !"G".equals(axis) && !"H".equals(axis)) {
             response.addContextualMessage("tellPositionPointType.axis", "validate.axis.invalid");
-        if (scaleRawHigh <= scaleRawLow)
+        }
+        if (scaleRawHigh <= scaleRawLow) {
             response.addContextualMessage("tellPositionPointType.scaleRawHighId", "validate.greaterThanRawLow");
-        if (scaleEngHigh <= scaleEngLow)
+        }
+        if (scaleEngHigh <= scaleEngLow) {
             response.addContextualMessage("tellPositionPointType.scaleEngHighId", "validate.greaterThanEngLow");
+        }
     }
 
     public void setAxis(String axis) {

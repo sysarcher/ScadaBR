@@ -1,27 +1,27 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.event.handlers;
 
 /**
  * @author Matthew Lohbihler
  */
-public class SnmpTrapHandlerRT /* extends EventHandlerRT */{
+public class SnmpTrapHandlerRT /* extends EventHandlerRT */ {
     // TODO
 
     // CommunityTarget target = new CommunityTarget();
@@ -38,7 +38,6 @@ public class SnmpTrapHandlerRT /* extends EventHandlerRT */{
     // pdu.add(new VariableBinding(new OID(".0") , new OctetString("my message")));
     //    
     // snmp.trap(pdu, target);
-
     // private static final Log LOG = LogFactory.getLog(EmailHandlerRT.class);
     //    
     // /**
@@ -127,7 +126,7 @@ public class SnmpTrapHandlerRT /* extends EventHandlerRT */{
     //        
     // ResourceBundle bundle = Common.getBundle();
     //        
-    // String subject = I18NUtils.getMessage(bundle, subjectKey);
+    // String subject = Localizer.localizeI18nKey(bundle, subjectKey);
     // if (evt.getId() != Common.NEW_ID)
     // subject += new LocalizableMessage("ftl.subject.eventId", evt.getId()).getLocalizedMessage(bundle);
     //        
@@ -153,7 +152,6 @@ public class SnmpTrapHandlerRT /* extends EventHandlerRT */{
     // LOG.error("", e);
     // }
     // }
-
     // public SetPointHandlerRT(EventHandlerVO vo) {
     // this.vo = vo;
     // }
@@ -278,5 +276,4 @@ public class SnmpTrapHandlerRT /* extends EventHandlerRT */{
     // public int getSetPointSourceType() {
     // return SetPointSource.Types.EVENT_HANDLER;
     // }
-
 }

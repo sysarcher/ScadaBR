@@ -38,7 +38,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.IntValuePair;
 import com.serotonin.mango.Common;
 import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
@@ -54,13 +54,12 @@ import com.serotonin.mango.vo.hierarchy.PointHierarchy;
 import com.serotonin.mango.vo.hierarchy.PointHierarchyEventDispatcher;
 import com.serotonin.mango.vo.link.PointLinkVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.Tuple;
+import br.org.scadabr.util.Tuple;
 import java.sql.Connection;
 import java.sql.Statement;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
 public class DataPointDao extends BaseDao {
@@ -500,12 +499,13 @@ public class DataPointDao extends BaseDao {
     }
 
     public void copyPermissions(final int fromDataPointId, final int toDataPointId) {
-        final List<Tuple<Integer, Integer>> ups = ejt.query(
+        final List<Tuple<Integer, Integer>> ups;
+        ups = ejt.query(
                 "select userId, permission from dataPointUsers where dataPointId=?",
                 new RowMapper<Tuple<Integer, Integer>>() {
                     @Override
                     public Tuple<Integer, Integer> mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        return new Tuple<Integer, Integer>(rs.getInt(1), rs.getInt(2));
+                        return new Tuple<>(rs.getInt(1), rs.getInt(2));
                     }
                 }, fromDataPointId);
 

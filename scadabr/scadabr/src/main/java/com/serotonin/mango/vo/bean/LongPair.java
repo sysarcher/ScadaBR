@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
 
 public class LongPair {
+
     public static final RowMapper<LongPair> ROW_MAPPER = new RowMapper<LongPair>() {
         @Override
         public LongPair mapRow(ResultSet rs, int index) throws SQLException {

@@ -22,17 +22,20 @@ import com.serotonin.mango.vo.report.ReportPointInfo;
 import com.serotonin.mango.web.dwr.beans.DataExportDefinition;
 
 public class ChartExportServlet extends HttpServlet {
+
     private static final long serialVersionUID = 1L;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         User user = Common.getUser(request);
-        if (user == null)
+        if (user == null) {
             return;
+        }
 
         DataExportDefinition def = user.getDataExportDefinition();
-        if (def == null)
+        if (def == null) {
             return;
+        }
 
         DataPointDao dataPointDao = new DataPointDao();
         PointValueDao pointValueDao = new PointValueDao();
@@ -52,10 +55,11 @@ public class ChartExportServlet extends HttpServlet {
             public void row(PointValueTime pvt, int rowIndex) {
                 rdv.setValue(pvt.getValue());
                 rdv.setTime(pvt.getTime());
-                if (pvt instanceof AnnotatedPointValueTime)
+                if (pvt instanceof AnnotatedPointValueTime) {
                     rdv.setAnnotation(((AnnotatedPointValueTime) pvt).getAnnotation(bundle));
-                else
+                } else {
                     rdv.setAnnotation(null);
+                }
                 exportCreator.pointData(rdv);
             }
         };

@@ -42,8 +42,9 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.l10n.Localizer;
 import java.sql.Connection;
 import java.sql.Statement;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -211,7 +212,7 @@ public class DataSourceDao extends BaseDao {
                 dataSourceCopy.setXid(generateUniqueXid());
                 dataSourceCopy.setEnabled(false);
                 dataSourceCopy.setName(StringUtils.truncate(
-                        LocalizableMessage.getMessage(bundle, "common.copyPrefix", dataSource.getName()), 40));
+                        Localizer.localizeI18nKey("common.copyPrefix", bundle, dataSource.getName()), 40));
                 saveDataSource(dataSourceCopy);
 
                 // Copy permissions.

@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.view.component;
 
@@ -23,22 +23,24 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 abstract public class PointComponent extends ViewComponent {
+
     private DataPointVO dataPoint;
     @JsonRemoteProperty
     private String nameOverride;
@@ -67,14 +69,14 @@ abstract public class PointComponent extends ViewComponent {
         if (dataPoint == null) {
             valid = false;
             visible = false;
-        }
-        else {
+        } else {
             visible = Permissions.hasDataPointReadPermission(user, dataPoint);
             valid = definition().supports(dataPoint.getPointLocator().getDataTypeId());
         }
 
-        if (makeReadOnly)
+        if (makeReadOnly) {
             settableOverride = false;
+        }
     }
 
     @Override
@@ -89,8 +91,9 @@ abstract public class PointComponent extends ViewComponent {
 
     @Override
     public boolean containsValidVisibleDataPoint(int dataPointId) {
-        if (!valid || !visible)
+        if (!valid || !visible) {
             return false;
+        }
 
         return dataPoint.getId() == dataPointId;
     }
@@ -104,28 +107,33 @@ abstract public class PointComponent extends ViewComponent {
     }
 
     public LocalizableMessage getDisplayName() {
-        return new LocalizableMessage(definition().getNameKey());
+        return new LocalizableMessageImpl(definition().getNameKey());
     }
 
     public String getName() {
-        if (!StringUtils.isEmpty(nameOverride))
+        if (!StringUtils.isEmpty(nameOverride)) {
             return nameOverride;
-        if (dataPoint == null)
+        }
+        if (dataPoint == null) {
             return "(unknown)";
+        }
         return dataPoint.getName();
     }
 
     public boolean isSettable() {
-        if (dataPoint == null)
+        if (dataPoint == null) {
             return false;
-        if (!dataPoint.getPointLocator().isSettable())
+        }
+        if (!dataPoint.getPointLocator().isSettable()) {
             return false;
+        }
         return settableOverride;
     }
 
     public boolean isChartRenderer() {
-        if (dataPoint == null)
+        if (dataPoint == null) {
             return false;
+        }
         return dataPoint.getChartRenderer() != null;
     }
 
@@ -138,8 +146,9 @@ abstract public class PointComponent extends ViewComponent {
     }
 
     public int getDataPointId() {
-        if (dataPoint == null)
+        if (dataPoint == null) {
             return 0;
+        }
         return dataPoint.getId();
     }
 

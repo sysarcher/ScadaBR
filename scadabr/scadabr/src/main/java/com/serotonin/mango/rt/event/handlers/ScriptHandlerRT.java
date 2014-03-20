@@ -10,34 +10,34 @@ import com.serotonin.mango.vo.event.EventHandlerVO;
 
 public class ScriptHandlerRT extends EventHandlerRT {
 
-	public ScriptHandlerRT(EventHandlerVO vo) {
-		this.vo = vo;
-	}
+    public ScriptHandlerRT(EventHandlerVO vo) {
+        this.vo = vo;
+    }
 
-	@Override
-	public void eventInactive(EventInstance evt) {
-		ScriptVO<?> script = new ScriptDao().getScript(vo
-				.getInactiveScriptCommand());
-		if (script != null) {
-			try {
-				script.createScriptRT().execute();
-			} catch (ScriptException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    @Override
+    public void eventInactive(EventInstance evt) {
+        ScriptVO<?> script = new ScriptDao().getScript(vo
+                .getInactiveScriptCommand());
+        if (script != null) {
+            try {
+                script.createScriptRT().execute();
+            } catch (ScriptException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-	@Override
-	public void eventRaised(EventInstance evt) {
-		ScriptVO<?> script = new ScriptDao().getScript(vo
-				.getActiveScriptCommand());
-		if (script != null) {
-			try {
-				script.createScriptRT().execute();
-			} catch (ScriptException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    @Override
+    public void eventRaised(EventInstance evt) {
+        ScriptVO<?> script = new ScriptDao().getScript(vo
+                .getActiveScriptCommand());
+        if (script != null) {
+            try {
+                script.createScriptRT().execute();
+            } catch (ScriptException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 }

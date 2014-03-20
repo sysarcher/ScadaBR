@@ -1,7 +1,7 @@
 package com.serotonin.mango.web.dwr.beans;
 
-
 public class EventExportDefinition {
+
     private final int eventId;
     private final int eventSourceType;
     private final String status;

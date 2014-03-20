@@ -10,7 +10,7 @@ import java.io.ObjectOutputStream;
 public class SerializationHelper {
 
     public static Object readObject(InputStream is) {
-        try (ObjectInputStream ois = new ObjectInputStream(is)) {
+        try (ObjectInputStream ois = new ScadaBrObjectInputStream(is)) {
             return ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);

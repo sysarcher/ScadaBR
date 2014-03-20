@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.event.detectors;
 
@@ -23,28 +23,33 @@ import java.util.Date;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.util.timeout.TimeoutClient;
 import com.serotonin.mango.util.timeout.TimeoutTask;
-import com.serotonin.timer.TimerTask;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.timer.TimerTask;
+import br.org.scadabr.web.i18n.LocalizableMessage;
 
 /**
- * This class is a base class for detectors that need to schedule timeouts for their operation. Subclasses may use
- * schedules for timeouts that make them active, or that make them inactive.
- * 
+ * This class is a base class for detectors that need to schedule timeouts for
+ * their operation. Subclasses may use schedules for timeouts that make them
+ * active, or that make them inactive.
+ *
  * @author Matthew Lohbihler
  */
 abstract public class TimeoutDetectorRT extends PointEventDetectorRT implements TimeoutClient {
+
     /**
-     * Internal configuration field. The millisecond version of the duration fields.
+     * Internal configuration field. The millisecond version of the duration
+     * fields.
      */
     private long durationMS;
 
     /**
-     * Internal configuration field. The human-readable description of the duration fields.
+     * Internal configuration field. The human-readable description of the
+     * duration fields.
      */
     private LocalizableMessage durationDescription;
 
     /**
-     * Internal configuration field. The unique name for this event producer to be used in the scheduler (if required).
+     * Internal configuration field. The unique name for this event producer to
+     * be used in the scheduler (if required).
      */
     private TimerTask task;
 
@@ -75,8 +80,9 @@ abstract public class TimeoutDetectorRT extends PointEventDetectorRT implements 
     }
 
     protected void scheduleJob(long timeout) {
-        if (task != null)
+        if (task != null) {
             cancelTask();
+        }
         task = new TimeoutTask(new Date(timeout), this);
     }
 

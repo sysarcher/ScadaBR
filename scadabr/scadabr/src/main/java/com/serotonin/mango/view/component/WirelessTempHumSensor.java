@@ -1,26 +1,26 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.view.component;
 
 import java.util.ResourceBundle;
 
-import com.serotonin.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteEntity;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.view.ImplDefinition;
 
@@ -29,6 +29,7 @@ import com.serotonin.mango.view.ImplDefinition;
  */
 @JsonRemoteEntity
 public class WirelessTempHumSensor extends CompoundComponent {
+
     private static final long serialVersionUID = -1;
     public static ImplDefinition DEFINITION = new ImplDefinition("wirelessTempHumSensor", "WIRELESS_TEMP_HUM_SENSOR",
             "graphic.wirelessTempHumSensor", null);
@@ -78,10 +79,10 @@ public class WirelessTempHumSensor extends CompoundComponent {
         humidity.setDisplayControls(true);
 
         addChild(TEXT, "graphic.wirelessTempHumSensor.staticText", text);
-        addChild(BATTERY, "graphic.wirelessTempHumSensor.battery", battery, new int[] { DataTypes.NUMERIC });
-        addChild(SIGNAL, "graphic.wirelessTempHumSensor.signal", signal, new int[] { DataTypes.NUMERIC });
-        addChild(TEMPERATURE, "graphic.wirelessTempHumSensor.temperature", temperature, new int[] { DataTypes.NUMERIC });
-        addChild(HUMIDITY, "graphic.wirelessTempHumSensor.humidity", humidity, new int[] { DataTypes.NUMERIC });
+        addChild(BATTERY, "graphic.wirelessTempHumSensor.battery", battery, new int[]{DataTypes.NUMERIC});
+        addChild(SIGNAL, "graphic.wirelessTempHumSensor.signal", signal, new int[]{DataTypes.NUMERIC});
+        addChild(TEMPERATURE, "graphic.wirelessTempHumSensor.temperature", temperature, new int[]{DataTypes.NUMERIC});
+        addChild(HUMIDITY, "graphic.wirelessTempHumSensor.humidity", humidity, new int[]{DataTypes.NUMERIC});
     }
 
     @Override

@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource.onewire;
 
@@ -37,13 +37,15 @@ import com.dalsemi.onewire.container.SwitchContainer;
 import com.dalsemi.onewire.utils.Address;
 
 /**
- * A utility that can scan a network, and return the network to its pre-scan state. This is important because we can't
- * necessarily tell the difference between relays (that are controlling equipment), and latches (that are serving as
- * branches to other devices).
- * 
+ * A utility that can scan a network, and return the network to its pre-scan
+ * state. This is important because we can't necessarily tell the difference
+ * between relays (that are controlling equipment), and latches (that are
+ * serving as branches to other devices).
+ *
  * @author Matthew Lohbihler
  */
 public class Network {
+
     private static final String DEFAULT_ADAPTER_NAME = "DS9097U";
 
     private final DSPortAdapter adapter;
@@ -113,19 +115,22 @@ public class Network {
     }
 
     public void unlock() {
-        if (adapter != null)
+        if (adapter != null) {
             adapter.endExclusive();
+        }
     }
 
     public String getAdapterName() {
-        if (adapter != null)
+        if (adapter != null) {
             return adapter.getAdapterName();
+        }
         return null;
     }
 
     public String getPortName() throws OneWireException {
-        if (adapter != null)
+        if (adapter != null) {
             return adapter.getPortName();
+        }
         return null;
     }
 
@@ -150,10 +155,11 @@ public class Network {
         sb.append('[');
         boolean first = true;
         for (Long address : pathsByAddress.keySet()) {
-            if (first)
+            if (first) {
                 first = false;
-            else
+            } else {
                 sb.append(", ");
+            }
             sb.append(pathsByAddress.get(address));
             sb.append(Address.toString(address));
         }
@@ -163,7 +169,7 @@ public class Network {
 
     /**
      * Recursive method for searching the network.
-     * 
+     *
      * @param path
      * @throws OneWireException
      * @throws OneWireIOException
@@ -203,8 +209,7 @@ public class Network {
                                 reSearch = true;
                             }
                         }
-                    }
-                    catch (OneWireIOException e) {
+                    } catch (OneWireIOException e) {
                         // The device may no longer be available because we could have turned off a branch that leads
                         // to it. Just ignore this.
                     }
@@ -213,9 +218,10 @@ public class Network {
 
             searchResult = adapter.findNextDevice();
 
-            if (!searchResult && reSearch)
-                // Restart the search.
+            if (!searchResult && reSearch) // Restart the search.
+            {
                 searchResult = adapter.findFirstDevice();
+            }
         }
 
         // Any new devices that we now find in the search will be children of the current path.
@@ -244,11 +250,11 @@ public class Network {
                     if (owc instanceof SwitchContainer) {
                         sc = (SwitchContainer) owc;
                         // Create a branch for every channel in this switch.
-                        for (int ch = 0; ch < sc.getNumberChannels(state); ch++)
+                        for (int ch = 0; ch < sc.getNumberChannels(state); ch++) {
                             newBranches.add(new NetworkPath(path, sc, address, ch));
+                        }
                     }
-                }
-                else if (owc instanceof OneWireContainer1D) {
+                } else if (owc instanceof OneWireContainer1D) {
                     // Map it.
                     OneWireContainerInfo info = new OneWireContainerInfo();
                     info.setAddress(address);
@@ -279,9 +285,10 @@ public class Network {
     }
 
     /**
-     * Recursive method for searching the network. Only treats 1F containers as network branches, so the overhead of
-     * checking other latch types is avoided.
-     * 
+     * Recursive method for searching the network. Only treats 1F containers as
+     * network branches, so the overhead of checking other latch types is
+     * avoided.
+     *
      * @param path
      * @throws OneWireException
      * @throws OneWireIOException
@@ -319,11 +326,11 @@ public class Network {
                     if (owc instanceof OneWireContainer1F) {
                         sc = (SwitchContainer) owc;
                         // Create a branch for every channel in this switch.
-                        for (int ch = 0; ch < sc.getNumberChannels(state); ch++)
+                        for (int ch = 0; ch < sc.getNumberChannels(state); ch++) {
                             newBranches.add(new NetworkPath(path, sc, address, ch));
+                        }
                     }
-                }
-                else if (owc instanceof OneWireContainer1D) {
+                } else if (owc instanceof OneWireContainer1D) {
                     // Map it.
                     OneWireContainerInfo info = new OneWireContainerInfo();
                     info.setAddress(address);

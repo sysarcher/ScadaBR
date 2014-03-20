@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.db;
 
@@ -42,13 +42,14 @@ import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.CallableStatementCreator;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.spring.ConnectionCallbackVoid;
 import com.serotonin.mango.Common;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 public class DerbyAccess extends DatabaseAccess {
+
     private final Log log = LogFactory.getLog(DerbyAccess.class);
 
     private static final double LARGEST_POSITIVE = 1.79769E+308;
@@ -83,8 +84,9 @@ public class DerbyAccess extends DatabaseAccess {
 
     private String getUrl(String propertyPrefix) {
         String name = Common.getEnvironmentProfile().getString(propertyPrefix + "db.url", "~/../../mangoDB");
-        if (name.startsWith("~"))
+        if (name.startsWith("~")) {
             name = ctx.getRealPath(name.substring(1));
+        }
         return name;
     }
 
@@ -96,15 +98,14 @@ public class DerbyAccess extends DatabaseAccess {
         Connection conn = null;
         try {
             conn = DataSourceUtils.getConnection(dataSource);
-        }
-        catch (CannotGetJdbcConnectionException e) {
+        } catch (CannotGetJdbcConnectionException e) {
             SQLException se = (SQLException) e.getCause();
             if ("XJ015".equals(se.getSQLState())) {
                 log.debug("Stopped database");
                 // A SQL code indicating that the system was successfully shut down. We can ignore this.
-            }
-            else
+            } else {
                 throw e;
+            }
         }
         DataSourceUtils.releaseConnection(conn, dataSource);
     }
@@ -128,8 +129,7 @@ public class DerbyAccess extends DatabaseAccess {
                 DataSourceUtils.releaseConnection(conn, dataSource);
                 out.flush();
                 out.close();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 // Should never happen, so just wrap in a runtime exception and rethrow.
                 throw new ShouldNeverHappenException(e);
             }
@@ -148,8 +148,9 @@ public class DerbyAccess extends DatabaseAccess {
     @Override
     public void runScript(String[] script, final OutputStream out) throws Exception {
         StringBuilder sb = new StringBuilder();
-        for (String line : script)
+        for (String line : script) {
             sb.append(line).append("\r\n");
+        }
         final InputStream in = new ByteArrayInputStream(sb.toString().getBytes("ASCII"));
 
         Common.ctx.getDatabaseAccess().doInConnection(new ConnectionCallbackVoid() {
@@ -157,8 +158,7 @@ public class DerbyAccess extends DatabaseAccess {
             public void doInConnection(Connection conn) {
                 try {
                     ij.runScript(conn, in, "ASCII", out, Common.UTF8);
-                }
-                catch (UnsupportedEncodingException e) {
+                } catch (UnsupportedEncodingException e) {
                     throw new ShouldNeverHappenException(e);
                 }
             }
@@ -171,32 +171,36 @@ public class DerbyAccess extends DatabaseAccess {
     }
 
     /**
-     * This method updates the tables with identity autoincrement values that are the maximum of the current
-     * autoincrement value or max(id)+1. This ensures that updates to tables that may have occurred are handled, and
-     * prevents cases where inserts are attempted with identities that already exist.
+     * This method updates the tables with identity autoincrement values that
+     * are the maximum of the current autoincrement value or max(id)+1. This
+     * ensures that updates to tables that may have occurred are handled, and
+     * prevents cases where inserts are attempted with identities that already
+     * exist.
      */
     private void updateIndentityStarts(JdbcTemplate ejt) {
         List<IdentityStart> starts = ejt.query("select t.tablename, c.columnname, c.autoincrementvalue " + //
                 "from sys.syscolumns c join sys.systables t on c.referenceid = t.tableid " + //
                 "where t.tabletype='T' and c.autoincrementvalue is not null", new RowMapper<IdentityStart>() {
-            @Override
-            public IdentityStart mapRow(ResultSet rs, int index) throws SQLException {
-                IdentityStart is = new IdentityStart();
-                is.table = rs.getString(1);
-                is.column = rs.getString(2);
-                is.aiValue = rs.getInt(3);
-                return is;
-            }
-        });
+                    @Override
+                    public IdentityStart mapRow(ResultSet rs, int index) throws SQLException {
+                        IdentityStart is = new IdentityStart();
+                        is.table = rs.getString(1);
+                        is.column = rs.getString(2);
+                        is.aiValue = rs.getInt(3);
+                        return is;
+                    }
+                });
 
         for (IdentityStart is : starts) {
             int maxId = ejt.queryForInt("select max(" + is.column + ") from " + is.table);
-            if (is.aiValue <= maxId)
+            if (is.aiValue <= maxId) {
                 ejt.execute("alter table " + is.table + " alter column " + is.column + " restart with " + (maxId + 1));
+            }
         }
     }
 
     class IdentityStart {
+
         String table;
         String column;
         int aiValue;
@@ -205,19 +209,20 @@ public class DerbyAccess extends DatabaseAccess {
     @Override
     public double applyBounds(double value) {
         if (value > 0) {
-            if (value < SMALLEST_POSITIVE)
+            if (value < SMALLEST_POSITIVE) {
                 value = SMALLEST_POSITIVE;
-            else if (value > LARGEST_POSITIVE)
+            } else if (value > LARGEST_POSITIVE) {
                 value = LARGEST_POSITIVE;
-        }
-        else if (value < 0) {
-            if (value < SMALLEST_NEGATIVE)
+            }
+        } else if (value < 0) {
+            if (value < SMALLEST_NEGATIVE) {
                 value = SMALLEST_NEGATIVE;
-            else if (value > LARGEST_NEGATIVE)
+            } else if (value > LARGEST_NEGATIVE) {
                 value = LARGEST_NEGATIVE;
-        }
-        else if (Double.isNaN(value))
+            }
+        } else if (Double.isNaN(value)) {
             value = 0;
+        }
 
         return value;
     }

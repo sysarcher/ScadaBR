@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo;
 
@@ -25,17 +25,17 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.InvalidArgumentException;
-import com.serotonin.ShouldNeverHappenException;
+import br.org.scadabr.InvalidArgumentException;
+import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
-import com.serotonin.json.JsonArray;
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
-import com.serotonin.json.JsonValue;
+import br.org.scadabr.json.JsonArray;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
+import br.org.scadabr.json.JsonValue;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -53,14 +53,17 @@ import com.serotonin.mango.view.text.PlainRenderer;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
-import com.serotonin.util.ColorUtils;
+import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.util.SerializationHelper;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.Objects;
 
 @JsonRemoteEntity
 public class DataPointVO implements Serializable, Cloneable, JsonSerializable, ChangeComparable<DataPointVO> {
+
     private static final long serialVersionUID = -1;
     public static final String XID_PREFIX = "DP_";
 
@@ -69,6 +72,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     }
 
     public interface LoggingTypes {
+
         int ON_CHANGE = 1;
         int ALL = 2;
         int NONE = 3;
@@ -77,6 +81,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     }
 
     private static final ExportCodes LOGGING_TYPE_CODES = new ExportCodes();
+
     static {
         LOGGING_TYPE_CODES.addElement(LoggingTypes.ON_CHANGE, "ON_CHANGE", "pointEdit.logging.type.change");
         LOGGING_TYPE_CODES.addElement(LoggingTypes.ALL, "ALL", "pointEdit.logging.type.all");
@@ -86,6 +91,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     }
 
     public interface PurgeTypes {
+
         int DAYS = Common.TimePeriods.DAYS;
         int WEEKS = Common.TimePeriods.WEEKS;
         int MONTHS = Common.TimePeriods.MONTHS;
@@ -93,6 +99,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     }
 
     public interface IntervalLoggingTypes {
+
         int INSTANT = 1;
         int MAXIMUM = 2;
         int MINIMUM = 3;
@@ -100,6 +107,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     }
 
     private static final ExportCodes INTERVAL_LOGGING_TYPE_CODES = new ExportCodes();
+
     static {
         INTERVAL_LOGGING_TYPE_CODES.addElement(IntervalLoggingTypes.INSTANT, "INSTANT",
                 "pointEdit.logging.valueType.instant");
@@ -112,11 +120,13 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     }
 
     public static final int ENGINEERING_UNITS_DEFAULT = 95; // No units
-    private static ExportCodes ENGINEERING_UNITS_CODES = new ExportCodes();
+    private static final ExportCodes ENGINEERING_UNITS_CODES = new ExportCodes();
+
     static {
-        for (int i = 0; i < 190; i++)
+        for (int i = 0; i < 190; i++) {
             ENGINEERING_UNITS_CODES.addElement(i, StringUtils.capitalize(new EngineeringUnits(i).toString()),
                     "engUnit." + i);
+        }
     }
 
     public LocalizableMessage getDataTypeMessage() {
@@ -217,15 +227,15 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     }
 
     public void defaultTextRenderer() {
-        if (pointLocator == null)
+        if (pointLocator == null) {
             textRenderer = new PlainRenderer("");
-        else {
+        } else {
             switch (pointLocator.getDataTypeId()) {
-            case DataTypes.IMAGE:
-                textRenderer = new NoneRenderer();
-                break;
-            default:
-                textRenderer = new PlainRenderer("");
+                case DataTypes.IMAGE:
+                    textRenderer = new NoneRenderer();
+                    break;
+                default:
+                    textRenderer = new PlainRenderer("");
             }
         }
     }
@@ -332,6 +342,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         this.pointFolderId = pointFolderId;
     }
 
+    @Override
     public int getId() {
         return id;
     }
@@ -371,8 +382,9 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
 
     public void setDataSourceName(String dataSourceName) {
         this.dataSourceName = dataSourceName;
-        if (deviceName == null)
+        if (deviceName == null) {
             deviceName = dataSourceName;
+        }
     }
 
     public String getDataSourceXid() {
@@ -530,8 +542,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     public DataPointVO copy() {
         try {
             return (DataPointVO) super.clone();
-        }
-        catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             throw new ShouldNeverHappenException(e);
         }
     }
@@ -553,49 +564,60 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(xid))
+        if (StringUtils.isEmpty(xid)) {
             response.addContextualMessage("xid", "validate.required");
-        else if (StringUtils.isLengthGreaterThan(xid, 50))
-            response.addMessage("xid", new LocalizableMessage("validate.notLongerThan", 50));
-        else if (!new DataPointDao().isXidUnique(xid, id))
+        } else if (StringUtils.isLengthGreaterThan(xid, 50)) {
+            response.addMessage("xid", new LocalizableMessageImpl("validate.notLongerThan", 50));
+        } else if (!new DataPointDao().isXidUnique(xid, id)) {
             response.addContextualMessage("xid", "validate.xidUsed");
-
-        if (StringUtils.isEmpty(name))
-            response.addContextualMessage("name", "validate.required");
-
-        if (!LOGGING_TYPE_CODES.isValidId(loggingType))
-            response.addContextualMessage("loggingType", "validate.invalidValue");
-        if (loggingType == DataPointVO.LoggingTypes.ON_CHANGE && pointLocator.getDataTypeId() == DataTypes.NUMERIC) {
-            if (tolerance < 0)
-                response.addContextualMessage("tolerance", "validate.cannotBeNegative");
         }
 
-        if (!Common.TIME_PERIOD_CODES.isValidId(intervalLoggingPeriodType))
+        if (StringUtils.isEmpty(name)) {
+            response.addContextualMessage("name", "validate.required");
+        }
+
+        if (!LOGGING_TYPE_CODES.isValidId(loggingType)) {
+            response.addContextualMessage("loggingType", "validate.invalidValue");
+        }
+        if (loggingType == DataPointVO.LoggingTypes.ON_CHANGE && pointLocator.getDataTypeId() == DataTypes.NUMERIC) {
+            if (tolerance < 0) {
+                response.addContextualMessage("tolerance", "validate.cannotBeNegative");
+            }
+        }
+
+        if (!Common.TIME_PERIOD_CODES.isValidId(intervalLoggingPeriodType)) {
             response.addContextualMessage("intervalLoggingPeriodType", "validate.invalidValue");
-        if (intervalLoggingPeriod <= 0)
+        }
+        if (intervalLoggingPeriod <= 0) {
             response.addContextualMessage("intervalLoggingPeriod", "validate.greaterThanZero");
-        if (!INTERVAL_LOGGING_TYPE_CODES.isValidId(intervalLoggingType))
+        }
+        if (!INTERVAL_LOGGING_TYPE_CODES.isValidId(intervalLoggingType)) {
             response.addContextualMessage("intervalLoggingType", "validate.invalidValue");
+        }
 
-        if (!Common.TIME_PERIOD_CODES.isValidId(purgeType))
+        if (!Common.TIME_PERIOD_CODES.isValidId(purgeType)) {
             response.addContextualMessage("purgeType", "validate.invalidValue");
-        if (purgePeriod <= 0)
+        }
+        if (purgePeriod <= 0) {
             response.addContextualMessage("purgePeriod", "validate.greaterThanZero");
+        }
 
-        if (textRenderer == null)
+        if (textRenderer == null) {
             response.addContextualMessage("textRenderer", "validate.required");
+        }
 
-        if (defaultCacheSize < 0)
+        if (defaultCacheSize < 0) {
             response.addContextualMessage("defaultCacheSize", "validate.cannotBeNegative");
+        }
 
-        if (discardExtremeValues && discardHighLimit <= discardLowLimit)
+        if (discardExtremeValues && discardHighLimit <= discardLowLimit) {
             response.addContextualMessage("discardHighLimit", "validate.greaterThanDiscardLow");
+        }
 
         if (!StringUtils.isEmpty(chartColour)) {
             try {
                 ColorUtils.toColor(chartColour);
-            }
-            catch (InvalidArgumentException e) {
+            } catch (InvalidArgumentException e) {
                 response.addContextualMessage("chartColour", "validate.invalidValue");
             }
         }
@@ -603,12 +625,14 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         pointLocator.validate(response);
 
         // Check text renderer type
-        if (textRenderer != null && !textRenderer.getDef().supports(pointLocator.getDataTypeId()))
+        if (textRenderer != null && !textRenderer.getDef().supports(pointLocator.getDataTypeId())) {
             response.addGenericMessage("validate.text.incompatible");
+        }
 
         // Check chart renderer type
-        if (chartRenderer != null && !chartRenderer.getDef().supports(pointLocator.getDataTypeId()))
+        if (chartRenderer != null && !chartRenderer.getDef().supports(pointLocator.getDataTypeId())) {
             response.addGenericMessage("validate.chart.incompatible");
+        }
     }
 
     //
@@ -663,8 +687,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             defaultCacheSize = 0;
             engineeringUnits = ENGINEERING_UNITS_DEFAULT;
             chartColour = null;
-        }
-        else if (ver == 2) {
+        } else if (ver == 2) {
             name = SerializationHelper.readSafeUTF(in);
             deviceName = null;
             enabled = in.readBoolean();
@@ -682,16 +705,14 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             // The spinwave changes were not correctly implemented, so we need to handle potential errors here.
             try {
                 pointLocator = (PointLocatorVO) in.readObject();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 // Turn this guy off.
                 enabled = false;
             }
             defaultCacheSize = 0;
             engineeringUnits = ENGINEERING_UNITS_DEFAULT;
             chartColour = null;
-        }
-        else if (ver == 3) {
+        } else if (ver == 3) {
             name = SerializationHelper.readSafeUTF(in);
             deviceName = null;
             enabled = in.readBoolean();
@@ -709,16 +730,14 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             // The spinwave changes were not correctly implemented, so we need to handle potential errors here.
             try {
                 pointLocator = (PointLocatorVO) in.readObject();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 // Turn this guy off.
                 enabled = false;
             }
             defaultCacheSize = in.readInt();
             engineeringUnits = ENGINEERING_UNITS_DEFAULT;
             chartColour = null;
-        }
-        else if (ver == 4) {
+        } else if (ver == 4) {
             name = SerializationHelper.readSafeUTF(in);
             deviceName = null;
             enabled = in.readBoolean();
@@ -736,16 +755,14 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             // The spinwave changes were not correctly implemented, so we need to handle potential errors here.
             try {
                 pointLocator = (PointLocatorVO) in.readObject();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 // Turn this guy off.
                 enabled = false;
             }
             defaultCacheSize = in.readInt();
             engineeringUnits = ENGINEERING_UNITS_DEFAULT;
             chartColour = null;
-        }
-        else if (ver == 5) {
+        } else if (ver == 5) {
             name = SerializationHelper.readSafeUTF(in);
             deviceName = null;
             enabled = in.readBoolean();
@@ -766,8 +783,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             discardHighLimit = in.readDouble();
             engineeringUnits = ENGINEERING_UNITS_DEFAULT;
             chartColour = null;
-        }
-        else if (ver == 6) {
+        } else if (ver == 6) {
             name = SerializationHelper.readSafeUTF(in);
             deviceName = null;
             enabled = in.readBoolean();
@@ -788,8 +804,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             discardHighLimit = in.readDouble();
             engineeringUnits = in.readInt();
             chartColour = null;
-        }
-        else if (ver == 7) {
+        } else if (ver == 7) {
             name = SerializationHelper.readSafeUTF(in);
             deviceName = null;
             enabled = in.readBoolean();
@@ -810,8 +825,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             discardHighLimit = in.readDouble();
             engineeringUnits = in.readInt();
             chartColour = SerializationHelper.readSafeUTF(in);
-        }
-        else if (ver == 8) {
+        } else if (ver == 8) {
             name = SerializationHelper.readSafeUTF(in);
             deviceName = SerializationHelper.readSafeUTF(in);
             enabled = in.readBoolean();
@@ -835,11 +849,13 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         }
 
         // Check the purge type. Weird how this could have been set to 0.
-        if (purgeType == 0)
+        if (purgeType == 0) {
             purgeType = Common.TimePeriods.YEARS;
+        }
         // Ditto for purge period
-        if (purgePeriod == 0)
+        if (purgePeriod == 0) {
             purgePeriod = 1;
+        }
     }
 
     @Override
@@ -859,38 +875,43 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         String text = json.getString("loggingType");
         if (text != null) {
             loggingType = LOGGING_TYPE_CODES.getId(text);
-            if (loggingType == -1)
+            if (loggingType == -1) {
                 throw new LocalizableJsonException("emport.error.invalid", "loggingType", text,
                         LOGGING_TYPE_CODES.getCodeList());
+            }
         }
 
         text = json.getString("intervalLoggingPeriodType");
         if (text != null) {
             intervalLoggingPeriodType = Common.TIME_PERIOD_CODES.getId(text);
-            if (intervalLoggingPeriodType == -1)
+            if (intervalLoggingPeriodType == -1) {
                 throw new LocalizableJsonException("emport.error.invalid", "intervalLoggingPeriodType", text,
                         Common.TIME_PERIOD_CODES.getCodeList());
+            }
         }
 
         text = json.getString("intervalLoggingType");
         if (text != null) {
             intervalLoggingType = INTERVAL_LOGGING_TYPE_CODES.getId(text);
-            if (intervalLoggingType == -1)
+            if (intervalLoggingType == -1) {
                 throw new LocalizableJsonException("emport.error.invalid", "intervalLoggingType", text,
                         INTERVAL_LOGGING_TYPE_CODES.getCodeList());
+            }
         }
 
         text = json.getString("purgeType");
         if (text != null) {
             purgeType = Common.TIME_PERIOD_CODES.getId(text);
-            if (purgeType == -1)
+            if (purgeType == -1) {
                 throw new LocalizableJsonException("emport.error.invalid", "purgeType", text,
                         Common.TIME_PERIOD_CODES.getCodeList());
+            }
         }
 
         JsonObject locatorJson = json.getJsonObject("pointLocator");
-        if (locatorJson != null)
+        if (locatorJson != null) {
             reader.populateObject(pointLocator, locatorJson);
+        }
 
         JsonArray pedArray = json.getJsonArray("eventDetectors");
         if (pedArray != null) {
@@ -898,13 +919,14 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
                 JsonObject pedObject = jv.toJsonObject();
 
                 String pedXid = pedObject.getString("xid");
-                if (StringUtils.isEmpty(pedXid))
+                if (StringUtils.isEmpty(pedXid)) {
                     throw new LocalizableJsonException("emport.error.ped.missingAttr", "xid");
+                }
 
                 // Use the ped xid to lookup an existing ped.
                 PointEventDetectorVO ped = null;
                 for (PointEventDetectorVO existing : eventDetectors) {
-                    if (StringUtils.isEqual(pedXid, existing.getXid())) {
+                    if (Objects.equals(pedXid, existing.getXid())) {
                         ped = existing;
                         break;
                     }
@@ -926,8 +948,9 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         text = json.getString("engineeringUnits");
         if (text != null) {
             engineeringUnits = ENGINEERING_UNITS_CODES.getId(text);
-            if (engineeringUnits == -1)
+            if (engineeringUnits == -1) {
                 engineeringUnits = ENGINEERING_UNITS_DEFAULT;
+            }
         }
     }
 }

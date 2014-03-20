@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.vo.dataSource.vmstat;
 
@@ -24,12 +24,12 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.json.JsonException;
-import com.serotonin.json.JsonObject;
-import com.serotonin.json.JsonReader;
-import com.serotonin.json.JsonRemoteEntity;
-import com.serotonin.json.JsonRemoteProperty;
-import com.serotonin.json.JsonSerializable;
+import br.org.scadabr.json.JsonException;
+import br.org.scadabr.json.JsonObject;
+import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.vmstat.VMStatPointLocatorRT;
@@ -37,15 +37,18 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
-import com.serotonin.web.dwr.DwrResponseI18n;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+
     public interface Attributes {
+
         int PROCS_R = 1;
         int PROCS_B = 2;
         int MEMORY_SWPD = 3;
@@ -66,6 +69,7 @@ public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements Json
     }
 
     public static ExportCodes ATTRIBUTE_CODES = new ExportCodes();
+
     static {
         ATTRIBUTE_CODES.addElement(Attributes.PROCS_R, "PROCS_R", "dsEdit.vmstat.attr.procsR");
         ATTRIBUTE_CODES.addElement(Attributes.PROCS_B, "PROCS_B", "dsEdit.vmstat.attr.procsB");
@@ -84,25 +88,31 @@ public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements Json
         ATTRIBUTE_CODES.addElement(Attributes.CPU_ID, "CPU_ID", "dsEdit.vmstat.attr.cpuId");
         ATTRIBUTE_CODES.addElement(Attributes.CPU_WA, "CPU_WA", "dsEdit.vmstat.attr.cpuWa");
         ATTRIBUTE_CODES.addElement(Attributes.CPU_ST, "CPU_ST", "dsEdit.vmstat.attr.cpuSt");
-    };
+    }
+    ;
 
     @JsonRemoteProperty
     private int attributeId = Attributes.CPU_ID;
 
+    @Override
     public boolean isSettable() {
         return false;
     }
 
+    @Override
     public PointLocatorRT createRuntime() {
         return new VMStatPointLocatorRT(this);
     }
 
+    @Override
     public LocalizableMessage getConfigurationDescription() {
-        if (ATTRIBUTE_CODES.isValidId(attributeId))
-            return new LocalizableMessage(ATTRIBUTE_CODES.getKey(attributeId));
-        return new LocalizableMessage("common.unknown");
+        if (ATTRIBUTE_CODES.isValidId(attributeId)) {
+            return new LocalizableMessageImpl(ATTRIBUTE_CODES.getKey(attributeId));
+        }
+        return new LocalizableMessageImpl("common.unknown");
     }
 
+    @Override
     public int getDataTypeId() {
         return DataTypes.NUMERIC;
     }
@@ -115,9 +125,11 @@ public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements Json
         this.attributeId = attributeId;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
-        if (!ATTRIBUTE_CODES.isValidId(attributeId))
+        if (!ATTRIBUTE_CODES.isValidId(attributeId)) {
             response.addContextualMessage("attributeId", "validate.invalidValue");
+        }
     }
 
     @Override
@@ -149,19 +161,22 @@ public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements Json
         int ver = in.readInt();
 
         // Switch on the version of the class so that version changes can be elegantly handled.
-        if (ver == 1)
+        if (ver == 1) {
             attributeId = in.readInt();
+        }
     }
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("attributeId");
-        if (text == null)
+        if (text == null) {
             throw new LocalizableJsonException("emport.error.missing", "attributeId", ATTRIBUTE_CODES.getCodeList());
+        }
         attributeId = ATTRIBUTE_CODES.getId(text);
-        if (!ATTRIBUTE_CODES.isValidId(attributeId))
+        if (!ATTRIBUTE_CODES.isValidId(attributeId)) {
             throw new LocalizableJsonException("emport.error.invalid", "attributeId", text, ATTRIBUTE_CODES
                     .getCodeList());
+        }
     }
 
     @Override

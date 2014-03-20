@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.maint.work;
 
@@ -35,8 +35,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
-import com.serotonin.InvalidArgumentException;
-import com.serotonin.io.StreamUtils;
+import br.org.scadabr.InvalidArgumentException;
+import br.org.scadabr.io.StreamUtils;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.MailingListDao;
@@ -51,19 +51,22 @@ import com.serotonin.mango.vo.report.ReportChartCreator.PointStatistics;
 import com.serotonin.mango.vo.report.ReportInstance;
 import com.serotonin.mango.vo.report.ReportPointVO;
 import com.serotonin.mango.vo.report.ReportVO;
-import com.serotonin.util.ColorUtils;
-import com.serotonin.util.StringUtils;
-import com.serotonin.web.email.EmailAttachment;
-import com.serotonin.web.email.EmailContent;
-import com.serotonin.web.email.EmailInline;
-import com.serotonin.web.i18n.LocalizableMessage;
+import br.org.scadabr.util.ColorUtils;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.email.EmailAttachment;
+import br.org.scadabr.web.email.EmailContent;
+import br.org.scadabr.web.email.EmailInline;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
  */
 public class ReportWorkItem implements WorkItem {
+
     static final Log LOG = LogFactory.getLog(ReportWorkItem.class);
 
+    @Override
     public int getPriority() {
         return WorkItem.PRIORITY_LOW;
     }
@@ -73,8 +76,9 @@ public class ReportWorkItem implements WorkItem {
 
         // Verify that the user is not disabled.
         User user = new UserDao().getUser(report.getUserId());
-        if (user.isDisabled())
+        if (user.isDisabled()) {
             return;
+        }
 
         // User is ok. Continue...
         ReportWorkItem item = new ReportWorkItem();
@@ -98,8 +102,9 @@ public class ReportWorkItem implements WorkItem {
     private User user;
     private ReportDao reportDao;
     private ReportInstance reportInstance;
-    List<File> filesToDelete = new ArrayList<File>();
+    List<File> filesToDelete = new ArrayList<>();
 
+    @Override
     public void execute() {
         LOG.info("Running report with id " + reportConfig.getId() + ", instance id " + reportInstance.getId());
 
@@ -109,16 +114,16 @@ public class ReportWorkItem implements WorkItem {
 
         // Create a list of DataPointVOs to which the user has permission.
         DataPointDao dataPointDao = new DataPointDao();
-        List<ReportDao.PointInfo> points = new ArrayList<ReportDao.PointInfo>(reportConfig.getPoints().size());
+        List<ReportDao.PointInfo> points = new ArrayList<>(reportConfig.getPoints().size());
         for (ReportPointVO reportPoint : reportConfig.getPoints()) {
             DataPointVO point = dataPointDao.getDataPoint(reportPoint.getPointId());
             if (point != null && Permissions.hasDataPointReadPermission(user, point)) {
                 String colour = null;
                 try {
-                    if (!StringUtils.isEmpty(reportPoint.getColour()))
+                    if (!StringUtils.isEmpty(reportPoint.getColour())) {
                         colour = ColorUtils.toHexString(reportPoint.getColour()).substring(1);
-                }
-                catch (InvalidArgumentException e) {
+                    }
+                } catch (InvalidArgumentException e) {
                     // Should never happen since the colour would have been validated on save, so just let it go 
                     // as null.
                 }
@@ -128,18 +133,16 @@ public class ReportWorkItem implements WorkItem {
 
         int recordCount = 0;
         try {
-            if (!points.isEmpty())
+            if (!points.isEmpty()) {
                 recordCount = reportDao.runReport(reportInstance, points, bundle);
-        }
-        catch (RuntimeException e) {
+            }
+        } catch (RuntimeException e) {
             recordCount = -1;
             throw e;
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             recordCount = -1;
             throw new RuntimeException("Report instance failed", e);
-        }
-        finally {
+        } finally {
             reportInstance.setRunEndTime(System.currentTimeMillis());
             reportInstance.setRecordCount(recordCount);
             reportDao.saveReportInstance(reportInstance);
@@ -161,22 +164,25 @@ public class ReportWorkItem implements WorkItem {
             EmailContent emailContent = new EmailContent(null, creator.getHtml(), Common.UTF8);
 
             // Add the consolidated chart
-            if (creator.getImageData() != null)
+            if (creator.getImageData() != null) {
                 emailContent
                         .addInline(new EmailInline.ByteArrayInline(inlinePrefix + ReportChartCreator.IMAGE_CONTENT_ID,
-                                creator.getImageData(), ImageChartUtils.getContentType()));
+                                        creator.getImageData(), ImageChartUtils.getContentType()));
+            }
 
             // Add the point charts
             for (PointStatistics pointStatistics : creator.getPointStatistics()) {
-                if (pointStatistics.getImageData() != null)
+                if (pointStatistics.getImageData() != null) {
                     emailContent.addInline(new EmailInline.ByteArrayInline(inlinePrefix
                             + pointStatistics.getChartName(), pointStatistics.getImageData(), ImageChartUtils
                             .getContentType()));
+                }
             }
 
             // Add optional images used by the template.
-            for (String s : creator.getInlineImageList())
+            for (String s : creator.getInlineImageList()) {
                 addImage(emailContent, s);
+            }
 
             // Check if we need to attach the data.
             if (reportConfig.isIncludeData()) {
@@ -189,21 +195,21 @@ public class ReportWorkItem implements WorkItem {
             if (reportConfig.isIncludeData()) {
                 // See that the temp file(s) gets deleted after the email is sent.
                 Runnable deleteTempFile = new Runnable() {
+                    @Override
                     public void run() {
                         for (File file : filesToDelete) {
-                            if (!file.delete())
+                            if (!file.delete()) {
                                 LOG.warn("Temp file " + file.getPath() + " not deleted");
+                            }
                         }
                     }
                 };
-                postEmail = new Runnable[] { deleteTempFile };
+                postEmail = new Runnable[]{deleteTempFile};
             }
 
             try {
-                LocalizableMessage lm = new LocalizableMessage("ftl.scheduledReport", reportConfig.getName());
-                EmailWorkItem.queueEmail(toAddrs, lm.getLocalizedMessage(bundle), emailContent, postEmail);
-            }
-            catch (AddressException e) {
+                EmailWorkItem.queueEmail(toAddrs, Localizer.localizeI18nKey("ftl.scheduledReport", bundle, reportConfig.getName()), emailContent, postEmail);
+            } catch (AddressException e) {
                 LOG.error(e);
             }
 
@@ -224,26 +230,25 @@ public class ReportWorkItem implements WorkItem {
             if (reportConfig.isZipData()) {
                 try {
                     File zipFile = File.createTempFile("tempZIP", ".zip");
-                    ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile));
-                    zipOut.putNextEntry(new ZipEntry(name));
+                    try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile))) {
+                        zipOut.putNextEntry(new ZipEntry(name));
 
-                    FileInputStream in = new FileInputStream(file);
-                    StreamUtils.transfer(in, zipOut);
-                    in.close();
+                        try (FileInputStream in = new FileInputStream(file)) {
+                            StreamUtils.transfer(in, zipOut);
+                        }
 
-                    zipOut.closeEntry();
-                    zipOut.close();
+                        zipOut.closeEntry();
+                    }
 
                     emailContent.addAttachment(new EmailAttachment.FileAttachment(name + ".zip", zipFile));
 
                     filesToDelete.add(zipFile);
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     LOG.error("Failed to create zip file", e);
                 }
-            }
-            else
+            } else {
                 emailContent.addAttachment(new EmailAttachment.FileAttachment(name, file));
+            }
 
             filesToDelete.add(file);
         }

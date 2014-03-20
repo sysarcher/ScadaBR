@@ -30,6 +30,7 @@ import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 
 public class MBusPointLocatorRT extends PointLocatorRT {
+
     private final MBusPointLocatorVO vo;
 
     public MBusPointLocatorRT(MBusPointLocatorVO vo) {
@@ -67,8 +68,7 @@ public class MBusPointLocatorRT extends PointLocatorRT {
                 vo.getExponent()));
         if (vo.getVifeLabels().length == 0) {
             result.setVifes(DataBlock.EMPTY_VIFE);
-        }
-        else {
+        } else {
             Vife[] vifes = new Vife[vo.getVifeLabels().length];
             for (int i = 0; i < vo.getVifeLabels().length; i++) {
                 vifes[i] = DataBlock.getVife(vo.getVifeTypes()[i], vo.getVifeLabels()[i]);

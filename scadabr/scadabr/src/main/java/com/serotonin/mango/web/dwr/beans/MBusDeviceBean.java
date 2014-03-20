@@ -25,6 +25,7 @@ import net.sf.mbus4j.dataframes.MBusResponseFramesContainer;
  * @author aploese
  */
 public class MBusDeviceBean {
+
     private final int index;
     private final MBusResponseFramesContainer dev;
 

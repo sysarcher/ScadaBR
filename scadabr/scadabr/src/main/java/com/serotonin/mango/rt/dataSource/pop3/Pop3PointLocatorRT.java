@@ -1,20 +1,20 @@
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
     
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.mango.rt.dataSource.pop3;
 
@@ -25,12 +25,13 @@ import java.util.regex.Pattern;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.pop3.Pop3PointLocatorVO;
-import com.serotonin.util.StringUtils;
+import br.org.scadabr.util.StringUtils;
 
 /**
  * @author Matthew Lohbihler
  */
 public class Pop3PointLocatorRT extends PointLocatorRT {
+
     private final boolean findInSubject;
     private final Pattern valuePattern;
     private final boolean ignoreIfMissing;
@@ -48,17 +49,17 @@ public class Pop3PointLocatorRT extends PointLocatorRT {
         ignoreIfMissing = vo.isIgnoreIfMissing();
         dataTypeId = vo.getDataTypeId();
 
-        if (dataTypeId == DataTypes.BINARY)
+        if (dataTypeId == DataTypes.BINARY) {
             binary0Value = vo.getValueFormat();
-        else if (dataTypeId == DataTypes.NUMERIC && !StringUtils.isEmpty(vo.getValueFormat()))
+        } else if (dataTypeId == DataTypes.NUMERIC && !StringUtils.isEmpty(vo.getValueFormat())) {
             valueFormat = new DecimalFormat(vo.getValueFormat());
+        }
 
         useReceivedTime = vo.isUseReceivedTime();
         if (!useReceivedTime && !StringUtils.isEmpty(vo.getTimeRegex())) {
             timePattern = Pattern.compile(vo.getTimeRegex());
             timeFormat = new SimpleDateFormat(vo.getTimeFormat());
-        }
-        else {
+        } else {
             timePattern = null;
             timeFormat = null;
         }
