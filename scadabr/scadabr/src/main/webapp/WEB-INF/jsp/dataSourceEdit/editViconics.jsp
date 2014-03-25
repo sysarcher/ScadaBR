@@ -101,11 +101,11 @@
                 <span class="formError">${commPortError}</span>
               </c:when>
               <c:otherwise>
-                <sst:select id="commPortId" value="${dataSource.commPortId}">
+                <sbt:select id="commPortId" value="${dataSource.commPortId}">
                   <c:forEach items="${commPorts}" var="port">
-                    <sst:option value="${port.name}">${port.name}</sst:option>
+                    <sbt:option value="${port.name}">${port.name}</sbt:option>
                   </c:forEach>
-                </sst:select>
+                </sbt:select>
               </c:otherwise>
             </c:choose>
           </td>
@@ -153,7 +153,7 @@
         
         <tr>
           <td class="formLabelRequired"><fmt:message key="dsEdit.viconics.convertCelsius"/></td>
-          <td class="formField"><sst:checkbox id="convertToCelsius" selectedValue="${dataSource.convertToCelsius}"/></td>
+          <td class="formField"><sbt:checkbox id="convertToCelsius" selectedValue="${dataSource.convertToCelsius}"/></td>
         </tr>
       </table>
       

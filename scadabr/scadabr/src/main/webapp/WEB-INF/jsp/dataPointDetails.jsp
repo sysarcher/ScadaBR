@@ -150,11 +150,11 @@
     <tr>
       <td valign="top" align="right">
         <fmt:message key="pointDetails.goto"/>:&nbsp;
-        <sst:select value="${point.id}" onchange="window.location='data_point_details.shtm?dpid='+ this.value;">
+        <sbt:select value="${point.id}" onchange="window.location='data_point_details.shtm?dpid='+ this.value;">
           <c:forEach items="${userPoints}" var="point">
-            <sst:option value="${point.id}">${point.extendedName}</sst:option>
+            <sbt:option value="${point.id}">${point.extendedName}</sbt:option>
           </c:forEach>
-        </sst:select>
+        </sbt:select>
         
         <c:if test="${!empty prevId}">
           <tag:img png="bullet_go_left" title="pagination.previous"
@@ -217,9 +217,9 @@
                 <fmt:message key="pointDetails.timePeriod"/>:
                 <input id="statsChartDuration" style="text-align:right;" type="text" class="formVeryShort"
                         value='${empty periodCount ? "1" : periodCount}'/>
-                <sst:select id="statsChartDurationType" value="${periodType}">
-                  <tag:timePeriodOptions sst="true" min="true" h="true" d="true" w="true" mon="true"/>
-                </sst:select>
+                <sbt:select id="statsChartDurationType" value="${periodType}">
+                  <tag:timePeriodOptions sbt="true" min="true" h="true" d="true" w="true" mon="true"/>
+                </sbt:select>
                 <tag:img id="statsChartImg" png="control_play_blue" title="pointDetails.getStatistics" onclick="getStatsChart()"/>
               </td>
             </tr>
@@ -340,11 +340,11 @@
               <tr class="row<c:if test="${status.index % 2 == 1}">Alt</c:if>">
                 <td align="center">${event.id}</td>
                 <td align="center"><tag:eventIcon event="${event}"/></td>
-                <td>${sst:time(event.activeTimestamp)}</td>
+                <td>${sbt:time(event.activeTimestamp)}</td>
                 <td>
                   <table cellspacing="0" cellpadding="0" width="100%">
                     <tr>
-                      <td><b><sst:i18n message="${event.message}"/></b></td>
+                      <td><b><sbt:i18n message="${event.message}"/></b></td>
                       <td align="right"><tag:img png="comment_add" title="notes.addNote"
                               onclick="openCommentDialog(${applicationScope['constants.UserComment.TYPE_EVENT']}, ${event.id})"/></td>
                     </tr>
@@ -375,20 +375,20 @@
                     </c:when>
                     <c:when test="${!event.rtnApplicable}"><fmt:message key="common.nortn"/></c:when>
                     <c:otherwise>
-                      ${sst:time(event.rtnTimestamp)} - <sst:i18n message="${event.rtnMessage}"/>
+                      ${sbt:time(event.rtnTimestamp)} - <sbt:i18n message="${event.rtnMessage}"/>
                     </c:otherwise>
                   </c:choose>
                 </td>
                 <td>
                   <c:if test="${event.acknowledged}">
-                    ${sst:time(event.acknowledgedTimestamp)}
-                    <sst:i18n message="${event.ackMessage}"/>
+                    ${sbt:time(event.acknowledgedTimestamp)}
+                    <sbt:i18n message="${event.ackMessage}"/>
                   </c:if>
                 </td>
               </tr>
             </c:forEach>
-            <c:if test="${sst:size(events) > 20}">
-              <tr class="row"><td align="center" colspan="6"><fmt:message key="pointDetails.maxEvents"/> ${sst:size(events)}</td></tr>
+            <c:if test="${sbt:size(events) > 20}">
+              <tr class="row"><td align="center" colspan="6"><fmt:message key="pointDetails.maxEvents"/> ${sbt:size(events)}</td></tr>
             </c:if>
             <c:if test="${empty events}">
               <tr class="row"><td colspan="6"><fmt:message key="events.emptyList"/></td></tr>

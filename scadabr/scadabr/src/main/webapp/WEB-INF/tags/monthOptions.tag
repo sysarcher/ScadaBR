@@ -21,18 +21,18 @@
 --%><%@attribute name="sst" type="java.lang.Boolean"%>
 <c:choose>
   <c:when test="${sst}">
-    <sst:option value="<%= Integer.toString(DateTimeConstants.JANUARY) %>"><fmt:message key="common.month.jan"/></sst:option>
-    <sst:option value="<%= Integer.toString(DateTimeConstants.FEBRUARY) %>"><fmt:message key="common.month.feb"/></sst:option>
-    <sst:option value="<%= Integer.toString(DateTimeConstants.MARCH) %>"><fmt:message key="common.month.mar"/></sst:option>
-    <sst:option value="<%= Integer.toString(DateTimeConstants.APRIL) %>"><fmt:message key="common.month.apr"/></sst:option>
-    <sst:option value="<%= Integer.toString(DateTimeConstants.MAY) %>"><fmt:message key="common.month.may"/></sst:option>
-    <sst:option value="<%= Integer.toString(DateTimeConstants.JUNE) %>"><fmt:message key="common.month.jun"/></sst:option>
-    <sst:option value="<%= Integer.toString(DateTimeConstants.JULY) %>"><fmt:message key="common.month.jul"/></sst:option>
-    <sst:option value="<%= Integer.toString(DateTimeConstants.AUGUST) %>"><fmt:message key="common.month.aug"/></sst:option>
-    <sst:option value="<%= Integer.toString(DateTimeConstants.SEPTEMBER) %>"><fmt:message key="common.month.sep"/></sst:option>
-    <sst:option value="<%= Integer.toString(DateTimeConstants.OCTOBER) %>"><fmt:message key="common.month.oct"/></sst:option>
-    <sst:option value="<%= Integer.toString(DateTimeConstants.NOVEMBER) %>"><fmt:message key="common.month.nov"/></sst:option>
-    <sst:option value="<%= Integer.toString(DateTimeConstants.DECEMBER) %>"><fmt:message key="common.month.dec"/></sst:option>
+    <sbt:option value="<%= Integer.toString(DateTimeConstants.JANUARY) %>"><fmt:message key="common.month.jan"/></sbt:option>
+    <sbt:option value="<%= Integer.toString(DateTimeConstants.FEBRUARY) %>"><fmt:message key="common.month.feb"/></sbt:option>
+    <sbt:option value="<%= Integer.toString(DateTimeConstants.MARCH) %>"><fmt:message key="common.month.mar"/></sbt:option>
+    <sbt:option value="<%= Integer.toString(DateTimeConstants.APRIL) %>"><fmt:message key="common.month.apr"/></sbt:option>
+    <sbt:option value="<%= Integer.toString(DateTimeConstants.MAY) %>"><fmt:message key="common.month.may"/></sbt:option>
+    <sbt:option value="<%= Integer.toString(DateTimeConstants.JUNE) %>"><fmt:message key="common.month.jun"/></sbt:option>
+    <sbt:option value="<%= Integer.toString(DateTimeConstants.JULY) %>"><fmt:message key="common.month.jul"/></sbt:option>
+    <sbt:option value="<%= Integer.toString(DateTimeConstants.AUGUST) %>"><fmt:message key="common.month.aug"/></sbt:option>
+    <sbt:option value="<%= Integer.toString(DateTimeConstants.SEPTEMBER) %>"><fmt:message key="common.month.sep"/></sbt:option>
+    <sbt:option value="<%= Integer.toString(DateTimeConstants.OCTOBER) %>"><fmt:message key="common.month.oct"/></sbt:option>
+    <sbt:option value="<%= Integer.toString(DateTimeConstants.NOVEMBER) %>"><fmt:message key="common.month.nov"/></sbt:option>
+    <sbt:option value="<%= Integer.toString(DateTimeConstants.DECEMBER) %>"><fmt:message key="common.month.dec"/></sbt:option>
   </c:when>
   <c:otherwise>
     <option value="<%= DateTimeConstants.JANUARY %>"><fmt:message key="common.month.jan"/></option>

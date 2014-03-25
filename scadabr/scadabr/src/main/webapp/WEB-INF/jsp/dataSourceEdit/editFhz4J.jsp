@@ -116,15 +116,15 @@
                 <span class="formError">${commPortError}</span>
             </c:when>
             <c:otherwise>
-                <sst:select id="commPortId" value="${dataSource.commPortId}">
+                <sbt:select id="commPortId" value="${dataSource.commPortId}">
                     <c:forEach items="${commPorts}" var="port">
-                        <sst:option value="${port.name}">${port.name}</sst:option>
+                        <sbt:option value="${port.name}">${port.name}</sbt:option>
                     </c:forEach>
-                    <sst:option value="/dev/ttyACM0">/dev/ttyACM0</sst:option>
-                    <sst:option value="/dev/ttyACM1">/dev/ttyACM1</sst:option>
-                    <sst:option value="/dev/ttyACM2">/dev/ttyACM2</sst:option>
-                    <sst:option value="/dev/ttyACM3">/dev/ttyACM3</sst:option>
-                </sst:select>
+                    <sbt:option value="/dev/ttyACM0">/dev/ttyACM0</sbt:option>
+                    <sbt:option value="/dev/ttyACM1">/dev/ttyACM1</sbt:option>
+                    <sbt:option value="/dev/ttyACM2">/dev/ttyACM2</sbt:option>
+                    <sbt:option value="/dev/ttyACM3">/dev/ttyACM3</sbt:option>
+                </sbt:select>
             </c:otherwise>
         </c:choose>
     </td>
@@ -162,11 +162,11 @@
                     <input type="text" id="deviceLocation" class="formShort"/>
                 </td>
                 <td class="formField">
-                    <sst:select id="deviceType" value="UNKNOWN">
+                    <sbt:select id="deviceType" value="UNKNOWN">
                         <c:forEach items="${dataSource.deviceTypes}" var="deviceType">
-                            <sst:option value="${deviceType.label}">${deviceType.label}</sst:option>
+                            <sbt:option value="${deviceType.label}">${deviceType.label}</sbt:option>
                         </c:forEach>
-                    </sst:select>
+                    </sbt:select>
                 </td>
                 <td>
                     <input id="showDevicePropsBtn" type="button" value="<fmt:message key="dsEdit.fhz4j.showDevicePropsBtn"/>" onclick="assembleDevice()"/>

@@ -20,7 +20,7 @@
 --%><%@attribute name="sst" type="java.lang.Boolean"%>
 <c:choose>
   <c:when test="${sst}">
-    <c:forEach begin="0" end="59" var="i"><sst:option value="${i}">${mango:padZeros(i, 2)}</sst:option></c:forEach>
+    <c:forEach begin="0" end="59" var="i"><sbt:option value="${i}">${mango:padZeros(i, 2)}</sbt:option></c:forEach>
   </c:when>
   <c:otherwise>
     <c:forEach begin="0" end="59" var="i"><option value="${i}">${mango:padZeros(i, 2)}</option></c:forEach>

@@ -34,14 +34,8 @@ public class AuthenticationHandler extends BasicHandler {
     private static final long serialVersionUID = 1L;
 
     private boolean isSecurityEnabled() {
-        String sec = Common.getEnvironmentProfile().getString(
-                "api.authentication", "enabled");
-
-        if (sec.equals("disabled")) {
-            return false;
-        } else {
-            return true;
-        }
+        final String sec = Common.getEnvironmentString("api.authentication", "enabled");
+        return !sec.equals("disabled");
     }
 
     @Override
@@ -73,10 +67,8 @@ public class AuthenticationHandler extends BasicHandler {
                 throw new AxisFault("No API authentication on header!");
             }
         } else {
-            String username = Common.getEnvironmentProfile().getString(
-                    "api.username", "admin");
-            String password = Common.getEnvironmentProfile().getString(
-                    "api.password", "admin");
+            String username = Common.getEnvironmentString("api.username", "admin");
+            String password = Common.getEnvironmentString("api.password", "admin");
 
             User user = new UserDao().getUser(username);
             if (user == null) {

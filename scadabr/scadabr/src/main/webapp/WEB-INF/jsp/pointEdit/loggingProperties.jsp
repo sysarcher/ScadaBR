@@ -92,13 +92,13 @@
       <tr>
         <td class="formLabelRequired"><fmt:message key="pointEdit.logging.type"/></td>
         <td class="formField">
-          <sst:select id="loggingType" name="loggingType" onchange="changeLoggingType();" value="${status.value}">
-            <sst:option value="<%= Integer.toString(DataPointVO.LoggingTypes.ON_CHANGE) %>"><fmt:message key="pointEdit.logging.type.change"/></sst:option>
-            <sst:option value="<%= Integer.toString(DataPointVO.LoggingTypes.ALL) %>"><fmt:message key="pointEdit.logging.type.all"/></sst:option>
-            <sst:option value="<%= Integer.toString(DataPointVO.LoggingTypes.NONE) %>"><fmt:message key="pointEdit.logging.type.never"/></sst:option>
-            <sst:option value="<%= Integer.toString(DataPointVO.LoggingTypes.INTERVAL) %>"><fmt:message key="pointEdit.logging.type.interval"/></sst:option>
-            <sst:option value="<%= Integer.toString(DataPointVO.LoggingTypes.ON_TS_CHANGE) %>"><fmt:message key="pointEdit.logging.type.tsChange"/></sst:option>
-          </sst:select>
+          <sbt:select id="loggingType" name="loggingType" onchange="changeLoggingType();" value="${status.value}">
+            <sbt:option value="<%= Integer.toString(DataPointVO.LoggingTypes.ON_CHANGE) %>"><fmt:message key="pointEdit.logging.type.change"/></sbt:option>
+            <sbt:option value="<%= Integer.toString(DataPointVO.LoggingTypes.ALL) %>"><fmt:message key="pointEdit.logging.type.all"/></sbt:option>
+            <sbt:option value="<%= Integer.toString(DataPointVO.LoggingTypes.NONE) %>"><fmt:message key="pointEdit.logging.type.never"/></sbt:option>
+            <sbt:option value="<%= Integer.toString(DataPointVO.LoggingTypes.INTERVAL) %>"><fmt:message key="pointEdit.logging.type.interval"/></sbt:option>
+            <sbt:option value="<%= Integer.toString(DataPointVO.LoggingTypes.ON_TS_CHANGE) %>"><fmt:message key="pointEdit.logging.type.tsChange"/></sbt:option>
+          </sbt:select>
         </td>
         <td class="formError">${status.errorMessage}</td>
       </tr>
@@ -109,9 +109,9 @@
         <td class="formLabelRequired"><fmt:message key="pointEdit.logging.period"/></td>
         <td class="formField">
           <fmt:message key="pointEdit.logging.every"/> <input type="text" name="intervalLoggingPeriod" value="${form.intervalLoggingPeriod}" class="formShort"/>
-          <sst:select name="intervalLoggingPeriodType" value="${form.intervalLoggingPeriodType}">
-            <tag:timePeriodOptions sst="true" s="true" min="true" h="true" d="true" w="true" mon="true" y="true"/>
-          </sst:select>
+          <sbt:select name="intervalLoggingPeriodType" value="${form.intervalLoggingPeriodType}">
+            <tag:timePeriodOptions sbt="true" s="true" min="true" h="true" d="true" w="true" mon="true" y="true"/>
+          </sbt:select>
         </td>
         <td class="formError">
           <spring:bind path="form.intervalLoggingPeriodType">
@@ -125,12 +125,12 @@
         <tr>
           <td class="formLabelRequired"><fmt:message key="pointEdit.logging.valueType"/></td>
           <td class="formField">
-            <sst:select id="intervalLoggingType" name="intervalLoggingType" value="${form.intervalLoggingType}">
-              <sst:option value="<%= Integer.toString(DataPointVO.IntervalLoggingTypes.INSTANT) %>"><fmt:message key="pointEdit.logging.valueType.instant"/></sst:option>
-              <sst:option value="<%= Integer.toString(DataPointVO.IntervalLoggingTypes.MAXIMUM) %>"><fmt:message key="pointEdit.logging.valueType.maximum"/></sst:option>
-              <sst:option value="<%= Integer.toString(DataPointVO.IntervalLoggingTypes.MINIMUM) %>"><fmt:message key="pointEdit.logging.valueType.minimum"/></sst:option>
-              <sst:option value="<%= Integer.toString(DataPointVO.IntervalLoggingTypes.AVERAGE) %>"><fmt:message key="pointEdit.logging.valueType.average"/></sst:option>
-            </sst:select>
+            <sbt:select id="intervalLoggingType" name="intervalLoggingType" value="${form.intervalLoggingType}">
+              <sbt:option value="<%= Integer.toString(DataPointVO.IntervalLoggingTypes.INSTANT) %>"><fmt:message key="pointEdit.logging.valueType.instant"/></sbt:option>
+              <sbt:option value="<%= Integer.toString(DataPointVO.IntervalLoggingTypes.MAXIMUM) %>"><fmt:message key="pointEdit.logging.valueType.maximum"/></sbt:option>
+              <sbt:option value="<%= Integer.toString(DataPointVO.IntervalLoggingTypes.MINIMUM) %>"><fmt:message key="pointEdit.logging.valueType.minimum"/></sbt:option>
+              <sbt:option value="<%= Integer.toString(DataPointVO.IntervalLoggingTypes.AVERAGE) %>"><fmt:message key="pointEdit.logging.valueType.average"/></sbt:option>
+            </sbt:select>
           </td>
           <td class="formError">${status.errorMessage}</td>
         </tr>
@@ -154,7 +154,7 @@
         <tr>
           <td class="formLabelRequired"><fmt:message key="pointEdit.logging.discard"/></td>
           <td class="formField">
-            <sst:checkbox id="discardExtremeValues" name="discardExtremeValues" selectedValue="${status.value}"
+            <sbt:checkbox id="discardExtremeValues" name="discardExtremeValues" selectedValue="${status.value}"
                     onclick="changeDiscard()"/>
           </td>
           <td class="formError">${status.errorMessage}</td>
@@ -184,9 +184,9 @@
       <td class="formLabelRequired"><fmt:message key="pointEdit.logging.purge"/></td>
       <td class="formField">
         <fmt:message key="pointEdit.logging.after"/> <input id="purgePeriod" type="text" name="purgePeriod" value="${form.purgePeriod}" class="formShort"/>
-        <sst:select id="purgeType" name="purgeType" value="${form.purgeType}">
-          <tag:timePeriodOptions sst="true" d="true" w="true" mon="true" y="true"/>
-        </sst:select>
+        <sbt:select id="purgeType" name="purgeType" value="${form.purgeType}">
+          <tag:timePeriodOptions sbt="true" d="true" w="true" mon="true" y="true"/>
+        </sbt:select>
       </td>
       <td class="formError">
         <spring:bind path="form.purgeType">

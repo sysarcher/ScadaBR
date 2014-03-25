@@ -123,8 +123,7 @@ abstract public class DBUpgrade extends BaseDao {
     }
 
     protected OutputStream createUpdateLogOutputStream(String version) {
-        String dir = Common.getEnvironmentProfile().getString(
-                "db.update.log.dir", "");
+        String dir = Common.getEnvironmentString("db.update.log.dir", "");
         dir = StringUtils.replaceMacros(dir, System.getProperties());
 
         File logDir = new File(dir);

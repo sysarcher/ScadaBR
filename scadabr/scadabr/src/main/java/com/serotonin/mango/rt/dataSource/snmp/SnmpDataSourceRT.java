@@ -18,11 +18,19 @@
  */
 package com.serotonin.mango.rt.dataSource.snmp;
 
+import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.rt.dataImage.DataPointRT;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
+import com.serotonin.mango.rt.dataImage.SetPointSource;
+import com.serotonin.mango.rt.dataSource.PollingDataSource;
+import com.serotonin.mango.vo.dataSource.snmp.SnmpDataSourceVO;
+import com.serotonin.mango.vo.dataSource.snmp.SnmpPointLocatorVO;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.snmp4j.PDU;
@@ -32,17 +40,6 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.Variable;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
-
-import br.org.scadabr.ShouldNeverHappenException;
-import com.serotonin.mango.rt.dataImage.DataPointRT;
-import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.SetPointSource;
-import com.serotonin.mango.rt.dataSource.DataSourceRT;
-import com.serotonin.mango.rt.dataSource.PollingDataSource;
-import com.serotonin.mango.vo.dataSource.snmp.SnmpDataSourceVO;
-import com.serotonin.mango.vo.dataSource.snmp.SnmpPointLocatorVO;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler

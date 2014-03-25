@@ -36,12 +36,12 @@
   </table>
   
   <fmt:message key="header.watchlist"/>:
-  <sst:select id="watchListSelect" value="${selectedWatchList}"
+  <sbt:select id="watchListSelect" value="${selectedWatchList}"
           onchange="window.location='mobile_watch_list.shtm?watchListId='+ this.value">
     <c:forEach items="${watchLists}" var="wl">
-      <sst:option value="${wl.key}">${wl.value}</sst:option>
+      <sbt:option value="${wl.key}">${wl.value}</sbt:option>
     </c:forEach>
-  </sst:select>
+  </sbt:select>
 
   <a href="mobile_watch_list.shtm"><fmt:message key="header.reload"/></a>
   

@@ -46,7 +46,7 @@
   
   <c:if test="${!empty view}">
     <script type="text/javascript">
-      mango.i18n = <sst:convert obj="${clientSideMessages}"/>;
+      mango.i18n = <sbt:convert obj="${clientSideMessages}"/>;
       dwr.util.setEscapeHtml(false);
       mango.view.initAnonymousView(${view.id});
       dojo.addOnLoad(mango.longPoll.start);

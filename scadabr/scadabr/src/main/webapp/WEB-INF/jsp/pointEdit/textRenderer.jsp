@@ -27,12 +27,12 @@
     <tr>
       <td class="formLabelRequired"><fmt:message key="pointEdit.text.type"/></td>
       <td class="formField">
-        <sst:select id="textRendererSelect" onchange="textRendererEditor.change();"
+        <sbt:select id="textRendererSelect" onchange="textRendererEditor.change();"
                 value="${form.textRenderer.typeName}">
           <c:forEach items="${textRenderers}" var="trdef">
-            <sst:option value="${trdef.name}"><fmt:message key="${trdef.nameKey}"/></sst:option>
+            <sbt:option value="${trdef.name}"><fmt:message key="${trdef.nameKey}"/></sbt:option>
           </c:forEach>
-        </sst:select>
+        </sbt:select>
       </td>
     </tr>
     

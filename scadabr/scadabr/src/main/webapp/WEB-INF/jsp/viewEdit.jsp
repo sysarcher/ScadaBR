@@ -27,7 +27,7 @@
     
     function doOnload() {
         <c:forEach items="${form.view.viewComponents}" var="vc">
-          <c:set var="compContent"><sst:convert obj="${vc}"/></c:set>
+          <c:set var="compContent"><sbt:convert obj="${vc}"/></c:set>
           createViewComponent(${mango:escapeScripts(compContent)}, false);
         </c:forEach>
         
@@ -319,11 +319,11 @@
                 <tr>
                   <td class="formLabelRequired" width="150"><fmt:message key="viewEdit.anonymous"/></td>
                   <td class="formField" width="250">
-                    <sst:select name="view.anonymousAccess" value="${status.value}">
-                      <sst:option value="<%= Integer.toString(ShareUser.ACCESS_NONE) %>"><fmt:message key="common.access.none"/></sst:option>
-                      <sst:option value="<%= Integer.toString(ShareUser.ACCESS_READ) %>"><fmt:message key="common.access.read"/></sst:option>
-                      <sst:option value="<%= Integer.toString(ShareUser.ACCESS_SET) %>"><fmt:message key="common.access.set"/></sst:option>
-                    </sst:select>
+                    <sbt:select name="view.anonymousAccess" value="${status.value}">
+                      <sbt:option value="<%= Integer.toString(ShareUser.ACCESS_NONE) %>"><fmt:message key="common.access.none"/></sbt:option>
+                      <sbt:option value="<%= Integer.toString(ShareUser.ACCESS_READ) %>"><fmt:message key="common.access.read"/></sbt:option>
+                      <sbt:option value="<%= Integer.toString(ShareUser.ACCESS_SET) %>"><fmt:message key="common.access.set"/></sbt:option>
+                    </sbt:select>
                   </td>
                   <td class="formError">${status.errorMessage}</td>
                 </tr>

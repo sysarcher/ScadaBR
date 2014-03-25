@@ -55,9 +55,9 @@
       <td class="formLabelRequired"><fmt:message key="pointEdit.purge.olderThan"/></td>
       <td class="formField">
         <input id="purgeNowPeriod" type="text" value="${form.purgePeriod}" class="formShort"/>
-        <sst:select id="purgeNowType" value="${form.purgeType}">
-          <tag:timePeriodOptions sst="true" min="true" h="true" d="true" w="true" mon="true" y="true"/>
-        </sst:select>
+        <sbt:select id="purgeNowType" value="${form.purgeType}">
+          <tag:timePeriodOptions sbt="true" min="true" h="true" d="true" w="true" mon="true" y="true"/>
+        </sbt:select>
       </td>
     </tr>
     

@@ -47,11 +47,11 @@
 <tr>
   <td class="formLabelRequired"><fmt:message key="dsEdit.modbusIp.transportType"/></td>
   <td class="formField">
-    <sst:select id="transportType" value="${dataSource.transportType}">
-      <sst:option value="<%= ModbusIpDataSourceVO.TransportType.TCP.toString() %>"><fmt:message key="dsEdit.modbusIp.transportType.tcp"/></sst:option>
-      <sst:option value="<%= ModbusIpDataSourceVO.TransportType.TCP_KEEP_ALIVE.toString() %>"><fmt:message key="dsEdit.modbusIp.transportType.tcpKA"/></sst:option>
-      <sst:option value="<%= ModbusIpDataSourceVO.TransportType.UDP.toString() %>"><fmt:message key="dsEdit.modbusIp.transportType.udp"/></sst:option>
-    </sst:select>
+    <sbt:select id="transportType" value="${dataSource.transportType}">
+      <sbt:option value="<%= ModbusIpDataSourceVO.TransportType.TCP.toString() %>"><fmt:message key="dsEdit.modbusIp.transportType.tcp"/></sbt:option>
+      <sbt:option value="<%= ModbusIpDataSourceVO.TransportType.TCP_KEEP_ALIVE.toString() %>"><fmt:message key="dsEdit.modbusIp.transportType.tcpKA"/></sbt:option>
+      <sbt:option value="<%= ModbusIpDataSourceVO.TransportType.UDP.toString() %>"><fmt:message key="dsEdit.modbusIp.transportType.udp"/></sbt:option>
+    </sbt:select>
   </td>
 </tr>
 
@@ -67,5 +67,5 @@
 
 <tr>
   <td class="formLabelRequired"><fmt:message key="dsEdit.modbusIp.encapsulated"/></td>
-  <td class="formField"><sst:checkbox id="encapsulated" selectedValue="${dataSource.encapsulated}"/></td>
+  <td class="formField"><sbt:checkbox id="encapsulated" selectedValue="${dataSource.encapsulated}"/></td>
 </tr>

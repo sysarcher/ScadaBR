@@ -297,11 +297,11 @@
                 <td width="30" />
                 <td class="formLabelRequired"><fmt:message key="dsEdit.mbus.bitPerSecond"/></td>
                 <td class="formField">
-                    <sst:select id="bitPerSecond" value="${dataSource.connection.bitPerSecond}">
-                        <sst:option>300</sst:option>
-                        <sst:option>2400</sst:option>
-                        <sst:option>9600</sst:option>
-                    </sst:select>
+                    <sbt:select id="bitPerSecond" value="${dataSource.connection.bitPerSecond}">
+                        <sbt:option>300</sbt:option>
+                        <sbt:option>2400</sbt:option>
+                        <sbt:option>9600</sbt:option>
+                    </sbt:select>
                 </td>        
             </tr>
         </table>
@@ -352,11 +352,11 @@
         <span class="formError">${commPortError}</span>
       </c:when>
       <c:otherwise>
-          <sst:select id="commPortId" value="${dataSource.serialDirect ? dataSource.connection.portName : ''}">
+          <sbt:select id="commPortId" value="${dataSource.serialDirect ? dataSource.connection.portName : ''}">
           <c:forEach items="${dataSource.commPorts}" var="port">
-            <sst:option value="${port}">${port}</sst:option>
+            <sbt:option value="${port}">${port}</sbt:option>
           </c:forEach>
-        </sst:select>
+        </sbt:select>
       </c:otherwise>
     </c:choose>
   </td>
@@ -368,9 +368,9 @@
     <td colspan="3">
         <label class="formLabelRequired" for="updatePeriods" ><fmt:message key="dsEdit.updatePeriod"/></label>
         <input class="formShort" type="text" id="updatePeriods" value="${dataSource.updatePeriods}" />
-        <sst:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
-            <tag:timePeriodOptions sst="true" s="true" min="true" h="true" d="true" w="true" mon="true"/>
-        </sst:select>
+        <sbt:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
+            <tag:timePeriodOptions sbt="true" s="true" min="true" h="true" d="true" w="true" mon="true"/>
+        </sbt:select>
     </td>
 </tr>
 
@@ -428,12 +428,12 @@
                                 <td width="30" />
                                 <td class="formLabelRequired"><fmt:message key="dsEdit.mbus.secAddrMedium"/></td>
                                 <td class="formField">
-                                    <sst:select id="secAddrMedium" value="">
-                                        <sst:option></sst:option>
+                                    <sbt:select id="secAddrMedium" value="">
+                                        <sbt:option></sbt:option>
                                         <c:forEach items="${dataSource.labels}" var="mediumLabel">
-                                            <sst:option value="${mediumLabel}">${mediumLabel}</sst:option>
+                                            <sbt:option value="${mediumLabel}">${mediumLabel}</sbt:option>
                                         </c:forEach>
-                                    </sst:select>
+                                    </sbt:select>
                                 </td>
                             </tr>
                             <tr>

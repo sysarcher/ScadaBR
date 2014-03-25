@@ -106,7 +106,7 @@ public class GetStatusResponse implements java.io.Serializable {
     }
 
     // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc
+    private final static org.apache.axis.description.TypeDesc typeDesc
             = new org.apache.axis.description.TypeDesc(GetStatusResponse.class, true);
 
     static {

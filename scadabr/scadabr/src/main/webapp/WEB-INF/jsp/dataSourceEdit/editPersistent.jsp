@@ -67,7 +67,7 @@
         
         <tr>
           <td class="formLabelRequired"><fmt:message key="dsEdit.persistent.acceptPointUpdates"/></td>
-          <td class="formField"><sst:checkbox id="acceptPointUpdates" selectedValue="${dataSource.acceptPointUpdates}"/></td>
+          <td class="formField"><sbt:checkbox id="acceptPointUpdates" selectedValue="${dataSource.acceptPointUpdates}"/></td>
         </tr>
         
       </table>

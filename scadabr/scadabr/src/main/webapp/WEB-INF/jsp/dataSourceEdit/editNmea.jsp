@@ -113,11 +113,11 @@
                 <span class="formError">${commPortError}</span>
               </c:when>
               <c:otherwise>
-                <sst:select id="commPortId" value="${dataSource.commPortId}">
+                <sbt:select id="commPortId" value="${dataSource.commPortId}">
                   <c:forEach items="${commPorts}" var="port">
-                    <sst:option value="${port.name}">${port.name}</sst:option>
+                    <sbt:option value="${port.name}">${port.name}</sbt:option>
                   </c:forEach>
-                </sst:select>
+                </sbt:select>
               </c:otherwise>
             </c:choose>
           </td>
@@ -126,12 +126,12 @@
         <tr>
           <td class="formLabelRequired"><fmt:message key="dsEdit.nmea.baud"/></td>
           <td class="formField">
-            <sst:select id="baudRate" value="${dataSource.baudRate}">
-              <sst:option>1200</sst:option>
-              <sst:option>2400</sst:option>
-              <sst:option>4800</sst:option>
-              <sst:option>9600</sst:option>
-            </sst:select>
+            <sbt:select id="baudRate" value="${dataSource.baudRate}">
+              <sbt:option>1200</sbt:option>
+              <sbt:option>2400</sbt:option>
+              <sbt:option>4800</sbt:option>
+              <sbt:option>9600</sbt:option>
+            </sbt:select>
           </td>
         </tr>
         

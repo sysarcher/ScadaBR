@@ -70,8 +70,7 @@ abstract public class DatabaseAccess {
     }
 
     public static DatabaseAccess createDatabaseAccess(ServletContext ctx) {
-        String type = Common.getEnvironmentProfile().getString("db.type",
-                "derby");
+        String type = Common.getEnvironmentString("db.type", "derby");
         DatabaseType dt = DatabaseType.valueOf(type.toUpperCase());
 
         if (dt == null) {

@@ -29,6 +29,6 @@
 </c:if>
 <c:forEach items="${events}" var="event">
   <tag:eventIcon event="${event}"/>
-  ${sst:time(event.activeTimestamp)} - <sst:i18n message="${event.message}"/>
+  ${sbt:time(event.activeTimestamp)} - <sbt:i18n message="${event.message}"/>
   <tag:alarmAck event="${event}"/><br/>
 </c:forEach>

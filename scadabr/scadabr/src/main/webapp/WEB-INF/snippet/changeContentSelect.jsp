@@ -22,9 +22,9 @@
 --%>
 <%@ include file="/WEB-INF/snippet/common.jsp" %>
 <fmt:message key="common.chooseSetPoint"/>:<br/>
-<sst:select value="${mango:rawText(point, pointValue)}" onchange="mango.view.setPoint(${point.id}, '${componentId}', this.value)">
+<sbt:select value="${mango:rawText(point, pointValue)}" onchange="mango.view.setPoint(${point.id}, '${componentId}', this.value)">
   <c:forEach items="${point.textRenderer.multistateValues}" var="valueDef">
-    <sst:option value="${valueDef.key}">${valueDef.text}</sst:option>
+    <sbt:option value="${valueDef.key}">${valueDef.text}</sbt:option>
   </c:forEach>
-</sst:select>
+</sbt:select>
 <tag:relinquish/>

@@ -34,11 +34,11 @@
       <td class="smallTitle"><fmt:message key="views.title"/> <tag:help id="graphicalViews"/></td>
       <td width="50"></td>
       <td align="right">
-        <sst:select value="${currentView.id}" onchange="window.location='?viewId='+ this.value;">
+        <sbt:select value="${currentView.id}" onchange="window.location='?viewId='+ this.value;">
           <c:forEach items="${views}" var="aView">
-            <sst:option value="${aView.key}">${sst:escapeLessThan(aView.value)}</sst:option>
+            <sbt:option value="${aView.key}">${sbt:escapeLessThan(aView.value)}</sbt:option>
           </c:forEach>
-        </sst:select>
+        </sbt:select>
         <c:if test="${!empty currentView}">
           <c:choose>
             <c:when test="${owner}">

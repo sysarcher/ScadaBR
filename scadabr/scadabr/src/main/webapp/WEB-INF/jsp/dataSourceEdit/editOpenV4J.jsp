@@ -200,11 +200,11 @@
               <span class="formError">${commPortError}</span>
             </c:when>
             <c:otherwise>
-              <sst:select id="commPortId" value="${dataSource.commPortId}">
+              <sbt:select id="commPortId" value="${dataSource.commPortId}">
                 <c:forEach items="${commPorts}" var="port">
-                  <sst:option value="${port.name}">${port.name}</sst:option>
+                  <sbt:option value="${port.name}">${port.name}</sbt:option>
                 </c:forEach>
-              </sst:select>
+              </sbt:select>
             </c:otherwise>
           </c:choose>
         </td>
@@ -213,11 +213,11 @@
       <tr>
         <td class="formLabelRequired"><fmt:message key="dsEdit.openv4j.device"/></td>
         <td class="formField">
-          <sst:select id="device" value="${dataSource.device}" onchange="deviceChanged();">
+          <sbt:select id="device" value="${dataSource.device}" onchange="deviceChanged();">
             <c:forEach items="${dataSource.devices}" var="device">
-              <sst:option value="${device}">${device.label}</sst:option>
+              <sbt:option value="${device}">${device.label}</sbt:option>
             </c:forEach>
-          </sst:select>
+          </sbt:select>
           <input id="detectDeviceBtn" type="button" value="<fmt:message key="dsEdit.openv4j.detectDevice"/>" onclick="detectDevice();"/>
         </td>
       </tr>
@@ -225,11 +225,11 @@
       <tr>
         <td class="formLabelRequired"><fmt:message key="dsEdit.openv4j.protocol"/></td>
         <td class="formField">
-          <sst:select id="protocol" value="${dataSource.protocol}">
+          <sbt:select id="protocol" value="${dataSource.protocol}">
             <c:forEach items="${dataSource.protocols}" var="protocol">
-              <sst:option value="${protocol.name}">${protocol.label}</sst:option>
+              <sbt:option value="${protocol.name}">${protocol.label}</sbt:option>
             </c:forEach>
-          </sst:select>
+          </sbt:select>
         </td>
       </tr>
       
@@ -237,9 +237,9 @@
         <td class="formLabelRequired"><fmt:message key="dsEdit.updatePeriod"/></td>
         <td class="formField">
           <input type="text" id="updatePeriods" value="${dataSource.updatePeriods}" class="formShort"/>
-          <sst:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
-            <tag:timePeriodOptions sst="true" s="true" min="true" h="true" d="true" w="true" mon="true"/>
-          </sst:select>
+          <sbt:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
+            <tag:timePeriodOptions sbt="true" s="true" min="true" h="true" d="true" w="true" mon="true"/>
+          </sbt:select>
       </td>
       </tr>
     </table>
@@ -281,11 +281,11 @@
             <tr>
               <td class="formLabelRequired"><fmt:message key="dsEdit.openv4j.group"/></td>
               <td class="formField">
-                <sst:select id="editGroup" onchange="editGroupChanged()">
+                <sbt:select id="editGroup" onchange="editGroupChanged()">
                   <c:forEach items="${dataSource.groups}" var="group">
-                    <sst:option value="${group.name}">${group.label}</sst:option>
+                    <sbt:option value="${group.name}">${group.label}</sbt:option>
                   </c:forEach>
-                </sst:select>
+                </sbt:select>
               </td>
             </tr>
 

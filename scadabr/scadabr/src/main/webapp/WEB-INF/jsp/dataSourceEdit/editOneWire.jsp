@@ -204,11 +204,11 @@
                 <span class="formError">${commPortError}</span>
               </c:when>
               <c:otherwise>
-                <sst:select id="commPortId" value="${dataSource.commPortId}">
+                <sbt:select id="commPortId" value="${dataSource.commPortId}">
                   <c:forEach items="${commPorts}" var="port">
-                    <sst:option value="${port.name}">${port.name}</sst:option>
+                    <sbt:option value="${port.name}">${port.name}</sbt:option>
                   </c:forEach>
-                </sst:select>
+                </sbt:select>
               </c:otherwise>
             </c:choose>
           </td>
@@ -218,9 +218,9 @@
           <td class="formLabelRequired"><fmt:message key="dsEdit.updatePeriod"/></td>
           <td class="formField">
             <input type="text" id="updatePeriods" value="${dataSource.updatePeriods}" class="formShort"/>
-            <sst:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
-              <tag:timePeriodOptions sst="true" s="true" min="true" h="true"/>
-            </sst:select>
+            <sbt:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
+              <tag:timePeriodOptions sbt="true" s="true" min="true" h="true"/>
+            </sbt:select>
           </td>
         </tr>
         
@@ -228,10 +228,10 @@
           <td class="formLabelRequired"><fmt:message key="dsEdit.1wire.scheduledRescan"/></td>
           <td class="formField">
             <input type="text" id="rescanPeriods" value="${dataSource.rescanPeriods}" class="formShort"/>
-            <sst:select id="rescanPeriodType" value="${dataSource.rescanPeriodType}" onchange="rescanChanged()">
-              <sst:option value="<%= Integer.toString(OneWireDataSourceVO.RESCAN_NONE) %>"><fmt:message key="dsEdit.1wire.none"/></sst:option>
-              <tag:timePeriodOptions sst="true" min="true" h="true" d="true" w="true"/>
-            </sst:select>
+            <sbt:select id="rescanPeriodType" value="${dataSource.rescanPeriodType}" onchange="rescanChanged()">
+              <sbt:option value="<%= Integer.toString(OneWireDataSourceVO.RESCAN_NONE) %>"><fmt:message key="dsEdit.1wire.none"/></sbt:option>
+              <tag:timePeriodOptions sbt="true" min="true" h="true" d="true" w="true"/>
+            </sbt:select>
           </td>
         </tr>
       </table>

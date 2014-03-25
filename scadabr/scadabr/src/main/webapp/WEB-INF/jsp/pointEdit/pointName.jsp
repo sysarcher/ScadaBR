@@ -50,11 +50,11 @@
     </td>
     <td valign="top" align="right">
       <fmt:message key="pointEdit.name.goto"/>:&nbsp;
-      <sst:select value="${form.id}" onchange="window.location='data_point_edit.shtm?dpid='+ this.value;">
+      <sbt:select value="${form.id}" onchange="window.location='data_point_edit.shtm?dpid='+ this.value;">
         <c:forEach items="${userPoints}" var="point">
-          <sst:option value="${point.id}">${point.extendedName}</sst:option>
+          <sbt:option value="${point.id}">${point.extendedName}</sbt:option>
         </c:forEach>
-      </sst:select>
+      </sbt:select>
       
       <c:if test="${!empty prevId}">
         <tag:img png="bullet_go_left" title="pagination.previous"

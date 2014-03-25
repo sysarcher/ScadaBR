@@ -112,10 +112,10 @@
             <td colspan="2">
               <table cellspacing="1" cellpadding="0" border="0">
                 <tr class="rowHeader">
-                  <td><sst:listSort labelKey="dsList.name" field="name" paging="${paging}"/></td>
-                  <td><sst:listSort labelKey="dsList.type" field="type" paging="${paging}"/></td>
-                  <td><sst:listSort labelKey="dsList.connection" field="conn" paging="${paging}"/></td>
-                  <td><sst:listSort labelKey="dsList.status" field="enabled" paging="${paging}"/></td>
+                  <td><sbt:listSort labelKey="dsList.name" field="name" paging="${paging}"/></td>
+                  <td><sbt:listSort labelKey="dsList.type" field="type" paging="${paging}"/></td>
+                  <td><sbt:listSort labelKey="dsList.connection" field="conn" paging="${paging}"/></td>
+                  <td><sbt:listSort labelKey="dsList.status" field="enabled" paging="${paging}"/></td>
                   <td></td>
                 </tr>
                 
@@ -125,7 +125,7 @@
                   <tr class="row" id="dataSourceRow${listParent.parent.id}">
                     <td><b>${listParent.parent.name}</b></td>
                     <td><fmt:message key="${listParent.parent.type.key}"/></td>
-                    <td><sst:i18n message="${listParent.parent.connectionDescription}"/></td>
+                    <td><sbt:i18n message="${listParent.parent.connectionDescription}"/></td>
                     <td align="center">
                       <c:choose>
                         <c:when test="${listParent.parent.enabled}">
@@ -161,7 +161,7 @@
                         <c:forEach items="${listParent.list}" var="point">
                           <tr id="pointRow${point.id}">
                             <td>${point.name}</td>
-                            <td><sst:i18n message="${point.dataTypeMessage}"/> / <sst:i18n message="${point.configurationDescription}"/></td>
+                            <td><sbt:i18n message="${point.dataTypeMessage}"/> / <sbt:i18n message="${point.configurationDescription}"/></td>
                             <td align="center">
                               <c:choose>
                                 <c:when test="${point.enabled}">
@@ -188,9 +188,9 @@
             </td>
           </tr>
           <tr>
-            <td><sst:pageNumber paging="${paging}" pageLabelKey="pagination.page" ofLabelKey="pagination.of"
+            <td><sbt:pageNumber paging="${paging}" pageLabelKey="pagination.page" ofLabelKey="pagination.of"
                     rowsLabelKey="pagination.rows" noRowsLabelKey="pagination.noRows"/></td>
-            <td align="right"><sst:pagination paging="${paging}" previousLabelKey="pagination.previous"
+            <td align="right"><sbt:pagination paging="${paging}" previousLabelKey="pagination.previous"
                     nextLabelKey="pagination.next"/></td>
           </tr>
         </table>  

@@ -19,8 +19,8 @@
 --%><%@tag body-content="empty"%><%--
 --%><%@attribute name="xid" required="true"%><%--
 --%><%@attribute name="color"%><%--
---%><sst:map var="pointMap"><%--
-  --%><sst:mapEntry key="xid" value="${xid}"/><%--
-  --%><sst:mapEntry key="color" value="${color}"/><%--
---%></sst:map><%--
---%><sst:listEntry listVar="chartPointList" value="${pointMap}"/>
+--%><sbt:map var="pointMap"><%--
+  --%><sbt:mapEntry key="xid" value="${xid}"/><%--
+  --%><sbt:mapEntry key="color" value="${color}"/><%--
+--%></sbt:map><%--
+--%><sbt:listEntry listVar="chartPointList" value="${pointMap}"/>

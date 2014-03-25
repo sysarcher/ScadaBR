@@ -57,7 +57,7 @@
   <c:forEach items="${js}" var="jsname">
     <script type="text/javascript" src="resources/${jsname}.js"></script></c:forEach>
   <script type="text/javascript">
-    mango.i18n = <sst:convert obj="${clientSideMessages}"/>;
+    mango.i18n = <sbt:convert obj="${clientSideMessages}"/>;
   </script>
   <c:if test="${!simple}">
     <script type="text/javascript" src="resources/header.js"></script>

@@ -64,7 +64,7 @@ import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.i18n.Utf8ResourceBundle;
 import br.org.scadabr.web.l10n.Localizer;
-import br.org.scadabr.util.PropertiesUtils;
+import java.util.MissingResourceException;
 
 public class Common {
 
@@ -77,6 +77,7 @@ public class Common {
 
     public static final int NEW_ID = -1;
     public static ContextWrapper ctx;
+    private static final ResourceBundle env = ResourceBundle.getBundle("env");
 
     // This is initialized
     public static final RealTimeTimer timer = new RealTimeTimer();
@@ -120,7 +121,7 @@ public class Common {
         int YEARS = 7;
     }
 
-    public static ExportCodes TIME_PERIOD_CODES = new ExportCodes();
+    public final static ExportCodes TIME_PERIOD_CODES = new ExportCodes();
 
     static {
         TIME_PERIOD_CODES.addElement(TimePeriods.MILLISECONDS, "MILLISECONDS");
@@ -211,12 +212,12 @@ public class Common {
                 new LocalizableMessageImpl(periodKey));
     }
 
-	//
+    //
     // Session user
     public static User getUser() {
         WebContext webContext = WebContextFactory.get();
         if (webContext == null) {
-			// If there is no web context, check if there is a background
+            // If there is no web context, check if there is a background
             // context
             BackgroundContext backgroundContext = BackgroundContext.get();
             if (backgroundContext == null) {
@@ -251,7 +252,7 @@ public class Common {
         request.getSession().setAttribute(SESSION_USER, user);
     }
 
-	//
+    //
     // Background process description. Used for audit logs when the system
     // automatically makes changes to data, such as
     // safe mode disabling stuff.
@@ -263,7 +264,7 @@ public class Common {
         return backgroundContext.getProcessDescriptionKey();
     }
 
-	//
+    //
     // Anonymous views
     public static View getAnonymousView(int id) {
         return getAnonymousView(
@@ -286,7 +287,7 @@ public class Common {
     public static void addAnonymousView(HttpServletRequest request, View view) {
         List<View> views = getAnonymousViews(request);
         if (views == null) {
-            views = new ArrayList<View>();
+            views = new ArrayList<>();
             request.getSession().setAttribute(ANON_VIEW_KEY, views);
         }
         // Remove the view if it already exists.
@@ -303,7 +304,7 @@ public class Common {
         return (List<View>) request.getSession().getAttribute(ANON_VIEW_KEY);
     }
 
-	//
+    //
     // Custom views
     public static CustomView getCustomView() {
         return getCustomView(WebContextFactory.get().getHttpServletRequest());
@@ -317,14 +318,38 @@ public class Common {
         request.getSession().setAttribute(CUSTOM_VIEW_KEY, view);
     }
 
-	//
+    //
     // Environment profile
-    public static PropertiesUtils getEnvironmentProfile() {
-        return new PropertiesUtils("env");
+    public static ResourceBundle getEnvironmentProfile() {
+        return env;
+    }
+
+    public static boolean getEnvironmentBoolean(String key, boolean defaultValue) {
+        try {
+            return Boolean.parseBoolean(env.getString(key));
+        } catch (MissingResourceException e) {
+            return defaultValue;
+        }
+    }
+
+    public static int getEnvironmentInt(String key, int defaultValue) {
+        try {
+            return Integer.parseInt(env.getString(key));
+        } catch (MissingResourceException | NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    public static String getEnvironmentString(String key, String defaultValue) {
+        try {
+            return env.getString(key);
+        } catch (MissingResourceException e) {
+            return defaultValue;
+        }
     }
 
     public static String getGroveUrl(String servlet) {
-        String grove = getEnvironmentProfile().getString("grove.url",
+        final String grove = getEnvironmentString("grove.url",
                 "http://mango.serotoninsoftware.com/servlet");
         return grove + "/" + servlet;
     }
@@ -398,12 +423,12 @@ public class Common {
         }
     }
 
-	//
+    //
     // Misc
     public static List<CommPortProxy> getCommPorts()
             throws CommPortConfigException {
         try {
-            List<CommPortProxy> ports = new LinkedList<CommPortProxy>();
+            List<CommPortProxy> ports = new LinkedList<>();
             Enumeration<?> portEnum = CommPortIdentifier.getPortIdentifiers();
             CommPortIdentifier cpid;
             while (portEnum.hasMoreElements()) {
@@ -423,8 +448,7 @@ public class Common {
 
     public synchronized static String encrypt(String plaintext) {
         try {
-            String alg = getEnvironmentProfile().getString(
-                    "security.hashAlgorithm", "SHA");
+            String alg = getEnvironmentString("security.hashAlgorithm", "SHA");
             if ("NONE".equals(alg)) {
                 return plaintext;
             }
@@ -442,13 +466,13 @@ public class Common {
             String hash = new String(Base64.encodeBase64(raw));
             return hash;
         } catch (NoSuchAlgorithmException e) {
-			// Should never happen, so just wrap in a runtime exception and
+            // Should never happen, so just wrap in a runtime exception and
             // rethrow
             throw new ShouldNeverHappenException(e);
         }
     }
 
-	//
+    //
     // HttpClient
     public static HttpClient getHttpClient() {
         return getHttpClient(30000); // 30 seconds.
@@ -494,7 +518,7 @@ public class Common {
         return client;
     }
 
-	//
+    //
     //
     // i18n
     //
