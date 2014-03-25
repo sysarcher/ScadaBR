@@ -12,6 +12,9 @@ import br.org.scadabr.api.constants.ServerStateCode;
 
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.vo.User;
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
+import org.quartz.TriggerKey;
 
 public class ServerStateChecker implements org.quartz.SchedulerListener, Job {
 
@@ -37,36 +40,11 @@ public class ServerStateChecker implements org.quartz.SchedulerListener, Job {
     }
 
     @Override
-    public void jobUnscheduled(String arg0, String arg1) {
-
-    }
-
-    @Override
-    public void jobsPaused(String arg0, String arg1) {
-
-    }
-
-    @Override
-    public void jobsResumed(String arg0, String arg1) {
-
-    }
-
-    @Override
     public void schedulerShutdown() {
     }
 
     @Override
     public void triggerFinalized(Trigger arg0) {
-
-    }
-
-    @Override
-    public void triggersPaused(String arg0, String arg1) {
-
-    }
-
-    @Override
-    public void triggersResumed(String arg0, String arg1) {
 
     }
 
@@ -124,6 +102,86 @@ public class ServerStateChecker implements org.quartz.SchedulerListener, Job {
         }
 
         return state;
+    }
+
+    @Override
+    public void jobUnscheduled(TriggerKey tk) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void triggerPaused(TriggerKey tk) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void triggersPaused(String string) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void triggerResumed(TriggerKey tk) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void triggersResumed(String string) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void jobAdded(JobDetail jd) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void jobDeleted(JobKey jobkey) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void jobPaused(JobKey jobkey) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void jobsPaused(String string) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void jobResumed(JobKey jobkey) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void jobsResumed(String string) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void schedulerInStandbyMode() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void schedulerStarted() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void schedulerStarting() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void schedulerShuttingdown() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void schedulingDataCleared() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

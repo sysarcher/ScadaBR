@@ -69,7 +69,6 @@ import com.serotonin.mango.vo.report.ReportJob;
 import com.serotonin.mango.vo.report.ReportVO;
 import com.serotonin.mango.web.ContextWrapper;
 import com.serotonin.mango.web.dwr.BaseDwr;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
@@ -134,6 +133,7 @@ public class MangoContextListener implements ServletContextListener {
 
     }
 
+    @Override
     public void contextDestroyed(ServletContextEvent evt) {
         log.info("Mango context terminating");
 
@@ -155,7 +155,7 @@ public class MangoContextListener implements ServletContextListener {
         databaseTerminate(ctx);
 
         Common.timer.cancel();
-        Common.timer.getExecutorService().shutdown();
+        Common.timer.shutdown();
 
         Common.ctx = null;
 
@@ -167,7 +167,7 @@ public class MangoContextListener implements ServletContextListener {
         List<DataPointVO> datapoints = new DataPointDao().getDataPoints(null,
                 false);
 
-        Map<String, Integer> mapping = new HashMap<String, Integer>();
+        Map<String, Integer> mapping = new HashMap<>();
 
         for (DataPointVO dataPointVO : datapoints) {
             String completeName = APIUtils.getCompletePath(

@@ -31,11 +31,11 @@
     <c:otherwise>
       <c:forEach items="${dataSource.eventTypes}" var="type">
         <tr>
-          <td><b><sst:i18n message="${type.description}"/></b></td>
+          <td><b><sbt:i18n message="${type.description}"/></b></td>
           <td>
-            <sst:select id="alarmLevel${type.typeRef2}" onchange="alarmLevelChanged(${type.typeRef2})" value="${type.alarmLevel}">
-              <tag:alarmLevelOptions sst="true"/>
-            </sst:select>
+            <sbt:select id="alarmLevel${type.typeRef2}" onchange="alarmLevelChanged(${type.typeRef2})" value="${type.alarmLevel}">
+              <tag:alarmLevelOptions sbt="true"/>
+            </sbt:select>
             <tag:img id="alarmLevelImg${type.typeRef2}" png="flag_green" style="display:none;"/>
             <script type="text/javascript">setAlarmLevelImg(${type.alarmLevel}, 'alarmLevelImg${type.typeRef2}')</script>
           </td>

@@ -59,7 +59,7 @@
         <tr>
           <td class="formLabelRequired"><fmt:message key="pointEdit.props.engineeringUnits"/></td>
           <td class="formField">
-            <sst:select name="engineeringUnits" value="${status.value}"><tag:engineeringUnits/></sst:select>
+            <sbt:select name="engineeringUnits" value="${status.value}"><tag:engineeringUnits/></sbt:select>
           </td>
           <td class="formError">${status.errorMessage}</td>
         </tr>

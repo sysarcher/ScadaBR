@@ -35,7 +35,7 @@ public class CrowdUtils {
     private static CrowdHttpAuthenticator authenticator;
 
     public static boolean isCrowdEnabled() {
-        return Common.getEnvironmentProfile().getBoolean("auth.crowd.on", false);
+        return Common.getEnvironmentBoolean("auth.crowd.on", false);
     }
 
     public static boolean authenticate(HttpServletRequest request, HttpServletResponse response, String username,

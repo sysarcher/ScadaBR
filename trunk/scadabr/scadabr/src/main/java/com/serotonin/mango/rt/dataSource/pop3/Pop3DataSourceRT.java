@@ -163,7 +163,7 @@ public class Pop3DataSourceRT extends PollingDataSource {
         Pop3Email email = new Pop3Email();
 
         // Get the body
-        StringBuffer body = new StringBuffer();
+        StringBuilder body = new StringBuilder();
         Object content = message.getContent();
         if (content instanceof String) // The content of the message is probably text/plain or text/html.
         {

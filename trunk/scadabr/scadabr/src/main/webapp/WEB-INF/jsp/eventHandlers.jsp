@@ -66,22 +66,22 @@
         allPoints = data.allPoints;
         
         emailRecipients = new mango.erecip.EmailRecipients("emailRecipients",
-                "<sst:i18n key="eventHandlers.recipTestEmailMessage" escapeDQuotes="true"/>",
+                "<sbt:i18n key="eventHandlers.recipTestEmailMessage" escapeDQuotes="true"/>",
                 data.mailingLists, data.users);
         emailRecipients.write("emailRecipients", "emailRecipients", null,
-        		"<sst:i18n key="eventHandlers.emailRecipients" escapeDQuotes="true"/>");
+        		"<sbt:i18n key="eventHandlers.emailRecipients" escapeDQuotes="true"/>");
         
         escalRecipients = new mango.erecip.EmailRecipients("escalRecipients",
-                "<sst:i18n key="eventHandlers.escalTestEmailMessage" escapeDQuotes="true"/>",
+                "<sbt:i18n key="eventHandlers.escalTestEmailMessage" escapeDQuotes="true"/>",
                 data.mailingLists, data.users);
         escalRecipients.write("escalRecipients", "escalRecipients", "escalationAddresses2",
-        		"<sst:i18n key="eventHandlers.escalRecipients" escapeDQuotes="true"/>");
+        		"<sbt:i18n key="eventHandlers.escalRecipients" escapeDQuotes="true"/>");
         
         inactiveRecipients = new mango.erecip.EmailRecipients("inactiveRecipients",
-                "<sst:i18n key="eventHandlers.inactiveTestEmailMessage" escapeDQuotes="true"/>",
+                "<sbt:i18n key="eventHandlers.inactiveTestEmailMessage" escapeDQuotes="true"/>",
                 data.mailingLists, data.users);
         inactiveRecipients.write("inactiveRecipients", "inactiveRecipients", "inactiveAddresses2",
-        		"<sst:i18n key="eventHandlers.inactiveRecipients" escapeDQuotes="true"/>");
+        		"<sbt:i18n key="eventHandlers.inactiveRecipients" escapeDQuotes="true"/>");
         
         var pointRoot = dojo.widget.manager.getWidgetById('rootPoint');
         for (i=0; i<data.dataPoints.length; i++) {

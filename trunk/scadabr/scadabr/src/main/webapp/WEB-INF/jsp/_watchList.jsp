@@ -444,12 +444,12 @@
             <tr>
               <td class="smallTitle"><fmt:message key="watchlist.watchlist"/> <tag:help id="watchList"/></td>
               <td align="right">
-                <sst:select id="watchListSelect" value="${selectedWatchList}" onchange="watchListChanged()"
+                <sbt:select id="watchListSelect" value="${selectedWatchList}" onchange="watchListChanged()"
                         onmouseover="closeLayers();">
                   <c:forEach items="${watchLists}" var="wl">
-                    <sst:option value="${wl.key}">${sst:escapeLessThan(wl.value)}</sst:option>
+                    <sbt:option value="${wl.key}">${sbt:escapeLessThan(wl.value)}</sbt:option>
                   </c:forEach>
-                </sst:select>
+                </sbt:select>
                 
                 <div id="wlEditDiv" style="display:inline;" onmouseover="showWatchListEdit()">
                   <tag:img id="wlEditImg" png="pencil" title="watchlist.editListName"/>

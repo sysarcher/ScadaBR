@@ -28,11 +28,11 @@
         <span class="formError">${commPortError}</span>
       </c:when>
       <c:otherwise>
-          <sst:select id="commPortId" value="${serialPortSettings != null ? serialPortSettings.commPortId : ''}">
+          <sbt:select id="commPortId" value="${serialPortSettings != null ? serialPortSettings.commPortId : ''}">
           <c:forEach items="${commPorts}" var="port">
-            <sst:option value="${port.name}">${port.name}</sst:option>
+            <sbt:option value="${port.name}">${port.name}</sbt:option>
           </c:forEach>
-        </sst:select>
+        </sbt:select>
       </c:otherwise>
     </c:choose>
   </td>
@@ -41,79 +41,79 @@
 <tr>
   <td class="formLabelRequired"><fmt:message key="dsEdit.serial.baud"/></td>
   <td class="formField">
-    <sst:select id="baudRate" value="${serialPortSettings != null ? serialPortSettings.baudRate : rxtxDefaultBaudrate}">
-      <sst:option>110</sst:option>
-      <sst:option>300</sst:option>
-      <sst:option>1200</sst:option>
-      <sst:option>2400</sst:option>
-      <sst:option>4800</sst:option>
-      <sst:option>9600</sst:option>
-      <sst:option>19200</sst:option>
-      <sst:option>38400</sst:option>
-      <sst:option>57600</sst:option>
-      <sst:option>115200</sst:option>
-      <sst:option>230400</sst:option>
-      <sst:option>460800</sst:option>
-      <sst:option>921600</sst:option>
-    </sst:select>
+    <sbt:select id="baudRate" value="${serialPortSettings != null ? serialPortSettings.baudRate : rxtxDefaultBaudrate}">
+      <sbt:option>110</sbt:option>
+      <sbt:option>300</sbt:option>
+      <sbt:option>1200</sbt:option>
+      <sbt:option>2400</sbt:option>
+      <sbt:option>4800</sbt:option>
+      <sbt:option>9600</sbt:option>
+      <sbt:option>19200</sbt:option>
+      <sbt:option>38400</sbt:option>
+      <sbt:option>57600</sbt:option>
+      <sbt:option>115200</sbt:option>
+      <sbt:option>230400</sbt:option>
+      <sbt:option>460800</sbt:option>
+      <sbt:option>921600</sbt:option>
+    </sbt:select>
   </td>
 </tr>
 
 <tr>
   <td class="formLabelRequired"><fmt:message key="dsEdit.serial.flowControlIn"/></td>
   <td class="formField">
-    <sst:select id="flowControlIn" value="${serialPortSettings != null ? serialPortSettings.flowControlIn : rxtxDefaultFlowControl}">
-      <sst:option value="NONE"><fmt:message key="dsEdit.serial.flow.none"/></sst:option>
-      <sst:option value="RTS|CTS"><fmt:message key="dsEdit.serial.flow.rtsCts"/></sst:option>
-      <sst:option value="XON|XOFF"><fmt:message key="dsEdit.serial.flow.xonXoff"/></sst:option>
-    </sst:select>
+    <sbt:select id="flowControlIn" value="${serialPortSettings != null ? serialPortSettings.flowControlIn : rxtxDefaultFlowControl}">
+      <sbt:option value="NONE"><fmt:message key="dsEdit.serial.flow.none"/></sbt:option>
+      <sbt:option value="RTS|CTS"><fmt:message key="dsEdit.serial.flow.rtsCts"/></sbt:option>
+      <sbt:option value="XON|XOFF"><fmt:message key="dsEdit.serial.flow.xonXoff"/></sbt:option>
+    </sbt:select>
   </td>
 </tr>
 
 <tr>
   <td class="formLabelRequired"><fmt:message key="dsEdit.serial.flowOut"/></td>
   <td class="formField">
-    <sst:select id="flowControlOut" value="${serialPortSettings != null ? serialPortSettings.flowControlOut : rxtxDefaultFlowControl}">
-      <sst:option value="NONE"><fmt:message key="dsEdit.serial.flow.none"/></sst:option>
-      <sst:option value="RTS|CTS"><fmt:message key="dsEdit.serial.flow.rtsCts"/></sst:option>
-      <sst:option value="XON|XOFF"><fmt:message key="dsEdit.serial.flow.xonXoff"/></sst:option>
-    </sst:select>
+    <sbt:select id="flowControlOut" value="${serialPortSettings != null ? serialPortSettings.flowControlOut : rxtxDefaultFlowControl}">
+      <sbt:option value="NONE"><fmt:message key="dsEdit.serial.flow.none"/></sbt:option>
+      <sbt:option value="RTS|CTS"><fmt:message key="dsEdit.serial.flow.rtsCts"/></sbt:option>
+      <sbt:option value="XON|XOFF"><fmt:message key="dsEdit.serial.flow.xonXoff"/></sbt:option>
+    </sbt:select>
   </td>
 </tr>
 
 <tr>
   <td class="formLabelRequired"><fmt:message key="dsEdit.serial.dataBits"/></td>
   <td class="formField">
-    <sst:select id="dataBits" value="${serialPortSettings != null ? serialPortSettings.dataBits : rxtxDefaultDataBits}">
-      <sst:option value="5">5</sst:option>
-      <sst:option value="6">6</sst:option>
-      <sst:option value="7">7</sst:option>
-      <sst:option value="8">8</sst:option>
-    </sst:select>
+    <sbt:select id="dataBits" value="${serialPortSettings != null ? serialPortSettings.dataBits : rxtxDefaultDataBits}">
+      <sbt:option value="5">5</sbt:option>
+      <sbt:option value="6">6</sbt:option>
+      <sbt:option value="7">7</sbt:option>
+      <sbt:option value="8">8</sbt:option>
+    </sbt:select>
   </td>
 </tr>
 
 <tr>
   <td class="formLabelRequired"><fmt:message key="dsEdit.serial.stopBits"/></td>
   <td class="formField">
-    <sst:select id="stopBits" value="${serialPortSettings != null ? serialPortSettings.stopBits : rxtxDefaultStopBits}">
-      <sst:option value="1">1</sst:option>
-      <sst:option value="1.5">1.5</sst:option>
-      <sst:option value="2">2</sst:option>
-    </sst:select>
+    <sbt:select id="stopBits" value="${serialPortSettings != null ? serialPortSettings.stopBits : rxtxDefaultStopBits}">
+      <sbt:option value="1">1</sbt:option>
+      <sbt:option value="1.5">1.5</sbt:option>
+      <sbt:option value="2">2</sbt:option>
+    </sbt:select>
   </td>
 </tr>
 
 <tr>
   <td class="formLabelRequired"><fmt:message key="dsEdit.serial.parity"/></td>
   <td class="formField">
-    <sst:select id="parity" value="${serialPortSettings != null ? serialPortSettings.parity : rxtxDefaultParity}">
-      <sst:option value="NONE"><fmt:message key="dsEdit.serial.parity.none"/></sst:option>
-      <sst:option value="ODD"><fmt:message key="dsEdit.serial.parity.odd"/></sst:option>
-      <sst:option value="EVEN"><fmt:message key="dsEdit.serial.parity.even"/></sst:option>
-      <sst:option value="MARK"><fmt:message key="dsEdit.serial.parity.mark"/></sst:option>
-      <sst:option value="SPACE"><fmt:message key="dsEdit.serial.parity.space"/></sst:option>
-    </sst:select>
+    <sbt:select id="parity" value="${serialPortSettings != null ? serialPortSettings.parity : rxtxDefaultParity}">
+      <sbt:option value="NONE"><fmt:message key="dsEdit.serial.parity.none"/></sbt:option>
+      <sbt:option value="ODD"><fmt:message key="dsEdit.serial.parity.odd"/></sbt:option>
+      <sbt:option value="EVEN"><fmt:message key="dsEdit.serial.parity.even"/></sbt:option>
+      <sbt:option value="MARK"><fmt:message key="dsEdit.serial.parity.mark"/></sbt:option>
+      <sbt:option value="SPACE"><fmt:message key="dsEdit.serial.parity.space"/></sbt:option>
+    </sbt:select>
   </td>
 </tr>
 

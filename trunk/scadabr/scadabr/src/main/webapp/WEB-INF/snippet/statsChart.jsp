@@ -18,8 +18,8 @@
 --%>
 <%@ include file="/WEB-INF/snippet/common.jsp" %>
 <c:if test="${!empty startsAndRuntimes}">
-  <b><fmt:message key="common.stats.start"/></b>: ${sst:fullTime(start)}<br/>
-  <b><fmt:message key="common.stats.end"/></b>: ${sst:fullTime(end)}<br/>
+  <b><fmt:message key="common.stats.start"/></b>: ${sbt:fullTime(start)}<br/>
+  <b><fmt:message key="common.stats.end"/></b>: ${sbt:fullTime(end)}<br/>
   <table>
     <tr>
       <th><fmt:message key="common.value"/></th>
@@ -41,10 +41,10 @@
       <b><fmt:message key="common.noData"/></b><br/>
     </c:when>
     <c:otherwise>
-      <b><fmt:message key="common.stats.start"/></b>: ${sst:fullTime(start)}<br/>
-      <b><fmt:message key="common.stats.end"/></b>: ${sst:fullTime(end)}<br/>
-      <b><fmt:message key="common.stats.min"/></b>: ${mango:specificHtmlTextValue(point, minimum)} @ ${sst:time(minTime)}<br/>
-      <b><fmt:message key="common.stats.max"/></b>: ${mango:specificHtmlTextValue(point, maximum)} @ ${sst:time(maxTime)}<br/>
+      <b><fmt:message key="common.stats.start"/></b>: ${sbt:fullTime(start)}<br/>
+      <b><fmt:message key="common.stats.end"/></b>: ${sbt:fullTime(end)}<br/>
+      <b><fmt:message key="common.stats.min"/></b>: ${mango:specificHtmlTextValue(point, minimum)} @ ${sbt:time(minTime)}<br/>
+      <b><fmt:message key="common.stats.max"/></b>: ${mango:specificHtmlTextValue(point, maximum)} @ ${sbt:time(maxTime)}<br/>
       <b><fmt:message key="common.stats.avg"/></b>: ${mango:specificHtmlTextValue(point, average)}<br/>
       <c:if test="${!empty sum}">
         <b><fmt:message key="common.stats.sum"/></b>: ${mango:specificHtmlTextValue(point, sum)}<br/>

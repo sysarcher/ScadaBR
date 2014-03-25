@@ -70,11 +70,11 @@
       <tr class="row<c:if test="${status.index % 2 == 1}">Alt</c:if>">
         <td align="center">${event.id}</td>
         <td align="center"><tag:eventIcon event="${event}"/></td>
-        <td>${sst:time(event.activeTimestamp)}</td>
+        <td>${sbt:time(event.activeTimestamp)}</td>
         <td>
           <table cellspacing="0" cellpadding="0" width="100%">
             <tr>
-              <td colspan="2"><b><sst:i18n message="${event.message}"/></b></td>
+              <td colspan="2"><b><sbt:i18n message="${event.message}"/></b></td>
               <td align="right">
                 <tag:img png="comment_add" title="notes.addNote"
                         onclick="openCommentDialog(${applicationScope['constants.UserComment.TYPE_EVENT']}, ${event.id})"/>
@@ -91,15 +91,15 @@
             </c:when>
             <c:when test="${!event.rtnApplicable}"><fmt:message key="common.nortn"/></c:when>
             <c:otherwise>
-              ${sst:time(event.rtnTimestamp)} - <sst:i18n message="${event.rtnMessage}"/>
+              ${sbt:time(event.rtnTimestamp)} - <sbt:i18n message="${event.rtnMessage}"/>
             </c:otherwise>
           </c:choose>
         </td>
         <c:if test="${!pendingEvents}">
           <td>
             <c:if test="${event.acknowledged}">
-              ${sst:time(event.acknowledgedTimestamp)}
-              <sst:i18n message="${event.ackMessage}"/>
+              ${sbt:time(event.acknowledgedTimestamp)}
+              <sbt:i18n message="${event.ackMessage}"/>
             </c:if>
           </td>
         </c:if>

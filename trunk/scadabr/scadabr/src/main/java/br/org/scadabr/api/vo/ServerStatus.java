@@ -112,14 +112,12 @@ public class ServerStatus implements java.io.Serializable {
 
     private java.lang.Object __equalsCalc = null;
 
+    @Override
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof ServerStatus)) {
             return false;
         }
         ServerStatus other = (ServerStatus) obj;
-        if (obj == null) {
-            return false;
-        }
         if (this == obj) {
             return true;
         }
@@ -147,6 +145,7 @@ public class ServerStatus implements java.io.Serializable {
 
     private boolean __hashCodeCalc = false;
 
+    @Override
     public synchronized int hashCode() {
         if (__hashCodeCalc) {
             return 0;
@@ -178,7 +177,7 @@ public class ServerStatus implements java.io.Serializable {
     }
 
     // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc
+    private final static org.apache.axis.description.TypeDesc typeDesc
             = new org.apache.axis.description.TypeDesc(ServerStatus.class, true);
 
     static {

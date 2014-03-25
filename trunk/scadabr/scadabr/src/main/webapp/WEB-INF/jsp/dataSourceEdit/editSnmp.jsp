@@ -116,9 +116,9 @@
           <td class="formLabelRequired"><fmt:message key="dsEdit.updatePeriod"/></td>
           <td class="formField">
             <input type="text" id="updatePeriods" value="${dataSource.updatePeriods}" class="formShort"/>
-            <sst:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
-              <tag:timePeriodOptions sst="true" s="true" min="true" h="true"/>
-            </sst:select>
+            <sbt:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
+              <tag:timePeriodOptions sbt="true" s="true" min="true" h="true"/>
+            </sbt:select>
           </td>
         </tr>
         
@@ -135,11 +135,11 @@
         <tr>
           <td class="formLabelRequired"><fmt:message key="dsEdit.snmp.version"/></td>
           <td class="formField">
-            <sst:select id="snmpVersion" value="${dataSource.snmpVersion}" onchange="versionChange()">
-              <sst:option value="<%= Integer.toString(SnmpConstants.version1) %>">1</sst:option>
-              <sst:option value="<%= Integer.toString(SnmpConstants.version2c) %>">2c</sst:option>
-              <sst:option value="<%= Integer.toString(SnmpConstants.version3) %>">3</sst:option>
-            </sst:select>
+            <sbt:select id="snmpVersion" value="${dataSource.snmpVersion}" onchange="versionChange()">
+              <sbt:option value="<%= Integer.toString(SnmpConstants.version1) %>">1</sbt:option>
+              <sbt:option value="<%= Integer.toString(SnmpConstants.version2c) %>">2c</sbt:option>
+              <sbt:option value="<%= Integer.toString(SnmpConstants.version3) %>">3</sbt:option>
+            </sbt:select>
           </td>
         </tr>
         
@@ -159,11 +159,11 @@
           <tr>
             <td class="formLabelRequired"><fmt:message key="dsEdit.snmp.authProtocol"/></td>
             <td class="formField">
-              <sst:select id="authProtocol" value="${dataSource.authProtocol}">
-                <sst:option value="<%= SnmpDataSourceVO.AuthProtocols.NONE %>"><fmt:message key="dsEdit.snmp.none"/></sst:option>
-                <sst:option value="<%= SnmpDataSourceVO.AuthProtocols.MD5 %>">MD5</sst:option>
-                <sst:option value="<%= SnmpDataSourceVO.AuthProtocols.SHA %>">SHA</sst:option>
-              </sst:select>
+              <sbt:select id="authProtocol" value="${dataSource.authProtocol}">
+                <sbt:option value="<%= SnmpDataSourceVO.AuthProtocols.NONE %>"><fmt:message key="dsEdit.snmp.none"/></sbt:option>
+                <sbt:option value="<%= SnmpDataSourceVO.AuthProtocols.MD5 %>">MD5</sbt:option>
+                <sbt:option value="<%= SnmpDataSourceVO.AuthProtocols.SHA %>">SHA</sbt:option>
+              </sbt:select>
             </td>
           </tr>
           
@@ -175,13 +175,13 @@
           <tr>
             <td class="formLabelRequired"><fmt:message key="dsEdit.snmp.privProtocol"/></td>
             <td class="formField">
-              <sst:select id="privProtocol" value="${dataSource.privProtocol}">
-                <sst:option value="<%= SnmpDataSourceVO.PrivProtocols.NONE %>"><fmt:message key="dsEdit.snmp.none"/></sst:option>
-                <sst:option value="<%= SnmpDataSourceVO.PrivProtocols.DES %>">DES</sst:option>
-                <sst:option value="<%= SnmpDataSourceVO.PrivProtocols.AES128 %>">AES128</sst:option>
-                <sst:option value="<%= SnmpDataSourceVO.PrivProtocols.AES192 %>">AES192</sst:option>
-                <sst:option value="<%= SnmpDataSourceVO.PrivProtocols.AES256 %>">AES256</sst:option>
-              </sst:select>
+              <sbt:select id="privProtocol" value="${dataSource.privProtocol}">
+                <sbt:option value="<%= SnmpDataSourceVO.PrivProtocols.NONE %>"><fmt:message key="dsEdit.snmp.none"/></sbt:option>
+                <sbt:option value="<%= SnmpDataSourceVO.PrivProtocols.DES %>">DES</sbt:option>
+                <sbt:option value="<%= SnmpDataSourceVO.PrivProtocols.AES128 %>">AES128</sbt:option>
+                <sbt:option value="<%= SnmpDataSourceVO.PrivProtocols.AES192 %>">AES192</sbt:option>
+                <sbt:option value="<%= SnmpDataSourceVO.PrivProtocols.AES256 %>">AES256</sbt:option>
+              </sbt:select>
             </td>
           </tr>
           

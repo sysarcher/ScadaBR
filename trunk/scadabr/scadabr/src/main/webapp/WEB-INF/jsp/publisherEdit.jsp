@@ -99,7 +99,7 @@
             
             <tr>
               <td class="formLabelRequired"><fmt:message key="common.enabled"/></td>
-              <td class="formField"><sst:checkbox id="enabled" selectedValue="${publisher.enabled}"/></td>
+              <td class="formField"><sbt:checkbox id="enabled" selectedValue="${publisher.enabled}"/></td>
             </tr>
             
             <tr>
@@ -113,16 +113,16 @@
             <tr>
               <td class="formLabelRequired"><fmt:message key="publisherEdit.updateEvent"/></td>
               <td class="formField">
-                <sst:select id="changesOnly" value="${publisher.changesOnly}">
-                  <sst:option value="false"><fmt:message key="publisherEdit.updateEvent.all"/></sst:option>
-                  <sst:option value="true"><fmt:message key="publisherEdit.updateEvent.changes"/></sst:option>
-                </sst:select>
+                <sbt:select id="changesOnly" value="${publisher.changesOnly}">
+                  <sbt:option value="false"><fmt:message key="publisherEdit.updateEvent.all"/></sbt:option>
+                  <sbt:option value="true"><fmt:message key="publisherEdit.updateEvent.changes"/></sbt:option>
+                </sbt:select>
               </td>
             </tr>
             
             <tr>
               <td class="formLabelRequired"><fmt:message key="publisherEdit.snapshot"/></td>
-              <td class="formField"><sst:checkbox id="sendSnapshot" onclick="sendSnapshotChanged()"
+              <td class="formField"><sbt:checkbox id="sendSnapshot" onclick="sendSnapshotChanged()"
                       selectedValue="${publisher.sendSnapshot}"/></td>
             </tr>
             
@@ -130,9 +130,9 @@
               <td class="formLabelRequired"><fmt:message key="publisherEdit.snapshotPeriod"/></td>
               <td class="formField">
                 <input type="text" id="snapshotSendPeriods" value="${publisher.snapshotSendPeriods}" class="formShort"/>
-                <sst:select id="snapshotSendPeriodType" value="${publisher.snapshotSendPeriodType}">
-                  <tag:timePeriodOptions sst="true" s="true" min="true" h="true"/>
-                </sst:select>
+                <sbt:select id="snapshotSendPeriodType" value="${publisher.snapshotSendPeriodType}">
+                  <tag:timePeriodOptions sbt="true" s="true" min="true" h="true"/>
+                </sbt:select>
                 <div id="snapshotSendPeriodsMsg" class="formError" style="display:none;"></div>
               </td>
             </tr>

@@ -28,8 +28,8 @@
       <c:forEach items="${userPoints}" var="dp">
         pointsArray[pointsArray.length] = {
             id : ${dp.id}, 
-            name : '${sst:quotEncode(dp.extendedName)}',
-            type : '<sst:i18n message="${dp.dataTypeMessage}"/>'
+            name : '${sbt:quotEncode(dp.extendedName)}',
+            type : '<sbt:i18n message="${dp.dataTypeMessage}"/>'
         };
       </c:forEach>
       

@@ -305,10 +305,10 @@
           <tr>
             <td class="formLabelRequired"><fmt:message key="publisherEdit.httpSender.method"/></td>
             <td class="formField">
-              <sst:select id="usePost" value="${publisher.usePost}">
-                <sst:option value="false">GET</sst:option>
-                <sst:option value="true">POST</sst:option>
-              </sst:select>
+              <sbt:select id="usePost" value="${publisher.usePost}">
+                <sbt:option value="false">GET</sbt:option>
+                <sbt:option value="true">POST</sbt:option>
+              </sbt:select>
             </td>
           </tr>
           
@@ -348,18 +348,18 @@
           
           <tr>
             <td class="formLabelRequired"><fmt:message key="publisherEdit.httpSender.raiseResultWarning"/></td>
-            <td class="formField"><sst:checkbox id="raiseResultWarning"
+            <td class="formField"><sbt:checkbox id="raiseResultWarning"
                     selectedValue="${publisher.raiseResultWarning}"/></td>
           </tr>
           
           <tr>
             <td class="formLabelRequired"><fmt:message key="publisherEdit.httpSender.dateFormat"/></td>
             <td class="formField">
-              <sst:select id="dateFormat" value="${publisher.dateFormat}">
-                <sst:option value="<%= Integer.toString(HttpSenderVO.DATE_FORMAT_BASIC) %>"><fmt:message key="publisherEdit.httpSender.dateFormat.basic"/></sst:option>
-                <sst:option value="<%= Integer.toString(HttpSenderVO.DATE_FORMAT_TZ) %>"><fmt:message key="publisherEdit.httpSender.dateFormat.tz"/></sst:option>
-                <sst:option value="<%= Integer.toString(HttpSenderVO.DATE_FORMAT_UTC) %>"><fmt:message key="publisherEdit.httpSender.dateFormat.utc"/></sst:option>
-              </sst:select>
+              <sbt:select id="dateFormat" value="${publisher.dateFormat}">
+                <sbt:option value="<%= Integer.toString(HttpSenderVO.DATE_FORMAT_BASIC) %>"><fmt:message key="publisherEdit.httpSender.dateFormat.basic"/></sbt:option>
+                <sbt:option value="<%= Integer.toString(HttpSenderVO.DATE_FORMAT_TZ) %>"><fmt:message key="publisherEdit.httpSender.dateFormat.tz"/></sbt:option>
+                <sbt:option value="<%= Integer.toString(HttpSenderVO.DATE_FORMAT_UTC) %>"><fmt:message key="publisherEdit.httpSender.dateFormat.utc"/></sbt:option>
+              </sbt:select>
             </td>
           </tr>
         </table>

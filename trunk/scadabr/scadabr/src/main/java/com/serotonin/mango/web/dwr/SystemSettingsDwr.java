@@ -423,7 +423,7 @@ public class SystemSettingsDwr extends BaseDwr {
 
     @MethodFilter
     public String checkTypeDB() {
-        return Common.getEnvironmentProfile().getString("db.type", "derby");
+        return Common.getEnvironmentString("db.type", "derby");
     }
 
     @MethodFilter

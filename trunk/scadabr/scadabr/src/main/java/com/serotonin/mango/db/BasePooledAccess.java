@@ -58,8 +58,8 @@ abstract public class BasePooledAccess extends DatabaseAccess {
         dataSource.setUrl(getUrl(propertyPrefix));
         dataSource.setUsername(Common.getEnvironmentProfile().getString(propertyPrefix + "db.username"));
         dataSource.setPassword(getDatabasePassword(propertyPrefix));
-        dataSource.setMaxActive(Common.getEnvironmentProfile().getInt(propertyPrefix + "db.pool.maxActive", 10));
-        dataSource.setMaxIdle(Common.getEnvironmentProfile().getInt(propertyPrefix + "db.pool.maxIdle", 10));
+        dataSource.setMaxActive(Common.getEnvironmentInt(propertyPrefix + "db.pool.maxActive", 10));
+        dataSource.setMaxIdle(Common.getEnvironmentInt(propertyPrefix + "db.pool.maxIdle", 10));
     }
 
     protected String getUrl(String propertyPrefix) {

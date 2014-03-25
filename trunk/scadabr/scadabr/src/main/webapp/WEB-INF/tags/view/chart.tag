@@ -20,7 +20,7 @@
 --%><%@attribute name="durationType" required="true"%><%--
 --%><%@attribute name="width" type="java.lang.Integer" required="true"%><%--
 --%><%@attribute name="height" type="java.lang.Integer" required="true"%><%--
---%><sst:list var="chartPointList"/><%--
+--%><sbt:list var="chartPointList"/><%--
 --%><jsp:doBody/><%--
 --%><mango:chart duration="${duration}" durationType="${durationType}" width="${width}" height="${height}"><%--
   --%><c:forEach items="${chartPointList}" var="chartPoint"><%--

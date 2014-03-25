@@ -157,11 +157,11 @@
 			<span class="formError">${commPortError}</span>
 		</c:when>
 		<c:otherwise>
-			<sst:select id="commPortId" value="${dataSource.commPortId}">
+			<sbt:select id="commPortId" value="${dataSource.commPortId}">
 				<c:forEach items="${commPorts}" var="port">
-					<sst:option value="${port.name}">${port.name}</sst:option>
+					<sbt:option value="${port.name}">${port.name}</sbt:option>
 				</c:forEach>
-			</sst:select>
+			</sbt:select>
 		</c:otherwise>
 	</c:choose></td>
 </tr>
@@ -169,57 +169,57 @@
 <tr>
 	<td class="formLabelRequired"><fmt:message
 		key="dsEdit.asciiSerial.baud" /></td>
-	<td class="formField"><sst:select id="baudRate"
+	<td class="formField"><sbt:select id="baudRate"
 		value="${dataSource.baudRate}">
-		<sst:option>110</sst:option>
-		<sst:option>300</sst:option>
-		<sst:option>1200</sst:option>
-		<sst:option>2400</sst:option>
-		<sst:option>4800</sst:option>
-		<sst:option>9600</sst:option>
-		<sst:option>19200</sst:option>
-		<sst:option>38400</sst:option>
-		<sst:option>57600</sst:option>
-		<sst:option>115200</sst:option>
-		<sst:option>230400</sst:option>
-		<sst:option>460800</sst:option>
-		<sst:option>921600</sst:option>
-	</sst:select></td>
+		<sbt:option>110</sbt:option>
+		<sbt:option>300</sbt:option>
+		<sbt:option>1200</sbt:option>
+		<sbt:option>2400</sbt:option>
+		<sbt:option>4800</sbt:option>
+		<sbt:option>9600</sbt:option>
+		<sbt:option>19200</sbt:option>
+		<sbt:option>38400</sbt:option>
+		<sbt:option>57600</sbt:option>
+		<sbt:option>115200</sbt:option>
+		<sbt:option>230400</sbt:option>
+		<sbt:option>460800</sbt:option>
+		<sbt:option>921600</sbt:option>
+	</sbt:select></td>
 </tr>
 
 <tr>
   <td class="formLabelRequired"><fmt:message key="dsEdit.asciiSerial.dataBits"/></td>
   <td class="formField">
-    <sst:select id="dataBits" value="${dataSource.dataBits}">
-      <sst:option value="5">5</sst:option>
-      <sst:option value="6">6</sst:option>
-      <sst:option value="7">7</sst:option>
-      <sst:option value="8">8</sst:option>
-    </sst:select>
+    <sbt:select id="dataBits" value="${dataSource.dataBits}">
+      <sbt:option value="5">5</sbt:option>
+      <sbt:option value="6">6</sbt:option>
+      <sbt:option value="7">7</sbt:option>
+      <sbt:option value="8">8</sbt:option>
+    </sbt:select>
   </td>
 </tr>
 
 <tr>
   <td class="formLabelRequired"><fmt:message key="dsEdit.asciiSerial.stopBits"/></td>
   <td class="formField">
-    <sst:select id="stopBits" value="${dataSource.stopBits}">
-      <sst:option value="1">1</sst:option>
-      <sst:option value="3">1.5</sst:option>
-      <sst:option value="2">2</sst:option>
-    </sst:select>
+    <sbt:select id="stopBits" value="${dataSource.stopBits}">
+      <sbt:option value="1">1</sbt:option>
+      <sbt:option value="3">1.5</sbt:option>
+      <sbt:option value="2">2</sbt:option>
+    </sbt:select>
   </td>
 </tr>
 
 <tr>
   <td class="formLabelRequired"><fmt:message key="dsEdit.asciiSerial.parity"/></td>
   <td class="formField">
-    <sst:select id="parity" value="${dataSource.parity}">
-      <sst:option value="0"><fmt:message key="dsEdit.modbusSerial.parity.none"/></sst:option>
-      <sst:option value="1"><fmt:message key="dsEdit.modbusSerial.parity.odd"/></sst:option>
-      <sst:option value="2"><fmt:message key="dsEdit.modbusSerial.parity.even"/></sst:option>
-      <sst:option value="3"><fmt:message key="dsEdit.modbusSerial.parity.mark"/></sst:option>
-      <sst:option value="4"><fmt:message key="dsEdit.modbusSerial.parity.space"/></sst:option>
-    </sst:select>
+    <sbt:select id="parity" value="${dataSource.parity}">
+      <sbt:option value="0"><fmt:message key="dsEdit.modbusSerial.parity.none"/></sbt:option>
+      <sbt:option value="1"><fmt:message key="dsEdit.modbusSerial.parity.odd"/></sbt:option>
+      <sbt:option value="2"><fmt:message key="dsEdit.modbusSerial.parity.even"/></sbt:option>
+      <sbt:option value="3"><fmt:message key="dsEdit.modbusSerial.parity.mark"/></sbt:option>
+      <sbt:option value="4"><fmt:message key="dsEdit.modbusSerial.parity.space"/></sbt:option>
+    </sbt:select>
   </td>
 </tr>
 
@@ -227,9 +227,9 @@
     <td class="formLabelRequired"><fmt:message key="dsEdit.updatePeriod"/></td>
     <td class="formField">
       <input type="text" id="updatePeriods" value="${dataSource.updatePeriods}" class="formShort" />
-      <sst:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
-        <tag:timePeriodOptions sst="true" ms="true" s="true" min="true" h="true"/>
-      </sst:select>
+      <sbt:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
+        <tag:timePeriodOptions sbt="true" ms="true" s="true" min="true" h="true"/>
+      </sbt:select>
     </td>
   </tr>
   
@@ -244,17 +244,17 @@
   
   <tr>
     <td class="formLabelRequired"><fmt:message key="dsEdit.quantize"/></td>
-    <td class="formField"><sst:checkbox id="quantize" selectedValue="${dataSource.quantize}"/></td>
+    <td class="formField"><sbt:checkbox id="quantize" selectedValue="${dataSource.quantize}"/></td>
   </tr>
   
   <tr>
   <td class="formLabelRequired"><fmt:message key="dsEdit.asciiSerial.stopMode"/></td>
   <td class="formField">
-    <sst:select id="stopMode" onchange="changeStopMode()" value="${dataSource.stopMode}">
-      <sst:option value="0"><fmt:message key="dsEdit.asciiSerial.stopMode.nChar"/></sst:option>
-      <sst:option value="1"><fmt:message key="dsEdit.asciiSerial.stopMode.charX"/></sst:option>
-      <sst:option value="2"><fmt:message key="dsEdit.asciiSerial.stopMode.stopTimeout"/></sst:option>
-    </sst:select>
+    <sbt:select id="stopMode" onchange="changeStopMode()" value="${dataSource.stopMode}">
+      <sbt:option value="0"><fmt:message key="dsEdit.asciiSerial.stopMode.nChar"/></sbt:option>
+      <sbt:option value="1"><fmt:message key="dsEdit.asciiSerial.stopMode.charX"/></sbt:option>
+      <sbt:option value="2"><fmt:message key="dsEdit.asciiSerial.stopMode.stopTimeout"/></sbt:option>
+    </sbt:select>
   </td>
 </tr>
   
@@ -267,10 +267,10 @@
   <tr>
   <td class="formLabelRequired"><fmt:message key="dsEdit.asciiSerial.charStopMode"/></td>
   <td class="formField">
-    <sst:select id="charStopMode" onchange="changeCharStopMode()" value="${dataSource.charStopMode}">
-      <sst:option value="0"><fmt:message key="dsEdit.asciiSerial.charStopMode.charASCII"/></sst:option>
-      <sst:option value="1"><fmt:message key="dsEdit.asciiSerial.charStopMode.hexValue"/></sst:option>
-    </sst:select>
+    <sbt:select id="charStopMode" onchange="changeCharStopMode()" value="${dataSource.charStopMode}">
+      <sbt:option value="0"><fmt:message key="dsEdit.asciiSerial.charStopMode.charASCII"/></sbt:option>
+      <sbt:option value="1"><fmt:message key="dsEdit.asciiSerial.charStopMode.hexValue"/></sbt:option>
+    </sbt:select>
   </td>
 </tr>
   <tr>
@@ -296,16 +296,16 @@
   <tr>
   <td class="formLabelRequired"><fmt:message key="dsEdit.asciiSerial.bufferSize"/></td>
   <td class="formField">
-    <sst:select id="bufferSize" value="${dataSource.bufferSize}">
-      <sst:option value="2">2</sst:option>
-      <sst:option value="4">4</sst:option>
-      <sst:option value="8">8</sst:option>
-      <sst:option value="16">16</sst:option>
-      <sst:option value="32">32</sst:option>
-      <sst:option value="64">64</sst:option>
-      <sst:option value="256">256</sst:option>
-      <sst:option value="1024">1024</sst:option>
-    </sst:select>
+    <sbt:select id="bufferSize" value="${dataSource.bufferSize}">
+      <sbt:option value="2">2</sbt:option>
+      <sbt:option value="4">4</sbt:option>
+      <sbt:option value="8">8</sbt:option>
+      <sbt:option value="16">16</sbt:option>
+      <sbt:option value="32">32</sbt:option>
+      <sbt:option value="64">64</sbt:option>
+      <sbt:option value="256">256</sbt:option>
+      <sbt:option value="1024">1024</sbt:option>
+    </sbt:select>
   	</td>
   </tr>
   

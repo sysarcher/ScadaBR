@@ -257,11 +257,11 @@
                 <span class="formError">${commPortError}</span>
               </c:when>
               <c:otherwise>
-                <sst:select id="commPortId" value="${dataSource.commPortId}">
+                <sbt:select id="commPortId" value="${dataSource.commPortId}">
                   <c:forEach items="${commPorts}" var="port">
-                    <sst:option value="${port.name}">${port.name}</sst:option>
+                    <sbt:option value="${port.name}">${port.name}</sbt:option>
                   </c:forEach>
-                </sst:select>
+                </sbt:select>
               </c:otherwise>
             </c:choose>
           </td>
@@ -275,10 +275,10 @@
         <tr>
           <td class="formLabelRequired"><fmt:message key="dsEdit.spinwave.version"/></td>
           <td class="formField">
-            <sst:select id="messageVersion" value="${dataSource.messageVersion}" onchange="messageVersionChange()">
-              <sst:option><%= SpinwaveReceiver.VERSION_1 %></sst:option>
-              <sst:option><%= SpinwaveReceiver.VERSION_2 %></sst:option>
-            </sst:select>
+            <sbt:select id="messageVersion" value="${dataSource.messageVersion}" onchange="messageVersionChange()">
+              <sbt:option><%= SpinwaveReceiver.VERSION_1 %></sbt:option>
+              <sbt:option><%= SpinwaveReceiver.VERSION_2 %></sbt:option>
+            </sbt:select>
             <span id="messageVersionWarning" style="display:none"><tag:img png="warn"
                     title="dsEdit.spinwave.deleteWarn"/></span>
           </td>

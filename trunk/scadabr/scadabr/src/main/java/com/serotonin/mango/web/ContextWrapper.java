@@ -61,7 +61,7 @@ public class ContextWrapper {
     }
 
     public List<String> getImageSetIds() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (ImageSet s : getImageSets()) {
             result.add(s.getId());
         }
@@ -75,7 +75,7 @@ public class ContextWrapper {
     }
 
     public List<String> getDynamicImageIds() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (DynamicImage d : getDynamicImages()) {
             result.add(d.getId());
         }

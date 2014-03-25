@@ -83,7 +83,7 @@ public class DerbyAccess extends DatabaseAccess {
     }
 
     private String getUrl(String propertyPrefix) {
-        String name = Common.getEnvironmentProfile().getString(propertyPrefix + "db.url", "~/../../mangoDB");
+        String name = Common.getEnvironmentString(propertyPrefix + "db.url", "~/../../mangoDB");
         if (name.startsWith("~")) {
             name = ctx.getRealPath(name.substring(1));
         }
@@ -99,7 +99,7 @@ public class DerbyAccess extends DatabaseAccess {
         try {
             conn = DataSourceUtils.getConnection(dataSource);
         } catch (CannotGetJdbcConnectionException e) {
-            SQLException se = (SQLException) e.getCause();
+            final SQLException se = (SQLException) e.getCause();
             if ("XJ015".equals(se.getSQLState())) {
                 log.debug("Stopped database");
                 // A SQL code indicating that the system was successfully shut down. We can ignore this.

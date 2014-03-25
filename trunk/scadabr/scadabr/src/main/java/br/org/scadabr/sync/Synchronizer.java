@@ -6,14 +6,13 @@
 package br.org.scadabr.sync;
 
 import br.org.scadabr.ImplementMeException;
-import com.serotonin.mango.web.servlet.AsyncImageChartServlet;
 import java.util.concurrent.ExecutorService;
 
 /**
  *
  * @author aploese
  */
-public class Synchronizer<T extends Object> {
+public class Synchronizer<T> {
 
     public void addTask(T t) {
         throw new ImplementMeException();

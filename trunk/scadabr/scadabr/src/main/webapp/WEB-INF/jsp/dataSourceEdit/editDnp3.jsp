@@ -211,7 +211,7 @@
   </c:choose>
   <tr>
           <td class="formLabelRequired"><fmt:message key="dsEdit.quantize"/></td>
-          <td class="formField"><sst:checkbox id="quantize" selectedValue="${dataSource.quantize}"/></td>
+          <td class="formField"><sbt:checkbox id="quantize" selectedValue="${dataSource.quantize}"/></td>
   </tr>
   <tr>
     <td class="formLabelRequired"><fmt:message key="dsEdit.dnp3.retries"/></td>
@@ -226,9 +226,9 @@
     <td class="formLabelRequired"><fmt:message key="dsEdit.dnp3.rbePeriod"/></td>
     <td class="formField">
       <input type="text" id="rbePollPeriods" value="${dataSource.rbePollPeriods}" class="formShort" />
-      <sst:select id="rbePeriodType" value="${dataSource.rbePeriodType}">
-        <tag:timePeriodOptions sst="true" ms="true" s="true" min="true" h="true"/>
-      </sst:select>
+      <sbt:select id="rbePeriodType" value="${dataSource.rbePeriodType}">
+        <tag:timePeriodOptions sbt="true" ms="true" s="true" min="true" h="true"/>
+      </sbt:select>
     </td>
   </tr>
   <tr>

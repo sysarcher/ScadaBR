@@ -158,9 +158,9 @@
     function updateMaintenanceEvent(me) {
         $("me"+ me.id +"Name").innerHTML = me.description;
         if (me.disabled)
-            updateImg("me"+ me.id +"Img", "images/hammer_disabled.png", "<sst:i18n key="maintenanceEvents.meDisabled" escapeDQuotes="true"/>", true);
+            updateImg("me"+ me.id +"Img", "images/hammer_disabled.png", "<sbt:i18n key="maintenanceEvents.meDisabled" escapeDQuotes="true"/>", true);
         else
-            updateImg("me"+ me.id +"Img", "images/hammer.png", "<sst:i18n key="maintenanceEvents.me" escapeDQuotes="true"/>", true);
+            updateImg("me"+ me.id +"Img", "images/hammer.png", "<sbt:i18n key="maintenanceEvents.me" escapeDQuotes="true"/>", true);
     }
     
     function deleteMaintenanceEvent() {
@@ -320,9 +320,9 @@
         var display = editingMaintenanceEvent.id != ${NEW_ID};
     	
     	if (active)
-            updateImg("toggleImg", "images/hammer_activated.png", "<sst:i18n key="maintenanceEvents.activated" escapeDQuotes="true"/>", display);
+            updateImg("toggleImg", "images/hammer_activated.png", "<sbt:i18n key="maintenanceEvents.activated" escapeDQuotes="true"/>", display);
     	else
-            updateImg("toggleImg", "images/hammer_deactivated.png", "<sst:i18n key="maintenanceEvents.deactivated" escapeDQuotes="true"/>", display);
+            updateImg("toggleImg", "images/hammer_deactivated.png", "<sbt:i18n key="maintenanceEvents.deactivated" escapeDQuotes="true"/>", display);
     }
     
     function toggleMaintenanceEvent() {

@@ -206,8 +206,8 @@
         this.oneImage = -1;
         this.componentId = null;
         this.typeName = null;
-        this.imageSets = <sst:convert obj="${imageSets}"/>;
-        this.dynamicImages = <sst:convert obj="${dynamicImages}"/>;
+        this.imageSets = <sbt:convert obj="${imageSets}"/>;
+        this.dynamicImages = <sbt:convert obj="${dynamicImages}"/>;
         
         this.open = function(compId) {
             graphicRendererEditor.currentImageSetId = null;

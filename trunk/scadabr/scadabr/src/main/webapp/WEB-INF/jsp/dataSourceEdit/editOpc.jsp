@@ -324,7 +324,7 @@ function toggleDiv(elem) {
 	<tr>
 		<td class="formLabelRequired"><fmt:message
 			key="dsEdit.opc.server" /></td>
-		<td class="formField"><sst:select id="server" value=""></sst:select>
+		<td class="formField"><sbt:select id="server" value=""></sbt:select>
 		<div style="height: 2px;"></div>
 		<input id="searchBtn" type="button"
 			value="<fmt:message key="dsEdit.opc.refreshServers"/>"
@@ -334,30 +334,30 @@ function toggleDiv(elem) {
 		<td class="formLabelRequired"><fmt:message
 			key="dsEdit.updatePeriod" /></td>
 		<td class="formField"><input type="text" id="updatePeriods"
-			value="${dataSource.updatePeriods}" class="formShort" /> <sst:select
+			value="${dataSource.updatePeriods}" class="formShort" /> <sbt:select
 			id="updatePeriodType" value="${dataSource.updatePeriodType}">
-			<tag:timePeriodOptions sst="true" ms="true" s="true" min="true"
+			<tag:timePeriodOptions sbt="true" ms="true" s="true" min="true"
 				h="true" />
-		</sst:select></td>
+		</sbt:select></td>
 	</tr>
 
 	<tr>
 		<td class="formLabelRequired"><fmt:message
 			key="dsEdit.opc.creationMode" /></td>
-		<td class="formField"><sst:select id="selectMethodTag"
+		<td class="formField"><sbt:select id="selectMethodTag"
 			value="${dataSource.creationMode}" onchange="toggleDiv(this)">
-			<sst:option value="BrowseTags">
+			<sbt:option value="BrowseTags">
 				<fmt:message key="dsEdit.opc.browseTags" />
-			</sst:option>
-			<sst:option value="AddTags">
+			</sbt:option>
+			<sbt:option value="AddTags">
 				<fmt:message key="dsEdit.opc.addTags" />
-			</sst:option>
-		</sst:select></td>
+			</sbt:option>
+		</sbt:select></td>
 	</tr>
 
 	<tr>
 		<td class="formLabelRequired"><fmt:message key="dsEdit.quantize" /></td>
-		<td class="formField"><sst:checkbox id="quantize"
+		<td class="formField"><sbt:checkbox id="quantize"
 			selectedValue="${dataSource.quantize}" /></td>
 	</tr>
 	</table>

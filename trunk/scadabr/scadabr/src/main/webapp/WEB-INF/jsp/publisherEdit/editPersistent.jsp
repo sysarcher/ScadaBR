@@ -164,12 +164,12 @@
           <tr>
             <td class="formLabelRequired"><fmt:message key="publisherEdit.persistent.sync"/></td>
             <td class="formField">
-              <sst:select id="syncType" value="${publisher.syncType}">
-                <sst:option value="<%= Integer.toString(PersistentSenderVO.SYNC_TYPE_NONE) %>"><fmt:message key="publisherEdit.persistent.sync.none"/></sst:option>
-                <sst:option value="<%= Integer.toString(PersistentSenderVO.SYNC_TYPE_DAILY) %>"><fmt:message key="publisherEdit.persistent.sync.daily"/></sst:option>
-                <sst:option value="<%= Integer.toString(PersistentSenderVO.SYNC_TYPE_WEEKLY) %>"><fmt:message key="publisherEdit.persistent.sync.weekly"/></sst:option>
-                <sst:option value="<%= Integer.toString(PersistentSenderVO.SYNC_TYPE_MONTHLY) %>"><fmt:message key="publisherEdit.persistent.sync.monthly"/></sst:option>
-              </sst:select>
+              <sbt:select id="syncType" value="${publisher.syncType}">
+                <sbt:option value="<%= Integer.toString(PersistentSenderVO.SYNC_TYPE_NONE) %>"><fmt:message key="publisherEdit.persistent.sync.none"/></sbt:option>
+                <sbt:option value="<%= Integer.toString(PersistentSenderVO.SYNC_TYPE_DAILY) %>"><fmt:message key="publisherEdit.persistent.sync.daily"/></sbt:option>
+                <sbt:option value="<%= Integer.toString(PersistentSenderVO.SYNC_TYPE_WEEKLY) %>"><fmt:message key="publisherEdit.persistent.sync.weekly"/></sbt:option>
+                <sbt:option value="<%= Integer.toString(PersistentSenderVO.SYNC_TYPE_MONTHLY) %>"><fmt:message key="publisherEdit.persistent.sync.monthly"/></sbt:option>
+              </sbt:select>
             </td>
           </tr>
         </table>

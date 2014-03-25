@@ -27,12 +27,12 @@
     <tr>
       <td class="formLabelRequired"><fmt:message key="pointEdit.chart.type"/></td>
       <td class="formField">
-        <sst:select id="chartRendererSelect" onchange="chartRendererEditor.change()"
+        <sbt:select id="chartRendererSelect" onchange="chartRendererEditor.change()"
                 value="${form.chartRenderer.typeName}">
           <c:forEach items="${chartRenderers}" var="crdef">
-            <sst:option value="${crdef.name}"><fmt:message key="${crdef.nameKey}"/></sst:option>
+            <sbt:option value="${crdef.name}"><fmt:message key="${crdef.nameKey}"/></sbt:option>
           </c:forEach>
-        </sst:select>
+        </sbt:select>
       </td>
     </tr>
     

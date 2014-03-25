@@ -96,11 +96,11 @@
 		<tr>
           <td class="formLabelRequired"><fmt:message key="dsEdit.iec101.linkLayerAddressSize"/></td>
           <td class="formField">
-	          <sst:select id="linkLayerAddressSize" value="${dataSource.linkLayerAddressSize}">
-			      <sst:option value="0">None</sst:option>
-			      <sst:option value="1">1 byte</sst:option>
-			      <sst:option value="2">2 bytes</sst:option>
-    		  </sst:select>
+	          <sbt:select id="linkLayerAddressSize" value="${dataSource.linkLayerAddressSize}">
+			      <sbt:option value="0">None</sbt:option>
+			      <sbt:option value="1">1 byte</sbt:option>
+			      <sbt:option value="2">2 bytes</sbt:option>
+    		  </sbt:select>
           </td>
           
         </tr>
@@ -111,10 +111,10 @@
         <tr>
           <td class="formLabelRequired"><fmt:message key="dsEdit.iec101.asduAddressSize"/></td>
           <td class="formField">
-          	<sst:select id="asduAddressSize" value="${dataSource.asduAddressSize}">
-			      <sst:option value="1">1 byte</sst:option>
-			      <sst:option value="2">2 bytes</sst:option>
-    		  </sst:select>
+          	<sbt:select id="asduAddressSize" value="${dataSource.asduAddressSize}">
+			      <sbt:option value="1">1 byte</sbt:option>
+			      <sbt:option value="2">2 bytes</sbt:option>
+    		  </sbt:select>
           </td>
         </tr>
         <tr>
@@ -124,20 +124,20 @@
          <tr>
           <td class="formLabelRequired"><fmt:message key="dsEdit.iec101.cotSize"/></td>
           <td class="formField">
-          	<sst:select id="cotSize" value="${dataSource.cotSize}">
-			      <sst:option value="1">1 byte</sst:option>
-			      <sst:option value="2">2 bytes</sst:option>
-    		  </sst:select>
+          	<sbt:select id="cotSize" value="${dataSource.cotSize}">
+			      <sbt:option value="1">1 byte</sbt:option>
+			      <sbt:option value="2">2 bytes</sbt:option>
+    		  </sbt:select>
           </td>
         </tr>
         <tr>
           <td class="formLabelRequired"><fmt:message key="dsEdit.iec101.objectAddressSize"/></td>
           <td class="formField">
-          	<sst:select id="objectAddressSize" value="${dataSource.objectAddressSize}">
-			      <sst:option value="1">1 byte</sst:option>
-			      <sst:option value="2">2 bytes</sst:option>
-			      <sst:option value="3">3 bytes</sst:option>
-    		  </sst:select>
+          	<sbt:select id="objectAddressSize" value="${dataSource.objectAddressSize}">
+			      <sbt:option value="1">1 byte</sbt:option>
+			      <sbt:option value="2">2 bytes</sbt:option>
+			      <sbt:option value="3">3 bytes</sbt:option>
+    		  </sbt:select>
           </td>
         </tr>
         
@@ -145,9 +145,9 @@
           <td class="formLabelRequired"><fmt:message key="dsEdit.updatePeriod"/></td>
           <td class="formField">
             <input type="text" id="updatePeriods" value="${dataSource.updatePeriods}" class="formShort"/>
-            <sst:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
-              <tag:timePeriodOptions sst="true" ms="true" s="true" min="true" h="true"/>
-            </sst:select>
+            <sbt:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
+              <tag:timePeriodOptions sbt="true" ms="true" s="true" min="true" h="true"/>
+            </sbt:select>
           </td>
         </tr>
         <tr>
@@ -170,7 +170,7 @@
         </tr>
         <tr>
           <td class="formLabelRequired"><fmt:message key="dsEdit.quantize"/></td>
-          <td class="formField"><sst:checkbox id="quantize" selectedValue="${dataSource.quantize}"/></td>
+          <td class="formField"><sbt:checkbox id="quantize" selectedValue="${dataSource.quantize}"/></td>
   		</tr>
               
         <c:choose>

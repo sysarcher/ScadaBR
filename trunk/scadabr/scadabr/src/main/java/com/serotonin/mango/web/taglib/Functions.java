@@ -126,10 +126,10 @@ public class Functions {
     }
 
     public static String envString(String key, String defaultValue) {
-        return Common.getEnvironmentProfile().getString(key, defaultValue);
+        return Common.getEnvironmentString(key, defaultValue);
     }
 
     public static boolean envBoolean(String key, boolean defaultValue) {
-        return Common.getEnvironmentProfile().getBoolean(key, defaultValue);
+        return Common.getEnvironmentBoolean(key, defaultValue);
     }
 }
