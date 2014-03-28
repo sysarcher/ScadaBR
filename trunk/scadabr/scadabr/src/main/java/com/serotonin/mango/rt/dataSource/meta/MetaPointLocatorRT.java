@@ -38,7 +38,7 @@ import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
 import br.org.scadabr.timer.AbstractTimer;
-import br.org.scadabr.timer.CronExpression;
+import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.OneTimeTrigger;
 import br.org.scadabr.timer.TimerTask;
 import br.org.scadabr.web.i18n.LocalizableMessage;
