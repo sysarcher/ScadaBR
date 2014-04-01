@@ -96,6 +96,7 @@ public class ScheduledEventRT extends SimpleEventDetector implements ModelTimeou
     // /
     //
     //
+    @Override
     public void initialize() {
         eventType = new ScheduledEventType(vo.getId());
         if (!vo.isReturnToNormal()) {

@@ -73,7 +73,7 @@ public class VersionCheck extends TimerTask {
         synchronized (INSTANCE_ID_FILE) {
             stop();
             instance = new VersionCheck();
-            Common.timer.schedule(instance);
+           //TODO do wee need this? Common.timer.schedule(instance);
         }
     }
 

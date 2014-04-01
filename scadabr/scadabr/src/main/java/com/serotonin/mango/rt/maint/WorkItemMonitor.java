@@ -8,6 +8,7 @@ import br.org.scadabr.monitor.IntegerMonitor;
 import br.org.scadabr.timer.FixedRateTrigger;
 import br.org.scadabr.timer.TimerTask;
 
+@Deprecated// "Whats this for?)"
 public class WorkItemMonitor extends TimerTask {
 
     private static final long TIMEOUT = 1000 * 10; // Run every ten seconds.
@@ -17,7 +18,7 @@ public class WorkItemMonitor extends TimerTask {
      * corresponding system setting for running this job is true.
      */
     public static void start() {
-        Common.timer.schedule(new WorkItemMonitor());
+        Common.systemCronPool.schedule(new WorkItemMonitor());
     }
 
     private final IntegerMonitor mediumPriorityServiceQueueSize = new IntegerMonitor(
@@ -44,9 +45,8 @@ public class WorkItemMonitor extends TimerTask {
         BackgroundProcessing bp = Common.ctx.getBackgroundProcessing();
 
         mediumPriorityServiceQueueSize.setValue(bp.getMediumPriorityServiceQueueSize());
-        scheduledTimerTaskCount.setValue(Common.timer.size());
-        highPriorityServiceQueueSize
-                .setValue(((ThreadPoolExecutor) Common.timer.getExecutorService()).getActiveCount());
+        scheduledTimerTaskCount.setValue(Common.systemCronPool.size());
+        highPriorityServiceQueueSize.setValue(((ThreadPoolExecutor) Common.systemCronPool.getExecutorService()).getActiveCount());
 
         // Check the stack heights
         int max = 0;

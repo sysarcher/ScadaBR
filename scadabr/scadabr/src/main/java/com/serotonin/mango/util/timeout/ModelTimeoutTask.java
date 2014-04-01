@@ -7,6 +7,7 @@ import br.org.scadabr.timer.OneTimeTrigger;
 import br.org.scadabr.timer.TimerTask;
 import br.org.scadabr.timer.TimerTrigger;
 
+@Deprecated//Whats this for?
 public class ModelTimeoutTask<T> extends TimerTask {
 
     private final ModelTimeoutClient<T> client;
@@ -24,7 +25,7 @@ public class ModelTimeoutTask<T> extends TimerTask {
         super(trigger);
         this.client = client;
         this.model = model;
-        Common.timer.schedule(this);
+        Common.systemCronPool.schedule(this);
     }
 
     @Override

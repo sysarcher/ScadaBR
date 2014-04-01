@@ -19,6 +19,7 @@
 /* modified for NORD Electric by MCA Sistemas */
 package com.serotonin.mango;
 
+import br.org.scadabr.ImplementMeException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -93,10 +94,6 @@ public class MangoContextListener implements ServletContextListener {
         // Create the common reference to the context
         Common.ctx = new ContextWrapper(ctx);
 
-        // Initialize the timer
-        Common.timer.init(new ThreadPoolExecutor(0, 1000, 30L,
-                TimeUnit.SECONDS, new SynchronousQueue<Runnable>()));
-
         // Create all the stuff we need.
         constantsInitialize(ctx);
         freemarkerInitialize(ctx);
@@ -154,8 +151,11 @@ public class MangoContextListener implements ServletContextListener {
         utilitiesTerminate(ctx);
         databaseTerminate(ctx);
 
-        Common.timer.cancel();
-        Common.timer.shutdown();
+        //TODO move to Common
+        Common.dataSourcePool.shutdown();
+        Common.systemCronPool.shutdown();
+        Common.eventPool.shutdown();
+        Common.systemPool.shutdown();
 
         Common.ctx = null;
 
@@ -567,7 +567,7 @@ public class MangoContextListener implements ServletContextListener {
     private void maintenanceInitialize() {
         // Processes are scheduled in the timer, so they are canceled when it
         // stops.
-        DataPurge.schedule();
+        if (true) throw new ImplementMeException(); //WAS: DataPurge.schedule();
 
         // The version checking job reschedules itself after each execution so
         // that requests from the various Mango

@@ -160,7 +160,7 @@ public class ImportTask extends ProgressiveTask {
         scripts = nonNullList(root, EmportDwr.SCRIPTS);
         pointValues = nonNullList(root, EmportDwr.POINT_VALUES);
         systemSettings = nonNullList(root, EmportDwr.SYSTEM_SETTINGS);
-        Common.timer.execute(this);
+        Common.systemPool.execute(this);
     }
 
     private List<JsonValue> nonNullList(JsonObject root, String key) {

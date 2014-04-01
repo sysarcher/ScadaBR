@@ -208,14 +208,14 @@ public class EventDao extends BaseDao {
             // This is a potentially long running query, so run it offline.
             userEvents = Collections.emptyList();
             addToCache(userId, userEvents);
-            Common.timer.execute(new UserPendingEventRetriever(userId));
+            Common.eventPool.execute(new UserPendingEventRetriever(userId));
         }
 
         List<EventInstance> list = null;
         for (EventInstance e : userEvents) {
             if (e.getEventType().getDataPointId() == dataPointId) {
                 if (list == null) {
-                    list = new ArrayList<EventInstance>();
+                    list = new ArrayList<>();
                 }
                 list.add(e);
             }

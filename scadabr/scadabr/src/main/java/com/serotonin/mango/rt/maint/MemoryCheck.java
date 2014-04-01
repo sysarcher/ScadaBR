@@ -28,6 +28,7 @@ import br.org.scadabr.timer.TimerTask;
 /**
  * @author Matthew Lohbihler
  */
+@Deprecated//Whats this for?
 public class MemoryCheck extends TimerTask {
 
     private static final Log log = LogFactory.getLog(MemoryCheck.class);
@@ -38,7 +39,7 @@ public class MemoryCheck extends TimerTask {
      * corresponding system setting for running this job is true.
      */
     public static void start() {
-        Common.timer.schedule(new MemoryCheck());
+        Common.systemCronPool.schedule(new MemoryCheck());
     }
 
     public MemoryCheck() {
