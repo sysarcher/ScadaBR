@@ -147,7 +147,7 @@ public class AsyncImageChartServlet extends BaseInfoServlet {
                 pdr.setRange(from, to);
             }
 
-            tasks.executeAndWait(Common.timer.getExecutorService());
+            tasks.executeAndWait(Common.systemCronPool.getExecutorService());
 
             PointTimeSeriesCollection ptsc = new PointTimeSeriesCollection();
             for (PointDataRetriever pdr : tasks.getTasks()) {

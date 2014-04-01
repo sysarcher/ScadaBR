@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
+import br.org.scadabr.ImplementMeException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -39,7 +40,7 @@ public class MetaDataSourceRT extends DataSourceRT {
     public static final int EVENT_TYPE_SCRIPT_ERROR = 2;
     public static final int EVENT_TYPE_RESULT_TYPE_ERROR = 3;
 
-    private final List<DataPointRT> points = new CopyOnWriteArrayList<DataPointRT>();
+    private final List<DataPointRT> points = new CopyOnWriteArrayList<>();
     private boolean contextPointDisabledEventActive;
 
     public MetaDataSourceRT(MetaDataSourceVO vo) {
@@ -58,8 +59,7 @@ public class MetaDataSourceRT extends DataSourceRT {
 
             MetaPointLocatorRT locator = dataPoint.getPointLocator();
             points.add(dataPoint);
-            locator.initialize(Common.timer, this, dataPoint);
-            checkForDisabledPoints();
+            throw  new ImplementMeException(); // this line was: locator.initialize(Common.timer, this, dataPoint); checkForDisabledPoints();
         }
     }
 

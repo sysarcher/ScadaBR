@@ -55,7 +55,7 @@ public class ReportJob extends TimerTask {
 
                 ReportJob reportJob = new ReportJob(trigger, report);
                 JOB_REGISTRY.put(report.getId(), reportJob);
-                Common.timer.schedule(reportJob);
+                Common.systemCronPool.schedule(reportJob);
             }
         }
     }

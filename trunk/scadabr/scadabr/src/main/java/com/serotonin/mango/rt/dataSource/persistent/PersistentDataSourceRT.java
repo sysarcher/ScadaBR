@@ -1,5 +1,6 @@
 package com.serotonin.mango.rt.dataSource.persistent;
 
+import br.org.scadabr.ImplementMeException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -167,7 +168,7 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
                     log.info("Received socket from " + socket.getRemoteSocketAddress());
                     ConnectionHandler ch = new ConnectionHandler(socket);
                     connectionHandlers.add(ch);
-                    Common.timer.execute(ch);
+                    throw  new ImplementMeException(); //Was: Common.timer.execute(ch);
                 } catch (SocketTimeoutException e) {
                     // no op
                 }
@@ -368,8 +369,7 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
                     }
 
                     if (packet.getType() == PacketType.RANGE_COUNT) {
-                        Common.timer.execute(new RangeCountHandler(packet, out));
-                        continue;
+                        throw  new ImplementMeException(); //WAS: Common.timer.execute(new RangeCountHandler(packet, out)); continue;
                     }
 
                     if (packet.getType() == PacketType.POINT_UPDATE) {

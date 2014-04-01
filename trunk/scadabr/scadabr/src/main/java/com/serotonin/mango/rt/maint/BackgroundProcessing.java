@@ -50,6 +50,7 @@ public class BackgroundProcessing implements ILifecycle {
 
     public void addWorkItem(final WorkItem item) {
         Runnable runnable = new Runnable() {
+            @Override
             public void run() {
                 try {
                     item.execute();
@@ -64,7 +65,7 @@ public class BackgroundProcessing implements ILifecycle {
         };
 
         if (item.getPriority() == WorkItem.PRIORITY_HIGH) {
-            Common.timer.execute(runnable);
+            Common.systemPool.execute(runnable);
         } else if (item.getPriority() == WorkItem.PRIORITY_MEDIUM) {
             mediumPriorityService.execute(runnable);
         } else {
@@ -76,6 +77,7 @@ public class BackgroundProcessing implements ILifecycle {
         return mediumPriorityService.getQueue().size();
     }
 
+    @Override
     public void initialize() {
         mediumPriorityService = new ThreadPoolExecutor(3, 30, 60L, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>());
@@ -83,12 +85,14 @@ public class BackgroundProcessing implements ILifecycle {
         lowPriorityService = Executors.newSingleThreadExecutor();
     }
 
+    @Override
     public void terminate() {
         // Close the executor services.
         mediumPriorityService.shutdown();
         lowPriorityService.shutdown();
     }
 
+    @Override
     public void joinTermination() {
         boolean medDone = false;
         boolean lowDone = false;

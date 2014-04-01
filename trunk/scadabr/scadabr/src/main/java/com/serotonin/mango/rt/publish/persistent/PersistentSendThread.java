@@ -88,7 +88,7 @@ class PersistentSendThread extends SendThread {
                 throw new ShouldNeverHappenException(e);
             }
 
-            Common.timer.schedule(syncTimer);
+            Common.systemCronPool.schedule(syncTimer);
         }
 
         pointHierarchySync = new PointHierarchySync();
@@ -388,7 +388,7 @@ class PersistentSendThread extends SendThread {
         }
 
         syncHandler = new SyncHandler(this);
-        Common.timer.execute(syncHandler);
+        Common.systemCronPool.execute(syncHandler);
 
         return true;
     }
@@ -407,7 +407,7 @@ class PersistentSendThread extends SendThread {
     }
 
     void writePointHierarchy() {
-        Common.timer.execute(new Runnable() {
+        Common.systemPool.execute(new Runnable() {
             @Override
             public void run() {
                 writePointHierarchy(new DataPointDao().getPointHierarchy());

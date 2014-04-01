@@ -58,13 +58,17 @@ import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.ContextWrapper;
 import br.org.scadabr.monitor.MonitoredValues;
 import br.org.scadabr.timer.CronTimerTrigger;
-import br.org.scadabr.timer.RealTimeTimer;
+import br.org.scadabr.timer.CronTimerPool;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.i18n.Utf8ResourceBundle;
 import br.org.scadabr.web.l10n.Localizer;
 import java.util.MissingResourceException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class Common {
 
@@ -80,7 +84,11 @@ public class Common {
     private static final ResourceBundle env = ResourceBundle.getBundle("env");
 
     // This is initialized
-    public static final RealTimeTimer timer = new RealTimeTimer();
+    public static final CronTimerPool dataSourcePool = new CronTimerPool();
+    public static final CronTimerPool systemCronPool = new CronTimerPool();
+    public static final ThreadPoolExecutor systemPool = new ThreadPoolExecutor(1, 5, 30, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
+    public static final ThreadPoolExecutor eventPool = new ThreadPoolExecutor(1, 5, 30, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
+    
 
     public static final MonitoredValues MONITORED_VALUES = new MonitoredValues();
 

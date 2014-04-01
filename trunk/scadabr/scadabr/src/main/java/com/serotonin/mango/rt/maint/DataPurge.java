@@ -27,7 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
-import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.timer.CronTask;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
@@ -38,8 +38,6 @@ import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.vo.DataPointVO;
-import br.org.scadabr.timer.CronTimerTrigger;
-import br.org.scadabr.timer.TimerTask;
 
 public class DataPurge {
 
@@ -47,14 +45,6 @@ public class DataPurge {
     private long runtime;
 
     private final RuntimeManager rm = Common.ctx.getRuntimeManager();
-
-    public static void schedule() {
-        try {
-            Common.timer.schedule(new DataPurgeTask());
-        } catch (ParseException e) {
-            throw new ShouldNeverHappenException(e);
-        }
-    }
 
     synchronized public void execute(long runtime) {
         this.runtime = runtime;
@@ -148,18 +138,15 @@ public class DataPurge {
         }
     }
 
-    static class DataPurgeTask extends TimerTask {
+    public static class DataPurgeTask extends CronTask {
 
-        DataPurgeTask() throws ParseException {
-            // Test trigger for running every 5 minutes.
-            //super(new CronTimerTrigger("0 0/5 * * * ?"));
-            // Trigger to run at 3:05am every day
-            super(new CronTimerTrigger("0 5 3 * * ?"));
+        DataPurgeTask(String pattern) throws ParseException {
+            super(pattern);
         }
 
         @Override
-        public void run(long runtime) {
-            new DataPurge().execute(runtime);
+        public void run() {
+            new DataPurge().execute(currentTimeInMillis);
         }
     }
 }

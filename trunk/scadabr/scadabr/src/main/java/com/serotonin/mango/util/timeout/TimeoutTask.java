@@ -22,7 +22,7 @@ public class TimeoutTask extends TimerTask {
     public TimeoutTask(TimerTrigger trigger, TimeoutClient client) {
         super(trigger);
         this.client = client;
-        Common.timer.schedule(this);
+        Common.systemCronPool.schedule(this);
     }
 
     @Override

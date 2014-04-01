@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.bacnet;
 
+import br.org.scadabr.ImplementMeException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -177,7 +178,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
 
         covResubscriptionTask = new CovResubscriptionTask(new FixedRateTrigger(0,
                 vo.getCovSubscriptionTimeoutMinutes() * 60 * 1000 / 2));
-        Common.timer.schedule(covResubscriptionTask);
+        throw  new ImplementMeException(); //line was: Common.timer.schedule(covResubscriptionTask);
     }
 
     @Override

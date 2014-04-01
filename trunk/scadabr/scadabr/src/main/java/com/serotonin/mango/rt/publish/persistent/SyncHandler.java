@@ -1,5 +1,6 @@
 package com.serotonin.mango.rt.publish.persistent;
 
+import br.org.scadabr.ImplementMeException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -97,7 +98,7 @@ class SyncHandler implements Runnable {
                 pointSyncs[i] = new PointSync(i);
                 sync.addTask(pointSyncs[i]);
             }
-            sync.executeAndWait(Common.timer.getExecutorService());
+            if (true) throw new ImplementMeException(); //Was: sync.executeAndWait(Common.timer.getExecutorService());
         } finally {
             sendThread.endSyncHandler();
             LOG.info("Sync handler run completed");

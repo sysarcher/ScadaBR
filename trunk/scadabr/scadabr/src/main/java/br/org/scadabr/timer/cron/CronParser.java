@@ -6,12 +6,69 @@
 package br.org.scadabr.timer.cron;
 
 import br.org.scadabr.ImplementMeException;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 /**
  *
  * @author aploese
  */
 public class CronParser {
+
+    private int sbToValue() {
+        switch (currentField) {
+            case DAY_OF_WEEK:
+                switch (sb.toString()) {
+                    case "SUN":
+                        return 0;
+                    case "MON":
+                        return 1;
+                    case "THE":
+                        return 2;
+                    case "WED":
+                        return 3;
+                    case "THU":
+                        return 4;
+                    case "FRI":
+                        return 5;
+                    case "SAT":
+                        return 6;
+                    default:
+                        throw new RuntimeException("Cant convert to day of week: " + sb.toString());
+                }
+            case MONTH:
+                switch (sb.toString()) {
+                    case "JAN":
+                        return 1;
+                    case "FEB":
+                        return 2;
+                    case "MAR":
+                        return 3;
+                    case "APR":
+                        return 4;
+                    case "MAY":
+                        return 5;
+                    case "JUN":
+                        return 6;
+                    case "JUL":
+                        return 7;
+                    case "AUG":
+                        return 8;
+                    case "SEP":
+                        return 9;
+                    case "OCT":
+                        return 10;
+                    case "NOV":
+                        return 11;
+                    case "DEC":
+                        return 12;
+                    default:
+                        throw new RuntimeException("Cant convert to month: " + sb.toString());
+                }
+            default:
+                return Integer.parseInt(sb.toString());
+        }
+    }
 
     enum ParseState {
 
@@ -26,14 +83,14 @@ public class CronParser {
     private StringBuilder sb;
     private CronFieldType currentField;
     private ParseState state;
-    private CombinedCronField currentCombinedField;
+    private CronField currentCombinedField;
 
     public CronExpression parse(final String cron) {
         result = new CronExpression();
         sb = new StringBuilder();
-        currentField = CronFieldType.MILLIS;
+        currentField = CronFieldType.MILLISECOND;
         state = ParseState.NONE;
-        CronRangeField currentBasicField = null;
+        CronField currentBasicField = null;
         currentCombinedField = null;
         int pos = -1;
         for (char c : cron.toCharArray()) {
@@ -45,28 +102,28 @@ public class CronParser {
                 case ',':
                     switch (state) {
                         case WAIT_FOR_RANGE_END:
-                            currentBasicField.setEndRange(currentField, sb.toString());
+                            currentBasicField.setEndRange(sbToValue());
                             sb.setLength(0);
                             if (currentCombinedField == null) {
-                                currentCombinedField = new CombinedCronField(currentField, currentBasicField);
+                                currentCombinedField = new CronField(currentBasicField);
                             } else {
-                                currentCombinedField.addField(currentBasicField);
+                                currentCombinedField.addChild(currentBasicField);
                             }
                             currentBasicField = null;
                             break;
                         case WAIT_FOR_INCREMENT:
-                            currentBasicField.setIncrement(currentField, sb.toString());
+                            currentBasicField.setIncrement(Integer.parseInt(sb.toString()));
                             sb.setLength(0);
                             sb.setLength(0);
                             if (currentCombinedField == null) {
-                                currentCombinedField = new CombinedCronField(currentField, currentBasicField);
+                                currentCombinedField = new CronField(currentBasicField);
                             } else {
-                                currentCombinedField.addField(currentBasicField);
+                                currentCombinedField.addChild(currentBasicField);
                             }
                             currentBasicField = null;
                             break;
                         case COLLECTING:
-                            currentCombinedField = new CombinedCronField(currentField, new CronValueField(currentField, sb.toString()));
+                            currentCombinedField = new CronField(new CronField(CronField.Type.VALUE).setValue(sbToValue()));
                             sb.setLength(0);
                             break;
                         default:
@@ -81,19 +138,18 @@ public class CronParser {
                     if (currentBasicField != null) {
                         throw new RuntimeException();
                     }
-                    currentBasicField = new CronRangeField(currentField);
-                    currentBasicField.setStartRange(currentField, sb.toString());
+                    currentBasicField = new CronField(CronField.Type.RANGE_INCREMENT).setStartRange(sbToValue());
                     sb.setLength(0);
                     state = ParseState.WAIT_FOR_RANGE_END;
                     break;
                 case '/':
                     switch (state) {
                         case ANY:
-                            currentBasicField = new CronRangeField(currentField);
+                            currentBasicField = new CronField(CronField.Type.RANGE_INCREMENT).setStartRange(currentField.floor).setEndRange(currentField.ceil);
                             state = ParseState.WAIT_FOR_INCREMENT;
                             break;
                         case WAIT_FOR_RANGE_END:
-                            currentBasicField.setEndRange(currentField, sb.toString());
+                            currentBasicField.setEndRange(sbToValue());
                             sb.setLength(0);
                             state = ParseState.WAIT_FOR_INCREMENT;
                             break;
@@ -106,22 +162,22 @@ public class CronParser {
                     fieldParsed(currentBasicField);
                     currentBasicField = null;
                     switch (currentField) {
-                        case MILLIS:
-                            currentField = CronFieldType.SEC;
+                        case MILLISECOND:
+                            currentField = CronFieldType.SECOND;
                             break;
-                        case SEC:
-                            currentField = CronFieldType.MIN;
+                        case SECOND:
+                            currentField = CronFieldType.MINUTE;
                             break;
-                        case MIN:
-                            currentField = CronFieldType.HOUR;
+                        case MINUTE:
+                            currentField = CronFieldType.HOUR_OF_DAY;
                             break;
-                        case HOUR:
+                        case HOUR_OF_DAY:
                             currentField = CronFieldType.DAY_OF_MONTH;
                             break;
                         case DAY_OF_MONTH:
-                            currentField = CronFieldType.MONTH_OF_YEAR;
+                            currentField = CronFieldType.MONTH;
                             break;
-                        case MONTH_OF_YEAR:
+                        case MONTH:
                             currentField = CronFieldType.DAY_OF_WEEK;
                             break;
                         case DAY_OF_WEEK:
@@ -153,25 +209,25 @@ public class CronParser {
     private void fieldParsed(CronField cronField) throws RuntimeException {
         switch (state) {
             case WAIT_FOR_RANGE_END:
-                ((CronRangeField) cronField).setEndRange(currentField, sb.toString());
+                cronField.setEndRange(sbToValue());
                 sb.setLength(0);
                 addToResult(cronField);
                 break;
             case WAIT_FOR_INCREMENT:
-                ((CronRangeField) cronField).setIncrement(currentField, sb.toString());
+                cronField.setIncrement(Integer.parseInt(sb.toString()));
                 sb.setLength(0);
                 addToResult(cronField);
                 break;
             case COLLECTING:
-                CronValueField cvf = new CronValueField(currentField, sb.toString());
+                CronField cf = new CronField(CronField.Type.VALUE).setValue(sbToValue());
                 sb.setLength(0);
-                addToResult(cvf);
+                addToResult(cf);
                 break;
             case ANY:
                 if ((currentCombinedField != null) || (cronField != null)) {
                     throw new RuntimeException();
                 }
-                result.setField(new AnyField(currentField));
+                result.setField(currentField, new CronField(CronField.Type.ANY));
                 break;
             default:
                 throw new RuntimeException("Field parsed, and state = " + state + " Dont know where to go");
@@ -181,11 +237,11 @@ public class CronParser {
 
     private void addToResult(CronField cronField) {
         if (currentCombinedField != null) {
-            currentCombinedField.addField(cronField);
-            result.setField(currentCombinedField);
+            currentCombinedField.addChild(cronField);
+            result.setField(currentField, currentCombinedField);
             currentCombinedField = null;
         } else {
-            result.setField(cronField);
+            result.setField(currentField, cronField);
         }
     }
 
