@@ -1303,13 +1303,13 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
     }
 
     private void validate(DataPointVO dataPoint, DwrResponseI18n response) {
-        if (StringUtils.isEmpty(dataPoint.getXid())) {
+        if (dataPoint.getXid().isEmpty()) {
             response.addContextualMessage("xid", "validate.required");
         } else if (!new DataPointDao().isXidUnique(dataPoint.getXid(),
                 dataPoint.getId())) {
             response.addContextualMessage("xid", "validate.xidUsed");
         }
-        if (StringUtils.isEmpty(dataPoint.getName())) {
+        if (dataPoint.getName().isEmpty()) {
             response.addContextualMessage("name", "validate.required");
         }
     }

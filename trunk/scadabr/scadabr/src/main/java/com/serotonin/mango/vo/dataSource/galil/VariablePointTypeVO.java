@@ -80,7 +80,7 @@ public class VariablePointTypeVO extends PointTypeVO {
         if (!DataTypes.CODES.isValidId(dataTypeId, DataTypes.IMAGE)) {
             response.addContextualMessage("dataTypeId", "validate.invalidValue");
         }
-        if (StringUtils.isEmpty(variableName)) {
+        if (variableName.isEmpty()) {
             response.addContextualMessage("variablePointType.variableName", "validate.required");
         }
     }

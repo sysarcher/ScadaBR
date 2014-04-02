@@ -262,14 +262,14 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(name)) {
+        if (name.isEmpty()) {
             response.addContextualMessage("name", "validate.required");
         }
         if (StringUtils.isLengthGreaterThan(name, 40)) {
             response.addContextualMessage("name", "validate.nameTooLong");
         }
 
-        if (StringUtils.isEmpty(xid)) {
+        if (xid.isEmpty()) {
             response.addContextualMessage("xid", "validate.required");
         } else if (!new PublisherDao().isXidUnique(xid, id)) {
             response.addContextualMessage("xid", "validate.xidUsed");

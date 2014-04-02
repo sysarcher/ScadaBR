@@ -51,12 +51,12 @@ public class Pop3PointLocatorRT extends PointLocatorRT {
 
         if (dataTypeId == DataTypes.BINARY) {
             binary0Value = vo.getValueFormat();
-        } else if (dataTypeId == DataTypes.NUMERIC && !StringUtils.isEmpty(vo.getValueFormat())) {
+        } else if (dataTypeId == DataTypes.NUMERIC && !vo.getValueFormat().isEmpty()) {
             valueFormat = new DecimalFormat(vo.getValueFormat());
         }
 
         useReceivedTime = vo.isUseReceivedTime();
-        if (!useReceivedTime && !StringUtils.isEmpty(vo.getTimeRegex())) {
+        if (!useReceivedTime && !vo.getTimeRegex().isEmpty()) {
             timePattern = Pattern.compile(vo.getTimeRegex());
             timeFormat = new SimpleDateFormat(vo.getTimeFormat());
         } else {

@@ -68,7 +68,7 @@ public class CustomViewChart extends CustomViewComponent {
         for (CustomViewChartPoint point : points) {
             htmlData.append('_');
             htmlData.append(point.getDataPointVO().getId());
-            if (!StringUtils.isEmpty(point.getColor())) {
+            if (!point.getColor().isEmpty()) {
                 htmlData.append('|').append(point.getColor().replaceAll("#", "0x"));
             }
         }

@@ -142,7 +142,7 @@ public class SqlDataSourceRT extends PollingDataSource {
 		// If there is no select statement, don't bother. It's true that we
         // wouldn't need to bother polling at all,
         // but for now this will do.
-        if (StringUtils.isEmpty(vo.getSelectStatement())) {
+        if (vo.getSelectStatement().isEmpty()) {
             return;
         }
 
@@ -191,7 +191,7 @@ public class SqlDataSourceRT extends PollingDataSource {
                 SqlPointLocatorVO locatorVO = locatorRT.getVO();
 
                 String fieldName = locatorVO.getFieldName();
-                if (!StringUtils.isEmpty(fieldName)) {
+                if (!fieldName.isEmpty()) {
                     // Point value.
                     MangoValue value;
                     try {
@@ -205,7 +205,7 @@ public class SqlDataSourceRT extends PollingDataSource {
                     // Point time override.
                     long pointTime = time;
                     String timeOverride = locatorVO.getTimeOverrideName();
-                    if (!StringUtils.isEmpty(timeOverride)) {
+                    if (!timeOverride.isEmpty()) {
                         // Find the meta data for the column.
                         int column = -1;
                         for (int i = 1; i <= meta.getColumnCount(); i++) {
@@ -263,7 +263,7 @@ public class SqlDataSourceRT extends PollingDataSource {
                 SqlPointLocatorVO locatorVO = locatorRT.getVO();
                 String fieldName = locatorVO.getFieldName();
 
-                if (!StringUtils.isEmpty(fieldName)
+                if (!fieldName.isEmpty()
                         && fieldName.equalsIgnoreCase(rowId)) {
                     found = true;
 

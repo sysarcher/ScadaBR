@@ -84,7 +84,7 @@ public class AddressEntry extends EmailRecipient {
         super.jsonDeserialize(reader, json);
 
         address = json.getString("address");
-        if (StringUtils.isEmpty(address)) {
+        if (address.isEmpty()) {
             throw new LocalizableJsonException("emport.error.recipient.missing.reference", "address");
         }
     }

@@ -52,7 +52,7 @@ public class ChartPointTag extends TagSupport {
 
         // Validate the colour.
         try {
-            if (!StringUtils.isEmpty(color)) {
+            if (!color.isEmpty()) {
                 ColorUtils.toColor(color);
             }
         } catch (InvalidArgumentException e) {

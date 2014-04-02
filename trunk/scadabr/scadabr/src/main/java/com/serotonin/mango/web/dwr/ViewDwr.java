@@ -525,10 +525,10 @@ public class ViewDwr extends BaseDwr {
     public DwrResponseI18n saveLinkComponent(String viewComponentId,
             String text, String link) {
         DwrResponseI18n response = new DwrResponseI18n();
-        if (StringUtils.isEmpty(text)) {
+        if (text.isEmpty()) {
             response.addContextualMessage("linkText", "validate.required");
         }
-        if (StringUtils.isEmpty(link)) {
+        if (link.isEmpty()) {
             response.addContextualMessage("linkLink", "validate.required");
         }
 
@@ -545,11 +545,11 @@ public class ViewDwr extends BaseDwr {
     public DwrResponseI18n saveScriptButtonComponent(String viewComponentId,
             String text, String scriptXid) {
         DwrResponseI18n response = new DwrResponseI18n();
-        if (StringUtils.isEmpty(text)) {
+        if (text.isEmpty()) {
             response.addContextualMessage("scriptButtonText",
                     "validate.required");
         }
-        if (StringUtils.isEmpty(scriptXid)) {
+        if (scriptXid.isEmpty()) {
             response.addContextualMessage("scriptsList", "validate.required");
         }
 
@@ -685,7 +685,7 @@ public class ViewDwr extends BaseDwr {
             String script) {
         DwrResponseI18n response = new DwrResponseI18n();
         // Validate
-        if (StringUtils.isEmpty(script)) {
+        if (script.isEmpty()) {
             response.addContextualMessage("graphicRendererScriptScript",
                     "viewEdit.graphic.missingScript");
         }
@@ -830,11 +830,11 @@ public class ViewDwr extends BaseDwr {
             response.addContextualMessage("graphicRendererButtonHeight",
                     "validate.cannotBeNegative");
         }
-        if (StringUtils.isEmpty(whenOnLabel)) {
+        if (whenOnLabel.isEmpty()) {
             response.addContextualMessage("graphicRendererButtonWhenOnLabel",
                     "validate.required");
         }
-        if (StringUtils.isEmpty(whenOffLabel)) {
+        if (whenOffLabel.isEmpty()) {
             response.addContextualMessage("graphicRendererButtonWhenOffLabel",
                     "validate.required");
         }
@@ -875,7 +875,7 @@ public class ViewDwr extends BaseDwr {
         }
 
         if (projectDefined) {
-            if (StringUtils.isEmpty(projectsSource)) {
+            if (projectsSource.isEmpty()) {
                 response.addContextualMessage("flexProjectsSource",
                         "validate.invalidValue");
             }
@@ -952,7 +952,7 @@ public class ViewDwr extends BaseDwr {
     }
 
     private void validateCompoundComponent(DwrResponseI18n response, String name) {
-        if (StringUtils.isEmpty(name)) {
+        if (name.isEmpty()) {
             response.addContextualMessage("compoundName",
                     "dsEdit.validate.required");
         }

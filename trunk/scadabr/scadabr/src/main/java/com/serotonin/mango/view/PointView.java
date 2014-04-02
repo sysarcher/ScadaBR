@@ -44,10 +44,7 @@ public class PointView {
     }
 
     public String getName() {
-        if (!StringUtils.isEmpty(nameOverride)) {
-            return nameOverride;
-        }
-        return dataPoint.getName();
+        return nameOverride == null ? dataPoint.getName() : nameOverride;
     }
 
     public boolean isSettable() {

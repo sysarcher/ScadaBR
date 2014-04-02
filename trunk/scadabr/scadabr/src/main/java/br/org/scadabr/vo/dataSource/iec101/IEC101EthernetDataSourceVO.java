@@ -44,7 +44,7 @@ public class IEC101EthernetDataSourceVO extends
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (StringUtils.isEmpty(host)) {
+        if (host.isEmpty()) {
             response.addContextualMessage("commPortId", "validate.required");
         }
         if (port <= 0) {

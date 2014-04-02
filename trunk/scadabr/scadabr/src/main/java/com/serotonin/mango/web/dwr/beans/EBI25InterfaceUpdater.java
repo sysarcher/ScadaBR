@@ -39,7 +39,7 @@ public class EBI25InterfaceUpdater {
     private static final Log LOG = LogFactory.getLog(EBI25InterfaceUpdater.class);
 
     public LocalizableMessage updateLogger(String host, int port, int timeout, int retries, EBI25PointLocatorVO locator) {
-        if (StringUtils.isEmpty(host)) {
+        if (host.isEmpty()) {
             return new LocalizableMessageImpl("dsEdit.ebi25.read.host");
         }
 
@@ -71,7 +71,7 @@ public class EBI25InterfaceUpdater {
     }
 
     public LocalizableMessage updateSysTime(String host, int port, int timeout, int retries) {
-        if (StringUtils.isEmpty(host)) {
+        if (host.isEmpty()) {
             return new LocalizableMessageImpl("dsEdit.ebi25.read.host");
         }
 

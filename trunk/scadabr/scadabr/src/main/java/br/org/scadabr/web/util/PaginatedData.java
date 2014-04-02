@@ -5,17 +5,28 @@
  */
 package br.org.scadabr.web.util;
 
-import br.org.scadabr.ImplementMeException;
 import java.util.List;
 
 /**
  *
  * @author aploese
  */
+@Deprecated
 public class PaginatedData<T> {
 
-    public PaginatedData(List<T> data, int size) {
-        throw new ImplementMeException();
+    private final List<T> data;
+    private final int rowCount;
+
+    public PaginatedData(List<T> data, int rowCount) {
+        this.data = data;
+        this.rowCount = rowCount;
     }
 
+    public List<T> getData() {
+        return data;
+    }
+
+    public int getRowCount() {
+        return rowCount;
+    }
 }

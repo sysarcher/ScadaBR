@@ -34,7 +34,7 @@
           <td><b><sbt:i18n message="${type.description}"/></b></td>
           <td>
             <sbt:select id="alarmLevel${type.typeRef2}" onchange="alarmLevelChanged(${type.typeRef2})" value="${type.alarmLevel}">
-              <tag:alarmLevelOptions sbt="true"/>
+              <tag:alarmLevelOptions sst="true"/>
             </sbt:select>
             <tag:img id="alarmLevelImg${type.typeRef2}" png="flag_green" style="display:none;"/>
             <script type="text/javascript">setAlarmLevelImg(${type.alarmLevel}, 'alarmLevelImg${type.typeRef2}')</script>

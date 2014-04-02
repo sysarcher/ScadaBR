@@ -169,7 +169,7 @@ public class PersistentSenderVO extends PublisherVO<PersistentPointVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
 
-        if (StringUtils.isEmpty(host)) {
+        if (host.isEmpty()) {
             response.addContextualMessage("host", "validate.required");
         }
         if (port <= 0 || port >= 65536) {

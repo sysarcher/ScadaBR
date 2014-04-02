@@ -109,7 +109,7 @@ public class PachubePointLocatorVO extends AbstractPointLocatorVO implements Jso
             response.addContextualMessage("feedId", "validate.invalidValue");
         }
 
-        if (StringUtils.isEmpty(dataStreamId)) {
+        if (dataStreamId.isEmpty()) {
             response.addContextualMessage("dataStreamId", "validate.required");
         }
 

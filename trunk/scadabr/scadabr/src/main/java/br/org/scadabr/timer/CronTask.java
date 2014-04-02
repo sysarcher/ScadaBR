@@ -9,6 +9,8 @@ package br.org.scadabr.timer;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -34,6 +36,14 @@ public abstract class CronTask implements Runnable {
     long nextExecutionTime;
     
     protected long currentTimeInMillis;
+
+    protected CronTask(GregorianCalendar c) {
+        cronExpression = new CronExpression(c);
+    }
+
+    protected CronTask(CronExpression ce) {
+        cronExpression = ce;
+    }
 
     protected CronTask(String pattern) throws ParseException {
         CronParser cp = new CronParser();
@@ -63,4 +73,5 @@ public abstract class CronTask implements Runnable {
             return nextExecutionTime;
         }
     }
+
 }

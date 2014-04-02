@@ -112,7 +112,7 @@ public class ImageChartUtils {
                 // If this chart displays a single point, check if there should be a range description.
                 TimeSeries timeSeries = pointTimeSeriesCollection.getNumericTimeSeriesCollection().getSeries(0);
                 String desc = timeSeries.getRangeDescription();
-                if (!StringUtils.isEmpty(desc)) {
+                if (!desc.isEmpty()) {
                     // Replace any HTML entities with Java equivalents
                     desc = StripEntities.stripHTMLEntities(desc, ' ');
                     plot.getRangeAxis().setLabel(desc);

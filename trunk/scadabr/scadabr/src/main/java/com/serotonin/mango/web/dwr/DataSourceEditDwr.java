@@ -343,7 +343,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         dp.setName(name);
         dp.setPointLocator(locator);
 
-        if (StringUtils.isEmpty(xid)) {
+        if (xid.isEmpty()) {
             response.addContextualMessage("xid", "validate.required");
         } else if (!new DataPointDao().isXidUnique(xid, id)) {
             response.addContextualMessage("xid", "validate.xidUsed");
@@ -351,7 +351,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             response.addContextualMessage("xid", "validate.notLongerThan", 50);
         }
 
-        if (StringUtils.isEmpty(name)) {
+        if (name.isEmpty()) {
             response.addContextualMessage("name", "dsEdit.validate.required");
         }
 
@@ -656,7 +656,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         User user = Common.getUser();
         Permissions.ensureDataSourcePermission(user);
 
-        if (StringUtils.isEmpty(commPortId)) {
+        if (commPortId.isEmpty()) {
             throw new Exception();
         }
 
@@ -1271,7 +1271,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             Address address = new Address(InetAddress.getByName(remoteIp)
                     .getAddress(), remotePort);
             com.serotonin.bacnet4j.Network network = null;
-            if (!StringUtils.isEmpty(networkAddress)) {
+            if (!networkAddress.isEmpty()) {
                 network = new com.serotonin.bacnet4j.Network(networkNumber,
                         networkAddress);
             }
@@ -1371,7 +1371,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             Pattern valuePattern = Pattern.compile(valueRegex);
             DecimalFormat decimalFormat = null;
             if (dataTypeId == DataTypes.NUMERIC
-                    && !StringUtils.isEmpty(valueFormat)) {
+                    && !valueFormat.isEmpty()) {
                 decimalFormat = new DecimalFormat(valueFormat);
             }
             MangoValue value = DataSourceUtils.getValue(valuePattern, data,
@@ -1470,7 +1470,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             Pattern valuePattern = Pattern.compile(valueRegex);
             DecimalFormat decimalFormat = null;
             if (dataTypeId == DataTypes.NUMERIC
-                    && !StringUtils.isEmpty(valueFormat)) {
+                    && !valueFormat.isEmpty()) {
                 decimalFormat = new DecimalFormat(valueFormat);
             }
             MangoValue value = DataSourceUtils.getValue(valuePattern, testData,
@@ -2225,7 +2225,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             locators[i].setIndex(index[i]);
             dp.setPointLocator(locators[i]);
 
-            if (StringUtils.isEmpty(dp.getXid())) {
+            if (dp.getXid().isEmpty()) {
                 response.addContextualMessage("xid", "validate.required");
             } else if (!new DataPointDao()
                     .isXidUnique(dp.getXid(), Common.NEW_ID)) {
@@ -2361,7 +2361,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             locators[i].setSettable(settables[i]);
             dp.setPointLocator(locators[i]);
 
-            if (StringUtils.isEmpty(dp.getXid())) {
+            if (dp.getXid().isEmpty()) {
                 response.addContextualMessage("xid", "validate.required");
             } else if (!new DataPointDao()
                     .isXidUnique(dp.getXid(), Common.NEW_ID)) {

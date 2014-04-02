@@ -173,7 +173,7 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(address)) {
+        if (address.isEmpty()) {
             response.addContextualMessage("address", "validate.required");
         }
         if (!ATTRIBUTE_CODES.isValidId(attributeId)) {

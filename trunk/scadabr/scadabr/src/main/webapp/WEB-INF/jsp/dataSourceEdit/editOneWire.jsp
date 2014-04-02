@@ -219,7 +219,7 @@
           <td class="formField">
             <input type="text" id="updatePeriods" value="${dataSource.updatePeriods}" class="formShort"/>
             <sbt:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
-              <tag:timePeriodOptions sbt="true" s="true" min="true" h="true"/>
+              <tag:timePeriodOptions sst="true" s="true" min="true" h="true"/>
             </sbt:select>
           </td>
         </tr>
@@ -230,7 +230,7 @@
             <input type="text" id="rescanPeriods" value="${dataSource.rescanPeriods}" class="formShort"/>
             <sbt:select id="rescanPeriodType" value="${dataSource.rescanPeriodType}" onchange="rescanChanged()">
               <sbt:option value="<%= Integer.toString(OneWireDataSourceVO.RESCAN_NONE) %>"><fmt:message key="dsEdit.1wire.none"/></sbt:option>
-              <tag:timePeriodOptions sbt="true" min="true" h="true" d="true" w="true"/>
+              <tag:timePeriodOptions sst="true" min="true" h="true" d="true" w="true"/>
             </sbt:select>
           </td>
         </tr>

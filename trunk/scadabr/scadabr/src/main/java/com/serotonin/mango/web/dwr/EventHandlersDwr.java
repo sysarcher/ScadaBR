@@ -309,7 +309,7 @@ public class EventHandlersDwr extends BaseDwr {
         EventDao eventDao = new EventDao();
 
         vo.setId(handlerId);
-        vo.setXid(StringUtils.isEmpty(xid) ? eventDao.generateUniqueXid() : xid);
+        vo.setXid(xid.isEmpty() ? eventDao.generateUniqueXid() : xid);
         vo.setAlias(alias);
         vo.setDisabled(disabled);
 
@@ -332,7 +332,7 @@ public class EventHandlersDwr extends BaseDwr {
     }
 
     public LocalizableMessage testProcessCommand(String command) {
-        if (StringUtils.isEmpty(command)) {
+        if (command.isEmpty()) {
             return null;
         }
 

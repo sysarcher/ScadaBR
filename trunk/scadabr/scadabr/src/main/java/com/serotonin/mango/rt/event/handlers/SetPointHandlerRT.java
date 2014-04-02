@@ -161,7 +161,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
         }
 
         SystemEventType eventType = new SystemEventType(SystemEventType.TYPE_SET_POINT_HANDLER_FAILURE, vo.getId());
-        if (StringUtils.isEmpty(vo.getAlias())) {
+        if (vo.getAlias().isEmpty()) {
             message = new LocalizableMessageImpl("event.setPointFailed", message);
         } else {
             message = new LocalizableMessageImpl("event.setPointFailed.alias", vo.getAlias(), message);

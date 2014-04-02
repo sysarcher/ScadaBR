@@ -48,11 +48,11 @@ public class HttpRetrieverPointLocatorRT extends PointLocatorRT {
 
         if (dataTypeId == DataTypes.BINARY) {
             binary0Value = vo.getValueFormat();
-        } else if (dataTypeId == DataTypes.NUMERIC && !StringUtils.isEmpty(vo.getValueFormat())) {
+        } else if (dataTypeId == DataTypes.NUMERIC && !vo.getValueFormat().isEmpty()) {
             valueFormat = new DecimalFormat(vo.getValueFormat());
         }
 
-        if (!StringUtils.isEmpty(vo.getTimeRegex())) {
+        if (!vo.getTimeRegex().isEmpty()) {
             timePattern = Pattern.compile(vo.getTimeRegex());
             timeFormat = new SimpleDateFormat(vo.getTimeFormat());
         } else {

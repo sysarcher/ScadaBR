@@ -36,7 +36,6 @@ import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.comparators.BaseComparator;
-import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.l10n.Localizer;
 import br.org.scadabr.web.util.PaginatedData;
 import br.org.scadabr.web.util.PaginatedListController;
@@ -45,8 +44,7 @@ import br.org.scadabr.web.util.PagingDataForm;
 public class DataSourceListController extends PaginatedListController {
 
     @Override
-    protected PaginatedData getData(HttpServletRequest request, PagingDataForm paging, BindException errors)
-            throws Exception {
+    protected PaginatedData getData(HttpServletRequest request, PagingDataForm paging, String orderByClause, int offset, int limit, BindException errors) throws Exception {
         User user = Common.getUser(request);
         DataPointDao dataPointDao = new DataPointDao();
 

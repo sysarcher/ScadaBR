@@ -102,8 +102,9 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         this.binary0Value = binary0Value;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(messageName)) {
+        if (messageName.isEmpty()) {
             response.addContextualMessage("messageName", "validate.required");
         }
 

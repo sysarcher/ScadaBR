@@ -66,7 +66,7 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.hierarchy.PointHierarchy;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.vo.publish.PublisherVO;
-import com.serotonin.mango.vo.report.ReportJob;
+import com.serotonin.mango.vo.report.ReportTask;
 import com.serotonin.mango.vo.report.ReportVO;
 import com.serotonin.mango.web.ContextWrapper;
 import com.serotonin.mango.web.dwr.BaseDwr;
@@ -78,6 +78,7 @@ import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
+import java.text.ParseException;
 import java.util.Objects;
 
 public class MangoContextListener implements ServletContextListener {
@@ -442,7 +443,10 @@ public class MangoContextListener implements ServletContextListener {
         File safeFile = null;
         // Check for safe mode.
         try {
-            safeFile = new File(ctx.getRealPath("SAFE"));
+            String s = ctx.getRealPath("SAFE");
+            if (s != null) {
+                safeFile = new File(s);
+            }
         } catch (Throwable t) {
             log.error("Save file ", t);
         }
@@ -552,7 +556,7 @@ public class MangoContextListener implements ServletContextListener {
         List<ReportVO> reports = new ReportDao().getReports();
         for (ReportVO report : reports) {
             try {
-                ReportJob.scheduleReportJob(report);
+                ReportTask.scheduleReportJob(report);
             } catch (ShouldNeverHappenException e) {
                 // Don't stop the startup if there is an error. Just log it.
                 log.error("Error starting report " + report.getName(), e);
@@ -567,12 +571,17 @@ public class MangoContextListener implements ServletContextListener {
     private void maintenanceInitialize() {
         // Processes are scheduled in the timer, so they are canceled when it
         // stops.
-        if (true) throw new ImplementMeException(); //WAS: DataPurge.schedule();
-
+        try {
+            DataPurge.DataPurgeTask dpt = new DataPurge.DataPurgeTask("0 0 5 * * * * *");
+            Common.systemCronPool.schedule(dpt);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
         // The version checking job reschedules itself after each execution so
         // that requests from the various Mango
         // instances even out over time.
-        VersionCheck.start();
+        
+        //TODO ask serotoninsoftware for new versions ??? Not anymore ;-) VersionCheck.start("0 0 0 0 * * * *");
         WorkItemMonitor.start();
 
         // MemoryCheck.start();

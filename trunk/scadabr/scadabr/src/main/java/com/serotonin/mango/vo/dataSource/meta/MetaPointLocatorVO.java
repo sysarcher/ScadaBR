@@ -35,6 +35,7 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.json.JsonValue;
+import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.Common.TimePeriods;
 import com.serotonin.mango.DataTypes;
@@ -46,12 +47,12 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
-import br.org.scadabr.timer.CronTimerTrigger;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
@@ -62,7 +63,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     public static final int UPDATE_EVENT_CONTEXT_UPDATE = 0;
     public static final int UPDATE_EVENT_CRON = 100;
 
-    public static ExportCodes UPDATE_EVENT_CODES = new ExportCodes();
+    public final static ExportCodes UPDATE_EVENT_CODES = new ExportCodes();
 
     static {
         UPDATE_EVENT_CODES.addElement(UPDATE_EVENT_CONTEXT_UPDATE, "CONTEXT_UPDATE", "dsEdit.meta.event.context");
@@ -157,14 +158,14 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     @Override
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(script)) {
+        if (script.isEmpty()) {
             response.addContextualMessage("script", "validate.required");
         }
 
         List<String> varNameSpace = new ArrayList<>();
         for (IntValuePair point : context) {
             String varName = point.getValue();
-            if (StringUtils.isEmpty(varName)) {
+            if (varName.isEmpty()) {
                 response.addContextualMessage("context", "validate.allVarNames");
                 break;
             }
@@ -188,8 +189,8 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
         if (updateEvent == UPDATE_EVENT_CRON) {
             try {
-                new CronTimerTrigger(updateCronPattern);
-            } catch (Exception e) {
+                new CronParser().parse(updateCronPattern);
+            } catch (ParseException e) {
                 response.addContextualMessage("updateCronPattern", "validate.invalidCron", updateCronPattern);
             }
         } else if (updateEvent != UPDATE_EVENT_CONTEXT_UPDATE && !Common.TIME_PERIOD_CODES.isValidId(updateEvent)) {

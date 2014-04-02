@@ -6,6 +6,8 @@
 package br.org.scadabr.web.taglib;
 
 import br.org.scadabr.ImplementMeException;
+import java.io.IOException;
+import javax.servlet.jsp.JspWriter;
 
 /**
  *
@@ -17,8 +19,41 @@ public class Functions {
         throw new ImplementMeException();
     }
 
-    public static Object[] escapeLessThan(String valueRegex) {
-        throw new ImplementMeException();
+    public static String escapeLessThan(String value) {
+        if (value == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder(value.length());
+        for (char c : value.toCharArray()) {
+            switch (c) {
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                default:
+                    sb.append(sb);
+            }
+        }
+        return sb.toString();
     }
 
+    /**
+     * Print the attribute, only if value != null.
+     * 
+     * @param out the JspWriter to write to.
+     * @param attributeName the name of the attribure
+     * @param attributeValue the value of the attribute, if null nothing is written
+     * @throws IOException 
+     */
+    public static void printAttribute(JspWriter out, String attributeName, String attributeValue) throws IOException {
+        if (attributeValue != null) {
+            out.print(" ");
+            out.print(attributeName);
+            out.print("=\"");
+            out.print(attributeValue);
+            out.print("\"");
+        }
+    }
 }

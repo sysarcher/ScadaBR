@@ -57,7 +57,7 @@
           <td class="formField">
             <input type="text" id="imageChartDurationPeriods" class="formShort"/>
             <select id="imageChartDurationType">
-              <tag:timePeriodOptions sbt="false" s="true" min="true" h="true" d="true" w="true" mon="true" y="true"/>
+              <tag:timePeriodOptions sst="false" s="true" min="true" h="true" d="true" w="true" mon="true" y="true"/>
             </select>
           </td>
         </tr>

@@ -228,7 +228,7 @@ abstract public class BaseDwr {
      * @return
      */
     public UserComment addUserComment(int typeId, int referenceId, String comment) {
-        if (StringUtils.isEmpty(comment)) {
+        if (comment.isEmpty()) {
             return null;
         }
 

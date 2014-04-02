@@ -369,7 +369,7 @@
         <label class="formLabelRequired" for="updatePeriods" ><fmt:message key="dsEdit.updatePeriod"/></label>
         <input class="formShort" type="text" id="updatePeriods" value="${dataSource.updatePeriods}" />
         <sbt:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
-            <tag:timePeriodOptions sbt="true" s="true" min="true" h="true" d="true" w="true" mon="true"/>
+            <tag:timePeriodOptions sst="true" s="true" min="true" h="true" d="true" w="true" mon="true"/>
         </sbt:select>
     </td>
 </tr>

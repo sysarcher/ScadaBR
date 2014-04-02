@@ -128,7 +128,7 @@ public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourc
         }
 
         for (String deviceId : deviceIdWhiteList) {
-            if (StringUtils.isEmpty(deviceId)) {
+            if (deviceId.isEmpty()) {
                 response.addContextualMessage("deviceIdWhiteList", "validate.missingDeviceId");
             }
         }

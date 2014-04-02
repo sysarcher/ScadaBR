@@ -70,7 +70,7 @@ public class DataPointAccess implements JsonSerializable {
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("dataPointXid");
-        if (StringUtils.isEmpty(text)) {
+        if (text == null) {
             throw new LocalizableJsonException("emport.error.permission.missing", "dataPointXid");
         }
 
@@ -81,7 +81,7 @@ public class DataPointAccess implements JsonSerializable {
         dataPointId = dp.getId();
 
         text = json.getString("permission");
-        if (StringUtils.isEmpty(text)) {
+        if (text == null) {
             throw new LocalizableJsonException("emport.error.missing", "permission", ACCESS_CODES.getCodeList());
         }
         permission = ACCESS_CODES.getId(text);

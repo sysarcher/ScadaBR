@@ -63,7 +63,7 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
     }
 
     public static LogicalOperator parseConditionStatement(String condition) throws ConditionParseException {
-        if (StringUtils.isEmpty(condition)) {
+        if (condition.isEmpty()) {
             throw new ConditionParseException("compoundDetectors.validation.notDefined");
         }
 

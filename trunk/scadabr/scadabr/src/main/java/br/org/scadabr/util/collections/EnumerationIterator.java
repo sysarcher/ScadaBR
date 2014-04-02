@@ -5,7 +5,6 @@
  */
 package br.org.scadabr.util.collections;
 
-import br.org.scadabr.ImplementMeException;
 import java.util.Enumeration;
 import java.util.Iterator;
 
@@ -13,15 +12,32 @@ import java.util.Iterator;
  *
  * @author aploese
  */
-public class EnumerationIterator<T extends Object> implements Iterable<T> {
+public class EnumerationIterator<T> implements Iterable<T>, Iterator<T> {
 
-    public EnumerationIterator(Enumeration e) {
-        throw new ImplementMeException();
+    private final Enumeration<T> enumeration;
+
+    public EnumerationIterator(Enumeration<T> enumeration1) {
+        this.enumeration = enumeration1;
     }
 
     @Override
     public Iterator<T> iterator() {
-        throw new ImplementMeException();
+        return this;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return enumeration.hasMoreElements();
+    }
+
+    @Override
+    public T next() {
+        return enumeration.nextElement();
+    }
+
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("Remove Not supported.");
     }
 
 }

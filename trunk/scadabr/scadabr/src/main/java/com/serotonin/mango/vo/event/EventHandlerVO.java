@@ -163,7 +163,7 @@ public class EventHandlerVO implements Serializable,
     }
 
     public LocalizableMessage getMessage() {
-        if (!StringUtils.isEmpty(alias)) {
+        if (!alias.isEmpty()) {
             return new LocalizableMessageImpl("common.default", alias);
         }
         return getTypeMessage(handlerType);
@@ -486,8 +486,7 @@ public class EventHandlerVO implements Serializable,
                 }
             }
         } else if (handlerType == TYPE_PROCESS) {
-            if (StringUtils.isEmpty(activeProcessCommand)
-                    && StringUtils.isEmpty(inactiveProcessCommand)) {
+            if (activeProcessCommand == null && inactiveProcessCommand == null) {
                 response.addGenericMessage("eventHandlers.invalidCommands");
             }
         } else if (handlerType == TYPE_SCRIPT) {

@@ -127,8 +127,9 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
         this.timeFormat = timeFormat;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(valueRegex)) {
+        if (valueRegex.isEmpty()) {
             response.addContextualMessage("valueRegex", "validate.required");
         } else {
             try {
@@ -141,7 +142,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
             }
         }
 
-        if (dataTypeId == DataTypes.NUMERIC && !StringUtils.isEmpty(valueFormat)) {
+        if (dataTypeId == DataTypes.NUMERIC && !valueFormat.isEmpty()) {
             try {
                 new DecimalFormat(valueFormat);
             } catch (IllegalArgumentException e) {
@@ -153,7 +154,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
             response.addContextualMessage("dataTypeId", "validate.invalidValue");
         }
 
-        if (!StringUtils.isEmpty(timeRegex)) {
+        if (!timeRegex.isEmpty()) {
             try {
                 Pattern pattern = Pattern.compile(timeRegex);
                 if (pattern.matcher("").groupCount() < 1) {
@@ -163,7 +164,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
                 response.addContextualMessage("timeRegex", "common.default", e.getMessage());
             }
 
-            if (StringUtils.isEmpty(timeFormat)) {
+            if (timeFormat.isEmpty()) {
                 response.addContextualMessage("timeFormat", "validate.required");
             } else {
                 try {

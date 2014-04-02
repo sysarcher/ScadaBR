@@ -206,7 +206,7 @@ public class ViconicsDataSourceVO extends DataSourceVO<ViconicsDataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
 
-        if (StringUtils.isEmpty(commPortId)) {
+        if (commPortId.isEmpty()) {
             response.addContextualMessage("commPortId", "validate.required");
         }
         if (panId < 0 || panId > 66535) {

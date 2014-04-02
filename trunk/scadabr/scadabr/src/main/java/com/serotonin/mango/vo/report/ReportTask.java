@@ -18,23 +18,22 @@
  */
 package com.serotonin.mango.vo.report;
 
+import br.org.scadabr.ImplementMeException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.timer.CronTask;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.maint.work.ReportWorkItem;
-import br.org.scadabr.timer.CronTimerTrigger;
-import br.org.scadabr.timer.TimerTask;
-import br.org.scadabr.timer.TimerTrigger;
 
 /**
  * @author Matthew Lohbihler
  */
-public class ReportJob extends TimerTask {
+public class ReportTask extends CronTask {
 
-    private static final Map<Integer, ReportJob> JOB_REGISTRY = new HashMap<Integer, ReportJob>();
+    private static final Map<Integer, ReportTask> JOB_REGISTRY = new HashMap<Integer, ReportTask>();
 
     public static void scheduleReportJob(ReportVO report) {
         synchronized (JOB_REGISTRY) {
@@ -42,18 +41,17 @@ public class ReportJob extends TimerTask {
             unscheduleReportJob(report);
 
             if (report.isSchedule()) {
-                CronTimerTrigger trigger;
+                ReportTask reportJob;
                 if (report.getSchedulePeriod() == ReportVO.SCHEDULE_CRON) {
                     try {
-                        trigger = new CronTimerTrigger(report.getScheduleCron());
+                        reportJob = new ReportTask(report.getScheduleCron(), report);
                     } catch (ParseException e) {
                         throw new ShouldNeverHappenException(e);
                     }
                 } else {
-                    trigger = Common.getCronTrigger(report.getSchedulePeriod(), report.getRunDelayMinutes() * 60);
+                    throw new ImplementMeException(); //WAS: reportJob = new ReportTask(report.getSchedulePeriod(), report.getRunDelayMinutes() * 60, report);
                 }
 
-                ReportJob reportJob = new ReportJob(trigger, report);
                 JOB_REGISTRY.put(report.getId(), reportJob);
                 Common.systemCronPool.schedule(reportJob);
             }
@@ -62,7 +60,7 @@ public class ReportJob extends TimerTask {
 
     public static void unscheduleReportJob(ReportVO report) {
         synchronized (JOB_REGISTRY) {
-            ReportJob reportJob = JOB_REGISTRY.remove(report.getId());
+            ReportTask reportJob = JOB_REGISTRY.remove(report.getId());
             if (reportJob != null) {
                 reportJob.cancel();
             }
@@ -71,13 +69,13 @@ public class ReportJob extends TimerTask {
 
     private final ReportVO report;
 
-    private ReportJob(TimerTrigger trigger, ReportVO report) {
-        super(trigger);
+    private ReportTask(String pattern, ReportVO report) throws ParseException {
+        super(pattern);
         this.report = report;
     }
 
     @Override
-    public void run(long runtime) {
+    public void run() {
         ReportWorkItem.queueReport(report);
     }
 }

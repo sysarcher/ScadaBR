@@ -68,7 +68,7 @@ public class EBI25InterfaceReader {
 
     public EBI25InterfaceReader(ResourceBundle bundle, EBI25DataSourceVO dataSource, String host, int port,
             boolean keepAlive, int timeout, int retries) {
-        if (StringUtils.isEmpty(host)) {
+        if (host.isEmpty()) {
             errorMessage = Localizer.localizeI18nKey("dsEdit.ebi25.read.host", bundle);
             return;
         }

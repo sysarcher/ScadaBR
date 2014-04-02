@@ -154,7 +154,7 @@ public class HttpSenderRT extends PublisherRT<HttpPointVO> {
                 if (code == HttpStatus.SC_OK) {
                     if (vo.isRaiseResultWarning()) {
                         String result = HttpUtils.readResponseBody(method, 1024);
-                        if (!StringUtils.isEmpty(result)) {
+                        if (!result.isEmpty()) {
                             Common.ctx.getEventManager().raiseEvent(resultWarningsEventType,
                                     System.currentTimeMillis(), false, AlarmLevels.INFORMATION,
                                     new LocalizableMessageImpl("common.default", result), createEventContext());

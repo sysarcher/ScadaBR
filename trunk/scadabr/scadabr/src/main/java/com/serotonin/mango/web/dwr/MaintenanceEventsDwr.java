@@ -132,7 +132,7 @@ public class MaintenanceEventsDwr extends BaseDwr {
         DwrResponseI18n response = new DwrResponseI18n();
         MaintenanceEventDao maintenanceEventDao = new MaintenanceEventDao();
 
-        if (StringUtils.isEmpty(xid)) {
+        if (xid.isEmpty()) {
             response.addContextualMessage("xid", "validate.required");
         } else if (!maintenanceEventDao.isXidUnique(xid, id)) {
             response.addContextualMessage("xid", "validate.xidUsed");

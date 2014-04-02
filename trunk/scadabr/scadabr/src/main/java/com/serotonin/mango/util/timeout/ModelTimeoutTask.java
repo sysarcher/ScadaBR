@@ -1,35 +1,28 @@
 package com.serotonin.mango.util.timeout;
 
-import java.util.Date;
+import br.org.scadabr.timer.CronTask;
+import br.org.scadabr.timer.cron.CronExpression;
+import java.text.ParseException;
 
-import com.serotonin.mango.Common;
-import br.org.scadabr.timer.OneTimeTrigger;
-import br.org.scadabr.timer.TimerTask;
-import br.org.scadabr.timer.TimerTrigger;
-
-@Deprecated//Whats this for?
-public class ModelTimeoutTask<T> extends TimerTask {
+public class ModelTimeoutTask<T> extends CronTask {
 
     private final ModelTimeoutClient<T> client;
     private final T model;
 
-    public ModelTimeoutTask(long delay, ModelTimeoutClient<T> client, T model) {
-        this(new OneTimeTrigger(delay), client, model);
-    }
-
-    public ModelTimeoutTask(Date date, ModelTimeoutClient<T> client, T model) {
-        this(new OneTimeTrigger(date), client, model);
-    }
-
-    public ModelTimeoutTask(TimerTrigger trigger, ModelTimeoutClient<T> client, T model) {
-        super(trigger);
+    public ModelTimeoutTask(CronExpression cronExpression, ModelTimeoutClient<T> client, T model) {
+        super(cronExpression);
         this.client = client;
         this.model = model;
-        Common.systemCronPool.schedule(this);
+    }
+
+    public ModelTimeoutTask(String cronPattern, ModelTimeoutClient<T> client, T model) throws ParseException {
+        super(cronPattern);
+        this.client = client;
+        this.model = model;
     }
 
     @Override
-    protected void run(long runtime) {
-        client.scheduleTimeout(model, runtime);
+    public void run() {
+        client.scheduleTimeout(model, currentTimeInMillis);
     }
 }

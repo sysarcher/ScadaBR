@@ -72,7 +72,7 @@ public class ShareUser implements JsonSerializable {
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("user");
-        if (StringUtils.isEmpty(text)) {
+        if (text == null) {
             throw new LocalizableJsonException("emport.error.viewShare.missing", "user");
         }
         User user = new UserDao().getUser(text);
@@ -82,7 +82,7 @@ public class ShareUser implements JsonSerializable {
         userId = user.getId();
 
         text = json.getString("accessType");
-        if (StringUtils.isEmpty(text)) {
+        if (text == null) {
             throw new LocalizableJsonException("emport.error.missing", "accessType", ACCESS_CODES
                     .getCodeList(ACCESS_OWNER));
         }

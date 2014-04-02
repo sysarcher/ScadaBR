@@ -65,7 +65,7 @@ public class JmxPointLocatorRT extends PointLocatorRT {
     }
 
     public boolean isComposite() {
-        return !StringUtils.isEmpty(vo.getCompositeItemName());
+        return !vo.getCompositeItemName().isEmpty();
     }
 
     public static boolean isValidType(String type) {

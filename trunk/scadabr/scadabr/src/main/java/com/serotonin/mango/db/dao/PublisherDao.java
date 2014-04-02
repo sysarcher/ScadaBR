@@ -40,6 +40,7 @@ import br.org.scadabr.util.StringUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Objects;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -76,10 +77,7 @@ public class PublisherDao extends BaseDao {
 
         @Override
         public int compare(PublisherVO<?> p1, PublisherVO<?> p2) {
-            if (StringUtils.isEmpty(p1.getName())) {
-                return -1;
-            }
-            return p1.getName().compareTo(p2.getName());
+            return p1.getName() == null ? -1 : p1.getName().compareTo(p2.getName());
         }
     }
 

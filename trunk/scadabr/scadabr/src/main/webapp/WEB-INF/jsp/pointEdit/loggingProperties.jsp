@@ -110,7 +110,7 @@
         <td class="formField">
           <fmt:message key="pointEdit.logging.every"/> <input type="text" name="intervalLoggingPeriod" value="${form.intervalLoggingPeriod}" class="formShort"/>
           <sbt:select name="intervalLoggingPeriodType" value="${form.intervalLoggingPeriodType}">
-            <tag:timePeriodOptions sbt="true" s="true" min="true" h="true" d="true" w="true" mon="true" y="true"/>
+            <tag:timePeriodOptions sst="true" s="true" min="true" h="true" d="true" w="true" mon="true" y="true"/>
           </sbt:select>
         </td>
         <td class="formError">
@@ -185,7 +185,7 @@
       <td class="formField">
         <fmt:message key="pointEdit.logging.after"/> <input id="purgePeriod" type="text" name="purgePeriod" value="${form.purgePeriod}" class="formShort"/>
         <sbt:select id="purgeType" name="purgeType" value="${form.purgeType}">
-          <tag:timePeriodOptions sbt="true" d="true" w="true" mon="true" y="true"/>
+          <tag:timePeriodOptions sst="true" d="true" w="true" mon="true" y="true"/>
         </sbt:select>
       </td>
       <td class="formError">

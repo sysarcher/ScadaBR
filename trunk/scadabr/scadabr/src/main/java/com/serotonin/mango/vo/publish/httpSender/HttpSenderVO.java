@@ -169,12 +169,12 @@ public class HttpSenderVO extends PublisherVO<HttpPointVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
 
-        if (StringUtils.isEmpty(url)) {
+        if (url.isEmpty()) {
             response.addContextualMessage("url", "validate.required");
         }
 
         for (HttpPointVO point : points) {
-            if (StringUtils.isEmpty(point.getParameterName())) {
+            if (point.getParameterName().isEmpty()) {
                 response.addContextualMessage("points", "validate.parameterRequired");
                 break;
             }

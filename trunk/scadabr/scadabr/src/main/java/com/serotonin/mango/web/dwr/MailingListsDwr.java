@@ -76,7 +76,7 @@ public class MailingListsDwr extends BaseDwr {
         MailingList ml = createMailingList(id, xid, name, entryBeans);
         ml.getInactiveIntervals().addAll(inactiveIntervals);
 
-        if (StringUtils.isEmpty(xid)) {
+        if (xid.isEmpty()) {
             response.addContextualMessage("xid", "validate.required");
         } else if (!mailingListDao.isXidUnique(xid, id)) {
             response.addContextualMessage("xid", "validate.xidUsed");

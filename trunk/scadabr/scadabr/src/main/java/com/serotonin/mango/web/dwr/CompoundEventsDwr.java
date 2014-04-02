@@ -124,7 +124,7 @@ public class CompoundEventsDwr extends BaseDwr {
 
         CompoundEventDetectorDao compoundEventDetectorDao = new CompoundEventDetectorDao();
 
-        if (StringUtils.isEmpty(xid)) {
+        if (xid.isEmpty()) {
             response.addContextualMessage("xid", "validate.required");
         } else if (!compoundEventDetectorDao.isXidUnique(xid, id)) {
             response.addContextualMessage("xid", "validate.xidUsed");

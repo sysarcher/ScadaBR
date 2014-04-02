@@ -100,15 +100,14 @@ abstract public class DatabaseAccess {
         try {
             if (newDatabaseCheck(ejt)) {
                 // Check if we should convert from another database.
-                String convertTypeStr = null;
+                String convertTypeStr;
                 try {
-                    convertTypeStr = Common.getEnvironmentProfile().getString(
-                            "convert.db.type");
+                    convertTypeStr = Common.getEnvironmentProfile().getString("convert.db.type");
                 } catch (MissingResourceException e) {
-                    // no op
+                    convertTypeStr = "";
                 }
 
-                if (!StringUtils.isEmpty(convertTypeStr)) {
+                if (!convertTypeStr.isEmpty()) {
                     // Found a database type from which to convert.
                     DatabaseType convertType = DatabaseType
                             .valueOf(convertTypeStr.toUpperCase());

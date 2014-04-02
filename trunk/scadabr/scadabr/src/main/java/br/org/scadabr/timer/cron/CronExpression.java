@@ -32,9 +32,107 @@ public class CronExpression {
     private CronField month;
     private CronField dayOfWeek;
     private CronField year;
+    
+    public static CronExpression createPeriodByMillisecond(int millisecondIncrement){
+        CronExpression result = new CronExpression();
+        result.millisecond = new CronField(CronField.Type.RANGE_INCREMENT).setStartRange(CronFieldType.MILLISECOND.floor).setEndRange(CronFieldType.MILLISECOND.ceil).setIncrement(millisecondIncrement);
+        result.second = new CronField(CronField.Type.ANY);
+        result.minute = new CronField(CronField.Type.ANY);
+        result.hourOfDay = new CronField(CronField.Type.ANY);
+        result.dayOfMonth = new CronField(CronField.Type.ANY);
+        result.month = new CronField(CronField.Type.ANY);
+        result.dayOfWeek = new CronField(CronField.Type.ANY);
+        result.year = new CronField(CronField.Type.ANY);
+        return result;
+    }
 
-    public CronExpression(String cronPattern) throws ParseException {
-        throw new ImplementMeException();
+
+    public static CronExpression createPeriodBySecond(int secondIncrement, int millisecond){
+        CronExpression result = new CronExpression();
+        result.millisecond = new CronField(CronField.Type.VALUE).setValue(millisecond);
+        result.second = new CronField(CronField.Type.RANGE_INCREMENT).setStartRange(CronFieldType.SECOND.floor).setEndRange(CronFieldType.SECOND.ceil).setIncrement(secondIncrement);
+        result.minute = new CronField(CronField.Type.ANY);
+        result.hourOfDay = new CronField(CronField.Type.ANY);
+        result.dayOfMonth = new CronField(CronField.Type.ANY);
+        result.month = new CronField(CronField.Type.ANY);
+        result.dayOfWeek = new CronField(CronField.Type.ANY);
+        result.year = new CronField(CronField.Type.ANY);
+        return result;
+    }
+
+    public static CronExpression createPeriodByMinute(int minuteIncrement, int second, int millisecond){
+        CronExpression result = new CronExpression();
+        result.millisecond = new CronField(CronField.Type.VALUE).setValue(millisecond);
+        result.second = new CronField(CronField.Type.VALUE).setValue(second);
+        result.minute = new CronField(CronField.Type.RANGE_INCREMENT).setStartRange(CronFieldType.MINUTE.floor).setEndRange(CronFieldType.MINUTE.ceil).setIncrement(minuteIncrement);
+        result.hourOfDay = new CronField(CronField.Type.ANY);
+        result.dayOfMonth = new CronField(CronField.Type.ANY);
+        result.month = new CronField(CronField.Type.ANY);
+        result.dayOfWeek = new CronField(CronField.Type.ANY);
+        result.year = new CronField(CronField.Type.ANY);
+        return result;
+    }
+
+    public static CronExpression createPeriodByHour(int hourIncrement,  int minute, int second, int millisecond){
+        CronExpression result = new CronExpression();
+        result.millisecond = new CronField(CronField.Type.VALUE).setValue(millisecond);
+        result.second = new CronField(CronField.Type.VALUE).setValue(second);
+        result.minute = new CronField(CronField.Type.VALUE).setValue(minute);
+        result.hourOfDay = new CronField(CronField.Type.RANGE_INCREMENT).setStartRange(CronFieldType.HOUR_OF_DAY.floor).setEndRange(CronFieldType.HOUR_OF_DAY.ceil).setIncrement(hourIncrement);
+        result.dayOfMonth = new CronField(CronField.Type.ANY);
+        result.month = new CronField(CronField.Type.ANY);
+        result.dayOfWeek = new CronField(CronField.Type.ANY);
+        result.year = new CronField(CronField.Type.ANY);
+        return result;
+    }
+
+    public static CronExpression createDaily(int hour,  int minute, int second, int millisecond){
+        CronExpression result = new CronExpression();
+        result.millisecond = new CronField(CronField.Type.VALUE).setValue(millisecond);
+        result.second = new CronField(CronField.Type.VALUE).setValue(second);
+        result.minute = new CronField(CronField.Type.VALUE).setValue(minute);
+        result.hourOfDay = new CronField(CronField.Type.VALUE).setValue(hour);
+        result.dayOfMonth = new CronField(CronField.Type.ANY);
+        result.month = new CronField(CronField.Type.ANY);
+        result.dayOfWeek = new CronField(CronField.Type.ANY);
+        result.year = new CronField(CronField.Type.ANY);
+        return result;
+    }
+
+    public CronExpression(int year, int month, int dayOfMonth, int hourOfDay, int minute, int second, int millisecond) {
+        nextTimeStamp = new CronCalendar();
+        nextTimeStamp.setMilliseconds(millisecond);
+        nextTimeStamp.setSeconds(second);
+        nextTimeStamp.setMinutes(minute);
+        nextTimeStamp.setHourOfDay(hourOfDay);
+        nextTimeStamp.setDayOfMonth(dayOfMonth);
+        try {
+            nextTimeStamp.setMonth(month);
+            nextTimeStamp.setYear(year);
+        } catch (CronCalendar.AfterLastDayOfMonthException | CronCalendar.NoLeapYearException | CronCalendar.TimeInPastException ex) {
+            throw new RuntimeException(ex);
+        }
+        this.millisecond = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getMillisecond());
+        this.second = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getSecond());
+        this.minute = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getMinute());
+        this.hourOfDay = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getHourOfDay());
+        this.dayOfMonth = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getDayOfMonth());
+        this.month = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getMonth());
+        this.dayOfWeek = new CronField(CronField.Type.ANY);
+        this.year = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getYear());
+    }
+
+    public CronExpression(GregorianCalendar c) {
+        nextTimeStamp = new CronCalendar();
+        nextTimeStamp.setCurrentTime(c);
+        millisecond = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getMillisecond());
+        second = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getSecond());
+        minute = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getMinute());
+        hourOfDay = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getHourOfDay());
+        dayOfMonth = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getDayOfMonth());
+        month = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getMonth());
+        dayOfWeek = new CronField(CronField.Type.ANY);
+        year = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getYear());
     }
 
     CronExpression() {
@@ -55,13 +153,13 @@ public class CronExpression {
         calcNextDayOfMonth();
         calcNextMonth();
         calcNextYear();
-        
+
     }
 
     public void calcNextValidTimeAfter() {
         doIncrementTime = true;
         calcNextValidTime();
-        
+
     }
 
     public void calcNextValidTimeIncludingNow() {

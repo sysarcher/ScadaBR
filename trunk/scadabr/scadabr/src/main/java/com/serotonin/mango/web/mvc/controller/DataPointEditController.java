@@ -123,7 +123,7 @@ public class DataPointEditController extends SimpleFormController {
     protected void onBindAndValidate(HttpServletRequest request, Object command, BindException errors) throws Exception {
         DataPointVO point = (DataPointVO) command;
 
-        if (StringUtils.isEmpty(point.getName())) {
+        if (point.getName().isEmpty()) {
             ValidationUtils.rejectValue(errors, "name", "validate.required");
         }
 
@@ -173,7 +173,7 @@ public class DataPointEditController extends SimpleFormController {
         // Make sure that xids are unique
         List<String> xids = new ArrayList<>();
         for (PointEventDetectorVO ped : point.getEventDetectors()) {
-            if (StringUtils.isEmpty(ped.getXid())) {
+            if (ped.getXid().isEmpty()) {
                 ValidationUtils.reject(errors, "validate.ped.xidMissing");
                 break;
             }

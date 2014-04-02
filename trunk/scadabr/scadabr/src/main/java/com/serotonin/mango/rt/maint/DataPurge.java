@@ -140,7 +140,7 @@ public class DataPurge {
 
     public static class DataPurgeTask extends CronTask {
 
-        DataPurgeTask(String pattern) throws ParseException {
+        public DataPurgeTask(String pattern) throws ParseException {
             super(pattern);
         }
 

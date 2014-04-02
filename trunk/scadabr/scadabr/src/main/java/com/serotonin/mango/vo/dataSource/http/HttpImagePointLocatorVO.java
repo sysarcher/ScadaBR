@@ -171,7 +171,7 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO implements J
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(url)) {
+        if (url.isEmpty()) {
             response.addContextualMessage("url", "validate.required");
         }
         if (timeoutSeconds <= 0) {

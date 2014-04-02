@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.maint;
 
+import br.org.scadabr.timer.CronTask;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -52,14 +53,15 @@ import br.org.scadabr.util.queue.ByteQueue;
 import br.org.scadabr.web.http.HttpUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
  *
  */
-public class VersionCheck extends TimerTask {
+@Deprecated
+public class VersionCheck extends CronTask {
 
-    private static final long TIMEOUT = 1000 * 60 * 60 * 24 * 2; // Run every other day.
     private static final String INSTANCE_ID_FILE = "WEB-INF/instance.txt";
 
     private static VersionCheck instance;
@@ -69,11 +71,11 @@ public class VersionCheck extends TimerTask {
      * This method will set up the version checking job. It assumes that the
      * corresponding system setting for running this job is true.
      */
-    public static void start() {
+    public static void start(String cronPattern) throws ParseException {
         synchronized (INSTANCE_ID_FILE) {
             stop();
-            instance = new VersionCheck();
-           //TODO do wee need this? Common.timer.schedule(instance);
+            instance = new VersionCheck(cronPattern);
+            Common.systemCronPool.schedule(instance);
         }
     }
 
@@ -86,8 +88,8 @@ public class VersionCheck extends TimerTask {
         }
     }
 
-    private VersionCheck() {
-        super(new FixedRateTrigger(100000, TIMEOUT));
+    private VersionCheck(String cronPattern) throws ParseException {
+        super(cronPattern);
     }
 
     public static String getInstanceId() {
@@ -98,14 +100,14 @@ public class VersionCheck extends TimerTask {
     }
 
     @Override
-    public void run(long fireTime) {
+    public void run() {
         try {
             String notifLevel = SystemSettingsDao.getValue(SystemSettingsDao.NEW_VERSION_NOTIFICATION_LEVEL);
-            newVersionCheck(fireTime, notifLevel);
+            newVersionCheck(currentTimeInMillis, notifLevel);
         } catch (SocketTimeoutException e) {
             // Ignore
         } catch (Exception e) {
-            SystemEventType.raiseEvent(getEventType(), fireTime, true, new LocalizableMessageImpl("event.version.error", e
+            SystemEventType.raiseEvent(getEventType(), currentTimeInMillis, true, new LocalizableMessageImpl("event.version.error", e
                     .getClass().getName(), e.getMessage()));
         }
     }

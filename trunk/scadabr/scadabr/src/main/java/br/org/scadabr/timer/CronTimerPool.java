@@ -5,13 +5,13 @@
  */
 package br.org.scadabr.timer;
 
-import br.org.scadabr.ImplementMeException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -20,12 +20,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class CronTimerPool extends AbstractTimer {
 
-    ThreadPoolExecutor tpe;
 class TimerThread extends Thread {
 
     boolean newTasksMayBeScheduled = true;
 
-    private TaskQueue queue;
+    private final TaskQueue queue;
 
     private final GregorianCalendar calendar = new GregorianCalendar();
 
@@ -92,16 +91,15 @@ class TimerThread extends Thread {
         }
     }
 }
+
+    ThreadPoolExecutor tpe;
+
     public void execute(Runnable r) {
         tpe.execute(r);
     }
 
-    public void init(ThreadPoolExecutor threadPoolExecutor) {
-        this.tpe = threadPoolExecutor;
-    }
-
-    public int size() {
-        throw new ImplementMeException();
+    public int poolSize() {
+        return tpe.getPoolSize();
     }
 
     public void shutdown() {
@@ -142,6 +140,7 @@ class TimerThread extends Thread {
 
     public CronTimerPool(String name) {
         thread.setName(name);
+        tpe = new ThreadPoolExecutor(1, 5, 30, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>());
         thread.start();
     }
 
@@ -174,6 +173,7 @@ class TimerThread extends Thread {
     }
 
     public void cancel() {
+        if (true) throw new RuntimeException("DO NOT CANCEL");
         synchronized (queue) {
             thread.newTasksMayBeScheduled = false;
             queue.clear();

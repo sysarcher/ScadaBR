@@ -74,12 +74,13 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
                 alarmLevel);
     }
 
+    @Override
     public String getTypeKey() {
         return "event.audit.compoundEventDetector";
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(name)) {
+        if (name.isEmpty()) {
             response.addContextualMessage("name", "compoundDetectors.validation.nameRequired");
         }
 

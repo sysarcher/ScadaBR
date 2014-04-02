@@ -11,12 +11,15 @@ import br.org.scadabr.ImplementMeException;
  *
  * @author aploese
  */
+@Deprecated
 public class AbstractTimer {
 
+    @Deprecated
     public long currentTimeMillis() {
         throw new ImplementMeException();
     }
 
+    @Deprecated
     public void schedule(Runnable r) {
         throw new ImplementMeException();
     }

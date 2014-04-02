@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.event.handlers;
 
+import br.org.scadabr.timer.CronTask;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -39,17 +40,19 @@ import com.serotonin.mango.vo.event.EventHandlerVO;
 import com.serotonin.mango.web.email.MangoEmailContent;
 import com.serotonin.mango.web.email.UsedImagesDirective;
 import br.org.scadabr.timer.TimerTask;
+import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.email.EmailInline;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
+import java.util.GregorianCalendar;
 
 public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient<EventInstance> {
 
     private static final Log LOG = LogFactory.getLog(EmailHandlerRT.class);
 
-    private TimerTask escalationTask;
+    private CronTask escalationTask;
 
     private Set<String> activeRecipients;
 
@@ -111,14 +114,17 @@ public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient
 
         // If an escalation is to be sent, set up timeout to trigger it.
         if (vo.isSendEscalation()) {
-            long delayMS = Common.getMillis(vo.getEscalationDelayType(), vo.getEscalationDelay());
-            escalationTask = new ModelTimeoutTask<EventInstance>(delayMS, this, evt);
+            GregorianCalendar c = new GregorianCalendar();
+            c.setTimeInMillis(Common.getMillis(vo.getEscalationDelayType(), vo.getEscalationDelay()));
+            escalationTask = new ModelTimeoutTask<>(new CronExpression(c), this, evt);
+            Common.systemCronPool.schedule(escalationTask);
         }
     }
 
     //
     // TimeoutClient
     //
+    @Override
     synchronized public void scheduleTimeout(EventInstance evt, long fireTime) {
         // Get the email addresses to send to
         Set<String> addresses = new MailingListDao().getRecipientAddresses(vo.getEscalationRecipients(), new DateTime(
@@ -170,7 +176,7 @@ public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient
         // Determine the subject to use.
         LocalizableMessage subjectMsg;
         LocalizableMessage notifTypeMsg = new LocalizableMessageImpl(notificationType.getKey());
-        if (StringUtils.isEmpty(alias)) {
+        if (alias.isEmpty()) {
             if (evt.getId() == Common.NEW_ID) {
                 subjectMsg = new LocalizableMessageImpl("ftl.subject.default", notifTypeMsg);
             } else {
