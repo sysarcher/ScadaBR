@@ -218,7 +218,7 @@
                 <input id="statsChartDuration" style="text-align:right;" type="text" class="formVeryShort"
                         value='${empty periodCount ? "1" : periodCount}'/>
                 <sbt:select id="statsChartDurationType" value="${periodType}">
-                  <tag:timePeriodOptions sbt="true" min="true" h="true" d="true" w="true" mon="true"/>
+                  <tag:timePeriodOptions sst="true" min="true" h="true" d="true" w="true" mon="true"/>
                 </sbt:select>
                 <tag:img id="statsChartImg" png="control_play_blue" title="pointDetails.getStatistics" onclick="getStatsChart()"/>
               </td>

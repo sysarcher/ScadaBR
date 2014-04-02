@@ -152,7 +152,7 @@ public class JmxDataSourceVO extends DataSourceVO<JmxDataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
 
-        if (!useLocalServer && StringUtils.isEmpty(remoteServerAddr)) {
+        if (!useLocalServer && remoteServerAddr.isEmpty()) {
             response.addContextualMessage("remoteServerAddr", "validate.required");
         }
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {

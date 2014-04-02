@@ -11,6 +11,7 @@ import br.org.scadabr.ImplementMeException;
  *
  * @author aploese
  */
+@Deprecated
 public class TimerTrigger {
 
     public long getNextExecutionTime() {

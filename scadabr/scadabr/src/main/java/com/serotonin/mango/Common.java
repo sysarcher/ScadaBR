@@ -57,7 +57,7 @@ import com.serotonin.mango.vo.CommPortProxy;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.ContextWrapper;
 import br.org.scadabr.monitor.MonitoredValues;
-import br.org.scadabr.timer.CronTimerTrigger;
+import br.org.scadabr.timer.CronTask;
 import br.org.scadabr.timer.CronTimerPool;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
@@ -65,7 +65,6 @@ import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.i18n.Utf8ResourceBundle;
 import br.org.scadabr.web.l10n.Localizer;
 import java.util.MissingResourceException;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -384,51 +383,6 @@ public class Common {
             lazyFiledataPath = name;
         }
         return lazyFiledataPath;
-    }
-
-    public static CronTimerTrigger getCronTrigger(int periodType,
-            int delaySeconds) {
-        int delayMinutes = 0;
-        if (delaySeconds >= 60) {
-            delayMinutes = delaySeconds / 60;
-            delaySeconds %= 60;
-
-            if (delayMinutes >= 60) {
-                delayMinutes = 59;
-            }
-        }
-
-        try {
-            switch (periodType) {
-                case TimePeriods.MILLISECONDS:
-                    throw new ShouldNeverHappenException(
-                            "Can't create a cron trigger for milliseconds");
-                case TimePeriods.SECONDS:
-                    return new CronTimerTrigger("* * * * * ?");
-                case TimePeriods.MINUTES:
-                    return new CronTimerTrigger(delaySeconds + " * * * * ?");
-                case TimePeriods.HOURS:
-                    return new CronTimerTrigger(delaySeconds + " " + delayMinutes
-                            + " * * * ?");
-                case TimePeriods.DAYS:
-                    return new CronTimerTrigger(delaySeconds + " " + delayMinutes
-                            + " 0 * * ?");
-                case TimePeriods.WEEKS:
-                    return new CronTimerTrigger(delaySeconds + " " + delayMinutes
-                            + " 0 ? * MON");
-                case TimePeriods.MONTHS:
-                    return new CronTimerTrigger(delaySeconds + " " + delayMinutes
-                            + " 0 1 * ?");
-                case TimePeriods.YEARS:
-                    return new CronTimerTrigger(delaySeconds + " " + delayMinutes
-                            + " 0 1 JAN ?");
-                default:
-                    throw new ShouldNeverHappenException(
-                            "Invalid cron period type: " + periodType);
-            }
-        } catch (ParseException e) {
-            throw new ShouldNeverHappenException(e);
-        }
     }
 
     //

@@ -131,7 +131,7 @@
               <td class="formField">
                 <input type="text" id="snapshotSendPeriods" value="${publisher.snapshotSendPeriods}" class="formShort"/>
                 <sbt:select id="snapshotSendPeriodType" value="${publisher.snapshotSendPeriodType}">
-                  <tag:timePeriodOptions sbt="true" s="true" min="true" h="true"/>
+                  <tag:timePeriodOptions sst="true" s="true" min="true" h="true"/>
                 </sbt:select>
                 <div id="snapshotSendPeriodsMsg" class="formError" style="display:none;"></div>
               </td>

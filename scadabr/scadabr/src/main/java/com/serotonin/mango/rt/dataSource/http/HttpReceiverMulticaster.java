@@ -52,7 +52,7 @@ public class HttpReceiverMulticaster {
             }
 
             // Check if the listener cares about stuff from this device id.
-            if (!StringUtils.isEmpty(data.getDeviceId())) {
+            if (data.getDeviceId() != null && !data.getDeviceId().isEmpty()) {
                 if (!StringUtils.globWhiteListMatchIgnoreCase(l.getDeviceIdWhiteList(), data.getDeviceId())) {
                     continue;
                 }

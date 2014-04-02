@@ -88,12 +88,12 @@ public class ProcessWorkItem implements WorkItem {
             timeout.interrupt();
 
             String input = out.getInput();
-            if (!StringUtils.isEmpty(input)) {
+            if (!input.isEmpty()) {
                 LOG.info("Process output: '" + input + "'");
             }
 
             input = err.getInput();
-            if (!StringUtils.isEmpty(input)) {
+            if (!input.isEmpty()) {
                 LOG.warn("Process error: '" + input + "'");
             }
         } catch (InterruptedException e) {

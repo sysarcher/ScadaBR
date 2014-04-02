@@ -187,7 +187,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
     }
 
     public LocalizableMessage getDescription() {
-        if (!StringUtils.isEmpty(alias)) {
+        if (!alias.isEmpty()) {
             return new LocalizableMessageImpl("common.default", alias);
         }
         return getConfigurationDescription();

@@ -119,7 +119,7 @@ public class SnmpTrapRouter {
                 // Look for the peer in the data source list.
                 for (SnmpDataSourceRT ds : dataSources) {
                     if (ds.getAddress().equals(peer)) {
-                        if (StringUtils.isEmpty(ds.getLocalAddress()) || localAddress.equals(ds.getLocalAddress())) {
+                        if (ds.getLocalAddress().isEmpty() || localAddress.equals(ds.getLocalAddress())) {
                             ds.receivedTrap(command);
                         }
                     }

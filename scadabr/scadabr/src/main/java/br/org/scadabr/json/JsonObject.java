@@ -7,7 +7,6 @@ package br.org.scadabr.json;
 
 import br.org.scadabr.ImplementMeException;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  *

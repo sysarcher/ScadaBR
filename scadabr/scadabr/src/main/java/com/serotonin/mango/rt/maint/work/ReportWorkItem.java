@@ -120,7 +120,7 @@ public class ReportWorkItem implements WorkItem {
             if (point != null && Permissions.hasDataPointReadPermission(user, point)) {
                 String colour = null;
                 try {
-                    if (!StringUtils.isEmpty(reportPoint.getColour())) {
+                    if (!reportPoint.getColour().isEmpty()) {
                         colour = ColorUtils.toHexString(reportPoint.getColour()).substring(1);
                     }
                 } catch (InvalidArgumentException e) {

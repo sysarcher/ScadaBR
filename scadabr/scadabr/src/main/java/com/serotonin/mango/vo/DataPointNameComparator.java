@@ -30,7 +30,7 @@ public class DataPointNameComparator implements Comparator<DataPointVO> {
     public static final DataPointNameComparator instance = new DataPointNameComparator();
 
     public int compare(DataPointVO dp1, DataPointVO dp2) {
-        if (StringUtils.isEmpty(dp1.getName())) {
+        if (dp1.getName().isEmpty()) {
             return -1;
         }
         return dp1.getName().compareToIgnoreCase(dp2.getName());

@@ -56,7 +56,7 @@
       <td class="formField">
         <input id="purgeNowPeriod" type="text" value="${form.purgePeriod}" class="formShort"/>
         <sbt:select id="purgeNowType" value="${form.purgeType}">
-          <tag:timePeriodOptions sbt="true" min="true" h="true" d="true" w="true" mon="true" y="true"/>
+          <tag:timePeriodOptions sst="true" min="true" h="true" d="true" w="true" mon="true" y="true"/>
         </sbt:select>
       </td>
     </tr>

@@ -128,7 +128,7 @@ public abstract class ScriptVO<T extends ScriptVO<?>> implements Serializable,
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(xid)) {
+        if (xid.isEmpty()) {
             response.addContextualMessage("xid", "validate.required");
         } else if (!new DataSourceDao().isXidUnique(xid, id)) {
             response.addContextualMessage("xid", "validate.xidUsed");
@@ -136,7 +136,7 @@ public abstract class ScriptVO<T extends ScriptVO<?>> implements Serializable,
             response.addContextualMessage("xid", "validate.notLongerThan", 50);
         }
 
-        if (StringUtils.isEmpty(name)) {
+        if (name.isEmpty()) {
             response.addContextualMessage("name", "validate.nameRequired");
         }
         if (StringUtils.isLengthGreaterThan(name, 40)) {

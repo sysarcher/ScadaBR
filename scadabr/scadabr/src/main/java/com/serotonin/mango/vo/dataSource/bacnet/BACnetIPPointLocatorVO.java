@@ -201,7 +201,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
             response.addContextualMessage("remoteDevicePort", "validate.illegalValue");
         }
 
-        if (!StringUtils.isEmpty(networkAddress)) {
+        if (!networkAddress.isEmpty()) {
             if (networkNumber < 0) {
                 response.addContextualMessage("networkNumber", "validate.illegalValue");
             }

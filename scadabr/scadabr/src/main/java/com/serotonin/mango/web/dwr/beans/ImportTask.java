@@ -299,7 +299,7 @@ public class ImportTask extends ProgressiveTask {
 
     private void importUser(JsonObject userJson) {
         String username = userJson.getString("username");
-        if (StringUtils.isEmpty(username)) {
+        if (username == null) {
             response.addGenericMessage("emport.user.username");
         } else {
             User user = userDao.getUser(username);
@@ -343,14 +343,14 @@ public class ImportTask extends ProgressiveTask {
     private void importDataSource(JsonObject dataSource) {
         String xid = dataSource.getString("xid");
         String name = dataSource.getString("name");
-        if (StringUtils.isEmpty(xid)) {
+        if (xid.isEmpty()) {
             response.addGenericMessage("emport.dataSource.xid",
                     name == null ? "(undefined)" : name);
         } else {
             DataSourceVO<?> vo = dataSourceDao.getDataSource(xid);
             if (vo == null) {
                 String typeStr = dataSource.getString("type");
-                if (StringUtils.isEmpty(typeStr)) {
+                if (typeStr == null) {
                     response.addGenericMessage("emport.dataSource.missingType",
                             xid, DataSourceVO.Type.getTypeList());
                 } else {
@@ -401,7 +401,7 @@ public class ImportTask extends ProgressiveTask {
     private void importDataPoint(JsonObject dataPoint) {
         String xid = dataPoint.getString("xid");
         String name = dataPoint.getString("name");
-        if (StringUtils.isEmpty(xid)) {
+        if (xid == null) {
             response.addGenericMessage("emport.dataPoint.xid",
                     name == null ? "(undefined)" : name);
         } else {
@@ -470,7 +470,7 @@ public class ImportTask extends ProgressiveTask {
 
     private void importView(JsonObject viewJson) {
         String xid = viewJson.getString("xid");
-        if (StringUtils.isEmpty(xid)) {
+        if (xid == null) {
             response.addGenericMessage("emport.view.xid");
         } else {
             View view = viewDao.getViewByXid(xid);
@@ -548,7 +548,7 @@ public class ImportTask extends ProgressiveTask {
 
     private void importPointLink(JsonObject pointLink) {
         String xid = pointLink.getString("xid");
-        if (StringUtils.isEmpty(xid)) {
+        if (xid == null) {
             response.addGenericMessage("emport.pointLink.xid");
         } else {
             PointLinkVO vo = pointLinkDao.getPointLink(xid);
@@ -584,7 +584,7 @@ public class ImportTask extends ProgressiveTask {
 
     private void importScheduledEvent(JsonObject scheduledEvent) {
         String xid = scheduledEvent.getString("xid");
-        if (StringUtils.isEmpty(xid)) {
+        if (xid == null) {
             response.addGenericMessage("emport.scheduledEvent.xid");
         } else {
             ScheduledEventVO vo = scheduledEventDao.getScheduledEvent(xid);
@@ -621,7 +621,7 @@ public class ImportTask extends ProgressiveTask {
 
     private void importCompoundEventDetector(JsonObject compoundEventDetector) {
         String xid = compoundEventDetector.getString("xid");
-        if (StringUtils.isEmpty(xid)) {
+        if (xid == null) {
             response.addGenericMessage("emport.compoundEvent.xid");
         } else {
             CompoundEventDetectorVO vo = compoundEventDetectorDao
@@ -659,7 +659,7 @@ public class ImportTask extends ProgressiveTask {
 
     private void importMailingList(JsonObject mailingList) {
         String xid = mailingList.getString("xid");
-        if (StringUtils.isEmpty(xid)) {
+        if (xid == null) {
             response.addGenericMessage("emport.mailingList.xid");
         } else {
             MailingList vo = mailingListDao.getMailingList(xid);
@@ -696,14 +696,14 @@ public class ImportTask extends ProgressiveTask {
     private void importPublisher(JsonObject publisher) {
         String xid = publisher.getString("xid");
         String name = publisher.getString("name");
-        if (StringUtils.isEmpty(xid)) {
+        if (xid == null) {
             response.addGenericMessage("emport.publisher.xid",
                     name == null ? "(undefined)" : name);
         } else {
             PublisherVO<?> vo = publisherDao.getPublisher(xid);
             if (vo == null) {
                 String typeStr = publisher.getString("type");
-                if (StringUtils.isEmpty(typeStr)) {
+                if (typeStr == null) {
                     response.addGenericMessage("emport.publisher.missingType",
                             xid, PublisherVO.Type.getTypeList());
                 } else {
@@ -752,7 +752,7 @@ public class ImportTask extends ProgressiveTask {
 
     private void importEventHandler(JsonObject eventHandler) {
         String xid = eventHandler.getString("xid");
-        if (StringUtils.isEmpty(xid)) {
+        if (xid == null) {
             response.addGenericMessage("emport.eventHandler.xid");
         } else {
             EventHandlerVO handler = eventDao.getEventHandler(xid);
@@ -809,7 +809,7 @@ public class ImportTask extends ProgressiveTask {
 
     private void importWatchList(JsonObject watchListJson) {
         String xid = watchListJson.getString("xid");
-        if (StringUtils.isEmpty(xid)) {
+        if (xid == null) {
             response.addGenericMessage("emport.watchList.xid");
         } else {
             WatchList watchList = watchListDao.getWatchList(xid);
@@ -846,7 +846,7 @@ public class ImportTask extends ProgressiveTask {
 
     private void importMaintenanceEvent(JsonObject maintenanceEvent) {
         String xid = maintenanceEvent.getString("xid");
-        if (StringUtils.isEmpty(xid)) {
+        if (xid == null) {
             response.addGenericMessage("emport.maintenanceEvent.xid");
         } else {
             MaintenanceEventVO vo = maintenanceEventDao
@@ -885,7 +885,7 @@ public class ImportTask extends ProgressiveTask {
     private void importScripts(JsonObject script) {
 
         String xid = script.getString("xid");
-        if (StringUtils.isEmpty(xid)) {
+        if (xid == null) {
             response.addGenericMessage("emport.script.xid");
         } else {
             ScriptVO vo = scriptDao.getScript(xid);

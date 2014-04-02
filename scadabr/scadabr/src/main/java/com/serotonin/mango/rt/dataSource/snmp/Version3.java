@@ -60,7 +60,7 @@ public class Version3 extends Version {
             String privPassphrase, String engineId, String contextEngineId, String contextName) {
         this.securityName = SnmpUtils.createOctetString(securityName);
 
-        if (!StringUtils.isEmpty(authProtocol)) {
+        if (!authProtocol.isEmpty()) {
             if (authProtocol.equals("MD5")) {
                 this.authProtocol = AuthMD5.ID;
             } else if (authProtocol.equals("SHA")) {
@@ -72,7 +72,7 @@ public class Version3 extends Version {
 
         this.authPassphrase = SnmpUtils.createOctetString(authPassphrase);
 
-        if (!StringUtils.isEmpty(privProtocol)) {
+        if (!privProtocol.isEmpty()) {
             if (privProtocol.equals("DES")) {
                 this.privProtocol = PrivDES.ID;
             } else if ((privProtocol.equals("AES128")) || (privProtocol.equals("AES"))) {

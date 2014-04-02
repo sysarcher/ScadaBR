@@ -5,13 +5,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import com.serotonin.mango.Common;
 import br.org.scadabr.monitor.IntegerMonitor;
+import br.org.scadabr.timer.CronTask;
 import br.org.scadabr.timer.FixedRateTrigger;
 import br.org.scadabr.timer.TimerTask;
+import br.org.scadabr.timer.cron.CronExpression;
 
 @Deprecated// "Whats this for?)"
-public class WorkItemMonitor extends TimerTask {
-
-    private static final long TIMEOUT = 1000 * 10; // Run every ten seconds.
+public class WorkItemMonitor extends CronTask {
 
     /**
      * This method will set up the memory checking job. It assumes that the
@@ -31,7 +31,7 @@ public class WorkItemMonitor extends TimerTask {
     private final IntegerMonitor threadCount = new IntegerMonitor("WorkItemMonitor.threadCount", null);
 
     private WorkItemMonitor() {
-        super(new FixedRateTrigger(TIMEOUT, TIMEOUT));
+        super(CronExpression.createPeriodBySecond(10, 0));
 
         Common.MONITORED_VALUES.addIfMissingStatMonitor(mediumPriorityServiceQueueSize);
         Common.MONITORED_VALUES.addIfMissingStatMonitor(scheduledTimerTaskCount);
@@ -41,11 +41,11 @@ public class WorkItemMonitor extends TimerTask {
     }
 
     @Override
-    public void run(long fireTime) {
+    public void run() {
         BackgroundProcessing bp = Common.ctx.getBackgroundProcessing();
 
         mediumPriorityServiceQueueSize.setValue(bp.getMediumPriorityServiceQueueSize());
-        scheduledTimerTaskCount.setValue(Common.systemCronPool.size());
+        scheduledTimerTaskCount.setValue(Common.systemCronPool.poolSize());
         highPriorityServiceQueueSize.setValue(((ThreadPoolExecutor) Common.systemCronPool.getExecutorService()).getActiveCount());
 
         // Check the stack heights

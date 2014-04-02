@@ -206,7 +206,7 @@ abstract public class ViewComponent implements Serializable, JsonSerializable {
     }
 
     public String getId() {
-        if (StringUtils.isEmpty(idSuffix)) {
+        if (idSuffix == null) {
             return Integer.toString(index);
         }
         return Integer.toString(index) + idSuffix;

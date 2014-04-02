@@ -140,7 +140,7 @@ public class SpinwaveDataSourceVO extends DataSourceVO<SpinwaveDataSourceVO> {
         if (messageVersion != SpinwaveReceiver.VERSION_1 && messageVersion != SpinwaveReceiver.VERSION_2) {
             response.addContextualMessage("messageVersion", "validate.invalidValue");
         }
-        if (StringUtils.isEmpty(commPortId)) {
+        if (commPortId.isEmpty()) {
             response.addContextualMessage("commPortId", "validate.required");
         }
         for (long addr : sensorAddresses) {

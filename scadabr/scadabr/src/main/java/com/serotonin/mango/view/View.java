@@ -213,7 +213,7 @@ public class View implements Serializable, JsonSerializable {
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(name)) {
+        if (name.isEmpty()) {
             response.addMessage("name", new LocalizableMessageImpl(
                     "validate.required"));
         } else if (StringUtils.isLengthGreaterThan(name, 100)) {
@@ -221,7 +221,7 @@ public class View implements Serializable, JsonSerializable {
                     "validate.notLongerThan", 100));
         }
 
-        if (StringUtils.isEmpty(xid)) {
+        if (xid.isEmpty()) {
             response.addMessage("xid", new LocalizableMessageImpl(
                     "validate.required"));
         } else if (StringUtils.isLengthGreaterThan(xid, 50)) {
@@ -268,7 +268,7 @@ public class View implements Serializable, JsonSerializable {
             throws JsonException {
         if (isNew()) {
             String username = json.getString("user");
-            if (StringUtils.isEmpty(username)) {
+            if (username.isEmpty()) {
                 throw new LocalizableJsonException("emport.error.missingValue",
                         "user");
             }

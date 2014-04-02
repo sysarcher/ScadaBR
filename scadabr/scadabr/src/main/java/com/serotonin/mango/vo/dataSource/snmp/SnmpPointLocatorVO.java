@@ -129,8 +129,9 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         this.trapOnly = trapOnly;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(oid)) {
+        if (oid.isEmpty()) {
             response.addContextualMessage("oid", "validate.required");
         } else {
             oid = oid.trim();

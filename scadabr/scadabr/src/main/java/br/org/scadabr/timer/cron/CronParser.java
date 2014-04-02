@@ -6,6 +6,7 @@
 package br.org.scadabr.timer.cron;
 
 import br.org.scadabr.ImplementMeException;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -85,7 +86,7 @@ public class CronParser {
     private ParseState state;
     private CronField currentCombinedField;
 
-    public CronExpression parse(final String cron) {
+    public CronExpression parse(final String cron) throws ParseException {
         result = new CronExpression();
         sb = new StringBuilder();
         currentField = CronFieldType.MILLISECOND;

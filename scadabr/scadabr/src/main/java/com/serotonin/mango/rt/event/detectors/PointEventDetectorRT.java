@@ -46,7 +46,7 @@ abstract public class PointEventDetectorRT extends SimpleEventDetector implement
 
     protected void raiseEvent(long time, Map<String, Object> context) {
         LocalizableMessage msg;
-        if (!StringUtils.isEmpty(vo.getAlias())) {
+        if (!vo.getAlias().isEmpty()) {
             msg = new LocalizableMessageImpl("common.default", vo.getAlias());
         } else {
             msg = getMessage();

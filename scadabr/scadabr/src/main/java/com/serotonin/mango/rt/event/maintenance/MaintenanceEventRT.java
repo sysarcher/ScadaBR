@@ -1,31 +1,35 @@
 package com.serotonin.mango.rt.event.maintenance;
 
+import br.org.scadabr.ImplementMeException;
 import java.text.ParseException;
 import java.util.Date;
 
 import org.joda.time.DateTime;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.timer.CronTask;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.MaintenanceEventType;
 import com.serotonin.mango.util.timeout.ModelTimeoutClient;
 import com.serotonin.mango.util.timeout.ModelTimeoutTask;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
-import br.org.scadabr.timer.CronTimerTrigger;
 import br.org.scadabr.timer.OneTimeTrigger;
 import br.org.scadabr.timer.TimerTask;
 import br.org.scadabr.timer.TimerTrigger;
+import br.org.scadabr.timer.cron.CronExpression;
+import br.org.scadabr.timer.cron.CronParser;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.GregorianCalendar;
 
 public class MaintenanceEventRT implements ModelTimeoutClient<Boolean> {
 
     private final MaintenanceEventVO vo;
     private MaintenanceEventType eventType;
     private boolean eventActive;
-    private TimerTask activeTask;
-    private TimerTask inactiveTask;
+    private CronTask activeTask;
+    private CronTask inactiveTask;
 
     public MaintenanceEventRT(MaintenanceEventVO vo) {
         this.vo = vo;
@@ -80,16 +84,18 @@ public class MaintenanceEventRT implements ModelTimeoutClient<Boolean> {
 
         if (vo.getScheduleType() != MaintenanceEventVO.TYPE_MANUAL) {
             // Schedule the active event.
-            TimerTrigger activeTrigger = createTrigger(true);
+            final CronExpression activeTrigger = createTrigger(true);
             activeTask = new ModelTimeoutTask<>(activeTrigger, this, true);
+            Common.systemCronPool.schedule(activeTask);
 
             // Schedule the inactive event
-            TimerTrigger inactiveTrigger = createTrigger(false);
+            final CronExpression inactiveTrigger = createTrigger(false);
             inactiveTask = new ModelTimeoutTask<>(inactiveTrigger, this, false);
+            Common.systemCronPool.schedule(inactiveTask);
 
             if (vo.getScheduleType() != MaintenanceEventVO.TYPE_ONCE) {
                 // Check if we are currently active.
-                if (inactiveTrigger.getNextExecutionTime() < activeTrigger.getNextExecutionTime()) {
+                if (inactiveTask.getNextScheduledExecutionTime() < activeTask.getNextScheduledExecutionTime()) {
                     raiseEvent(System.currentTimeMillis());
                 }
             }
@@ -114,85 +120,45 @@ public class MaintenanceEventRT implements ModelTimeoutClient<Boolean> {
         // no op
     }
 
-    private static final String[] weekdays = {"", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
+    public CronExpression createTrigger(boolean activeTrigger) {
+        final int month = activeTrigger ? vo.getActiveMonth() : vo.getInactiveMonth();
+        final int day = activeTrigger ? vo.getActiveDay() : vo.getInactiveDay();
+        final int hour = activeTrigger ? vo.getActiveHour() : vo.getInactiveHour();
+        final int minute = activeTrigger ? vo.getActiveMinute() : vo.getInactiveMinute();
+        final int second = activeTrigger ? vo.getActiveSecond() : vo.getInactiveSecond();
+        switch (vo.getScheduleType()) {
+            case MaintenanceEventVO.TYPE_MANUAL:
+                return null;
 
-    public TimerTrigger createTrigger(boolean activeTrigger) {
-        if (vo.getScheduleType() == MaintenanceEventVO.TYPE_MANUAL) {
-            return null;
-        }
+            case MaintenanceEventVO.TYPE_CRON:
+                try {
+                    if (activeTrigger) {
+                        return new CronParser().parse(vo.getActiveCron());
+                    }
+                    return new CronParser().parse(vo.getInactiveCron());
+                } catch (ParseException e) {
+                    // Should never happen, so wrap and rethrow
+                    throw new ShouldNeverHappenException(e);
+                }
 
-        if (vo.getScheduleType() == MaintenanceEventVO.TYPE_CRON) {
-            try {
+            case MaintenanceEventVO.TYPE_ONCE:
                 if (activeTrigger) {
-                    return new CronTimerTrigger(vo.getActiveCron());
-                }
-                return new CronTimerTrigger(vo.getInactiveCron());
-            } catch (ParseException e) {
-                // Should never happen, so wrap and rethrow
-                throw new ShouldNeverHappenException(e);
-            }
-        }
-
-        if (vo.getScheduleType() == MaintenanceEventVO.TYPE_ONCE) {
-            DateTime dt;
-            if (activeTrigger) {
-                dt = new DateTime(vo.getActiveYear(), vo.getActiveMonth(), vo.getActiveDay(), vo.getActiveHour(),
-                        vo.getActiveMinute(), vo.getActiveSecond(), 0);
-            } else {
-                dt = new DateTime(vo.getInactiveYear(), vo.getInactiveMonth(), vo.getInactiveDay(),
-                        vo.getInactiveHour(), vo.getInactiveMinute(), vo.getInactiveSecond(), 0);
-            }
-            return new OneTimeTrigger(new Date(dt.getMillis()));
-        }
-
-        int month = vo.getActiveMonth();
-        int day = vo.getActiveDay();
-        int hour = vo.getActiveHour();
-        int minute = vo.getActiveMinute();
-        int second = vo.getActiveSecond();
-        if (!activeTrigger) {
-            month = vo.getInactiveMonth();
-            day = vo.getInactiveDay();
-            hour = vo.getInactiveHour();
-            minute = vo.getInactiveMinute();
-            second = vo.getInactiveSecond();
-        }
-
-        StringBuilder expression = new StringBuilder();
-        expression.append(second).append(' ');
-        expression.append(minute).append(' ');
-        if (vo.getScheduleType() == MaintenanceEventVO.TYPE_HOURLY) {
-            expression.append("* * * ?");
-        } else {
-            expression.append(hour).append(' ');
-            if (vo.getScheduleType() == MaintenanceEventVO.TYPE_DAILY) {
-                expression.append("* * ?");
-            } else if (vo.getScheduleType() == MaintenanceEventVO.TYPE_WEEKLY) {
-                expression.append("? * ").append(weekdays[day]);
-            } else {
-                if (day > 0) {
-                    expression.append(day);
-                } else if (day == -1) {
-                    expression.append('L');
+                    return new CronExpression(vo.getActiveYear(), vo.getActiveMonth(), vo.getActiveDay(), vo.getActiveHour(),
+                            vo.getActiveMinute(), vo.getActiveSecond(), 0);
                 } else {
-                    expression.append(-day).append('L');
+                    return new CronExpression(vo.getInactiveYear(), vo.getInactiveMonth(), vo.getInactiveDay(),
+                            vo.getInactiveHour(), vo.getInactiveMinute(), vo.getInactiveSecond(), 0);
                 }
-
-                if (vo.getScheduleType() == MaintenanceEventVO.TYPE_MONTHLY) {
-                    expression.append(" * ?");
-                } else {
-                    expression.append(' ').append(month).append(" ?");
-                }
-            }
+            case MaintenanceEventVO.TYPE_HOURLY:
+                return CronExpression.createPeriodByHour(1, minute, second, 0);
+            case MaintenanceEventVO.TYPE_DAILY:
+                throw new ImplementMeException();
+            case MaintenanceEventVO.TYPE_WEEKLY:
+                throw new ImplementMeException();
+            case MaintenanceEventVO.TYPE_MONTHLY:
+                throw new ImplementMeException();
+            default:
+                throw new RuntimeException();
         }
-
-        CronTimerTrigger cronTrigger;
-        try {
-            cronTrigger = new CronTimerTrigger(expression.toString());
-        } catch (ParseException e) {
-            // Should never happen, so wrap and rethrow
-            throw new ShouldNeverHappenException(e);
-        }
-        return cronTrigger;
     }
 }

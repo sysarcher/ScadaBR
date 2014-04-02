@@ -119,13 +119,13 @@ public class WatchList implements JsonSerializable {
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(name)) {
+        if (name.isEmpty()) {
             response.addMessage("name", new LocalizableMessageImpl("validate.required"));
         } else if (StringUtils.isLengthGreaterThan(name, 50)) {
             response.addMessage("name", new LocalizableMessageImpl("validate.notLongerThan", 50));
         }
 
-        if (StringUtils.isEmpty(xid)) {
+        if (xid.isEmpty()) {
             response.addMessage("xid", new LocalizableMessageImpl("validate.required"));
         } else if (StringUtils.isLengthGreaterThan(xid, 50)) {
             response.addMessage("xid", new LocalizableMessageImpl("validate.notLongerThan", 50));
@@ -160,7 +160,7 @@ public class WatchList implements JsonSerializable {
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String username = json.getString("user");
-        if (StringUtils.isEmpty(username)) {
+        if (username.isEmpty()) {
             throw new LocalizableJsonException("emport.error.missingValue", "user");
         }
         User user = new UserDao().getUser(username);

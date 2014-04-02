@@ -148,7 +148,7 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(valueRegex)) {
+        if (valueRegex.isEmpty()) {
             response.addContextualMessage("valueRegex", "validate.required");
         } else {
             try {
@@ -161,7 +161,7 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             }
         }
 
-        if (dataTypeId == DataTypes.NUMERIC && !StringUtils.isEmpty(valueFormat)) {
+        if (dataTypeId == DataTypes.NUMERIC && !valueFormat.isEmpty()) {
             try {
                 new DecimalFormat(valueFormat);
             } catch (IllegalArgumentException e) {
@@ -173,7 +173,7 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             response.addContextualMessage("dataTypeId", "validate.invalidValue");
         }
 
-        if (!StringUtils.isEmpty(timeRegex)) {
+        if (!timeRegex.isEmpty()) {
             try {
                 Pattern pattern = Pattern.compile(timeRegex);
                 if (pattern.matcher("").groupCount() < 1) {
@@ -183,7 +183,7 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
                 response.addContextualMessage("timeRegex", "common.default", e.getMessage());
             }
 
-            if (StringUtils.isEmpty(timeFormat)) {
+            if (timeFormat.isEmpty()) {
                 response.addContextualMessage("timeFormat", "validate.required");
             } else {
                 try {

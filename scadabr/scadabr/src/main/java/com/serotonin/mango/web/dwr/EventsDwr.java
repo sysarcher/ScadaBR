@@ -160,9 +160,9 @@ public class EventsDwr extends BaseDwr {
 
     private String[] getKeywords(String keywordStr) {
         String[] keywordArr = keywordStr.split("\\s+");
-        List<String> keywords = new ArrayList<String>();
+        List<String> keywords = new ArrayList<>(keywordArr.length);
         for (String s : keywordArr) {
-            if (!StringUtils.isEmpty(s)) {
+            if (!s.isEmpty()) {
                 keywords.add(s);
             }
         }

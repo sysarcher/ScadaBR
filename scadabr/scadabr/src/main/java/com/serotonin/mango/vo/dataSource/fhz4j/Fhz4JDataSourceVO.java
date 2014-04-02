@@ -126,7 +126,7 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
 
-        if (StringUtils.isEmpty(commPortId)) {
+        if (commPortId.isEmpty()) {
             response.addContextualMessage("commPortId", "validate.required");
         }
     }

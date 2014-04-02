@@ -115,7 +115,7 @@ public class PachubeSenderVO extends PublisherVO<PachubePointVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
 
-        if (StringUtils.isEmpty(apiKey)) {
+        if (apiKey.isEmpty()) {
             response.addContextualMessage("apiKey", "validate.required");
         }
         if (timeoutSeconds <= 0) {
@@ -126,7 +126,7 @@ public class PachubeSenderVO extends PublisherVO<PachubePointVO> {
         }
 
         for (PachubePointVO point : points) {
-            if (StringUtils.isEmpty(point.getDataStreamId())) {
+            if (point.getDataStreamId().isEmpty()) {
                 response.addContextualMessage("points", "validate.pachube.dataStreadIdRequired");
                 break;
             }

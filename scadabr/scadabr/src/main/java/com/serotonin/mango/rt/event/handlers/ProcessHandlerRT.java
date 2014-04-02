@@ -43,7 +43,7 @@ public class ProcessHandlerRT extends EventHandlerRT {
     }
 
     private void executeCommand(String command) {
-        if (StringUtils.isEmpty(command)) {
+        if (command.isEmpty()) {
             return;
         }
         ProcessWorkItem.queueProcess(command);

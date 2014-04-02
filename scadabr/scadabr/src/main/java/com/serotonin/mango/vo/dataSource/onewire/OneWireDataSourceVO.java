@@ -150,7 +150,7 @@ public class OneWireDataSourceVO extends DataSourceVO<OneWireDataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
 
-        if (StringUtils.isEmpty(commPortId)) {
+        if (commPortId.isEmpty()) {
             response.addContextualMessage("commPortId", "validate.required");
         }
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {

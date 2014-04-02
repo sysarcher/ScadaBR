@@ -564,7 +564,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(xid)) {
+        if (xid.isEmpty()) {
             response.addContextualMessage("xid", "validate.required");
         } else if (StringUtils.isLengthGreaterThan(xid, 50)) {
             response.addMessage("xid", new LocalizableMessageImpl("validate.notLongerThan", 50));
@@ -572,7 +572,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             response.addContextualMessage("xid", "validate.xidUsed");
         }
 
-        if (StringUtils.isEmpty(name)) {
+        if (name.isEmpty()) {
             response.addContextualMessage("name", "validate.required");
         }
 
@@ -614,7 +614,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             response.addContextualMessage("discardHighLimit", "validate.greaterThanDiscardLow");
         }
 
-        if (!StringUtils.isEmpty(chartColour)) {
+        if (!chartColour.isEmpty()) {
             try {
                 ColorUtils.toColor(chartColour);
             } catch (InvalidArgumentException e) {
@@ -919,7 +919,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
                 JsonObject pedObject = jv.toJsonObject();
 
                 String pedXid = pedObject.getString("xid");
-                if (StringUtils.isEmpty(pedXid)) {
+                if (pedXid.isEmpty()) {
                     throw new LocalizableJsonException("emport.error.ped.missingAttr", "xid");
                 }
 

@@ -163,7 +163,7 @@ public class GalilDataSourceVO extends DataSourceVO<GalilDataSourceVO> {
         if (updatePeriods <= 0) {
             response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
         }
-        if (StringUtils.isEmpty(host)) {
+        if (host.isEmpty()) {
             response.addContextualMessage("host", "validate.required");
         }
         if (port <= 0 || port > 0xffff) {

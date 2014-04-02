@@ -117,7 +117,7 @@ public class UsersDwr extends BaseDwr {
             user = userDao.getUser(id);
         }
         user.setUsername(username);
-        if (!StringUtils.isEmpty(password)) {
+        if (!password.isEmpty()) {
             user.setPassword(Common.encrypt(password));
         }
         user.setEmail(email);
@@ -174,7 +174,7 @@ public class UsersDwr extends BaseDwr {
 
         UserDao userDao = new UserDao();
         User updateUser = userDao.getUser(id);
-        if (!StringUtils.isEmpty(password)) {
+        if (!password.isEmpty()) {
             updateUser.setPassword(Common.encrypt(password));
         }
         updateUser.setEmail(email);

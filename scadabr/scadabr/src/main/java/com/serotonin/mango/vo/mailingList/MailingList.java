@@ -134,7 +134,7 @@ public class MailingList extends EmailRecipient {
 
     public void validate(DwrResponseI18n response) {
         // Check that required fields are present.
-        if (StringUtils.isEmpty(name)) {
+        if (name.isEmpty()) {
             response.addContextualMessage("name", "mailingLists.validate.nameRequired");
         }
 

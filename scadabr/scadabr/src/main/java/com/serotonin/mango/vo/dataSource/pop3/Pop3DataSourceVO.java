@@ -144,13 +144,13 @@ public class Pop3DataSourceVO extends DataSourceVO<Pop3DataSourceVO> {
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (StringUtils.isEmpty(pop3Server)) {
+        if (pop3Server.isEmpty()) {
             response.addContextualMessage("pop3Server", "validate.required");
         }
-        if (StringUtils.isEmpty(username)) {
+        if (username.isEmpty()) {
             response.addContextualMessage("username", "validate.required");
         }
-        if (StringUtils.isEmpty(password)) {
+        if (password.isEmpty()) {
             response.addContextualMessage("password", "validate.required");
         }
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {

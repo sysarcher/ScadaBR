@@ -41,6 +41,7 @@ import br.org.scadabr.timer.AbstractTimer;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.OneTimeTrigger;
 import br.org.scadabr.timer.TimerTask;
+import br.org.scadabr.timer.cron.CronParser;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
@@ -218,7 +219,7 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
         long timeout;
         if (updateEventId == MetaPointLocatorVO.UPDATE_EVENT_CRON) {
             try {
-                CronExpression ce = new CronExpression(vo.getUpdateCronPattern());
+                CronExpression ce = new CronParser().parse(vo.getUpdateCronPattern());
                 timeout = ce.getNextValidTimeAfter(new Date(time)).getTime();
             } catch (ParseException e) {
                 throw new ShouldNeverHappenException(e);

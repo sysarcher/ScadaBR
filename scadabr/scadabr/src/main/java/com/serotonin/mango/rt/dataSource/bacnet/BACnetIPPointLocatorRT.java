@@ -64,7 +64,7 @@ public class BACnetIPPointLocatorRT extends PointLocatorRT {
     }
 
     public Network getNetwork() {
-        if (!StringUtils.isEmpty(vo.getNetworkAddress())) {
+        if (!vo.getNetworkAddress().isEmpty()) {
             return new Network(vo.getNetworkNumber(), vo.getNetworkAddress());
         }
         return null;

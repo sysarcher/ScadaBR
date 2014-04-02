@@ -6,19 +6,41 @@
 package br.org.scadabr.web.util;
 
 import br.org.scadabr.ImplementMeException;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.validation.BindException;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.AbstractCommandController;
 
 /**
  *
  * @author aploese
  */
-public abstract class PaginatedListController {
+@Deprecated
+public abstract class PaginatedListController extends AbstractCommandController {
 
-    protected abstract PaginatedData getData(HttpServletRequest request, PagingDataForm paging, BindException errors) throws Exception;
+    private String viewName;
 
-    protected Object getCommand(HttpServletRequest request) {
-        throw new ImplementMeException();
+    public void setViewName(String viewName) {
+        this.viewName = viewName;
     }
 
+    @Override
+    protected ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object command, BindException errors)
+            throws Exception {
+        PagingDataForm paging = (PagingDataForm) command;
+
+        PaginatedData data = getData(request, paging, paging.getOrderByClause(), paging.getOffset(), paging.getItemsPerPage(), errors);
+
+        paging.setData(data.getData());
+        paging.setNumberOfItems(data.getRowCount());
+
+        Map model = errors.getModel();
+        model.put(getCommandName(), command);
+
+        return new ModelAndView(viewName, model);
+    }
+
+    protected abstract PaginatedData getData(HttpServletRequest request, PagingDataForm paging, String orderByClause, int offset, int limit, BindException errors) throws Exception;
 }

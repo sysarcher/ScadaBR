@@ -94,7 +94,7 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(parameterName)) {
+        if (parameterName.isEmpty()) {
             response.addContextualMessage("parameterName", "validate.required");
         }
         if (!DataTypes.CODES.isValidId(dataTypeId)) {

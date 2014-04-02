@@ -403,15 +403,15 @@ public class User implements SetPointSource, HttpSessionBindingListener,
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(username)) {
+        if (username.isEmpty()) {
             response.addMessage("username", new LocalizableMessageImpl(
                     "validate.required"));
         }
-        if (StringUtils.isEmpty(email)) {
+        if (email.isEmpty()) {
             response.addMessage("email", new LocalizableMessageImpl(
                     "validate.required"));
         }
-        if (id == Common.NEW_ID && StringUtils.isEmpty(password)) {
+        if (id == Common.NEW_ID && password.isEmpty()) {
             response.addMessage("password", new LocalizableMessageImpl(
                     "validate.required"));
         }

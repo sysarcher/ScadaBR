@@ -308,7 +308,7 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
             response.addContextualMessage("trapPort", "validate.invalidValue");
         }
 
-        if (StringUtils.isEmpty(host)) {
+        if (host.isEmpty()) {
             response.addContextualMessage("host", "validate.required");
         }
 

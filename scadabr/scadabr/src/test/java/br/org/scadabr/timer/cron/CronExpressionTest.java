@@ -70,7 +70,7 @@ public class CronExpressionTest {
      * Test of calcNextValidTime method, of class CronExpression.
      */
     @Test
-    public void testCalcNextValidTime_ANY() {
+    public void testCalcNextValidTime_ANY() throws Exception {
         System.out.println("calcNextValidTime");
         CronExpression instance = cp.parse("* * * * * * * *");
         Calendar c = getCalendar();
@@ -90,7 +90,7 @@ public class CronExpressionTest {
     }
 
     @Test
-    public void testCalcNextValidTime_Sec() {
+    public void testCalcNextValidTime_Sec() throws Exception {
         System.out.println("calcNextValidTime");
         CronExpression instance = cp.parse("0 5-25/7 * * * * * *");
         Calendar c = getCalendar();
@@ -116,7 +116,7 @@ public class CronExpressionTest {
     }
 
     @Test
-    public void testCalc_30() {
+    public void testCalc_30() throws Exception {
         System.out.println("calcNextValidTime");
         CronExpression instance = cp.parse("0 0 0 12 30 * * *");
         Calendar c = getCalendar();
@@ -139,7 +139,7 @@ public class CronExpressionTest {
     }
 
     @Test
-    public void testCalc_31() {
+    public void testCalc_31() throws Exception {
         System.out.println("calcNextValidTime");
         CronExpression instance = cp.parse("0 0 0 15 31 * * *");
         Calendar c = getCalendar();
@@ -174,7 +174,7 @@ public class CronExpressionTest {
     }
 
     @Test
-    public void testCalc_29_FEB() {
+    public void testCalc_29_FEB() throws Exception {
         System.out.println("calcNextValidTime");
         CronExpression instance = cp.parse("0 0 0 12 29 FEB * *");
         Calendar c = getCalendar();
@@ -192,7 +192,7 @@ public class CronExpressionTest {
     }
 
     @Test
-    public void testCalc_Range_28_TO_31() {
+    public void testCalc_Range_28_TO_31() throws Exception {
         System.out.println("calcNextValidTime");
         CronExpression instance = cp.parse("0 0 0 21 28-31 * * *");
         Calendar c = getCalendar();
@@ -244,7 +244,7 @@ public class CronExpressionTest {
     
     @Test
     @Ignore("Currently No ranges in day, month and year")
-    public void testCalc_Range_28_29_30_31() {
+    public void testCalc_Range_28_29_30_31() throws Exception {
         CronExpression instance = cp.parse("0 0 0 21 28,29,30,31 * * *");
         Calendar c = getCalendar();
 //        instance.getNextTimestamp().setTimeZone(tz);
@@ -263,7 +263,7 @@ public class CronExpressionTest {
     }
 
     @Test
-    public void testCalc_Range_28_TO_29_FEB() {
+    public void testCalc_Range_28_TO_29_FEB() throws Exception {
         System.out.println("calcNextValidTime");
         CronExpression instance = cp.parse("0 0 0 21 28-29 FEB * *");
         Calendar c = getCalendar();
@@ -291,7 +291,7 @@ public class CronExpressionTest {
     
     @Test
     @Ignore("No ranges in day, month and year")
-    public void testCalc_Range_28_29_FEB() {
+    public void testCalc_Range_28_29_FEB() throws Exception {
         CronExpression instance = cp.parse("0 0 0 21 28,29 FEB * *");
         Calendar c = getCalendar();
 //        instance.getNextTimestamp().setTimeZone(tz);
@@ -312,7 +312,7 @@ public class CronExpressionTest {
 
     @Test
     @Ignore
-    public void testCalc_Last_Day_Of_Month() {
+    public void testCalc_Last_Day_Of_Month() throws Exception {
         System.out.println("calcNextValidTime");
         CronExpression instance = cp.parse("0 0 0 12 L * * *");
         Calendar c = getCalendar();
@@ -338,7 +338,7 @@ public class CronExpressionTest {
 
     @Test
     @Ignore
-    public void testCalc_WeekDay() {
+    public void testCalc_WeekDay() throws Exception {
         System.out.println("calcNextValidTime");
         CronExpression instance = cp.parse("0 0 0 12 * * SUN *");
         Calendar c = getCalendar();
@@ -364,7 +364,7 @@ public class CronExpressionTest {
 
     @Test
     @Ignore
-    public void testCalc_WorkDay() {
+    public void testCalc_WorkDay() throws Exception {
         //cron # ???
         System.out.println("calcNextValidTime");
         CronExpression instance = cp.parse("0 0 0 12 29W * * *");
@@ -390,7 +390,7 @@ public class CronExpressionTest {
     }
 
     @Test
-    public void testCalc_Ranges() {
+    public void testCalc_Ranges() throws Exception {
         System.out.println("calcNextValidTime");
         CronExpression instance = cp.parse("0 0 0-29/3,30-59/5 * * * * *");
         Calendar c = getCalendar();

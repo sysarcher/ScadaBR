@@ -12,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.timer.CronTask;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -25,7 +26,6 @@ import com.serotonin.mango.vo.hierarchy.PointHierarchyEventDispatcher;
 import com.serotonin.mango.vo.hierarchy.PointHierarchyListener;
 import com.serotonin.mango.vo.publish.persistent.PersistentPointVO;
 import com.serotonin.mango.vo.publish.persistent.PersistentSenderVO;
-import br.org.scadabr.timer.CronTimerTrigger;
 import br.org.scadabr.timer.TimerTask;
 import br.org.scadabr.timer.TimerTrigger;
 import br.org.scadabr.util.StringUtils;
@@ -83,7 +83,7 @@ class PersistentSendThread extends SendThread {
             }
 
             try {
-                syncTimer = new SyncTimer(new CronTimerTrigger(pattern));
+                syncTimer = new SyncTimer(pattern);
             } catch (ParseException e) {
                 throw new ShouldNeverHappenException(e);
             }
@@ -299,7 +299,7 @@ class PersistentSendThread extends SendThread {
             //
             // Points
             String prefix = "";
-            if (!StringUtils.isEmpty(publisher.vo.getXidPrefix())) {
+            if (!publisher.vo.getXidPrefix().isEmpty()) {
                 prefix = publisher.vo.getXidPrefix();
             }
 
@@ -369,14 +369,14 @@ class PersistentSendThread extends SendThread {
         }
     }
 
-    class SyncTimer extends TimerTask {
+    class SyncTimer extends CronTask {
 
-        public SyncTimer(TimerTrigger trigger) {
-            super(trigger);
+        public SyncTimer(String pattern) throws ParseException {
+            super(pattern);
         }
 
         @Override
-        protected void run(long runtime) {
+        public void run() {
             startSync();
         }
     }

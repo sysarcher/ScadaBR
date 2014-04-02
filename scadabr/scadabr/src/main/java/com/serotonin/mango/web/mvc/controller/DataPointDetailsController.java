@@ -57,7 +57,7 @@ public class DataPointDetailsController extends ParameterizableViewController {
         String idStr = request.getParameter("dpid");
         DataPointVO point = null;
 
-        if (StringUtils.isEmpty(idStr)) {
+        if (idStr.isEmpty()) {
             // Check for pedid (point event detector id)
             String pedStr = request.getParameter("pedid");
             if (pedStr == null) {

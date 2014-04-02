@@ -54,7 +54,7 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
 
     @Override
     public boolean isSettable() {
-        return !StringUtils.isEmpty(updateStatement);
+        return !updateStatement.isEmpty();
     }
 
     @Override
@@ -94,6 +94,7 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
         this.updateStatement = updateStatement;
     }
 
+    @Override
     public int getDataTypeId() {
         return dataTypeId;
     }
@@ -102,11 +103,12 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
         this.dataTypeId = dataTypeId;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
         if (!DataTypes.CODES.isValidId(dataTypeId)) {
             response.addContextualMessage("dataTypeId", "validate.invalidValue");
         }
-        if (StringUtils.isEmpty(fieldName) && StringUtils.isEmpty(updateStatement)) {
+        if (fieldName.isEmpty() && updateStatement.isEmpty()) {
             response.addContextualMessage("fieldName", "validate.fieldName");
         }
     }

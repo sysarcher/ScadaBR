@@ -336,7 +336,7 @@ function toggleDiv(elem) {
 		<td class="formField"><input type="text" id="updatePeriods"
 			value="${dataSource.updatePeriods}" class="formShort" /> <sbt:select
 			id="updatePeriodType" value="${dataSource.updatePeriodType}">
-			<tag:timePeriodOptions sbt="true" ms="true" s="true" min="true"
+			<tag:timePeriodOptions sst="true" ms="true" s="true" min="true"
 				h="true" />
 		</sbt:select></td>
 	</tr>

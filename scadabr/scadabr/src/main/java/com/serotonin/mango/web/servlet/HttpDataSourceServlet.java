@@ -182,7 +182,7 @@ public class HttpDataSourceServlet extends HttpServlet {
     }
 
     private long stringToTime(String s) {
-        if (StringUtils.isEmpty(s)) {
+        if (s.isEmpty()) {
             return 0;
         }
 

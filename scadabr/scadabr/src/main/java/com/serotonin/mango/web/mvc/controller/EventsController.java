@@ -36,10 +36,8 @@ import br.org.scadabr.web.util.PagingDataForm;
 
 public class EventsController extends PaginatedListController {
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected PaginatedData getData(HttpServletRequest request, PagingDataForm paging, BindException errors)
-            throws Exception {
+    protected PaginatedData getData(HttpServletRequest request, PagingDataForm paging, String orderByClause, int offset, int limit, BindException errors) throws Exception {
 //        List<EventInstance> data;
         ResourceBundle bundle = ControllerUtils.getResourceBundle(request);
 //        if (((EventsForm)paging).isInactive()) {
@@ -66,4 +64,5 @@ public class EventsController extends PaginatedListController {
         }
         Collections.sort(data, comp);
     }
+
 }

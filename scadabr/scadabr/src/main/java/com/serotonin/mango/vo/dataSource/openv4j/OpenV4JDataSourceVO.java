@@ -148,7 +148,7 @@ public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
 
-        if (StringUtils.isEmpty(commPortId)) {
+        if (commPortId.isEmpty()) {
             response.addContextualMessage("commPortId", "validate.required");
         }
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {

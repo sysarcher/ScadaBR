@@ -183,11 +183,11 @@ public class SqlDataSourceVO extends DataSourceVO<SqlDataSourceVO> {
             response.addContextualMessage("updatePeriods",
                     "validate.greaterThanZero");
         }
-        if (StringUtils.isEmpty(driverClassname)) {
+        if (driverClassname.isEmpty()) {
             response.addContextualMessage("driverClassname",
                     "validate.required");
         }
-        if (StringUtils.isEmpty(connectionUrl)) {
+        if (connectionUrl.isEmpty()) {
             response.addContextualMessage("connectionUrl", "validate.required");
         }
     }

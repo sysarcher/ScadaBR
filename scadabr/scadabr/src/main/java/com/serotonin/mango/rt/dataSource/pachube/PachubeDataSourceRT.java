@@ -176,7 +176,7 @@ public class PachubeDataSourceRT extends PollingDataSource {
 
                     // Get the time.
                     long valueTime;
-                    if (StringUtils.isEmpty(dataValue.getTimestamp())) {
+                    if (dataValue.getTimestamp().isEmpty()) {
                         valueTime = time;
                     } else {
                         valueTime = sdf.parse(dataValue.getTimestamp()).getTime();

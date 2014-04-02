@@ -101,7 +101,7 @@ public class HttpReceiverDataSourceRT extends EventDataSource implements HttpMul
 
                         MangoValue value;
                         if (locator.getDataTypeId() == DataTypes.BINARY
-                                && !StringUtils.isEmpty(locator.getBinary0Value())) {
+                                && !locator.getBinary0Value().isEmpty()) {
                             if (valueStr.equalsIgnoreCase(locator.getBinary0Value())) {
                                 value = BinaryValue.ZERO;
                             } else {

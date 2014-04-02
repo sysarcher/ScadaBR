@@ -5,7 +5,7 @@
  */
 package br.org.scadabr.monitor;
 
-import br.org.scadabr.ImplementMeException;
+import java.util.Objects;
 
 /**
  *
@@ -13,16 +13,25 @@ import br.org.scadabr.ImplementMeException;
  */
 public class IntegerMonitor {
 
-    public IntegerMonitor(String batchWriteBehindENTRIES_MONITOR, Object object) {
-        throw new ImplementMeException();
+    private int value;
+    private final String id;
+    private final String name;    
+    
+    public IntegerMonitor(String id, String name) {
+        this.id= id;
+        this.name = name;
     }
 
-    public void setValue(int size) {
-        throw new ImplementMeException();
+    public void setValue(int value) {
+        this.value  = value;
     }
 
     public int getValue() {
-        throw new ImplementMeException();
+        return value;
+    }
+
+    String getId() {
+        return id;
     }
 
 }

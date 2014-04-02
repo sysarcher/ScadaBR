@@ -238,7 +238,7 @@
         <td class="formField">
           <input type="text" id="updatePeriods" value="${dataSource.updatePeriods}" class="formShort"/>
           <sbt:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
-            <tag:timePeriodOptions sbt="true" s="true" min="true" h="true" d="true" w="true" mon="true"/>
+            <tag:timePeriodOptions sst="true" s="true" min="true" h="true" d="true" w="true" mon="true"/>
           </sbt:select>
       </td>
       </tr>

@@ -12,6 +12,8 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
+import br.org.scadabr.timer.cron.CronExpression;
+import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.event.AlarmLevels;
@@ -22,7 +24,6 @@ import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import br.org.scadabr.timer.CronTimerTrigger;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
@@ -43,7 +44,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     public static final int TYPE_ONCE = 7;
     public static final int TYPE_CRON = 8;
 
-    public static ExportCodes TYPE_CODES = new ExportCodes();
+    public final static ExportCodes TYPE_CODES = new ExportCodes();
 
     static {
         TYPE_CODES.addElement(TYPE_MANUAL, "MANUAL", "maintenanceEvents.type.manual");
@@ -106,6 +107,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
         return id == Common.NEW_ID;
     }
 
+    @Override
     public int getId() {
         return id;
     }
@@ -305,7 +307,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     public LocalizableMessage getDescription() {
         LocalizableMessage message;
 
-        if (!StringUtils.isEmpty(alias)) {
+        if (!alias.isEmpty()) {
             message = new LocalizableMessageImpl("common.default", alias);
         } else if (scheduleType == TYPE_MANUAL) {
             message = new LocalizableMessageImpl("maintenanceEvents.schedule.manual", dataSourceName);
@@ -444,13 +446,13 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
         // Check that cron patterns are ok.
         if (scheduleType == TYPE_CRON) {
             try {
-                new CronTimerTrigger(activeCron);
+                new CronParser().parse(activeCron);
             } catch (Exception e) {
                 response.addContextualMessage("activeCron", "maintenanceEvents.validate.activeCron", e.getMessage());
             }
 
             try {
-                new CronTimerTrigger(inactiveCron);
+                new CronParser().parse(inactiveCron);
             } catch (Exception e) {
                 response.addContextualMessage("inactiveCron", "maintenanceEvents.validate.inactiveCron", e.getMessage());
             }

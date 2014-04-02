@@ -44,8 +44,9 @@ public class CronField {
         return this;
     }
 
-    void setIncrement(int value) {
+    CronField setIncrement(int value) {
         values[2] = value;
+        return this;
     }
 
     void addChild(CronField cf) {

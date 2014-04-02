@@ -30,6 +30,7 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
+import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.schedule.ScheduledEventRT;
@@ -38,7 +39,6 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
-import br.org.scadabr.timer.CronTimerTrigger;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
@@ -67,7 +67,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     public static final int TYPE_ONCE = 6;
     public static final int TYPE_CRON = 7;
 
-    public static ExportCodes TYPE_CODES = new ExportCodes();
+    public final static ExportCodes TYPE_CODES = new ExportCodes();
 
     static {
         TYPE_CODES.addElement(TYPE_HOURLY, "HOURLY", "scheduledEvents.type.hour");
@@ -139,7 +139,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     public LocalizableMessage getDescription() {
         LocalizableMessage message;
 
-        if (!StringUtils.isEmpty(alias)) {
+        if (!alias.isEmpty()) {
             message = new LocalizableMessageImpl("common.default", alias);
         } else if (scheduleType == TYPE_ONCE) {
             if (returnToNormal) {
@@ -297,14 +297,14 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         // Check that cron patterns are ok.
         if (scheduleType == TYPE_CRON) {
             try {
-                new CronTimerTrigger(activeCron);
+                new CronParser().parse(activeCron);
             } catch (Exception e) {
                 response.addContextualMessage("activeCron", "scheduledEvents.validate.activeCron", e.getMessage());
             }
 
             if (returnToNormal) {
                 try {
-                    new CronTimerTrigger(inactiveCron);
+                    new CronParser().parse(inactiveCron);
                 } catch (Exception e) {
                     response.addContextualMessage("inactiveCron", "scheduledEvents.validate.inactiveCron",
                             e.getMessage());
@@ -548,12 +548,14 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     // / Serialization
     // /
     //
+    @Override
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
         map.put("alarmLevel", AlarmLevels.CODES.getCode(alarmLevel));
         map.put("scheduleType", TYPE_CODES.getCode(scheduleType));
     }
 
+    @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("alarmLevel");
         if (text != null) {

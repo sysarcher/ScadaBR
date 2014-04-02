@@ -94,12 +94,12 @@ public class LoginController extends SimpleFormController {
         LoginForm login = (LoginForm) command;
 
         // Make sure there is a username
-        if (StringUtils.isEmpty(login.getUsername())) {
+        if (login.getUsername().isEmpty()) {
             ValidationUtils.rejectValue(errors, "username", "login.validation.noUsername");
         }
 
         // Make sure there is a password
-        if (StringUtils.isEmpty(login.getPassword())) {
+        if (login.getPassword().isEmpty()) {
             ValidationUtils.rejectValue(errors, "password", "login.validation.noPassword");
         }
     }
@@ -173,7 +173,7 @@ public class LoginController extends SimpleFormController {
             if (user.isFirstLogin()) {
                 return new ModelAndView(new RedirectView(newUserUrl));
             }
-            if (!StringUtils.isEmpty(user.getHomeUrl())) {
+            if (!user.getHomeUrl().isEmpty()) {
                 return new ModelAndView(new RedirectView(user.getHomeUrl()));
             }
         }

@@ -118,7 +118,7 @@ public class NmeaDataSourceVO extends DataSourceVO<NmeaDataSourceVO> {
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (StringUtils.isEmpty(commPortId)) {
+        if (commPortId.isEmpty()) {
             response.addContextualMessage("commPortId", "validate.required");
         }
         if (resetTimeout < 2) {

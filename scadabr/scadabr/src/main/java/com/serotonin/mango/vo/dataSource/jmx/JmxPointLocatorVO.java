@@ -71,7 +71,7 @@ public class JmxPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
     public LocalizableMessage getConfigurationDescription() {
         StringBuilder sb = new StringBuilder();
         sb.append(objectName).append(" > ").append(attributeName);
-        if (!StringUtils.isEmpty(compositeItemName)) {
+        if (!compositeItemName.isEmpty()) {
             sb.append(" > ").append(compositeItemName);
         }
         return new LocalizableMessageImpl("common.default", sb.toString());
@@ -116,10 +116,10 @@ public class JmxPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
 
     @Override
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isEmpty(objectName)) {
+        if (objectName.isEmpty()) {
             response.addContextualMessage("objectName", "validate.required");
         }
-        if (StringUtils.isEmpty(attributeName)) {
+        if (attributeName.isEmpty()) {
             response.addContextualMessage("attributeName", "validate.required");
         }
         if (!DataTypes.CODES.isValidId(dataTypeId)) {

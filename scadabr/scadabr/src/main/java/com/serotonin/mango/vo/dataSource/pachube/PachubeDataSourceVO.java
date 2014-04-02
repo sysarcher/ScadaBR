@@ -144,7 +144,7 @@ public class PachubeDataSourceVO extends DataSourceVO<PachubeDataSourceVO> {
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (StringUtils.isEmpty(apiKey)) {
+        if (apiKey.isEmpty()) {
             response.addContextualMessage("apiKey", "validate.required");
         }
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {

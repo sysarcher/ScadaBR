@@ -15,18 +15,24 @@ import java.util.Properties;
 public class StringUtils {
 
     @Deprecated //Use Arrays.???
-    public static boolean isEmpty(int[] name) {
+    public static boolean isEmpty(int[] values) {
         throw new ImplementMeException();
     }
 
-    public static boolean isEmpty(String name) {
-        throw new ImplementMeException();
+    public static String pad(String s, char c, int length) {
+        if (s.length() >= length) {
+            return s;
+        }
+        StringBuilder sb = new StringBuilder(length);
+        final int amount = length - s.length();
+        for (int i = 0; i < amount; i++) {
+            sb.append(c);
+        }
+        sb.append(s);
+        return sb.toString();
     }
 
-    public static String pad(String toString, char c, int i) {
-        throw new ImplementMeException();
-    }
-
+    @Deprecated
     public static boolean isLengthGreaterThan(String username, int i) {
         throw new ImplementMeException();
     }

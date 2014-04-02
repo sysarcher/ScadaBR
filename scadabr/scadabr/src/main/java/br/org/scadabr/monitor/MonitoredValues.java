@@ -5,20 +5,25 @@
  */
 package br.org.scadabr.monitor;
 
-import br.org.scadabr.ImplementMeException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * @author aploese
  */
 public class MonitoredValues {
-
-    public void addIfMissingStatMonitor(IntegerMonitor ENTRIES_MONITOR) {
-        throw new ImplementMeException();
-    }
-
-    public Object getValueMonitor(String s) {
-        throw new ImplementMeException();
-    }
+   
+    private final Map<String, IntegerMonitor> monitors = new HashMap<>();
+  
+  public void addIfMissingStatMonitor(IntegerMonitor monitor)
+  {
+      monitors.put(monitor.getId(), monitor);
+  }
+  
+  public IntegerMonitor getValueMonitor(String id)
+  {
+      return monitors.get(id);
+  }
 
 }

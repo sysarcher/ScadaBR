@@ -11,6 +11,7 @@ import br.org.scadabr.ImplementMeException;
  *
  * @author aploese
  */
+@Deprecated
 public abstract class TimerTask implements Runnable {
 
     public TimerTask(TimerTrigger trigger) {

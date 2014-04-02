@@ -107,9 +107,9 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
 
         int targetDataType = targetPoint.getVO().getPointLocator().getDataTypeId();
 
-        if (!StringUtils.isEmpty(vo.getScript())) {
+        if (!vo.getScript().isEmpty()) {
             ScriptExecutor scriptExecutor = new ScriptExecutor();
-            Map<String, IDataPoint> context = new HashMap<String, IDataPoint>();
+            Map<String, IDataPoint> context = new HashMap<>();
             DataPointRT source = Common.ctx.getRuntimeManager().getDataPoint(vo.getSourcePointId());
             context.put(CONTEXT_VAR_NAME, source);
 

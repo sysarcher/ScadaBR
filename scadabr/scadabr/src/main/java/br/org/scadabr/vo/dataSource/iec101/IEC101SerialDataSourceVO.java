@@ -55,7 +55,7 @@ public class IEC101SerialDataSourceVO extends
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (StringUtils.isEmpty(commPortId)) {
+        if (commPortId.isEmpty()) {
             response.addContextualMessage("commPortId", "validate.required");
         }
         if (baudRate <= 0) {

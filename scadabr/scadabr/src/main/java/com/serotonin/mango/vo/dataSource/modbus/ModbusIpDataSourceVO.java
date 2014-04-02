@@ -153,7 +153,7 @@ public class ModbusIpDataSourceVO extends ModbusDataSourceVO<ModbusIpDataSourceV
         if (transportType == null) {
             response.addContextualMessage("transportType", "validate.required");
         }
-        if (StringUtils.isEmpty(host)) {
+        if (host.isEmpty()) {
             response.addContextualMessage("host", "validate.required");
         }
         if (port <= 0 || port > 0xffff) {

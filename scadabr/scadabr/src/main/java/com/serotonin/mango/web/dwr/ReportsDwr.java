@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import br.org.scadabr.InvalidArgumentException;
+import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.MailingListDao;
@@ -34,15 +35,13 @@ import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.vo.report.ReportInstance;
-import com.serotonin.mango.vo.report.ReportJob;
+import com.serotonin.mango.vo.report.ReportTask;
 import com.serotonin.mango.vo.report.ReportPointVO;
 import com.serotonin.mango.vo.report.ReportVO;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
-import br.org.scadabr.timer.CronTimerTrigger;
 import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.l10n.Localizer;
 
 /**
@@ -99,7 +98,7 @@ public class ReportsDwr extends BaseDwr {
             if (schedulePeriod == ReportVO.SCHEDULE_CRON) {
                 // Check the cron pattern.
                 try {
-                    new CronTimerTrigger(scheduleCron);
+                    new CronParser().parse(scheduleCron);
                 } catch (Exception e) {
                     response.addContextualMessage("scheduleCron", "reports.validate.cron", e.getMessage());
                 }
@@ -168,7 +167,7 @@ public class ReportsDwr extends BaseDwr {
         reportDao.saveReport(report);
 
         // Conditionally schedule the report.
-        ReportJob.scheduleReportJob(report);
+        ReportTask.scheduleReportJob(report);
 
         // Send back the report id in case this was new.
         response.addData("reportId", report.getId());
@@ -228,14 +227,14 @@ public class ReportsDwr extends BaseDwr {
         ReportVO report = reportDao.getReport(id);
         if (report != null) {
             Permissions.ensureReportPermission(Common.getUser(), report);
-            ReportJob.unscheduleReportJob(report);
+            ReportTask.unscheduleReportJob(report);
             reportDao.deleteReport(id);
         }
     }
 
     private void validateData(DwrResponseI18n response, String name, List<ReportPointVO> points, int dateRangeType,
             int relativeDateType, int previousPeriodCount, int pastPeriodCount) {
-        if (StringUtils.isEmpty(name)) {
+        if (name.isEmpty()) {
             response.addContextualMessage("name", "reports.validate.required");
         }
         if (StringUtils.isLengthGreaterThan(name, 100)) {
@@ -264,7 +263,7 @@ public class ReportsDwr extends BaseDwr {
             Permissions.ensureDataPointReadPermission(user, dataPointDao.getDataPoint(point.getPointId()));
 
             try {
-                if (!StringUtils.isEmpty(point.getColour())) {
+                if (!point.getColour().isEmpty()) {
                     ColorUtils.toColor(point.getColour());
                 }
             } catch (InvalidArgumentException e) {

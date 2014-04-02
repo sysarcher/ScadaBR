@@ -57,7 +57,7 @@
     <td class="formLabelRequired"><fmt:message key="dsEdit.vmstat.outputScale"/></td>
     <td class="formField">
       <sbt:select id="outputScale" value="${dataSource.outputScale}">
-        <tag:exportCodesOptions sbt="true" optionList="<%= VMStatDataSourceVO.OUTPUT_SCALE_CODES.getIdKeys() %>"/>
+        <tag:exportCodesOptions sst="true" optionList="<%= VMStatDataSourceVO.OUTPUT_SCALE_CODES.getIdKeys() %>"/>
       </sbt:select>
     </td>
   </tr>

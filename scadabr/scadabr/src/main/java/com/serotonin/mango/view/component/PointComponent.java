@@ -111,7 +111,7 @@ abstract public class PointComponent extends ViewComponent {
     }
 
     public String getName() {
-        if (!StringUtils.isEmpty(nameOverride)) {
+        if (nameOverride != null) {
             return nameOverride;
         }
         if (dataPoint == null) {

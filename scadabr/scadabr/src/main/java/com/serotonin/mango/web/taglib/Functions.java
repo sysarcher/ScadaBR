@@ -53,7 +53,7 @@ public class Functions {
             return "-";
         }
         String result = point.getTextRenderer().getText(pointValue, TextRenderer.HINT_RAW);
-        if (!StringUtils.isEmpty(result)) {
+        if (!result.isEmpty()) {
             return encodeDQuot(result);
         }
         return result;
@@ -87,14 +87,14 @@ public class Functions {
 
         if (text != null && detectOverflow && text.length() > 30) {
             text = encodeDQuot(text);
-            if (StringUtils.isEmpty(colour)) {
+            if (colour.isEmpty()) {
                 result = "<input type='text' readonly='readonly' class='ovrflw' value=\"" + text + "\"/>";
             } else {
                 result = "<input type='text' readonly='readonly' class='ovrflw' style='color:" + colour + ";' value=\""
                         + text + "\"/>";
             }
         } else {
-            if (StringUtils.isEmpty(colour)) {
+            if (colour.isEmpty()) {
                 result = text;
             } else {
                 result = "<span style='color:" + colour + ";'>" + text + "</span>";
