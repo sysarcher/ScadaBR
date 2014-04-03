@@ -14,7 +14,6 @@ import java.util.List;
  *
  * @author aploese
  */
-@Deprecated
 public class PagingDataForm<T> {
 
     private List<T> data;

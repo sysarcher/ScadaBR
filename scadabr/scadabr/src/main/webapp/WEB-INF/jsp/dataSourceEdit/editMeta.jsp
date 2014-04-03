@@ -28,7 +28,7 @@
       <c:forEach items="${userPoints}" var="dp">
         pointsArray[pointsArray.length] = {
             id : ${dp.id}, 
-            name : '${sbt:quotEncode(dp.extendedName)}',
+            name : '${sbt:escapeSingleQuote(dp.extendedName)}',
             type : '<sbt:i18n message="${dp.dataTypeMessage}"/>'
         };
       </c:forEach>

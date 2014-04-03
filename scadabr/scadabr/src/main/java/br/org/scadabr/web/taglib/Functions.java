@@ -7,6 +7,8 @@ package br.org.scadabr.web.taglib;
 
 import br.org.scadabr.ImplementMeException;
 import java.io.IOException;
+import java.util.Collection;
+import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 
 /**
@@ -111,4 +113,15 @@ public class Functions {
             out.print("\"");
         }
     }
+
+    public static int size(Object o) throws JspException {
+        if ((o instanceof Collection)) {
+            return ((Collection) o).size();
+        }
+        if (o.getClass().isArray()) {
+            return ((Object[]) o).length;
+        }
+        throw new JspException("Object of type " + o.getClass().getName() + " not implemented");
+    }
+
 }

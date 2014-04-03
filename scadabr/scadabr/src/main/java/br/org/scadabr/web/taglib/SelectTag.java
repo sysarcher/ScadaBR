@@ -142,10 +142,10 @@ public class SelectTag extends TagSupport {
             printAttribute(out, "onmouseout", onmouseout);
             printAttribute(out, "style", style);
             out.println(">");
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             throw new JspTagException(ex.getMessage());
         }
-        return 1;
+        return EVAL_BODY_INCLUDE;
     }
 
     @Override
@@ -157,6 +157,6 @@ public class SelectTag extends TagSupport {
         } catch (IOException ex) {
             throw new JspTagException(ex.getMessage());
         }
-        return 6;
+        return EVAL_PAGE;
     }
 }

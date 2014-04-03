@@ -52,11 +52,11 @@ public class LocalizableMessageTag extends TagSupport {
         }
         if (s != null) {
             if (escapeQuotes && escapeDQuotes) {
-                s = Functions.escapeAllQuotes(s);
+                s = escapeAllQuotes(s);
             } else if (escapeQuotes) {
-                s = Functions.escapeSingleQuote(s);
+                s = escapeSingleQuote(s);
             } else {
-                s = Functions.escapeDoubleQuote(s);
+                s = escapeDoubleQuote(s);
             }
             
             try {
@@ -65,6 +65,6 @@ public class LocalizableMessageTag extends TagSupport {
                 throw new JspException(e);
             }
         }
-        return 6;
+        return EVAL_PAGE;
     }
 }

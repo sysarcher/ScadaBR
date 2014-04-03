@@ -33,7 +33,7 @@ public class OptionTag extends BodyTagSupport {
         if (getBodyContent() != null) {
             getBodyContent().clearBody();
         }
-        return 2;
+        return EVAL_BODY_AGAIN;
     }
 
     @Override
@@ -65,7 +65,7 @@ public class OptionTag extends BodyTagSupport {
         } catch (IOException ex) {
             throw new JspTagException(ex.getMessage());
         }
-        return 6;
+        return EVAL_PAGE;
     }
 
     @Override
