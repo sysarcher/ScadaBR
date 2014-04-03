@@ -58,7 +58,7 @@ public class DwrConvertTag extends TagSupport {
         } finally {
             webContextBuilder.unset();
         }
-        return 6;
+        return EVAL_PAGE;
     }
 
     @Override

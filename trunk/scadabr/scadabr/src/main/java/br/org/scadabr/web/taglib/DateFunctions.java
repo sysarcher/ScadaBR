@@ -5,7 +5,6 @@
  */
 package br.org.scadabr.web.taglib;
 
-import br.org.scadabr.ImplementMeException;
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -21,12 +20,14 @@ public class DateFunctions {
         return DateFormat.getTimeInstance().format(new Date(ts));
     }
 
-    public static String getFullSecondTime(long activeTimestamp) {
-        throw new ImplementMeException();
+    public static String getFullSecondTime(long ts) {
+        //TODO getLocale!!!
+        return DateFormat.getDateTimeInstance().format(new Date(ts));
     }
 
-    public static String getFullMinuteTime(long reportStartTime) {
-        throw new ImplementMeException();
+    public static String getFullMinuteTime(long ts) {
+        //TODO getLocale!!!
+        return DateFormat.getDateTimeInstance().format(new Date(ts));
     }
 
 }
