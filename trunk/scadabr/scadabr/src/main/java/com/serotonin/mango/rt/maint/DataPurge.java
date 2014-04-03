@@ -27,7 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
-import br.org.scadabr.timer.CronTask;
+import br.org.scadabr.timer.cron.SystemCronTask;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
@@ -38,6 +38,7 @@ import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.vo.DataPointVO;
+import java.util.TimeZone;
 
 public class DataPurge {
 
@@ -138,15 +139,15 @@ public class DataPurge {
         }
     }
 
-    public static class DataPurgeTask extends CronTask {
+    public static class DataPurgeTask extends SystemCronTask {
 
-        public DataPurgeTask(String pattern) throws ParseException {
-            super(pattern);
+        public DataPurgeTask(String pattern, TimeZone tz) throws ParseException {
+            super(pattern, tz);
         }
 
         @Override
-        public void run() {
-            new DataPurge().execute(currentTimeInMillis);
+        protected void run(long scheduledExecutionTime) {
+            new DataPurge().execute(scheduledExecutionTime);
         }
     }
 }

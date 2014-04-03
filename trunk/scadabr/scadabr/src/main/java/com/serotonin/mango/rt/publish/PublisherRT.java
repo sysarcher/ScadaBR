@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.publish;
 
+import br.org.scadabr.ImplementMeException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,19 +33,17 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.PublisherEventType;
-import com.serotonin.mango.util.timeout.TimeoutClient;
-import com.serotonin.mango.util.timeout.TimeoutTask;
+import com.serotonin.mango.util.timeout.RunClient;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.timer.FixedRateTrigger;
 import br.org.scadabr.timer.TimerTask;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
-abstract public class PublisherRT<T extends PublishedPointVO> implements TimeoutClient {
+abstract public class PublisherRT<T extends PublishedPointVO> implements RunClient {
 
     public static final int POINT_DISABLED_EVENT = 1;
     public static final int QUEUE_SIZE_WARNING_EVENT = 2;
@@ -55,7 +54,7 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
     private final EventType queueSizeWarningEventType;
 
     private final PublisherVO<T> vo;
-    protected final List<PublishedPointRT<T>> pointRTs = new ArrayList<PublishedPointRT<T>>();
+    protected final List<PublishedPointRT<T>> pointRTs = new ArrayList<>();
     protected final PublishQueue<T> queue;
     private boolean pointDisabledEventActive;
     private volatile Thread jobThread;
@@ -75,7 +74,7 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
     }
 
     protected PublishQueue<T> createPublishQueue(PublisherVO<T> vo) {
-        return new PublishQueue<T>(this, vo.getCacheWarningSize());
+        return new PublishQueue<>(this, vo.getCacheWarningSize());
     }
 
     public PublisherVO<T> getVo() {
@@ -200,7 +199,7 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
         if (vo.isSendSnapshot()) {
             // Add a schedule to send the snapshot
             long snapshotPeriodMillis = Common.getMillis(vo.getSnapshotSendPeriodType(), vo.getSnapshotSendPeriods());
-            snapshotTask = new TimeoutTask(new FixedRateTrigger(0, snapshotPeriodMillis), this);
+            throw new ImplementMeException(); //WAS: snapshotTask = new TimeoutTask(new FixedRateTrigger(0, snapshotPeriodMillis), this);
         }
 
         checkForDisabledPoints();
@@ -243,7 +242,7 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements Timeout
     // Scheduled snapshot send stuff
     //
     @Override
-    public void scheduleTimeout(long fireTime) {
+    public void run(long fireTime) {
         if (jobThread != null) {
             return;
         }

@@ -54,7 +54,7 @@ public class EventManager implements ILifecycle {
 
     private final Log log = LogFactory.getLog(EventManager.class);
 
-    private final List<EventInstance> activeEvents = new CopyOnWriteArrayList<EventInstance>();
+    private final List<EventInstance> activeEvents = new CopyOnWriteArrayList<>();
     private EventDao eventDao;
     private UserDao userDao;
     private long lastAlarmTimestamp = 0;
@@ -110,8 +110,8 @@ public class EventManager implements ILifecycle {
         eventDao.saveEvent(evt);
 
         // Create user alarm records for all applicable users
-        List<Integer> eventUserIds = new ArrayList<Integer>();
-        Set<String> emailUsers = new HashSet<String>();
+        List<Integer> eventUserIds = new ArrayList<>();
+        Set<String> emailUsers = new HashSet<>();
 
         for (User user : userDao.getActiveUsers()) {
             // Do not create an event for this user if the event type says the user should be skipped.

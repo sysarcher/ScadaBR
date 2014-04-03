@@ -25,15 +25,17 @@ import java.util.Map;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.timer.CronTask;
+import br.org.scadabr.timer.cron.SystemCronTask;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.maint.work.ReportWorkItem;
+import java.util.TimeZone;
 
 /**
  * @author Matthew Lohbihler
  */
-public class ReportTask extends CronTask {
+public class ReportTask extends SystemCronTask {
 
-    private static final Map<Integer, ReportTask> JOB_REGISTRY = new HashMap<Integer, ReportTask>();
+    private static final Map<Integer, ReportTask> JOB_REGISTRY = new HashMap<>();
 
     public static void scheduleReportJob(ReportVO report) {
         synchronized (JOB_REGISTRY) {
@@ -44,7 +46,7 @@ public class ReportTask extends CronTask {
                 ReportTask reportJob;
                 if (report.getSchedulePeriod() == ReportVO.SCHEDULE_CRON) {
                     try {
-                        reportJob = new ReportTask(report.getScheduleCron(), report);
+                        reportJob = new ReportTask(report.getScheduleCron(), report.getTimeZone(), report);
                     } catch (ParseException e) {
                         throw new ShouldNeverHappenException(e);
                     }
@@ -69,13 +71,13 @@ public class ReportTask extends CronTask {
 
     private final ReportVO report;
 
-    private ReportTask(String pattern, ReportVO report) throws ParseException {
-        super(pattern);
+    private ReportTask(String pattern, TimeZone tz, ReportVO report) throws ParseException {
+        super(pattern, tz);
         this.report = report;
     }
 
     @Override
-    public void run() {
+    protected void run(long scheduledExecutionTime) {
         ReportWorkItem.queueReport(report);
     }
 }

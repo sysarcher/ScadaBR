@@ -23,16 +23,17 @@ import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.mango.Common;
 import br.org.scadabr.timer.FixedRateTrigger;
-import br.org.scadabr.timer.TimerTask;
+import br.org.scadabr.timer.cron.CronExpression;
+import br.org.scadabr.timer.cron.SystemCronTask;
 
 /**
  * @author Matthew Lohbihler
  */
 @Deprecated//Whats this for?
-public class MemoryCheck extends TimerTask {
+public class MemoryCheck extends SystemCronTask {
 
     private static final Log log = LogFactory.getLog(MemoryCheck.class);
-    private static final long TIMEOUT = 1000 * 5; // Run every five seconds.
+    private static final int PERIOD_IN_S = 5; // Run every five seconds.
 
     /**
      * This method will set up the memory checking job. It assumes that the
@@ -43,11 +44,11 @@ public class MemoryCheck extends TimerTask {
     }
 
     public MemoryCheck() {
-        super(new FixedRateTrigger(TIMEOUT, TIMEOUT));
+        super(CronExpression.createPeriodBySecond(PERIOD_IN_S, 0));
     }
 
     @Override
-    public void run(long fireTime) {
+    protected void run(long scheduledExecutionTime) {
         memoryCheck();
     }
 
@@ -55,4 +56,5 @@ public class MemoryCheck extends TimerTask {
         Runtime rt = Runtime.getRuntime();
         log.info("Free=" + rt.freeMemory() + ", total=" + rt.totalMemory() + ", max=" + rt.maxMemory());
     }
+
 }

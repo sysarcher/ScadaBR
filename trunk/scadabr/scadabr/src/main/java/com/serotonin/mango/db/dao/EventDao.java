@@ -38,6 +38,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.timer.cron.EventRunnable;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -208,7 +209,7 @@ public class EventDao extends BaseDao {
             // This is a potentially long running query, so run it offline.
             userEvents = Collections.emptyList();
             addToCache(userId, userEvents);
-            Common.eventPool.execute(new UserPendingEventRetriever(userId));
+            Common.eventCronPool.execute(new UserPendingEventRetriever(userId));
         }
 
         List<EventInstance> list = null;
@@ -227,7 +228,7 @@ public class EventDao extends BaseDao {
         return list;
     }
 
-    class UserPendingEventRetriever implements Runnable {
+    class UserPendingEventRetriever implements EventRunnable {
 
         private final int userId;
 
@@ -450,8 +451,8 @@ public class EventDao extends BaseDao {
             long dateFrom, long dateTo, int userId,
             final ResourceBundle bundle, final int from, final int to,
             final Date date) {
-        List<String> where = new ArrayList<String>();
-        List<Object> params = new ArrayList<Object>();
+        List<String> where = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder();
         sql.append(EVENT_SELECT_WITH_USER_DATA);
@@ -468,15 +469,19 @@ public class EventDao extends BaseDao {
             params.add(eventSourceType);
         }
 
-        if (EventsDwr.STATUS_ACTIVE.equals(status)) {
-            where.add("e.rtnApplicable=? and e.rtnTs is null");
-            params.add(boolToChar(true));
-        } else if (EventsDwr.STATUS_RTN.equals(status)) {
-            where.add("e.rtnApplicable=? and e.rtnTs is not null");
-            params.add(boolToChar(true));
-        } else if (EventsDwr.STATUS_NORTN.equals(status)) {
-            where.add("e.rtnApplicable=?");
-            params.add(boolToChar(false));
+        if (null != status) switch (status) {
+            case EventsDwr.STATUS_ACTIVE:
+                where.add("e.rtnApplicable=? and e.rtnTs is null");
+                params.add(boolToChar(true));
+                break;
+            case EventsDwr.STATUS_RTN:
+                where.add("e.rtnApplicable=? and e.rtnTs is not null");
+                params.add(boolToChar(true));
+                break;
+            case EventsDwr.STATUS_NORTN:
+                where.add("e.rtnApplicable=?");
+                params.add(boolToChar(false));
+                break;
         }
 
         if (alarmLevel != -1) {
@@ -502,7 +507,7 @@ public class EventDao extends BaseDao {
         }
         sql.append(" order by e.activeTs desc");
 
-        final List<EventInstance> results = new ArrayList<EventInstance>();
+        final List<EventInstance> results = new ArrayList<>();
         final UserEventInstanceRowMapper rowMapper = new UserEventInstanceRowMapper();
 
         final int[] data = new int[2];
@@ -811,7 +816,7 @@ public class EventDao extends BaseDao {
         }
     }
 
-    private static Map<Integer, PendingEventCacheEntry> pendingEventCache = new ConcurrentHashMap<Integer, PendingEventCacheEntry>();
+    private static Map<Integer, PendingEventCacheEntry> pendingEventCache = new ConcurrentHashMap<>();
 
     private static final long CACHE_TTL = 300000; // 5 minutes
 

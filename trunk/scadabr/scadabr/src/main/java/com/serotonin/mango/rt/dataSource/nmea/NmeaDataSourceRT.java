@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.nmea;
 
+import br.org.scadabr.ImplementMeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,18 +28,17 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.DataSourceUtils;
 import com.serotonin.mango.rt.dataSource.EventDataSource;
-import com.serotonin.mango.util.timeout.TimeoutClient;
-import com.serotonin.mango.util.timeout.TimeoutTask;
+import com.serotonin.mango.util.timeout.RunClient;
 import com.serotonin.mango.vo.dataSource.nmea.NmeaDataSourceVO;
-import br.org.scadabr.timer.TimerTask;
 import br.org.scadabr.web.i18n.LocalizableException;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.util.timeout.SystemRunTask;
 
 /**
  * @author Matthew Lohbihler
  */
-public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageListener, TimeoutClient {
+public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageListener, RunClient {
 
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int PARSE_EXCEPTION_EVENT = 2;
@@ -47,7 +47,7 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
 
     private final NmeaDataSourceVO vo;
     private NmeaReceiver nmeaReceiver;
-    private TimerTask resetTask;
+    private SystemRunTask resetTask;
 
     public NmeaDataSourceRT(NmeaDataSourceVO vo) {
         super(vo);
@@ -174,7 +174,7 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
     // /
     //
     @Override
-    public void scheduleTimeout(long fireTime) {
+    public void run(long fireTime) {
         // We haven't heard from the device for too long. Restart the listener.
         termNmea();
         if (initNmea()) {
@@ -183,11 +183,12 @@ public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageList
     }
 
     private void scheduleTimeout() {
-        resetTask = new TimeoutTask(vo.getResetTimeout() * 1000, this);
+        throw  new ImplementMeException(); //resetTask = new TimeoutTask(vo.getResetTimeout() * 1000, this);
     }
 
     private void unscheduleTimeout() {
-        TimerTask tt = resetTask;
+        // do we need to copy?? - what for???
+        SystemRunTask tt = resetTask;
         if (tt != null) {
             tt.cancel();
         }

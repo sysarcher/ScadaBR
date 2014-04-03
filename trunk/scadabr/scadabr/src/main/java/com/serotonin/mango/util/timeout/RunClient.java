@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.util.timeout;
 
-public interface TimeoutClient {
+public interface RunClient {
 
-    void scheduleTimeout(long fireTime);
+    void run(long fireTime);
 }

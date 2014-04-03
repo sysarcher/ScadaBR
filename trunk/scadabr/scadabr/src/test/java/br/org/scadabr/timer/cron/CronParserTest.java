@@ -49,7 +49,7 @@ public class CronParserTest {
     public void testParseANY() throws Exception {
         System.out.println("parse");
         String cron = "* * * * * * * *";
-        CronExpression result = parser.parse(cron);
+        CronExpression result = parser.parse(cron, CronExpression.TIMEZONE_UTC);
         assertEquals(cron, result.toString());
     }
     
@@ -60,7 +60,7 @@ public class CronParserTest {
     public void testParse_Fixed() throws Exception {
         System.out.println("parse");
         String cron = "0 * * * * * * *";
-        CronExpression result = parser.parse(cron);
+        CronExpression result = parser.parse(cron, CronExpression.TIMEZONE_UTC);
         assertEquals(cron, result.toString());
     }
 
@@ -71,7 +71,7 @@ public class CronParserTest {
     public void testParse_Too_Long() throws Exception {
         System.out.println("parse");
         String cron = "* * * * * * * * *";
-        CronExpression result = parser.parse(cron);
+        CronExpression result = parser.parse(cron, CronExpression.TIMEZONE_UTC);
     }
 
 
@@ -82,7 +82,7 @@ public class CronParserTest {
     public void testParse_Too_Short() throws Exception {
         System.out.println("parse");
         String cron = "* * * * * *";
-        CronExpression result = parser.parse(cron);
+        CronExpression result = parser.parse(cron, CronExpression.TIMEZONE_UTC);
     }
 
 
@@ -95,7 +95,7 @@ public class CronParserTest {
     public void testParse_Fixed_TWO() throws Exception {
         System.out.println("parse");
         String cron = "0,500 * * * * * * *";
-        CronExpression result = parser.parse(cron);
+        CronExpression result = parser.parse(cron, CronExpression.TIMEZONE_UTC);
         assertEquals(cron, result.toString());
     }
 
@@ -107,7 +107,7 @@ public class CronParserTest {
     public void testParse_MS_Range() throws Exception {
         System.out.println("parse");
         String cron = "100-200 * * * * * * *";
-        CronExpression result = parser.parse(cron);
+        CronExpression result = parser.parse(cron, CronExpression.TIMEZONE_UTC);
         assertEquals(cron, result.toString());
     }
 
@@ -118,7 +118,7 @@ public class CronParserTest {
     public void testParse_MS_Range_Increment() throws Exception {
         System.out.println("parse");
         String cron = "100-600/17 * * * * * * *";
-        CronExpression result = parser.parse(cron);
+        CronExpression result = parser.parse(cron, CronExpression.TIMEZONE_UTC);
         assertEquals(cron, result.toString());
     }
 
@@ -129,7 +129,7 @@ public class CronParserTest {
     public void testParse_MS_ANY_Increment() throws Exception {
         System.out.println("parse");
         String cron = "*/200 * * * * * * *";
-        CronExpression result = parser.parse(cron);
+        CronExpression result = parser.parse(cron, CronExpression.TIMEZONE_UTC);
         assertEquals(cron, result.toString());
     }
 
@@ -140,7 +140,7 @@ public class CronParserTest {
     public void testParse_MS_Range_Increment_Range() throws Exception {
         System.out.println("parse");
         String cron = "0-499/100,500-999/50 * * * * * * *";
-        CronExpression result = parser.parse(cron);
+        CronExpression result = parser.parse(cron, CronExpression.TIMEZONE_UTC);
         assertEquals(cron, result.toString());
     }
 

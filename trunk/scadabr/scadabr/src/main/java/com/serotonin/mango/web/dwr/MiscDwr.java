@@ -433,7 +433,7 @@ public class MiscDwr extends BaseDwr {
                 model.put("pendingEvents", true);
                 model.put("noContentWhenEmpty", true);
                 String currentContent = generateContent(httpRequest, "eventList.jsp", model);
-                currentContent = StringUtils.trimWhitespace(currentContent);
+                currentContent = currentContent.trim();
 
                 if (!Objects.equals(currentContent, state.getPendingAlarmsContent())) {
                     response.put("pendingAlarmsContent", currentContent);

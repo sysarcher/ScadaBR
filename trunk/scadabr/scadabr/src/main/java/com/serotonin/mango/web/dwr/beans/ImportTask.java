@@ -33,6 +33,7 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonValue;
+import br.org.scadabr.timer.cron.SystemRunnable;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -78,7 +79,7 @@ import br.org.scadabr.web.l10n.Localizer;
 /**
  * @author Matthew Lohbihler
  */
-public class ImportTask extends ProgressiveTask {
+public class ImportTask extends ProgressiveTask implements SystemRunnable {
 
     private final JsonReader reader;
     private final ResourceBundle bundle;
@@ -160,7 +161,7 @@ public class ImportTask extends ProgressiveTask {
         scripts = nonNullList(root, EmportDwr.SCRIPTS);
         pointValues = nonNullList(root, EmportDwr.POINT_VALUES);
         systemSettings = nonNullList(root, EmportDwr.SYSTEM_SETTINGS);
-        Common.systemPool.execute(this);
+        Common.systemCronPool.execute(this);
     }
 
     private List<JsonValue> nonNullList(JsonObject root, String key) {

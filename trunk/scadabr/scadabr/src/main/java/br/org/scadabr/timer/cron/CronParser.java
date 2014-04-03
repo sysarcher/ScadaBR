@@ -86,8 +86,8 @@ public class CronParser {
     private ParseState state;
     private CronField currentCombinedField;
 
-    public CronExpression parse(final String cron) throws ParseException {
-        result = new CronExpression();
+    public CronExpression parse(final String cron, TimeZone tz) throws ParseException {
+        result = new CronExpression(tz);
         sb = new StringBuilder();
         currentField = CronFieldType.MILLISECOND;
         state = ParseState.NONE;

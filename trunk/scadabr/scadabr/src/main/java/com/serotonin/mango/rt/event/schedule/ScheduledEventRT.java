@@ -20,32 +20,30 @@ package com.serotonin.mango.rt.event.schedule;
 
 import br.org.scadabr.ImplementMeException;
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.timer.CronTask;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.SimpleEventDetector;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.ScheduledEventType;
-import com.serotonin.mango.util.timeout.ModelTimeoutClient;
-import com.serotonin.mango.util.timeout.ModelTimeoutTask;
+import com.serotonin.mango.util.timeout.RunWithArgClient;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
-import br.org.scadabr.timer.TimerTrigger;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.util.timeout.EventRunWithArgTask;
 import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
  *
  */
-public class ScheduledEventRT extends SimpleEventDetector implements ModelTimeoutClient<Boolean> {
+public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgClient<Boolean> {
 
     private final ScheduledEventVO vo;
     private ScheduledEventType eventType;
     private boolean eventActive;
-    private CronTask activeTask;
-    private CronTask inactiveTask;
+    private EventRunWithArgTask<Boolean> activeTask;
+    private EventRunWithArgTask<Boolean> inactiveTask;
 
     public ScheduledEventRT(ScheduledEventVO vo) {
         this.vo = vo;
@@ -78,7 +76,7 @@ public class ScheduledEventRT extends SimpleEventDetector implements ModelTimeou
     }
 
     @Override
-    synchronized public void scheduleTimeout(Boolean active, long fireTime) {
+    synchronized public void run(Boolean active, long fireTime) {
         if (active) {
             raiseEvent(fireTime);
         } else {
@@ -102,13 +100,13 @@ public class ScheduledEventRT extends SimpleEventDetector implements ModelTimeou
 
         // Schedule the active event.
         CronExpression activeTrigger = createTrigger(true);
-        activeTask = new ModelTimeoutTask<Boolean>(activeTrigger, this, true);
-            Common.systemCronPool.schedule(activeTask);
+        activeTask = new EventRunWithArgTask<>(activeTrigger, this, true);
+            Common.eventCronPool.schedule(activeTask);
 
             if (vo.isReturnToNormal()) {
             CronExpression inactiveTrigger = createTrigger(false);
-            inactiveTask = new ModelTimeoutTask<Boolean>(inactiveTrigger, this, false);
-            Common.systemCronPool.schedule(inactiveTask);
+            inactiveTask = new EventRunWithArgTask<>(inactiveTrigger, this, false);
+            Common.eventCronPool.schedule(inactiveTask);
 
             if (vo.getScheduleType() != ScheduledEventVO.TYPE_ONCE) {
                 // Check if we are currently active.
@@ -151,9 +149,9 @@ public class ScheduledEventRT extends SimpleEventDetector implements ModelTimeou
             case ScheduledEventVO.TYPE_CRON:
                 try {
                     if (activeTrigger) {
-                        return new CronParser().parse(vo.getActiveCron());
+                        return new CronParser().parse(vo.getActiveCron(), CronExpression.TIMEZONE_UTC);
                     }
-                    return new CronParser().parse(vo.getInactiveCron());
+                    return new CronParser().parse(vo.getInactiveCron(), CronExpression.TIMEZONE_UTC);
                 } catch (ParseException e) {
                     // Should never happen, so wrap and rethrow
                     throw new ShouldNeverHappenException(e);
@@ -162,10 +160,10 @@ public class ScheduledEventRT extends SimpleEventDetector implements ModelTimeou
             case ScheduledEventVO.TYPE_ONCE:
                 if (activeTrigger) {
                     return new CronExpression(vo.getActiveYear(), vo.getActiveMonth(), vo.getActiveDay(), vo.getActiveHour(),
-                            vo.getActiveMinute(), vo.getActiveSecond(), 0);
+                            vo.getActiveMinute(), vo.getActiveSecond(), 0, CronExpression.TIMEZONE_UTC);
                 } else {
                     return new CronExpression(vo.getInactiveYear(), vo.getInactiveMonth(), vo.getInactiveDay(),
-                            vo.getInactiveHour(), vo.getInactiveMinute(), vo.getInactiveSecond(), 0);
+                            vo.getInactiveHour(), vo.getInactiveMinute(), vo.getInactiveSecond(), 0, CronExpression.TIMEZONE_UTC);
                 }
             case ScheduledEventVO.TYPE_HOURLY:
                 return CronExpression.createPeriodByHour(1, minute, second, 0);

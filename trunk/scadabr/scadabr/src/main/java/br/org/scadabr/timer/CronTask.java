@@ -6,19 +6,58 @@
 
 package br.org.scadabr.timer;
 
+import br.org.scadabr.ImplementMeException;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 /**
  *
  * @author aploese
  */
-public abstract class CronTask implements Runnable {
+public abstract class CronTask {
 
+    protected abstract void run(long executionTime);
+
+    TaskRunner tr;
+
+    TaskRunner createRunner(long scheduledExecutionTime) {
+        return new TaskRunner(scheduledExecutionTime);
+    }
+    
+    class TaskRunner implements Runnable {
+
+        final long executionTime;
+        
+        public TaskRunner(long executionTime) {
+            this.executionTime = executionTime;
+            synchronized (lock) {
+                if (tr == null) {
+                    tr = this;
+                } else {
+                    throw  new ImplementMeException(); // what should happen if the old run is not over and we called again???
+                }
+            }
+        }
+
+        @Override
+        public void run() {
+            try {
+                CronTask.this.run(executionTime);
+            } finally {
+                synchronized(lock) {
+                    if (tr == this) {
+                        tr = null;
+                    }
+                }
+            }
+        }
+    }
+    
     final Object lock = new Object();
 
     int state = VIRGIN;
@@ -35,8 +74,6 @@ public abstract class CronTask implements Runnable {
 
     long nextExecutionTime;
     
-    protected long currentTimeInMillis;
-
     protected CronTask(GregorianCalendar c) {
         cronExpression = new CronExpression(c);
     }
@@ -45,9 +82,9 @@ public abstract class CronTask implements Runnable {
         cronExpression = ce;
     }
 
-    protected CronTask(String pattern) throws ParseException {
+    protected CronTask(String pattern, TimeZone tz) throws ParseException {
         CronParser cp = new CronParser();
-        cronExpression = cp.parse(pattern);
+        cronExpression = cp.parse(pattern, tz);
     }
 
     public boolean cancel() {
@@ -58,14 +95,18 @@ public abstract class CronTask implements Runnable {
         }
     }
 
-    public long calcNextExecutionTimeAfter(GregorianCalendar c) {
+    public long calcNextExecutionTimeIncludingNow(long timeInMillis) {
         synchronized(lock) {
-            cronExpression.calcNextValidTimeAfter();
-            cronExpression.setNextTimestampTo(c);
-            nextExecutionTime = c.getTimeInMillis();
+            nextExecutionTime = cronExpression.calcNextValidTimeIncludingThis(timeInMillis);
             return nextExecutionTime;
         }
-        
+    }
+    
+    public long calcNextExecutionTimeAfter(GregorianCalendar c) {
+        synchronized(lock) {
+            nextExecutionTime =  cronExpression.calcNextValidTimeAfter();
+            return nextExecutionTime;
+        }
     }
     
     public long getNextScheduledExecutionTime() {

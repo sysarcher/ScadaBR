@@ -11,6 +11,7 @@ import br.org.scadabr.ImplementMeException;
  *
  * @author aploese
  */
+@Deprecated
 public class FixedRateTrigger extends TimerTrigger {
 
     public FixedRateTrigger(long i, long millis) {

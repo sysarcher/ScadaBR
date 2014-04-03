@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.maint;
 
+import br.org.scadabr.timer.cron.SystemRunnable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -49,7 +50,7 @@ public class BackgroundProcessing implements ILifecycle {
     private ExecutorService lowPriorityService;
 
     public void addWorkItem(final WorkItem item) {
-        Runnable runnable = new Runnable() {
+        SystemRunnable runnable = new SystemRunnable() {
             @Override
             public void run() {
                 try {
@@ -65,7 +66,7 @@ public class BackgroundProcessing implements ILifecycle {
         };
 
         if (item.getPriority() == WorkItem.PRIORITY_HIGH) {
-            Common.systemPool.execute(runnable);
+            Common.systemCronPool.execute(runnable);
         } else if (item.getPriority() == WorkItem.PRIORITY_MEDIUM) {
             mediumPriorityService.execute(runnable);
         } else {

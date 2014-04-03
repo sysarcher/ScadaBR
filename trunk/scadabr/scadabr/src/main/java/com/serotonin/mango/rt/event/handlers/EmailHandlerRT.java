@@ -34,25 +34,23 @@ import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.work.EmailWorkItem;
-import com.serotonin.mango.util.timeout.ModelTimeoutClient;
-import com.serotonin.mango.util.timeout.ModelTimeoutTask;
+import com.serotonin.mango.util.timeout.RunWithArgClient;
 import com.serotonin.mango.vo.event.EventHandlerVO;
 import com.serotonin.mango.web.email.MangoEmailContent;
 import com.serotonin.mango.web.email.UsedImagesDirective;
-import br.org.scadabr.timer.TimerTask;
 import br.org.scadabr.timer.cron.CronExpression;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.email.EmailInline;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
+import com.serotonin.mango.util.timeout.EventRunWithArgTask;
 import java.util.GregorianCalendar;
 
-public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient<EventInstance> {
+public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<EventInstance> {
 
     private static final Log LOG = LogFactory.getLog(EmailHandlerRT.class);
 
-    private CronTask escalationTask;
+    private EventRunWithArgTask<EventInstance> escalationTask;
 
     private Set<String> activeRecipients;
 
@@ -116,8 +114,8 @@ public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient
         if (vo.isSendEscalation()) {
             GregorianCalendar c = new GregorianCalendar();
             c.setTimeInMillis(Common.getMillis(vo.getEscalationDelayType(), vo.getEscalationDelay()));
-            escalationTask = new ModelTimeoutTask<>(new CronExpression(c), this, evt);
-            Common.systemCronPool.schedule(escalationTask);
+            escalationTask = new EventRunWithArgTask<>(new CronExpression(c), this, evt);
+            Common.eventCronPool.schedule(escalationTask);
         }
     }
 
@@ -125,7 +123,7 @@ public class EmailHandlerRT extends EventHandlerRT implements ModelTimeoutClient
     // TimeoutClient
     //
     @Override
-    synchronized public void scheduleTimeout(EventInstance evt, long fireTime) {
+    synchronized public void run(EventInstance evt, long fireTime) {
         // Get the email addresses to send to
         Set<String> addresses = new MailingListDao().getRecipientAddresses(vo.getEscalationRecipients(), new DateTime(
                 fireTime));

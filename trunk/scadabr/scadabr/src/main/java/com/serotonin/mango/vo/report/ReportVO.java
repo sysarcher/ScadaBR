@@ -31,6 +31,7 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import br.org.scadabr.util.SerializationHelper;
+import java.util.TimeZone;
 
 /**
  * @author Matthew Lohbihler
@@ -618,5 +619,9 @@ public class ReportVO implements Serializable {
             result.add(vo);
         }
         return result;
+    }
+
+    TimeZone getTimeZone() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

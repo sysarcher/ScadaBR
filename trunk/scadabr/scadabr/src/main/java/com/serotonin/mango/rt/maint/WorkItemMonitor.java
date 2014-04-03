@@ -1,17 +1,14 @@
 package com.serotonin.mango.rt.maint;
 
 import java.util.Collection;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import com.serotonin.mango.Common;
 import br.org.scadabr.monitor.IntegerMonitor;
-import br.org.scadabr.timer.CronTask;
-import br.org.scadabr.timer.FixedRateTrigger;
-import br.org.scadabr.timer.TimerTask;
 import br.org.scadabr.timer.cron.CronExpression;
+import br.org.scadabr.timer.cron.SystemCronTask;
 
 @Deprecated// "Whats this for?)"
-public class WorkItemMonitor extends CronTask {
+public class WorkItemMonitor extends SystemCronTask {
 
     /**
      * This method will set up the memory checking job. It assumes that the
@@ -41,12 +38,12 @@ public class WorkItemMonitor extends CronTask {
     }
 
     @Override
-    public void run() {
+    protected void run(long scheduledExecutionTime) {
         BackgroundProcessing bp = Common.ctx.getBackgroundProcessing();
 
         mediumPriorityServiceQueueSize.setValue(bp.getMediumPriorityServiceQueueSize());
-        scheduledTimerTaskCount.setValue(Common.systemCronPool.poolSize());
-        highPriorityServiceQueueSize.setValue(((ThreadPoolExecutor) Common.systemCronPool.getExecutorService()).getActiveCount());
+        scheduledTimerTaskCount.setValue(Common.systemCronPool.getPoolSize());
+        highPriorityServiceQueueSize.setValue(Common.systemCronPool.getActiveCount());
 
         // Check the stack heights
         int max = 0;

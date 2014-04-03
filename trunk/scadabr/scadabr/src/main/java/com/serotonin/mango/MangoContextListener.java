@@ -41,6 +41,7 @@ import org.apache.commons.logging.LogFactory;
 import br.org.scadabr.api.utils.APIUtils;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.timer.cron.CronExpression;
 import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.ReportDao;
@@ -155,14 +156,14 @@ public class MangoContextListener implements ServletContextListener {
         //TODO move to Common
         Common.dataSourcePool.shutdown();
         Common.systemCronPool.shutdown();
-        Common.eventPool.shutdown();
-        Common.systemPool.shutdown();
+        Common.eventCronPool.shutdown();
 
         Common.ctx = null;
 
         log.info("Mango context terminated");
     }
 
+    @Deprecated // unused???
     private void dataPointsNameToIdMapping(ServletContext ctx) {
         PointHierarchy pH = new DataPointDao().getPointHierarchy();
         List<DataPointVO> datapoints = new DataPointDao().getDataPoints(null,
@@ -572,7 +573,7 @@ public class MangoContextListener implements ServletContextListener {
         // Processes are scheduled in the timer, so they are canceled when it
         // stops.
         try {
-            DataPurge.DataPurgeTask dpt = new DataPurge.DataPurgeTask("0 0 5 * * * * *");
+            DataPurge.DataPurgeTask dpt = new DataPurge.DataPurgeTask("0 0 5 * * * * *", CronExpression.TIMEZONE_UTC);
             Common.systemCronPool.schedule(dpt);
         } catch (ParseException e) {
             throw new RuntimeException(e);

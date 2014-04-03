@@ -7,9 +7,7 @@ package br.org.scadabr.timer;
 
 import java.util.Arrays;
 import java.util.GregorianCalendar;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,97 +16,92 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author aploese
  */
-public class CronTimerPool extends AbstractTimer {
+public class CronTimerPool<T extends CronTask, V extends Runnable> {
 
-class TimerThread extends Thread {
+    class TimerThread extends Thread {
 
-    boolean newTasksMayBeScheduled = true;
+        boolean newTasksMayBeScheduled = true;
 
-    private final TaskQueue queue;
+        private final TaskQueue queue;
 
-    private final GregorianCalendar calendar = new GregorianCalendar();
+        private final GregorianCalendar calendar = new GregorianCalendar();
 
-    TimerThread(TaskQueue queue) {
-        this.queue = queue;
-    }
-
-    @Override
-    public void run() {
-        try {
-            mainLoop();
-        } finally {
-            // Someone killed this Thread, behave as if Timer cancelled
-            synchronized (queue) {
-                newTasksMayBeScheduled = false;
-                queue.clear();  // Eliminate obsolete references
-            }
+        TimerThread(TaskQueue queue) {
+            this.queue = queue;
         }
-    }
 
-    /**
-     * The main timer loop. (See class comment.)
-     */
-    private void mainLoop() {
-        while (true) {
+        @Override
+        public void run() {
             try {
-                CronTask task;
-                boolean taskFired;
+                mainLoop();
+            } finally {
+                // Someone killed this Thread, behave as if Timer cancelled
                 synchronized (queue) {
-                    // Wait for queue to become non-empty
-                    while (queue.isEmpty() && newTasksMayBeScheduled) {
-                        queue.wait();
-                    }
-                    if (queue.isEmpty()) {
-                        break; // Queue is empty and will forever remain; die
-                    }
-                    // Queue nonempty; look at first evt and do the right thing
-                    long currentTime, executionTime;
-                    task = queue.getMin();
-                    synchronized (task.lock) {
-                        if (task.state == CronTask.CANCELLED) {
-                            queue.removeMin();
-                            continue;  // No action required, poll queue again
+                    newTasksMayBeScheduled = false;
+                    queue.clear();  // Eliminate obsolete references
+                }
+            }
+        }
+
+        /**
+         * The main timer loop. (See class comment.)
+         */
+        private void mainLoop() {
+            while (true) {
+                try {
+                    CronTask task;
+                    boolean taskFired;
+                    long executionTime;
+                    synchronized (queue) {
+                        // Wait for queue to become non-empty
+                        while (queue.isEmpty() && newTasksMayBeScheduled) {
+                            queue.wait();
                         }
-                        currentTime = System.currentTimeMillis();
-                        executionTime = task.nextExecutionTime;
-                        if (taskFired = (executionTime <= currentTime)) {
-                            queue.rescheduleMin(
-                                    task.calcNextExecutionTimeAfter(calendar));
+                        if (queue.isEmpty()) {
+                            break; // Queue is empty and will forever remain; die
+                        }
+                        // Queue nonempty; look at first evt and do the right thing
+                        long currentTime;
+                        task = queue.getMin();
+                        synchronized (task.lock) {
+                            if (task.state == CronTask.CANCELLED) {
+                                queue.removeMin();
+                                continue;  // No action required, poll queue again
+                            }
+                            currentTime = System.currentTimeMillis();
+                            executionTime = task.nextExecutionTime;
+                            if (taskFired = (executionTime <= currentTime)) {
+                                queue.rescheduleMin(
+                                        task.calcNextExecutionTimeAfter(calendar));
+                            }
+                        }
+                        if (!taskFired) // Task hasn't yet fired; wait
+                        {
+                            queue.wait(executionTime - currentTime);
                         }
                     }
-                    if (!taskFired) // Task hasn't yet fired; wait
+                    if (taskFired) // Task fired; run it, holding no locks
                     {
-                        queue.wait(executionTime - currentTime);
+                        tpe.execute(task.createRunner(executionTime));
                     }
+                } catch (InterruptedException e) {
                 }
-                if (taskFired) // Task fired; run it, holding no locks
-                {
-                    task.currentTimeInMillis = task.nextExecutionTime;
-                    tpe.execute(thread);
-                }
-            } catch (InterruptedException e) {
             }
         }
     }
-}
 
     ThreadPoolExecutor tpe;
 
-    public void execute(Runnable r) {
+    public void execute(V r) {
         tpe.execute(r);
     }
 
-    public int poolSize() {
+    public int getPoolSize() {
         return tpe.getPoolSize();
     }
 
-    public void shutdown() {
-        tpe.shutdown();
-    }
-
-    @Deprecated
-    public ExecutorService getExecutorService() {
-        return tpe;
+    public int getActiveCount() {
+        return tpe.getActiveCount();
     }
 
     private final TaskQueue queue = new TaskQueue();
@@ -130,27 +123,14 @@ class TimerThread extends Thread {
         return nextSerialNumber.getAndIncrement();
     }
 
-    public CronTimerPool() {
-        this("CronTimerPool-" + serialNumber());
-    }
-
-    public CronTimerPool(boolean isDaemon) {
-        this("CronTimerPool-" + serialNumber(), isDaemon);
-    }
-
-    public CronTimerPool(String name) {
-        thread.setName(name);
-        tpe = new ThreadPoolExecutor(1, 5, 30, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>());
+    public CronTimerPool(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
+        thread.setName("CronTimerPool-" + serialNumber());
+        thread.setDaemon(true);
         thread.start();
+        tpe = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, new LinkedBlockingQueue<Runnable>());
     }
 
-    public CronTimerPool(String name, boolean isDaemon) {
-        thread.setName(name);
-        thread.setDaemon(isDaemon);
-        thread.start();
-    }
-
-    public void schedule(CronTask task) {
+    public void schedule(T task) {
 
         synchronized (queue) {
             if (!thread.newTasksMayBeScheduled) {
@@ -162,6 +142,7 @@ class TimerThread extends Thread {
                     throw new IllegalStateException(
                             "Task already scheduled or cancelled");
                 }
+                task.calcNextExecutionTimeIncludingNow(System.currentTimeMillis());
                 task.state = CronTask.SCHEDULED;
             }
 
@@ -172,13 +153,13 @@ class TimerThread extends Thread {
         }
     }
 
-    public void cancel() {
-        if (true) throw new RuntimeException("DO NOT CANCEL");
+    public void shutdown() {
         synchronized (queue) {
             thread.newTasksMayBeScheduled = false;
             queue.clear();
             queue.notify();  // In case queue was already empty.
         }
+        tpe.shutdown();
     }
 
     public int purge() {

@@ -446,13 +446,13 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
         // Check that cron patterns are ok.
         if (scheduleType == TYPE_CRON) {
             try {
-                new CronParser().parse(activeCron);
+                new CronParser().parse(activeCron, CronExpression.TIMEZONE_UTC);
             } catch (Exception e) {
                 response.addContextualMessage("activeCron", "maintenanceEvents.validate.activeCron", e.getMessage());
             }
 
             try {
-                new CronParser().parse(inactiveCron);
+                new CronParser().parse(inactiveCron, CronExpression.TIMEZONE_UTC);
             } catch (Exception e) {
                 response.addContextualMessage("inactiveCron", "maintenanceEvents.validate.inactiveCron", e.getMessage());
             }
