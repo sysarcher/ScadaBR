@@ -30,6 +30,7 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
+import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.AlarmLevels;
@@ -297,14 +298,14 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         // Check that cron patterns are ok.
         if (scheduleType == TYPE_CRON) {
             try {
-                new CronParser().parse(activeCron);
+                new CronParser().parse(activeCron, CronExpression.TIMEZONE_UTC);
             } catch (Exception e) {
                 response.addContextualMessage("activeCron", "scheduledEvents.validate.activeCron", e.getMessage());
             }
 
             if (returnToNormal) {
                 try {
-                    new CronParser().parse(inactiveCron);
+                    new CronParser().parse(inactiveCron, CronExpression.TIMEZONE_UTC);
                 } catch (Exception e) {
                     response.addContextualMessage("inactiveCron", "scheduledEvents.validate.inactiveCron",
                             e.getMessage());

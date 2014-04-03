@@ -39,13 +39,68 @@ public class Functions {
         return sb.toString();
     }
 
+    public static String escapeAllQuotes(String value) {
+        if (value == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder(value.length());
+        for (char c : value.toCharArray()) {
+            switch (c) {
+                case '\"':
+                    sb.append("\\\\\"");
+                    break;
+                case '\'':
+                    sb.append("\\\\'");
+                    break;
+                default:
+                    sb.append(sb);
+            }
+        }
+        return sb.toString();
+    }
+
+    public static String escapeDoubleQuote(String value) {
+        if (value == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder(value.length());
+        for (char c : value.toCharArray()) {
+            switch (c) {
+                case '\"':
+                    sb.append("\\\\\"");
+                    break;
+                default:
+                    sb.append(sb);
+            }
+        }
+        return sb.toString();
+    }
+
+    public static String escapeSingleQuote(String value) {
+        if (value == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder(value.length());
+        for (char c : value.toCharArray()) {
+            switch (c) {
+                case '\'':
+                    sb.append("\\\\'");
+                    break;
+                default:
+                    sb.append(sb);
+            }
+        }
+        return sb.toString();
+    }
+
     /**
      * Print the attribute, only if value != null.
-     * 
+     *
      * @param out the JspWriter to write to.
      * @param attributeName the name of the attribure
-     * @param attributeValue the value of the attribute, if null nothing is written
-     * @throws IOException 
+     * @param attributeValue the value of the attribute, if null nothing is
+     * written
+     * @throws IOException
      */
     public static void printAttribute(JspWriter out, String attributeName, String attributeValue) throws IOException {
         if (attributeValue != null) {

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource;
 
+import br.org.scadabr.ImplementMeException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,25 +27,25 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.timer.cron.CronExpression;
+import br.org.scadabr.timer.cron.DataSourceCronTask;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
-import com.serotonin.mango.util.timeout.TimeoutClient;
-import com.serotonin.mango.util.timeout.TimeoutTask;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import br.org.scadabr.timer.FixedRateTrigger;
-import br.org.scadabr.timer.TimerTask;
 import br.org.scadabr.web.taglib.DateFunctions;
+import java.text.ParseException;
+import java.util.TimeZone;
 
-abstract public class PollingDataSource extends DataSourceRT implements TimeoutClient {
+abstract public class PollingDataSource extends DataSourceRT {
 
     private final Log LOG = LogFactory.getLog(PollingDataSource.class);
 
     private final DataSourceVO<?> vo;
     protected List<DataPointRT> dataPoints = new ArrayList<>();
     protected boolean pointListChanged = false;
-    private long pollingPeriodMillis = 300000; // Default to 5 minutes just to have something here
-    private boolean quantize;
-    private TimerTask timerTask;
+    private String cronPattern = "0 0 5 * * * * * *"; // Default to 5 minutes just to have something here
+    private TimeZone timeZone = CronExpression.TIMEZONE_UTC;
+    private DataSourceCronTask timerTask;
     private Thread jobThread;
     private long jobThreadStartTime;
 
@@ -53,13 +54,11 @@ abstract public class PollingDataSource extends DataSourceRT implements TimeoutC
         this.vo = vo;
     }
 
-    public void setPollingPeriod(int periodType, int periods, boolean quantize) {
-        pollingPeriodMillis = Common.getMillis(periodType, periods);
-        this.quantize = quantize;
+    public void setCronPattern(String cronPattern) {
+        this.cronPattern = cronPattern;
     }
 
-    @Override
-    public void scheduleTimeout(long fireTime) {
+    public void collectData(long fireTime) {
         if (jobThread != null) {
             // There is another poll still running, so abort this one.
             LOG.warn(vo.getName() + ": poll at " + DateFunctions.getFullSecondTime(fireTime)
@@ -109,13 +108,13 @@ abstract public class PollingDataSource extends DataSourceRT implements TimeoutC
     //
     @Override
     public void beginPolling() {
-        // Quantize the start.
-        long delay = 0;
-        if (quantize) {
-            delay = pollingPeriodMillis - (System.currentTimeMillis() % pollingPeriodMillis);
+        try {
+            timerTask = new DataSourceCronTask(this, cronPattern, timeZone);
+            super.beginPolling();
+            Common.dataSourcePool.schedule(timerTask);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
-        timerTask = new TimeoutTask(new FixedRateTrigger(delay, pollingPeriodMillis), this);
-        super.beginPolling();
     }
 
     @Override
@@ -143,4 +142,11 @@ abstract public class PollingDataSource extends DataSourceRT implements TimeoutC
             }
         }
     }
+
+    @Deprecated
+    protected void setPollingPeriod(int updatePeriodType, int updatePeriods, boolean quantize) {
+        // Set cronpattern from this
+        throw new ImplementMeException();
+    }
+
 }

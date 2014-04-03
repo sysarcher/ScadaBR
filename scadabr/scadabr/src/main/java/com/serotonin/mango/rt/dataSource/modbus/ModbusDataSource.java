@@ -403,4 +403,5 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
         raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
                 "event.modbus.master", e.getMessage()));
     }
+
 }

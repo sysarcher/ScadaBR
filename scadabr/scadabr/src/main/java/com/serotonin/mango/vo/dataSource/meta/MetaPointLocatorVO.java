@@ -35,6 +35,7 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.json.JsonValue;
+import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.Common.TimePeriods;
@@ -189,7 +190,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
         if (updateEvent == UPDATE_EVENT_CRON) {
             try {
-                new CronParser().parse(updateCronPattern);
+                new CronParser().parse(updateCronPattern, CronExpression.TIMEZONE_UTC);
             } catch (ParseException e) {
                 response.addContextualMessage("updateCronPattern", "validate.invalidCron", updateCronPattern);
             }

@@ -18,13 +18,13 @@
  */
 package com.serotonin.mango.rt.event.detectors;
 
+import br.org.scadabr.ImplementMeException;
 import java.util.Date;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.util.timeout.TimeoutClient;
-import com.serotonin.mango.util.timeout.TimeoutTask;
-import br.org.scadabr.timer.TimerTask;
+import com.serotonin.mango.util.timeout.RunClient;
 import br.org.scadabr.web.i18n.LocalizableMessage;
+import com.serotonin.mango.util.timeout.SystemRunTask;
 
 /**
  * This class is a base class for detectors that need to schedule timeouts for
@@ -33,7 +33,7 @@ import br.org.scadabr.web.i18n.LocalizableMessage;
  *
  * @author Matthew Lohbihler
  */
-abstract public class TimeoutDetectorRT extends PointEventDetectorRT implements TimeoutClient {
+abstract public class TimeoutDetectorRT extends PointEventDetectorRT implements RunClient {
 
     /**
      * Internal configuration field. The millisecond version of the duration
@@ -51,7 +51,8 @@ abstract public class TimeoutDetectorRT extends PointEventDetectorRT implements 
      * Internal configuration field. The unique name for this event producer to
      * be used in the scheduler (if required).
      */
-    private TimerTask task;
+    // TODO is this right???
+    private SystemRunTask task;
 
     @Override
     public void initialize() {
@@ -83,7 +84,7 @@ abstract public class TimeoutDetectorRT extends PointEventDetectorRT implements 
         if (task != null) {
             cancelTask();
         }
-        task = new TimeoutTask(new Date(timeout), this);
+        throw new ImplementMeException(); //WAS task = new TimeoutTask(new Date(timeout), this);
     }
 
     protected void unscheduleJob() {
@@ -91,7 +92,7 @@ abstract public class TimeoutDetectorRT extends PointEventDetectorRT implements 
     }
 
     @Override
-    synchronized public final void scheduleTimeout(long fireTime) {
+    synchronized public final void run(long fireTime) {
         scheduleTimeoutImpl(fireTime);
         task = null;
     }

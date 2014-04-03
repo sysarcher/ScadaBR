@@ -1,5 +1,6 @@
 package com.serotonin.mango.rt.publish.persistent;
 
+import br.org.scadabr.ImplementMeException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,8 +29,12 @@ import com.serotonin.mango.vo.publish.persistent.PersistentPointVO;
 import com.serotonin.mango.vo.publish.persistent.PersistentSenderVO;
 import br.org.scadabr.timer.TimerTask;
 import br.org.scadabr.timer.TimerTrigger;
+import br.org.scadabr.timer.cron.CronExpression;
+import br.org.scadabr.timer.cron.SystemCronTask;
+import br.org.scadabr.timer.cron.SystemRunnable;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.util.queue.ByteQueue;
+import java.util.TimeZone;
 
 class PersistentSendThread extends SendThread {
 
@@ -46,7 +51,7 @@ class PersistentSendThread extends SendThread {
     SyncTimer syncTimer;
     SyncHandler syncHandler;
     PointHierarchySync pointHierarchySync;
-    final List<Packet> packetsToSend = new CopyOnWriteArrayList<Packet>();
+    final List<Packet> packetsToSend = new CopyOnWriteArrayList<>();
     private long lastTestPacket;
 
     public PersistentSendThread(PersistentSenderRT publisher) {
@@ -71,6 +76,10 @@ class PersistentSendThread extends SendThread {
             //String pattern = "15 0/5 * * * ?"; // Testing pattern. Every 5 minutes.
             //
 
+            if (true) {
+                throw new ImplementMeException();
+            }
+            // The pattern is not valis for our cron stuff
             String pattern;
             if (publisher.vo.getSyncType() == PersistentSenderVO.SYNC_TYPE_DAILY) {
                 pattern = "0 0 1 * * ?";
@@ -83,7 +92,7 @@ class PersistentSendThread extends SendThread {
             }
 
             try {
-                syncTimer = new SyncTimer(pattern);
+                syncTimer = new SyncTimer(pattern, CronExpression.TIMEZONE_UTC);
             } catch (ParseException e) {
                 throw new ShouldNeverHappenException(e);
             }
@@ -369,14 +378,14 @@ class PersistentSendThread extends SendThread {
         }
     }
 
-    class SyncTimer extends CronTask {
+    class SyncTimer extends SystemCronTask {
 
-        public SyncTimer(String pattern) throws ParseException {
-            super(pattern);
+        public SyncTimer(String pattern, TimeZone tz) throws ParseException {
+            super(pattern, tz);
         }
 
         @Override
-        public void run() {
+        protected void run(long scheduledExecutionTime) {
             startSync();
         }
     }
@@ -407,7 +416,7 @@ class PersistentSendThread extends SendThread {
     }
 
     void writePointHierarchy() {
-        Common.systemPool.execute(new Runnable() {
+        Common.systemCronPool.execute(new SystemRunnable() {
             @Override
             public void run() {
                 writePointHierarchy(new DataPointDao().getPointHierarchy());

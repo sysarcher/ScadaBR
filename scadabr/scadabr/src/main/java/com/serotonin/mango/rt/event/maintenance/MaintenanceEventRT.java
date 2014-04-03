@@ -2,34 +2,27 @@ package com.serotonin.mango.rt.event.maintenance;
 
 import br.org.scadabr.ImplementMeException;
 import java.text.ParseException;
-import java.util.Date;
-
-import org.joda.time.DateTime;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.timer.CronTask;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.MaintenanceEventType;
-import com.serotonin.mango.util.timeout.ModelTimeoutClient;
-import com.serotonin.mango.util.timeout.ModelTimeoutTask;
+import com.serotonin.mango.util.timeout.RunWithArgClient;
+import com.serotonin.mango.util.timeout.SystemRunWithArgTask;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
-import br.org.scadabr.timer.OneTimeTrigger;
-import br.org.scadabr.timer.TimerTask;
-import br.org.scadabr.timer.TimerTrigger;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
+import br.org.scadabr.timer.cron.SystemCronTask;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import java.util.GregorianCalendar;
 
-public class MaintenanceEventRT implements ModelTimeoutClient<Boolean> {
+public class MaintenanceEventRT implements RunWithArgClient<Boolean> {
 
     private final MaintenanceEventVO vo;
     private MaintenanceEventType eventType;
     private boolean eventActive;
-    private CronTask activeTask;
-    private CronTask inactiveTask;
+    private SystemRunWithArgTask<Boolean> activeTask;
+    private SystemRunWithArgTask<Boolean> inactiveTask;
 
     public MaintenanceEventRT(MaintenanceEventVO vo) {
         this.vo = vo;
@@ -62,12 +55,12 @@ public class MaintenanceEventRT implements ModelTimeoutClient<Boolean> {
     }
 
     public boolean toggle() {
-        scheduleTimeout(!eventActive, System.currentTimeMillis());
+        run(!eventActive, System.currentTimeMillis());
         return eventActive;
     }
 
     @Override
-    synchronized public void scheduleTimeout(Boolean active, long fireTime) {
+    synchronized public void run(Boolean active, long fireTime) {
         if (active) {
             raiseEvent(fireTime);
         } else {
@@ -85,12 +78,12 @@ public class MaintenanceEventRT implements ModelTimeoutClient<Boolean> {
         if (vo.getScheduleType() != MaintenanceEventVO.TYPE_MANUAL) {
             // Schedule the active event.
             final CronExpression activeTrigger = createTrigger(true);
-            activeTask = new ModelTimeoutTask<>(activeTrigger, this, true);
+            activeTask = new SystemRunWithArgTask<>(activeTrigger, this, true);
             Common.systemCronPool.schedule(activeTask);
 
             // Schedule the inactive event
             final CronExpression inactiveTrigger = createTrigger(false);
-            inactiveTask = new ModelTimeoutTask<>(inactiveTrigger, this, false);
+            inactiveTask = new SystemRunWithArgTask<>(inactiveTrigger, this, false);
             Common.systemCronPool.schedule(inactiveTask);
 
             if (vo.getScheduleType() != MaintenanceEventVO.TYPE_ONCE) {
@@ -133,9 +126,9 @@ public class MaintenanceEventRT implements ModelTimeoutClient<Boolean> {
             case MaintenanceEventVO.TYPE_CRON:
                 try {
                     if (activeTrigger) {
-                        return new CronParser().parse(vo.getActiveCron());
+                        return new CronParser().parse(vo.getActiveCron(), CronExpression.TIMEZONE_UTC);
                     }
-                    return new CronParser().parse(vo.getInactiveCron());
+                    return new CronParser().parse(vo.getInactiveCron(), CronExpression.TIMEZONE_UTC);
                 } catch (ParseException e) {
                     // Should never happen, so wrap and rethrow
                     throw new ShouldNeverHappenException(e);
@@ -144,10 +137,10 @@ public class MaintenanceEventRT implements ModelTimeoutClient<Boolean> {
             case MaintenanceEventVO.TYPE_ONCE:
                 if (activeTrigger) {
                     return new CronExpression(vo.getActiveYear(), vo.getActiveMonth(), vo.getActiveDay(), vo.getActiveHour(),
-                            vo.getActiveMinute(), vo.getActiveSecond(), 0);
+                            vo.getActiveMinute(), vo.getActiveSecond(), 0, CronExpression.TIMEZONE_UTC);
                 } else {
                     return new CronExpression(vo.getInactiveYear(), vo.getInactiveMonth(), vo.getInactiveDay(),
-                            vo.getInactiveHour(), vo.getInactiveMinute(), vo.getInactiveSecond(), 0);
+                            vo.getInactiveHour(), vo.getInactiveMinute(), vo.getInactiveSecond(), 0, CronExpression.TIMEZONE_UTC);
                 }
             case MaintenanceEventVO.TYPE_HOURLY:
                 return CronExpression.createPeriodByHour(1, minute, second, 0);

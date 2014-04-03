@@ -73,10 +73,6 @@ public class StringUtils {
         throw new ImplementMeException();
     }
 
-    public static String trimWhitespace(String currentContent) {
-        throw new ImplementMeException();
-    }
-
     public static Object[] truncate(String url, int i, String s) {
         throw new ImplementMeException();
     }

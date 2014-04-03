@@ -4,6 +4,7 @@
  */
 package com.serotonin.mango.web.servlet;
 
+import br.org.scadabr.ImplementMeException;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -147,7 +148,7 @@ public class AsyncImageChartServlet extends BaseInfoServlet {
                 pdr.setRange(from, to);
             }
 
-            tasks.executeAndWait(Common.systemCronPool.getExecutorService());
+            if (true) throw new ImplementMeException(); //WAS: tasks.executeAndWait(Common.systemPool);
 
             PointTimeSeriesCollection ptsc = new PointTimeSeriesCollection();
             for (PointDataRetriever pdr : tasks.getTasks()) {

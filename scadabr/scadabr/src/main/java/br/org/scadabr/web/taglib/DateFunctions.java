@@ -6,6 +6,8 @@
 package br.org.scadabr.web.taglib;
 
 import br.org.scadabr.ImplementMeException;
+import java.text.DateFormat;
+import java.util.Date;
 
 /**
  *
@@ -13,8 +15,10 @@ import br.org.scadabr.ImplementMeException;
  */
 public class DateFunctions {
 
+    
     public static String getTime(long ts) {
-        throw new ImplementMeException();
+        //TODO getLocale!!!
+        return DateFormat.getTimeInstance().format(new Date(ts));
     }
 
     public static String getFullSecondTime(long activeTimestamp) {

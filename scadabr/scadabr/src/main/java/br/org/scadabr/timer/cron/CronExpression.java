@@ -5,16 +5,10 @@
  */
 package br.org.scadabr.timer.cron;
 
-import br.org.scadabr.ImplementMeException;
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -22,8 +16,11 @@ import java.util.logging.Logger;
  */
 public class CronExpression {
 
-    private boolean doIncrementTime;
-    private CronCalendar nextTimeStamp;
+    public final static TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
+
+    private final CronCalendar nextTimeStamp;
+    private final Calendar calendar;
+
     private CronField millisecond;
     private CronField second;
     private CronField minute;
@@ -32,9 +29,11 @@ public class CronExpression {
     private CronField month;
     private CronField dayOfWeek;
     private CronField year;
-    
-    public static CronExpression createPeriodByMillisecond(int millisecondIncrement){
-        CronExpression result = new CronExpression();
+
+    private boolean doIncrementTime;
+
+    public static CronExpression createPeriodByMillisecond(int millisecondIncrement) {
+        CronExpression result = new CronExpression(TIMEZONE_UTC);
         result.millisecond = new CronField(CronField.Type.RANGE_INCREMENT).setStartRange(CronFieldType.MILLISECOND.floor).setEndRange(CronFieldType.MILLISECOND.ceil).setIncrement(millisecondIncrement);
         result.second = new CronField(CronField.Type.ANY);
         result.minute = new CronField(CronField.Type.ANY);
@@ -46,9 +45,8 @@ public class CronExpression {
         return result;
     }
 
-
-    public static CronExpression createPeriodBySecond(int secondIncrement, int millisecond){
-        CronExpression result = new CronExpression();
+    public static CronExpression createPeriodBySecond(int secondIncrement, int millisecond) {
+        CronExpression result = new CronExpression(TIMEZONE_UTC);
         result.millisecond = new CronField(CronField.Type.VALUE).setValue(millisecond);
         result.second = new CronField(CronField.Type.RANGE_INCREMENT).setStartRange(CronFieldType.SECOND.floor).setEndRange(CronFieldType.SECOND.ceil).setIncrement(secondIncrement);
         result.minute = new CronField(CronField.Type.ANY);
@@ -60,8 +58,8 @@ public class CronExpression {
         return result;
     }
 
-    public static CronExpression createPeriodByMinute(int minuteIncrement, int second, int millisecond){
-        CronExpression result = new CronExpression();
+    public static CronExpression createPeriodByMinute(int minuteIncrement, int second, int millisecond) {
+        CronExpression result = new CronExpression(TIMEZONE_UTC);
         result.millisecond = new CronField(CronField.Type.VALUE).setValue(millisecond);
         result.second = new CronField(CronField.Type.VALUE).setValue(second);
         result.minute = new CronField(CronField.Type.RANGE_INCREMENT).setStartRange(CronFieldType.MINUTE.floor).setEndRange(CronFieldType.MINUTE.ceil).setIncrement(minuteIncrement);
@@ -73,8 +71,8 @@ public class CronExpression {
         return result;
     }
 
-    public static CronExpression createPeriodByHour(int hourIncrement,  int minute, int second, int millisecond){
-        CronExpression result = new CronExpression();
+    public static CronExpression createPeriodByHour(int hourIncrement, int minute, int second, int millisecond) {
+        CronExpression result = new CronExpression(TIMEZONE_UTC);
         result.millisecond = new CronField(CronField.Type.VALUE).setValue(millisecond);
         result.second = new CronField(CronField.Type.VALUE).setValue(second);
         result.minute = new CronField(CronField.Type.VALUE).setValue(minute);
@@ -86,8 +84,8 @@ public class CronExpression {
         return result;
     }
 
-    public static CronExpression createDaily(int hour,  int minute, int second, int millisecond){
-        CronExpression result = new CronExpression();
+    public static CronExpression createDaily(int hour, int minute, int second, int millisecond) {
+        CronExpression result = new CronExpression(TIMEZONE_UTC);
         result.millisecond = new CronField(CronField.Type.VALUE).setValue(millisecond);
         result.second = new CronField(CronField.Type.VALUE).setValue(second);
         result.minute = new CronField(CronField.Type.VALUE).setValue(minute);
@@ -99,8 +97,8 @@ public class CronExpression {
         return result;
     }
 
-    public CronExpression(int year, int month, int dayOfMonth, int hourOfDay, int minute, int second, int millisecond) {
-        nextTimeStamp = new CronCalendar();
+    public CronExpression(int year, int month, int dayOfMonth, int hourOfDay, int minute, int second, int millisecond, TimeZone tz) {
+        this(tz);
         nextTimeStamp.setMilliseconds(millisecond);
         nextTimeStamp.setSeconds(second);
         nextTimeStamp.setMinutes(minute);
@@ -123,6 +121,7 @@ public class CronExpression {
     }
 
     public CronExpression(GregorianCalendar c) {
+        calendar = c;
         nextTimeStamp = new CronCalendar();
         nextTimeStamp.setCurrentTime(c);
         millisecond = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getMillisecond());
@@ -135,12 +134,14 @@ public class CronExpression {
         year = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getYear());
     }
 
-    CronExpression() {
+    CronExpression(TimeZone tz) {
         nextTimeStamp = new CronCalendar();
+        calendar = new GregorianCalendar(tz);
     }
 
-    CronExpression(CronCalendar nextTimeStamp) {
+    CronExpression(CronCalendar nextTimeStamp, TimeZone tz) {
         this.nextTimeStamp = nextTimeStamp;
+        calendar = new GregorianCalendar(tz);
     }
 
     private void calcNextValidTime() {
@@ -156,15 +157,33 @@ public class CronExpression {
 
     }
 
-    public void calcNextValidTimeAfter() {
+    public long calcNextValidTimeAfter() {
         doIncrementTime = true;
         calcNextValidTime();
-
+        synchronized (calendar) {
+            nextTimeStamp.setCalendarToTimestamp(calendar);
+            return calendar.getTimeInMillis();
+        }
     }
 
-    public void calcNextValidTimeIncludingNow() {
+    public long calcNextValidTimeIncludingCurrent() {
         doIncrementTime = false;
         calcNextValidTime();
+        synchronized (calendar) {
+            nextTimeStamp.setCalendarToTimestamp(calendar);
+            return calendar.getTimeInMillis();
+        }
+    }
+
+    public long calcNextValidTimeIncludingThis(long tileInMillis) {
+        doIncrementTime = false;
+        synchronized (calendar) {
+            calendar.setTimeInMillis(tileInMillis);
+            nextTimeStamp.setCurrentTime(calendar);
+            calcNextValidTime();
+            nextTimeStamp.setCalendarToTimestamp(calendar);
+            return calendar.getTimeInMillis();
+        }
     }
 
     public CronField setMilliSecond(CronField field) {
@@ -179,12 +198,11 @@ public class CronExpression {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public void setCurrentTime(Calendar c) {
-        nextTimeStamp.setCurrentTime(c);
-    }
-
-    public void setNextTimestampTo(GregorianCalendar c) {
-        nextTimeStamp.setCalendarTo(c);
+    public void setCurrentTime(long millis) {
+        synchronized (calendar) {
+            calendar.setTimeInMillis(millis);
+            nextTimeStamp.setCurrentTime(calendar);
+        }
     }
 
     public void setTimeZone(TimeZone tz) {

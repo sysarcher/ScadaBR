@@ -219,7 +219,7 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
         long timeout;
         if (updateEventId == MetaPointLocatorVO.UPDATE_EVENT_CRON) {
             try {
-                CronExpression ce = new CronParser().parse(vo.getUpdateCronPattern());
+                CronExpression ce = new CronParser().parse(vo.getUpdateCronPattern(), CronExpression.TIMEZONE_UTC);
                 timeout = ce.getNextValidTimeAfter(new Date(time)).getTime();
             } catch (ParseException e) {
                 throw new ShouldNeverHappenException(e);

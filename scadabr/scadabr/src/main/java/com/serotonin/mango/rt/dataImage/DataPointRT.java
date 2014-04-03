@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataImage;
 
+import br.org.scadabr.ImplementMeException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,18 +39,16 @@ import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.event.detectors.PointEventDetectorRT;
 import com.serotonin.mango.rt.maint.work.WorkItem;
-import com.serotonin.mango.util.timeout.TimeoutClient;
-import com.serotonin.mango.util.timeout.TimeoutTask;
+import com.serotonin.mango.util.timeout.RunClient;
 import com.serotonin.mango.view.stats.AnalogStatistics;
 import com.serotonin.mango.view.stats.IValueTime;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
-import br.org.scadabr.timer.FixedRateTrigger;
-import br.org.scadabr.timer.TimerTask;
+import br.org.scadabr.timer.cron.DataSourceCronTask;
 import br.org.scadabr.util.ILifecycle;
 import java.util.Objects;
 
-public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
+public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
 
     private static final Log LOG = LogFactory.getLog(DataPointRT.class);
     private static final PvtTimeComparator pvtTimeComparator = new PvtTimeComparator();
@@ -63,14 +62,14 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
     private final PointValueCache valueCache;
     private RuntimeManager rm;
     private List<PointEventDetectorRT> detectors;
-    private final Map<String, Object> attributes = new HashMap<String, Object>();
+    private final Map<String, Object> attributes = new HashMap<>();
 
     // Interval logging data.
     private PointValueTime intervalValue;
     private long intervalStartTime = -1;
     private List<IValueTime> averagingValues;
     private final Object intervalLoggingLock = new Object();
-    private TimerTask intervalLoggingTask;
+    private DataSourceCronTask intervalLoggingTask;
 
     /**
      * This is the value around which tolerance decisions will be made when
@@ -84,10 +83,12 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         valueCache = new PointValueCache(vo.getId(), vo.getDefaultCacheSize());
     }
 
+    @Override
     public List<PointValueTime> getLatestPointValues(int limit) {
         return valueCache.getLatestPointValues(limit);
     }
 
+    @Override
     public PointValueTime getPointValueBefore(long time) {
         for (PointValueTime pvt : valueCache.getCacheContents()) {
             if (pvt.getTime() < time) {
@@ -108,6 +109,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         return new PointValueDao().getPointValueAt(vo.getId(), time);
     }
 
+    @Override
     public List<PointValueTime> getPointValues(long since) {
         List<PointValueTime> result = new PointValueDao().getPointValues(vo.getId(), since);
 
@@ -123,6 +125,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         return result;
     }
 
+    @Override
     public List<PointValueTime> getPointValuesBetween(long from, long to) {
         List<PointValueTime> result = new PointValueDao().getPointValuesBetween(vo.getId(), from, to);
 
@@ -145,10 +148,12 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
      *
      * @param newValue
      */
+    @Override
     public void updatePointValue(PointValueTime newValue) {
         savePointValue(newValue, null, true);
     }
 
+    @Override
     public void updatePointValue(PointValueTime newValue, boolean async) {
         savePointValue(newValue, null, async);
     }
@@ -162,6 +167,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
      * point was set from the UI, or could be a program run by schedule or on
      * event.
      */
+    @Override
     public void setPointValue(PointValueTime newValue, SetPointSource source) {
         if (source == null) {
             savePointValue(newValue, source, true);
@@ -284,8 +290,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
                 return;
             }
 
-            intervalLoggingTask = new TimeoutTask(new FixedRateTrigger(0, Common.getMillis(
-                    vo.getIntervalLoggingPeriodType(), vo.getIntervalLoggingPeriod())), this);
+            if (true) throw new ImplementMeException(); //WAS: intervalLoggingTask = new TimeoutTask(this, vo.getIntervalLoggingPeriodType(), vo.getIntervalLoggingPeriod());
 
             intervalValue = pointValue;
             if (vo.getIntervalLoggingType() == DataPointVO.IntervalLoggingTypes.AVERAGE) {
@@ -329,7 +334,12 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         }
     }
 
-    public void scheduleTimeout(long fireTime) {
+    /**
+     * Collect the data and store them
+     * @param fireTime 
+     */
+    @Override
+    public void run(long fireTime) {
         synchronized (intervalLoggingLock) {
             MangoValue value;
             if (vo.getIntervalLoggingType() == DataPointVO.IntervalLoggingTypes.INSTANT) {
@@ -375,6 +385,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         return vo.getId();
     }
 
+    @Override
     public PointValueTime getPointValue() {
         return pointValue;
     }
@@ -392,6 +403,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         return vo;
     }
 
+    @Override
     public int getDataTypeId() {
         return vo.getPointLocator().getDataTypeId();
     }
@@ -428,10 +440,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
             return false;
         }
         final DataPointRT other = (DataPointRT) obj;
-        if (getId() != other.getId()) {
-            return false;
-        }
-        return true;
+        return getId() == other.getId();
     }
 
     @Override
@@ -499,6 +508,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
     //
     // Lifecycle
     //
+    @Override
     public void initialize() {
         rm = Common.ctx.getRuntimeManager();
 
@@ -513,7 +523,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         // Add point event listeners
         for (PointEventDetectorVO ped : vo.getEventDetectors()) {
             if (detectors == null) {
-                detectors = new ArrayList<PointEventDetectorRT>();
+                detectors = new ArrayList<>();
             }
 
             PointEventDetectorRT pedRT = ped.createRuntime();
@@ -525,6 +535,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         initializeIntervalLogging();
     }
 
+    @Override
     public void terminate() {
         terminateIntervalLogging();
 
@@ -537,6 +548,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, TimeoutClient {
         Common.ctx.getEventManager().cancelEventsForDataPoint(vo.getId());
     }
 
+    @Override
     public void joinTermination() {
         // no op
     }

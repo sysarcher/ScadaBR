@@ -526,8 +526,12 @@ public class CronCalendar {
         return gc.isLeapYear(year);
     }
 
-    void setCalendarTo(GregorianCalendar c) {
-        c.set(year, month, dayOfMonth, hourOfDay, minute, second);
+    /**
+     * Set the current time and date to the calendar.
+     * @param c 
+     */
+    void setCalendarToTimestamp(Calendar c) {
+        c.set(year, month-1, dayOfMonth, hourOfDay, minute, second);
         c.set(Calendar.MILLISECOND, millisecond);
     }
 

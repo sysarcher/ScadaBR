@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import br.org.scadabr.InvalidArgumentException;
+import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -98,7 +99,7 @@ public class ReportsDwr extends BaseDwr {
             if (schedulePeriod == ReportVO.SCHEDULE_CRON) {
                 // Check the cron pattern.
                 try {
-                    new CronParser().parse(scheduleCron);
+                    new CronParser().parse(scheduleCron, CronExpression.TIMEZONE_UTC);
                 } catch (Exception e) {
                     response.addContextualMessage("scheduleCron", "reports.validate.cron", e.getMessage());
                 }

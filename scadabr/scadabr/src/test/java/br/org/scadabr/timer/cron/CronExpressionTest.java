@@ -72,11 +72,11 @@ public class CronExpressionTest {
     @Test
     public void testCalcNextValidTime_ANY() throws Exception {
         System.out.println("calcNextValidTime");
-        CronExpression instance = cp.parse("* * * * * * * *");
+        CronExpression instance = cp.parse("* * * * * * * *", CronExpression.TIMEZONE_UTC);
         Calendar c = getCalendar();
-        instance.setCurrentTime(c);
+        instance.setCurrentTime(c.getTimeInMillis());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-01 00:00:00.000", instance.getNextTimestampAsString());
         instance.calcNextValidTimeAfter();
         assertEquals("2014-01-01 00:00:00.001", instance.getNextTimestampAsString());
@@ -84,7 +84,7 @@ public class CronExpressionTest {
         assertEquals("2014-01-01 00:00:00.002", instance.getNextTimestampAsString());
 
         c.set(Calendar.MILLISECOND, 999);
-        instance.setCurrentTime(c);
+        instance.setCurrentTime(c.getTimeInMillis());
         instance.calcNextValidTimeAfter();
         assertEquals("2014-01-01 00:00:01.000", instance.getNextTimestampAsString());
     }
@@ -92,14 +92,14 @@ public class CronExpressionTest {
     @Test
     public void testCalcNextValidTime_Sec() throws Exception {
         System.out.println("calcNextValidTime");
-        CronExpression instance = cp.parse("0 5-25/7 * * * * * *");
+        CronExpression instance = cp.parse("0 5-25/7 * * * * * *", CronExpression.TIMEZONE_UTC);
         Calendar c = getCalendar();
-        instance.setCurrentTime(c);
+        instance.setCurrentTime(c.getTimeInMillis());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-01 00:00:05.000", instance.getNextTimestampAsString());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-01 00:00:05.000", instance.getNextTimestampAsString());
 
         instance.calcNextValidTimeAfter();
@@ -118,14 +118,14 @@ public class CronExpressionTest {
     @Test
     public void testCalc_30() throws Exception {
         System.out.println("calcNextValidTime");
-        CronExpression instance = cp.parse("0 0 0 12 30 * * *");
+        CronExpression instance = cp.parse("0 0 0 12 30 * * *", CronExpression.TIMEZONE_UTC);
         Calendar c = getCalendar();
-        instance.setCurrentTime(c);
+        instance.setCurrentTime(c.getTimeInMillis());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-30 12:00:00.000", instance.getNextTimestampAsString());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-30 12:00:00.000", instance.getNextTimestampAsString());
 
         instance.calcNextValidTimeAfter();
@@ -141,14 +141,14 @@ public class CronExpressionTest {
     @Test
     public void testCalc_31() throws Exception {
         System.out.println("calcNextValidTime");
-        CronExpression instance = cp.parse("0 0 0 15 31 * * *");
+        CronExpression instance = cp.parse("0 0 0 15 31 * * *", CronExpression.TIMEZONE_UTC);
         Calendar c = getCalendar();
-        instance.setCurrentTime(c);
+        instance.setCurrentTime(c.getTimeInMillis());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-31 15:00:00.000", instance.getNextTimestampAsString());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-31 15:00:00.000", instance.getNextTimestampAsString());
 
         instance.calcNextValidTimeAfter();
@@ -176,15 +176,15 @@ public class CronExpressionTest {
     @Test
     public void testCalc_29_FEB() throws Exception {
         System.out.println("calcNextValidTime");
-        CronExpression instance = cp.parse("0 0 0 12 29 FEB * *");
+        CronExpression instance = cp.parse("0 0 0 12 29 FEB * *", CronExpression.TIMEZONE_UTC);
         Calendar c = getCalendar();
 //        instance.getNextTimestamp().setTimeZone(tz);
-        instance.setCurrentTime(c);
+        instance.setCurrentTime(c.getTimeInMillis());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2016-02-29 12:00:00.000", instance.getNextTimestampAsString());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2016-02-29 12:00:00.000", instance.getNextTimestampAsString());
 
         instance.calcNextValidTimeAfter();
@@ -194,15 +194,15 @@ public class CronExpressionTest {
     @Test
     public void testCalc_Range_28_TO_31() throws Exception {
         System.out.println("calcNextValidTime");
-        CronExpression instance = cp.parse("0 0 0 21 28-31 * * *");
+        CronExpression instance = cp.parse("0 0 0 21 28-31 * * *", CronExpression.TIMEZONE_UTC);
         Calendar c = getCalendar();
 //        instance.getNextTimestamp().setTimeZone(tz);
-        instance.setCurrentTime(c);
+        instance.setCurrentTime(c.getTimeInMillis());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-28 21:00:00.000", instance.getNextTimestampAsString());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-28 21:00:00.000", instance.getNextTimestampAsString());
 
         instance.calcNextValidTimeAfter();
@@ -245,15 +245,15 @@ public class CronExpressionTest {
     @Test
     @Ignore("Currently No ranges in day, month and year")
     public void testCalc_Range_28_29_30_31() throws Exception {
-        CronExpression instance = cp.parse("0 0 0 21 28,29,30,31 * * *");
+        CronExpression instance = cp.parse("0 0 0 21 28,29,30,31 * * *", CronExpression.TIMEZONE_UTC);
         Calendar c = getCalendar();
 //        instance.getNextTimestamp().setTimeZone(tz);
-        instance.setCurrentTime(c);
+        instance.setCurrentTime(c.getTimeInMillis());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2016-29-02 12:00:00.000", instance.getNextTimestampAsString());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2016-29-02 12:00:00.000", instance.getNextTimestampAsString());
 
         instance.calcNextValidTimeAfter();
@@ -265,15 +265,15 @@ public class CronExpressionTest {
     @Test
     public void testCalc_Range_28_TO_29_FEB() throws Exception {
         System.out.println("calcNextValidTime");
-        CronExpression instance = cp.parse("0 0 0 21 28-29 FEB * *");
+        CronExpression instance = cp.parse("0 0 0 21 28-29 FEB * *", CronExpression.TIMEZONE_UTC);
         Calendar c = getCalendar();
 //        instance.getNextTimestamp().setTimeZone(tz);
-        instance.setCurrentTime(c);
+        instance.setCurrentTime(c.getTimeInMillis());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-02-28 21:00:00.000", instance.getNextTimestampAsString());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-02-28 21:00:00.000", instance.getNextTimestampAsString());
 
         instance.calcNextValidTimeAfter();
@@ -292,15 +292,15 @@ public class CronExpressionTest {
     @Test
     @Ignore("No ranges in day, month and year")
     public void testCalc_Range_28_29_FEB() throws Exception {
-        CronExpression instance = cp.parse("0 0 0 21 28,29 FEB * *");
+        CronExpression instance = cp.parse("0 0 0 21 28,29 FEB * *", CronExpression.TIMEZONE_UTC);
         Calendar c = getCalendar();
 //        instance.getNextTimestamp().setTimeZone(tz);
-        instance.setCurrentTime(c);
+        instance.setCurrentTime(c.getTimeInMillis());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2016-29-02 12:00:00.000", instance.getNextTimestampAsString());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2016-29-02 12:00:00.000", instance.getNextTimestampAsString());
 
         instance.calcNextValidTimeAfter();
@@ -314,14 +314,14 @@ public class CronExpressionTest {
     @Ignore
     public void testCalc_Last_Day_Of_Month() throws Exception {
         System.out.println("calcNextValidTime");
-        CronExpression instance = cp.parse("0 0 0 12 L * * *");
+        CronExpression instance = cp.parse("0 0 0 12 L * * *", CronExpression.TIMEZONE_UTC);
         Calendar c = getCalendar();
-        instance.setCurrentTime(c);
+        instance.setCurrentTime(c.getTimeInMillis());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-01 00:00:00.000", instance.getNextTimestampAsString());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-01 00:00:00.000", instance.getNextTimestampAsString());
 
         instance.calcNextValidTimeAfter();
@@ -340,14 +340,14 @@ public class CronExpressionTest {
     @Ignore
     public void testCalc_WeekDay() throws Exception {
         System.out.println("calcNextValidTime");
-        CronExpression instance = cp.parse("0 0 0 12 * * SUN *");
+        CronExpression instance = cp.parse("0 0 0 12 * * SUN *", CronExpression.TIMEZONE_UTC);
         Calendar c = getCalendar();
-        instance.setCurrentTime(c);
+        instance.setCurrentTime(c.getTimeInMillis());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-01 00:00:00.000", instance.getNextTimestampAsString());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-01 00:00:00.000", instance.getNextTimestampAsString());
 
         instance.calcNextValidTimeAfter();
@@ -367,14 +367,14 @@ public class CronExpressionTest {
     public void testCalc_WorkDay() throws Exception {
         //cron # ???
         System.out.println("calcNextValidTime");
-        CronExpression instance = cp.parse("0 0 0 12 29W * * *");
+        CronExpression instance = cp.parse("0 0 0 12 29W * * *", CronExpression.TIMEZONE_UTC);
         Calendar c = getCalendar();
-        instance.setCurrentTime(c);
+        instance.setCurrentTime(c.getTimeInMillis());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-01 00:00:00.000", instance.getNextTimestampAsString());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-01 00:00:00.000", instance.getNextTimestampAsString());
 
         instance.calcNextValidTimeAfter();
@@ -392,11 +392,11 @@ public class CronExpressionTest {
     @Test
     public void testCalc_Ranges() throws Exception {
         System.out.println("calcNextValidTime");
-        CronExpression instance = cp.parse("0 0 0-29/3,30-59/5 * * * * *");
+        CronExpression instance = cp.parse("0 0 0-29/3,30-59/5 * * * * *", CronExpression.TIMEZONE_UTC);
         Calendar c = getCalendar();
-        instance.setCurrentTime(c);
+        instance.setCurrentTime(c.getTimeInMillis());
 
-        instance.calcNextValidTimeIncludingNow();
+        instance.calcNextValidTimeIncludingCurrent();
         assertEquals("2014-01-01 00:00:00.000", instance.getNextTimestampAsString());
 
         instance.calcNextValidTimeAfter();
@@ -406,7 +406,7 @@ public class CronExpressionTest {
         assertEquals("2014-01-01 00:06:00.000", instance.getNextTimestampAsString());
 
         c.set(Calendar.MINUTE, 27);
-        instance.setCurrentTime(c);
+        instance.setCurrentTime(c.getTimeInMillis());
         instance.calcNextValidTimeAfter();
         assertEquals("2014-01-01 00:30:00.000", instance.getNextTimestampAsString());
 
