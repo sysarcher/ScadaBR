@@ -86,7 +86,7 @@ public abstract class ScriptVO<T extends ScriptVO<?>> implements Serializable,
         }
 
         public static List<String> getTypeList() {
-            List<String> result = new ArrayList<String>();
+            List<String> result = new ArrayList<>();
             for (Type type : values()) {
                 result.add(type.name());
             }
@@ -129,18 +129,18 @@ public abstract class ScriptVO<T extends ScriptVO<?>> implements Serializable,
 
     public void validate(DwrResponseI18n response) {
         if (xid.isEmpty()) {
-            response.addContextualMessage("xid", "validate.required");
+            response.addContextual("xid", "validate.required");
         } else if (!new DataSourceDao().isXidUnique(xid, id)) {
-            response.addContextualMessage("xid", "validate.xidUsed");
-        } else if (StringUtils.isLengthGreaterThan(xid, 50)) {
-            response.addContextualMessage("xid", "validate.notLongerThan", 50);
+            response.addContextual("xid", "validate.xidUsed");
+        } else if (xid.length() > 50) {
+            response.addContextual("xid", "validate.notLongerThan", 50);
         }
 
         if (name.isEmpty()) {
-            response.addContextualMessage("name", "validate.nameRequired");
+            response.addContextual("name", "validate.nameRequired");
         }
-        if (StringUtils.isLengthGreaterThan(name, 40)) {
-            response.addContextualMessage("name", "validate.nameTooLong");
+        if (name.length() > 40) {
+            response.addContextual("name", "validate.nameTooLong");
         }
     }
 

@@ -116,15 +116,13 @@ public class Alpha2DataSourceVO<T extends Alpha2DataSourceVO<?>> extends
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (station < 0) {
-            response.addContextualMessage("station", "validate.invalidValue");
+            response.addContextual("station", "validate.invalidValue");
         }
         if (timeout <= 0) {
-            response
-                    .addContextualMessage("timeout", "validate.greaterThanZero");
+            response .addContextual("timeout", "validate.greaterThanZero");
         }
         if (retries < 0) {
-            response.addContextualMessage("retries",
-                    "validate.cannotBeNegative");
+            response.addContextual("retries", "validate.cannotBeNegative");
         }
     }
 

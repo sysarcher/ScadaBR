@@ -132,18 +132,18 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @Override
     public void validate(DwrResponseI18n response) {
         if (oid.isEmpty()) {
-            response.addContextualMessage("oid", "validate.required");
+            response.addContextual("oid", "validate.required");
         } else {
             oid = oid.trim();
             try {
                 new OID(oid);
             } catch (RuntimeException e) {
-                response.addContextualMessage("oid", "validate.parseError", e.getMessage());
+                response.addContextual("oid", "validate.parseError", e.getMessage());
             }
         }
 
         if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
+            response.addContextual("dataTypeId", "validate.invalidValue");
         }
     }
 

@@ -39,7 +39,6 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -153,13 +152,13 @@ public class JmxDataSourceVO extends DataSourceVO<JmxDataSourceVO> {
         super.validate(response);
 
         if (!useLocalServer && remoteServerAddr.isEmpty()) {
-            response.addContextualMessage("remoteServerAddr", "validate.required");
+            response.addContextual("remoteServerAddr", "validate.required");
         }
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextualMessage("updatePeriodType", "validate.invalidValue");
+            response.addContextual("updatePeriodType", "validate.invalidValue");
         }
         if (updatePeriods <= 0) {
-            response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
+            response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
     }
 

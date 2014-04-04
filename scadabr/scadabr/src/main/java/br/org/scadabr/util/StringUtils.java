@@ -7,12 +7,22 @@ package br.org.scadabr.util;
 
 import br.org.scadabr.ImplementMeException;
 import java.util.Properties;
+import java.util.Random;
 
 /**
  *
  * @author aploese
  */
 public class StringUtils {
+
+    public static final Random RANDOM;
+
+    static {
+        RANDOM = new Random();
+        for (int i = 0; i < 100; i++) {
+            RANDOM.nextInt();
+        }
+    }
 
     @Deprecated //Use Arrays.???
     public static boolean isEmpty(int[] values) {
@@ -32,13 +42,12 @@ public class StringUtils {
         return sb.toString();
     }
 
-    @Deprecated
-    public static boolean isLengthGreaterThan(String username, int i) {
-        throw new ImplementMeException();
-    }
-
-    public static String generateRandomString(int i, String string) {
-        throw new ImplementMeException();
+    public static String generateRandomString(int length, String charSet) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append(charSet.charAt(RANDOM.nextInt(charSet.length())));
+        }
+        return sb.toString();
     }
 
     public static boolean globWhiteListMatchIgnoreCase(String[] deviceIdWhiteList, String deviceId) {

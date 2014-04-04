@@ -52,7 +52,7 @@ public class MailingList extends EmailRecipient {
      * 4 * 24 * 7 = 672 individual periods.
      */
     @JsonRemoteProperty(innerType = Integer.class)
-    private Set<Integer> inactiveIntervals = new TreeSet<Integer>();
+    private Set<Integer> inactiveIntervals = new TreeSet<>();
 
     @Override
     public int getRecipientType() {
@@ -135,17 +135,17 @@ public class MailingList extends EmailRecipient {
     public void validate(DwrResponseI18n response) {
         // Check that required fields are present.
         if (name.isEmpty()) {
-            response.addContextualMessage("name", "mailingLists.validate.nameRequired");
+            response.addContextual("name", "mailingLists.validate.nameRequired");
         }
 
         // Check field lengths
-        if (StringUtils.isLengthGreaterThan(name, 40)) {
-            response.addContextualMessage("name", "mailingLists.validate.nameGreaterThan40");
+        if (name.length() > 40) {
+            response.addContextual("name", "mailingLists.validate.nameGreaterThan40");
         }
 
         // Check for entries.
-        if (entries.size() == 0) {
-            response.addGenericMessage("mailingLists.validate.entries");
+        if (entries.isEmpty()) {
+            response.addGeneric("mailingLists.validate.entries");
         }
     }
 

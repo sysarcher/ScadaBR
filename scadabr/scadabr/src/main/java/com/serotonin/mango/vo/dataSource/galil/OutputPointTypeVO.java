@@ -70,7 +70,7 @@ public class OutputPointTypeVO extends PointTypeVO {
     @Override
     public void validate(DwrResponseI18n response) {
         if (outputId < 1 || outputId > 80) {
-            response.addContextualMessage("outputPointType.outputId", "validate.1to80");
+            response.addContextual("outputPointType.outputId", "validate.1to80");
         }
     }
 

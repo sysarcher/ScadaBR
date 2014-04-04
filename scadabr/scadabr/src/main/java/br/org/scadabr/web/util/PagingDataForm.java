@@ -5,7 +5,6 @@
  */
 package br.org.scadabr.web.util;
 
-import br.org.scadabr.ImplementMeException;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;

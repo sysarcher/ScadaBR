@@ -101,22 +101,22 @@ public class ReportsDwr extends BaseDwr {
                 try {
                     new CronParser().parse(scheduleCron, CronExpression.TIMEZONE_UTC);
                 } catch (Exception e) {
-                    response.addContextualMessage("scheduleCron", "reports.validate.cron", e.getMessage());
+                    response.addContextual("scheduleCron", "reports.validate.cron", e);
                 }
             } else {
                 if (runDelayMinutes < 0) {
-                    response.addContextualMessage("runDelayMinutes", "reports.validate.lessThan0");
+                    response.addContextual("runDelayMinutes", "reports.validate.lessThan0");
                 } else if (runDelayMinutes > 59) {
-                    response.addContextualMessage("runDelayMinutes", "reports.validate.greaterThan59");
+                    response.addContextual("runDelayMinutes", "reports.validate.greaterThan59");
                 }
             }
         }
 
         if (schedule && email && recipients.isEmpty()) {
-            response.addContextualMessage("recipients", "reports.validate.needRecip");
+            response.addContextual("recipients", "reports.validate.needRecip");
         }
 
-        if (response.getHasMessages()) {
+        if (!response.isEmpty()) {
             return response;
         }
 
@@ -186,7 +186,7 @@ public class ReportsDwr extends BaseDwr {
         // Basic validation
         validateData(response, name, points, dateRangeType, relativeDateType, previousPeriodCount, pastPeriodCount);
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             ReportVO report = new ReportVO();
             report.setName(name);
             report.setUserId(Common.getUser().getId());
@@ -236,26 +236,26 @@ public class ReportsDwr extends BaseDwr {
     private void validateData(DwrResponseI18n response, String name, List<ReportPointVO> points, int dateRangeType,
             int relativeDateType, int previousPeriodCount, int pastPeriodCount) {
         if (name.isEmpty()) {
-            response.addContextualMessage("name", "reports.validate.required");
+            response.addContextual("name", "reports.validate.required");
         }
-        if (StringUtils.isLengthGreaterThan(name, 100)) {
-            response.addContextualMessage("name", "reports.validate.longerThan100");
+        if (name.length() > 100) {
+            response.addContextual("name", "reports.validate.longerThan100");
         }
         if (points.isEmpty()) {
-            response.addContextualMessage("points", "reports.validate.needPoint");
+            response.addContextual("points", "reports.validate.needPoint");
         }
         if (dateRangeType != ReportVO.DATE_RANGE_TYPE_RELATIVE && dateRangeType != ReportVO.DATE_RANGE_TYPE_SPECIFIC) {
-            response.addGenericMessage("reports.validate.invalidDateRangeType");
+            response.addGeneric("reports.validate.invalidDateRangeType");
         }
         if (relativeDateType != ReportVO.RELATIVE_DATE_TYPE_PAST
                 && relativeDateType != ReportVO.RELATIVE_DATE_TYPE_PREVIOUS) {
-            response.addGenericMessage("reports.validate.invalidRelativeDateType");
+            response.addGeneric("reports.validate.invalidRelativeDateType");
         }
         if (previousPeriodCount < 1) {
-            response.addContextualMessage("previousPeriodCount", "reports.validate.periodCountLessThan1");
+            response.addContextual("previousPeriodCount", "reports.validate.periodCountLessThan1");
         }
         if (pastPeriodCount < 1) {
-            response.addContextualMessage("pastPeriodCount", "reports.validate.periodCountLessThan1");
+            response.addContextual("pastPeriodCount", "reports.validate.periodCountLessThan1");
         }
 
         User user = Common.getUser();
@@ -268,7 +268,7 @@ public class ReportsDwr extends BaseDwr {
                     ColorUtils.toColor(point.getColour());
                 }
             } catch (InvalidArgumentException e) {
-                response.addContextualMessage("points", "reports.validate.colour", point.getColour());
+                response.addContextual("points", "reports.validate.colour", point.getColour());
             }
         }
     }

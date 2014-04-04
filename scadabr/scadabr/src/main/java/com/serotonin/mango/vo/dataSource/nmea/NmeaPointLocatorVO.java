@@ -36,7 +36,6 @@ import com.serotonin.mango.rt.dataSource.nmea.NmeaPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -86,6 +85,7 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         this.fieldIndex = fieldIndex;
     }
 
+    @Override
     public int getDataTypeId() {
         return dataTypeId;
     }
@@ -105,11 +105,11 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @Override
     public void validate(DwrResponseI18n response) {
         if (messageName.isEmpty()) {
-            response.addContextualMessage("messageName", "validate.required");
+            response.addContextual("messageName", "validate.required");
         }
 
         if (fieldIndex <= 0) {
-            response.addContextualMessage("fieldIndex", "validate.greaterThanZero");
+            response.addContextual("fieldIndex", "validate.greaterThanZero");
         }
     }
 

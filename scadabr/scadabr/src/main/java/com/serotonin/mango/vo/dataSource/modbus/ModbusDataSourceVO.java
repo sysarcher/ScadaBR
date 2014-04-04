@@ -177,25 +177,25 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<?>> extend
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextualMessage("updatePeriodType", "validate.invalidValue");
+            response.addContextual("updatePeriodType", "validate.invalidValue");
         }
         if (updatePeriods <= 0) {
-            response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
+            response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
         if (timeout <= 0) {
-            response.addContextualMessage("timeout", "validate.greaterThanZero");
+            response.addContextual("timeout", "validate.greaterThanZero");
         }
         if (retries < 0) {
-            response.addContextualMessage("retries", "validate.cannotBeNegative");
+            response.addContextual("retries", "validate.cannotBeNegative");
         }
         if (maxReadBitCount < 1) {
-            response.addContextualMessage("maxReadBitCount", "validate.greaterThanZero");
+            response.addContextual("maxReadBitCount", "validate.greaterThanZero");
         }
         if (maxReadRegisterCount < 1) {
-            response.addContextualMessage("maxReadRegisterCount", "validate.greaterThanZero");
+            response.addContextual("maxReadRegisterCount", "validate.greaterThanZero");
         }
         if (maxWriteRegisterCount < 1) {
-            response.addContextualMessage("maxWriteRegisterCount", "validate.greaterThanZero");
+            response.addContextual("maxWriteRegisterCount", "validate.greaterThanZero");
         }
     }
 

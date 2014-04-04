@@ -32,12 +32,12 @@ public class DrStorageHt5bPointLocatorVO extends AbstractPointLocatorVO
     @JsonRemoteProperty
     private boolean settable;
 
-    private int dataType = DataTypes.ALPHANUMERIC;
+    private final int dataType = DataTypes.ALPHANUMERIC;
 
     @Override
     public void validate(DwrResponseI18n response) {
         if (StringUtils.isEmpty(pointType)) {
-            response.addContextualMessage("pointType", "validate.required");
+            response.addContextual("pointType", "validate.required");
         }
     }
 

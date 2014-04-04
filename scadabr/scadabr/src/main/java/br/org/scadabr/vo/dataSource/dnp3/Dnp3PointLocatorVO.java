@@ -149,7 +149,7 @@ public class Dnp3PointLocatorVO extends AbstractPointLocatorVO implements
     @Override
     public void validate(DwrResponseI18n response) {
         if (index < 0) {
-            response.addContextualMessage("index", "validate.invalidValue");
+            response.addContextual("index", "validate.invalidValue");
         }
     }
 

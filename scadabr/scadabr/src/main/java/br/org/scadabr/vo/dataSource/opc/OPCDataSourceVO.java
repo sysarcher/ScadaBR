@@ -178,22 +178,21 @@ public class OPCDataSourceVO<T extends OPCDataSourceVO<?>> extends
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (host.isEmpty()) {
-            response.addContextualMessage("host", "validate.required");
+            response.addContextual("host", "validate.required");
         }
 		// if (StringUtils.isEmpty(domain))
         // response.addContextualMessage("domain", "validate.required");
         if (user.isEmpty()) {
-            response.addContextualMessage("user", "validate.required");
+            response.addContextual("user", "validate.required");
         }
         if (password.isEmpty()) {
-            response.addContextualMessage("password", "validate.required");
+            response.addContextual("password", "validate.required");
         }
         if (server.isEmpty()) {
-            response.addContextualMessage("server", "validate.required");
+            response.addContextual("server", "validate.required");
         }
         if (updatePeriods <= 0) {
-            response.addContextualMessage("updatePeriods",
-                    "validate.greaterThanZero");
+            response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
     }
 

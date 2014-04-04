@@ -138,18 +138,18 @@ public class SpinwaveDataSourceVO extends DataSourceVO<SpinwaveDataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (messageVersion != SpinwaveReceiver.VERSION_1 && messageVersion != SpinwaveReceiver.VERSION_2) {
-            response.addContextualMessage("messageVersion", "validate.invalidValue");
+            response.addContextual("messageVersion", "validate.invalidValue");
         }
         if (commPortId.isEmpty()) {
-            response.addContextualMessage("commPortId", "validate.required");
+            response.addContextual("commPortId", "validate.required");
         }
         for (long addr : sensorAddresses) {
             if (addr <= 0) {
-                response.addContextualMessage("sensorAddresses", "validate.invalidAddress", addr);
+                response.addContextual("sensorAddresses", "validate.invalidAddress", addr);
             }
         }
         if (heartbeatTimeout < 30) {
-            response.addContextualMessage("heartbeatTimeout", "validate.notLessThan30s");
+            response.addContextual("heartbeatTimeout", "validate.notLessThan30s");
         }
     }
 

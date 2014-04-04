@@ -55,7 +55,7 @@ public class ScriptsDwr extends BaseDwr {
 
         vo.validate(response);
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             new ScriptDao().saveScript(vo);
         }
 

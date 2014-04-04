@@ -115,6 +115,7 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         this.valueFormat = valueFormat;
     }
 
+    @Override
     public int getDataTypeId() {
         return dataTypeId;
     }
@@ -147,17 +148,18 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         this.timeFormat = timeFormat;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
         if (valueRegex.isEmpty()) {
-            response.addContextualMessage("valueRegex", "validate.required");
+            response.addContextual("valueRegex", "validate.required");
         } else {
             try {
                 Pattern pattern = Pattern.compile(valueRegex);
                 if (pattern.matcher("").groupCount() < 1) {
-                    response.addContextualMessage("valueRegex", "validate.captureGroup");
+                    response.addContextual("valueRegex", "validate.captureGroup");
                 }
             } catch (PatternSyntaxException e) {
-                response.addContextualMessage("valueRegex", "common.default", e.getMessage());
+                response.addContextual("valueRegex", "common.default", e);
             }
         }
 
@@ -165,31 +167,31 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             try {
                 new DecimalFormat(valueFormat);
             } catch (IllegalArgumentException e) {
-                response.addContextualMessage("valueFormat", "common.default", e.getMessage());
+                response.addContextual("valueFormat", "common.default", e);
             }
         }
 
         if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
+            response.addContextual("dataTypeId", "validate.invalidValue");
         }
 
         if (!timeRegex.isEmpty()) {
             try {
                 Pattern pattern = Pattern.compile(timeRegex);
                 if (pattern.matcher("").groupCount() < 1) {
-                    response.addContextualMessage("timeRegex", "validate.captureGroup");
+                    response.addContextual("timeRegex", "validate.captureGroup");
                 }
             } catch (PatternSyntaxException e) {
-                response.addContextualMessage("timeRegex", "common.default", e.getMessage());
+                response.addContextual("timeRegex", "common.default", e);
             }
 
             if (timeFormat.isEmpty()) {
-                response.addContextualMessage("timeFormat", "validate.required");
+                response.addContextual("timeFormat", "validate.required");
             } else {
                 try {
                     new SimpleDateFormat(timeFormat);
                 } catch (IllegalArgumentException e) {
-                    response.addContextualMessage("timeFormat", "common.default", e.getMessage());
+                    response.addContextual("timeFormat", "common.default", e);
                 }
             }
         }

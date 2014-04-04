@@ -316,7 +316,7 @@ public class EventHandlersDwr extends BaseDwr {
         DwrResponseI18n response = new DwrResponseI18n();
         vo.validate(response);
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             eventDao.saveEventHandler(type, vo);
             response.addData("handler", vo);
         }

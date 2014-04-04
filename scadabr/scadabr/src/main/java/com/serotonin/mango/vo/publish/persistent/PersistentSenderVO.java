@@ -38,7 +38,6 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -81,7 +80,7 @@ public class PersistentSenderVO extends PublisherVO<PersistentPointVO> {
     public static final int SYNC_TYPE_WEEKLY = 2;
     public static final int SYNC_TYPE_MONTHLY = 3;
 
-    private static ExportCodes SYNC_TYPE_CODES = new ExportCodes();
+    private final static ExportCodes SYNC_TYPE_CODES = new ExportCodes();
 
     static {
         SYNC_TYPE_CODES.addElement(SYNC_TYPE_NONE, "SYNC_TYPE_NONE", "publisherEdit.persistent.sync.none");
@@ -170,14 +169,14 @@ public class PersistentSenderVO extends PublisherVO<PersistentPointVO> {
         super.validate(response);
 
         if (host.isEmpty()) {
-            response.addContextualMessage("host", "validate.required");
+            response.addContextual("host", "validate.required");
         }
         if (port <= 0 || port >= 65536) {
-            response.addContextualMessage("port", "validate.illegalValue");
+            response.addContextual("port", "validate.illegalValue");
         }
 
         if (!SYNC_TYPE_CODES.isValidId(syncType)) {
-            response.addContextualMessage("syncType", "validate.invalidValue");
+            response.addContextual("syncType", "validate.invalidValue");
         }
     }
 

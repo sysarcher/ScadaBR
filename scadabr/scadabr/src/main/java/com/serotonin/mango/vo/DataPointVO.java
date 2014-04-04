@@ -565,60 +565,60 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
 
     public void validate(DwrResponseI18n response) {
         if (xid.isEmpty()) {
-            response.addContextualMessage("xid", "validate.required");
-        } else if (StringUtils.isLengthGreaterThan(xid, 50)) {
-            response.addMessage("xid", new LocalizableMessageImpl("validate.notLongerThan", 50));
+            response.addContextual("xid", "validate.required");
+        } else if (xid.length() > 50) {
+            response.addContextual("xid", "validate.notLongerThan", 50);
         } else if (!new DataPointDao().isXidUnique(xid, id)) {
-            response.addContextualMessage("xid", "validate.xidUsed");
+            response.addContextual("xid", "validate.xidUsed");
         }
 
         if (name.isEmpty()) {
-            response.addContextualMessage("name", "validate.required");
+            response.addContextual("name", "validate.required");
         }
 
         if (!LOGGING_TYPE_CODES.isValidId(loggingType)) {
-            response.addContextualMessage("loggingType", "validate.invalidValue");
+            response.addContextual("loggingType", "validate.invalidValue");
         }
         if (loggingType == DataPointVO.LoggingTypes.ON_CHANGE && pointLocator.getDataTypeId() == DataTypes.NUMERIC) {
             if (tolerance < 0) {
-                response.addContextualMessage("tolerance", "validate.cannotBeNegative");
+                response.addContextual("tolerance", "validate.cannotBeNegative");
             }
         }
 
         if (!Common.TIME_PERIOD_CODES.isValidId(intervalLoggingPeriodType)) {
-            response.addContextualMessage("intervalLoggingPeriodType", "validate.invalidValue");
+            response.addContextual("intervalLoggingPeriodType", "validate.invalidValue");
         }
         if (intervalLoggingPeriod <= 0) {
-            response.addContextualMessage("intervalLoggingPeriod", "validate.greaterThanZero");
+            response.addContextual("intervalLoggingPeriod", "validate.greaterThanZero");
         }
         if (!INTERVAL_LOGGING_TYPE_CODES.isValidId(intervalLoggingType)) {
-            response.addContextualMessage("intervalLoggingType", "validate.invalidValue");
+            response.addContextual("intervalLoggingType", "validate.invalidValue");
         }
 
         if (!Common.TIME_PERIOD_CODES.isValidId(purgeType)) {
-            response.addContextualMessage("purgeType", "validate.invalidValue");
+            response.addContextual("purgeType", "validate.invalidValue");
         }
         if (purgePeriod <= 0) {
-            response.addContextualMessage("purgePeriod", "validate.greaterThanZero");
+            response.addContextual("purgePeriod", "validate.greaterThanZero");
         }
 
         if (textRenderer == null) {
-            response.addContextualMessage("textRenderer", "validate.required");
+            response.addContextual("textRenderer", "validate.required");
         }
 
         if (defaultCacheSize < 0) {
-            response.addContextualMessage("defaultCacheSize", "validate.cannotBeNegative");
+            response.addContextual("defaultCacheSize", "validate.cannotBeNegative");
         }
 
         if (discardExtremeValues && discardHighLimit <= discardLowLimit) {
-            response.addContextualMessage("discardHighLimit", "validate.greaterThanDiscardLow");
+            response.addContextual("discardHighLimit", "validate.greaterThanDiscardLow");
         }
 
         if (!chartColour.isEmpty()) {
             try {
                 ColorUtils.toColor(chartColour);
             } catch (InvalidArgumentException e) {
-                response.addContextualMessage("chartColour", "validate.invalidValue");
+                response.addContextual("chartColour", "validate.invalidValue");
             }
         }
 
@@ -626,12 +626,12 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
 
         // Check text renderer type
         if (textRenderer != null && !textRenderer.getDef().supports(pointLocator.getDataTypeId())) {
-            response.addGenericMessage("validate.text.incompatible");
+            response.addGeneric("validate.text.incompatible");
         }
 
         // Check chart renderer type
         if (chartRenderer != null && !chartRenderer.getDef().supports(pointLocator.getDataTypeId())) {
-            response.addGenericMessage("validate.chart.incompatible");
+            response.addGeneric("validate.chart.incompatible");
         }
     }
 

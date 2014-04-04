@@ -48,6 +48,9 @@ import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
+import freemarker.template.TemplateException;
+import java.io.IOException;
+import javax.mail.internet.AddressException;
 
 public class UsersDwr extends BaseDwr {
 
@@ -135,22 +138,22 @@ public class UsersDwr extends BaseDwr {
         // Check if the username is unique.
         User dupUser = userDao.getUser(username);
         if (id == Common.NEW_ID && dupUser != null) {
-            response.addMessage("users.validate.usernameUnique");
+            response.addGeneric("users.validate.usernameUnique");
         } else if (dupUser != null && id != dupUser.getId()) {
-            response.addMessage("users.validate.usernameInUse");
+            response.addGeneric("users.validate.usernameInUse");
         }
 
         // Cannot make yourself disabled or not admin
         if (currentUser.getId() == id) {
             if (!admin) {
-                response.addMessage("users.validate.adminInvalid");
+                response.addGeneric("users.validate.adminInvalid");
             }
             if (disabled) {
-                response.addMessage("users.validate.adminDisable");
+                response.addGeneric("users.validate.adminDisable");
             }
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             userDao.saveUser(user);
 
             if (currentUser.getId() == id) // Update the user object in session too. Why not?
@@ -185,7 +188,7 @@ public class UsersDwr extends BaseDwr {
         DwrResponseI18n response = new DwrResponseI18n();
         updateUser.validate(response);
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             userDao.saveUser(user);
 
             // Update the user object in session too. Why not?
@@ -205,7 +208,7 @@ public class UsersDwr extends BaseDwr {
             MangoEmailContent cnt = new MangoEmailContent("testEmail", model, bundle, Localizer.localizeI18nKey("ftl.testEmail", bundle), Common.UTF8);
             EmailWorkItem.queueEmail(email, cnt);
             result.put("message", new LocalizableMessageImpl("common.testEmailSent", email));
-        } catch (Exception e) {
+        } catch (TemplateException | IOException | AddressException e) {
             result.put("exception", e.getMessage());
         }
         return result;
@@ -218,7 +221,7 @@ public class UsersDwr extends BaseDwr {
 
         if (currentUser.getId() == id) // You can't delete yourself.
         {
-            response.addMessage("users.validate.badDelete");
+            response.addGeneric("users.validate.badDelete");
         } else {
             new UserDao().deleteUser(id);
         }

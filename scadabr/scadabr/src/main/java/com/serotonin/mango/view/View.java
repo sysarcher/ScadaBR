@@ -214,22 +214,17 @@ public class View implements Serializable, JsonSerializable {
 
     public void validate(DwrResponseI18n response) {
         if (name.isEmpty()) {
-            response.addMessage("name", new LocalizableMessageImpl(
-                    "validate.required"));
-        } else if (StringUtils.isLengthGreaterThan(name, 100)) {
-            response.addMessage("name", new LocalizableMessageImpl(
-                    "validate.notLongerThan", 100));
+            response.addContextual("name",  "validate.required");
+        } else if (name.length() > 100) {
+            response.addContextual("name", "validate.notLongerThan", 100);
         }
 
         if (xid.isEmpty()) {
-            response.addMessage("xid", new LocalizableMessageImpl(
-                    "validate.required"));
-        } else if (StringUtils.isLengthGreaterThan(xid, 50)) {
-            response.addMessage("xid", new LocalizableMessageImpl(
-                    "validate.notLongerThan", 50));
+            response.addContextual("xid", "validate.required");
+        } else if (xid.length() >  50) {
+            response.addContextual("xid", "validate.notLongerThan", 50);
         } else if (!new ViewDao().isXidUnique(xid, id)) {
-            response.addMessage("xid", new LocalizableMessageImpl(
-                    "validate.xidUsed"));
+            response.addContextual("xid", "validate.xidUsed");
         }
 
         for (ViewComponent vc : viewComponents) {

@@ -384,14 +384,13 @@ public class EventHandlerVO implements Serializable,
             DataPointVO dp = new DataPointDao().getDataPoint(targetPointId);
 
             if (dp == null) {
-                response.addGenericMessage("eventHandlers.noTargetPoint");
+                response.addGeneric("eventHandlers.noTargetPoint");
             } else {
                 int dataType = dp.getPointLocator().getDataTypeId();
 
                 if (activeAction == SET_ACTION_NONE
                         && inactiveAction == SET_ACTION_NONE) {
-                    response
-                            .addGenericMessage("eventHandlers.noSetPointAction");
+                    response.addGeneric("eventHandlers.noSetPointAction");
                 }
 
                 // Active
@@ -400,8 +399,7 @@ public class EventHandlerVO implements Serializable,
                     try {
                         Integer.parseInt(activeValueToSet);
                     } catch (NumberFormatException e) {
-                        response
-                                .addGenericMessage("eventHandlers.invalidActiveValue");
+                        response.addGeneric("eventHandlers.invalidActiveValue");
                     }
                 }
 
@@ -410,8 +408,7 @@ public class EventHandlerVO implements Serializable,
                     try {
                         Double.parseDouble(activeValueToSet);
                     } catch (NumberFormatException e) {
-                        response
-                                .addGenericMessage("eventHandlers.invalidActiveValue");
+                        response.addGeneric("eventHandlers.invalidActiveValue");
                     }
                 }
 
@@ -420,12 +417,10 @@ public class EventHandlerVO implements Serializable,
                             .getDataPoint(activePointId);
 
                     if (dpActive == null) {
-                        response
-                                .addGenericMessage("eventHandlers.invalidActiveSource");
+                        response.addGeneric("eventHandlers.invalidActiveSource");
                     } else if (dataType != dpActive.getPointLocator()
                             .getDataTypeId()) {
-                        response
-                                .addGenericMessage("eventHandlers.invalidActiveSourceType");
+                        response.addGeneric("eventHandlers.invalidActiveSourceType");
                     }
                 }
 
@@ -435,8 +430,7 @@ public class EventHandlerVO implements Serializable,
                     try {
                         Integer.parseInt(inactiveValueToSet);
                     } catch (NumberFormatException e) {
-                        response
-                                .addGenericMessage("eventHandlers.invalidInactiveValue");
+                        response.addGeneric("eventHandlers.invalidInactiveValue");
                     }
                 }
 
@@ -445,8 +439,7 @@ public class EventHandlerVO implements Serializable,
                     try {
                         Double.parseDouble(inactiveValueToSet);
                     } catch (NumberFormatException e) {
-                        response
-                                .addGenericMessage("eventHandlers.invalidInactiveValue");
+                        response.addGeneric("eventHandlers.invalidInactiveValue");
                     }
                 }
 
@@ -455,43 +448,39 @@ public class EventHandlerVO implements Serializable,
                             .getDataPoint(inactivePointId);
 
                     if (dpInactive == null) {
-                        response
-                                .addGenericMessage("eventHandlers.invalidInactiveSource");
+                        response.addGeneric("eventHandlers.invalidInactiveSource");
                     } else if (dataType != dpInactive.getPointLocator()
                             .getDataTypeId()) {
-                        response
-                                .addGenericMessage("eventHandlers.invalidInactiveSourceType");
+                        response.addGeneric("eventHandlers.invalidInactiveSourceType");
                     }
                 }
             }
         } else if (handlerType == TYPE_EMAIL) {
             if (activeRecipients.isEmpty()) {
-                response.addGenericMessage("eventHandlers.noEmailRecips");
+                response.addGeneric("eventHandlers.noEmailRecips");
             }
 
             if (sendEscalation) {
                 if (escalationDelay <= 0) {
-                    response.addContextualMessage("escalationDelay",
-                            "eventHandlers.escalDelayError");
+                    response.addContextual("escalationDelay", "eventHandlers.escalDelayError");
                 }
                 if (escalationRecipients.isEmpty()) {
-                    response.addGenericMessage("eventHandlers.noEscalRecips");
+                    response.addGeneric("eventHandlers.noEscalRecips");
                 }
             }
 
             if (sendInactive && inactiveOverride) {
                 if (inactiveRecipients.isEmpty()) {
-                    response
-                            .addGenericMessage("eventHandlers.noInactiveRecips");
+                    response.addGeneric("eventHandlers.noInactiveRecips");
                 }
             }
         } else if (handlerType == TYPE_PROCESS) {
             if (activeProcessCommand == null && inactiveProcessCommand == null) {
-                response.addGenericMessage("eventHandlers.invalidCommands");
+                response.addGeneric("eventHandlers.invalidCommands");
             }
         } else if (handlerType == TYPE_SCRIPT) {
             if (activeScriptCommand < 1 && inactiveScriptCommand < 1) {
-                response.addGenericMessage("eventHandlers.invalidScripts");
+                response.addGeneric("eventHandlers.invalidScripts");
             }
         }
     }

@@ -144,19 +144,19 @@ public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSou
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (url.isEmpty()) {
-            response.addContextualMessage("url", "validate.required");
+            response.addContextual("url", "validate.required");
         }
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextualMessage("updatePeriodType", "validate.invalidValue");
+            response.addContextual("updatePeriodType", "validate.invalidValue");
         }
         if (updatePeriods <= 0) {
-            response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
+            response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
         if (timeoutSeconds <= 0) {
-            response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
+            response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
         if (retries < 0) {
-            response.addContextualMessage("retries", "validate.cannotBeNegative");
+            response.addContextual("retries", "validate.cannotBeNegative");
         }
     }
 

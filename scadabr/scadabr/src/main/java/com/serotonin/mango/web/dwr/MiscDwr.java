@@ -64,11 +64,8 @@ import com.serotonin.mango.web.dwr.longPoll.LongPollData;
 import com.serotonin.mango.web.dwr.longPoll.LongPollRequest;
 import com.serotonin.mango.web.dwr.longPoll.LongPollState;
 import com.serotonin.mango.web.email.MangoEmailContent;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.dwr.MethodFilter;
-import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
 import java.util.Objects;
@@ -102,7 +99,7 @@ public class MiscDwr extends BaseDwr {
 
     @MethodFilter
     public DwrResponseI18n silenceAll() {
-        List<Integer> silenced = new ArrayList<Integer>();
+        List<Integer> silenced = new ArrayList<>();
         User user = Common.getUser();
         EventDao eventDao = new EventDao();
         for (EventInstance evt : eventDao.getPendingEvents(user.getId())) {
@@ -150,7 +147,7 @@ public class MiscDwr extends BaseDwr {
     }
 
     public Map<String, Object> getDocumentationItem(String documentId) {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
 
         DocumentationManifest manifest = Common.ctx.getDocumentationManifest();
         DocumentationItem item = manifest.getItem(documentId);
@@ -160,17 +157,18 @@ public class MiscDwr extends BaseDwr {
             // Read the content.
             String filename = Common.getDocPath() + "/" + getMessage("dox.dir") + "/" + documentId + ".htm";
             try {
-                Reader in = new FileReader(filename);
-                StringWriter out = new StringWriter();
-                StreamUtils.transfer(in, out);
-                in.close();
+                StringWriter out;
+                try (Reader in = new FileReader(filename)) {
+                    out = new StringWriter();
+                    StreamUtils.transfer(in, out);
+                }
 
                 addDocumentationItem(result, item);
                 result.put("content", out.toString());
 
-                List<Map<String, Object>> related = new ArrayList<Map<String, Object>>();
+                List<Map<String, Object>> related = new ArrayList<>();
                 for (String relatedId : item.getRelated()) {
-                    Map<String, Object> map = new HashMap<String, Object>();
+                    Map<String, Object> map = new HashMap<>();
                     related.add(map);
                     addDocumentationItem(map, manifest.getItem(relatedId));
                 }
@@ -204,7 +202,7 @@ public class MiscDwr extends BaseDwr {
 
         String[] toAddrs = new MailingListDao().getRecipientAddresses(recipientList, null).toArray(new String[0]);
         if (toAddrs.length == 0) {
-            response.addGenericMessage("js.email.noRecipForEmail");
+            response.addGeneric("js.email.noRecipForEmail");
         } else {
             try {
                 ResourceBundle bundle = Common.getBundle();
@@ -214,7 +212,7 @@ public class MiscDwr extends BaseDwr {
                 MangoEmailContent cnt = new MangoEmailContent("testEmail", model, bundle, Localizer.localizeI18nKey("ftl.testEmail", bundle), Common.UTF8);
                 EmailWorkItem.queueEmail(toAddrs, cnt);
             } catch (Exception e) {
-                response.addGenericMessage("common.default", e.getMessage());
+                response.addGeneric("common.default", e);
             }
         }
 

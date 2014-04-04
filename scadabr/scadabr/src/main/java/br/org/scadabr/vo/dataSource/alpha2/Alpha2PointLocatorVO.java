@@ -97,11 +97,10 @@ public class Alpha2PointLocatorVO extends AbstractPointLocatorVO {
         if ((deviceCodeId != RUN_STOP_CODE)
                 && DeviceCodes.toDeviceCode(deviceCodeId) == null) {
             response
-                    .addContextualMessage("deviceCode", "validate.invalidValue");
+                    .addContextual("deviceCode", "validate.invalidValue");
         }
         if (deviceNumber < 0) {
-            response.addContextualMessage("deviceNumber",
-                    "validate.invalidValue");
+            response.addContextual("deviceNumber", "validate.invalidValue");
         }
     }
 

@@ -36,9 +36,7 @@ import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.dwr.beans.EventSourceBean;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
@@ -55,13 +53,13 @@ public class CompoundEventsDwr extends BaseDwr {
         User user = Common.getUser();
         Permissions.ensureDataSourcePermission(user);
 
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
 
         // All existing compound events.
         model.put("compoundEvents", new CompoundEventDetectorDao().getCompoundEventDetectors());
 
         // Get the data points
-        List<EventSourceBean> dataPoints = new LinkedList<EventSourceBean>();
+        List<EventSourceBean> dataPoints = new LinkedList<>();
         EventSourceBean source;
         for (DataPointVO dp : new DataPointDao().getDataPoints(DataPointExtendedNameComparator.instance, true)) {
             if (!Permissions.hasDataSourcePermission(user, dp.getDataSourceId())) {
@@ -84,7 +82,7 @@ public class CompoundEventsDwr extends BaseDwr {
         model.put("dataPoints", dataPoints);
 
         // Get the scheduled events
-        List<EventTypeVO> scheduledEvents = new LinkedList<EventTypeVO>();
+        List<EventTypeVO> scheduledEvents = new LinkedList<>();
         List<ScheduledEventVO> ses = new ScheduledEventDao().getScheduledEvents();
         for (ScheduledEventVO se : ses) {
             scheduledEvents.add(se.getEventType());
@@ -125,15 +123,15 @@ public class CompoundEventsDwr extends BaseDwr {
         CompoundEventDetectorDao compoundEventDetectorDao = new CompoundEventDetectorDao();
 
         if (xid.isEmpty()) {
-            response.addContextualMessage("xid", "validate.required");
+            response.addContextual("xid", "validate.required");
         } else if (!compoundEventDetectorDao.isXidUnique(xid, id)) {
-            response.addContextualMessage("xid", "validate.xidUsed");
+            response.addContextual("xid", "validate.xidUsed");
         }
 
         ced.validate(response);
 
         // Save it
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             boolean success = Common.ctx.getRuntimeManager().saveCompoundEventDetector(ced);
 
             if (!success) {

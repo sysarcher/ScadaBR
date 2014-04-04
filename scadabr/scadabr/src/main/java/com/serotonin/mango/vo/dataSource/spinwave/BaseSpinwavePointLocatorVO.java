@@ -39,14 +39,17 @@ import br.org.scadabr.web.i18n.LocalizableMessageImpl;
  */
 abstract public class BaseSpinwavePointLocatorVO extends AbstractPointLocatorVO {
 
+    @Override
     public boolean isSettable() {
         return false;
     }
 
+    @Override
     public PointLocatorRT createRuntime() {
         return new SpinwavePointLocatorRT(this);
     }
 
+    @Override
     public LocalizableMessage getConfigurationDescription() {
         return new LocalizableMessageImpl("dsEdit.spinwave.dpconn", sensorAddress, new LocalizableMessageImpl(
                 getAttributeDescription()));
@@ -87,9 +90,10 @@ abstract public class BaseSpinwavePointLocatorVO extends AbstractPointLocatorVO 
         this.sensorAddress = sensorAddress;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
         if (sensorAddress <= 1) {
-            response.addContextualMessage("sensorAddress", "validate.required");
+            response.addContextual("sensorAddress", "validate.required");
         }
     }
 

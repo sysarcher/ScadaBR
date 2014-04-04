@@ -40,8 +40,6 @@ import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
@@ -52,7 +50,7 @@ public class MultistateGraphicComponent extends ImageSetComponent {
     public static ImplDefinition DEFINITION = new ImplDefinition("multistateGraphic", "MULTISTATE_GRAPHIC",
             "graphic.multistateGraphic", new int[]{DataTypes.MULTISTATE});
 
-    private Map<Integer, Integer> stateImageMap = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> stateImageMap = new HashMap<>();
     @JsonRemoteProperty
     private int defaultImage;
 
@@ -85,19 +83,17 @@ public class MultistateGraphicComponent extends ImageSetComponent {
             imageId = defaultImage;
         }
 
-        if (imageId != null) {
-            int id = imageId;
+        int id = imageId;
 
-            if (id >= 0 && id < imageSet.getImageCount()) {
-                return imageSet.getImageFilename(id);
-            }
+        if (id >= 0 && id < imageSet.getImageCount()) {
+            return imageSet.getImageFilename(id);
         }
 
         return null;
     }
 
     public List<IntValuePair> getImageStateList() {
-        List<IntValuePair> result = new ArrayList<IntValuePair>();
+        List<IntValuePair> result = new ArrayList<>();
         for (Integer state : stateImageMap.keySet()) {
             Integer imageId = stateImageMap.get(state);
 
@@ -140,25 +136,21 @@ public class MultistateGraphicComponent extends ImageSetComponent {
 
         for (Integer index : stateImageMap.values()) {
             if (index < 0) {
-                response.addMessage("stateImageMappings", new LocalizableMessageImpl("validate.cannotBeNegative"));
+                response.addContextual("stateImageMappings", "validate.cannotBeNegative");
             }
         }
         if (defaultImage < 0) {
-            response.addMessage("defaultImageIndex", new LocalizableMessageImpl("validate.cannotBeNegative"));
+            response.addContextual("defaultImageIndex", "validate.cannotBeNegative");
         }
 
         if (imageSet != null) {
             for (Integer index : stateImageMap.values()) {
                 if (index >= imageSet.getImageCount()) {
-                    response
-                            .addMessage("stateImageMappings", new LocalizableMessageImpl(
-                                            "emport.error.component.imageIndex", index, imageSet.getId(), imageSet
-                                            .getImageCount() - 1));
+                    response.addContextual("stateImageMappings", "emport.error.component.imageIndex", index, imageSet.getId(), imageSet.getImageCount() - 1);
                 }
             }
             if (defaultImage >= imageSet.getImageCount()) {
-                response.addMessage("defaultImageIndex", new LocalizableMessageImpl("emport.error.component.imageIndex",
-                        defaultImage, imageSet.getId(), imageSet.getImageCount() - 1));
+                response.addContextual("defaultImageIndex", "emport.error.component.imageIndex", defaultImage, imageSet.getId(), imageSet.getImageCount() - 1);
             }
         }
     }
@@ -218,10 +210,10 @@ public class MultistateGraphicComponent extends ImageSetComponent {
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
 
-        List<Map<String, Object>> jsonStateList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> jsonStateList = new ArrayList<>();
         map.put("stateImageMappings", jsonStateList);
         for (Map.Entry<Integer, Integer> mapping : stateImageMap.entrySet()) {
-            Map<String, Object> jsonMapping = new HashMap<String, Object>();
+            Map<String, Object> jsonMapping = new HashMap<>();
             jsonMapping.put("state", mapping.getKey());
             jsonMapping.put("imageIndex", mapping.getValue());
             jsonStateList.add(jsonMapping);

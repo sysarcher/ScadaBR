@@ -68,7 +68,7 @@ public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements Json
         int CPU_ST = 17;
     }
 
-    public static ExportCodes ATTRIBUTE_CODES = new ExportCodes();
+    public final static ExportCodes ATTRIBUTE_CODES = new ExportCodes();
 
     static {
         ATTRIBUTE_CODES.addElement(Attributes.PROCS_R, "PROCS_R", "dsEdit.vmstat.attr.procsR");
@@ -128,7 +128,7 @@ public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements Json
     @Override
     public void validate(DwrResponseI18n response) {
         if (!ATTRIBUTE_CODES.isValidId(attributeId)) {
-            response.addContextualMessage("attributeId", "validate.invalidValue");
+            response.addContextual("attributeId", "validate.invalidValue");
         }
     }
 

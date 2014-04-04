@@ -93,38 +93,30 @@ abstract public class IEC101DataSourceVO<T extends IEC101DataSourceVO<?>>
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextualMessage("updatePeriodType",
-                    "validate.invalidValue");
+            response.addContextual("updatePeriodType", "validate.invalidValue");
         }
         if (updatePeriods <= 0) {
-            response.addContextualMessage("updatePeriods",
-                    "validate.greaterThanZero");
+            response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
 
         if (giRelativePeriod <= 0) {
-            response.addContextualMessage("giRelativePeriod",
-                    "validate.greaterThanZero");
+            response.addContextual("giRelativePeriod", "validate.greaterThanZero");
         }
         if (clockSynchRelativePeriod <= 0) {
-            response.addContextualMessage("clockSynchRelativePeriod",
-                    "validate.greaterThanZero");
+            response.addContextual("clockSynchRelativePeriod", "validate.greaterThanZero");
         }
         if (linkLayerAddress <= 0) {
-            response.addContextualMessage("linkLayerAddress",
-                    "validate.greaterThanZero");
+            response.addContextual("linkLayerAddress", "validate.greaterThanZero");
         }
         if (asduAddress <= 0) {
-            response.addContextualMessage("asduAddress",
-                    "validate.greaterThanZero");
+            response.addContextual("asduAddress", "validate.greaterThanZero");
         }
 
         if (timeout <= 0) {
-            response
-                    .addContextualMessage("timeout", "validate.greaterThanZero");
+            response .addContextual("timeout", "validate.greaterThanZero");
         }
         if (retries < 0) {
-            response.addContextualMessage("retries",
-                    "validate.cannotBeNegative");
+            response.addContextual("retries", "validate.cannotBeNegative");
         }
     }
 

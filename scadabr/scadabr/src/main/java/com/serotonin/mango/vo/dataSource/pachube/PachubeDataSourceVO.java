@@ -37,7 +37,6 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -145,19 +144,19 @@ public class PachubeDataSourceVO extends DataSourceVO<PachubeDataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (apiKey.isEmpty()) {
-            response.addContextualMessage("apiKey", "validate.required");
+            response.addContextual("apiKey", "validate.required");
         }
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextualMessage("updatePeriodType", "validate.invalidValue");
+            response.addContextual("updatePeriodType", "validate.invalidValue");
         }
         if (updatePeriods <= 0) {
-            response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
+            response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
         if (timeoutSeconds <= 0) {
-            response.addContextualMessage("timeoutSeconds", "validate.greaterThanZero");
+            response.addContextual("timeoutSeconds", "validate.greaterThanZero");
         }
         if (retries < 0) {
-            response.addContextualMessage("retries", "validate.cannotBeNegative");
+            response.addContextual("retries", "validate.cannotBeNegative");
         }
     }
 

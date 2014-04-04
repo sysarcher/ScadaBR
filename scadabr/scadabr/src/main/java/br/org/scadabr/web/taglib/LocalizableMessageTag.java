@@ -58,7 +58,7 @@ public class LocalizableMessageTag extends TagSupport {
             } else {
                 s = escapeDoubleQuote(s);
             }
-            
+
             try {
                 pageContext.getOut().write(s);
             } catch (IOException e) {

@@ -35,7 +35,6 @@ import com.serotonin.mango.rt.dataSource.galil.VariablePointTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.LocalizableJsonException;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -78,10 +77,10 @@ public class VariablePointTypeVO extends PointTypeVO {
     @Override
     public void validate(DwrResponseI18n response) {
         if (!DataTypes.CODES.isValidId(dataTypeId, DataTypes.IMAGE)) {
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
+            response.addContextual("dataTypeId", "validate.invalidValue");
         }
         if (variableName.isEmpty()) {
-            response.addContextualMessage("variablePointType.variableName", "validate.required");
+            response.addContextual("variablePointType.variableName", "validate.required");
         }
     }
 

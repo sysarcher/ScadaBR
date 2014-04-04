@@ -37,7 +37,6 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.modbus4j.serial.SerialMaster;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -65,7 +64,7 @@ public class ModbusSerialDataSourceVO extends ModbusDataSourceVO<ModbusSerialDat
         }
     }
 
-    private static ExportCodes CONCURRENCY_CODES = new ExportCodes();
+    private final static ExportCodes CONCURRENCY_CODES = new ExportCodes();
 
     static {
         CONCURRENCY_CODES.addElement(SerialMaster.SYNC_TRANSPORT, "SYNC_TRANSPORT",
@@ -209,32 +208,32 @@ public class ModbusSerialDataSourceVO extends ModbusDataSourceVO<ModbusSerialDat
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (commPortId.isEmpty()) {
-            response.addContextualMessage("commPortId", "validate.required");
+            response.addContextual("commPortId", "validate.required");
         }
         if (baudRate <= 0) {
-            response.addContextualMessage("baudRate", "validate.invalidValue");
+            response.addContextual("baudRate", "validate.invalidValue");
         }
         if (!(flowControlIn == 0 || flowControlIn == 1 || flowControlIn == 4)) {
-            response.addContextualMessage("flowControlIn", "validate.invalidValue");
+            response.addContextual("flowControlIn", "validate.invalidValue");
         }
         if (!(flowControlOut == 0 || flowControlOut == 2 || flowControlOut == 8)) {
-            response.addContextualMessage("flowControlOut", "validate.invalidValue");
+            response.addContextual("flowControlOut", "validate.invalidValue");
         }
         if (dataBits < 5 || dataBits > 8) {
-            response.addContextualMessage("dataBits", "validate.invalidValue");
+            response.addContextual("dataBits", "validate.invalidValue");
         }
         if (stopBits < 1 || stopBits > 3) {
-            response.addContextualMessage("stopBits", "validate.invalidValue");
+            response.addContextual("stopBits", "validate.invalidValue");
         }
         if (parity < 0 || parity > 4) {
-            response.addContextualMessage("parityBits", "validate.invalidValue");
+            response.addContextual("parityBits", "validate.invalidValue");
         }
         if (encoding == null) {
-            response.addContextualMessage("encodingBits", "validate.required");
+            response.addContextual("encodingBits", "validate.required");
         }
 
         if (!CONCURRENCY_CODES.isValidId(concurrency)) {
-            response.addContextualMessage("concurrency", "validate.invalidValue");
+            response.addContextual("concurrency", "validate.invalidValue");
         }
     }
 

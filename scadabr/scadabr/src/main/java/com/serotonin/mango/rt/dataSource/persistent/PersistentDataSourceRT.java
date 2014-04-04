@@ -483,7 +483,7 @@ public class PersistentDataSourceRT extends EventDataSource implements Runnable 
                 // The point is disabled (because otherwise it would be in the RT list).
                 updatePoint(oldDpvo, newDpvo);
             } else {
-                if (StringUtils.isLengthGreaterThan(xid, 50)) {
+                if (xid.length() > 50) {
                     throw new DoAbortException("event.persistent.xidTooLong", xid);
                 }
 

@@ -232,7 +232,7 @@
   
     <tag>
         <name>map</name>
-        <tag-class>com.serotonin.web.taglib.MapTag</tag-class>
+        <tag-class>br.org.scadabr.web.taglib.MapTag</tag-class>
         <body-content>JSP</body-content>
         <attribute>
             <name>var</name>
@@ -243,7 +243,7 @@
   
     <tag>
         <name>mapEntry</name>
-        <tag-class>com.serotonin.web.taglib.MapEntryTag</tag-class>
+        <tag-class>br.org.scadabr.web.taglib.MapEntryTag</tag-class>
         <body-content>empty</body-content>
         <attribute>
             <name>key</name>
@@ -274,7 +274,7 @@
 
     <tag>
         <name>pageNumber</name>
-        <tag-class>com.serotonin.web.taglib.PageNumberTag</tag-class>
+        <tag-class>br.org.scadabr.web.taglib.PageNumberTag</tag-class>
         <body-content>empty</body-content>
         <attribute>
             <name>paging</name>
@@ -310,7 +310,7 @@
 
     <tag>
         <name>pagination</name>
-        <tag-class>com.serotonin.web.taglib.PaginationTag</tag-class>
+        <tag-class>br.org.scadabr.web.taglib.PaginationTag</tag-class>
         <body-content>empty</body-content>
         <attribute>
             <name>paging</name>

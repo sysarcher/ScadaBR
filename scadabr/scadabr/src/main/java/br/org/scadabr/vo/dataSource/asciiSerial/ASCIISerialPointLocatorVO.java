@@ -46,16 +46,14 @@ public class ASCIISerialPointLocatorVO extends AbstractPointLocatorVO implements
     @Override
     public void validate(DwrResponseI18n response) {
         if (StringUtils.isEmpty(valueRegex)) {
-            response.addContextualMessage("valueRegex", "validate.required");
+            response.addContextual("valueRegex", "validate.required");
         }
         if (customTimestamp) {
             if (StringUtils.isEmpty(timestampFormat)) {
-                response.addContextualMessage("timestampFormat",
-                        "validate.required");
+                response.addContextual("timestampFormat", "validate.required");
             }
             if (StringUtils.isEmpty(timestampRegex)) {
-                response.addContextualMessage("timestampRegex",
-                        "validate.required");
+                response.addContextual("timestampRegex", "validate.required");
             }
         }
     }

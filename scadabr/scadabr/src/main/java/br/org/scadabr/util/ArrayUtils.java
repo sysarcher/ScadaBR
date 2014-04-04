@@ -6,6 +6,7 @@
 package br.org.scadabr.util;
 
 import br.org.scadabr.ImplementMeException;
+import java.util.Arrays;
 
 /**
  *
@@ -13,8 +14,16 @@ import br.org.scadabr.ImplementMeException;
  */
 public class ArrayUtils {
 
-    public static boolean contains(int[] excludeIds, int id) {
-        throw new ImplementMeException();
+    public static boolean contains(int[] array, int value) {
+        if (array == null) {
+            return false;
+        }
+        for (int v : array) {
+            if (v == value) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean contains(String[] deviceIdWhiteList, String string) {

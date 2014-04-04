@@ -56,7 +56,7 @@ public class ModbusPointLocatorVO extends AbstractPointLocatorVO implements
         return new LocalizableMessageImpl(RANGE_CODES.getKey(range));
     }
 
-    private static ExportCodes RANGE_CODES = new ExportCodes();
+    private final static ExportCodes RANGE_CODES = new ExportCodes();
 
     static {
         RANGE_CODES.addElement(RegisterRange.COIL_STATUS, "COIL_STATUS",
@@ -70,7 +70,7 @@ public class ModbusPointLocatorVO extends AbstractPointLocatorVO implements
     }
     ;
 
-	private static ExportCodes MODBUS_DATA_TYPE_CODES = new ExportCodes();
+	private final static ExportCodes MODBUS_DATA_TYPE_CODES = new ExportCodes();
 
     static {
         MODBUS_DATA_TYPE_CODES.addElement(DataType.BINARY, "BINARY",
@@ -291,49 +291,46 @@ public class ModbusPointLocatorVO extends AbstractPointLocatorVO implements
     @Override
     public void validate(DwrResponseI18n response) {
         if (!RANGE_CODES.isValidId(range)) {
-            response.addContextualMessage("range", "validate.invalidValue");
+            response.addContextual("range", "validate.invalidValue");
         }
 
         if (!MODBUS_DATA_TYPE_CODES.isValidId(modbusDataType)) {
-            response.addContextualMessage("modbusDataType",
+            response.addContextual("modbusDataType",
                     "validate.invalidValue");
         }
 
         if (!StringUtils.isBetweenInc(slaveId, 1, 240)) {
-            response.addContextualMessage("slaveId", "validate.1to240");
+            response.addContextual("slaveId", "validate.1to240");
         }
 
         if (!slaveMonitor) {
             int maxEndOffset = 65536 - DataType
                     .getRegisterCount(modbusDataType);
             if (!StringUtils.isBetweenInc(offset, 0, maxEndOffset)) {
-                response.addContextualMessage("offset", "validate.0toArg",
-                        maxEndOffset);
+                response.addContextual("offset", "validate.0toArg", maxEndOffset);
             }
 
             if ((range == RegisterRange.HOLDING_REGISTER || range == RegisterRange.INPUT_REGISTER)
                     && modbusDataType == DataType.BINARY) {
                 if (!StringUtils.isBetweenInc(bit, 0, 15)) {
-                    response.addContextualMessage("bit", "validate.0to15");
+                    response.addContextual("bit", "validate.0to15");
                 }
             }
 
             if (isString()) {
                 if (registerCount < 1) {
-                    response.addContextualMessage("registerCount",
-                            "validate.greaterThanZero");
+                    response.addContextual("registerCount", "validate.greaterThanZero");
                 }
 
                 try {
                     Charset.forName(charset);
                 } catch (IllegalCharsetNameException e) {
-                    response.addContextualMessage("charset",
-                            "validate.invalidCharset");
+                    response.addContextual("charset", "validate.invalidCharset");
                 }
             }
 
             if (multiplier == 0) {
-                response.addContextualMessage("multiplier", "validate.not0");
+                response.addContextual("multiplier", "validate.not0");
             }
         }
     }

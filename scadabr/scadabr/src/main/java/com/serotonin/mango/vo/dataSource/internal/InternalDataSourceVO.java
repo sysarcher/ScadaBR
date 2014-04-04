@@ -101,10 +101,10 @@ public class InternalDataSourceVO extends DataSourceVO<InternalDataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextualMessage("updatePeriodType", "validate.invalidValue");
+            response.addContextual("updatePeriodType", "validate.invalidValue");
         }
         if (updatePeriods <= 0) {
-            response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
+            response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
     }
 

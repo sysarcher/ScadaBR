@@ -78,25 +78,29 @@ public class GalilPointLocatorVO extends AbstractPointLocatorVO implements JsonS
         return null;
     }
 
+    @Override
     public PointLocatorRT createRuntime() {
         PointTypeRT changeType = getPointType().createRuntime();
         return new GalilPointLocatorRT(changeType);
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
         // Command
         PointTypeVO pointType = getPointType();
         if (pointType == null) {
-            response.addContextualMessage("pointTypeId", "validate.invalidChoice");
+            response.addContextual("pointTypeId", "validate.invalidChoice");
         } else {
             pointType.validate(response);
         }
     }
 
+    @Override
     public int getDataTypeId() {
         return getPointType().getDataTypeId();
     }
 
+    @Override
     public boolean isSettable() {
         return getPointType().isSettable();
     }

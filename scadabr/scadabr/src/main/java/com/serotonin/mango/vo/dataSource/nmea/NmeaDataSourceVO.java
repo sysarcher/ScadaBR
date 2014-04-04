@@ -32,7 +32,6 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -119,10 +118,10 @@ public class NmeaDataSourceVO extends DataSourceVO<NmeaDataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (commPortId.isEmpty()) {
-            response.addContextualMessage("commPortId", "validate.required");
+            response.addContextual("commPortId", "validate.required");
         }
         if (resetTimeout < 2) {
-            response.addContextualMessage("resetTimeout", "validate.greaterThan1s");
+            response.addContextual("resetTimeout", "validate.greaterThan1s");
         }
     }
 

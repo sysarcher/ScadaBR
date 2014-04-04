@@ -262,10 +262,10 @@ abstract public class ViewComponent implements Serializable, JsonSerializable {
 
     public void validate(DwrResponseI18n response) {
         if (x < 0) {
-            response.addMessage("x", new LocalizableMessageImpl("validate.cannotBeNegative"));
+            response.addContextual("x", "validate.cannotBeNegative");
         }
         if (y < 0) {
-            response.addMessage("y", new LocalizableMessageImpl("validate.cannotBeNegative"));
+            response.addContextual("y", "validate.cannotBeNegative");
         }
     }
 

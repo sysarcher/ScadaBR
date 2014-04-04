@@ -151,13 +151,13 @@ public class ModbusIpDataSourceVO extends ModbusDataSourceVO<ModbusIpDataSourceV
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (transportType == null) {
-            response.addContextualMessage("transportType", "validate.required");
+            response.addContextual("transportType", "validate.required");
         }
         if (host.isEmpty()) {
-            response.addContextualMessage("host", "validate.required");
+            response.addContextual("host", "validate.required");
         }
         if (port <= 0 || port > 0xffff) {
-            response.addContextualMessage("port", "validate.invalidValue");
+            response.addContextual("port", "validate.invalidValue");
         }
     }
 

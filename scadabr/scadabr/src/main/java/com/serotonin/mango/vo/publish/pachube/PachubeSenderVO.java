@@ -116,18 +116,18 @@ public class PachubeSenderVO extends PublisherVO<PachubePointVO> {
         super.validate(response);
 
         if (apiKey.isEmpty()) {
-            response.addContextualMessage("apiKey", "validate.required");
+            response.addContextual("apiKey", "validate.required");
         }
         if (timeoutSeconds <= 0) {
-            response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
+            response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
         if (retries < 0) {
-            response.addContextualMessage("retries", "validate.cannotBeNegative");
+            response.addContextual("retries", "validate.cannotBeNegative");
         }
 
         for (PachubePointVO point : points) {
             if (point.getDataStreamId().isEmpty()) {
-                response.addContextualMessage("points", "validate.pachube.dataStreadIdRequired");
+                response.addContextual("points", "validate.pachube.dataStreadIdRequired");
                 break;
             }
         }

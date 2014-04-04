@@ -201,22 +201,22 @@ public class EBI25DataSourceVO extends DataSourceVO<EBI25DataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (host.isEmpty()) {
-            response.addContextualMessage("host", "validate.required");
+            response.addContextual("host", "validate.required");
         }
         if (port <= 0 || port > 0xffff) {
-            response.addContextualMessage("port", "validate.invalidValue");
+            response.addContextual("port", "validate.invalidValue");
         }
         if (updatePeriods <= 0) {
-            response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
+            response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextualMessage("updatePeriodType", "validate.invalidValue");
+            response.addContextual("updatePeriodType", "validate.invalidValue");
         }
         if (timeout <= 0) {
-            response.addContextualMessage("timeout", "validate.greaterThanZero");
+            response.addContextual("timeout", "validate.greaterThanZero");
         }
         if (retries < 0) {
-            response.addContextualMessage("retries", "validate.cannotBeNegative");
+            response.addContextual("retries", "validate.cannotBeNegative");
         }
     }
 

@@ -224,6 +224,11 @@ import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import br.org.scadabr.web.taglib.DateFunctions;
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.IntrospectionException;
+import javax.management.MBeanException;
+import javax.management.ReflectionException;
 
 /**
  * @author Matthew Lohbihler
@@ -249,7 +254,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
         ds.validate(response);
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             Common.ctx.getRuntimeManager().saveDataSource(ds);
             response.addData("id", ds.getId());
         }
@@ -344,20 +349,20 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         dp.setPointLocator(locator);
 
         if (xid.isEmpty()) {
-            response.addContextualMessage("xid", "validate.required");
+            response.addContextual("xid", "validate.required");
         } else if (!new DataPointDao().isXidUnique(xid, id)) {
-            response.addContextualMessage("xid", "validate.xidUsed");
-        } else if (StringUtils.isLengthGreaterThan(xid, 50)) {
-            response.addContextualMessage("xid", "validate.notLongerThan", 50);
+            response.addContextual("xid", "validate.xidUsed");
+        } else if (xid.length() > 50) {
+            response.addContextual("xid", "validate.notLongerThan", 50);
         }
 
         if (name.isEmpty()) {
-            response.addContextualMessage("name", "dsEdit.validate.required");
+            response.addContextual("name", "dsEdit.validate.required");
         }
 
         locator.validate(response);
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             Common.ctx.getRuntimeManager().saveDataPoint(dp);
             response.addData("id", dp.getId());
             response.addData("points", getPoints());
@@ -471,7 +476,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             ModbusPointLocatorVO locator, boolean serial,
             DwrResponseI18n response) {
         locator.validate(response);
-        if (response.getHasMessages()) {
+        if (!response.isEmpty()) {
             return;
         }
 
@@ -483,16 +488,16 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                     "dsEdit.modbus.locatorTest.result", result));
         } catch (ModbusInitException e) {
             if (serial) {
-                response.addMessage("dsEdit.modbus.locatorTestIp.startError", e.getMessage());
+                response.addGeneric("dsEdit.modbus.locatorTestIp.startError", e);
             } else {
-                response.addMessage("dsEdit.modbus.locatorTestSerial.startError", e.getMessage());
+                response.addGeneric("dsEdit.modbus.locatorTestSerial.startError", e);
             }
         } catch (ErrorResponseException e) {
-            response.addMessage("common.default", e.getErrorResponse().getExceptionMessage());
+            response.addGeneric("common.default", e.getErrorResponse().getExceptionMessage());
         } catch (ModbusTransportException e) {
-            response.addMessage(DataSourceRT.wrapException(e));
+            response.addGeneric(DataSourceRT.wrapException(e));
         } catch (IllegalCharsetNameException e) {
-            response.addMessage("validate.invalidCharset");
+            response.addGeneric("validate.invalidCharset");
         } finally {
             modbusMaster.destroy();
         }
@@ -518,7 +523,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             modbusMaster.init();
             ReadResponse mres = (ReadResponse) modbusMaster.send(mreq);
             if (mres.isException()) {
-                response.addMessage("common.default", mres.getExceptionMessage());
+                response.addGeneric("common.default", mres.getExceptionMessage());
             } else {
                 List<String> results = new ArrayList<>();
                 if (binary) {
@@ -536,16 +541,14 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                 }
                 response.addData("results", results);
             }
-        } catch (ModbusIdException e) {
-            response.addMessage(DataSourceRT.wrapException(e));
+        } catch (ModbusIdException | ModbusTransportException e) {
+            response.addGeneric(DataSourceRT.wrapException(e));
         } catch (ModbusInitException e) {
             if (serial) {
-                response.addMessage("dsEdit.modbus.locatorTestIp.startError", e.getMessage());
+                response.addGeneric("dsEdit.modbus.locatorTestIp.startError", e);
             } else {
-                response.addMessage("dsEdit.modbus.locatorTestSerial.startError", e.getMessage());
+                response.addGeneric("dsEdit.modbus.locatorTestSerial.startError", e);
             }
-        } catch (ModbusTransportException e) {
-            response.addMessage(DataSourceRT.wrapException(e));
         } finally {
             modbusMaster.destroy();
         }
@@ -624,7 +627,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                     dataBits, stopBits, parity, encoding, concurrency);
             testModbusPointLocator(modbusMaster, locator, true, response);
         } catch (Exception e) {
-            response.addMessage("dsEdit.modbus.scanError");
+            response.addGeneric("dsEdit.modbus.scanError", e);
         }
         return response;
     }
@@ -644,7 +647,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             testModbusData(modbusMaster, slaveId, range, offset, length, true,
                     response);
         } catch (Exception e) {
-            response.addMessage("dsEdit.modbus.scanError");
+            response.addGeneric("dsEdit.modbus.scanError", e);
         }
         return response;
     }
@@ -828,7 +831,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             return null;
         }
 
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
         result.put("nodes", l.getSensorsFound());
         result.put("message", l.getMessage());
 
@@ -1004,7 +1007,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
     @MethodFilter
     public Map<String, Object> httpReceiverListenerUpdate() {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
         HttpReceiverDataListener l = Common.getUser().getTestingUtility(
                 HttpReceiverDataListener.class);
         if (l == null) {
@@ -1082,7 +1085,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                 network.quickInitialize();
 
                 List<Long> addresses = network.getAddresses();
-                List<OneWireContainerInfo> devices = new ArrayList<OneWireContainerInfo>();
+                List<OneWireContainerInfo> devices = new ArrayList<>();
                 for (Long address : addresses) {
                     NetworkPath path = network.getNetworkPath(address);
                     if (!path.isCoupler()) {
@@ -1095,7 +1098,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                 network.unlock();
             }
         } catch (Exception e) {
-            response.addGenericMessage("common.default", e.getMessage());
+            response.addGeneric("common.default", e);
         } finally {
             try {
                 if (network != null) {
@@ -1148,20 +1151,16 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             PointValueTime pvt = executor.execute(script, convertedContext,
                     System.currentTimeMillis(), dataTypeId, -1);
             if (pvt.getTime() == -1) {
-                response.addContextualMessage("script",
-                        "dsEdit.meta.test.success", pvt.getValue());
+                response.addContextual("script", "dsEdit.meta.test.success", pvt.getValue());
             } else {
-                response.addContextualMessage("script",
-                        "dsEdit.meta.test.successTs", pvt.getValue(),
-                        DateFunctions.getTime(pvt.getTime()));
+                response.addContextual("script", "dsEdit.meta.test.successTs", pvt.getValue(), DateFunctions.getTime(pvt.getTime()));
             }
         } catch (DataPointStateException e) {
-            response.addMessage("context", e);
+            response.addContextual("context", e);
         } catch (ScriptException e) {
-            response.addContextualMessage("script",
-                    "dsEdit.meta.test.scriptError", e.getMessage());
+            response.addContextual("script", "dsEdit.meta.test.scriptError", e);
         } catch (ResultTypeException e) {
-            response.addMessage("script", e);
+            response.addGeneric("script", e);
         }
 
         return response;
@@ -1656,8 +1655,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                     .getEditDataSource();
 
             if (locator.getSampleRate() < 1) {
-                response.addContextualMessage("sampleRate",
-                        "validate.greaterThanZero");
+                response.addContextual("sampleRate", "validate.greaterThanZero");
             } else {
                 // Try to update the EBI25 interface
                 LocalizableMessage errorMessage = new EBI25InterfaceUpdater()
@@ -1689,7 +1687,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                                 }
                             });
                 } else {
-                    response.addMessage("sampleRate", errorMessage);
+                    response.addContextual("sampleRate", errorMessage.getI18nKey(), errorMessage.getArgs());
                 }
             }
         } else {
@@ -1768,7 +1766,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         DwrResponseI18n response = new DwrResponseI18n();
 
         if (rt == null) {
-            response.addGenericMessage("dsEdit.viconics.dataSourceNotStarted");
+            response.addGeneric("dsEdit.viconics.dataSourceNotStarted");
         } else {
             try {
                 NetworkIdentifyResponse res = rt
@@ -1809,14 +1807,8 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                     devices.add(dev);
                 }
                 response.addData("devices", devices);
-            } catch (ViconicsTransportException e) {
-                response.addGenericMessage(
-                        "dsEdit.viconics.networkIdentifyFailure",
-                        e.getMessage());
-            } catch (RequestFailureException e) {
-                response.addGenericMessage(
-                        "dsEdit.viconics.networkIdentifyFailure",
-                        e.getMessage());
+            } catch (ViconicsTransportException | RequestFailureException e) {
+                response.addGeneric( "dsEdit.viconics.networkIdentifyFailure", e);
             }
         }
 
@@ -1987,7 +1979,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     }
 
     public Map<String, Object> openV4JSearchUpdate() {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
         OpenV4JDiscovery test = Common.getUser().getTestingUtility(
                 OpenV4JDiscovery.class);
         if (test == null) {
@@ -1999,7 +1991,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     }
 
     public Map<String, Object> openV4JDetectDeviceUpdate() {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
         OpenV4JDiscovery test = Common.getUser().getTestingUtility(
                 OpenV4JDiscovery.class);
         if (test == null) {
@@ -2016,7 +2008,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
     public OpenV4JDataPointBean[] getOpenV4jDataPointsOfGroup(String groupName) {
         Group g = Group.valueOf(groupName);
-        List<OpenV4JDataPointBean> result = new ArrayList<OpenV4JDataPointBean>();
+        List<OpenV4JDataPointBean> result = new ArrayList<>();
         for (DataPoint dp : DataPoint.values()) {
             if (dp.getGroup().equals(g)) {
                 result.add(new OpenV4JDataPointBean(dp));
@@ -2147,12 +2139,10 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         DwrResponseI18n response = new DwrResponseI18n();
 
         if (locator.getTimeOn() < 0) {
-            response.addContextualMessage("timeOn",
-                    "reports.validate.lessThan0");
+            response.addContextual("timeOn", "reports.validate.lessThan0");
         }
         if (locator.getTimeOff() < 0) {
-            response.addContextualMessage("timeOff",
-                    "reports.validate.lessThan0");
+            response.addContextual("timeOff", "reports.validate.lessThan0");
         }
 
         List<DataPointVO> points = getPoints();
@@ -2164,12 +2154,11 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                     .getDnp3DataType()
                     && loc.getIndex() == ((Dnp3PointLocatorVO) locator)
                     .getIndex() && id != vo.getId()) {
-                response.addContextualMessage("index",
-                        "dsEdit.dnp3.validate.indexUsed");
+                response.addContextual("index", "dsEdit.dnp3.validate.indexUsed");
             }
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             return validatePoint(id, xid, name, locator, null);
         }
         return response;
@@ -2188,12 +2177,10 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
         if (locators[0].getClass().equals(Dnp3PointLocatorVO.class)) {
             if (locators[0].getTimeOn() < 0) {
-                response.addContextualMessage("timeOn",
-                        "reports.validate.lessThan0");
+                response.addContextual("timeOn", "reports.validate.lessThan0");
             }
             if (locators[0].getTimeOff() < 0) {
-                response.addContextualMessage("timeOff",
-                        "reports.validate.lessThan0");
+                response.addContextual("timeOff", "reports.validate.lessThan0");
             }
         }
 
@@ -2209,13 +2196,12 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                         .getDnp3DataType()
                         && loc.getIndex() == ((Dnp3PointLocatorVO) locators[i])
                         .getIndex()) {
-                    response.addContextualMessage("index",
-                            "dsEdit.dnp3.validate.someIndexUsed");
+                    response.addContextual("index", "dsEdit.dnp3.validate.someIndexUsed");
                 }
             }
         }
 
-        if (response.getHasMessages()) {
+        if (!response.isEmpty()) {
             return response;
         }
 
@@ -2226,18 +2212,18 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             dp.setPointLocator(locators[i]);
 
             if (dp.getXid().isEmpty()) {
-                response.addContextualMessage("xid", "validate.required");
+                response.addContextual("xid", "validate.required");
             } else if (!new DataPointDao()
                     .isXidUnique(dp.getXid(), Common.NEW_ID)) {
-                response.addContextualMessage("xid", "validate.xidUsed");
-            } else if (StringUtils.isLengthGreaterThan(dp.getXid(), 50)) {
-                response.addContextualMessage("xid", "validate.notLongerThan",
+                response.addContextual("xid", "validate.xidUsed");
+            } else if (dp.getXid().length() > 50) {
+                response.addContextual("xid", "validate.notLongerThan",
                         50);
             }
 
             locators[i].validate(response);
 
-            if (!response.getHasMessages()) {
+            if (response.isEmpty()) {
                 Common.ctx.getRuntimeManager().saveDataPoint(dp);
                 response.addData("id", dp.getId());
                 response.addData("points", getPoints());
@@ -2301,7 +2287,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         Logger log = JISystem.getLogger();
         log.setLevel(Level.OFF);
 
-        ArrayList<OPCItem> opcItems = new ArrayList<OPCItem>();
+        ArrayList<OPCItem> opcItems = new ArrayList<>();
 
         try {
             opcItems = new RealOPCMaster().browseOPCTags(user, password, host,
@@ -2349,8 +2335,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         OPCDataSourceVO<?> ds = (OPCDataSourceVO<?>) Common.getUser()
                 .getEditDataSource();
         if (ds.isNew()) {
-            response.addContextualMessage(context,
-                    "dsEdit.opc.validate.dataSourceNotSaved");
+            response.addContextual(context, "dsEdit.opc.validate.dataSourceNotSaved");
             return response;
         }
         for (int i = 0; i < locators.length; i++) {
@@ -2362,17 +2347,16 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             dp.setPointLocator(locators[i]);
 
             if (dp.getXid().isEmpty()) {
-                response.addContextualMessage("xid", "validate.required");
+                response.addContextual("xid", "validate.required");
             } else if (!new DataPointDao()
                     .isXidUnique(dp.getXid(), Common.NEW_ID)) {
-                response.addContextualMessage("xid", "validate.xidUsed");
-            } else if (StringUtils.isLengthGreaterThan(dp.getXid(), 50)) {
-                response.addContextualMessage("xid", "validate.notLongerThan",
-                        50);
+                response.addContextual("xid", "validate.xidUsed");
+            } else if (dp.getXid().length() > 50) {
+                response.addContextual("xid", "validate.notLongerThan", 50);
             }
 
             // locators[i].validate(response);
-            if (!response.getHasMessages()) {
+            if (response.isEmpty()) {
                 Common.ctx.getRuntimeManager().saveDataPoint(dp);
                 response.addData("id", dp.getId());
                 response.addData("points", getPoints());
@@ -2670,21 +2654,19 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                             url), null);
                     server = connector.getMBeanServerConnection();
                 } catch (MalformedURLException e) {
-                    response.addGenericMessage("dsEdit.jmx.badUrl",
-                            e.getMessage());
+                    response.addGeneric("dsEdit.jmx.badUrl", e);
                 } catch (IOException e) {
-                    response.addGenericMessage("dsEdit.jmx.connectionError",
-                            e.getMessage());
+                    response.addGeneric("dsEdit.jmx.connectionError", e);
                 }
             }
 
-            if (!response.getHasMessages()) {
+            if (response.isEmpty()) {
                 try {
-                    Map<String, Object> names = new TreeMap<String, Object>();
+                    Map<String, Object> names = new TreeMap<>();
                     response.addData("names", names);
 
                     for (ObjectName on : server.queryNames(null, null)) {
-                        List<Map<String, Object>> objectAttributesList = new ArrayList<Map<String, Object>>();
+                        List<Map<String, Object>> objectAttributesList = new ArrayList<>();
                         names.put(on.getCanonicalName(), objectAttributesList);
 
                         for (MBeanAttributeInfo attr : server.getMBeanInfo(on)
@@ -2693,7 +2675,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                                 continue;
                             }
 
-                            Map<String, Object> objectAttributes = new HashMap<String, Object>();
+                            Map<String, Object> objectAttributes = new HashMap<>();
                             try {
                                 objectAttributes.put("name", attr.getName());
                                 if (attr.getType()
@@ -2702,12 +2684,12 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                                     CompositeData cd = (CompositeData) server
                                             .getAttribute(on, attr.getName());
                                     if (cd != null) {
-                                        List<Map<String, Object>> compositeItemsList = new ArrayList<Map<String, Object>>();
+                                        List<Map<String, Object>> compositeItemsList = new ArrayList<>();
                                         objectAttributes.put("items",
                                                 compositeItemsList);
                                         for (String key : cd.getCompositeType()
                                                 .keySet()) {
-                                            Map<String, Object> compositeItems = new HashMap<String, Object>();
+                                            Map<String, Object> compositeItems = new HashMap<>();
                                             compositeItemsList
                                                     .add(compositeItems);
                                             compositeItems.put("name", key);
@@ -2728,9 +2710,8 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                             }
                         }
                     }
-                } catch (Exception e) {
-                    response.addGenericMessage("dsEdit.jmx.readError",
-                            e.getMessage());
+                } catch (IOException | AttributeNotFoundException | InstanceNotFoundException | IntrospectionException | MBeanException | ReflectionException e) {
+                    response.addGeneric("dsEdit.jmx.readError", e);
                     LOG.warn("", e);
                 }
             }

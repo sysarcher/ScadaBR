@@ -136,13 +136,13 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         switch (getAddressing()) {
             case PRIMARY:
                 if ((address & 0xFF) > (MBusUtils.LAST_REGULAR_PRIMARY_ADDRESS & 0xFF)) {
-                    response.addContextualMessage("address >= 0xFD", "validate.required");
+                    response.addContextual("address >= 0xFD", "validate.required");
                 }
                 break;
             case SECONDARY:
                 if ((address == MBusUtils.BROADCAST_NO_ANSWER_PRIMARY_ADDRESS)
                         || (address == MBusUtils.BROADCAST_WITH_ANSWER_PRIMARY_ADDRESS)) {
-                    response.addContextualMessage("address", "validate.required");
+                    response.addContextual("address", "validate.required");
                 }
                 break;
 
@@ -150,61 +150,61 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         try {
             DataFieldCode.fromLabel(difCode);
         } catch (IllegalArgumentException ex) {
-            response.addContextualMessage("difCode", "validate.required");
+            response.addContextual("difCode", "validate.required");
         }
 
         try {
             FunctionField.fromLabel(functionField);
         } catch (IllegalArgumentException ex) {
-            response.addContextualMessage("functionField", "validate.required");
+            response.addContextual("functionField", "validate.required");
         }
 
         if (deviceUnit < 0) {
-            response.addContextualMessage("deviceUnit", "validate.required");
+            response.addContextual("deviceUnit", "validate.required");
         }
 
         if (tariff < 0) {
-            response.addContextualMessage("tariff", "validate.required");
+            response.addContextual("tariff", "validate.required");
         }
 
         if (storageNumber < 0) {
-            response.addContextualMessage("storageNumber", "validate.required");
+            response.addContextual("storageNumber", "validate.required");
         }
 
         try {
             DataBlock.getVif(vifType, vifLabel, unitOfMeasurement, siPrefix, exponent);
         } catch (IllegalArgumentException ex) {
-            response.addContextualMessage("vif", "validate.required");
+            response.addContextual("vif", "validate.required");
         }
 
         if (vifeLabels.length > 0) {
             if (vifeLabels.length != vifeTypes.length) {
-                response.addContextualMessage("vife and vifetype lenght mismatch", "validate.required");
+                response.addContextual("vife and vifetype lenght mismatch", "validate.required");
             }
             for (int i = 0; i < vifeLabels.length; i++) {
                 try {
                     DataBlock.getVife(vifeTypes[i], vifeLabels[i]);
                 } catch (IllegalArgumentException ex) {
-                    response.addContextualMessage("vife", "validate.required");
+                    response.addContextual("vife", "validate.required");
                 }
             }
         }
         try {
             MBusMedium.fromLabel(medium);
         } catch (IllegalArgumentException ex) {
-            response.addContextualMessage("medium", "validate.required");
+            response.addContextual("medium", "validate.required");
         }
         if ((responseFrame == null) || (responseFrame.length() == 0)) {
-            response.addContextualMessage("responseFrame", "validate.required");
+            response.addContextual("responseFrame", "validate.required");
         }
         if (((version & 0xFF) < 0) || ((version & 0xFF) > 0xFF)) {
-            response.addContextualMessage("version", "validate.required");
+            response.addContextual("version", "validate.required");
         }
         if (identNumber < 0) {
-            response.addContextualMessage("id", "validate.required");
+            response.addContextual("id", "validate.required");
         }
         if ((manufacturer == null) || (manufacturer.length() != 3)) {
-            response.addContextualMessage("man", "validate.required");
+            response.addContextual("man", "validate.required");
         }
     }
 

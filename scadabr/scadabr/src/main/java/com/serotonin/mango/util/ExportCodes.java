@@ -55,19 +55,45 @@ public class ExportCodes {
         return e.key;
     }
 
-    public int getId(String code, int... excludeIds) {
+    public int getId(String code, int excludedId) {
         for (Element element : elements) {
-            if (element.code.equalsIgnoreCase(code) && !ArrayUtils.contains(excludeIds, element.id)) {
+            if (element.code.equalsIgnoreCase(code) && excludedId != element.id) {
                 return element.id;
             }
         }
         return -1;
     }
 
-    public boolean isValidId(int id, int... excludeIds) {
+    public int getId(String code) {
         for (Element element : elements) {
-            int eid = element.id;
-            if (!ArrayUtils.contains(excludeIds, eid) && eid == id) {
+            if (element.code.equalsIgnoreCase(code)) {
+                return element.id;
+            }
+        }
+        return -1;
+    }
+
+    public boolean isValidId(int id) {
+        for (Element element : elements) {
+            if (element.id == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isValidId(int id, int excludedId) {
+        for (Element element : elements) {
+            if (element.id != excludedId && element.id == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isValidId(int id, int[] excludeIds) {
+        for (Element element : elements) {
+            if (!ArrayUtils.contains(excludeIds, element.id) && element.id == id) {
                 return true;
             }
         }

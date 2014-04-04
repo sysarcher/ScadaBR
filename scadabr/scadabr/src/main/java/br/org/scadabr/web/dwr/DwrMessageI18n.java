@@ -13,15 +13,33 @@ import br.org.scadabr.web.i18n.LocalizableMessage;
  * @author aploese
  */
 public class DwrMessageI18n implements LocalizableMessage {
+    
+    private final String contextKey;
+    private final String i18nKey;
+    private final Object[] args;
+
+    public DwrMessageI18n(String contextKey, String i18nKey, Object... args) {
+        this.contextKey = contextKey;
+        this.i18nKey = i18nKey;
+        this.args = args;
+    }
+
+    public boolean isInContext() {
+        return contextKey != null;
+    }
+    
+    public String getContextKey() {
+        return contextKey;
+    }
 
     @Override
     public String getI18nKey() {
-        throw new ImplementMeException();
+        return i18nKey;
     }
 
     @Override
     public Object[] getArgs() {
-        throw new ImplementMeException();
+        return args;
     }
 
 }

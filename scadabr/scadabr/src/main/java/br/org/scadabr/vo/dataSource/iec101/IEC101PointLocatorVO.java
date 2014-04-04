@@ -129,11 +129,10 @@ public class IEC101PointLocatorVO extends AbstractPointLocatorVO implements
     @Override
     public void validate(DwrResponseI18n response) {
         if (objectAddress < 1) {
-            response.addContextualMessage("objectAddress",
-                    "validate.invalidValue");
+            response.addContextual("objectAddress", "validate.invalidValue");
         }
         if (offset < 0) {
-            response.addContextualMessage("offset", "validate.invalidValue");
+            response.addContextual("offset", "validate.invalidValue");
         }
 
     }

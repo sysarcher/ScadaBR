@@ -44,61 +44,6 @@ public class DwrResponseI18nTest {
     }
 
     /**
-     * Test of addMessage method, of class DwrResponseI18n.
-     */
-    @Test
-    public void testAddMessage_String_ObjectArr() {
-        System.out.println("addMessage");
-        String i18nKey = "";
-        Object[] args = null;
-        DwrResponseI18n instance = new DwrResponseI18n();
-        instance.addMessage(i18nKey, args);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of addMessage method, of class DwrResponseI18n.
-     */
-    @Test
-    public void testAddMessage_LocalizableMessage() {
-        System.out.println("addMessage");
-        LocalizableMessage msg = null;
-        DwrResponseI18n instance = new DwrResponseI18n();
-        instance.addMessage(msg);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of addContextualMessage method, of class DwrResponseI18n.
-     */
-    @Test
-    public void testAddContextualMessage() {
-        System.out.println("addContextualMessage");
-        String i18nKey = "";
-        Object[] args = null;
-        DwrResponseI18n instance = new DwrResponseI18n();
-        instance.addContextualMessage(i18nKey, args);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of addGenericMessage method, of class DwrResponseI18n.
-     */
-    @Test
-    public void testAddGenericMessage() {
-        System.out.println("addGenericMessage");
-        String i18nKey = "";
-        Object[] args = null;
-        DwrResponseI18n instance = new DwrResponseI18n();
-        instance.addGenericMessage(i18nKey, args);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of setMessages method, of class DwrResponseI18n.
      */
     @Test
@@ -112,20 +57,6 @@ public class DwrResponseI18nTest {
     }
 
     /**
-     * Test of getHasMessages method, of class DwrResponseI18n.
-     */
-    @Test
-    public void testGetHasMessages() {
-        System.out.println("getHasMessages");
-        DwrResponseI18n instance = new DwrResponseI18n();
-        boolean expResult = false;
-        boolean result = instance.getHasMessages();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of getMessages method, of class DwrResponseI18n.
      */
     @Test
@@ -134,21 +65,6 @@ public class DwrResponseI18nTest {
         DwrResponseI18n instance = new DwrResponseI18n();
         Iterable<DwrMessageI18n> expResult = null;
         Iterable<DwrMessageI18n> result = instance.getMessages();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of toString method, of class DwrResponseI18n.
-     */
-    @Test
-    public void testToString() {
-        System.out.println("toString");
-        ResourceBundle b = null;
-        DwrResponseI18n instance = new DwrResponseI18n();
-        String expResult = "";
-        String result = instance.toString(b);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

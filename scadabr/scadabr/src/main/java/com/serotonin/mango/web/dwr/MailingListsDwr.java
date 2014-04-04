@@ -38,10 +38,7 @@ import com.serotonin.mango.vo.mailingList.EmailRecipient;
 import com.serotonin.mango.vo.mailingList.MailingList;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import com.serotonin.mango.web.email.MangoEmailContent;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
 
@@ -77,14 +74,14 @@ public class MailingListsDwr extends BaseDwr {
         ml.getInactiveIntervals().addAll(inactiveIntervals);
 
         if (xid.isEmpty()) {
-            response.addContextualMessage("xid", "validate.required");
+            response.addContextual("xid", "validate.required");
         } else if (!mailingListDao.isXidUnique(xid, id)) {
-            response.addContextualMessage("xid", "validate.xidUsed");
+            response.addContextual("xid", "validate.xidUsed");
         }
 
         ml.validate(response);
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             // Save the mailing list
             mailingListDao.saveMailingList(ml);
             response.addData("mlId", ml.getId());
@@ -114,7 +111,7 @@ public class MailingListsDwr extends BaseDwr {
             MangoEmailContent cnt = new MangoEmailContent("ftl.testEmail", model, bundle, Localizer.localizeI18nKey("ftl.testEmail", bundle), Common.UTF8);
             EmailWorkItem.queueEmail(toAddrs, cnt);
         } catch (Exception e) {
-            response.addGenericMessage("mailingLists.testerror", e.getMessage());
+            response.addGeneric("mailingLists.testerror", e);
             log.warn("", e);
         }
 

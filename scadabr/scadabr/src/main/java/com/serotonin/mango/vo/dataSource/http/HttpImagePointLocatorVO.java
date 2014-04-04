@@ -38,7 +38,6 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -166,39 +165,41 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO implements J
         this.webcamLiveFeedCode = webcamLiveFeedCode;
     }
 
+    @Override
     public int getDataTypeId() {
         return DataTypes.IMAGE;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
         if (url.isEmpty()) {
-            response.addContextualMessage("url", "validate.required");
+            response.addContextual("url", "validate.required");
         }
         if (timeoutSeconds <= 0) {
-            response.addContextualMessage("timeoutSeconds", "validate.greaterThanZero");
+            response.addContextual("timeoutSeconds", "validate.greaterThanZero");
         }
         if (retries < 0) {
-            response.addContextualMessage("retries", "validate.cannotBeNegative");
+            response.addContextual("retries", "validate.cannotBeNegative");
         }
         if (!SCALE_TYPE_CODES.isValidId(scaleType)) {
-            response.addContextualMessage("scaleType", "validate.invalidValue");
+            response.addContextual("scaleType", "validate.invalidValue");
         }
         if (scaleType == SCALE_TYPE_PERCENT) {
             if (scalePercent <= 0) {
-                response.addContextualMessage("scalePercent", "validate.greaterThanZero");
+                response.addContextual("scalePercent", "validate.greaterThanZero");
             } else if (scalePercent > 100) {
-                response.addContextualMessage("scalePercent", "validate.lessThan100");
+                response.addContextual("scalePercent", "validate.lessThan100");
             }
         } else if (scaleType == SCALE_TYPE_BOX) {
             if (scaleWidth <= 0) {
-                response.addContextualMessage("scaleWidth", "validate.greaterThanZero");
+                response.addContextual("scaleWidth", "validate.greaterThanZero");
             }
             if (scaleHeight <= 0) {
-                response.addContextualMessage("scaleHeight", "validate.greaterThanZero");
+                response.addContextual("scaleHeight", "validate.greaterThanZero");
             }
         }
         if (readLimit <= 0) {
-            response.addContextualMessage("readLimit", "validate.greaterThanZero");
+            response.addContextual("readLimit", "validate.greaterThanZero");
         }
     }
 

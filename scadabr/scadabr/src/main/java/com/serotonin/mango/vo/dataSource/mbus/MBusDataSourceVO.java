@@ -146,13 +146,13 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
         super.validate(response);
 
         if (connection == null) {
-            response.addContextualMessage("connection", "validate.required");
+            response.addContextual("connection", "validate.required");
         }
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextualMessage("updatePeriodType", "validate.invalidValue");
+            response.addContextual("updatePeriodType", "validate.invalidValue");
         }
         if (updatePeriods <= 0) {
-            response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
+            response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
     }
     //

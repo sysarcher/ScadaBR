@@ -435,12 +435,12 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isLengthGreaterThan(alias, 50)) {
-            response.addContextualMessage("alias", "maintenanceEvents.validate.aliasTooLong");
+        if (alias.length() > 50) {
+            response.addContextual("alias", "maintenanceEvents.validate.aliasTooLong");
         }
 
         if (dataSourceId <= 0) {
-            response.addContextualMessage("dataSourceId", "validate.invalidValue");
+            response.addContextual("dataSourceId", "validate.invalidValue");
         }
 
         // Check that cron patterns are ok.
@@ -448,13 +448,13 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
             try {
                 new CronParser().parse(activeCron, CronExpression.TIMEZONE_UTC);
             } catch (Exception e) {
-                response.addContextualMessage("activeCron", "maintenanceEvents.validate.activeCron", e.getMessage());
+                response.addContextual("activeCron", "maintenanceEvents.validate.activeCron", e);
             }
 
             try {
                 new CronParser().parse(inactiveCron, CronExpression.TIMEZONE_UTC);
             } catch (Exception e) {
-                response.addContextualMessage("inactiveCron", "maintenanceEvents.validate.inactiveCron", e.getMessage());
+                response.addContextual("inactiveCron", "maintenanceEvents.validate.inactiveCron", e);
             }
         }
 
@@ -463,13 +463,13 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
         try {
             rt.createTrigger(true);
         } catch (RuntimeException e) {
-            response.addContextualMessage("activeCron", "maintenanceEvents.validate.activeTrigger", e.getMessage());
+            response.addContextual("activeCron", "maintenanceEvents.validate.activeTrigger", e);
         }
 
         try {
             rt.createTrigger(false);
         } catch (RuntimeException e) {
-            response.addContextualMessage("inactiveCron", "maintenanceEvents.validate.inactiveTrigger", e.getMessage());
+            response.addContextual("inactiveCron", "maintenanceEvents.validate.inactiveTrigger", e);
         }
 
         // If the event is once, make sure the active time is earlier than the inactive time.
@@ -478,7 +478,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
             DateTime idt = new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute,
                     inactiveSecond, 0);
             if (idt.getMillis() <= adt.getMillis()) {
-                response.addContextualMessage("scheduleType", "maintenanceEvents.validate.invalidRtn");
+                response.addContextual("scheduleType", "maintenanceEvents.validate.invalidRtn");
             }
         }
     }

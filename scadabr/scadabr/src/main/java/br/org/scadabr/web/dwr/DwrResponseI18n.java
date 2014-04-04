@@ -5,10 +5,11 @@
  */
 package br.org.scadabr.web.dwr;
 
-import br.org.scadabr.ImplementMeException;
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.Map;
 
 /**
  *
@@ -16,41 +17,56 @@ import java.util.ResourceBundle;
  */
 public class DwrResponseI18n {
 
-    public void addMessage(String i18nKey, Object... args) {
-        throw new ImplementMeException();
+   private List<DwrMessageI18n> messages = new ArrayList<>();
+  private Map<String, Object> data = new HashMap<>();
+  
+ public void add(DwrMessageI18n message)
+  {
+    messages.add(message);
+  }
+
+    public void addContextual(String contexKey, String i18nKey, Object... args) {
+        add(new DwrMessageI18n(contexKey, i18nKey, args));
     }
 
-    public void addMessage(LocalizableMessage msg) {
-        throw new ImplementMeException();
+    public void addContextual(String contexKey, LocalizableException e) {
+        add(new DwrMessageI18n(contexKey, e.getI18nKey(), e.getArgs()));
     }
 
-    public void addContextualMessage(String i18nKey, Object... args) {
-        throw new ImplementMeException();
+    public void addContextual(String contexKey, String i18nKey, Throwable t) {
+        add(new DwrMessageI18n(contexKey, i18nKey, t.getMessage()));
     }
 
-    public void addGenericMessage(String i18nKey, Object... args) {
-        throw new ImplementMeException();
+    public void addGeneric(String i18nKey, Object... args) {
+        add(new DwrMessageI18n(null, i18nKey, args));
     }
 
-    public void setMessages(List<DwrMessageI18n> l) {
-        throw new ImplementMeException();
+    public void addGeneric(LocalizableException e) {
+        add(new DwrMessageI18n(null, e.getI18nKey(), e.getArgs()));
+    }
+
+    public void addGeneric(String i18nKey, Throwable t) {
+        add(new DwrMessageI18n(null, i18nKey, t.getMessage()));
+    }
+
+    public void setMessages(List<DwrMessageI18n> messages) {
+        this.messages = messages;
     }
 
     //Todo change to hasMessages???
-    public boolean getHasMessages() {
-        throw new ImplementMeException();
+    public boolean isEmpty() {
+        return messages.isEmpty();
     }
 
     public Iterable<DwrMessageI18n> getMessages() {
-        throw new ImplementMeException();
+        return messages;
     }
 
-    @Deprecated //USe Localizer
-    public String toString(ResourceBundle b) {
-        throw new ImplementMeException();
+    public void addData(String i18nKey, Object value) {
+        data.put(i18nKey, value);
     }
 
-    public void addData(String name, Object b) {
-        throw new ImplementMeException();
+    public Map<String, Object> getData() {
+        return data;
     }
 }
