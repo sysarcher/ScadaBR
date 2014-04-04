@@ -48,7 +48,7 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO>, JsonSerializa
     public static final int EVENT_UPDATE = 1;
     public static final int EVENT_CHANGE = 2;
 
-    public static ExportCodes EVENT_CODES = new ExportCodes();
+    public final static ExportCodes EVENT_CODES = new ExportCodes();
 
     static {
         EVENT_CODES.addElement(EVENT_UPDATE, "UPDATE", "pointLinks.event.update");
@@ -132,13 +132,13 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO>, JsonSerializa
 
     public void validate(DwrResponseI18n response) {
         if (sourcePointId == 0) {
-            response.addContextualMessage("sourcePointId", "pointLinks.validate.sourceRequired");
+            response.addContextual("sourcePointId", "pointLinks.validate.sourceRequired");
         }
         if (targetPointId == 0) {
-            response.addContextualMessage("targetPointId", "pointLinks.validate.targetRequired");
+            response.addContextual("targetPointId", "pointLinks.validate.targetRequired");
         }
         if (sourcePointId == targetPointId) {
-            response.addContextualMessage("targetPointId", "pointLinks.validate.samePoint");
+            response.addContextual("targetPointId", "pointLinks.validate.samePoint");
         }
     }
 

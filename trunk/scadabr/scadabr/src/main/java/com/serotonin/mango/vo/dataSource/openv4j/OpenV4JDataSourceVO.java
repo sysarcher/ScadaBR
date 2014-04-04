@@ -46,7 +46,6 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -149,13 +148,13 @@ public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
         super.validate(response);
 
         if (commPortId.isEmpty()) {
-            response.addContextualMessage("commPortId", "validate.required");
+            response.addContextual("commPortId", "validate.required");
         }
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextualMessage("updatePeriodType", "validate.invalidValue");
+            response.addContextual("updatePeriodType", "validate.invalidValue");
         }
         if (updatePeriods <= 0) {
-            response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
+            response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
     }
 

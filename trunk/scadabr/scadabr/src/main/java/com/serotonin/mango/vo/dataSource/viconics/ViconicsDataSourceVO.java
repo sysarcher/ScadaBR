@@ -34,7 +34,6 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -207,31 +206,31 @@ public class ViconicsDataSourceVO extends DataSourceVO<ViconicsDataSourceVO> {
         super.validate(response);
 
         if (commPortId.isEmpty()) {
-            response.addContextualMessage("commPortId", "validate.required");
+            response.addContextual("commPortId", "validate.required");
         }
         if (panId < 0 || panId > 66535) {
-            response.addContextualMessage("panId", "validate.between", 0, 66535);
+            response.addContextual("panId", "validate.between", 0, 66535);
         }
         if (channel < 0 || channel > 255) {
-            response.addContextualMessage("channel", "validate.between", 0, 255);
+            response.addContextual("channel", "validate.between", 0, 255);
         }
         if (timeout <= 0) {
-            response.addContextualMessage("timeout", "validate.greaterThanZero");
+            response.addContextual("timeout", "validate.greaterThanZero");
         }
         if (retries <= 0) {
-            response.addContextualMessage("retries", "validate.greaterThanZero");
+            response.addContextual("retries", "validate.greaterThanZero");
         }
         if (networkTimeoutSeconds <= 0) {
-            response.addContextualMessage("networkTimeoutSeconds", "validate.greaterThanZero");
+            response.addContextual("networkTimeoutSeconds", "validate.greaterThanZero");
         }
         if (deviceWarningTimeoutSeconds <= 0) {
-            response.addContextualMessage("deviceWarningTimeoutSeconds", "validate.greaterThanZero");
+            response.addContextual("deviceWarningTimeoutSeconds", "validate.greaterThanZero");
         }
         if (deviceRemoveTimeoutSeconds <= 0) {
-            response.addContextualMessage("deviceRemoveTimeoutSeconds", "validate.greaterThanZero");
+            response.addContextual("deviceRemoveTimeoutSeconds", "validate.greaterThanZero");
         }
         if (pointValueMinimumFreshnessSeconds <= 0) {
-            response.addContextualMessage("pointValueMinimumFreshnessSeconds", "validate.greaterThanZero");
+            response.addContextual("pointValueMinimumFreshnessSeconds", "validate.greaterThanZero");
         }
     }
 

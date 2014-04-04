@@ -103,7 +103,7 @@ public class ViewDwr extends BaseDwr {
     public List<ViewComponentState> getViewPointDataAnon(int viewId) {
         View view = Common.getAnonymousView(viewId);
         if (view == null) {
-            return new ArrayList<ViewComponentState>();
+            return new ArrayList<>();
         }
         return getViewPointData(null, view, false);
     }
@@ -164,8 +164,8 @@ public class ViewDwr extends BaseDwr {
             boolean edit) {
         WebContext webContext = WebContextFactory.get();
         HttpServletRequest request = webContext.getHttpServletRequest();
-        List<ViewComponentState> states = new ArrayList<ViewComponentState>();
-        Map<String, Object> model = new HashMap<String, Object>();
+        List<ViewComponentState> states = new ArrayList<>();
+        Map<String, Object> model = new HashMap<>();
         RuntimeManager rtm = Common.ctx.getRuntimeManager();
 
         for (ViewComponent viewComponent : view.getViewComponents()) {
@@ -189,14 +189,14 @@ public class ViewDwr extends BaseDwr {
 
                 model.clear();
                 model.put("compoundComponent", compoundComponent);
-                List<Map<String, Object>> childData = new ArrayList<Map<String, Object>>();
+                List<Map<String, Object>> childData = new ArrayList<>();
                 for (CompoundChild child : compoundComponent
                         .getChildComponents()) {
                     if (child.getViewComponent().isPointComponent()) {
                         DataPointVO point = ((PointComponent) child
                                 .getViewComponent()).tgetDataPoint();
                         if (point != null) {
-                            Map<String, Object> map = new HashMap<String, Object>();
+                            Map<String, Object> map = new HashMap<>();
                             if (imageChart) {
                                 map.put("name", point.getName());
                             } else {
@@ -391,7 +391,7 @@ public class ViewDwr extends BaseDwr {
     //
     @MethodFilter
     public Map<String, Object> editInit() {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
         User user = Common.getUser();
 
         // Users with which to share.
@@ -401,7 +401,7 @@ public class ViewDwr extends BaseDwr {
         result.put("viewUsers", user.getView().getViewUsers());
 
         // View component types
-        List<KeyValuePair> components = new ArrayList<KeyValuePair>();
+        List<KeyValuePair> components = new ArrayList<>();
         for (ImplDefinition impl : ViewComponent.getImplementations()) {
             components.add(new KeyValuePair(impl.getName(), getMessage(impl
                     .getNameKey())));
@@ -411,7 +411,7 @@ public class ViewDwr extends BaseDwr {
         // Available points
         List<DataPointVO> allPoints = new DataPointDao().getDataPoints(
                 DataPointExtendedNameComparator.instance, false);
-        List<DataPointBean> availablePoints = new ArrayList<DataPointBean>();
+        List<DataPointBean> availablePoints = new ArrayList<>();
         for (DataPointVO dataPoint : allPoints) {
             if (Permissions.hasDataPointReadPermission(user, dataPoint)) {
                 availablePoints.add(new DataPointBean(dataPoint));
@@ -457,8 +457,7 @@ public class ViewDwr extends BaseDwr {
 
         DataPointVO dp = new DataPointDao().getDataPoint(dataPointId);
         if (dp == null || !Permissions.hasDataPointReadPermission(user, dp)) {
-            response.addContextualMessage("settingsPointList",
-                    "validate.required");
+            response.addContextual("settingsPointList", "validate.required");
         } else {
             pc.tsetDataPoint(dp);
             pc.setNameOverride(name);
@@ -476,7 +475,7 @@ public class ViewDwr extends BaseDwr {
     @MethodFilter
     public List<String> getViewComponentIds() {
         User user = Common.getUser();
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (ViewComponent vc : user.getView().getViewComponents()) {
             result.add(vc.getId());
         }
@@ -526,13 +525,13 @@ public class ViewDwr extends BaseDwr {
             String text, String link) {
         DwrResponseI18n response = new DwrResponseI18n();
         if (text.isEmpty()) {
-            response.addContextualMessage("linkText", "validate.required");
+            response.addContextual("linkText", "validate.required");
         }
         if (link.isEmpty()) {
-            response.addContextualMessage("linkLink", "validate.required");
+            response.addContextual("linkLink", "validate.required");
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             LinkComponent c = (LinkComponent) getViewComponent(viewComponentId);
             c.setText(text);
             c.setLink(link);
@@ -546,14 +545,13 @@ public class ViewDwr extends BaseDwr {
             String text, String scriptXid) {
         DwrResponseI18n response = new DwrResponseI18n();
         if (text.isEmpty()) {
-            response.addContextualMessage("scriptButtonText",
-                    "validate.required");
+            response.addContextual("scriptButtonText", "validate.required");
         }
         if (scriptXid.isEmpty()) {
-            response.addContextualMessage("scriptsList", "validate.required");
+            response.addContextual("scriptsList", "validate.required");
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             ScriptButtonComponent c = (ScriptButtonComponent) getViewComponent(viewComponentId);
             c.setText(text);
             c.setScriptXid(scriptXid);
@@ -569,17 +567,15 @@ public class ViewDwr extends BaseDwr {
 
         // Validate
         if (min >= max) {
-            response.addContextualMessage("graphicRendererAnalogMin",
-                    "viewEdit.graphic.invalidMinMax");
+            response.addContextual("graphicRendererAnalogMin", "viewEdit.graphic.invalidMinMax");
         }
 
         ImageSet imageSet = getImageSet(imageSetId);
         if (imageSet == null) {
-            response.addContextualMessage("graphicRendererAnalogImageSet",
-                    "viewEdit.graphic.missingImageSet");
+            response.addContextual("graphicRendererAnalogImageSet", "viewEdit.graphic.missingImageSet");
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             AnalogGraphicComponent c = (AnalogGraphicComponent) getViewComponent(viewComponentId);
             c.setMin(min);
             c.setMax(max);
@@ -599,22 +595,17 @@ public class ViewDwr extends BaseDwr {
         // Validate
         ImageSet imageSet = getImageSet(imageSetId);
         if (imageSet == null) {
-            response.addContextualMessage("graphicRendererBinaryImageSet",
-                    "viewEdit.graphic.missingImageSet");
+            response.addContextual("graphicRendererBinaryImageSet", "viewEdit.graphic.missingImageSet");
         } else {
             if (zeroImage == -1) {
-                response.addContextualMessage(
-                        "graphicRendererBinaryImageSetZeroMsg",
-                        "viewEdit.graphic.missingZeroImage");
+                response.addContextual( "graphicRendererBinaryImageSetZeroMsg", "viewEdit.graphic.missingZeroImage");
             }
             if (oneImage == -1) {
-                response.addContextualMessage(
-                        "graphicRendererBinaryImageSetOneMsg",
-                        "viewEdit.graphic.missingOneImage");
+                response.addContextual( "graphicRendererBinaryImageSetOneMsg", "viewEdit.graphic.missingOneImage");
             }
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             BinaryGraphicComponent c = (BinaryGraphicComponent) getViewComponent(viewComponentId);
             c.tsetImageSet(imageSet);
             c.setZeroImage(zeroImage);
@@ -633,17 +624,15 @@ public class ViewDwr extends BaseDwr {
 
         // Validate
         if (min >= max) {
-            response.addContextualMessage("graphicRendererDynamicMin",
-                    "viewEdit.graphic.invalidMinMax");
+            response.addContextual("graphicRendererDynamicMin", "viewEdit.graphic.invalidMinMax");
         }
 
         DynamicImage dynamicImage = getDynamicImage(dynamicImageId);
         if (dynamicImage == null) {
-            response.addContextualMessage("graphicRendererDynamicImage",
-                    "viewEdit.graphic.missingDynamicImage");
+            response.addContextual("graphicRendererDynamicImage", "viewEdit.graphic.missingDynamicImage");
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             DynamicGraphicComponent c = (DynamicGraphicComponent) getViewComponent(viewComponentId);
             c.setMin(min);
             c.setMax(max);
@@ -664,11 +653,10 @@ public class ViewDwr extends BaseDwr {
         // Validate
         ImageSet imageSet = getImageSet(imageSetId);
         if (imageSet == null) {
-            response.addContextualMessage("graphicRendererMultistateImageSet",
-                    "viewEdit.graphic.missingImageSet");
+            response.addContextual("graphicRendererMultistateImageSet", "viewEdit.graphic.missingImageSet");
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             MultistateGraphicComponent c = (MultistateGraphicComponent) getViewComponent(viewComponentId);
             c.setImageStateList(imageStates);
             c.setDefaultImage(defaultImage);
@@ -686,11 +674,10 @@ public class ViewDwr extends BaseDwr {
         DwrResponseI18n response = new DwrResponseI18n();
         // Validate
         if (script.isEmpty()) {
-            response.addContextualMessage("graphicRendererScriptScript",
-                    "viewEdit.graphic.missingScript");
+            response.addContextual("graphicRendererScriptScript", "viewEdit.graphic.missingScript");
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             ScriptComponent c = (ScriptComponent) getViewComponent(viewComponentId);
             c.setScript(script);
             resetPointComponent(c);
@@ -717,12 +704,10 @@ public class ViewDwr extends BaseDwr {
 
         // Validate
         if (scalePercent < 1) {
-            response.addContextualMessage(
-                    "graphicRendererThumbnailScalePercent",
-                    "viewEdit.graphic.invalidScale");
+            response.addContextual( "graphicRendererThumbnailScalePercent", "viewEdit.graphic.invalidScale");
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             ThumbnailComponent c = (ThumbnailComponent) getViewComponent(viewComponentId);
             c.setScalePercent(scalePercent);
             resetPointComponent(c);
@@ -748,12 +733,10 @@ public class ViewDwr extends BaseDwr {
         }
 
         if (StringUtils.parseInt(leadPointId, 0) <= 0) {
-            response.addContextualMessage("compoundPointSelect"
-                    + SimpleCompoundComponent.LEAD_POINT,
-                    "dsEdit.validate.required");
+            response.addContextual(String.format("compoundPointSelect%s", SimpleCompoundComponent.LEAD_POINT), "dsEdit.validate.required");
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             SimpleCompoundComponent c = (SimpleCompoundComponent) getViewComponent(viewComponentId);
             c.setName(name);
             c.setBackgroundColour(backgroundColour);
@@ -771,23 +754,19 @@ public class ViewDwr extends BaseDwr {
 
         validateCompoundComponent(response, name);
         if (width < 1) {
-            response.addContextualMessage("imageChartWidth",
-                    "validate.greaterThanZero");
+            response.addContextual("imageChartWidth", "validate.greaterThanZero");
         }
         if (height < 1) {
-            response.addContextualMessage("imageChartHeight",
-                    "validate.greaterThanZero");
+            response.addContextual("imageChartHeight", "validate.greaterThanZero");
         }
         if (!Common.TIME_PERIOD_CODES.isValidId(durationType)) {
-            response.addContextualMessage("imageChartDurationType",
-                    "validate.invalidValue");
+            response.addContextual("imageChartDurationType", "validate.invalidValue");
         }
         if (durationPeriods <= 0) {
-            response.addContextualMessage("imageChartDurationPeriods",
-                    "validate.greaterThanZero");
+            response.addContextual("imageChartDurationPeriods", "validate.greaterThanZero");
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             ImageChartComponent c = (ImageChartComponent) getViewComponent(viewComponentId);
             c.setName(name);
             c.setWidth(width);
@@ -807,7 +786,7 @@ public class ViewDwr extends BaseDwr {
 
         validateCompoundComponent(response, name);
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             CompoundComponent c = (CompoundComponent) getViewComponent(viewComponentId);
             c.setName(name);
             saveCompoundPoints(c, childPointIds);
@@ -823,23 +802,19 @@ public class ViewDwr extends BaseDwr {
         // Validate
 
         if (width < 0) {
-            response.addContextualMessage("graphicRendererButtonWidth",
-                    "validate.cannotBeNegative");
+            response.addContextual("graphicRendererButtonWidth", "validate.cannotBeNegative");
         }
         if (height < 0) {
-            response.addContextualMessage("graphicRendererButtonHeight",
-                    "validate.cannotBeNegative");
+            response.addContextual("graphicRendererButtonHeight", "validate.cannotBeNegative");
         }
         if (whenOnLabel.isEmpty()) {
-            response.addContextualMessage("graphicRendererButtonWhenOnLabel",
-                    "validate.required");
+            response.addContextual("graphicRendererButtonWhenOnLabel", "validate.required");
         }
         if (whenOffLabel.isEmpty()) {
-            response.addContextualMessage("graphicRendererButtonWhenOffLabel",
-                    "validate.required");
+            response.addContextual("graphicRendererButtonWhenOffLabel", "validate.required");
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             ButtonComponent c = (ButtonComponent) getViewComponent(viewComponentId);
             c.setWhenOnLabel(whenOnLabel);
             c.setWhenOffLabel(whenOffLabel);
@@ -859,29 +834,28 @@ public class ViewDwr extends BaseDwr {
         // Validate
 
         if (width < FlexBuilderComponent.MIN_WIDTH) {
-            response.addContextualMessage("flexWidth", "validate.invalidValue");
+            response.addContextual("flexWidth", "validate.invalidValue");
         }
 
         if (width > FlexBuilderComponent.MAX_WIDTH) {
-            response.addContextualMessage("flexWidth", "validate.invalidValue");
+            response.addContextual("flexWidth", "validate.invalidValue");
         }
 
         if (height < FlexBuilderComponent.MIN_HEIGHT) {
-            response.addContextualMessage("flexHeight", "validate.invalidValue");
+            response.addContextual("flexHeight", "validate.invalidValue");
         }
 
         if (height > FlexBuilderComponent.MAX_HEIGHT) {
-            response.addContextualMessage("flexHeight", "validate.invalidValue");
+            response.addContextual("flexHeight", "validate.invalidValue");
         }
 
         if (projectDefined) {
             if (projectsSource.isEmpty()) {
-                response.addContextualMessage("flexProjectsSource",
-                        "validate.invalidValue");
+                response.addContextual("flexProjectsSource", "validate.invalidValue");
             }
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             FlexBuilderComponent c = (FlexBuilderComponent) getViewComponent(viewComponentId);
             c.setWidth(width);
             c.setHeight(height);
@@ -901,14 +875,14 @@ public class ViewDwr extends BaseDwr {
         // Validate
 
         if (width < 1) {
-            response.addContextualMessage("flexWidth", "validate.invalidValue");
+            response.addContextual("flexWidth", "validate.invalidValue");
         }
 
         if (height < 1) {
-            response.addContextualMessage("flexHeight", "validate.invalidValue");
+            response.addContextual("flexHeight", "validate.invalidValue");
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             ChartComparatorComponent c = (ChartComparatorComponent) getViewComponent(viewComponentId);
             c.setWidth(width);
             c.setHeight(height);
@@ -927,15 +901,13 @@ public class ViewDwr extends BaseDwr {
         // Validate
 
         if (maxListSize < 1) {
-            response.addContextualMessage("customEditorAlarmListMaxListSize",
-                    "validate.greaterThanZero");
+            response.addContextual("customEditorAlarmListMaxListSize", "validate.greaterThanZero");
         }
         if (width < 0) {
-            response.addContextualMessage("customEditorAlarmListWidth",
-                    "validate.cannotBeNegative");
+            response.addContextual("customEditorAlarmListWidth", "validate.cannotBeNegative");
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             AlarmListComponent c = (AlarmListComponent) getViewComponent(viewComponentId);
             c.setMinAlarmLevel(minAlarmLevel);
             c.setMaxListSize(maxListSize);
@@ -953,8 +925,7 @@ public class ViewDwr extends BaseDwr {
 
     private void validateCompoundComponent(DwrResponseI18n response, String name) {
         if (name.isEmpty()) {
-            response.addContextualMessage("compoundName",
-                    "dsEdit.validate.required");
+            response.addContextual("compoundName", "dsEdit.validate.required");
         }
     }
 
@@ -1038,7 +1009,7 @@ public class ViewDwr extends BaseDwr {
             Date fromDate2 = (Date) formatter.parseObject(fromDateString2);
             Date toDate2 = (Date) formatter.parseObject(toDateString2);
 
-            List<DataPointVO> dps = new ArrayList<DataPointVO>();
+            List<DataPointVO> dps = new ArrayList<>();
             for (Integer dpId : dataPoints) {
                 DataPointVO dp = new DataPointDao().getDataPoint(dpId);
                 dps.add(dp);

@@ -46,7 +46,7 @@ public class PersistentPointLocatorVO extends AbstractPointLocatorVO {
     @Override
     public void validate(DwrResponseI18n response) {
         if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
+            response.addContextual("dataTypeId", "validate.invalidValue");
         }
     }
 

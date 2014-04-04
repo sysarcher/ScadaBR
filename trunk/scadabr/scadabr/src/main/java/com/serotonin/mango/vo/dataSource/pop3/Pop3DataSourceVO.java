@@ -145,19 +145,19 @@ public class Pop3DataSourceVO extends DataSourceVO<Pop3DataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (pop3Server.isEmpty()) {
-            response.addContextualMessage("pop3Server", "validate.required");
+            response.addContextual("pop3Server", "validate.required");
         }
         if (username.isEmpty()) {
-            response.addContextualMessage("username", "validate.required");
+            response.addContextual("username", "validate.required");
         }
         if (password.isEmpty()) {
-            response.addContextualMessage("password", "validate.required");
+            response.addContextual("password", "validate.required");
         }
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextualMessage("updatePeriodType", "validate.invalidValue");
+            response.addContextual("updatePeriodType", "validate.invalidValue");
         }
         if (updatePeriods <= 0) {
-            response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
+            response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
     }
 

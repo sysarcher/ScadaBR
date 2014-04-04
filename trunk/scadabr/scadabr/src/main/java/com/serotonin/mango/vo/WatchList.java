@@ -120,17 +120,17 @@ public class WatchList implements JsonSerializable {
 
     public void validate(DwrResponseI18n response) {
         if (name.isEmpty()) {
-            response.addMessage("name", new LocalizableMessageImpl("validate.required"));
-        } else if (StringUtils.isLengthGreaterThan(name, 50)) {
-            response.addMessage("name", new LocalizableMessageImpl("validate.notLongerThan", 50));
+            response.addContextual("name", "validate.required");
+        } else if (name.length() >  50) {
+            response.addContextual("name", "validate.notLongerThan", 50);
         }
 
         if (xid.isEmpty()) {
-            response.addMessage("xid", new LocalizableMessageImpl("validate.required"));
-        } else if (StringUtils.isLengthGreaterThan(xid, 50)) {
-            response.addMessage("xid", new LocalizableMessageImpl("validate.notLongerThan", 50));
+            response.addContextual("xid", "validate.required");
+        } else if (xid.length() >  50) {
+            response.addContextual("xid", "validate.notLongerThan", 50);
         } else if (!new WatchListDao().isXidUnique(xid, id)) {
-            response.addMessage("xid", new LocalizableMessageImpl("validate.xidUsed"));
+            response.addContextual("xid", "validate.xidUsed");
         }
 
         for (DataPointVO dpVO : pointList) {
@@ -148,7 +148,7 @@ public class WatchList implements JsonSerializable {
 
         map.put("user", new UserDao().getUser(userId).getUsername());
 
-        List<String> dpXids = new ArrayList<String>();
+        List<String> dpXids = new ArrayList<>();
         for (DataPointVO dpVO : pointList) {
             dpXids.add(dpVO.getXid());
         }

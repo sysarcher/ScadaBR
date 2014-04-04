@@ -86,22 +86,22 @@ public class InputPointTypeVO extends PointTypeVO {
     @Override
     public void validate(DwrResponseI18n response) {
         if (!DataTypes.CODES.isValidId(dataTypeId, EXCLUDE_DATA_TYPES)) {
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
+            response.addContextual("dataTypeId", "validate.invalidValue");
         }
 
         if (dataTypeId == DataTypes.BINARY) {
             if (inputId < 1 || inputId > 96) {
-                response.addContextualMessage("inputPointType.inputId", "validate.1to96");
+                response.addContextual("inputPointType.inputId", "validate.1to96");
             }
         } else {
             if (inputId < 1 || inputId > 8) {
-                response.addContextualMessage("inputPointType.inputId", "validate.1to8");
+                response.addContextual("inputPointType.inputId", "validate.1to8");
             }
             if (scaleRawHigh <= scaleRawLow) {
-                response.addContextualMessage("inputPointType.scaleRawHighId", "validate.greaterThanRawLow");
+                response.addContextual("inputPointType.scaleRawHighId", "validate.greaterThanRawLow");
             }
             if (scaleEngHigh <= scaleEngLow) {
-                response.addContextualMessage("inputPointType.scaleEngHighId", "validate.greaterThanEngLow");
+                response.addContextual("inputPointType.scaleEngHighId", "validate.greaterThanEngLow");
             }
         }
     }

@@ -38,7 +38,6 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -123,6 +122,7 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
         return getAttributeDescription(attributeId);
     }
 
+    @Override
     public int getDataTypeId() {
         return getAttributeDataType(attributeId);
     }
@@ -136,14 +136,17 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
         return s;
     }
 
+    @Override
     public boolean isSettable() {
         return attributeId == AttributeTypes.LATCH_STATE || attributeId == AttributeTypes.WIPER_POSITION;
     }
 
+    @Override
     public PointLocatorRT createRuntime() {
         return new OneWirePointLocatorRT(this);
     }
 
+    @Override
     public LocalizableMessage getConfigurationDescription() {
         return new LocalizableMessageImpl("dsEdit.1wire.dpconn", address, getAttributeIndexDescription());
     }
@@ -172,12 +175,13 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
         this.index = index;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
         if (address.isEmpty()) {
-            response.addContextualMessage("address", "validate.required");
+            response.addContextual("address", "validate.required");
         }
         if (!ATTRIBUTE_CODES.isValidId(attributeId)) {
-            response.addContextualMessage("attributeId", "validate.invalidValue");
+            response.addContextual("attributeId", "validate.invalidValue");
         }
     }
 

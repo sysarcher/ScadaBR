@@ -77,7 +77,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         UPDATE_EVENT_CODES.addElement(UPDATE_EVENT_CRON, "CRON", "dsEdit.meta.event.cron");
     }
 
-    private List<IntValuePair> context = new ArrayList<IntValuePair>();
+    private List<IntValuePair> context = new ArrayList<>();
     @JsonRemoteProperty
     private String script;
     private int dataTypeId;
@@ -160,24 +160,24 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @Override
     public void validate(DwrResponseI18n response) {
         if (script.isEmpty()) {
-            response.addContextualMessage("script", "validate.required");
+            response.addContextual("script", "validate.required");
         }
 
         List<String> varNameSpace = new ArrayList<>();
         for (IntValuePair point : context) {
             String varName = point.getValue();
             if (varName.isEmpty()) {
-                response.addContextualMessage("context", "validate.allVarNames");
+                response.addContextual("context", "validate.allVarNames");
                 break;
             }
 
             if (!validateVarName(varName)) {
-                response.addContextualMessage("context", "validate.invalidVarName", varName);
+                response.addContextual("context", "validate.invalidVarName", varName);
                 break;
             }
 
             if (varNameSpace.contains(varName)) {
-                response.addContextualMessage("context", "validate.duplicateVarName", varName);
+                response.addContextual("context", "validate.duplicateVarName", varName);
                 break;
             }
 
@@ -185,21 +185,21 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         }
 
         if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
+            response.addContextual("dataTypeId", "validate.invalidValue");
         }
 
         if (updateEvent == UPDATE_EVENT_CRON) {
             try {
                 new CronParser().parse(updateCronPattern, CronExpression.TIMEZONE_UTC);
             } catch (ParseException e) {
-                response.addContextualMessage("updateCronPattern", "validate.invalidCron", updateCronPattern);
+                response.addContextual("updateCronPattern", "validate.invalidCron", updateCronPattern);
             }
         } else if (updateEvent != UPDATE_EVENT_CONTEXT_UPDATE && !Common.TIME_PERIOD_CODES.isValidId(updateEvent)) {
-            response.addContextualMessage("updateEvent", "validate.invalidValue");
+            response.addContextual("updateEvent", "validate.invalidValue");
         }
 
         if (executionDelaySeconds < 0) {
-            response.addContextualMessage("executionDelaySeconds", "validate.cannotBeNegative");
+            response.addContextual("executionDelaySeconds", "validate.cannotBeNegative");
         }
     }
 

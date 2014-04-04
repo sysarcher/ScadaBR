@@ -14,7 +14,6 @@ import java.util.Date;
  */
 public class DateFunctions {
 
-    
     public static String getTime(long ts) {
         //TODO getLocale!!!
         return DateFormat.getTimeInstance().format(new Date(ts));

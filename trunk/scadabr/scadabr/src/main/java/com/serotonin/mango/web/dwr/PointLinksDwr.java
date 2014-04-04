@@ -122,15 +122,15 @@ public class PointLinksDwr extends BaseDwr {
         PointLinkDao pointLinkDao = new PointLinkDao();
 
         if (xid.isEmpty()) {
-            response.addContextualMessage("xid", "validate.required");
+            response.addContextual("xid", "validate.required");
         } else if (!pointLinkDao.isXidUnique(xid, id)) {
-            response.addContextualMessage("xid", "validate.xidUsed");
+            response.addContextual("xid", "validate.xidUsed");
         }
 
         vo.validate(response);
 
         // Save it
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             Common.ctx.getRuntimeManager().savePointLink(vo);
         }
 
@@ -152,7 +152,7 @@ public class PointLinksDwr extends BaseDwr {
         if (point == null) {
             message = new LocalizableMessageImpl("event.pointLink.sourceUnavailable");
         } else {
-            Map<String, IDataPoint> context = new HashMap<String, IDataPoint>();
+            Map<String, IDataPoint> context = new HashMap<>();
             context.put(PointLinkRT.CONTEXT_VAR_NAME, point);
             int targetDataType = new DataPointDao().getDataPoint(targetPointId).getPointLocator().getDataTypeId();
 
@@ -174,7 +174,7 @@ public class PointLinksDwr extends BaseDwr {
             }
         }
 
-        response.addMessage("script", message);
+        response.addContextual("script", message.getI18nKey(), message.getArgs());
         return response;
     }
 }

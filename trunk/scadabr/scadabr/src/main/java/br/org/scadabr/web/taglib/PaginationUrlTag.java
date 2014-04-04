@@ -17,7 +17,6 @@ import javax.servlet.jsp.JspException;
  */
 public class PaginationUrlTag extends PaginationTagSupport {
 
-    private static final long serialVersionUID = -1L;
     private String excludeParams;
 
     public void setExcludeParams(String excludeParams) {

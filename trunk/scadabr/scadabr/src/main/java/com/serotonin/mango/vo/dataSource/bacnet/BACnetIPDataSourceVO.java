@@ -232,55 +232,55 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
         super.validate(response);
 
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextualMessage("updatePeriodType", "validate.invalidValue");
+            response.addContextual("updatePeriodType", "validate.invalidValue");
         }
 
         if (updatePeriods <= 0) {
-            response.addContextualMessage("updatePeriods", "validate.cannotBeNegative");
+            response.addContextual("updatePeriods", "validate.cannotBeNegative");
         }
 
         try {
             new LocalDevice(deviceId, broadcastAddress);
         } catch (IllegalArgumentException e) {
-            response.addContextualMessage("deviceId", "validate.illegalValue");
+            response.addContextual("deviceId", "validate.illegalValue");
         }
 
         try {
             IpAddressUtils.toIpAddress(broadcastAddress);
         } catch (IllegalArgumentException e) {
-            response.addContextualMessage("broadcastAddress", "common.default", e.getMessage());
+            response.addContextual("broadcastAddress", "common.default", e);
         }
 
         try {
             new InetSocketAddress(broadcastAddress, port);
         } catch (IllegalArgumentException e) {
             if (e.getMessage().startsWith("port")) {
-                response.addContextualMessage("port", "validate.illegalValue");
+                response.addContextual("port", "validate.illegalValue");
             } else {
-                response.addContextualMessage("broadcastAddress", "validate.illegalValue");
+                response.addContextual("broadcastAddress", "validate.illegalValue");
             }
         }
 
         if (timeout < 0) {
-            response.addContextualMessage("timeout", "validate.cannotBeNegative");
+            response.addContextual("timeout", "validate.cannotBeNegative");
         }
         if (segTimeout < 0) {
-            response.addContextualMessage("segTimeout", "validate.cannotBeNegative");
+            response.addContextual("segTimeout", "validate.cannotBeNegative");
         }
         if (segWindow < 1) {
-            response.addContextualMessage("segWindow", "validate.greaterThanZero");
+            response.addContextual("segWindow", "validate.greaterThanZero");
         }
         if (retries < 0) {
-            response.addContextualMessage("retries", "validate.cannotBeNegative");
+            response.addContextual("retries", "validate.cannotBeNegative");
         }
         if (covSubscriptionTimeoutMinutes < 1) {
-            response.addContextualMessage("covSubscriptionTimeoutMinutes", "validate.greaterThanZero");
+            response.addContextual("covSubscriptionTimeoutMinutes", "validate.greaterThanZero");
         }
         if (maxReadMultipleReferencesSegmented < 1) {
-            response.addContextualMessage("maxReadMultipleReferencesSegmented", "validate.greaterThanZero");
+            response.addContextual("maxReadMultipleReferencesSegmented", "validate.greaterThanZero");
         }
         if (maxReadMultipleReferencesNonsegmented < 1) {
-            response.addContextualMessage("maxReadMultipleReferencesNonsegmented", "validate.greaterThanZero");
+            response.addContextual("maxReadMultipleReferencesNonsegmented", "validate.greaterThanZero");
         }
     }
 

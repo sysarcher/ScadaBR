@@ -318,28 +318,22 @@ public class SystemSettingsDwr extends BaseDwr {
         try {
             ColorUtils.toColor(chartBackgroundColour);
         } catch (InvalidArgumentException e) {
-            response.addContextualMessage(
-                    SystemSettingsDao.CHART_BACKGROUND_COLOUR,
-                    "systemSettings.validation.invalidColour");
+            response.addContextual( SystemSettingsDao.CHART_BACKGROUND_COLOUR, "systemSettings.validation.invalidColour");
         }
 
         try {
             ColorUtils.toColor(plotBackgroundColour);
         } catch (InvalidArgumentException e) {
-            response.addContextualMessage(
-                    SystemSettingsDao.PLOT_BACKGROUND_COLOUR,
-                    "systemSettings.validation.invalidColour");
+            response.addContextual( SystemSettingsDao.PLOT_BACKGROUND_COLOUR, "systemSettings.validation.invalidColour");
         }
 
         try {
             ColorUtils.toColor(plotGridlineColour);
         } catch (InvalidArgumentException e) {
-            response.addContextualMessage(
-                    SystemSettingsDao.PLOT_GRIDLINE_COLOUR,
-                    "systemSettings.validation.invalidColour");
+            response.addContextual( SystemSettingsDao.PLOT_GRIDLINE_COLOUR, "systemSettings.validation.invalidColour");
         }
 
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             SystemSettingsDao systemSettingsDao = new SystemSettingsDao();
             systemSettingsDao.setValue(
                     SystemSettingsDao.CHART_BACKGROUND_COLOUR,

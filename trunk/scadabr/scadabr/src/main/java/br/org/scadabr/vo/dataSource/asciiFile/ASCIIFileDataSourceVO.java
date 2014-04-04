@@ -102,7 +102,7 @@ public class ASCIIFileDataSourceVO<T extends ASCIIFileDataSourceVO<?>> extends
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (StringUtils.isEmpty(filePath)) {
-            response.addContextualMessage("filePath", "validate.required");
+            response.addContextual("filePath", "validate.required");
         }
     }
 

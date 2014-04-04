@@ -58,7 +58,6 @@ import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
 import com.serotonin.mango.vo.hierarchy.PointHierarchy;
 import com.serotonin.mango.vo.permission.Permissions;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 
 public class MangoDaoImpl implements ScadaBRAPIDao {
@@ -126,7 +125,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
                     }
                 }
 
-                if (itemValueList.size() == 0) {
+                if (itemValueList.isEmpty()) {
                     APIError error = new APIError();
                     error.setCode(ErrorCode.INVALID_PARAMETER);
                     error.setDescription(APIConstants.UNKNOW_TAG_NAME);
@@ -533,7 +532,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
                     maxReturn = lpvt.size();
                 }
 
-                itemHistory = new ArrayList<ItemValue>();
+                itemHistory = new ArrayList<>();
                 for (int i = 0; i < maxReturn; i++) {
                     PointValueTime pointValueTime = lpvt.get(i);
 
@@ -628,7 +627,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
             Calendar initialDate, Calendar finalDate, int maxReturn)
             throws ScadaBRAPIException {
         checkUser();
-        List<EventNotification> alarms = new ArrayList<EventNotification>();
+        List<EventNotification> alarms = new ArrayList<>();
         List<EventInstance> events = getAcknowledgedEvents();
         if (events.size() <= maxReturn) {
             maxReturn = events.size();
@@ -647,7 +646,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
             }
         }
 
-        if (alarms.size() == 0) {
+        if (alarms.isEmpty()) {
             APIError error = new APIError();
             error.setCode(ErrorCode.OK);
             error.setDescription("No alarm found in this period");
@@ -681,12 +680,12 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
     public List<EventDefinition> getEventDefinitions(EventType eventType)
             throws ScadaBRAPIException {
         checkUser();
-        List<EventDefinition> events = new ArrayList<EventDefinition>();
+        List<EventDefinition> events = new ArrayList<>();
 
         if ((eventType == null) || eventType == EventType.POINT_CONDITION_EVENT) {
             List<DataSourceVO<?>> dataSources = new DataSourceDao()
                     .getDataSources();
-            List<PointEventDetectorVO> pointEventDetectors = new ArrayList<PointEventDetectorVO>();
+            List<PointEventDetectorVO> pointEventDetectors = new ArrayList<>();
 
             for (DataSourceVO<?> dataSourceVO : dataSources) {
                 List<DataPointVO> dataPoints = new DataPointDao()
@@ -771,7 +770,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
         List<DataSourceVO<?>> allDataSources = new DataSourceDao()
                 .getDataSources();
 
-        List<Object> dataSources = new ArrayList<Object>();
+        List<Object> dataSources = new ArrayList<>();
 
         for (DataSourceVO<?> dataSourceVO : allDataSources) {
             if (dataSourceVO.getType() == dsType) {
@@ -782,7 +781,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
             }
         }
 
-        if (dataSources.size() == 0) {
+        if (dataSources.isEmpty()) {
             APIError error = new APIError();
             error.setCode(ErrorCode.OK);
             error.setDescription("No Data Source Found.");
@@ -906,7 +905,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 
             DwrResponseI18n validate = new DwrResponseI18n();
             ds.validate(validate);
-            if (validate.getHasMessages()) {
+            if (!validate.isEmpty()) {
                 throw new ScadaBRAPIException(new APIError(
                         ErrorCode.INVALID_PARAMETER,
                         "Check the configuration parameters."));
@@ -949,7 +948,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 
             DwrResponseI18n validate = new DwrResponseI18n();
             ds.validate(validate);
-            if (validate.getHasMessages()) {
+            if (!validate.isEmpty()) {
                 throw new ScadaBRAPIException(new APIError(
                         ErrorCode.INVALID_PARAMETER,
                         "Check the configuration parameters."));
@@ -1015,7 +1014,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 
         List<DataPointVO> mangoPoints = new DataPointDao().getDataPoints(
                 dataSourceId, null);
-        List<Object> dataPoints = new ArrayList<Object>();
+        List<Object> dataPoints = new ArrayList<>();
 
         for (DataPointVO dataPointVO : mangoPoints) {
 
@@ -1035,7 +1034,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
             dataPoints.add(point);
         }
 
-        if (dataPoints.size() == 0) {
+        if (dataPoints.isEmpty()) {
             APIError error = new APIError();
             error.setCode(ErrorCode.OK);
             error.setDescription("No Data Point Found.");
@@ -1293,7 +1292,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
         DwrResponseI18n validate = new DwrResponseI18n();
         validate(mangoPoint, validate);
         mangoLocator.validate(validate);
-        if (validate.getHasMessages()) {
+        if (!validate.isEmpty()) {
             throw new ScadaBRAPIException(new APIError(
                     ErrorCode.INVALID_PARAMETER,
                     "Check the configuration parameters."));
@@ -1304,13 +1303,13 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 
     private void validate(DataPointVO dataPoint, DwrResponseI18n response) {
         if (dataPoint.getXid().isEmpty()) {
-            response.addContextualMessage("xid", "validate.required");
+            response.addContextual("xid", "validate.required");
         } else if (!new DataPointDao().isXidUnique(dataPoint.getXid(),
                 dataPoint.getId())) {
-            response.addContextualMessage("xid", "validate.xidUsed");
+            response.addContextual("xid", "validate.xidUsed");
         }
         if (dataPoint.getName().isEmpty()) {
-            response.addContextualMessage("name", "validate.required");
+            response.addContextual("name", "validate.required");
         }
     }
 

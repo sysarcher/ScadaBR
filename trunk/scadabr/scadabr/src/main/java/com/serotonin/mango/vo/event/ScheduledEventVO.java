@@ -291,8 +291,8 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     }
 
     public void validate(DwrResponseI18n response) {
-        if (StringUtils.isLengthGreaterThan(alias, 50)) {
-            response.addContextualMessage("alias", "scheduledEvents.validate.aliasTooLong");
+        if (alias.length() > 50) {
+            response.addContextual("alias", "scheduledEvents.validate.aliasTooLong");
         }
 
         // Check that cron patterns are ok.
@@ -300,15 +300,14 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
             try {
                 new CronParser().parse(activeCron, CronExpression.TIMEZONE_UTC);
             } catch (Exception e) {
-                response.addContextualMessage("activeCron", "scheduledEvents.validate.activeCron", e.getMessage());
+                response.addContextual("activeCron", "scheduledEvents.validate.activeCron", e);
             }
 
             if (returnToNormal) {
                 try {
                     new CronParser().parse(inactiveCron, CronExpression.TIMEZONE_UTC);
                 } catch (Exception e) {
-                    response.addContextualMessage("inactiveCron", "scheduledEvents.validate.inactiveCron",
-                            e.getMessage());
+                    response.addContextual("inactiveCron", "scheduledEvents.validate.inactiveCron", e);
                 }
             }
         }
@@ -318,14 +317,14 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         try {
             rt.createTrigger(true);
         } catch (RuntimeException e) {
-            response.addContextualMessage("activeCron", "scheduledEvents.validate.activeTrigger", e.getMessage());
+            response.addContextual("activeCron", "scheduledEvents.validate.activeTrigger", e.getMessage());
         }
 
         if (returnToNormal) {
             try {
                 rt.createTrigger(false);
             } catch (RuntimeException e) {
-                response.addContextualMessage("inactiveCron", "scheduledEvents.validate.inactiveTrigger",
+                response.addContextual("inactiveCron", "scheduledEvents.validate.inactiveTrigger",
                         e.getMessage());
             }
         }
@@ -336,7 +335,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
             DateTime idt = new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute,
                     inactiveSecond, 0);
             if (idt.getMillis() <= adt.getMillis()) {
-                response.addContextualMessage("scheduleType", "scheduledEvents.validate.invalidRtn");
+                response.addContextual("scheduleType", "scheduledEvents.validate.invalidRtn");
             }
         }
     }

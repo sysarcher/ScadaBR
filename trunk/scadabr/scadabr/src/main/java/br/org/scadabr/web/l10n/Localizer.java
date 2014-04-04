@@ -3,7 +3,6 @@ package br.org.scadabr.web.l10n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import java.text.MessageFormat;
 import java.util.Locale;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;

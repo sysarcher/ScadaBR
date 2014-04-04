@@ -45,7 +45,6 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.IpAddressUtils;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -88,6 +87,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
     private int writePriority = 16;
     private int dataTypeId;
 
+    @Override
     public int getDataTypeId() {
         return dataTypeId;
     }
@@ -172,6 +172,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
         this.settable = settable;
     }
 
+    @Override
     public boolean isSettable() {
         return settable;
     }
@@ -190,55 +191,56 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
                 new PropertyIdentifier(propertyIdentifierId));
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
         try {
             IpAddressUtils.toIpAddress(remoteDeviceIp);
         } catch (IllegalArgumentException e) {
-            response.addContextualMessage("remoteDeviceIp", "common.default", e.getMessage());
+            response.addContextual("remoteDeviceIp", "common.default", e);
         }
 
         if (remoteDevicePort < 0 || remoteDevicePort > 65535) {
-            response.addContextualMessage("remoteDevicePort", "validate.illegalValue");
+            response.addContextual("remoteDevicePort", "validate.illegalValue");
         }
 
         if (!networkAddress.isEmpty()) {
             if (networkNumber < 0) {
-                response.addContextualMessage("networkNumber", "validate.illegalValue");
+                response.addContextual("networkNumber", "validate.illegalValue");
             }
 
             try {
                 BACnetUtils.dottedStringToBytes(networkAddress);
             } catch (NumberFormatException e) {
-                response.addContextualMessage("networkAddress", "validate.illegalValue");
+                response.addContextual("networkAddress", "validate.illegalValue");
             }
         }
 
         try {
             new ObjectIdentifier(null, remoteDeviceInstanceNumber);
         } catch (IllegalArgumentException e) {
-            response.addContextualMessage("remoteDeviceInstanceNumber", "validate.illegalValue");
+            response.addContextual("remoteDeviceInstanceNumber", "validate.illegalValue");
         }
 
         if (!OBJECT_TYPE_CODES.isValidId(objectTypeId)) {
-            response.addContextualMessage("objectTypeId", "validate.invalidValue");
+            response.addContextual("objectTypeId", "validate.invalidValue");
         }
 
         if (!PROPERTY_TYPE_CODES.isValidId(propertyIdentifierId)) {
-            response.addContextualMessage("propertyIdentifierId", "validate.invalidValue");
+            response.addContextual("propertyIdentifierId", "validate.invalidValue");
         }
 
         try {
             new ObjectIdentifier(null, objectInstanceNumber);
         } catch (IllegalArgumentException e) {
-            response.addContextualMessage("objectInstanceNumber", "validate.illegalValue");
+            response.addContextual("objectInstanceNumber", "validate.illegalValue");
         }
 
         if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
+            response.addContextual("dataTypeId", "validate.invalidValue");
         }
 
         if (writePriority < 1 || writePriority > 16) {
-            response.addContextualMessage("writePriority", "validate.illegalValue");
+            response.addContextual("writePriority", "validate.illegalValue");
         }
     }
 
@@ -401,7 +403,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
         map.put("propertyIdentifier", PROPERTY_TYPE_CODES.getCode(propertyIdentifierId));
     }
 
-    private static ExportCodes OBJECT_TYPE_CODES = new ExportCodes();
+    private final static ExportCodes OBJECT_TYPE_CODES = new ExportCodes();
 
     static {
         OBJECT_TYPE_CODES.addElement(ObjectType.analogInput.intValue(), "ANALOG_INPUT",
@@ -458,7 +460,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
                 "dsEdit.bacnetIp.objectType.accessDoor");
     }
 
-    private static ExportCodes PROPERTY_TYPE_CODES = new ExportCodes();
+    private final static ExportCodes PROPERTY_TYPE_CODES = new ExportCodes();
 
     static {
         PROPERTY_TYPE_CODES.addElement(PropertyIdentifier.ackedTransitions.intValue(), "ACKED_TRANSITIONS");

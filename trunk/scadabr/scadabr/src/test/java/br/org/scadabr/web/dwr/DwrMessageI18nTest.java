@@ -46,7 +46,7 @@ public class DwrMessageI18nTest {
     @Test
     public void testGetI18nKey() {
         System.out.println("getI18nKey");
-        DwrMessageI18n instance = new DwrMessageI18n();
+        DwrMessageI18n instance = new DwrMessageI18n("contextKey", "contextualMessageKey", "contextualMessageParam1");
         com.serotonin.web.dwr.DwrMessageI18n msg = new com.serotonin.web.dwr.DwrMessageI18n("contextKey", "contextualMessageKey", "contextualMessageParam1");
         String expResult = "";
         String result = instance.getI18nKey();
@@ -61,7 +61,7 @@ public class DwrMessageI18nTest {
     @Test
     public void testGetArgs() {
         System.out.println("getArgs");
-        DwrMessageI18n instance = new DwrMessageI18n();
+        DwrMessageI18n instance = new DwrMessageI18n("contextKey", "contextualMessageKey", "contextualMessageParam1");
         Object[] expResult = null;
         Object[] result = instance.getArgs();
         assertArrayEquals(expResult, result);

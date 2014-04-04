@@ -404,30 +404,24 @@ public class User implements SetPointSource, HttpSessionBindingListener,
 
     public void validate(DwrResponseI18n response) {
         if (username.isEmpty()) {
-            response.addMessage("username", new LocalizableMessageImpl(
-                    "validate.required"));
+            response.addContextual("username", "validate.required");
         }
         if (email.isEmpty()) {
-            response.addMessage("email", new LocalizableMessageImpl(
-                    "validate.required"));
+            response.addContextual("email", "validate.required");
         }
         if (id == Common.NEW_ID && password.isEmpty()) {
-            response.addMessage("password", new LocalizableMessageImpl(
-                    "validate.required"));
+            response.addContextual("password",  "validate.required");
         }
 
         // Check field lengths
-        if (StringUtils.isLengthGreaterThan(username, 40)) {
-            response.addMessage("username", new LocalizableMessageImpl(
-                    "validate.notLongerThan", 40));
+        if (username.length()> 40) {
+            response.addContextual("username", "validate.notLongerThan", 40);
         }
-        if (StringUtils.isLengthGreaterThan(email, 255)) {
-            response.addMessage("email", new LocalizableMessageImpl(
-                    "validate.notLongerThan", 255));
+        if (email.length() > 255) {
+            response.addContextual("email", "validate.notLongerThan", 255);
         }
-        if (StringUtils.isLengthGreaterThan(phone, 40)) {
-            response.addMessage("phone", new LocalizableMessageImpl(
-                    "validate.notLongerThan", 40));
+        if (phone.length() >  40) {
+            response.addContextual("phone", "validate.notLongerThan", 40);
         }
     }
 

@@ -52,7 +52,6 @@ import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.db.dao.ViewDao;
 import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.rt.RuntimeManager;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
@@ -105,7 +104,7 @@ public class EmportDwr extends BaseDwr {
             boolean pointHierarchy, boolean mailingLists, boolean publishers,
             boolean watchLists, boolean maintenanceEvents, boolean scripts,
             boolean pointValues, int maxPointValues, boolean systemSettings) {
-        Map<String, Object> data = new LinkedHashMap<String, Object>();
+        Map<String, Object> data = new LinkedHashMap<>();
 
         if (graphicalViews) {
             data.put(GRAPHICAL_VIEWS, new ViewDao().getViews());
@@ -162,7 +161,7 @@ public class EmportDwr extends BaseDwr {
             data.put(SCRIPTS, new ScriptDao().getScripts());
         }
         if (pointValues) {
-            List<PointValueJSONWrapper> allWrappedValues = new ArrayList<PointValueJSONWrapper>();
+            List<PointValueJSONWrapper> allWrappedValues = new ArrayList<>();
 
             long antes = System.currentTimeMillis();
             PointValueDao dao = new PointValueDao();
@@ -217,10 +216,10 @@ public class EmportDwr extends BaseDwr {
                 user.setImportTask(importTask);
                 response.addData("importStarted", true);
             } else {
-                response.addGenericMessage("emport.invalidImportData");
+                response.addGeneric("emport.invalidImportData");
             }
         } catch (ClassCastException | JsonException e) {
-            response.addGenericMessage("emport.parseError", e.getMessage());
+            response.addGeneric("emport.parseError", e);
         }
 
         return response;

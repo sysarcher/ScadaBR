@@ -26,7 +26,6 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.ScheduledEventDao;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
 import com.serotonin.mango.vo.permission.Permissions;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 
 /**
@@ -95,15 +94,15 @@ public class ScheduledEventsDwr extends BaseDwr {
         ScheduledEventDao scheduledEventDao = new ScheduledEventDao();
 
         if (xid.isEmpty()) {
-            response.addContextualMessage("xid", "validate.required");
+            response.addContextual("xid", "validate.required");
         } else if (!scheduledEventDao.isXidUnique(xid, id)) {
-            response.addContextualMessage("xid", "validate.xidUsed");
+            response.addContextual("xid", "validate.xidUsed");
         }
 
         se.validate(response);
 
         // Save the scheduled event
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             Common.ctx.getRuntimeManager().saveScheduledEvent(se);
         }
 

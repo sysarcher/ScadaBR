@@ -88,7 +88,7 @@ public class CheckboxTag extends TagSupport {
     @Override
     public int doEndTag() throws JspException {
         try {
-            JspWriter out = pageContext.getOut();
+            final JspWriter out = pageContext.getOut();
 
             out.print("<input");
             printAttribute(out, "type", "checkbox");

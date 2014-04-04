@@ -292,7 +292,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                 msg += ", " + Localizer.localizeI18nKey("emport.causedBy", bundle)
                         + " '" + t.getMessage() + "'";
             }
-            response.addGenericMessage("common.default", msg);
+            response.addGeneric("common.default", msg);
         } finally {
             BackgroundContext.remove();
         }
@@ -301,7 +301,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
     private void importUser(JsonObject userJson) {
         String username = userJson.getString("username");
         if (username == null) {
-            response.addGenericMessage("emport.user.username");
+            response.addGeneric("emport.user.username");
         } else {
             User user = userDao.getUser(username);
             if (user == null) {
@@ -320,7 +320,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                 // errors.
                 DwrResponseI18n userResponse = new DwrResponseI18n();
                 user.validate(userResponse);
-                if (userResponse.getHasMessages()) // Too bad. Copy the errors into the actual response.
+                if (!userResponse.isEmpty()) // Too bad. Copy the errors into the actual response.
                 {
                     copyValidationMessages(userResponse, "emport.user.prefix",
                             username);
@@ -334,9 +334,9 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                     pass2users.add(userJson);
                 }
             } catch (LocalizableJsonException e) {
-                response.addGenericMessage("emport.user.prefix", username, e);
+                response.addGeneric("emport.user.prefix", username, e);
             } catch (JsonException e) {
-                response.addGenericMessage("emport.user.prefix", username, getJsonExceptionMessage(e));
+                response.addGeneric("emport.user.prefix", username, getJsonExceptionMessage(e));
             }
         }
     }
@@ -345,20 +345,20 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
         String xid = dataSource.getString("xid");
         String name = dataSource.getString("name");
         if (xid.isEmpty()) {
-            response.addGenericMessage("emport.dataSource.xid",
+            response.addGeneric("emport.dataSource.xid",
                     name == null ? "(undefined)" : name);
         } else {
             DataSourceVO<?> vo = dataSourceDao.getDataSource(xid);
             if (vo == null) {
                 String typeStr = dataSource.getString("type");
                 if (typeStr == null) {
-                    response.addGenericMessage("emport.dataSource.missingType",
+                    response.addGeneric("emport.dataSource.missingType",
                             xid, DataSourceVO.Type.getTypeList());
                 } else {
                     DataSourceVO.Type type = DataSourceVO.Type
                             .valueOfIgnoreCase(typeStr);
                     if (type == null) {
-                        response.addGenericMessage(
+                        response.addGeneric(
                                 "emport.dataSource.invalidType", xid, typeStr,
                                 DataSourceVO.Type.getTypeList());
                     } else {
@@ -379,7 +379,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                     // other errors.
                     DwrResponseI18n voResponse = new DwrResponseI18n();
                     vo.validate(voResponse);
-                    if (voResponse.getHasMessages()) // Too bad. Copy the errors into the actual response.
+                    if (!voResponse.isEmpty()) // Too bad. Copy the errors into the actual response.
                     {
                         copyValidationMessages(voResponse,
                                 "emport.dataSource.prefix", xid);
@@ -391,9 +391,9 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                                 xid);
                     }
                 } catch (LocalizableJsonException e) {
-                    response.addGenericMessage("emport.dataSource.prefix", xid, e);
+                    response.addGeneric("emport.dataSource.prefix", xid, e);
                 } catch (JsonException e) {
-                    response.addGenericMessage("emport.dataSource.prefix", xid, getJsonExceptionMessage(e));
+                    response.addGeneric("emport.dataSource.prefix", xid, getJsonExceptionMessage(e));
                 }
             }
         }
@@ -403,8 +403,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
         String xid = dataPoint.getString("xid");
         String name = dataPoint.getString("name");
         if (xid == null) {
-            response.addGenericMessage("emport.dataPoint.xid",
-                    name == null ? "(undefined)" : name);
+            response.addGeneric("emport.dataPoint.xid", name == null ? "(undefined)" : name);
         } else {
             DataSourceVO<?> dsvo;
             DataPointVO vo = dataPointDao.getDataPoint(xid);
@@ -413,8 +412,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                 String dsxid = dataPoint.getString("dataSourceXid");
                 dsvo = dataSourceDao.getDataSource(dsxid);
                 if (dsvo == null) {
-                    response.addGenericMessage("emport.dataPoint.badReference",
-                            xid);
+                    response.addGeneric("emport.dataPoint.badReference", xid);
                 } else {
                     vo = new DataPointVO();
                     vo.setXid(xid);
@@ -437,7 +435,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                     // other errors.
                     DwrResponseI18n voResponse = new DwrResponseI18n();
                     vo.validate(voResponse);
-                    if (voResponse.getHasMessages()) // Too bad. Copy the errors into the actual response.
+                    if (!voResponse.isEmpty()) // Too bad. Copy the errors into the actual response.
                     {
                         copyValidationMessages(voResponse,
                                 "emport.dataPoint.prefix", xid);
@@ -461,9 +459,9 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                         addSuccessMessage(isnew, "emport.dataPoint.prefix", xid);
                     }
                 } catch (LocalizableJsonException e) {
-                    response.addGenericMessage("emport.dataPoint.prefix", xid, e);
+                    response.addGeneric("emport.dataPoint.prefix", xid, e);
                 } catch (JsonException e) {
-                    response.addGenericMessage("emport.dataPoint.prefix", xid, getJsonExceptionMessage(e));
+                    response.addGeneric("emport.dataPoint.prefix", xid, getJsonExceptionMessage(e));
                 }
             }
         }
@@ -472,7 +470,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
     private void importView(JsonObject viewJson) {
         String xid = viewJson.getString("xid");
         if (xid == null) {
-            response.addGenericMessage("emport.view.xid");
+            response.addGeneric("emport.view.xid");
         } else {
             View view = viewDao.getViewByXid(xid);
             if (view == null) {
@@ -488,7 +486,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                 // errors.
                 DwrResponseI18n viewResponse = new DwrResponseI18n();
                 view.validate(viewResponse);
-                if (viewResponse.getHasMessages()) // Too bad. Copy the errors into the actual response.
+                if (!viewResponse.isEmpty()) // Too bad. Copy the errors into the actual response.
                 {
                     copyValidationMessages(viewResponse, "emport.view.prefix",
                             xid);
@@ -499,9 +497,9 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                     addSuccessMessage(isnew, "emport.view.prefix", xid);
                 }
             } catch (LocalizableJsonException e) {
-                response.addGenericMessage("emport.view.prefix", xid, e);
+                response.addGeneric("emport.view.prefix", xid, e);
             } catch (JsonException e) {
-                response.addGenericMessage("emport.view.prefix", xid, getJsonExceptionMessage(e));
+                response.addGeneric("emport.view.prefix", xid, getJsonExceptionMessage(e));
             }
         }
     }
@@ -517,9 +515,9 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
             userDao.saveUser(user);
             addSuccessMessage(false, "emport.userPermission.prefix", username);
         } catch (LocalizableJsonException e) {
-            response.addGenericMessage("emport.userPermission.prefix", username, e);
+            response.addGeneric("emport.userPermission.prefix", username, e);
         } catch (JsonException e) {
-            response.addGenericMessage("emport.userPermission.prefix", username, getJsonExceptionMessage(e));
+            response.addGeneric("emport.userPermission.prefix", username, getJsonExceptionMessage(e));
         }
     }
 
@@ -538,19 +536,19 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
 
             // Save the new values.
             dataPointDao.savePointHierarchy(root);
-            response.addGenericMessage("emport.pointHierarchy.prefix",
+            response.addGeneric("emport.pointHierarchy.prefix",
                     Localizer.localizeI18nKey("emport.saved", bundle));
         } catch (LocalizableJsonException e) {
-            response.addGenericMessage("emport.pointHierarchy.prefix", e);
+            response.addGeneric("emport.pointHierarchy.prefix", e);
         } catch (JsonException e) {
-            response.addGenericMessage("emport.pointHierarchy.prefix", getJsonExceptionMessage(e));
+            response.addGeneric("emport.pointHierarchy.prefix", getJsonExceptionMessage(e));
         }
     }
 
     private void importPointLink(JsonObject pointLink) {
         String xid = pointLink.getString("xid");
         if (xid == null) {
-            response.addGenericMessage("emport.pointLink.xid");
+            response.addGeneric("emport.pointLink.xid");
         } else {
             PointLinkVO vo = pointLinkDao.getPointLink(xid);
             if (vo == null) {
@@ -565,7 +563,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                 // distinguish errors in this vo from other errors.
                 DwrResponseI18n voResponse = new DwrResponseI18n();
                 vo.validate(voResponse);
-                if (voResponse.getHasMessages()) // Too bad. Copy the errors into the actual response.
+                if (!voResponse.isEmpty()) // Too bad. Copy the errors into the actual response.
                 {
                     copyValidationMessages(voResponse,
                             "emport.pointLink.prefix", xid);
@@ -576,9 +574,9 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                     addSuccessMessage(isnew, "emport.pointLink.prefix", xid);
                 }
             } catch (LocalizableJsonException e) {
-                response.addGenericMessage("emport.pointLink.prefix", xid, e);
+                response.addGeneric("emport.pointLink.prefix", xid, e);
             } catch (JsonException e) {
-                response.addGenericMessage("emport.pointLink.prefix", xid, getJsonExceptionMessage(e));
+                response.addGeneric("emport.pointLink.prefix", xid, getJsonExceptionMessage(e));
             }
         }
     }
@@ -586,7 +584,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
     private void importScheduledEvent(JsonObject scheduledEvent) {
         String xid = scheduledEvent.getString("xid");
         if (xid == null) {
-            response.addGenericMessage("emport.scheduledEvent.xid");
+            response.addGeneric("emport.scheduledEvent.xid");
         } else {
             ScheduledEventVO vo = scheduledEventDao.getScheduledEvent(xid);
             if (vo == null) {
@@ -601,7 +599,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                 // distinguish errors in this vo from other errors.
                 DwrResponseI18n voResponse = new DwrResponseI18n();
                 vo.validate(voResponse);
-                if (voResponse.getHasMessages()) // Too bad. Copy the errors into the actual response.
+                if (!voResponse.isEmpty()) // Too bad. Copy the errors into the actual response.
                 {
                     copyValidationMessages(voResponse,
                             "emport.scheduledEvent.prefix", xid);
@@ -613,9 +611,9 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                             xid);
                 }
             } catch (LocalizableJsonException e) {
-                response.addGenericMessage("emport.scheduledEvent.prefix", xid, e);
+                response.addGeneric("emport.scheduledEvent.prefix", xid, e);
             } catch (JsonException e) {
-                response.addGenericMessage("emport.scheduledEvent.prefix", xid, getJsonExceptionMessage(e));
+                response.addGeneric("emport.scheduledEvent.prefix", xid, getJsonExceptionMessage(e));
             }
         }
     }
@@ -623,7 +621,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
     private void importCompoundEventDetector(JsonObject compoundEventDetector) {
         String xid = compoundEventDetector.getString("xid");
         if (xid == null) {
-            response.addGenericMessage("emport.compoundEvent.xid");
+            response.addGeneric("emport.compoundEvent.xid");
         } else {
             CompoundEventDetectorVO vo = compoundEventDetectorDao
                     .getCompoundEventDetector(xid);
@@ -639,7 +637,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                 // distinguish errors in this vo from other errors.
                 DwrResponseI18n voResponse = new DwrResponseI18n();
                 vo.validate(voResponse);
-                if (voResponse.getHasMessages()) // Too bad. Copy the errors into the actual response.
+                if (!voResponse.isEmpty()) // Too bad. Copy the errors into the actual response.
                 {
                     copyValidationMessages(voResponse,
                             "emport.compoundEvent.prefix", xid);
@@ -651,9 +649,9 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                     addSuccessMessage(isnew, "emport.compoundEvent.prefix", xid);
                 }
             } catch (LocalizableJsonException e) {
-                response.addGenericMessage("emport.compoundEvent.prefix", xid, e);
+                response.addGeneric("emport.compoundEvent.prefix", xid, e);
             } catch (JsonException e) {
-                response.addGenericMessage("emport.compoundEvent.prefix", xid, getJsonExceptionMessage(e));
+                response.addGeneric("emport.compoundEvent.prefix", xid, getJsonExceptionMessage(e));
             }
         }
     }
@@ -661,7 +659,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
     private void importMailingList(JsonObject mailingList) {
         String xid = mailingList.getString("xid");
         if (xid == null) {
-            response.addGenericMessage("emport.mailingList.xid");
+            response.addGeneric("emport.mailingList.xid");
         } else {
             MailingList vo = mailingListDao.getMailingList(xid);
             if (vo == null) {
@@ -676,7 +674,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                 // distinguish errors in this vo from other errors.
                 DwrResponseI18n voResponse = new DwrResponseI18n();
                 vo.validate(voResponse);
-                if (voResponse.getHasMessages()) // Too bad. Copy the errors into the actual response.
+                if (!voResponse.isEmpty()) // Too bad. Copy the errors into the actual response.
                 {
                     copyValidationMessages(voResponse,
                             "emport.mailingList.prefix", xid);
@@ -687,9 +685,9 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                     addSuccessMessage(isnew, "emport.mailingList.prefix", xid);
                 }
             } catch (LocalizableJsonException e) {
-                response.addGenericMessage("emport.mailingList.prefix", xid, e);
+                response.addGeneric("emport.mailingList.prefix", xid, e);
             } catch (JsonException e) {
-                response.addGenericMessage("emport.mailingList.prefix", xid, getJsonExceptionMessage(e));
+                response.addGeneric("emport.mailingList.prefix", xid, getJsonExceptionMessage(e));
             }
         }
     }
@@ -698,20 +696,20 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
         String xid = publisher.getString("xid");
         String name = publisher.getString("name");
         if (xid == null) {
-            response.addGenericMessage("emport.publisher.xid",
+            response.addGeneric("emport.publisher.xid",
                     name == null ? "(undefined)" : name);
         } else {
             PublisherVO<?> vo = publisherDao.getPublisher(xid);
             if (vo == null) {
                 String typeStr = publisher.getString("type");
                 if (typeStr == null) {
-                    response.addGenericMessage("emport.publisher.missingType",
+                    response.addGeneric("emport.publisher.missingType",
                             xid, PublisherVO.Type.getTypeList());
                 } else {
                     PublisherVO.Type type = PublisherVO.Type
                             .valueOfIgnoreCase(typeStr);
                     if (type == null) {
-                        response.addGenericMessage(
+                        response.addGeneric(
                                 "emport.publisher.invalidType", xid, typeStr,
                                 PublisherVO.Type.getTypeList());
                     } else {
@@ -732,7 +730,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                     // other errors.
                     DwrResponseI18n voResponse = new DwrResponseI18n();
                     vo.validate(voResponse);
-                    if (voResponse.getHasMessages()) // Too bad. Copy the errors into the actual response.
+                    if (!voResponse.isEmpty()) // Too bad. Copy the errors into the actual response.
                     {
                         copyValidationMessages(voResponse,
                                 "emport.publisher.prefix", xid);
@@ -743,9 +741,9 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                         addSuccessMessage(isnew, "emport.publisher.prefix", xid);
                     }
                 } catch (LocalizableJsonException e) {
-                    response.addGenericMessage("emport.publisher.prefix", xid, e);
+                    response.addGeneric("emport.publisher.prefix", xid, e);
                 } catch (JsonException e) {
-                    response.addGenericMessage("emport.publisher.prefix", xid, getJsonExceptionMessage(e));
+                    response.addGeneric("emport.publisher.prefix", xid, getJsonExceptionMessage(e));
                 }
             }
         }
@@ -754,7 +752,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
     private void importEventHandler(JsonObject eventHandler) {
         String xid = eventHandler.getString("xid");
         if (xid == null) {
-            response.addGenericMessage("emport.eventHandler.xid");
+            response.addGeneric("emport.eventHandler.xid");
         } else {
             EventHandlerVO handler = eventDao.getEventHandler(xid);
             if (handler == null) {
@@ -774,7 +772,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                 // distinguish errors in this vo from other errors.
                 DwrResponseI18n voResponse = new DwrResponseI18n();
                 handler.validate(voResponse);
-                if (voResponse.getHasMessages()) // Too bad. Copy the errors into the actual response.
+                if (!voResponse.isEmpty()) // Too bad. Copy the errors into the actual response.
                 {
                     copyValidationMessages(voResponse,
                             "emport.eventHandler.prefix", xid);
@@ -801,9 +799,9 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                     addSuccessMessage(isnew, "emport.eventHandler.prefix", xid);
                 }
             } catch (LocalizableJsonException e) {
-                response.addGenericMessage("emport.eventHandler.prefix", xid, e);
+                response.addGeneric("emport.eventHandler.prefix", xid, e);
             } catch (JsonException e) {
-                response.addGenericMessage("emport.eventHandler.prefix", xid, getJsonExceptionMessage(e));
+                response.addGeneric("emport.eventHandler.prefix", xid, getJsonExceptionMessage(e));
             }
         }
     }
@@ -811,7 +809,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
     private void importWatchList(JsonObject watchListJson) {
         String xid = watchListJson.getString("xid");
         if (xid == null) {
-            response.addGenericMessage("emport.watchList.xid");
+            response.addGeneric("emport.watchList.xid");
         } else {
             WatchList watchList = watchListDao.getWatchList(xid);
             if (watchList == null) {
@@ -827,10 +825,9 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                 // errors.
                 DwrResponseI18n watchListResponse = new DwrResponseI18n();
                 watchList.validate(watchListResponse);
-                if (watchListResponse.getHasMessages()) // Too bad. Copy the errors into the actual response.
+                if (!watchListResponse.isEmpty()) // Too bad. Copy the errors into the actual response.
                 {
-                    copyValidationMessages(watchListResponse,
-                            "emport.watchList.prefix", xid);
+                    copyValidationMessages(watchListResponse, "emport.watchList.prefix", xid);
                 } else {
                     // Sweet. Save it.
                     boolean isnew = watchList.getId() == Common.NEW_ID;
@@ -838,9 +835,9 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                     addSuccessMessage(isnew, "emport.watchList.prefix", xid);
                 }
             } catch (LocalizableJsonException e) {
-                response.addGenericMessage("emport.watchList.prefix", xid, e);
+                response.addGeneric("emport.watchList.prefix", xid, e);
             } catch (JsonException e) {
-                response.addGenericMessage("emport.watchList.prefix", xid, getJsonExceptionMessage(e));
+                response.addGeneric("emport.watchList.prefix", xid, getJsonExceptionMessage(e));
             }
         }
     }
@@ -848,7 +845,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
     private void importMaintenanceEvent(JsonObject maintenanceEvent) {
         String xid = maintenanceEvent.getString("xid");
         if (xid == null) {
-            response.addGenericMessage("emport.maintenanceEvent.xid");
+            response.addGeneric("emport.maintenanceEvent.xid");
         } else {
             MaintenanceEventVO vo = maintenanceEventDao
                     .getMaintenanceEvent(xid);
@@ -864,7 +861,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                 // distinguish errors in this vo from other errors.
                 DwrResponseI18n voResponse = new DwrResponseI18n();
                 vo.validate(voResponse);
-                if (voResponse.getHasMessages()) // Too bad. Copy the errors into the actual response.
+                if (!voResponse.isEmpty()) // Too bad. Copy the errors into the actual response.
                 {
                     copyValidationMessages(voResponse,
                             "emport.maintenanceEvent.prefix", xid);
@@ -876,9 +873,9 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                             xid);
                 }
             } catch (LocalizableJsonException e) {
-                response.addGenericMessage("emport.maintenanceEvent.prefix", xid, e);
+                response.addGeneric("emport.maintenanceEvent.prefix", xid, e);
             } catch (JsonException e) {
-                response.addGenericMessage("emport.maintenanceEvent.prefix", xid, getJsonExceptionMessage(e));
+                response.addGeneric("emport.maintenanceEvent.prefix", xid, getJsonExceptionMessage(e));
             }
         }
     }
@@ -887,7 +884,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
 
         String xid = script.getString("xid");
         if (xid == null) {
-            response.addGenericMessage("emport.script.xid");
+            response.addGeneric("emport.script.xid");
         } else {
             ScriptVO vo = scriptDao.getScript(xid);
             if (vo == null) {
@@ -903,7 +900,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                 // distinguish errors in this vo from other errors.
                 DwrResponseI18n voResponse = new DwrResponseI18n();
                 vo.validate(voResponse);
-                if (voResponse.getHasMessages()) {
+                if (!voResponse.isEmpty()) {
                     copyValidationMessages(voResponse, "emport.script.prefix",
                             xid);
                 } // Too bad. Copy the errors into the actual response.
@@ -915,10 +912,10 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
                 }
             } catch (LocalizableJsonException e) {
                 e.printStackTrace();
-                response.addGenericMessage("emport.script.prefix", xid, e);
+                response.addGeneric("emport.script.prefix", xid, e);
             } catch (JsonException e) {
                 e.printStackTrace();
-                response.addGenericMessage("emport.script.prefix", xid, getJsonExceptionMessage(e));
+                response.addGeneric("emport.script.prefix", xid, getJsonExceptionMessage(e));
             }
         }
     }
@@ -927,7 +924,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
         String pointXid = json.getString("pointXid");
         DataPointVO dp = new DataPointDao().getDataPoint(pointXid);
         if (dp == null) {
-            response.addGenericMessage("emport.script.xid");
+            response.addGeneric("emport.script.xid");
         } else {
             long time = json.getLong("timestamp");
             String value = json.getString("value");
@@ -945,7 +942,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
             reader.populateObject(new SystemSettingsJSONWrapper(), json);
         } catch (JsonException e) {
             e.printStackTrace();
-            response.addGenericMessage("emport.systemSettingsFailed");
+            response.addGeneric("emport.systemSettingsFailed");
         }
 
     }
@@ -953,17 +950,16 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
     private void copyValidationMessages(DwrResponseI18n voResponse, String key,
             String desc) {
         for (DwrMessageI18n msg : voResponse.getMessages()) {
-            response.addGenericMessage(key, desc, Localizer.localizeMessage(msg, bundle));
+            response.addGeneric(key, desc, Localizer.localizeMessage(msg, bundle));
         }
     }
 
     private void addSuccessMessage(boolean isnew, String key, String desc) {
+        //TODO Localizer.localizeI18nKey should be done later wrap this in an LocalizableMsg????
         if (isnew) {
-            response.addGenericMessage(key, desc,
-                    Localizer.localizeI18nKey("emport.added", bundle));
+            response.addGeneric(key, desc, Localizer.localizeI18nKey("emport.added", bundle));
         } else {
-            response.addGenericMessage(key, desc,
-                    Localizer.localizeI18nKey("emport.saved", bundle));
+            response.addGeneric(key, desc, Localizer.localizeI18nKey("emport.saved", bundle));
         }
     }
 

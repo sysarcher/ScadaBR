@@ -143,20 +143,19 @@ public class Dnp3SerialDataSourceVO extends
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (commPortId.isEmpty()) {
-            response.addContextualMessage("commPortId", "validate.required");
+            response.addContextual("commPortId", "validate.required");
         }
         if (baudRate <= 0) {
-            response.addContextualMessage("baudRate", "validate.invalidValue");
+            response.addContextual("baudRate", "validate.invalidValue");
         }
         if (dataBits < 5 || dataBits > 8) {
-            response.addContextualMessage("dataBits", "validate.invalidValue");
+            response.addContextual("dataBits", "validate.invalidValue");
         }
         if (stopBits < 1 || stopBits > 3) {
-            response.addContextualMessage("stopBits", "validate.invalidValue");
+            response.addContextual("stopBits", "validate.invalidValue");
         }
         if (parity < 0 || parity > 4) {
-            response
-                    .addContextualMessage("parityBits", "validate.invalidValue");
+            response .addContextual("parityBits", "validate.invalidValue");
         }
     }
 

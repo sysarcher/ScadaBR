@@ -96,6 +96,7 @@ public class PachubePointLocatorVO extends AbstractPointLocatorVO implements Jso
         this.binary0Value = binary0Value;
     }
 
+    @Override
     public boolean isSettable() {
         return settable;
     }
@@ -104,17 +105,18 @@ public class PachubePointLocatorVO extends AbstractPointLocatorVO implements Jso
         this.settable = settable;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
         if (feedId <= 0) {
-            response.addContextualMessage("feedId", "validate.invalidValue");
+            response.addContextual("feedId", "validate.invalidValue");
         }
 
         if (dataStreamId.isEmpty()) {
-            response.addContextualMessage("dataStreamId", "validate.required");
+            response.addContextual("dataStreamId", "validate.required");
         }
 
         if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
+            response.addContextual("dataTypeId", "validate.invalidValue");
         }
     }
 

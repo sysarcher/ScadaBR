@@ -131,11 +131,11 @@ public class VMStatDataSourceVO extends DataSourceVO<VMStatDataSourceVO> {
         super.validate(response);
 
         if (pollSeconds < 1) {
-            response.addContextualMessage("pollSeconds", "validate.greaterThanZero", pollSeconds);
+            response.addContextual("pollSeconds", "validate.greaterThanZero", pollSeconds);
         }
 
         if (!OUTPUT_SCALE_CODES.isValidId(outputScale)) {
-            response.addContextualMessage("outputScale", "validate.invalidValue");
+            response.addContextual("outputScale", "validate.invalidValue");
         }
     }
 

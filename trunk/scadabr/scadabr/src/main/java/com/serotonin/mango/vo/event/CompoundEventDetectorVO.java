@@ -81,7 +81,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
 
     public void validate(DwrResponseI18n response) {
         if (name.isEmpty()) {
-            response.addContextualMessage("name", "compoundDetectors.validation.nameRequired");
+            response.addContextual("name", "compoundDetectors.validation.nameRequired");
         }
 
         validate(condition, response);
@@ -126,7 +126,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
                 }
             }
         } catch (ConditionParseException e) {
-            response.addMessage("condition", e);
+            response.addContextual("condition", e);
             if (e.isRange()) {
                 response.addData("range", true);
                 response.addData("from", e.getFrom());

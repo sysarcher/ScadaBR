@@ -123,13 +123,13 @@ public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourc
         for (String ipmask : ipWhiteList) {
             String msg = IpAddressUtils.checkIpMask(ipmask);
             if (msg != null) {
-                response.addContextualMessage("ipWhiteList", "common.default", msg);
+                response.addContextual("ipWhiteList", "common.default", msg);
             }
         }
 
         for (String deviceId : deviceIdWhiteList) {
             if (deviceId.isEmpty()) {
-                response.addContextualMessage("deviceIdWhiteList", "validate.missingDeviceId");
+                response.addContextual("deviceIdWhiteList", "validate.missingDeviceId");
             }
         }
     }

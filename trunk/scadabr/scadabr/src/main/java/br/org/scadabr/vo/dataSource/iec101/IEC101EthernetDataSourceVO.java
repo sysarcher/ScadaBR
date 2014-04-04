@@ -45,10 +45,10 @@ public class IEC101EthernetDataSourceVO extends
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (host.isEmpty()) {
-            response.addContextualMessage("commPortId", "validate.required");
+            response.addContextual("commPortId", "validate.required");
         }
         if (port <= 0) {
-            response.addContextualMessage("port", "validate.invalidValue");
+            response.addContextual("port", "validate.invalidValue");
         }
     }
 

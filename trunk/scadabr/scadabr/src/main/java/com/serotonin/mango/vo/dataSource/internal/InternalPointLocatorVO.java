@@ -68,7 +68,7 @@ public class InternalPointLocatorVO extends AbstractPointLocatorVO implements Js
         "WorkItemMonitor.threadCount", //
 };
 
-    public static ExportCodes ATTRIBUTE_CODES = new ExportCodes();
+    public final static ExportCodes ATTRIBUTE_CODES = new ExportCodes();
 
     static {
         ATTRIBUTE_CODES.addElement(Attributes.BATCH_ENTRIES, "BATCH_ENTRIES", "dsEdit.internal.attr.BATCH_ENTRIES");
@@ -121,7 +121,7 @@ public class InternalPointLocatorVO extends AbstractPointLocatorVO implements Js
     @Override
     public void validate(DwrResponseI18n response) {
         if (!ATTRIBUTE_CODES.isValidId(attributeId)) {
-            response.addContextualMessage("attributeId", "validate.invalidValue");
+            response.addContextual("attributeId", "validate.invalidValue");
         }
     }
 

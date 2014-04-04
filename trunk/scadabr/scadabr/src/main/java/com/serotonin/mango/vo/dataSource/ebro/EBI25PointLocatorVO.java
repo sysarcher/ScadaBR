@@ -202,12 +202,13 @@ public class EBI25PointLocatorVO extends AbstractPointLocatorVO implements JsonS
         this.highLimit = highLimit;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
         if (!TYPE_CODES.isValidId(type)) {
-            response.addContextualMessage("type", "validate.invalidValue");
+            response.addContextual("type", "validate.invalidValue");
         }
         if (type == TYPE_VALUE && !EBI25Constants.UNIT_CODES.isValidId(unit)) {
-            response.addContextualMessage("unit", "validate.invalidValue");
+            response.addContextual("unit", "validate.invalidValue");
         }
     }
 

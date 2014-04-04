@@ -50,7 +50,7 @@ public class PublisherEditDwr extends BaseDwr {
         DwrResponseI18n response = new DwrResponseI18n();
 
         p.validate(response);
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             Common.ctx.getRuntimeManager().savePublisher(p);
             response.addData("id", p.getId());
         }
@@ -181,28 +181,24 @@ public class PublisherEditDwr extends BaseDwr {
 
         DwrResponseI18n response = new DwrResponseI18n();
         if (rt == null) {
-            response.addGenericMessage("publisherEdit.persistent.status.notEnabled");
+            response.addGeneric("publisherEdit.persistent.status.notEnabled");
         } else {
-            response.addGenericMessage("publisherEdit.persistent.status.pointCount", rt.getPointCount());
-            response.addGenericMessage("publisherEdit.persistent.status.queueSize", rt.getQueueSize());
+            response.addGeneric("publisherEdit.persistent.status.pointCount", rt.getPointCount());
+            response.addGeneric("publisherEdit.persistent.status.queueSize", rt.getQueueSize());
             if (rt.getConnectingIndex() != -1) {
-                response.addGenericMessage("publisherEdit.persistent.status.connectionState", new LocalizableMessageImpl(
-                        "publisherEdit.persistent.status.connecting", rt.getConnectingIndex(), rt.getPointCount()));
+                response.addGeneric("publisherEdit.persistent.status.connectionState", new LocalizableMessageImpl( "publisherEdit.persistent.status.connecting", rt.getConnectingIndex(), rt.getPointCount()));
             } else if (rt.isConnected()) {
-                response.addGenericMessage("publisherEdit.persistent.status.connectionState", new LocalizableMessageImpl(
-                        "publisherEdit.persistent.status.connected"));
+                response.addGeneric("publisherEdit.persistent.status.connectionState", new LocalizableMessageImpl( "publisherEdit.persistent.status.connected"));
             } else {
-                response.addGenericMessage("publisherEdit.persistent.status.connectionState", new LocalizableMessageImpl(
-                        "publisherEdit.persistent.status.notConnected"));
+                response.addGeneric("publisherEdit.persistent.status.connectionState", new LocalizableMessageImpl( "publisherEdit.persistent.status.notConnected"));
             }
-            response.addGenericMessage("publisherEdit.persistent.status.packetQueueSize", rt.getPacketsToSend());
+            response.addGeneric("publisherEdit.persistent.status.packetQueueSize", rt.getPacketsToSend());
 
             int syncStatus = rt.getSyncStatus();
             if (syncStatus == -1) {
-                response.addGenericMessage("publisherEdit.persistent.status.syncNotRunning");
+                response.addGeneric("publisherEdit.persistent.status.syncNotRunning");
             } else {
-                response.addGenericMessage("publisherEdit.persistent.status.syncStatus", syncStatus,
-                        rt.getPointCount(), rt.getSyncRequestsSent());
+                response.addGeneric("publisherEdit.persistent.status.syncStatus", syncStatus, rt.getPointCount(), rt.getSyncRequestsSent());
             }
         }
 
@@ -215,11 +211,11 @@ public class PublisherEditDwr extends BaseDwr {
 
         DwrResponseI18n response = new DwrResponseI18n();
         if (rt == null) {
-            response.addGenericMessage("publisherEdit.persistent.status.notEnabled");
+            response.addGeneric("publisherEdit.persistent.status.notEnabled");
         } else if (rt.startSync()) {
-            response.addGenericMessage("publisherEdit.persistent.syncStarted");
+            response.addGeneric("publisherEdit.persistent.syncStarted");
         } else {
-            response.addGenericMessage("publisherEdit.persistent.syncNotStarted");
+            response.addGeneric("publisherEdit.persistent.syncNotStarted");
         }
 
         return response;

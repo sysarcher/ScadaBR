@@ -263,28 +263,28 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
 
     public void validate(DwrResponseI18n response) {
         if (name.isEmpty()) {
-            response.addContextualMessage("name", "validate.required");
+            response.addContextual("name", "validate.required");
         }
-        if (StringUtils.isLengthGreaterThan(name, 40)) {
-            response.addContextualMessage("name", "validate.nameTooLong");
+        if (name.length() > 40) {
+            response.addContextual("name", "validate.nameTooLong");
         }
 
         if (xid.isEmpty()) {
-            response.addContextualMessage("xid", "validate.required");
+            response.addContextual("xid", "validate.required");
         } else if (!new PublisherDao().isXidUnique(xid, id)) {
-            response.addContextualMessage("xid", "validate.xidUsed");
-        } else if (StringUtils.isLengthGreaterThan(xid, 50)) {
-            response.addContextualMessage("xid", "validate.notLongerThan", 50);
+            response.addContextual("xid", "validate.xidUsed");
+        } else if (xid.length() > 50) {
+            response.addContextual("xid", "validate.notLongerThan", 50);
         }
 
         if (sendSnapshot) {
             if (snapshotSendPeriods <= 0) {
-                response.addContextualMessage("snapshotSendPeriods", "validate.greaterThanZero");
+                response.addContextual("snapshotSendPeriods", "validate.greaterThanZero");
             }
         }
 
         if (cacheWarningSize < 1) {
-            response.addContextualMessage("cacheWarningSize", "validate.greaterThanZero");
+            response.addContextual("cacheWarningSize", "validate.greaterThanZero");
         }
 
     }

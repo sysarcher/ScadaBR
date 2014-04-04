@@ -242,7 +242,7 @@ public class HttpImageDataSourceRT extends PollingDataSource {
                 }
                 lEx = new LocalizableException("event.http.response", url, responseCode);
             } catch (Exception e) {
-                lEx = super.wrapException(e);
+                lEx = PollingDataSource.wrapException(e);
             } finally {
                 if (method != null) {
                     method.releaseConnection();

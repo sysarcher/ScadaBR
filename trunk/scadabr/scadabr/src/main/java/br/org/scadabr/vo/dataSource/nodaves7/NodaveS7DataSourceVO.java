@@ -103,7 +103,7 @@ public class NodaveS7DataSourceVO<T extends NodaveS7DataSourceVO<?>> extends
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (StringUtils.isEmpty(filePath)) {
-            response.addContextualMessage("filePath", "validate.required");
+            response.addContextual("filePath", "validate.required");
         }
     }
 

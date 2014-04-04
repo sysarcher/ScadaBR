@@ -36,7 +36,6 @@ import com.serotonin.mango.rt.dataSource.http.HttpReceiverPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -93,12 +92,13 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
         this.binary0Value = binary0Value;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
         if (parameterName.isEmpty()) {
-            response.addContextualMessage("parameterName", "validate.required");
+            response.addContextual("parameterName", "validate.required");
         }
         if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
+            response.addContextual("dataTypeId", "validate.invalidValue");
         }
     }
 

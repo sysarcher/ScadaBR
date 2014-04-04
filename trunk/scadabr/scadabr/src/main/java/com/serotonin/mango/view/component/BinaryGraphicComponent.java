@@ -29,8 +29,6 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
@@ -81,20 +79,18 @@ public class BinaryGraphicComponent extends ImageSetComponent {
         super.validate(response);
 
         if (zeroImage < 0) {
-            response.addMessage("zeroImageIndex", new LocalizableMessageImpl("validate.cannotBeNegative"));
+            response.addContextual("zeroImageIndex", "validate.cannotBeNegative");
         }
         if (oneImage < 0) {
-            response.addMessage("oneImageIndex", new LocalizableMessageImpl("validate.cannotBeNegative"));
+            response.addContextual("oneImageIndex", "validate.cannotBeNegative");
         }
 
         if (imageSet != null) {
             if (zeroImage >= imageSet.getImageCount()) {
-                response.addMessage("zeroImageIndex", new LocalizableMessageImpl("emport.error.component.imageIndex",
-                        zeroImage, imageSet.getId(), imageSet.getImageCount() - 1));
+                response.addContextual("zeroImageIndex", "emport.error.component.imageIndex", zeroImage, imageSet.getId(), imageSet.getImageCount() - 1);
             }
             if (oneImage >= imageSet.getImageCount()) {
-                response.addMessage("oneImageIndex", new LocalizableMessageImpl("emport.error.component.imageIndex",
-                        oneImage, imageSet.getId(), imageSet.getImageCount() - 1));
+                response.addContextual("oneImageIndex", "emport.error.component.imageIndex", oneImage, imageSet.getId(), imageSet.getImageCount() - 1);
             }
         }
     }

@@ -344,7 +344,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
         }
 
         public static List<String> getTypeList() {
-            List<String> result = new ArrayList<String>();
+            List<String> result = new ArrayList<>();
             for (Type type : values()) {
                 result.add(type.name());
             }
@@ -373,7 +373,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
     abstract public ExportCodes getEventCodes();
 
     final public List<EventTypeVO> getEventTypes() {
-        List<EventTypeVO> eventTypes = new ArrayList<EventTypeVO>();
+        List<EventTypeVO> eventTypes = new ArrayList<>();
         addEventTypes(eventTypes);
         return eventTypes;
     }
@@ -390,7 +390,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
     private String name;
     @JsonRemoteProperty
     private boolean enabled;
-    private Map<Integer, Integer> alarmLevels = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> alarmLevels = new HashMap<>();
 
     public boolean isEnabled() {
         return enabled;
@@ -400,6 +400,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
         this.enabled = enabled;
     }
 
+    @Override
     public int getId() {
         return id;
     }
@@ -461,20 +462,18 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
 
     public void validate(DwrResponseI18n response) {
         if (xid.isEmpty()) {
-            response.addContextualMessage("xid", "validate.required");
+            response.addContextual("xid", "validate.required");
         } else if (!new DataSourceDao().isXidUnique(xid, id)) {
-            response.addContextualMessage("xid", "validate.xidUsed");
-        } else if (StringUtils.isLengthGreaterThan(xid, 50)) {
-            response.addContextualMessage("xid", "validate.notLongerThan", 50);
+            response.addContextual("xid", "validate.xidUsed");
+        } else if (xid.length() > 50) {
+            response.addContextual("xid", "validate.notLongerThan", 50);
         }
 
         if (name.isEmpty()) {
-            response.addContextualMessage("dataSourceName",
-                    "validate.nameRequired");
+            response.addContextual("dataSourceName", "validate.nameRequired");
         }
-        if (StringUtils.isLengthGreaterThan(name, 40)) {
-            response.addContextualMessage("dataSourceName",
-                    "validate.nameTooLong");
+        if (name.length() > 40) {
+            response.addContextual("dataSourceName", "validate.nameTooLong");
         }
     }
 
@@ -547,7 +546,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
         // elegantly handled.
         if (ver == 1) {
             enabled = in.readBoolean();
-            alarmLevels = new HashMap<Integer, Integer>();
+            alarmLevels = new HashMap<>();
         } else if (ver == 2) {
             enabled = in.readBoolean();
             alarmLevels = (HashMap<Integer, Integer>) in.readObject();
@@ -561,7 +560,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
 
         ExportCodes eventCodes = getEventCodes();
         if (eventCodes != null && eventCodes.size() > 0) {
-            Map<String, String> alarmCodeLevels = new HashMap<String, String>();
+            Map<String, String> alarmCodeLevels = new HashMap<>();
 
             for (int i = 0; i < eventCodes.size(); i++) {
                 int eventId = eventCodes.getId(i);

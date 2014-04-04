@@ -82,13 +82,13 @@ public class TellPositionPointTypeVO extends PointTypeVO {
     public void validate(DwrResponseI18n response) {
         if (!"A".equals(axis) && !"B".equals(axis) && !"C".equals(axis) && !"D".equals(axis) && !"E".equals(axis)
                 && !"F".equals(axis) && !"G".equals(axis) && !"H".equals(axis)) {
-            response.addContextualMessage("tellPositionPointType.axis", "validate.axis.invalid");
+            response.addContextual("tellPositionPointType.axis", "validate.axis.invalid");
         }
         if (scaleRawHigh <= scaleRawLow) {
-            response.addContextualMessage("tellPositionPointType.scaleRawHighId", "validate.greaterThanRawLow");
+            response.addContextual("tellPositionPointType.scaleRawHighId", "validate.greaterThanRawLow");
         }
         if (scaleEngHigh <= scaleEngLow) {
-            response.addContextualMessage("tellPositionPointType.scaleEngHighId", "validate.greaterThanEngLow");
+            response.addContextual("tellPositionPointType.scaleEngHighId", "validate.greaterThanEngLow");
         }
     }
 

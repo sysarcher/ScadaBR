@@ -34,10 +34,7 @@ import com.serotonin.mango.rt.event.maintenance.MaintenanceEventRT;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
 import com.serotonin.mango.vo.permission.Permissions;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
 
 /**
@@ -133,15 +130,15 @@ public class MaintenanceEventsDwr extends BaseDwr {
         MaintenanceEventDao maintenanceEventDao = new MaintenanceEventDao();
 
         if (xid.isEmpty()) {
-            response.addContextualMessage("xid", "validate.required");
+            response.addContextual("xid", "validate.required");
         } else if (!maintenanceEventDao.isXidUnique(xid, id)) {
-            response.addContextualMessage("xid", "validate.xidUsed");
+            response.addContextual("xid", "validate.xidUsed");
         }
 
         e.validate(response);
 
         // Save the maintenance event
-        if (!response.getHasMessages()) {
+        if (response.isEmpty()) {
             Common.ctx.getRuntimeManager().saveMaintenanceEvent(e);
             response.addData("meId", e.getId());
         }
@@ -161,7 +158,7 @@ public class MaintenanceEventsDwr extends BaseDwr {
         MaintenanceEventRT rt = Common.ctx.getRuntimeManager().getRunningMaintenanceEvent(id);
         boolean activated = false;
         if (rt == null) {
-            response.addMessage("maintenanceEvents.toggle.disabled");
+            response.addGeneric("maintenanceEvents.toggle.disabled");
         } else {
             activated = rt.toggle();
         }

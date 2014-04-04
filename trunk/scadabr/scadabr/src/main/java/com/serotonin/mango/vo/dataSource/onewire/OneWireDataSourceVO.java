@@ -151,16 +151,16 @@ public class OneWireDataSourceVO extends DataSourceVO<OneWireDataSourceVO> {
         super.validate(response);
 
         if (commPortId.isEmpty()) {
-            response.addContextualMessage("commPortId", "validate.required");
+            response.addContextual("commPortId", "validate.required");
         }
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextualMessage("updatePeriodType", "validate.invalidValue");
+            response.addContextual("updatePeriodType", "validate.invalidValue");
         }
         if (updatePeriods <= 0) {
-            response.addContextualMessage("updatePeriods", "validate.greaterThanZero");
+            response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
         if (rescanPeriodType != RESCAN_NONE && rescanPeriods <= 0) {
-            response.addContextualMessage("rescanPeriods", "validate.greaterThanZero");
+            response.addContextual("rescanPeriods", "validate.greaterThanZero");
         }
     }
 

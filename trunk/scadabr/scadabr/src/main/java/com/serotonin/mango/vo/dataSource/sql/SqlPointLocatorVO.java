@@ -106,10 +106,10 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
     @Override
     public void validate(DwrResponseI18n response) {
         if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
+            response.addContextual("dataTypeId", "validate.invalidValue");
         }
         if (fieldName.isEmpty() && updateStatement.isEmpty()) {
-            response.addContextualMessage("fieldName", "validate.fieldName");
+            response.addContextual("fieldName", "validate.fieldName");
         }
     }
 

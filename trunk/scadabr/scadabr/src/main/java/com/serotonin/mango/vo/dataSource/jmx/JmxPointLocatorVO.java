@@ -36,7 +36,6 @@ import com.serotonin.mango.rt.dataSource.jmx.JmxPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -117,13 +116,13 @@ public class JmxPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
     @Override
     public void validate(DwrResponseI18n response) {
         if (objectName.isEmpty()) {
-            response.addContextualMessage("objectName", "validate.required");
+            response.addContextual("objectName", "validate.required");
         }
         if (attributeName.isEmpty()) {
-            response.addContextualMessage("attributeName", "validate.required");
+            response.addContextual("attributeName", "validate.required");
         }
         if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextualMessage("dataTypeId", "validate.invalidValue");
+            response.addContextual("dataTypeId", "validate.invalidValue");
         }
     }
 

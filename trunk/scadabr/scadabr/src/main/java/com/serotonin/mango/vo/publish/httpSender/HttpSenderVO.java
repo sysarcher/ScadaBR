@@ -40,7 +40,6 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -59,7 +58,7 @@ public class HttpSenderVO extends PublisherVO<HttpPointVO> {
                 new LocalizableMessageImpl("event.pb.resultWarnings"), AlarmLevels.INFORMATION));
     }
 
-    private static final ExportCodes EVENT_CODES = new ExportCodes();
+    private final static ExportCodes EVENT_CODES = new ExportCodes();
 
     static {
         PublisherVO.addDefaultEventCodes(EVENT_CODES);
@@ -71,7 +70,7 @@ public class HttpSenderVO extends PublisherVO<HttpPointVO> {
     public static final int DATE_FORMAT_TZ = 2;
     public static final int DATE_FORMAT_UTC = 3;
 
-    private static ExportCodes DATE_FORMAT_CODES = new ExportCodes();
+    private final static ExportCodes DATE_FORMAT_CODES = new ExportCodes();
 
     static {
         DATE_FORMAT_CODES.addElement(DATE_FORMAT_BASIC, "DATE_FORMAT_BASIC",
@@ -170,18 +169,18 @@ public class HttpSenderVO extends PublisherVO<HttpPointVO> {
         super.validate(response);
 
         if (url.isEmpty()) {
-            response.addContextualMessage("url", "validate.required");
+            response.addContextual("url", "validate.required");
         }
 
         for (HttpPointVO point : points) {
             if (point.getParameterName().isEmpty()) {
-                response.addContextualMessage("points", "validate.parameterRequired");
+                response.addContextual("points", "validate.parameterRequired");
                 break;
             }
         }
 
         if (!DATE_FORMAT_CODES.isValidId(dateFormat)) {
-            response.addContextualMessage("dateFormat", "validate.invalidValue");
+            response.addContextual("dateFormat", "validate.invalidValue");
         }
     }
 

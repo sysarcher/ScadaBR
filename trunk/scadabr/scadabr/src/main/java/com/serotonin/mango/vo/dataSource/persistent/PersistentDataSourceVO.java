@@ -95,7 +95,7 @@ public class PersistentDataSourceVO extends DataSourceVO<PersistentDataSourceVO>
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (port <= 0 || port > 65535) {
-            response.addContextualMessage("port", "validate.invalidValue");
+            response.addContextual("port", "validate.invalidValue");
         }
     }
 

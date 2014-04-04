@@ -176,60 +176,40 @@ public class SqlDataSourceVO extends DataSourceVO<SqlDataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextualMessage("updatePeriodType",
-                    "validate.invalidValue");
+            response.addContextual("updatePeriodType", "validate.invalidValue");
         }
         if (updatePeriods <= 0) {
-            response.addContextualMessage("updatePeriods",
-                    "validate.greaterThanZero");
+            response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
         if (driverClassname.isEmpty()) {
-            response.addContextualMessage("driverClassname",
-                    "validate.required");
+            response.addContextual("driverClassname", "validate.required");
         }
         if (connectionUrl.isEmpty()) {
-            response.addContextualMessage("connectionUrl", "validate.required");
+            response.addContextual("connectionUrl", "validate.required");
         }
     }
 
     @Override
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
-        AuditEventType.addPeriodMessage(list, "dsEdit.updatePeriod",
-                updatePeriodType, updatePeriods);
-        AuditEventType.addPropertyMessage(list, "dsEdit.sql.driverClassName",
-                driverClassname);
-        AuditEventType.addPropertyMessage(list, "dsEdit.sql.connectionString",
-                connectionUrl);
-        AuditEventType
-                .addPropertyMessage(list, "dsEdit.sql.username", username);
-        AuditEventType
-                .addPropertyMessage(list, "dsEdit.sql.password", password);
-        AuditEventType.addPropertyMessage(list, "dsEdit.sql.select",
-                selectStatement);
-        AuditEventType.addPropertyMessage(list, "dsEdit.sql.rowQuery",
-                rowBasedQuery);
+        AuditEventType.addPeriodMessage(list, "dsEdit.updatePeriod", updatePeriodType, updatePeriods);
+        AuditEventType.addPropertyMessage(list, "dsEdit.sql.driverClassName", driverClassname);
+        AuditEventType.addPropertyMessage(list, "dsEdit.sql.connectionString", connectionUrl);
+        AuditEventType .addPropertyMessage(list, "dsEdit.sql.username", username);
+        AuditEventType .addPropertyMessage(list, "dsEdit.sql.password", password);
+        AuditEventType.addPropertyMessage(list, "dsEdit.sql.select", selectStatement);
+        AuditEventType.addPropertyMessage(list, "dsEdit.sql.rowQuery", rowBasedQuery);
     }
 
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list,
             SqlDataSourceVO from) {
-        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod",
-                from.updatePeriodType, from.updatePeriods, updatePeriodType,
-                updatePeriods);
-        AuditEventType.maybeAddPropertyChangeMessage(list,
-                "dsEdit.sql.driverClassName", from.driverClassname,
-                driverClassname);
-        AuditEventType.maybeAddPropertyChangeMessage(list,
-                "dsEdit.sql.connectionString", from.connectionUrl,
-                connectionUrl);
-        AuditEventType.maybeAddPropertyChangeMessage(list,
-                "dsEdit.sql.username", from.username, username);
-        AuditEventType.maybeAddPropertyChangeMessage(list,
-                "dsEdit.sql.password", from.password, password);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.select",
-                from.selectStatement, selectStatement);
-        AuditEventType.maybeAddPropertyChangeMessage(list,
-                "dsEdit.sql.rowQuery", from.rowBasedQuery, rowBasedQuery);
+        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", from.updatePeriodType, from.updatePeriods, updatePeriodType, updatePeriods);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.driverClassName", from.driverClassname, driverClassname);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.connectionString", from.connectionUrl, connectionUrl);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.username", from.username, username);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.password", from.password, password);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.select", from.selectStatement, selectStatement);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.rowQuery", from.rowBasedQuery, rowBasedQuery);
     }
 
 	//

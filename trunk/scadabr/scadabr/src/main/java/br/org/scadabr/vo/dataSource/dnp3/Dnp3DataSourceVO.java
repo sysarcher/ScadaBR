@@ -149,36 +149,29 @@ abstract public class Dnp3DataSourceVO<T extends Dnp3DataSourceVO<?>> extends
     public void validate(DwrResponseI18n response) {
         super.validate(response);
         if (synchPeriods <= 0) {
-            response.addContextualMessage("synchPeriods",
-                    "validate.greaterThanZero");
+            response.addContextual("synchPeriods", "validate.greaterThanZero");
         }
         if (sourceAddress <= 0) {
-            response.addContextualMessage("sourceAddress",
-                    "validate.greaterThanZero");
+            response.addContextual("sourceAddress", "validate.greaterThanZero");
         }
         if (slaveAddress <= 0) {
-            response.addContextualMessage("slaveAddress",
-                    "validate.greaterThanZero");
+            response.addContextual("slaveAddress", "validate.greaterThanZero");
         }
         if (staticPollPeriods <= 0) {
-            response.addContextualMessage("staticPollPeriods",
-                    "validate.greaterThanZero");
+            response.addContextual("staticPollPeriods", "validate.greaterThanZero");
         }
         if (!Common.TIME_PERIOD_CODES.isValidId(rbePeriodType)) {
-            response.addContextualMessage("rbePeriodType",
-                    "validate.invalidValue");
+            response.addContextual("rbePeriodType", "validate.invalidValue");
         }
         if (rbePollPeriods <= 0) {
-            response.addContextualMessage("rbePollPeriods",
-                    "validate.greaterThanZero");
+            response.addContextual("rbePollPeriods", "validate.greaterThanZero");
         }
         if (timeout <= 0) {
             response
-                    .addContextualMessage("timeout", "validate.greaterThanZero");
+                    .addContextual("timeout", "validate.greaterThanZero");
         }
         if (retries < 0) {
-            response.addContextualMessage("retries",
-                    "validate.cannotBeNegative");
+            response.addContextual("retries", "validate.cannotBeNegative");
         }
     }
 
