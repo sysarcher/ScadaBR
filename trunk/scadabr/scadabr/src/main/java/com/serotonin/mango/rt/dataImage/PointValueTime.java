@@ -118,6 +118,9 @@ public class PointValueTime implements Serializable, IValueTime,
 
     @Override
     public boolean equals(Object o) {
+        if (!(o instanceof PointValueTime)) {
+            return false;
+        }
         PointValueTime that = (PointValueTime) o;
         if (time != that.time) {
             return false;

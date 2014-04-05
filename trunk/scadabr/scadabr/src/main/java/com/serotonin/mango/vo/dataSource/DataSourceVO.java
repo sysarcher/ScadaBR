@@ -76,7 +76,7 @@ import com.serotonin.mango.vo.dataSource.spinwave.SpinwaveDataSourceVO;
 import com.serotonin.mango.vo.dataSource.sql.SqlDataSourceVO;
 import com.serotonin.mango.vo.dataSource.viconics.ViconicsDataSourceVO;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualDataSourceVO;
-import com.serotonin.mango.vo.dataSource.vmstat.VMStatDataSourceVO;
+import br.org.scadabr.vo.dataSource.vmstat.VMStatDataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;

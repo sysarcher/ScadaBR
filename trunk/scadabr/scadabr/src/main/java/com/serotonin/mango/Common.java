@@ -368,7 +368,7 @@ public class Common {
     }
 
     public static String getDocPath() {
-        return ctx.getServletContext().getRealPath("WEB-INF/dox") + "/";
+        return ctx.getServletContext().getRealPath("/WEB-INF/dox") + "/";
     }
 
     private static String lazyFiledataPath = null;

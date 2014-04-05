@@ -766,24 +766,24 @@ function showDwrMessages(/*DwrResponseI18n.messages*/messages, /*tbody*/genericM
             node = $(m.contextKey +"Ctxmsg");
             if (!node) {
                 field = $(m.contextKey);
-                if (field)
+                if (field) {
                     node = createContextualMessageNode(field, m.contextKey);
-                else
+                } else {
                     alert("No contextual field found for key "+ m.contextKey);
-            }
-            
-            if (node) {
+                }
+            } else {
                 node.innerHTML = m.contextualMessage;
                 dojo.html.show(node);
             }
-        }
-        else
+        } else {
             genericMessages[genericMessages.length] = m.genericMessage;
+        }
     }
     
     if (genericMessages.length > 0) {
-        if (!genericMessageNode)
+        if (!genericMessageNode) {
             alert("generic messages node not defined");
+        }
         genericMessageNode = getNodeIfString(genericMessageNode);
         dwr.util.removeAllRows(genericMessageNode);
         dwr.util.addRows(genericMessageNode, genericMessages, [ function(data) { return data; } ],

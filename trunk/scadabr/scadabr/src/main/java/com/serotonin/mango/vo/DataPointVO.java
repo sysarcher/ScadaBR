@@ -124,8 +124,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
 
     static {
         for (int i = 0; i < 190; i++) {
-            ENGINEERING_UNITS_CODES.addElement(i, StringUtils.capitalize(new EngineeringUnits(i).toString()),
-                    "engUnit." + i);
+            ENGINEERING_UNITS_CODES.addElement(i, new EngineeringUnits(i).toString().toUpperCase().replace(' ', '_'),  "engUnit." + i);
         }
     }
 

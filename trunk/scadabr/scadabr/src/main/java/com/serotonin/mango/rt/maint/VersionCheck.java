@@ -62,7 +62,7 @@ import java.util.TimeZone;
 @Deprecated
 public class VersionCheck extends SystemCronTask {
 
-    private static final String INSTANCE_ID_FILE = "WEB-INF/instance.txt";
+    private static final String INSTANCE_ID_FILE = "/WEB-INF/instance.txt";
 
     private static VersionCheck instance;
     private static String instanceId;

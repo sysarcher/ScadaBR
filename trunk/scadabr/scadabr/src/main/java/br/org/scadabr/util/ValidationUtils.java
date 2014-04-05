@@ -5,7 +5,9 @@
  */
 package br.org.scadabr.util;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.web.dwr.DwrMessage;
+import br.org.scadabr.web.dwr.DwrMessageI18n;
+import br.org.scadabr.web.dwr.DwrResponse;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import org.springframework.validation.BindException;
 
@@ -15,20 +17,32 @@ import org.springframework.validation.BindException;
  */
 public class ValidationUtils {
 
-    public static void rejectValue(BindException errors, String loggingType, String validaterequired) {
-        throw new ImplementMeException();
+    public static void reject(BindException errors, String errorCode, Object... args) {
+        errors.reject(errorCode, args, "???" + errorCode + "(10)???");
     }
 
-    public static void reject(BindException errors, String loginvalidationaccountDisabled) {
-        throw new ImplementMeException();
+    public static void rejectValue(BindException errors, String field, String errorCode, Object... args) {
+        errors.rejectValue(field, errorCode, args, "???" + errorCode + "(11)???");
     }
 
-    public static void reject(BindException errors, String validatepedxidUsed, String xid) {
-        throw new ImplementMeException();
+    public static void reject(BindException errors, String fieldPrefix, DwrResponse response) {
+        for (DwrMessage m : response.getMessages()) {
+            if (m.isInContext() ) {
+                rejectValue(errors, fieldPrefix + m.getContextKey(), m.getMessage(), new Object[0]);
+            } else {
+                reject(errors, m.getMessage(), new Object[0]);
+            }
+        }
     }
 
-    public static void reject(BindException errors, String view, DwrResponseI18n response) {
-        throw new ImplementMeException();
+    public static void reject(BindException errors, String fieldPrefix, DwrResponseI18n response) {
+        for (DwrMessageI18n m : response.getMessages()) {
+            if (m.isInContext()) {
+                rejectValue(errors, fieldPrefix + m.getContextKey(), m.getI18nKey(), m.getArgs());
+            } else {
+                reject(errors, m.getI18nKey(), m.getArgs());
+            }
+        }
     }
 
 }

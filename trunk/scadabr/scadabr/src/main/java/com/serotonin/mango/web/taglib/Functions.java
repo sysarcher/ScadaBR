@@ -83,25 +83,20 @@ public class Functions {
     }
 
     private static String getHtml(String colour, String text, boolean detectOverflow) {
-        String result;
 
         if (text != null && detectOverflow && text.length() > 30) {
             text = encodeDQuot(text);
-            if (colour.isEmpty()) {
-                result = "<input type='text' readonly='readonly' class='ovrflw' value=\"" + text + "\"/>";
+            if (colour == null || colour.isEmpty()) {
+                return "<input type='text' readonly='readonly' class='ovrflw' value=\"" + text + "\"/>";
             } else {
-                result = "<input type='text' readonly='readonly' class='ovrflw' style='color:" + colour + ";' value=\""
+                return "<input type='text' readonly='readonly' class='ovrflw' style='color:" + colour + ";' value=\""
                         + text + "\"/>";
             }
+        } else if (colour == null || colour.isEmpty()) {
+            return text;
         } else {
-            if (colour.isEmpty()) {
-                result = text;
-            } else {
-                result = "<span style='color:" + colour + ";'>" + text + "</span>";
-            }
+            return "<span style='color:" + colour + ";'>" + text + "</span>";
         }
-
-        return result;
     }
 
     public static String getTime(PointValueTime pointValue) {

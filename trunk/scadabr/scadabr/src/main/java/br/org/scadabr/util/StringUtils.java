@@ -54,10 +54,6 @@ public class StringUtils {
         throw new ImplementMeException();
     }
 
-    public static String capitalize(String toString) {
-        throw new ImplementMeException();
-    }
-
     public static boolean isBetweenInc(int slaveId, int i, int i0) {
         throw new ImplementMeException();
     }

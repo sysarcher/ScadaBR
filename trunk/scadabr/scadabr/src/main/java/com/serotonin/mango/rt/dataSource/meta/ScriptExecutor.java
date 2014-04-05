@@ -205,14 +205,14 @@ public class ScriptExecutor {
     private static void ensureFunctions() {
         if (FUNCTIONS == null) {
             if (SCRIPT_FUNCTION_PATH == null) {
-                SCRIPT_FUNCTION_PATH = Common.ctx.getServletContext().getRealPath("WEB-INF/scripts/scriptFunctions.js");
+                SCRIPT_FUNCTION_PATH = Common.ctx.getServletContext().getRealPath("/WEB-INF/scripts/scriptFunctions.js");
             }
             StringWriter sw = new StringWriter();
             FileReader fr = null;
             try {
                 fr = new FileReader(SCRIPT_FUNCTION_PATH);
                 StreamUtils.transfer(fr, sw);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 throw new ShouldNeverHappenException(e);
             } finally {
                 try {
