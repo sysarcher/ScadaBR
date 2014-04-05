@@ -18,8 +18,8 @@
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
 
-<%@page import="com.serotonin.mango.vo.dataSource.vmstat.VMStatDataSourceVO"%>
-<%@page import="com.serotonin.mango.vo.dataSource.vmstat.VMStatPointLocatorVO"%>
+<%@page import="br.org.scadabr.vo.dataSource.vmstat.VMStatDataSourceVO"%>
+<%@page import="br.org.scadabr.vo.dataSource.vmstat.VMStatPointLocatorVO"%>
 <script type="text/javascript">
   function saveDataSourceImpl() {
       DataSourceEditDwr.saveVMStatDataSource($get("dataSourceName"), $get("dataSourceXid"), $get("pollSeconds"),

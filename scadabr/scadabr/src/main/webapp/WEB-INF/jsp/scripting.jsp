@@ -240,12 +240,11 @@
     }
 
     function validateScript() {
-        alert('Not implemented!');
-        //DataSourceEditDwr.validateScript($get("script"), createContextArray(), $get("dataTypeId"), validateScriptCB);
+        DataSourceEditDwr.validateScript($get("script"), createContextArray(), $get("dataTypeId"), validateScriptCB);
     }
     
     function validateScriptCB(response) {
-        //showDwrMessages(response.messages);
+        showDwrMessages(response.messages);
     }
 
     function clearObjectsTable() {

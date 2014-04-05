@@ -26,29 +26,46 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.serotonin.mango.Common;
-import br.org.scadabr.util.XmlUtils;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Matthew Lohbihler
  */
 public class DocumentationManifest {
 
+    public List<Element> getElementsByTagName(Element parent, String name) {
+        List<Element> result = new ArrayList<>();
+
+        final NodeList list = parent.getElementsByTagName(name);
+        for (int i = 0; i < list.getLength(); i++) {
+            result.add((Element) list.item(i));
+        }
+        return result;
+    }
+
     private final List<DocumentationItem> items = new ArrayList<>();
 
     public DocumentationManifest() throws Exception {
         // Read the documentation manifest file.
-        XmlUtils utils = new XmlUtils();
+        final DocumentBuilder builder;
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        builder = factory.newDocumentBuilder();
 
-        Document document = utils.parse(new File(Common.getDocPath() + "manifest.xml"));
+        Document document = builder.parse(new File(Common.getDocPath() + "manifest.xml"));
 
         Element root = document.getDocumentElement();
-        for (Element item : utils.getElementsByTagName(root, "item")) {
+
+        final NodeList itemList = root.getElementsByTagName("item");
+        for (int nodeIndex = 0; nodeIndex < itemList.getLength(); nodeIndex++) {
+            final Element item = ((Element) itemList.item(nodeIndex));
             DocumentationItem di = new DocumentationItem(item.getAttribute("id"));
 
-            for (Element relation : utils.getElementsByTagName(item, "relation")) {
-                di.addRelated(relation.getAttribute("id"));
+            final NodeList relationList = item.getElementsByTagName("relation");
+            for (int relationIndex = 0; relationIndex < relationList.getLength(); relationIndex++) {
+                di.addRelated(((Element) relationList.item(relationIndex)).getAttribute("id"));
             }
-
             items.add(di);
         }
     }

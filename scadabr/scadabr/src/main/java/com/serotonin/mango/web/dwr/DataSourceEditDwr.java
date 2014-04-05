@@ -177,8 +177,8 @@ import com.serotonin.mango.vo.dataSource.viconics.ViconicsPointLocatorVO;
 import com.serotonin.mango.vo.dataSource.virtual.ChangeTypeVO;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualDataSourceVO;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualPointLocatorVO;
-import com.serotonin.mango.vo.dataSource.vmstat.VMStatDataSourceVO;
-import com.serotonin.mango.vo.dataSource.vmstat.VMStatPointLocatorVO;
+import br.org.scadabr.vo.dataSource.vmstat.VMStatDataSourceVO;
+import br.org.scadabr.vo.dataSource.vmstat.VMStatPointLocatorVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.dwr.beans.BACnetDiscovery;
@@ -1140,14 +1140,12 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     }
 
     @MethodFilter
-    public DwrResponseI18n validateScript(String script,
-            List<IntValuePair> context, int dataTypeId) {
+    public DwrResponseI18n validateScript(String script, List<IntValuePair> context, int dataTypeId) {
         DwrResponseI18n response = new DwrResponseI18n();
 
         ScriptExecutor executor = new ScriptExecutor();
         try {
-            Map<String, IDataPoint> convertedContext = executor
-                    .convertContext(context);
+            Map<String, IDataPoint> convertedContext = executor.convertContext(context);
             PointValueTime pvt = executor.execute(script, convertedContext,
                     System.currentTimeMillis(), dataTypeId, -1);
             if (pvt.getTime() == -1) {
@@ -1160,7 +1158,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         } catch (ScriptException e) {
             response.addContextual("script", "dsEdit.meta.test.scriptError", e);
         } catch (ResultTypeException e) {
-            response.addGeneric("script", e);
+            response.addContextual("script", e);
         }
 
         return response;

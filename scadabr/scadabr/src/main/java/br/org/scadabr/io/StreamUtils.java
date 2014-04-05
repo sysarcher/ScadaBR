@@ -5,13 +5,10 @@
  */
 package br.org.scadabr.io;
 
-import br.org.scadabr.ImplementMeException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.io.Writer;
 
 /**
@@ -21,31 +18,67 @@ import java.io.Writer;
 public class StreamUtils {
 
     public static void transfer(InputStream in, OutputStream out) throws IOException {
-        throw new ImplementMeException();
+        final byte[] buf = new byte[2048];
+        int bytesReaded;
+
+        while ((bytesReaded = in.read(buf)) > 0) {
+            out.write(buf, 0, bytesReaded);
+        }
+
+        out.flush();
     }
 
-    public static void transfer(InputStream in, OutputStream out, int i) throws IOException {
-        throw new ImplementMeException();
+    public static void transfer(InputStream in, OutputStream out, long limit) throws IOException {
+        final byte[] buf = new byte[2048];
+        long bytesWritten = 0;
+        int bytesReaded;
+
+        while ((bytesReaded = in.read(buf)) > 0 && bytesWritten < limit) {
+            out.write(buf, 0, bytesReaded);
+            bytesWritten += bytesReaded;
+        }
+
+        out.flush();
     }
 
     public static void transfer(Reader r, Writer w) throws IOException {
-        throw new ImplementMeException();
+        final char[] buf = new char[2048];
+        int bytesReaded;
+
+        while ((bytesReaded = r.read(buf)) > 0) {
+            w.write(buf, 0, bytesReaded);
+        }
+
+        w.flush();
     }
 
     public static int read4ByteSigned(InputStream in) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        byte[] buf = new byte[4];
+        if (in.read(buf) < 4) {
+            throw new IOException("Stream closed");
+        }
+        return buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
     }
 
     public static byte readByte(InputStream in) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        final int result = in.read();
+        if (result < 0) {
+            throw new IOException("Stream closed");
+        }
+        return (byte) result;
     }
 
-    public static void write4ByteSigned(OutputStream out, int length) throws IOException {
-        throw new ImplementMeException();
+    public static void write4ByteSigned(OutputStream out, int value) throws IOException {
+        final byte[] buf = new byte[4];
+        buf[0] = (byte) (value & 0x000000FF);
+        buf[1] = (byte) ((value & 0x0000FF00) >> 8);
+        buf[1] = (byte) ((value & 0x00FF0000) >> 16);
+        buf[1] = (byte) ((value & 0xFF000000) >> 24);
+        out.write(buf);
     }
 
-    public static void writeByte(OutputStream out, byte id) throws IOException {
-        throw new ImplementMeException();
+    public static void writeByte(OutputStream out, byte b) throws IOException {
+        out.write(b);
     }
 
 }

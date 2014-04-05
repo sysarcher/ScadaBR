@@ -35,7 +35,7 @@ public class Functions {
                     sb.append("&lt;");
                     break;
                 default:
-                    sb.append(sb);
+                    sb.append(c);
             }
         }
         return sb.toString();
@@ -55,7 +55,7 @@ public class Functions {
                     sb.append("\\\\'");
                     break;
                 default:
-                    sb.append(sb);
+                    sb.append(c);
             }
         }
         return sb.toString();
@@ -72,7 +72,7 @@ public class Functions {
                     sb.append("\\\\\"");
                     break;
                 default:
-                    sb.append(sb);
+                    sb.append(c);
             }
         }
         return sb.toString();
@@ -89,7 +89,7 @@ public class Functions {
                     sb.append("\\\\'");
                     break;
                 default:
-                    sb.append(sb);
+                    sb.append(c);
             }
         }
         return sb.toString();

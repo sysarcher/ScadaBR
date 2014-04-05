@@ -5,7 +5,6 @@
  */
 package br.org.scadabr.web.dwr;
 
-import br.org.scadabr.ImplementMeException;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 
 /**

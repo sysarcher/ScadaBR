@@ -34,6 +34,7 @@ public class LoggedInAjaxFilter implements AjaxFilter {
 
     private static final Log LOG = LogFactory.getLog(LoggedInAjaxFilter.class);
 
+    @Override
     public Object doFilter(Object obj, Method method, Object[] params, AjaxFilterChain chain) throws Exception {
         LOG.debug("Running LoggedInAjaxFilter, hash=" + hashCode());
         Permissions.ensureValidUser();

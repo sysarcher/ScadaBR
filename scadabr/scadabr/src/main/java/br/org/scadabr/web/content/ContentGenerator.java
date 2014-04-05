@@ -50,6 +50,8 @@ public class ContentGenerator {
         } catch (MissingResourceException e) {
             if (true) throw new ImplementMeException();
             return "Resource " + contentJsp + " not found";
+        } catch (NullPointerException e) {
+            throw new ImplementMeException();
         } finally {
             if (model != null) {
                 for (String key : model.keySet()) {
