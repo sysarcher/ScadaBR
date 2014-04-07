@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.http;
 
-import br.org.scadabr.web.taglib.DateFunctions;
+import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 
 /**
  * @author Matthew Lohbihler
@@ -47,10 +47,4 @@ public class HttpReceiverPointSample {
         return time;
     }
 
-    public String getPrettyTime() {
-        if (time == 0) {
-            return null;
-        }
-        return DateFunctions.getTime(time);
-    }
 }

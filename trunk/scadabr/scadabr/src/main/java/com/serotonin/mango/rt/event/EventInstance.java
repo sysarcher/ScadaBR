@@ -27,7 +27,7 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.UserComment;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.taglib.DateFunctions;
+import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 
 public class EventInstance {
 
@@ -182,26 +182,6 @@ public class EventInstance {
         }
 
         return null;
-    }
-
-    public String getPrettyActiveTimestamp() {
-        return DateFunctions.getTime(activeTimestamp);
-    }
-
-    public String getFullPrettyActiveTimestamp() {
-        return DateFunctions.getFullSecondTime(activeTimestamp);
-    }
-
-    public String getPrettyRtnTimestamp() {
-        return DateFunctions.getTime(rtnTimestamp);
-    }
-
-    public String getFullPrettyRtnTimestamp() {
-        return DateFunctions.getFullSecondTime(rtnTimestamp);
-    }
-
-    public String getFullPrettyAcknowledgedTimestamp() {
-        return DateFunctions.getFullSecondTime(acknowledgedTimestamp);
     }
 
     public boolean isAlarm() {

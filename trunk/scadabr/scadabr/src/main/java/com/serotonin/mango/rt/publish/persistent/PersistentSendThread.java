@@ -13,7 +13,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.timer.CronTask;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -27,12 +26,9 @@ import com.serotonin.mango.vo.hierarchy.PointHierarchyEventDispatcher;
 import com.serotonin.mango.vo.hierarchy.PointHierarchyListener;
 import com.serotonin.mango.vo.publish.persistent.PersistentPointVO;
 import com.serotonin.mango.vo.publish.persistent.PersistentSenderVO;
-import br.org.scadabr.timer.TimerTask;
-import br.org.scadabr.timer.TimerTrigger;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.SystemCronTask;
 import br.org.scadabr.timer.cron.SystemRunnable;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.util.queue.ByteQueue;
 import java.util.TimeZone;
 

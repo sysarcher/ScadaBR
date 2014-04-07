@@ -41,7 +41,6 @@ import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import com.serotonin.mango.web.dwr.beans.EventInstanceBean;
-import br.org.scadabr.web.taglib.DateFunctions;
 
 /**
  * @author Matthew Lohbihler
@@ -87,8 +86,7 @@ public class PublisherEditController extends ParameterizableViewController {
             if (events != null) {
                 ResourceBundle bundle = ControllerUtils.getResourceBundle(request);
                 for (EventInstance event : events) {
-                    beans.add(new EventInstanceBean(event.isActive(), event.getAlarmLevel(), DateFunctions
-                            .getTime(event.getActiveTimestamp()), Localizer.localizeMessage(event.getMessage(), bundle)));
+                    beans.add(new EventInstanceBean(event.isActive(), event.getAlarmLevel(), event.getActiveTimestamp(), Localizer.localizeMessage(event.getMessage(), bundle)));
                 }
             }
             model.put("publisherEvents", beans);

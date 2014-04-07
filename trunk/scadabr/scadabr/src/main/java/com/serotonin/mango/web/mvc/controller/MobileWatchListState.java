@@ -18,6 +18,8 @@
  */
 package com.serotonin.mango.web.mvc.controller;
 
+import java.util.Date;
+
 /**
  * @author Matthew Lohbihler
  */
@@ -27,7 +29,7 @@ public class MobileWatchListState {
     private String name;
     private boolean disabled;
     private String value;
-    private String time;
+    private Date time;
 
     public String getId() {
         return id;
@@ -53,11 +55,11 @@ public class MobileWatchListState {
         this.disabled = disabled;
     }
 
-    public String getTime() {
+    public Date getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 

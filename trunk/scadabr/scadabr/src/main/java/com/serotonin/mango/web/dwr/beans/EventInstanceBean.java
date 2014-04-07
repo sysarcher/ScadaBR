@@ -25,13 +25,13 @@ public class EventInstanceBean {
 
     private final boolean active;
     private final int alarmLevel;
-    private final String prettyActiveTimestamp;
+    private final long activeTimestamp;
     private final String message;
 
-    public EventInstanceBean(boolean active, int alarmLevel, String prettyActiveTimestamp, String message) {
+    public EventInstanceBean(boolean active, int alarmLevel, long activeTimestamp, String message) {
         this.active = active;
         this.alarmLevel = alarmLevel;
-        this.prettyActiveTimestamp = prettyActiveTimestamp;
+        this.activeTimestamp = activeTimestamp;
         this.message = message;
     }
 
@@ -43,8 +43,8 @@ public class EventInstanceBean {
         return alarmLevel;
     }
 
-    public String getPrettyActiveTimestamp() {
-        return prettyActiveTimestamp;
+    public long getActiveTimestamp() {
+        return activeTimestamp;
     }
 
     public String getMessage() {

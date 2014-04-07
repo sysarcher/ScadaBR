@@ -1,8 +1,11 @@
 package br.org.scadabr.web.l10n;
 
 import br.org.scadabr.web.i18n.LocalizableMessage;
+import java.text.DateFormat;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,7 +41,11 @@ public class Localizer {
                 localizedArgs[i] = args[i];
             }
         }
-        return new MessageFormat(bundle.getString(i18nKey), bundle.getLocale()).format(localizedArgs);
+        try {
+            return new MessageFormat(bundle.getString(i18nKey), bundle.getLocale()).format(localizedArgs);
+        } catch (MissingResourceException e) {
+            return logAndGetMessage(i18nKey, bundle.getLocale());
+        }
     }
 
     /**
@@ -63,6 +70,19 @@ public class Localizer {
      */
     private static String logAndGetMessage(String i18nKey, Locale locale) {
         LOG.log(Level.SEVERE, "Localizer found unknown I18N key {0} for locale: {2}.", new Object[]{i18nKey, locale});
-        return String.format("!>>>%s:%s.%s<<<!", locale, i18nKey);
+        return String.format("!>>>%s:%s<<<!", locale, i18nKey);
     }
+
+    public static String localizeDateTime(Locale locale, long ts) {
+        return DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, locale).format(new Date(ts));
+    }
+
+    public static String localizeDate(Locale locale, long ts) {
+        return DateFormat.getDateInstance(DateFormat.DEFAULT, locale).format(new Date(ts));
+    }
+
+    public static String localizeTime(Locale locale, long ts) {
+        return DateFormat.getTimeInstance(DateFormat.DEFAULT, locale).format(new Date(ts));
+    }
+
 }

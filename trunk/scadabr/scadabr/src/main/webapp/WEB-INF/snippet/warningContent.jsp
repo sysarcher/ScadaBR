@@ -46,7 +46,7 @@
         <tr>
           <td><tag:eventIcon event="${event}"/></td>
           <td style="white-space:nowrap;">&nbsp;<tag:alarmAck event="${event}"/></td>
-          <td>${sbt:time(event.activeTimestamp)}</td>
+          <td><sbt:i18ntimestamp timestamp="${event.activeTimestamp}" hideDateOfToday="true" /></td>
           <td style="white-space:nowrap;">&nbsp;<sbt:i18n message="${event.message}"/></td>
         </tr>
       </c:forEach>

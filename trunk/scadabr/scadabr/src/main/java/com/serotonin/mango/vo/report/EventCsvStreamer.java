@@ -28,6 +28,7 @@ import com.serotonin.mango.view.export.CsvWriter;
 import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.l10n.Localizer;
+import java.util.Locale;
 
 /**
  * @author Matthew Lohbihler
@@ -52,7 +53,7 @@ public class EventCsvStreamer {
         for (EventInstance event : events) {
             data[0] = Integer.toString(event.getId());
             data[1] = Localizer.localizeMessage(AlarmLevels.getAlarmLevelMessage(event.getAlarmLevel()), bundle);
-            data[2] = event.getFullPrettyActiveTimestamp();
+            data[2] = Localizer.localizeDateTime(bundle.getLocale(), event.getActiveTimestamp());
             data[3] = Localizer.localizeMessage(event.getMessage(), bundle);
 
             if (event.isActive()) {
@@ -60,11 +61,11 @@ public class EventCsvStreamer {
             } else if (!event.isRtnApplicable()) {
                 data[4] = "";
             } else {
-                data[4] = event.getFullPrettyRtnTimestamp() + " - " + Localizer.localizeMessage(event.getRtnMessage(), bundle);
+                data[4] = String.format("%s - %s", Localizer.localizeDateTime(bundle.getLocale(), event.getRtnTimestamp()), Localizer.localizeMessage(event.getRtnMessage(), bundle));
             }
 
             if (event.isAcknowledged()) {
-                data[5] = event.getFullPrettyAcknowledgedTimestamp();
+                data[5] = Localizer.localizeDateTime(bundle.getLocale(), event.getAcknowledgedTimestamp());
 
                 LocalizableMessage ack = event.getExportAckMessage();
                 if (ack == null) {

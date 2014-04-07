@@ -26,7 +26,7 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.util.DateUtils;
 import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.l10n.Localizer;
-import br.org.scadabr.web.taglib.DateFunctions;
+import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 
 /**
  * @author Matthew Lohbihler
@@ -112,60 +112,6 @@ public class ReportInstance {
 
     public boolean isToNow() {
         return reportEndTime == -1;
-    }
-
-    public String getPrettyReportStartTime() {
-        if (reportStartTime == -1) {
-            return Localizer.localizeI18nKey("common.inception", bundle);
-        }
-        return DateFunctions.getFullMinuteTime(reportStartTime);
-    }
-
-    public String getPrettyReportEndTime() {
-        if (reportEndTime == -1) {
-            return Localizer.localizeI18nKey("reports.now", bundle);
-        }
-        return DateFunctions.getFullMinuteTime(reportEndTime);
-    }
-
-    public String getPrettyRunStartTime() {
-        if (runStartTime == -1) {
-            return Localizer.localizeI18nKey("reports.notStarted", bundle);
-        }
-        return DateFunctions.getFullMinuteTime(runStartTime);
-    }
-
-    public String getPrettyRunEndTime() {
-        if (runStartTime == -1) {
-            return "";
-        }
-        if (runEndTime == -1) {
-            return Localizer.localizeI18nKey("reports.inProgress", bundle);
-        }
-        return DateFunctions.getFullMinuteTime(runEndTime);
-    }
-
-    public String getPrettyRunDuration() {
-        if (runStartTime == -1) {
-            return "";
-        }
-        if (runEndTime == -1) {
-            return Localizer.localizeI18nKey("reports.inProgress", bundle);
-        }
-        return Localizer.localizeMessage(DateUtils.getDuration(runEndTime - runStartTime), bundle);
-    }
-
-    public String getPrettyRecordCount() {
-        if (runStartTime == -1) {
-            return "";
-        }
-        if (runEndTime == -1) {
-            return "";
-        }
-        if (recordCount == -1) {
-            return Localizer.localizeI18nKey("reports.failed", bundle);
-        }
-        return Integer.toString(recordCount);
     }
 
     public int getId() {

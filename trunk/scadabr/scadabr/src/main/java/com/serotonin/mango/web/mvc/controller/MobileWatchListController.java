@@ -40,6 +40,7 @@ import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.dwr.BaseDwr;
 import com.serotonin.mango.web.taglib.Functions;
+import java.util.Date;
 
 /**
  * @author Matthew Lohbihler
@@ -94,11 +95,11 @@ public class MobileWatchListController extends WatchListController {
             state.setDisabled(true);
         } else {
             PointValueTime pvt = pointRT.getPointValue();
-            state.setTime(Functions.getTime(pvt));
+            state.setTime(new Date(pvt.getTime()));
 
-            if (pvt != null && pvt.getValue() instanceof ImageValue) {
+            if (pvt.getValue() instanceof ImageValue) {
                 // Text renderers don't help here. Create a thumbnail.
-                Map<String, Object> model = new HashMap<String, Object>();
+                Map<String, Object> model = new HashMap<>();
                 model.put("point", pointVO);
                 model.put("pointValue", pvt);
                 state.setValue(BaseDwr.generateContent(request, "imageValueThumbnail.jsp", model));

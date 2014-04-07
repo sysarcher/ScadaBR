@@ -44,7 +44,8 @@ import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.taglib.DateFunctions;
+import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
+import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
@@ -144,13 +145,10 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
             message = new LocalizableMessageImpl("common.default", alias);
         } else if (scheduleType == TYPE_ONCE) {
             if (returnToNormal) {
-                message = new LocalizableMessageImpl("event.schedule.onceUntil", DateFunctions.getTime(new DateTime(
-                        activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0).getMillis()),
-                        DateFunctions.getTime(new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour,
-                                        inactiveMinute, inactiveSecond, 0).getMillis()));
+                message = new LocalizableMessageImpl("event.schedule.onceUntil", new DateTime(activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0).toDate(),
+                        new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute, inactiveSecond, 0).toDate());
             } else {
-                message = new LocalizableMessageImpl("event.schedule.onceAt", DateFunctions.getTime(new DateTime(
-                        activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0).getMillis()));
+                message = new LocalizableMessageImpl("event.schedule.onceAt", new DateTime(activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0).toDate());
             }
         } else if (scheduleType == TYPE_HOURLY) {
             String activeTime = StringUtils.pad(Integer.toString(activeMinute), '0', 2) + ":"
@@ -299,14 +297,14 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         if (scheduleType == TYPE_CRON) {
             try {
                 new CronParser().parse(activeCron, CronExpression.TIMEZONE_UTC);
-            } catch (Exception e) {
+            } catch (ParseException e) {
                 response.addContextual("activeCron", "scheduledEvents.validate.activeCron", e);
             }
 
             if (returnToNormal) {
                 try {
                     new CronParser().parse(inactiveCron, CronExpression.TIMEZONE_UTC);
-                } catch (Exception e) {
+                } catch (ParseException e) {
                     response.addContextual("inactiveCron", "scheduledEvents.validate.inactiveCron", e);
                 }
             }

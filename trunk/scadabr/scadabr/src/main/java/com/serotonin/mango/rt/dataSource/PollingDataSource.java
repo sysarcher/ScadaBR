@@ -23,22 +23,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.DataSourceCronTask;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import br.org.scadabr.web.taglib.DateFunctions;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 abstract public class PollingDataSource extends DataSourceRT {
 
-    private final Log LOG = LogFactory.getLog(PollingDataSource.class);
+    private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCARABR_DS_RT);
 
     private final DataSourceVO<?> vo;
     protected List<DataPointRT> dataPoints = new ArrayList<>();
@@ -61,9 +61,7 @@ abstract public class PollingDataSource extends DataSourceRT {
     public void collectData(long fireTime) {
         if (jobThread != null) {
             // There is another poll still running, so abort this one.
-            LOG.warn(vo.getName() + ": poll at " + DateFunctions.getFullSecondTime(fireTime)
-                    + " aborted because a previous poll started at "
-                    + DateFunctions.getFullSecondTime(jobThreadStartTime) + " is still running");
+            LOG.log(Level.WARNING, "{0}: poll at {1} aborted because a previous poll started at {2} is still running", new Object[]{vo.getName(), new Date(fireTime), new Date(jobThreadStartTime)});
             return;
         }
 

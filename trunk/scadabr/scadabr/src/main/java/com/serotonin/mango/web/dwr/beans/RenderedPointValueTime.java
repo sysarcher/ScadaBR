@@ -18,20 +18,22 @@
  */
 package com.serotonin.mango.web.dwr.beans;
 
+import java.util.Date;
+
 /**
  * @author Matthew Lohbihler
  */
 public class RenderedPointValueTime {
 
     private String value;
-    private String time;
+    private Date time;
     private String annotation;
 
     public RenderedPointValueTime() {
         // no op
     }
 
-    public RenderedPointValueTime(String value, String time, String annotation) {
+    public RenderedPointValueTime(String value, Date time, String annotation) {
         this.value = value;
         this.time = time;
         this.annotation = annotation;
@@ -45,11 +47,11 @@ public class RenderedPointValueTime {
         this.value = value;
     }
 
-    public String getTime() {
+    public Date getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 

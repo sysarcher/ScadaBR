@@ -12,6 +12,7 @@ import java.util.Date;
  *
  * @author aploese
  */
+@Deprecated
 public class OneTimeTrigger extends TimerTrigger {
 
     public OneTimeTrigger(Date date) {

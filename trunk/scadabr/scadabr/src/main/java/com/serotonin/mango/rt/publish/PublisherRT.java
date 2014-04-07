@@ -36,7 +36,6 @@ import com.serotonin.mango.rt.event.type.PublisherEventType;
 import com.serotonin.mango.util.timeout.RunClient;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
-import br.org.scadabr.timer.FixedRateTrigger;
 import br.org.scadabr.timer.TimerTask;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 

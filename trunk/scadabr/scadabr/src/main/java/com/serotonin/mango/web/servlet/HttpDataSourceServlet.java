@@ -36,7 +36,6 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverData;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverMulticaster;
-import br.org.scadabr.util.StringUtils;
 
 /**
  * @author Matthew Lohbihler
