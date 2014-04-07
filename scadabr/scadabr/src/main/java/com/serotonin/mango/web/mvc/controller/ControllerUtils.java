@@ -35,7 +35,6 @@ import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
-import br.org.scadabr.web.i18n.Utf8ResourceBundle;
 
 /**
  * @author Matthew Lohbihler
@@ -43,7 +42,7 @@ import br.org.scadabr.web.i18n.Utf8ResourceBundle;
 public class ControllerUtils {
 
     public static ResourceBundle getResourceBundle(HttpServletRequest request) {
-        return Utf8ResourceBundle.getBundle("messages", getLocale(request));
+        return ResourceBundle.getBundle("messages", getLocale(request));
     }
 
     public static Locale getLocale(HttpServletRequest request) {

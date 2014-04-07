@@ -68,12 +68,8 @@ import br.org.scadabr.timer.cron.SystemRunnable;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.i18n.Utf8ResourceBundle;
 import br.org.scadabr.web.l10n.Localizer;
 import java.util.MissingResourceException;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class Common {
@@ -517,7 +513,7 @@ public class Common {
                                 "Locale for given language not found: "
                                 + systemLanguage);
                     }
-                    systemBundle = Utf8ResourceBundle.getBundle("messages",
+                    systemBundle = ResourceBundle.getBundle("messages",
                             locale);
                 }
             }
@@ -550,7 +546,7 @@ public class Common {
 
     public static List<KeyValuePair> getLanguages() {
         List<KeyValuePair> languages = new ArrayList<>();
-        ResourceBundle i18n = Utf8ResourceBundle.getBundle("i18n");
+        ResourceBundle i18n = ResourceBundle.getBundle("i18n");
         for (String key : i18n.keySet()) {
             languages.add(new KeyValuePair(key, i18n.getString(key)));
         }
