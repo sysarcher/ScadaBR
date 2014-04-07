@@ -34,7 +34,7 @@ import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.event.EventTypeVO;
-import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.web.i18n.LocalizableI18nKey;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.util.Objects;
@@ -75,7 +75,7 @@ public class AuditEventType extends EventType {
 
     public static List<EventTypeVO> getAuditEventTypes() {
         if (auditEventTypes == null) {
-            auditEventTypes = new ArrayList<EventTypeVO>();
+            auditEventTypes = new ArrayList<>();
 
             addEventTypeVO(TYPE_DATA_SOURCE, "event.audit.dataSource");
             addEventTypeVO(TYPE_DATA_POINT, "event.audit.dataPoint");
@@ -112,15 +112,15 @@ public class AuditEventType extends EventType {
     }
 
     public static void raiseAddedEvent(int auditEventTypeId, ChangeComparable<?> o) {
-        List<LocalizableMessage> list = new ArrayList<LocalizableMessage>();
+        List<LocalizableMessage> list = new ArrayList<>();
         o.addProperties(list);
         raiseEvent(auditEventTypeId, o, "event.audit.added", list.toArray());
     }
 
     public static <T> void raiseChangedEvent(int auditEventTypeId, T from, ChangeComparable<T> to) {
-        List<LocalizableMessage> changes = new ArrayList<LocalizableMessage>();
+        List<LocalizableMessage> changes = new ArrayList<>();
         to.addPropertyChanges(changes, from);
-        if (changes.size() == 0) // If the object wasn't in fact changed, don't raise an event.
+        if (changes.isEmpty()) // If the object wasn't in fact changed, don't raise an event.
         {
             return;
         }
@@ -128,7 +128,7 @@ public class AuditEventType extends EventType {
     }
 
     public static void raiseDeletedEvent(int auditEventTypeId, ChangeComparable<?> o) {
-        List<LocalizableMessage> list = new ArrayList<LocalizableMessage>();
+        List<LocalizableMessage> list = new ArrayList<>();
         o.addProperties(list);
         raiseEvent(auditEventTypeId, o, "event.audit.deleted", list.toArray());
     }
@@ -162,6 +162,10 @@ public class AuditEventType extends EventType {
     // / Utility methods for other classes
     // /
     //
+    public static void addPropertyMessage(List<LocalizableMessage> list, String propertyNameKey, LocalizableI18nKey propertyValue) {
+        list.add(new LocalizableMessageImpl("event.audit.property", new LocalizableMessageImpl(propertyNameKey), propertyValue));
+    }
+
     public static void addPropertyMessage(List<LocalizableMessage> list, String propertyNameKey, Object propertyValue) {
         list.add(new LocalizableMessageImpl("event.audit.property", new LocalizableMessageImpl(propertyNameKey), propertyValue));
     }
@@ -191,6 +195,13 @@ public class AuditEventType extends EventType {
     public static void maybeAddPropertyChangeMessage(List<LocalizableMessage> list, String propertyNameKey,
             int fromValue, int toValue) {
         if (fromValue != toValue) {
+            addPropertyChangeMessage(list, propertyNameKey, fromValue, toValue);
+        }
+    }
+
+    public static void maybeAddPropertyChangeMessage(List<LocalizableMessage> list, String propertyNameKey,
+            LocalizableI18nKey fromValue, LocalizableI18nKey toValue) {
+        if (!Objects.equals(fromValue, toValue)) {
             addPropertyChangeMessage(list, propertyNameKey, fromValue, toValue);
         }
     }

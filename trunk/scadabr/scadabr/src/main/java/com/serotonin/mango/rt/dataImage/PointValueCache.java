@@ -75,7 +75,7 @@ public class PointValueCache {
 
         // Insert the value in the cache.
         int pos = 0;
-        if (newCache.size() == 0) {
+        if (newCache.isEmpty()) {
             newCache.add(pvt);
         } else {
             while (pos < newCache.size() && newCache.get(pos).getTime() > pvt.getTime()) {

@@ -27,5 +27,6 @@ public interface IValueTime {
 
     MangoValue getValue();
 
+    @Deprecated //TODO change to Date ???
     long getTime();
 }

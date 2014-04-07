@@ -47,6 +47,7 @@ import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 @JsonRemoteEntity
 public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
+    @Deprecated
     public interface Attributes {
 
         int PROCS_R = 1;

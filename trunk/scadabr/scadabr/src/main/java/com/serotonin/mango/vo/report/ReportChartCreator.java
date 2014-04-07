@@ -64,6 +64,7 @@ import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import java.util.Locale;
 
 /**
  * @author Matthew Lohbihler
@@ -378,7 +379,7 @@ public class ReportChartCreator {
         }
 
         public String getAnalogMinTime() {
-            return Localizer.localizeDateTime(bundle.getLocale(), ((AnalogStatistics) stats).getMinTime());
+            return Localizer.localizeTimeStamp(((AnalogStatistics) stats).getMinTime(), false, bundle.getLocale());
         }
 
         public String getAnalogMaximum() {
@@ -386,7 +387,7 @@ public class ReportChartCreator {
         }
 
         public String getAnalogMaxTime() {
-            return Localizer.localizeDateTime(bundle.getLocale(), ((AnalogStatistics) stats).getMaxTime());
+            return Localizer.localizeTimeStamp(((AnalogStatistics) stats).getMaxTime(), false, bundle.getLocale());
         }
 
         public String getAnalogAverage() {

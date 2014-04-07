@@ -51,7 +51,9 @@ import com.serotonin.mango.web.taglib.Functions;
 import br.org.scadabr.util.ArrayUtils;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.web.l10n.Localizer;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 public class WatchListDwr extends BaseDwr {
@@ -99,7 +101,7 @@ public class WatchListDwr extends BaseDwr {
 
     private List<WatchListState> getPointDataImpl(WatchList watchList) {
         if (watchList == null) {
-            return new ArrayList<WatchListState>();
+            return new ArrayList<>();
         }
 
         HttpServletRequest request = WebContextFactory.get()
@@ -109,9 +111,9 @@ public class WatchListDwr extends BaseDwr {
         RuntimeManager rtm = Common.ctx.getRuntimeManager();
 
         WatchListState state;
-        List<WatchListState> states = new ArrayList<WatchListState>(watchList
+        List<WatchListState> states = new ArrayList<>(watchList
                 .getPointList().size());
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         for (DataPointVO point : watchList.getPointList()) {
             // Create the watch list state.
             state = createWatchListState(request, point, rtm, model, user);
@@ -320,7 +322,7 @@ public class WatchListDwr extends BaseDwr {
             state.setValue(generateContent(request, "imageValueThumbnail.jsp",
                     model));
             if (pointValue != null) {
-                state.setTime(new Date(pointValue.getTime()));
+                state.setTime(Localizer.localizeTimeStamp(pointValue.getTime(), true, request.getLocale()));
             }
             pointVO.updateLastValue(pointValue);
         }

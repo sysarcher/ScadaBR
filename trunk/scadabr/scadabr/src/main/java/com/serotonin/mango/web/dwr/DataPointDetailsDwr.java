@@ -47,9 +47,7 @@ import com.serotonin.mango.web.servlet.ImageValueServlet;
 import com.serotonin.mango.web.taglib.Functions;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.dwr.MethodFilter;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 import java.util.Date;
 
 public class DataPointDetailsDwr extends BaseDwr {
@@ -58,14 +56,13 @@ public class DataPointDetailsDwr extends BaseDwr {
     public WatchListState getPointData() {
 		// Get the point from the user's session. It should have been set by the
         // controller.
-        HttpServletRequest request = WebContextFactory.get()
-                .getHttpServletRequest();
+        HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
         User user = Common.getUser(request);
         DataPointVO pointVO = user.getEditPoint();
 
         // Create the watch list state.
         RuntimeManager rtm = Common.ctx.getRuntimeManager();
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
 
         // Get the data point status from the data image.
         DataPointRT pointRT = rtm.getDataPoint(pointVO.getId());
@@ -136,7 +133,7 @@ public class DataPointDetailsDwr extends BaseDwr {
         htmlData.append(width);
         htmlData.append("&h=");
         htmlData.append(height);
-        htmlData.append("\" alt=\"" + getMessage("common.imageChart") + "\"/>");
+        htmlData.append("\" alt=\"").append(getMessage("common.imageChart")).append("\"/>");
 
         DwrResponseI18n response = new DwrResponseI18n();
         response.addData("chart", htmlData.toString());
@@ -165,7 +162,7 @@ public class DataPointDetailsDwr extends BaseDwr {
                 .getHttpServletRequest();
         DataPointVO pointVO = Common.getUser(request).getEditPoint();
 
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         model.put("point", pointVO);
         StatisticsChartRenderer r = new StatisticsChartRenderer(periodType,
                 period, includeSum);
@@ -208,7 +205,6 @@ public class DataPointDetailsDwr extends BaseDwr {
     }
 
     private void addAsof(DwrResponseI18n response) {
-        response.addData("asof", new LocalizableMessageImpl("dsDetils.asof",
-                LocalizableTimeStampTag.getFullSecondTime(System.currentTimeMillis())));
+        response.addData("asof", new LocalizableMessageImpl("dsDetils.asof", new Date(System.currentTimeMillis())));
     }
 }

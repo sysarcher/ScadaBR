@@ -62,7 +62,9 @@ import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.l10n.Localizer;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 abstract public class BaseDwr {
 
@@ -135,7 +137,7 @@ abstract public class BaseDwr {
         if (!Objects.equals(pointVO.lastValue(), pointValue)) {
             state.setValue(prettyText);
             if (pointValue != null) {
-                state.setTime(new Date(pointValue.getTime()));
+                state.setTime(Localizer.localizeTimeStamp(pointValue.getTime(), true, getLocale()));
             }
             pointVO.updateLastValue(pointValue);
         }
@@ -302,6 +304,12 @@ abstract public class BaseDwr {
 
     protected String getMessage(LocalizableMessage message) {
         return Localizer.localizeMessage(message, getResourceBundle());
+    }
+
+    protected Locale getLocale() {
+        WebContext webContext = WebContextFactory.get();
+        LocalizationContext localizationContext = (LocalizationContext) Config.get(webContext.getHttpServletRequest(), Config.FMT_LOCALIZATION_CONTEXT);
+        return localizationContext.getLocale();
     }
 
     protected ResourceBundle getResourceBundle() {

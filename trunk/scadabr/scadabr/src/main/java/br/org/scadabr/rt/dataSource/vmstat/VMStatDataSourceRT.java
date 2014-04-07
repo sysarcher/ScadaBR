@@ -66,16 +66,16 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
 
         String command = "vmstat -n ";
         switch (vo.getOutputScale()) {
-            case VMStatDataSourceVO.OutputScale.LOWER_K:
+            case LOWER_K:
                 command += "-S k ";
                 break;
-            case VMStatDataSourceVO.OutputScale.UPPER_K:
+            case UPPER_K:
                 command += "-S K ";
                 break;
-            case VMStatDataSourceVO.OutputScale.LOWER_M:
+            case LOWER_M:
                 command += "-S m ";
                 break;
-            case VMStatDataSourceVO.OutputScale.UPPER_M:
+            case UPPER_M:
                 command += "-S M ";
                 break;
         }
@@ -83,7 +83,7 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
         command += vo.getPollSeconds();
 
         try {
-            vmstatProcess = Runtime.getRuntime().exec(command);
+            vmstatProcess = Runtime.getRuntime().exec(command, new String[]{"LANG=C"}); //LANG=DE will have Frei instead of free...
 
             // Create the input stream readers.
             in = new BufferedReader(new InputStreamReader(vmstatProcess.getInputStream()));
@@ -97,58 +97,60 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
             String[] headerParts = headers.split("\\s+");
             for (int i = 0; i < headerParts.length; i++) {
                 int attributeId = -1;
-                if (null != headerParts[i]) switch (headerParts[i]) {
-                    case "r":
-                        attributeId = VMStatPointLocatorVO.Attributes.PROCS_R;
-                        break;
-                    case "b":
-                        attributeId = VMStatPointLocatorVO.Attributes.PROCS_B;
-                        break;
-                    case "swpd":
-                        attributeId = VMStatPointLocatorVO.Attributes.MEMORY_SWPD;
-                        break;
-                    case "free":
-                        attributeId = VMStatPointLocatorVO.Attributes.MEMORY_FREE;
-                        break;
-                    case "buff":
-                        attributeId = VMStatPointLocatorVO.Attributes.MEMORY_BUFF;
-                        break;
-                    case "cache":
-                        attributeId = VMStatPointLocatorVO.Attributes.MEMORY_CACHE;
-                        break;
-                    case "si":
-                        attributeId = VMStatPointLocatorVO.Attributes.SWAP_SI;
-                        break;
-                    case "so":
-                        attributeId = VMStatPointLocatorVO.Attributes.SWAP_SO;
-                        break;
-                    case "bi":
-                        attributeId = VMStatPointLocatorVO.Attributes.IO_BI;
-                        break;
-                    case "bo":
-                        attributeId = VMStatPointLocatorVO.Attributes.IO_BO;
-                        break;
-                    case "in":
-                        attributeId = VMStatPointLocatorVO.Attributes.SYSTEM_IN;
-                        break;
-                    case "cs":
-                        attributeId = VMStatPointLocatorVO.Attributes.SYSTEM_CS;
-                        break;
-                    case "us":
-                        attributeId = VMStatPointLocatorVO.Attributes.CPU_US;
-                        break;
-                    case "sy":
-                        attributeId = VMStatPointLocatorVO.Attributes.CPU_SY;
-                        break;
-                    case "id":
-                        attributeId = VMStatPointLocatorVO.Attributes.CPU_ID;
-                        break;
-                    case "wa":
-                        attributeId = VMStatPointLocatorVO.Attributes.CPU_WA;
-                        break;
-                    case "st":
-                        attributeId = VMStatPointLocatorVO.Attributes.CPU_ST;
-                        break;
+                if (null != headerParts[i]) {
+                    switch (headerParts[i]) {
+                        case "r":
+                            attributeId = VMStatPointLocatorVO.Attributes.PROCS_R;
+                            break;
+                        case "b":
+                            attributeId = VMStatPointLocatorVO.Attributes.PROCS_B;
+                            break;
+                        case "swpd":
+                            attributeId = VMStatPointLocatorVO.Attributes.MEMORY_SWPD;
+                            break;
+                        case "free":
+                            attributeId = VMStatPointLocatorVO.Attributes.MEMORY_FREE;
+                            break;
+                        case "buff":
+                            attributeId = VMStatPointLocatorVO.Attributes.MEMORY_BUFF;
+                            break;
+                        case "cache":
+                            attributeId = VMStatPointLocatorVO.Attributes.MEMORY_CACHE;
+                            break;
+                        case "si":
+                            attributeId = VMStatPointLocatorVO.Attributes.SWAP_SI;
+                            break;
+                        case "so":
+                            attributeId = VMStatPointLocatorVO.Attributes.SWAP_SO;
+                            break;
+                        case "bi":
+                            attributeId = VMStatPointLocatorVO.Attributes.IO_BI;
+                            break;
+                        case "bo":
+                            attributeId = VMStatPointLocatorVO.Attributes.IO_BO;
+                            break;
+                        case "in":
+                            attributeId = VMStatPointLocatorVO.Attributes.SYSTEM_IN;
+                            break;
+                        case "cs":
+                            attributeId = VMStatPointLocatorVO.Attributes.SYSTEM_CS;
+                            break;
+                        case "us":
+                            attributeId = VMStatPointLocatorVO.Attributes.CPU_US;
+                            break;
+                        case "sy":
+                            attributeId = VMStatPointLocatorVO.Attributes.CPU_SY;
+                            break;
+                        case "id":
+                            attributeId = VMStatPointLocatorVO.Attributes.CPU_ID;
+                            break;
+                        case "wa":
+                            attributeId = VMStatPointLocatorVO.Attributes.CPU_WA;
+                            break;
+                        case "st":
+                            attributeId = VMStatPointLocatorVO.Attributes.CPU_ST;
+                            break;
+                    }
                 }
 
                 if (attributeId != -1) {

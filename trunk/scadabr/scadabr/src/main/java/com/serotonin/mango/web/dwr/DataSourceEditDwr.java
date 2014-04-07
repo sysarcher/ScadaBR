@@ -92,7 +92,6 @@ import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import br.org.scadabr.db.IntValuePair;
-import br.org.scadabr.io.StreamUtils;
 import com.serotonin.io.serial.SerialParameters;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
@@ -222,10 +221,9 @@ import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableException;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.l10n.Localizer;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
-import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 import java.util.Date;
+import java.util.TimeZone;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
@@ -1220,7 +1218,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
     @MethodFilter
     public Map<String, Object> bacnetWhoIsUpdate() {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
         BACnetDiscovery test = Common.getUser().getTestingUtility(
                 BACnetDiscovery.class);
         if (test == null) {
@@ -1685,15 +1683,13 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     // VMStat stuff
     //
     @MethodFilter
-    public DwrResponseI18n saveVMStatDataSource(String name, String xid,
-            int pollSeconds, int outputScale) {
-        VMStatDataSourceVO ds = (VMStatDataSourceVO) Common.getUser()
-                .getEditDataSource();
+    public DwrResponseI18n saveVMStatDataSource(String name, String xid, int pollSeconds, String outputScale) {
+        VMStatDataSourceVO ds = (VMStatDataSourceVO) Common.getUser().getEditDataSource();
 
         ds.setXid(xid);
         ds.setName(name);
         ds.setPollSeconds(pollSeconds);
-        ds.setOutputScale(outputScale);
+        ds.setOutputScale(VMStatDataSourceVO.OutputScale.valueOf(outputScale));
 
         return tryDataSourceSave(ds);
     }
@@ -2253,7 +2249,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         Logger log = JISystem.getLogger();
         log.setLevel(Level.OFF);
 
-        ArrayList<String> serverList = new ArrayList<String>();
+        ArrayList<String> serverList = new ArrayList<>();
         try {
             serverList = new RealOPCMaster().listOPCServers(user, password,
                     host, domain);

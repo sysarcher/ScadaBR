@@ -53,7 +53,7 @@ public class EventCsvStreamer {
         for (EventInstance event : events) {
             data[0] = Integer.toString(event.getId());
             data[1] = Localizer.localizeMessage(AlarmLevels.getAlarmLevelMessage(event.getAlarmLevel()), bundle);
-            data[2] = Localizer.localizeDateTime(bundle.getLocale(), event.getActiveTimestamp());
+            data[2] = Localizer.localizeTimeStamp(event.getActiveTimestamp(), false, bundle.getLocale());
             data[3] = Localizer.localizeMessage(event.getMessage(), bundle);
 
             if (event.isActive()) {
@@ -61,11 +61,11 @@ public class EventCsvStreamer {
             } else if (!event.isRtnApplicable()) {
                 data[4] = "";
             } else {
-                data[4] = String.format("%s - %s", Localizer.localizeDateTime(bundle.getLocale(), event.getRtnTimestamp()), Localizer.localizeMessage(event.getRtnMessage(), bundle));
+                data[4] = String.format("%s - %s", Localizer.localizeTimeStamp(event.getRtnTimestamp(), false, bundle.getLocale()), Localizer.localizeMessage(event.getRtnMessage(), bundle));
             }
 
             if (event.isAcknowledged()) {
-                data[5] = Localizer.localizeDateTime(bundle.getLocale(), event.getAcknowledgedTimestamp());
+                data[5] = Localizer.localizeTimeStamp(event.getAcknowledgedTimestamp(), false, bundle.getLocale());
 
                 LocalizableMessage ack = event.getExportAckMessage();
                 if (ack == null) {

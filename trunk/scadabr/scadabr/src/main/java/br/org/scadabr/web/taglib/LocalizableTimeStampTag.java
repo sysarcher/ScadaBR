@@ -5,12 +5,11 @@
  */
 package br.org.scadabr.web.taglib;
 
-import br.org.scadabr.web.i18n.I18NUtils;
+import br.org.scadabr.web.l10n.Localizer;
 import java.io.IOException;
 import java.text.DateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.Locale;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.jstl.core.Config;
 import javax.servlet.jsp.jstl.fmt.LocalizationContext;
@@ -22,23 +21,15 @@ import javax.servlet.jsp.tagext.TagSupport;
  */
 public class LocalizableTimeStampTag extends TagSupport {
 
-    public static String getFullSecondTime(long time) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     private long timestamp;
     private boolean hideDateOfToday;
 
     //TODO get proper date from ??? Usersettings???? - so currently all that is older 24 hours from now 
     @Override
     public int doEndTag() throws JspException {
-        LocalizationContext lc = (LocalizationContext) Config.find(pageContext, Config.FMT_LOCALIZATION_CONTEXT);
+        Locale l = ((LocalizationContext) Config.find(pageContext, Config.FMT_LOCALIZATION_CONTEXT)).getLocale();
         try {
-            if (hideDateOfToday && (System.currentTimeMillis() - timestamp) < 86400000) {
-                pageContext.getOut().write(DateFormat.getTimeInstance(DateFormat.DEFAULT, lc.getLocale()).format(new Date(timestamp)));
-            } else {
-                pageContext.getOut().write(DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, lc.getLocale()).format(new Date(timestamp)));
-            }
+            pageContext.getOut().write(Localizer.localizeTimeStamp(timestamp, hideDateOfToday, l));
         } catch (IOException e) {
             throw new JspException(e);
         }

@@ -4,9 +4,11 @@ import br.org.scadabr.web.i18n.LocalizableMessage;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sf.mbus4j.log.LogUtils;
@@ -73,8 +75,13 @@ public class Localizer {
         return String.format("!>>>%s:%s<<<!", locale, i18nKey);
     }
 
-    public static String localizeDateTime(Locale locale, long ts) {
-        return DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, locale).format(new Date(ts));
+    //TODO set TimeZone ???
+    public static String localizeTimeStamp(long ts, boolean hideDateOfToday, Locale locale) {
+        if (hideDateOfToday && (System.currentTimeMillis() - ts) < 86400000) {
+            return DateFormat.getTimeInstance(DateFormat.DEFAULT, locale).format(new Date(ts));
+        } else {
+            return DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, locale).format(new Date(ts));
+        }
     }
 
     public static String localizeDate(Locale locale, long ts) {

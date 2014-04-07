@@ -29,80 +29,40 @@ public class SelectTag extends TagSupport {
     private String onmouseout;
     private String style;
 
-    public String getName() {
-        return name;
-    }
-
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getValue() {
-        return value;
     }
 
     public void setValue(String value) {
         this.value = value;
     }
 
-    public String getSize() {
-        return size;
-    }
-
     public void setSize(String size) {
         this.size = size;
-    }
-
-    public String getOnchange() {
-        return onchange;
     }
 
     public void setOnchange(String onchange) {
         this.onchange = onchange;
     }
 
-    public String getOnblur() {
-        return onblur;
-    }
-
     public void setOnblur(String onblur) {
         this.onblur = onblur;
-    }
-
-    public String getOnclick() {
-        return onclick;
     }
 
     public void setOnclick(String onclick) {
         this.onclick = onclick;
     }
 
-    public String getOnmouseover() {
-        return onmouseover;
-    }
-
     public void setOnmouseover(String onmouseover) {
         this.onmouseover = onmouseover;
-    }
-
-    public String getOnmouseout() {
-        return onmouseout;
     }
 
     public void setOnmouseout(String onmouseout) {
         this.onmouseout = onmouseout;
     }
 
-    public String getStyleClass() {
-        return styleClass;
-    }
-
     public void setStyleClass(String styleClass) {
         this.styleClass = styleClass;
-    }
-
-    public String getStyle() {
-        return style;
     }
 
     public void setStyle(String style) {
@@ -158,5 +118,9 @@ public class SelectTag extends TagSupport {
             throw new JspTagException(ex.getMessage());
         }
         return EVAL_PAGE;
+    }
+
+    public String getValue() {
+        return value;
     }
 }

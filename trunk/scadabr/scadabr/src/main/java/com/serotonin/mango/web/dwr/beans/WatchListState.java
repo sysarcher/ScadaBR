@@ -19,19 +19,18 @@
 package com.serotonin.mango.web.dwr.beans;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import java.util.Date;
 import java.util.Objects;
 
 public class WatchListState extends BasePointState {
 
     private String value;
-    private Date time;
+    private String time;
 
-    public Date getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(String time) {
         this.time = time;
     }
 
