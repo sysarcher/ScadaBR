@@ -1,7 +1,5 @@
 package br.org.scadabr.web.dwr;
 
-import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.i18n.Utf8ResourceBundle;
 import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -41,7 +39,7 @@ public class LocalizationFilter implements org.directwebremoting.AjaxFilter {
 
         LocaleResolver localeResolver = (LocaleResolver) webApplicationContext.getBean(localeResolverKey);
         Locale locale = localeResolver.resolveLocale(request);
-        ResourceBundle resourceBundle = Utf8ResourceBundle.getBundle(bundleBaseName, locale);
+        ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleBaseName, locale);
         LocalizationContext localizationContext = new LocalizationContext(resourceBundle, locale);
         Config.set(request, Config.FMT_LOCALIZATION_CONTEXT, localizationContext);
     }
