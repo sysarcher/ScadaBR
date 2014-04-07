@@ -70,7 +70,7 @@
       <tr class="row<c:if test="${status.index % 2 == 1}">Alt</c:if>">
         <td align="center">${event.id}</td>
         <td align="center"><tag:eventIcon event="${event}"/></td>
-        <td>${sbt:time(event.activeTimestamp)}</td>
+        <td><sbt:i18ntimestamp timestamp="${event.activeTimestamp}" hideDateOfToday="true" /></td>
         <td>
           <table cellspacing="0" cellpadding="0" width="100%">
             <tr>
@@ -91,14 +91,14 @@
             </c:when>
             <c:when test="${!event.rtnApplicable}"><fmt:message key="common.nortn"/></c:when>
             <c:otherwise>
-              ${sbt:time(event.rtnTimestamp)} - <sbt:i18n message="${event.rtnMessage}"/>
+              <sbt:i18ntimestamp timestamp="${event.rtnTimestamp}" hideDateOfToday="true" /> - <sbt:i18n message="${event.rtnMessage}"/>
             </c:otherwise>
           </c:choose>
         </td>
         <c:if test="${!pendingEvents}">
           <td>
             <c:if test="${event.acknowledged}">
-              ${sbt:time(event.acknowledgedTimestamp)}
+              <sbt:i18ntimestamp timestamp="${event.acknowledgedTimestamp}" hideDateOfToday="true" />
               <sbt:i18n message="${event.ackMessage}"/>
             </c:if>
           </td>

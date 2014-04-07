@@ -51,6 +51,7 @@ import com.serotonin.mango.web.taglib.Functions;
 import br.org.scadabr.util.ArrayUtils;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.Date;
 import java.util.Objects;
 
 public class WatchListDwr extends BaseDwr {
@@ -319,7 +320,7 @@ public class WatchListDwr extends BaseDwr {
             state.setValue(generateContent(request, "imageValueThumbnail.jsp",
                     model));
             if (pointValue != null) {
-                state.setTime(Functions.getTime(pointValue));
+                state.setTime(new Date(pointValue.getTime()));
             }
             pointVO.updateLastValue(pointValue);
         }
@@ -369,7 +370,7 @@ public class WatchListDwr extends BaseDwr {
         htmlData.append(width);
         htmlData.append("&h=");
         htmlData.append(height);
-        htmlData.append("\" alt=\"" + getMessage("common.imageChart") + "\"/>");
+        htmlData.append("\" alt=\"").append(getMessage("common.imageChart")).append("\"/>");
 
         return htmlData.toString();
     }

@@ -31,7 +31,7 @@
       <tr class="row<c:if test="${status.index % 2 == 1}">Alt</c:if>">
       	<c:if test="${!hideIdColumn}"><td align="center">${event.id}</td></c:if>
       	<c:if test="${!hideAlarmLevelColumn}"><td align="center"><tag:eventIcon event="${event}"/></td></c:if>
-        <c:if test="${!hideTimestampColumn}"><td align="center">${sbt:time(event.activeTimestamp)}</td></c:if>
+        <c:if test="${!hideTimestampColumn}"><td align="center"><sbt:i18ntimestamp timestamp="${event.activeTimestamp}" hideDateOfToday="true" /></td></c:if>
         <td> <b><sbt:i18n message="${event.message}"/></b></td>
         <c:if test="${!hideInactivityColumn}">
 	        <td>
@@ -42,7 +42,7 @@
 	            </c:when>
 	            <c:when test="${!event.rtnApplicable}"><fmt:message key="common.nortn"/></c:when>
 	            <c:otherwise>
-	              ${sbt:time(event.rtnTimestamp)} - <sbt:i18n message="${event.rtnMessage}"/>
+	              <sbt:i18ntimestamp timestamp="${event.rtnTimestamp}" hideDateOfToday="true" /> - <sbt:i18n message="${event.rtnMessage}"/>
 	            </c:otherwise>
 	          </c:choose>
 	        </td>

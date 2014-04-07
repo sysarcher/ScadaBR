@@ -6,7 +6,6 @@
 package br.org.scadabr.util;
 
 import br.org.scadabr.ImplementMeException;
-import java.util.Arrays;
 
 /**
  *

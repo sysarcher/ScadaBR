@@ -31,7 +31,8 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.stats.IValueTime;
-import br.org.scadabr.web.taglib.DateFunctions;
+import java.text.MessageFormat;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -138,8 +139,7 @@ public class PointValueTime implements Serializable, IValueTime,
 
     @Override
     public String toString() {
-        return "PointValueTime(" + value + "@" + DateFunctions.getTime(time)
-                + ")";
+        return MessageFormat.format("PointValueTime( {0} @{1})", value, new Date(time));
     }
 
     @Override

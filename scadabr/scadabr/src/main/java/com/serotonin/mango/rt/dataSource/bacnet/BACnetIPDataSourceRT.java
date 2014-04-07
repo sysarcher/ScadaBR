@@ -18,16 +18,13 @@
  */
 package com.serotonin.mango.rt.dataSource.bacnet;
 
-import br.org.scadabr.ImplementMeException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.logger.LogUtils;
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.RemoteDevice;
@@ -82,13 +79,15 @@ import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.rt.maint.work.WorkItem;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.bacnet.BACnetIPDataSourceVO;
-import br.org.scadabr.timer.FixedRateTrigger;
-import br.org.scadabr.timer.TimerTask;
-import br.org.scadabr.timer.TimerTrigger;
+import br.org.scadabr.timer.cron.CronExpression;
+import br.org.scadabr.timer.cron.SystemCronTask;
 import com.serotonin.util.queue.ByteQueue;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.taglib.DateFunctions;
+import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
+import java.io.IOException;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Matthew Lohbihler
@@ -99,11 +98,11 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
     public static final int MESSAGE_EXCEPTION_EVENT = 2;
     public static final int DEVICE_EXCEPTION_EVENT = 3;
 
-    final Log log = LogFactory.getLog(BACnetIPDataSourceRT.class);
+    final Logger log = Logger.getLogger(LogUtils.LOGGER_SCARABR_BACNET_IP);
     final BACnetIPDataSourceVO vo;
     private LocalDevice localDevice;
     private boolean initialized = false;
-    final List<RemoteDevice> pollsInProgress = new ArrayList<RemoteDevice>();
+    final List<RemoteDevice> pollsInProgress = new ArrayList<>();
     private CovResubscriptionTask covResubscriptionTask;
 
     public BACnetIPDataSourceRT(BACnetIPDataSourceVO vo) {
@@ -136,7 +135,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
 
             // Deactivate any existing event.
             returnToNormal(INITIALIZATION_EXCEPTION_EVENT, System.currentTimeMillis());
-        } catch (Exception e) {
+        } catch (IOException e) {
             raiseEvent(INITIALIZATION_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
                     "event.initializationError", e.getMessage()));
             return;
@@ -176,9 +175,8 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
 
         super.beginPolling();
 
-        covResubscriptionTask = new CovResubscriptionTask(new FixedRateTrigger(0,
-                vo.getCovSubscriptionTimeoutMinutes() * 60 * 1000 / 2));
-        throw  new ImplementMeException(); //line was: Common.timer.schedule(covResubscriptionTask);
+        covResubscriptionTask = new CovResubscriptionTask(CronExpression.createPeriodByMinute(vo.getCovSubscriptionTimeoutMinutes() / 2, 0, 0));
+        Common.systemCronPool.schedule(covResubscriptionTask);
     }
 
     @Override
@@ -252,7 +250,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
                 // Ignore.
             } catch (PropertyValueException e) {
                 // Shouldn't happen, so just log.
-                log.error("Couldn't manually get segmentation and vendor id from device", e);
+                log.log(Level.SEVERE, "Couldn't manually get segmentation and vendor id from device", e);
             }
         }
 
@@ -294,7 +292,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
     //
     @Override
     protected void doPoll(long time) {
-        Map<RemoteDevice, List<DataPointRT>> devicePoints = new HashMap<RemoteDevice, List<DataPointRT>>();
+        Map<RemoteDevice, List<DataPointRT>> devicePoints = new HashMap<>();
 
         synchronized (pointListChangeLock) {
             for (DataPointRT dp : dataPoints) {
@@ -305,7 +303,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
 
                 List<DataPointRT> points = devicePoints.get(locator.getRemoteDevice());
                 if (points == null) {
-                    points = new ArrayList<DataPointRT>();
+                    points = new ArrayList<>();
                     devicePoints.put(locator.getRemoteDevice(), points);
                 }
 
@@ -335,8 +333,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
             synchronized (pollsInProgress) {
                 if (pollsInProgress.contains(d)) {
                     // There is another poll still running for the device, so abort this one.
-                    log.warn(vo.getName() + ": poll of " + d + " at " + DateFunctions.getFullSecondTime(time)
-                            + " aborted because a previous poll is still running");
+                    log.log(Level.WARNING, "{0}: poll of {1} at {2} aborted because a previous poll is still running", new Object[]{vo.getName(), d, new Date(time)});
                     return;
                 }
 
@@ -424,7 +421,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
                     new UnsignedInteger(locator.getWritePriority()));
             localDevice.send(locator.getRemoteDevice(), writeRequest);
             dataPoint.setPointValue(pvt, source);
-        } catch (Throwable t) {
+        } catch (BACnetException t) {
             fireMessageExceptionEvent("event.setPointFailed", t.getMessage());
         }
     }
@@ -445,7 +442,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
                     new Null(), new UnsignedInteger(locator.getWritePriority()));
             localDevice.send(locator.getRemoteDevice(), writeRequest);
             forcePointRead(dataPoint);
-        } catch (Throwable t) {
+        } catch (BACnetException t) {
             fireMessageExceptionEvent("event.relinquishFailed", t.getMessage());
         }
     }
@@ -456,14 +453,14 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
 
     //
     // COV subscriptions
-    class CovResubscriptionTask extends TimerTask {
+    class CovResubscriptionTask extends SystemCronTask {
 
-        public CovResubscriptionTask(TimerTrigger trigger) {
-            super(trigger);
+        public CovResubscriptionTask(CronExpression cronExpression) {
+            super(cronExpression);
         }
 
         @Override
-        public void run(long fireTime) {
+        public void run(long executionTime) {
             synchronized (pointListChangeLock) {
                 for (DataPointRT dp : getDataPoints()) {
                     BACnetIPPointLocatorRT locator = dp.getPointLocator();
@@ -480,14 +477,17 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
     // / DeviceEventListener
     // /
     //
+    @Override
     public void listenerException(Throwable e) {
         fireMessageExceptionEvent(e);
     }
 
+    @Override
     public boolean allowPropertyWrite(BACnetObject obj, PropertyValue pv) {
         return true;
     }
 
+    @Override
     public void iAmReceived(RemoteDevice d) {
         try {
             localDevice.getExtendedDeviceInformation(d);
@@ -497,14 +497,17 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
         }
     }
 
+    @Override
     public void propertyWritten(BACnetObject obj, PropertyValue pv) {
         // no op
     }
 
+    @Override
     public void iHaveReceived(RemoteDevice d, RemoteObject o) {
         // no op
     }
 
+    @Override
     public void covNotificationReceived(UnsignedInteger subscriberProcessIdentifier, RemoteDevice initiatingDevice,
             ObjectIdentifier monitoredObjectIdentifier, UnsignedInteger timeRemaining,
             SequenceOf<PropertyValue> listOfValues) {
@@ -542,6 +545,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
         }
     }
 
+    @Override
     public void eventNotificationReceived(UnsignedInteger processIdentifier, RemoteDevice initiatingDevice,
             ObjectIdentifier eventObjectIdentifier, TimeStamp timeStamp, UnsignedInteger notificationClass,
             UnsignedInteger priority, com.serotonin.bacnet4j.type.enumerated.EventType eventType,
@@ -551,11 +555,13 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
         // no op
     }
 
+    @Override
     public void textMessageReceived(RemoteDevice textMessageSourceDevice, Choice messageClass,
             MessagePriority messagePriority, CharacterString message) {
         // no op
     }
 
+    @Override
     public void privateTransferReceived(UnsignedInteger vendorId, UnsignedInteger serviceNumber,
             Encodable serviceParameters) {
         // no op
@@ -576,17 +582,19 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
     // / ExceptionListener
     // /
     //
+    @Override
     public void receivedException(Exception e) {
         fireMessageExceptionEvent(e);
     }
 
+    @Override
     public void receivedThrowable(Throwable t) {
         fireMessageExceptionEvent(t);
     }
 
+    @Override
     public void unimplementedVendorService(UnsignedInteger vendorId, UnsignedInteger serviceNumber, ByteQueue queue) {
-        log.warn("Received unimplemented vendor service: vendor id=" + vendorId + ", service number=" + serviceNumber
-                + ", bytes (with context id)=" + queue);
+        log.log(Level.WARNING, "Received unimplemented vendor service: vendor id={0}, service number={1}, bytes (with context id)={2}", new Object[]{vendorId, serviceNumber, queue});
     }
 
     //
@@ -630,7 +638,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
 
     private void fireMessageExceptionEvent(Throwable t) {
         fireMessageExceptionEvent("common.default", t.getMessage());
-        log.info("", t);
+        log.log(Level.INFO, "Message exception event fired", t);
     }
 
     private void fireMessageExceptionEvent(String key, Object... args) {
@@ -655,7 +663,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
             if (encodable instanceof Real) {
                 return new BinaryValue(((Real) encodable).floatValue() != 0);
             }
-            log.warn("Unexpected Encodable type for data type Binary: " + encodable.getClass().getName());
+            log.log(Level.WARNING, "Unexpected Encodable type for data type Binary: {0}", encodable.getClass().getName());
             return BinaryValue.ZERO;
         } else if (dataTypeId == DataTypes.MULTISTATE) {
             if (encodable instanceof UnsignedInteger) {
@@ -667,7 +675,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
             if (encodable instanceof Real) {
                 return new MultistateValue((int) ((Real) encodable).floatValue());
             }
-            log.warn("Unexpected Encodable type for data type Multistate: " + encodable.getClass().getName());
+            log.log(Level.WARNING, "Unexpected Encodable type for data type Multistate: {0}", encodable.getClass().getName());
             return new MultistateValue(1);
         } else if (dataTypeId == DataTypes.NUMERIC) {
             if (encodable instanceof Enumerated) {
@@ -676,7 +684,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
             if (encodable instanceof Real) {
                 return new NumericValue(((Real) encodable).floatValue());
             }
-            log.warn("Unexpected Encodable type for data type Numeric: " + encodable.getClass().getName());
+            log.log(Level.WARNING, "Unexpected Encodable type for data type Numeric: {0}", encodable.getClass().getName());
             return new NumericValue(0);
         } else if (dataTypeId == DataTypes.ALPHANUMERIC) {
             return new AlphanumericValue(encodable.toString());

@@ -222,8 +222,10 @@ import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableException;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.web.l10n.Localizer;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
-import br.org.scadabr.web.taglib.DateFunctions;
+import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
+import java.util.Date;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
@@ -403,9 +405,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         List<EventInstanceBean> beans = new ArrayList<>();
         if (events != null) {
             for (EventInstance event : events) {
-                beans.add(new EventInstanceBean(event.isActive(), event
-                        .getAlarmLevel(), DateFunctions.getTime(event
-                                .getActiveTimestamp()), getMessage(event.getMessage())));
+                beans.add(new EventInstanceBean(event.isActive(), event.getAlarmLevel(), event.getActiveTimestamp(), getMessage(event.getMessage())));
             }
         }
         return beans;
@@ -452,7 +452,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public Map<String, Object> modbusScanUpdate() {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
         ModbusNodeScanListener scan = Common.getUser().getTestingUtility(
                 ModbusNodeScanListener.class);
         if (scan == null) {
@@ -1018,7 +1018,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         if (data != null) {
             result.put("remoteIp", data.getRemoteIp());
             result.put("deviceId", data.getDeviceId());
-            result.put("time", DateFunctions.getTime(data.getTime()));
+            result.put("time", new Date(data.getTime()));
             result.put("data", data.getData());
         }
         result.put("message", l.getMessage());
@@ -1151,7 +1151,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             if (pvt.getTime() == -1) {
                 response.addContextual("script", "dsEdit.meta.test.success", pvt.getValue());
             } else {
-                response.addContextual("script", "dsEdit.meta.test.successTs", pvt.getValue(), DateFunctions.getTime(pvt.getTime()));
+                response.addContextual("script", "dsEdit.meta.test.successTs", pvt.getValue(), new Date(pvt.getTime()));
             }
         } catch (DataPointStateException e) {
             response.addContextual("context", e);
@@ -1376,29 +1376,21 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             return getMessage("common.result") + ": " + value.toString();
         } catch (LocalizableException e) {
             return getMessage(e);
-        } catch (Exception e) {
-            return e.getMessage();
         }
     }
 
     @MethodFilter
-    public String testHttpRetrieverTimeParams(String url, int timeoutSeconds,
+    public Date testHttpRetrieverTimeParams(String url, int timeoutSeconds,
             int retries, String timeRegex, String timeFormat) {
-        try {
-            String data = HttpRetrieverDataSourceRT.getData(url,
-                    timeoutSeconds, retries);
+        String data = HttpRetrieverDataSourceRT.getData(url,
+                timeoutSeconds, retries);
 
-            Pattern timePattern = Pattern.compile(timeRegex);
-            DateFormat dateFormat = new SimpleDateFormat(timeFormat);
-            long time = DataSourceUtils.getValueTime(
-                    System.currentTimeMillis(), timePattern, data, dateFormat,
-                    null);
-            return DateFunctions.getTime(time);
-        } catch (LocalizableException e) {
-            return getMessage(e);
-        } catch (Exception e) {
-            return e.getMessage();
-        }
+        Pattern timePattern = Pattern.compile(timeRegex);
+        DateFormat dateFormat = new SimpleDateFormat(timeFormat);
+        long time = DataSourceUtils.getValueTime(
+                System.currentTimeMillis(), timePattern, data, dateFormat,
+                null);
+        return new Date(time);
     }
 
     //
@@ -1475,24 +1467,17 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             return getMessage("common.result") + ": " + value.toString();
         } catch (LocalizableException e) {
             return getMessage(e);
-        } catch (Exception e) {
-            return e.getMessage();
         }
     }
 
     @MethodFilter
-    public String testPop3TimeParams(String testData, String timeRegex,
-            String timeFormat) {
-        try {
-            Pattern timePattern = Pattern.compile(timeRegex);
-            DateFormat dateFormat = new SimpleDateFormat(timeFormat);
-            long time = DataSourceUtils.getValueTime(
-                    System.currentTimeMillis(), timePattern, testData,
-                    dateFormat, null);
-            return DateFunctions.getTime(time);
-        } catch (Exception e) {
-            return e.getMessage();
-        }
+    public Date testPop3TimeParams(String testData, String timeRegex, String timeFormat) {
+        Pattern timePattern = Pattern.compile(timeRegex);
+        DateFormat dateFormat = new SimpleDateFormat(timeFormat);
+        long time = DataSourceUtils.getValueTime(
+                System.currentTimeMillis(), timePattern, testData,
+                dateFormat, null);
+        return new Date(time);
     }
 
     //
@@ -1806,7 +1791,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                 }
                 response.addData("devices", devices);
             } catch (ViconicsTransportException | RequestFailureException e) {
-                response.addGeneric( "dsEdit.viconics.networkIdentifyFailure", e);
+                response.addGeneric("dsEdit.viconics.networkIdentifyFailure", e);
             }
         }
 
@@ -2032,7 +2017,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         return result;
     }
 
-	//
+    //
     // /
     // / FHZ 4 J stuff
     // /

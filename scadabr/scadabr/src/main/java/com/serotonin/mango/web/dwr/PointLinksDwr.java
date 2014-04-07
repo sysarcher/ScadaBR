@@ -40,11 +40,10 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.link.PointLinkVO;
 import com.serotonin.mango.vo.permission.Permissions;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.taglib.DateFunctions;
+import java.util.Date;
 
 /**
  * @author Matthew Lohbihler
@@ -53,12 +52,12 @@ public class PointLinksDwr extends BaseDwr {
 
     public Map<String, Object> init() {
         User user = Common.getUser();
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
 
         // Get the points that this user can access.
         List<DataPointVO> allPoints = new DataPointDao().getDataPoints(DataPointExtendedNameComparator.instance, false);
-        List<IntValuePair> sourcePoints = new ArrayList<IntValuePair>();
-        List<IntValuePair> targetPoints = new ArrayList<IntValuePair>();
+        List<IntValuePair> sourcePoints = new ArrayList<>();
+        List<IntValuePair> targetPoints = new ArrayList<>();
         for (DataPointVO point : allPoints) {
             if (Permissions.hasDataPointReadPermission(user, point)) {
                 sourcePoints.add(new IntValuePair(point.getId(), point.getExtendedName()));
@@ -72,7 +71,7 @@ public class PointLinksDwr extends BaseDwr {
         data.put("targetPoints", targetPoints);
 
         // Get the existing point links.
-        List<PointLinkVO> pointLinks = new ArrayList<PointLinkVO>();
+        List<PointLinkVO> pointLinks = new ArrayList<>();
         for (PointLinkVO pointLink : new PointLinkDao().getPointLinks()) {
             if (containsPoint(sourcePoints, pointLink.getSourcePointId())
                     && containsPoint(targetPoints, pointLink.getTargetPointId())) {
@@ -164,8 +163,7 @@ public class PointLinksDwr extends BaseDwr {
                 } else if (pvt.getTime() == -1) {
                     message = new LocalizableMessageImpl("pointLinks.validate.success", pvt.getValue());
                 } else {
-                    message = new LocalizableMessageImpl("pointLinks.validate.successTs", pvt.getValue(),
-                            DateFunctions.getTime(pvt.getTime()));
+                    message = new LocalizableMessageImpl("pointLinks.validate.successTs", pvt.getValue(), new Date(pvt.getTime()));
                 }
             } catch (ScriptException e) {
                 message = new LocalizableMessageImpl("common.default", e.getMessage());

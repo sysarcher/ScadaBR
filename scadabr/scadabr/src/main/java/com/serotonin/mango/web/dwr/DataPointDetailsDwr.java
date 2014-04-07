@@ -49,7 +49,8 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.taglib.DateFunctions;
+import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
+import java.util.Date;
 
 public class DataPointDetailsDwr extends BaseDwr {
 
@@ -92,13 +93,13 @@ public class DataPointDetailsDwr extends BaseDwr {
         PointValueFacade facade = new PointValueFacade(pointVO.getId());
 
         List<PointValueTime> rawData = facade.getLatestPointValues(limit);
-        List<RenderedPointValueTime> renderedData = new ArrayList<RenderedPointValueTime>(
+        List<RenderedPointValueTime> renderedData = new ArrayList<>(
                 rawData.size());
 
         for (PointValueTime pvt : rawData) {
             RenderedPointValueTime rpvt = new RenderedPointValueTime();
             rpvt.setValue(Functions.getHtmlText(pointVO, pvt));
-            rpvt.setTime(Functions.getTime(pvt));
+            rpvt.setTime(new Date(pvt.getTime()));
             if (pvt.isAnnotated()) {
                 AnnotatedPointValueTime apvt = (AnnotatedPointValueTime) pvt;
                 rpvt.setAnnotation(apvt.getAnnotation(getResourceBundle()));
@@ -197,7 +198,7 @@ public class DataPointDetailsDwr extends BaseDwr {
             String uri = ImageValueServlet.servletPath
                     + ImageValueServlet.historyPrefix + pvt.getTime() + "_"
                     + vo.getId() + "." + imageValue.getTypeExtension();
-            result.add(new ImageValueBean(Functions.getTime(pvt), uri));
+            result.add(new ImageValueBean(new Date(pvt.getTime()), uri));
         }
 
         DwrResponseI18n response = new DwrResponseI18n();
@@ -208,6 +209,6 @@ public class DataPointDetailsDwr extends BaseDwr {
 
     private void addAsof(DwrResponseI18n response) {
         response.addData("asof", new LocalizableMessageImpl("dsDetils.asof",
-                DateFunctions.getFullSecondTime(System.currentTimeMillis())));
+                LocalizableTimeStampTag.getFullSecondTime(System.currentTimeMillis())));
     }
 }

@@ -18,20 +18,22 @@
  */
 package com.serotonin.mango.vo.bean;
 
+import java.util.Date;
+
 /**
  * @author Matthew Lohbihler
  */
 public class ImageValueBean {
 
-    private final String time;
+    private final Date time;
     private final String uri;
 
-    public ImageValueBean(String time, String uri) {
+    public ImageValueBean(Date time, String uri) {
         this.time = time;
         this.uri = uri;
     }
 
-    public String getTime() {
+    public Date getTime() {
         return time;
     }
 

@@ -61,6 +61,7 @@ import br.org.scadabr.web.content.ContentGenerator;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.l10n.Localizer;
+import java.util.Date;
 import java.util.Objects;
 
 abstract public class BaseDwr {
@@ -134,7 +135,7 @@ abstract public class BaseDwr {
         if (!Objects.equals(pointVO.lastValue(), pointValue)) {
             state.setValue(prettyText);
             if (pointValue != null) {
-                state.setTime(Functions.getTime(pointValue));
+                state.setTime(new Date(pointValue.getTime()));
             }
             pointVO.updateLastValue(pointValue);
         }

@@ -22,7 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.mango.Common;
-import br.org.scadabr.timer.FixedRateTrigger;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.SystemCronTask;
 

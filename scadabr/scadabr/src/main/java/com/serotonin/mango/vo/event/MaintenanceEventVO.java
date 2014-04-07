@@ -28,7 +28,7 @@ import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.taglib.DateFunctions;
+import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 
 @JsonRemoteEntity
 public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>, JsonSerializable {
@@ -312,10 +312,8 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
         } else if (scheduleType == TYPE_MANUAL) {
             message = new LocalizableMessageImpl("maintenanceEvents.schedule.manual", dataSourceName);
         } else if (scheduleType == TYPE_ONCE) {
-            message = new LocalizableMessageImpl("maintenanceEvents.schedule.onceUntil", dataSourceName,
-                    DateFunctions.getTime(new DateTime(activeYear, activeMonth, activeDay, activeHour, activeMinute,
-                                    activeSecond, 0).getMillis()), DateFunctions.getTime(new DateTime(inactiveYear,
-                                    inactiveMonth, inactiveDay, inactiveHour, inactiveMinute, inactiveSecond, 0).getMillis()));
+            message = new LocalizableMessageImpl("maintenanceEvents.schedule.onceUntil", dataSourceName, new DateTime(activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0).toDate(), 
+                    new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute, inactiveSecond, 0).toDate());
         } else if (scheduleType == TYPE_HOURLY) {
             String activeTime = StringUtils.pad(Integer.toString(activeMinute), '0', 2) + ":"
                     + StringUtils.pad(Integer.toString(activeSecond), '0', 2);

@@ -60,9 +60,10 @@ import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.web.email.MessageFormatDirective;
 import com.serotonin.mango.web.email.UsedImagesDirective;
 import br.org.scadabr.util.ColorUtils;
-import br.org.scadabr.web.taglib.DateFunctions;
+import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 
 import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 /**
  * @author Matthew Lohbihler
@@ -126,7 +127,7 @@ public class ReportChartCreator {
         UsedImagesDirective inlineImages = new UsedImagesDirective();
 
         // Prepare the model for the content rendering.
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         model.put("fmt", new MessageFormatDirective(bundle));
         model.put("img", inlineImages);
         model.put("instance", reportInstance);
@@ -211,7 +212,7 @@ public class ReportChartCreator {
         StringWriter writer = new StringWriter();
         try {
             template.process(model, writer);
-        } catch (Exception e) {
+        } catch (TemplateException | IOException e) {
             // Couldn't process the template?
             throw new ShouldNeverHappenException(e);
         }
@@ -377,7 +378,7 @@ public class ReportChartCreator {
         }
 
         public String getAnalogMinTime() {
-            return DateFunctions.getFullMinuteTime(((AnalogStatistics) stats).getMinTime());
+            return Localizer.localizeDateTime(bundle.getLocale(), ((AnalogStatistics) stats).getMinTime());
         }
 
         public String getAnalogMaximum() {
@@ -385,7 +386,7 @@ public class ReportChartCreator {
         }
 
         public String getAnalogMaxTime() {
-            return DateFunctions.getFullMinuteTime(((AnalogStatistics) stats).getMaxTime());
+            return Localizer.localizeDateTime(bundle.getLocale(), ((AnalogStatistics) stats).getMaxTime());
         }
 
         public String getAnalogAverage() {
@@ -402,7 +403,7 @@ public class ReportChartCreator {
 
         public List<StartsAndRuntimeWrapper> getStartsAndRuntimes() {
             List<StartsAndRuntime> original = ((StartsAndRuntimeList) stats).getData();
-            List<StartsAndRuntimeWrapper> result = new ArrayList<StartsAndRuntimeWrapper>(original.size());
+            List<StartsAndRuntimeWrapper> result = new ArrayList<>(original.size());
             for (StartsAndRuntime sar : original) {
                 result.add(new StartsAndRuntimeWrapper(sar, textRenderer));
             }

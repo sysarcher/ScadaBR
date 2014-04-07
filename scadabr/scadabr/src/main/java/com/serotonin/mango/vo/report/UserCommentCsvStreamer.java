@@ -60,7 +60,7 @@ public class UserCommentCsvStreamer {
                 data[2] = "";
             }
 
-            data[3] = comment.getPrettyTime();
+            data[3] = Localizer.localizeTime(bundle.getLocale(), comment.getTs());
             data[4] = comment.getComment();
 
             out.write(csvWriter.encodeRow(data));

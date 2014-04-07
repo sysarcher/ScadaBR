@@ -18,8 +18,6 @@
  */
 package com.serotonin.mango.vo.report;
 
-import br.org.scadabr.web.taglib.DateFunctions;
-
 public class ReportUserComment {
 
     private String username;
@@ -28,10 +26,6 @@ public class ReportUserComment {
     private String pointName;
     private long ts;
     private String comment;
-
-    public String getPrettyTime() {
-        return DateFunctions.getTime(ts);
-    }
 
     public String getUsername() {
         return username;

@@ -28,7 +28,7 @@ import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.web.taglib.DateFunctions;
+import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 
 public class Functions {
 
@@ -97,13 +97,6 @@ public class Functions {
         } else {
             return "<span style='color:" + colour + ";'>" + text + "</span>";
         }
-    }
-
-    public static String getTime(PointValueTime pointValue) {
-        if (pointValue != null) {
-            return DateFunctions.getTime(pointValue.getTime());
-        }
-        return null;
     }
 
     public static String padZeros(int i, int len) {

@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.vo;
 
-import br.org.scadabr.web.taglib.DateFunctions;
+import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 
 public class UserComment {
 
@@ -32,10 +32,6 @@ public class UserComment {
 
     // Relational fields
     private String username;
-
-    public String getPrettyTime() {
-        return DateFunctions.getTime(ts);
-    }
 
     public String getComment() {
         return comment;
