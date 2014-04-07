@@ -9,10 +9,8 @@ package br.org.scadabr.web.i18n;
  *
  * @author aploese
  */
-public interface LocalizableMessage {
+public interface LocalizableI18nKey {
     
     String getI18nKey();
-
-    Object[] getArgs();
 
 }

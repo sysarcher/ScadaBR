@@ -24,9 +24,11 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 
 import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import br.org.scadabr.rt.dataSource.vmstat.VMStatDataSourceRT;
+import br.org.scadabr.timer.cron.CronCalendar;
+import br.org.scadabr.timer.cron.CronExpression;
+import br.org.scadabr.util.SerializationHelper;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -34,8 +36,12 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableI18nKey;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.TimeZone;
 
 /**
  * @author Matthew Lohbihler
@@ -43,15 +49,12 @@ import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 @JsonRemoteEntity
 public class VMStatDataSourceVO extends DataSourceVO<VMStatDataSourceVO> {
 
-    public static final Type TYPE = Type.VMSTAT;
-
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
         ets.add(createEventType(VMStatDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.dataSource"), EventType.DuplicateHandling.IGNORE_SAME_MESSAGE, AlarmLevels.URGENT));
-        ets
-                .add(createEventType(VMStatDataSourceRT.PARSE_EXCEPTION_EVENT, new LocalizableMessageImpl(
-                                        "event.ds.dataParse")));
+        ets.add(createEventType(VMStatDataSourceRT.PARSE_EXCEPTION_EVENT, new LocalizableMessageImpl(
+                "event.ds.dataParse")));
     }
 
     private static final ExportCodes EVENT_CODES = new ExportCodes();
@@ -66,28 +69,34 @@ public class VMStatDataSourceVO extends DataSourceVO<VMStatDataSourceVO> {
         return EVENT_CODES;
     }
 
-    public interface OutputScale {
+    public enum OutputScale implements LocalizableI18nKey {
 
-        int NONE = 1;
-        int LOWER_K = 2;
-        int UPPER_K = 3;
-        int LOWER_M = 4;
-        int UPPER_M = 5;
-    }
+        NONE("dsEdit.vmstat.scale.none"),
+        LOWER_K("dsEdit.vmstat.scale.k"),
+        UPPER_K("dsEdit.vmstat.scale.K"),
+        LOWER_M("dsEdit.vmstat.scale.m"),
+        UPPER_M("dsEdit.vmstat.scale.M");
 
-    public static final ExportCodes OUTPUT_SCALE_CODES = new ExportCodes();
+        public final String i18nKey;
 
-    static {
-        OUTPUT_SCALE_CODES.addElement(OutputScale.NONE, "NONE", "dsEdit.vmstat.scale.none");
-        OUTPUT_SCALE_CODES.addElement(OutputScale.LOWER_K, "LOWER_K", "dsEdit.vmstat.scale.k");
-        OUTPUT_SCALE_CODES.addElement(OutputScale.UPPER_K, "UPPER_K", "dsEdit.vmstat.scale.K");
-        OUTPUT_SCALE_CODES.addElement(OutputScale.LOWER_M, "LOWER_M", "dsEdit.vmstat.scale.m");
-        OUTPUT_SCALE_CODES.addElement(OutputScale.UPPER_M, "UPPER_M", "dsEdit.vmstat.scale.M");
+        private OutputScale(String i18nKey) {
+            this.i18nKey = i18nKey;
+        }
+
+        @Override
+        public String getI18nKey() {
+            return i18nKey;
+        }
+
+        public String getName() {
+            return name();
+        }
+
     }
 
     @Override
     public Type getType() {
-        return TYPE;
+        return Type.VMSTAT;
     }
 
     @Override
@@ -105,10 +114,8 @@ public class VMStatDataSourceVO extends DataSourceVO<VMStatDataSourceVO> {
         return new VMStatPointLocatorVO();
     }
 
-    @JsonRemoteProperty
-    private int pollSeconds = 60;
-    @JsonRemoteProperty
-    private int outputScale = OutputScale.NONE;
+    private int pollSeconds = 3;
+    private OutputScale outputScale = OutputScale.NONE;
 
     public int getPollSeconds() {
         return pollSeconds;
@@ -118,38 +125,32 @@ public class VMStatDataSourceVO extends DataSourceVO<VMStatDataSourceVO> {
         this.pollSeconds = pollSeconds;
     }
 
-    public int getOutputScale() {
+    public OutputScale getOutputScale() {
         return outputScale;
     }
 
-    public void setOutputScale(int outputScale) {
+    public void setOutputScale(OutputScale outputScale) {
         this.outputScale = outputScale;
     }
 
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-
         if (pollSeconds < 1) {
             response.addContextual("pollSeconds", "validate.greaterThanZero", pollSeconds);
-        }
-
-        if (!OUTPUT_SCALE_CODES.isValidId(outputScale)) {
-            response.addContextual("outputScale", "validate.invalidValue");
         }
     }
 
     @Override
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.vmstat.pollSeconds", pollSeconds);
-        AuditEventType.addExportCodeMessage(list, "dsEdit.vmstat.outputScale", OUTPUT_SCALE_CODES, outputScale);
+        AuditEventType.addPropertyMessage(list, "dsEdit.vmstat.outputScale", outputScale);
     }
 
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, VMStatDataSourceVO from) {
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.vmstat.pollSeconds", from.pollSeconds, pollSeconds);
-        AuditEventType.maybeAddExportCodeChangeMessage(list, "dsEdit.vmstat.outputScale", OUTPUT_SCALE_CODES,
-                from.outputScale, outputScale);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.vmstat.outputScale", from.outputScale, outputScale);
     }
 
     //
@@ -158,21 +159,36 @@ public class VMStatDataSourceVO extends DataSourceVO<VMStatDataSourceVO> {
     // /
     //
     private static final long serialVersionUID = -1;
-    private static final int version = 1;
+    private static final int version = 2;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
         out.writeInt(pollSeconds);
-        out.writeInt(outputScale);
+        out.writeUTF(outputScale.name());
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
         int ver = in.readInt();
 
         // Switch on the version of the class so that version changes can be elegantly handled.
-        if (ver == 1) {
-            pollSeconds = in.readInt();
-            outputScale = in.readInt();
+        switch (ver) {
+            case 1:
+                pollSeconds = in.readInt();
+                final int osValue = in.read();
+                for (OutputScale os : OutputScale.values()) {
+                    if (os.ordinal() == osValue) {
+                        outputScale = os;
+                        break;
+                    }
+                }
+                break;
+            case 2:
+                pollSeconds = in.readInt();
+                outputScale = OutputScale.valueOf(in.readUTF());
+                break;
+            default:
+                throw new RuntimeException(String.format("Version %d not supported", ver));
         }
+
     }
 }

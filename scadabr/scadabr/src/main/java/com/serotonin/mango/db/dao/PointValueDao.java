@@ -62,9 +62,11 @@ import com.serotonin.mango.rt.maint.work.WorkItem;
 import com.serotonin.mango.vo.AnonymousUser;
 import com.serotonin.mango.vo.bean.LongPair;
 import br.org.scadabr.monitor.IntegerMonitor;
-import br.org.scadabr.util.queue.ObjectQueue;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.ArrayDeque;
+import java.util.Queue;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -73,7 +75,7 @@ import org.springframework.transaction.support.TransactionCallback;
 
 public class PointValueDao extends BaseDao {
 
-    private static List<UnsavedPointValue> UNSAVED_POINT_VALUES = new ArrayList<>();
+    private final static List<UnsavedPointValue> UNSAVED_POINT_VALUES = new ArrayList<>();
 
     private static final String POINT_VALUE_INSERT_START = "insert into pointValues (dataPointId, dataType, pointValue, ts) values ";
     private static final String POINT_VALUE_INSERT_VALUES = "(?,?,?,?)";
@@ -95,8 +97,7 @@ public class PointValueDao extends BaseDao {
      * Only the PointValueCache should call this method during runtime. Do not
      * use.
      */
-    public PointValueTime savePointValueSync(int pointId,
-            PointValueTime pointValue, SetPointSource source) {
+    public PointValueTime savePointValueSync(int pointId, PointValueTime pointValue, SetPointSource source) {
         long id = savePointValueImpl(pointId, pointValue, source, false);
 
         PointValueTime savedPointValue;
@@ -120,8 +121,7 @@ public class PointValueDao extends BaseDao {
      * Only the PointValueCache should call this method during runtime. Do not
      * use.
      */
-    public void savePointValueAsync(int pointId, PointValueTime pointValue,
-            SetPointSource source) {
+    public void savePointValueAsync(int pointId, PointValueTime pointValue, SetPointSource source) {
         long id = savePointValueImpl(pointId, pointValue, source, true);
         if (id != -1) {
             clearUnsavedPointValues();
@@ -157,6 +157,7 @@ public class PointValueDao extends BaseDao {
                 // Create a transaction within which to do the insert.
                 id = getTransactionTemplate().execute(
                         new TransactionCallback<Long>() {
+                            @Override
                             public Long doInTransaction(TransactionStatus status) {
                                 return savePointValue(pointId, dataType,
                                         dvalueFinal, pointValue.getTime(),
@@ -524,7 +525,7 @@ public class PointValueDao extends BaseDao {
     }
 
     private void updateAnnotations(List<PointValueTime> values) {
-        Map<Integer, List<AnnotatedPointValueTime>> userIds = new HashMap<Integer, List<AnnotatedPointValueTime>>();
+        Map<Integer, List<AnnotatedPointValueTime>> userIds = new HashMap<>();
         List<AnnotatedPointValueTime> alist;
 
         // Look for annotated point values.
@@ -535,7 +536,7 @@ public class PointValueDao extends BaseDao {
                 if (apv.getSourceType() == SetPointSource.Types.USER) {
                     alist = userIds.get(apv.getSourceId());
                     if (alist == null) {
-                        alist = new ArrayList<AnnotatedPointValueTime>();
+                        alist = new ArrayList<>();
                         userIds.put(apv.getSourceId(), alist);
                     }
                     alist.add(apv);
@@ -774,7 +775,7 @@ public class PointValueDao extends BaseDao {
 
     static class BatchWriteBehind implements WorkItem {
 
-        private static final ObjectQueue<BatchWriteBehindEntry> ENTRIES = new ObjectQueue<>();
+        private static final Queue<BatchWriteBehindEntry> ENTRIES = new ArrayDeque<>();
         private static final CopyOnWriteArrayList<BatchWriteBehind> instances = new CopyOnWriteArrayList<>();
         private static final Log LOG = LogFactory.getLog(BatchWriteBehind.class);
         private static final int SPAWN_THRESHOLD = 10000;
@@ -807,7 +808,7 @@ public class PointValueDao extends BaseDao {
 
         static void add(BatchWriteBehindEntry e, JdbcTemplate ejt) {
             synchronized (ENTRIES) {
-                ENTRIES.push(e);
+                ENTRIES.add(e);
                 ENTRIES_MONITOR.setValue(ENTRIES.size());
                 if (ENTRIES.size() > instances.size() * SPAWN_THRESHOLD) {
                     if (instances.size() < MAX_INSTANCES) {
@@ -843,9 +844,10 @@ public class PointValueDao extends BaseDao {
                             break;
                         }
 
-                        inserts = new BatchWriteBehindEntry[ENTRIES.size() < MAX_ROWS ? ENTRIES
-                                .size() : MAX_ROWS];
-                        ENTRIES.pop(inserts);
+                        inserts = new BatchWriteBehindEntry[ENTRIES.size() < MAX_ROWS ? ENTRIES .size() : MAX_ROWS];
+                        for (int i = 0; i < inserts.length; i++) {
+                            inserts[i] = ENTRIES.peek();
+                        }
                         ENTRIES_MONITOR.setValue(ENTRIES.size());
                     }
 
@@ -888,7 +890,7 @@ public class PointValueDao extends BaseDao {
                             }
 
                             retries--;
-                        } catch (RuntimeException e) {
+                        } catch (DataAccessException e) {
                             LOG.error("Error saving " + inserts.length
                                     + " batch inserts. Data lost.", e);
                             break;
@@ -901,6 +903,7 @@ public class PointValueDao extends BaseDao {
             }
         }
 
+        @Override
         public int getPriority() {
             return WorkItem.PRIORITY_HIGH;
         }

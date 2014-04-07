@@ -43,20 +43,27 @@ abstract public class PollingDataSource extends DataSourceRT {
     private final DataSourceVO<?> vo;
     protected List<DataPointRT> dataPoints = new ArrayList<>();
     protected boolean pointListChanged = false;
-    private String cronPattern = "0 0 5 * * * * * *"; // Default to 5 minutes just to have something here
-    private TimeZone timeZone = CronExpression.TIMEZONE_UTC;
+    private final String cronPattern; 
+    private final TimeZone timeZone;
     private DataSourceCronTask timerTask;
     private Thread jobThread;
     private long jobThreadStartTime;
 
+    @Deprecated
     public PollingDataSource(DataSourceVO<?> vo) {
         super(vo);
         this.vo = vo;
+        cronPattern = "0 0 5 * * * * * *";// Default to 5 minutes just to have something here
+        timeZone = CronExpression.TIMEZONE_UTC;
     }
 
-    public void setCronPattern(String cronPattern) {
+    public PollingDataSource(DataSourceVO<?> vo, String cronPattern, TimeZone tz) {
+        super(vo);
+        this.vo = vo;
         this.cronPattern = cronPattern;
+        this.timeZone = tz;
     }
+
 
     public void collectData(long fireTime) {
         if (jobThread != null) {
