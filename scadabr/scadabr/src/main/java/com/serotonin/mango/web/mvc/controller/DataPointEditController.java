@@ -44,7 +44,7 @@ import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.dataSource.DataPointSaveHandler;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.mango.vo.permission.Permissions;
-import br.org.scadabr.propertyEditor.DecimalFormatEditor;
+import br.org.scadabr.propertyEditor.DoubleFormatEditor;
 import br.org.scadabr.propertyEditor.IntegerFormatEditor;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.util.ValidationUtils;
@@ -111,11 +111,11 @@ public class DataPointEditController extends SimpleFormController {
 
     @Override
     protected void initBinder(HttpServletRequest request, ServletRequestDataBinder binder) {
-        binder.registerCustomEditor(Double.TYPE, "tolerance", new DecimalFormatEditor(new DecimalFormat("#.##"), false));
+        binder.registerCustomEditor(Double.TYPE, "tolerance", new DoubleFormatEditor(new DecimalFormat("#.##"), false));
         binder.registerCustomEditor(Integer.TYPE, "purgePeriod", new IntegerFormatEditor(new DecimalFormat("#"), false));
-        binder.registerCustomEditor(Double.TYPE, "discardLowLimit", new DecimalFormatEditor(new DecimalFormat("#.##"),
+        binder.registerCustomEditor(Double.TYPE, "discardLowLimit", new DoubleFormatEditor(new DecimalFormat("#.##"),
                 false));
-        binder.registerCustomEditor(Double.TYPE, "discardHighLimit", new DecimalFormatEditor(new DecimalFormat("#.##"),
+        binder.registerCustomEditor(Double.TYPE, "discardHighLimit", new DoubleFormatEditor(new DecimalFormat("#.##"),
                 false));
     }
 

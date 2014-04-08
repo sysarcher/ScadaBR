@@ -86,9 +86,9 @@ public class Common {
     private static final ResourceBundle env = ResourceBundle.getBundle("env");
 
     // This is initialized
-    public static final CronTimerPool<DataSourceCronTask, DataSourceRunnable> dataSourcePool = new CronTimerPool(2, 5, 30, TimeUnit.SECONDS);
-    public static final CronTimerPool<SystemCronTask, SystemRunnable> systemCronPool = new CronTimerPool(2, 5, 30, TimeUnit.SECONDS);
-    public static final CronTimerPool<EventCronTask, EventRunnable> eventCronPool = new CronTimerPool(2, 5, 30, TimeUnit.SECONDS);
+    public static CronTimerPool<DataSourceCronTask, DataSourceRunnable> dataSourcePool;
+    public static CronTimerPool<SystemCronTask, SystemRunnable> systemCronPool;
+    public static CronTimerPool<EventCronTask, EventRunnable> eventCronPool;
     
 
     public static final MonitoredValues MONITORED_VALUES = new MonitoredValues();

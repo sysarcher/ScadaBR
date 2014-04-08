@@ -846,7 +846,7 @@ public class PointValueDao extends BaseDao {
 
                         inserts = new BatchWriteBehindEntry[ENTRIES.size() < MAX_ROWS ? ENTRIES .size() : MAX_ROWS];
                         for (int i = 0; i < inserts.length; i++) {
-                            inserts[i] = ENTRIES.peek();
+                            inserts[i] = ENTRIES.remove();
                         }
                         ENTRIES_MONITOR.setValue(ENTRIES.size());
                     }
