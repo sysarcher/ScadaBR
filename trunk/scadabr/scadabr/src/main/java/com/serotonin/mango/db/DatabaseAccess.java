@@ -195,7 +195,7 @@ abstract public class DatabaseAccess {
             conn.setAutoCommit(false);
             callback.doInConnection(conn);
             conn.commit();
-        } catch (Exception e) {
+        } catch (SQLException | CannotGetJdbcConnectionException e) {
             try {
                 if (conn != null) {
                     conn.rollback();

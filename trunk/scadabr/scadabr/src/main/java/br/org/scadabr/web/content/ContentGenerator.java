@@ -7,6 +7,7 @@ package br.org.scadabr.web.content;
 
 import br.org.scadabr.ImplementMeException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -48,10 +49,10 @@ public class ContentGenerator {
         try {
             request.getRequestDispatcher(contentJsp).forward(request, response);
         } catch (MissingResourceException e) {
-            if (true) throw new ImplementMeException();
             return "Resource " + contentJsp + " not found";
         } catch (NullPointerException e) {
-            throw new ImplementMeException();
+            //TODO LOG ???
+            return Arrays.deepToString(e.getStackTrace());
         } finally {
             if (model != null) {
                 for (String key : model.keySet()) {

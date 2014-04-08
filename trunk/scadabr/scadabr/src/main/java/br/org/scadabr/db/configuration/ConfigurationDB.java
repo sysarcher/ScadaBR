@@ -9,6 +9,7 @@ import java.io.OutputStream;
 
 import com.serotonin.mango.Common;
 
+@Deprecated // Anyone uses this???
 public class ConfigurationDB {
 
     public static void copy(File src, File dst) throws IOException {

@@ -45,6 +45,7 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.spring.ConnectionCallbackVoid;
 import com.serotonin.mango.Common;
+import java.io.IOException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -122,14 +123,14 @@ public class DerbyAccess extends DatabaseAccess {
             // The users table wasn't found, so assume that this is a new Mango instance.
             // Create the tables
             try {
-                FileOutputStream out = new FileOutputStream("createTables.log");
-                Connection conn = DataSourceUtils.getConnection(dataSource);
-                org.apache.derby.tools.ij.runScript(conn,
-                        ctx.getResourceAsStream("/WEB-INF/db/createTables-derby.sql"), "ASCII", out, Common.UTF8);
-                DataSourceUtils.releaseConnection(conn, dataSource);
-                out.flush();
-                out.close();
-            } catch (Exception e) {
+                try (FileOutputStream out = new FileOutputStream("createTables.log")) {
+                    Connection conn = DataSourceUtils.getConnection(dataSource);
+                    org.apache.derby.tools.ij.runScript(conn,
+                            ctx.getResourceAsStream("/WEB-INF/db/createTables-derby.sql"), "ASCII", out, Common.UTF8);
+                    DataSourceUtils.releaseConnection(conn, dataSource);
+                    out.flush();
+                }
+            } catch (IOException | CannotGetJdbcConnectionException e) {
                 // Should never happen, so just wrap in a runtime exception and rethrow.
                 throw new ShouldNeverHappenException(e);
             }

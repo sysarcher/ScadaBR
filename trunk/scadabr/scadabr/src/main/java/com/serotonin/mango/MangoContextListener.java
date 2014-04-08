@@ -19,7 +19,6 @@
 /* modified for NORD Electric by MCA Sistemas */
 package com.serotonin.mango;
 
-import br.org.scadabr.ImplementMeException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,8 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
@@ -41,6 +38,7 @@ import org.apache.commons.logging.LogFactory;
 import br.org.scadabr.api.utils.APIUtils;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.timer.CronTimerPool;
 import br.org.scadabr.timer.cron.CronExpression;
 import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -54,7 +52,6 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.BackgroundProcessing;
 import com.serotonin.mango.rt.maint.DataPurge;
-import com.serotonin.mango.rt.maint.VersionCheck;
 import com.serotonin.mango.rt.maint.WorkItemMonitor;
 import com.serotonin.mango.util.BackgroundContext;
 import com.serotonin.mango.view.DynamicImage;
@@ -95,6 +92,10 @@ public class MangoContextListener implements ServletContextListener {
 
         // Create the common reference to the context
         Common.ctx = new ContextWrapper(ctx);
+        // Once the threadpool was shut down no its dead, so create them new here....
+        Common.dataSourcePool = new CronTimerPool(2, 5, 30, TimeUnit.SECONDS);
+        Common.systemCronPool = new CronTimerPool(2, 5, 30, TimeUnit.SECONDS);
+        Common.eventCronPool = new CronTimerPool(2, 5, 30, TimeUnit.SECONDS);
 
         // Create all the stuff we need.
         constantsInitialize(ctx);
@@ -151,12 +152,13 @@ public class MangoContextListener implements ServletContextListener {
         runtimeManagerTerminate(ctx);
         eventManagerTerminate(ctx);
         utilitiesTerminate(ctx);
-        databaseTerminate(ctx);
 
         //TODO move to Common
         Common.dataSourcePool.shutdown();
         Common.systemCronPool.shutdown();
         Common.eventCronPool.shutdown();
+
+        databaseTerminate(ctx);
 
         Common.ctx = null;
 
@@ -363,7 +365,7 @@ public class MangoContextListener implements ServletContextListener {
             "js.disabledPointLink", "pointLinks.pointLink", "header.mute",
             "header.unmute",};
 
-        Map<String, LocalizableMessage> messages = new HashMap<String, LocalizableMessage>();
+        Map<String, LocalizableMessage> messages = new HashMap<>();
         for (String code : codes) {
             messages.put(code, new LocalizableMessageImpl(code));
         }
@@ -501,8 +503,8 @@ public class MangoContextListener implements ServletContextListener {
     //
     private void imageSetInitialize(ServletContext ctx) {
         ViewGraphicLoader loader = new ViewGraphicLoader();
-        List<ImageSet> imageSets = new ArrayList<ImageSet>();
-        List<DynamicImage> dynamicImages = new ArrayList<DynamicImage>();
+        List<ImageSet> imageSets = new ArrayList<>();
+        List<DynamicImage> dynamicImages = new ArrayList<>();
 
         for (ViewGraphic g : loader.loadViewGraphics(ctx.getRealPath(""))) {
             if (g.isImageSet()) {
@@ -526,7 +528,7 @@ public class MangoContextListener implements ServletContextListener {
     private void freemarkerInitialize(ServletContext ctx) {
         Configuration cfg = new Configuration();
         try {
-            List<TemplateLoader> loaders = new ArrayList<TemplateLoader>();
+            List<TemplateLoader> loaders = new ArrayList<>();
 
             // Add the override template dir
             try {
@@ -581,7 +583,7 @@ public class MangoContextListener implements ServletContextListener {
         // The version checking job reschedules itself after each execution so
         // that requests from the various Mango
         // instances even out over time.
-        
+
         //TODO ask serotoninsoftware for new versions ??? Not anymore ;-) VersionCheck.start("0 0 0 0 * * * *");
         WorkItemMonitor.start();
 
