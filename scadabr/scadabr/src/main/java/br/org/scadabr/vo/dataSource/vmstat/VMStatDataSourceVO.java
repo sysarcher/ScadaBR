@@ -168,13 +168,8 @@ public class VMStatDataSourceVO extends DataSourceVO<VMStatDataSourceVO> {
         switch (ver) {
             case 1:
                 pollSeconds = in.readInt();
-                final int osValue = in.read();
-                for (OutputScale os : OutputScale.values()) {
-                    if (os.ordinal() == osValue) {
-                        outputScale = os;
-                        break;
-                    }
-                }
+                final int osValue = in.readInt();
+                outputScale = OutputScale.values()[osValue -1];
                 break;
             case 2:
                 pollSeconds = in.readInt();
