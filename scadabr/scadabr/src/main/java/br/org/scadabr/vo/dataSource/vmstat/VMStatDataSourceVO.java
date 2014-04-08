@@ -26,9 +26,6 @@ import java.util.List;
 import br.org.scadabr.json.JsonRemoteEntity;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import br.org.scadabr.rt.dataSource.vmstat.VMStatDataSourceRT;
-import br.org.scadabr.timer.cron.CronCalendar;
-import br.org.scadabr.timer.cron.CronExpression;
-import br.org.scadabr.util.SerializationHelper;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -39,9 +36,6 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableI18nKey;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.TimeZone;
 
 /**
  * @author Matthew Lohbihler

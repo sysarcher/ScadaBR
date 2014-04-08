@@ -36,14 +36,14 @@ public class ExceptionDetectionFilter implements AjaxFilter {
 
     private static final Log LOG = LogFactory.getLog(ExceptionDetectionFilter.class);
 
+    @Override
     public Object doFilter(Object obj, Method method, Object[] params, AjaxFilterChain chain) throws Exception {
         try {
             return chain.doFilter(obj, method, params);
-        } catch (PermissionException e) {
-            throw e;
-        } catch (RTException e) {
+        } catch (PermissionException | RTException e) {
             throw e;
         } catch (Exception e) {
+            LOG.error("DWR invocation exception", e);
             Throwable e2 = e;
             if (e2 instanceof InvocationTargetException) {
                 e2 = ((InvocationTargetException) e).getTargetException();

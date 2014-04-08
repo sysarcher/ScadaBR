@@ -21,7 +21,6 @@ package br.org.scadabr.rt.dataSource.vmstat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -34,6 +33,8 @@ import br.org.scadabr.vo.dataSource.vmstat.VMStatDataSourceVO;
 import br.org.scadabr.vo.dataSource.vmstat.VMStatPointLocatorVO;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.dataSource.vmstat.Attribute;
+import java.util.EnumMap;
 
 /**
  * @author Matthew Lohbihler
@@ -47,7 +48,7 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
     private final VMStatDataSourceVO vo;
     private Process vmstatProcess;
     private BufferedReader in;
-    private Map<Integer, Integer> attributePositions;
+    private Map<Attribute, Integer> attributePositions;
     private boolean terminated;
 
     public VMStatDataSourceRT(VMStatDataSourceVO vo) {
@@ -93,69 +94,65 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
             String headers = in.readLine();
 
             // Create a mapping of attribute ids to split array positions.
-            attributePositions = new HashMap<>();
+            attributePositions = new EnumMap(Attribute.class);
             String[] headerParts = headers.split("\\s+");
             for (int i = 0; i < headerParts.length; i++) {
-                int attributeId = -1;
                 if (null != headerParts[i]) {
                     switch (headerParts[i]) {
                         case "r":
-                            attributeId = VMStatPointLocatorVO.Attributes.PROCS_R;
+                            attributePositions.put(Attribute.PROCS_R, i);
                             break;
                         case "b":
-                            attributeId = VMStatPointLocatorVO.Attributes.PROCS_B;
+                            attributePositions.put(Attribute.PROCS_B, i);
                             break;
                         case "swpd":
-                            attributeId = VMStatPointLocatorVO.Attributes.MEMORY_SWPD;
+                            attributePositions.put(Attribute.MEMORY_SWPD, i);
                             break;
                         case "free":
-                            attributeId = VMStatPointLocatorVO.Attributes.MEMORY_FREE;
+                            attributePositions.put(Attribute.MEMORY_FREE, i);
                             break;
                         case "buff":
-                            attributeId = VMStatPointLocatorVO.Attributes.MEMORY_BUFF;
+                            attributePositions.put(Attribute.MEMORY_BUFF, i);
                             break;
                         case "cache":
-                            attributeId = VMStatPointLocatorVO.Attributes.MEMORY_CACHE;
+                            attributePositions.put(Attribute.MEMORY_CACHE, i);
                             break;
                         case "si":
-                            attributeId = VMStatPointLocatorVO.Attributes.SWAP_SI;
+                            attributePositions.put(Attribute.SWAP_SI, i);
                             break;
                         case "so":
-                            attributeId = VMStatPointLocatorVO.Attributes.SWAP_SO;
+                            attributePositions.put(Attribute.SWAP_SO, i);
                             break;
                         case "bi":
-                            attributeId = VMStatPointLocatorVO.Attributes.IO_BI;
+                            attributePositions.put(Attribute.IO_BI, i);
                             break;
                         case "bo":
-                            attributeId = VMStatPointLocatorVO.Attributes.IO_BO;
+                            attributePositions.put(Attribute.IO_BO, i);
                             break;
                         case "in":
-                            attributeId = VMStatPointLocatorVO.Attributes.SYSTEM_IN;
+                            attributePositions.put(Attribute.SYSTEM_IN, i);
                             break;
                         case "cs":
-                            attributeId = VMStatPointLocatorVO.Attributes.SYSTEM_CS;
+                            attributePositions.put(Attribute.SYSTEM_CS, i);
                             break;
                         case "us":
-                            attributeId = VMStatPointLocatorVO.Attributes.CPU_US;
+                            attributePositions.put(Attribute.CPU_US, i);
                             break;
                         case "sy":
-                            attributeId = VMStatPointLocatorVO.Attributes.CPU_SY;
+                            attributePositions.put(Attribute.CPU_SY, i);
                             break;
                         case "id":
-                            attributeId = VMStatPointLocatorVO.Attributes.CPU_ID;
+                            attributePositions.put(Attribute.CPU_ID, i);
                             break;
                         case "wa":
-                            attributeId = VMStatPointLocatorVO.Attributes.CPU_WA;
+                            attributePositions.put(Attribute.CPU_WA, i);
                             break;
                         case "st":
-                            attributeId = VMStatPointLocatorVO.Attributes.CPU_ST;
+                            attributePositions.put(Attribute.CPU_ST, i);
                             break;
                     }
                 }
 
-                if (attributeId != -1) {
-                    attributePositions.put(attributeId, i);
-                }
             }
 
             // Read the first line of data. This is a summary of beginning of time until now, so it is no good for
@@ -223,7 +220,7 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
             for (DataPointRT dp : dataPoints) {
                 VMStatPointLocatorVO locator = ((VMStatPointLocatorRT) dp.getPointLocator()).getPointLocatorVO();
 
-                Integer position = attributePositions.get(locator.getAttributeId());
+                Integer position = attributePositions.get(locator.getAttribute());
                 if (position == null) {
                     if (error != null) {
                         error = new LocalizableMessageImpl("event.vmstat.attributeNotFound", locator
@@ -236,7 +233,7 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
                         dp.updatePointValue(new PointValueTime(value, time));
                     } catch (NumberFormatException e) {
                         log.error("Weird. We couldn't parse the value " + parts[position]
-                                + " into a double. attribute=" + locator.getAttributeId());
+                                + " into a double. attribute=" + locator.getAttribute());
                     } catch (ArrayIndexOutOfBoundsException e) {
                         log.error("Weird. We need element " + position + " but the vmstat data is only " + parts.length
                                 + " elements long");

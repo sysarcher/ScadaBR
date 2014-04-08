@@ -27,6 +27,7 @@ import br.org.scadabr.util.ArrayUtils;
 /**
  * @author Matthew Lohbihler
  */
+@Deprecated // Use enum see VmStatDataSourceVO / VmStatPointLocatorVO
 public class ExportCodes {
 
     private final List<Element> elements = new ArrayList<>();

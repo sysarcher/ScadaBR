@@ -191,6 +191,12 @@
     <convert converter="bean" match="br.org.scadabr.vo.scripting.ScriptVO">
     	<param name="exclude" value="type"/>
     </convert>
+    
+    <!-- VMStat stuff -->
+    <convert converter="enum" match="br.org.scadabr.vo.dataSource.vmstat.Attribute" />
+    <!-- End VMStat stuff -->
+    
+    
      <!-- MBus4J stuff-->
     <convert converter="bean" match="net.sf.mbus4j.Connection">
       <param name="include" value="bitPerSecond,responseTimeOutOffset"/><!--copy to child classes-->
