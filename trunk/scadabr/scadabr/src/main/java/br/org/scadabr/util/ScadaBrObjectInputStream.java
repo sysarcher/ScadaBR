@@ -5,12 +5,12 @@
  */
 package br.org.scadabr.util;
 
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.vo.dataSource.vmstat.VMStatDataSourceVO;
+import br.org.scadabr.vo.dataSource.vmstat.VMStatPointLocatorVO;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
-import org.junit.Ignore;
 
 /**
  *
@@ -23,15 +23,15 @@ class ScadaBrObjectInputStream extends ObjectInputStream {
     }
 
     @Override
-    protected Class<?> resolveClass(ObjectStreamClass desc)
-            throws IOException, ClassNotFoundException {
-        String name = desc.getName();
-        switch (name) {
-            case "com.serotonin.Message":
-                desc = ObjectStreamClass.lookup(LocalizableMessage.class);
-                break;
+    protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException {
+        final ObjectStreamClass osc = super.readClassDescriptor();
+        switch (osc.getName()) {
+            case "com.serotonin.mango.vo.dataSource.vmstat.VMStatDataSourceVO":
+                return ObjectStreamClass.lookup(VMStatDataSourceVO.class);
+            case "com.serotonin.mango.vo.dataSource.vmstat.VMStatPointLocatorVO":
+                return ObjectStreamClass.lookup(VMStatPointLocatorVO.class);
             default:
+                return osc;
         }
-        return super.resolveClass(desc);
     }
 }
