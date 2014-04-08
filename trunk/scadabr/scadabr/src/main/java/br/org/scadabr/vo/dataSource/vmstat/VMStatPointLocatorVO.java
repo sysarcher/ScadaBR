@@ -38,6 +38,7 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.web.i18n.LocalizableI18nKey;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
@@ -47,53 +48,8 @@ import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 @JsonRemoteEntity
 public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
-    @Deprecated
-    public interface Attributes {
-
-        int PROCS_R = 1;
-        int PROCS_B = 2;
-        int MEMORY_SWPD = 3;
-        int MEMORY_FREE = 4;
-        int MEMORY_BUFF = 5;
-        int MEMORY_CACHE = 6;
-        int SWAP_SI = 7;
-        int SWAP_SO = 8;
-        int IO_BI = 9;
-        int IO_BO = 10;
-        int SYSTEM_IN = 11;
-        int SYSTEM_CS = 12;
-        int CPU_US = 13;
-        int CPU_SY = 14;
-        int CPU_ID = 15;
-        int CPU_WA = 16;
-        int CPU_ST = 17;
-    }
-
-    public final static ExportCodes ATTRIBUTE_CODES = new ExportCodes();
-
-    static {
-        ATTRIBUTE_CODES.addElement(Attributes.PROCS_R, "PROCS_R", "dsEdit.vmstat.attr.procsR");
-        ATTRIBUTE_CODES.addElement(Attributes.PROCS_B, "PROCS_B", "dsEdit.vmstat.attr.procsB");
-        ATTRIBUTE_CODES.addElement(Attributes.MEMORY_SWPD, "MEMORY_SWPD", "dsEdit.vmstat.attr.memorySwpd");
-        ATTRIBUTE_CODES.addElement(Attributes.MEMORY_FREE, "MEMORY_FREE", "dsEdit.vmstat.attr.memoryFree");
-        ATTRIBUTE_CODES.addElement(Attributes.MEMORY_BUFF, "MEMORY_BUFF", "dsEdit.vmstat.attr.memoryBuff");
-        ATTRIBUTE_CODES.addElement(Attributes.MEMORY_CACHE, "MEMORY_CACHE", "dsEdit.vmstat.attr.memoryCache");
-        ATTRIBUTE_CODES.addElement(Attributes.SWAP_SI, "SWAP_SI", "dsEdit.vmstat.attr.swapSi");
-        ATTRIBUTE_CODES.addElement(Attributes.SWAP_SO, "SWAP_SO", "dsEdit.vmstat.attr.swapSo");
-        ATTRIBUTE_CODES.addElement(Attributes.IO_BI, "IO_BI", "dsEdit.vmstat.attr.ioBi");
-        ATTRIBUTE_CODES.addElement(Attributes.IO_BO, "IO_BO", "dsEdit.vmstat.attr.ioBo");
-        ATTRIBUTE_CODES.addElement(Attributes.SYSTEM_IN, "SYSTEM_IN", "dsEdit.vmstat.attr.systemIn");
-        ATTRIBUTE_CODES.addElement(Attributes.SYSTEM_CS, "SYSTEM_CS", "dsEdit.vmstat.attr.systemCs");
-        ATTRIBUTE_CODES.addElement(Attributes.CPU_US, "CPU_US", "dsEdit.vmstat.attr.cpuUs");
-        ATTRIBUTE_CODES.addElement(Attributes.CPU_SY, "CPU_SY", "dsEdit.vmstat.attr.cpuSy");
-        ATTRIBUTE_CODES.addElement(Attributes.CPU_ID, "CPU_ID", "dsEdit.vmstat.attr.cpuId");
-        ATTRIBUTE_CODES.addElement(Attributes.CPU_WA, "CPU_WA", "dsEdit.vmstat.attr.cpuWa");
-        ATTRIBUTE_CODES.addElement(Attributes.CPU_ST, "CPU_ST", "dsEdit.vmstat.attr.cpuSt");
-    }
-    ;
-
     @JsonRemoteProperty
-    private int attributeId = Attributes.CPU_ID;
+    private Attribute attribute = Attribute.CPU_ID;
 
     @Override
     public boolean isSettable() {
@@ -107,10 +63,7 @@ public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements Json
 
     @Override
     public LocalizableMessage getConfigurationDescription() {
-        if (ATTRIBUTE_CODES.isValidId(attributeId)) {
-            return new LocalizableMessageImpl(ATTRIBUTE_CODES.getKey(attributeId));
-        }
-        return new LocalizableMessageImpl("common.unknown");
+        return new LocalizableMessageImpl(attribute.getI18nKey());
     }
 
     @Override
@@ -118,31 +71,28 @@ public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements Json
         return DataTypes.NUMERIC;
     }
 
-    public int getAttributeId() {
-        return attributeId;
+    public Attribute getAttribute() {
+        return attribute;
     }
 
-    public void setAttributeId(int attributeId) {
-        this.attributeId = attributeId;
+    public void setAttribute(Attribute attribute) {
+        this.attribute = attribute;
     }
 
     @Override
     public void validate(DwrResponseI18n response) {
-        if (!ATTRIBUTE_CODES.isValidId(attributeId)) {
-            response.addContextual("attributeId", "validate.invalidValue");
-        }
+        //NoOp
     }
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addExportCodeMessage(list, "dsEdit.vmstat.attribute", ATTRIBUTE_CODES, attributeId);
+        AuditEventType.addPropertyMessage(list, "dsEdit.vmstat.attribute", attribute);
     }
 
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         VMStatPointLocatorVO from = (VMStatPointLocatorVO) o;
-        AuditEventType.maybeAddExportCodeChangeMessage(list, "dsEdit.vmstat.attribute", ATTRIBUTE_CODES,
-                from.attributeId, attributeId);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.vmstat.attribute", from.attribute, attribute);
     }
 
     //
@@ -151,37 +101,48 @@ public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements Json
     // /
     //
     private static final long serialVersionUID = -1;
-    private static final int version = 1;
+    private static final int version = 2;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(attributeId);
+        out.writeUTF(attribute.name());
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
-        int ver = in.readInt();
+        final int ver = in.readInt();
 
         // Switch on the version of the class so that version changes can be elegantly handled.
-        if (ver == 1) {
-            attributeId = in.readInt();
+        switch (ver) {
+            case 1:
+                final int attributeId = in.readInt();
+                attribute = Attribute.values()[attributeId -1];
+               break;
+            case 2:
+                attribute = Attribute.valueOf(in.readUTF());
+                break;
+            default:
+                throw new RuntimeException(String.format("Version %d not supported", ver));
         }
     }
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
+     /*TODO
         String text = json.getString("attributeId");
         if (text == null) {
             throw new LocalizableJsonException("emport.error.missing", "attributeId", ATTRIBUTE_CODES.getCodeList());
         }
+     
         attributeId = ATTRIBUTE_CODES.getId(text);
         if (!ATTRIBUTE_CODES.isValidId(attributeId)) {
             throw new LocalizableJsonException("emport.error.invalid", "attributeId", text, ATTRIBUTE_CODES
                     .getCodeList());
         }
+             */
     }
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        map.put("attributeId", ATTRIBUTE_CODES.getCode(attributeId));
+        //TODO map.put("attributeId", ATTRIBUTE_CODES.getCode(attributeId));
     }
 }

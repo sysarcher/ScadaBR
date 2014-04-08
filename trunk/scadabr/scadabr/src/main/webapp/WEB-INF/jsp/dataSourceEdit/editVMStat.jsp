@@ -20,6 +20,7 @@
 
 <%@page import="br.org.scadabr.vo.dataSource.vmstat.VMStatDataSourceVO"%>
 <%@page import="br.org.scadabr.vo.dataSource.vmstat.VMStatPointLocatorVO"%>
+<%@page import="br.org.scadabr.vo.dataSource.vmstat.Attribute"%>
 <script type="text/javascript">
     function saveDataSourceImpl() {
         DataSourceEditDwr.saveVMStatDataSource($get("dataSourceName"), $get("dataSourceXid"), $get("pollSeconds"),  $get("outputScale"), saveDataSourceCB);
@@ -34,14 +35,14 @@
     }
 
     function editPointCBImpl(locator) {
-        $set("attributeId", locator.attributeId);
+        $set("attribute", locator.attribute);
     }
 
     function savePointImpl(locator) {
         delete locator.settable;
         delete locator.dataTypeId;
 
-        locator.attributeId = $get("attributeId");
+        locator.attribute = $get("attribute");
 
         DataSourceEditDwr.saveVMStatPointLocator(currentPoint.id, $get("xid"), $get("name"), locator, savePointCB);
     }
@@ -59,7 +60,7 @@
     <td class="formField">
         <sbt:select id="outputScale" value="${dataSource.outputScale.name}" >
             <c:forEach items="<%= VMStatDataSourceVO.OutputScale.values() %>" var="os">
-                <sbt:option value="${os.name}" ><sbt:i18n key="${os.i18nKey}" /></sbt:option>
+                <sbt:option value="${os.name}" ><fmt:message key="${os.i18nKey}" /></sbt:option>
             </c:forEach>
         </sbt:select>
     </td>
@@ -70,8 +71,10 @@
     <tr>
         <td class="formLabelRequired"><fmt:message key="dsEdit.vmstat.attribute"/></td>
         <td class="formField">
-            <select id="attributeId">
-                <tag:exportCodesOptions optionList="<%= VMStatPointLocatorVO.ATTRIBUTE_CODES.getIdKeys()%>"/>
+            <select id="attribute" >
+            <c:forEach items="<%= Attribute.values() %>" var="attr">
+                <option value="${attr.name}" ><fmt:message key="${attr.i18nKey}" /></option>
+            </c:forEach>
             </select>
         </td>
     </tr>

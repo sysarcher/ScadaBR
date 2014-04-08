@@ -428,11 +428,11 @@ public class PointValueDao extends BaseDao {
 
     public PointValueTime getPointValueBefore(int dataPointId, long time) {
         try {
-            Long valueTime = ejt.queryForObject(
+            final Long valueTime = ejt.queryForObject(
                     "select max(ts) from pointValues where dataPointId=? and ts<?",
                     Long.class, dataPointId, time);
-            return getPointValueAt(dataPointId, valueTime);
-        } catch (EmptyResultDataAccessException e) {
+            return valueTime == null ? null : getPointValueAt(dataPointId, valueTime);
+        } catch (DataAccessException e) {
             return null;
         }
     }
