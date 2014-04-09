@@ -25,7 +25,6 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -57,7 +56,6 @@ import com.serotonin.mango.vo.CommPortProxy;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.ContextWrapper;
 import br.org.scadabr.monitor.MonitoredValues;
-import br.org.scadabr.timer.CronTask;
 import br.org.scadabr.timer.CronTimerPool;
 import br.org.scadabr.timer.cron.DataSourceCronTask;
 import br.org.scadabr.timer.cron.DataSourceRunnable;
@@ -70,7 +68,6 @@ import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
 import java.util.MissingResourceException;
-import java.util.concurrent.TimeUnit;
 
 public class Common {
 

@@ -104,6 +104,10 @@ public class CronTimerPool<T extends CronTask, V extends Runnable> {
         return tpe.getActiveCount();
     }
 
+    public int getQueueSize() {
+        return tpe.getQueue().size();
+    }
+
     private final TaskQueue queue = new TaskQueue();
 
     private final TimerThread thread = new TimerThread(queue);
@@ -151,6 +155,10 @@ public class CronTimerPool<T extends CronTask, V extends Runnable> {
                 queue.notify();
             }
         }
+    }
+    
+    public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+        return tpe.awaitTermination(timeout, unit);
     }
 
     public void shutdown() {

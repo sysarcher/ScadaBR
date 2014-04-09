@@ -238,7 +238,7 @@ public class SystemSettingsDao extends BaseDao {
         DEFAULT_VALUES.put(EMAIL_FROM_ADDRESS, "");
         DEFAULT_VALUES.put(EMAIL_SMTP_USERNAME, "");
         DEFAULT_VALUES.put(EMAIL_SMTP_PASSWORD, "");
-        DEFAULT_VALUES.put(EMAIL_FROM_NAME, "Mango M2M");
+        DEFAULT_VALUES.put(EMAIL_FROM_NAME, "ScadaBR");
 
         DEFAULT_VALUES.put(EVENT_PURGE_PERIOD_TYPE, Common.TimePeriods.YEARS);
         DEFAULT_VALUES.put(EVENT_PURGE_PERIODS, 1);
@@ -260,7 +260,7 @@ public class SystemSettingsDao extends BaseDao {
         DEFAULT_VALUES.put(FUTURE_DATE_LIMIT_PERIOD_TYPE,
                 Common.TimePeriods.HOURS);
         DEFAULT_VALUES.put(INSTANCE_DESCRIPTION,
-                "ScadaBR - Powered by Serotonin's Mango M2M");
+                "ScadaBR - Powered by Serotonin's ScadaBR");
 
         DEFAULT_VALUES.put(CHART_BACKGROUND_COLOUR, "white");
         DEFAULT_VALUES.put(PLOT_BACKGROUND_COLOUR, "white");

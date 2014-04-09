@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.db;
 
+import br.org.scadabr.ImplementMeException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -87,6 +88,9 @@ public class DerbyAccess extends DatabaseAccess {
         String name = Common.getEnvironmentString(propertyPrefix + "db.url", "~/../../mangoDB");
         if (name.startsWith("~")) {
             name = ctx.getRealPath(name.substring(1));
+            if (name == null) {
+                throw new ImplementMeException(); // missing leadiung "/" ??? 
+            }
         }
         return name;
     }

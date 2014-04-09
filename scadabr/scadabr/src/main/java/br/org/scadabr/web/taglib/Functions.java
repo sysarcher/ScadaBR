@@ -5,7 +5,7 @@
  */
 package br.org.scadabr.web.taglib;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.util.StringUtils;
 import java.io.IOException;
 import java.util.Collection;
 import javax.servlet.jsp.JspException;
@@ -17,8 +17,8 @@ import javax.servlet.jsp.JspWriter;
  */
 public class Functions {
 
-    public static String truncate(String comment, int i) {
-        throw new ImplementMeException();
+    public static String truncate(final String string, final int length) {
+        return StringUtils.truncate(string, length);
     }
 
     public static String escapeLessThan(String value) {

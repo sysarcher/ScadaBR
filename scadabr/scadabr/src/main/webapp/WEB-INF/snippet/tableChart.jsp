@@ -22,7 +22,7 @@
   <c:when test="${empty chartData}"><fmt:message key="common.noData"/></c:when>
   <c:otherwise>
     <c:forEach items="${chartData}" var="historyPointValue">
-      ${mango:pointValueTime(historyPointValue)} - ${mango:htmlText(point, historyPointValue)}
+      <sbt:i18ntimestamp timestamp="${historyPointValue.time}"/> - ${mango:htmlText(point, historyPointValue)}
       <c:if test="${historyPointValue.annotated}">
         (<fmt:message key="${historyPointValue.sourceDescriptionKey}">
           <fmt:param>

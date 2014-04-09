@@ -28,7 +28,6 @@ import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 
 public class Functions {
 

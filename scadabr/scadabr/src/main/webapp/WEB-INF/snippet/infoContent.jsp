@@ -34,5 +34,5 @@
     </c:when>
     <c:otherwise><span class="infoData">${mango:htmlText(point, pointValue)}</span><br/></c:otherwise>
   </c:choose>
-  <c:if test="${!empty pointValue}">&nbsp;&nbsp;&nbsp;<fmt:message key="common.time"/>: <span class="infoData">${mango:pointValueTime(pointValue)}</span><br/></c:if>
+    <c:if test="${!empty pointValue}">&nbsp;&nbsp;&nbsp;<fmt:message key="common.time"/>: <span class="infoData"><sbt:i18ntimestamp timestamp="${pointValue.time}"/></span><br/></c:if>
 </c:if>

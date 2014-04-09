@@ -90,4 +90,12 @@ public class LocalizableMessageImplTest {
         LocalizableMessage deserialized = I18NUtils.deserialize(serialized);
         assertEquals(expResult, I18NUtils.serialize(deserialized));
     }
+    
+    @Test
+    public void testAuditEventWithDouble() throws Exception {
+        System.out.println("testAuditEventWithDouble");
+        String data = "event.audit.added|admin (1)|[event.audit.dataPoint|]|\\I4|[event.audit.propertyList.15|[event.audit.property|[common.xid|]|DP_593013|]|[event.audit.property|[dsEdit.points.name|]|aa|]|[event.audit.property|[common.enabled|]|[common.false|]|]|[event.audit.property|[pointEdit.logging.type|]|[pointEdit.logging.type.change|]|]|[event.audit.property|[pointEdit.logging.period|]|[common.tp.description|\\I15|[common.tp.minutes|]|]|]|[event.audit.property|[pointEdit.logging.valueType|]|[pointEdit.logging.valueType.instant|]|]|[event.audit.property|[pointEdit.logging.tolerance|]|\\D0.0|]|[event.audit.property|[pointEdit.logging.purge|]|[common.tp.description|\\I1|[common.tp.years|]|]|]|[event.audit.property|[pointEdit.logging.defaultCache|]|\\I1|]|[event.audit.property|[pointEdit.logging.discard|]|[common.false|]|]|[event.audit.property|[pointEdit.logging.discardLow|]|\\D-1.7976931348623157E308|]|[event.audit.property|[pointEdit.logging.discardHigh|]|\\D1.7976931348623157E308|]|[event.audit.property|[pointEdit.logging.engineeringUnits|]|\\I95|]|[event.audit.property|[pointEdit.props.chartColour|]||]|[event.audit.property|[dsEdit.vmstat.attribute|]|MEMORY_BUFF|]|]|";
+        LocalizableMessage lm = I18NUtils.deserialize(data);
+        assertEquals(data, I18NUtils.serialize(lm));
+    }
 }

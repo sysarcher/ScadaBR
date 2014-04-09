@@ -355,7 +355,7 @@
                         <td valign="top" width="16"><tag:img png="comment" title="notes.note"/></td>
                         <td valign="top">
                           <span class="copyTitle">
-                            ${comment.prettyTime} <fmt:message key="notes.by"/>
+                              <sbt:i18ntimestamp timestamp="${comment.ts}"/> <fmt:message key="notes.by"/>
                             <c:choose>
                               <c:when test="${empty comment.username}"><fmt:message key="common.deleted"/></c:when>
                               <c:otherwise>${comment.username}</c:otherwise>

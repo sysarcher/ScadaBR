@@ -170,12 +170,6 @@
   </function> 
   
   <function>
-    <name>pointValueTime</name>
-    <function-class>com.serotonin.mango.web.taglib.Functions</function-class>
-    <function-signature>String getTime(com.serotonin.mango.rt.dataImage.PointValueTime)</function-signature>
-  </function> 
-  
-  <function>
     <name>padZeros</name>
     <function-class>com.serotonin.mango.web.taglib.Functions</function-class>
     <function-signature>String padZeros(int, int)</function-signature>

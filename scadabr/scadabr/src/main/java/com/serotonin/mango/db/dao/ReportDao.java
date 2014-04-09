@@ -20,7 +20,6 @@ package com.serotonin.mango.db.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -52,15 +51,12 @@ import com.serotonin.mango.vo.report.ReportUserComment;
 import com.serotonin.mango.vo.report.ReportVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.l10n.Localizer;
-import br.org.scadabr.web.taglib.Functions;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
@@ -322,7 +318,7 @@ public class ReportDao extends BaseDao {
                 public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                     PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                     // Insert the reportInstancePoints record
-                    final String name = Functions.truncate(point.getName(), 100);
+                    final String name = StringUtils.truncate(point.getName(), 100);
                     ps.setInt(1, instance.getId());
                     ps.setString(2, point.getDeviceName());
                     ps.setString(3, name);

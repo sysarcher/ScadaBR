@@ -7,6 +7,7 @@
 package br.org.scadabr.web.l10n;
 
 import br.org.scadabr.web.i18n.LocalizableMessage;
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import org.junit.After;
@@ -122,5 +123,15 @@ public class LocalizerTest {
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
+    
+    @Test
+    public void testLocalizeDouble() {
+        System.out.println("localizeDouble");
+        Locale locale = Locale.GERMAN;
+        String expResult = "179,76931E306";
+        String result = new MessageFormat("{0,number,##0.#####E0}", locale).format(new Object[] {Double.MAX_VALUE});
+        assertEquals(expResult, result);
+    }
+    
     
 }

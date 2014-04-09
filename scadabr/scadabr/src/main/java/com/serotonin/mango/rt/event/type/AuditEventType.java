@@ -166,8 +166,13 @@ public class AuditEventType extends EventType {
         list.add(new LocalizableMessageImpl("event.audit.property", new LocalizableMessageImpl(propertyNameKey), propertyValue));
     }
 
+    @Deprecated // use datatypes
     public static void addPropertyMessage(List<LocalizableMessage> list, String propertyNameKey, Object propertyValue) {
         list.add(new LocalizableMessageImpl("event.audit.property", new LocalizableMessageImpl(propertyNameKey), propertyValue));
+    }
+
+    public static void addDoubleSientificProperty(List<LocalizableMessage> list, String propertyNameKey, double propertyValue) {
+        list.add(new LocalizableMessageImpl("event.audit.propertyDoubleScientific", new LocalizableMessageImpl(propertyNameKey), propertyValue));
     }
 
     public static void addPropertyMessage(List<LocalizableMessage> list, String propertyNameKey, boolean propertyValue) {
@@ -213,10 +218,17 @@ public class AuditEventType extends EventType {
         }
     }
 
+    @Deprecated // Use more specific
     public static void maybeAddPropertyChangeMessage(List<LocalizableMessage> list, String propertyNameKey,
             boolean fromValue, boolean toValue) {
         if (fromValue != toValue) {
             addPropertyChangeMessage(list, propertyNameKey, getBooleanMessage(fromValue), getBooleanMessage(toValue));
+        }
+    }
+
+    public static void evaluateDoubleScientific(List<LocalizableMessage> list, String propertyNameKey, double fromValue, double toValue) {
+        if (fromValue != toValue) {
+            list.add(new LocalizableMessageImpl("event.audit.changedPropertyDoubleScientific", propertyNameKey, fromValue, toValue));
         }
     }
 
@@ -267,10 +279,8 @@ public class AuditEventType extends EventType {
         return new LocalizableMessageImpl(key);
     }
 
-    public static void addPropertyChangeMessage(List<LocalizableMessage> list, String propertyNameKey,
-            Object fromValue, Object toValue) {
-        list.add(new LocalizableMessageImpl("event.audit.changedProperty", new LocalizableMessageImpl(propertyNameKey),
-                fromValue, toValue));
+    public static void addPropertyChangeMessage(List<LocalizableMessage> list, String propertyNameKey, Object fromValue, Object toValue) {
+        list.add(new LocalizableMessageImpl("event.audit.changedProperty", new LocalizableMessageImpl(propertyNameKey), fromValue, toValue));
     }
 
     //

@@ -35,8 +35,7 @@ public class ZIPProjectManager {
     private static final String JSON_FILE_NAME = "json_project.txt";
     private static final String PROJECT_DESCRIPTION_FILE_NAME = "project_description.txt";
 
-    private static final String FILE_SEPARATOR = System
-            .getProperty("file.separator");
+    private static final String FILE_SEPARATOR = System.getProperty("file.separator");
 
     private static final String uploadsFolder = "uploads" + FILE_SEPARATOR;
     private static final String graphicsFolder = "graphics" + FILE_SEPARATOR;
@@ -58,7 +57,7 @@ public class ZIPProjectManager {
         response.setHeader("Content-Disposition", "attachment; filename="
                 + projectName.replaceAll(" ", "") + ".zip");
 
-        List<FileToPack> filesToZip = new ArrayList<FileToPack>();
+        List<FileToPack> filesToZip = new ArrayList<>();
 
         filesToZip.add(buildProjectDescriptionFile(projectName,
                 projectDescription));
@@ -133,8 +132,7 @@ public class ZIPProjectManager {
     }
 
     private void restoreFiles(List<ZipEntry> uploadFiles) {
-        String appPath = Common.ctx.getServletContext().getRealPath(
-                FILE_SEPARATOR);
+        String appPath = Common.ctx.getServletContext().getRealPath(FILE_SEPARATOR);
 
         byte[] buf = new byte[1024];
         try {
@@ -212,13 +210,11 @@ public class ZIPProjectManager {
     }
 
     private List<FileToPack> getUploadsFolderFiles() {
-        String uploadFolder = Common.ctx.getServletContext().getRealPath(
-                FILE_SEPARATOR)
-                + "uploads";
+        String uploadFolder = Common.ctx.getServletContext().getRealPath(FILE_SEPARATOR) + "uploads";
 
         List<File> files = FileUtil.getFilesOnDirectory(uploadFolder);
 
-        List<FileToPack> pack = new ArrayList<FileToPack>();
+        List<FileToPack> pack = new ArrayList<>();
         for (File file : files) {
 
             String filePartialPath = uploadsFolder + file.getName();
@@ -230,13 +226,11 @@ public class ZIPProjectManager {
     }
 
     private List<FileToPack> getGraphicsFolderFiles() {
-        String graphicFolder = Common.ctx.getServletContext().getRealPath(
-                FILE_SEPARATOR)
-                + "graphics";
+        String graphicFolder = Common.ctx.getServletContext().getRealPath(FILE_SEPARATOR) + "graphics";
 
         List<File> files = FileUtil.getFilesOnDirectory(graphicFolder);
 
-        List<FileToPack> pack = new ArrayList<FileToPack>();
+        List<FileToPack> pack = new ArrayList<>();
 
         for (File file : files) {
 
@@ -257,8 +251,7 @@ public class ZIPProjectManager {
         ZipEntry jsonFile = zipFile
                 .getEntry(ProjectExporterController.PROJECT_DESCRIPTION_FILE_NAME);
 
-        DataInputStream in = new DataInputStream(
-                zipFile.getInputStream(jsonFile));
+        DataInputStream in = new DataInputStream(zipFile.getInputStream(jsonFile));
 
         model.put("projectName", in.readLine());
         model.put("projectDescription", in.readLine());
@@ -271,16 +264,12 @@ public class ZIPProjectManager {
     private void extractExportParametersFromRequest(HttpServletRequest request) {
         this.projectName = request.getParameter("projectName");
         this.projectDescription = request.getParameter("projectDescription");
-        this.includePointValues = Boolean.parseBoolean(request
-                .getParameter("includePointValues"));
-        this.maxPointValues = Integer.parseInt(request
-                .getParameter("pointValuesMaxZip"));
+        this.includePointValues = Boolean.parseBoolean(request.getParameter("includePointValues"));
+        this.maxPointValues = Integer.parseInt(request.getParameter("pointValuesMaxZip"));
 
         System.out.println(this.maxPointValues);
-        this.includeUploadsFolder = Boolean.parseBoolean(request
-                .getParameter("includeUploadsFolder"));
-        this.includeGraphicsFolder = Boolean.parseBoolean(request
-                .getParameter("includeGraphicsFolder"));
+        this.includeUploadsFolder = Boolean.parseBoolean(request.getParameter("includeUploadsFolder"));
+        this.includeGraphicsFolder = Boolean.parseBoolean(request.getParameter("includeGraphicsFolder"));
 
     }
 
@@ -291,9 +280,9 @@ public class ZIPProjectManager {
         MultipartFile multipartFile = mpRequest.getFile("importFile");
 
         File projectFile = File.createTempFile("temp", "");
-        FileOutputStream fos = new FileOutputStream(projectFile);
-        fos.write(multipartFile.getBytes());
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(projectFile)) {
+            fos.write(multipartFile.getBytes());
+        }
         projectFile.deleteOnExit();
 
         this.zipFile = toZipFile(projectFile);
