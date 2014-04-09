@@ -66,8 +66,8 @@ public class StringUtils {
         throw new ImplementMeException();
     }
 
-    public static String truncate(String localizeI18nKey, int i) {
-        throw new ImplementMeException();
+    public static String truncate(final String string, final int length) {
+        return string.length() > length ? string.substring(0, length) : string;
     }
 
     public static String replaceMacros(String dir, Properties properties) {

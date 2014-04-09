@@ -55,10 +55,8 @@ import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.util.Objects;
 
 @JsonRemoteEntity
@@ -124,7 +122,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
 
     static {
         for (int i = 0; i < 190; i++) {
-            ENGINEERING_UNITS_CODES.addElement(i, new EngineeringUnits(i).toString().toUpperCase().replace(' ', '_'),  "engUnit." + i);
+            ENGINEERING_UNITS_CODES.addElement(i, new EngineeringUnits(i).toString().toUpperCase().replace(' ', '_'), "engUnit." + i);
         }
     }
 
@@ -264,15 +262,14 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         AuditEventType.addPropertyMessage(list, "dsEdit.points.name", name);
         AuditEventType.addPropertyMessage(list, "common.enabled", enabled);
         AuditEventType.addExportCodeMessage(list, "pointEdit.logging.type", LOGGING_TYPE_CODES, loggingType);
-        AuditEventType.addPeriodMessage(list, "pointEdit.logging.period", intervalLoggingPeriodType,
-                intervalLoggingPeriod);
-        AuditEventType.addExportCodeMessage(list, "pointEdit.logging.valueType", INTERVAL_LOGGING_TYPE_CODES,
-                intervalLoggingType);
+        AuditEventType.addPeriodMessage(list, "pointEdit.logging.period", intervalLoggingPeriodType, intervalLoggingPeriod);
+        AuditEventType.addExportCodeMessage(list, "pointEdit.logging.valueType", INTERVAL_LOGGING_TYPE_CODES, intervalLoggingType);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.tolerance", tolerance);
         AuditEventType.addPeriodMessage(list, "pointEdit.logging.purge", purgeType, purgePeriod);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.defaultCache", defaultCacheSize);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.discard", discardExtremeValues);
-        AuditEventType.addPropertyMessage(list, "pointEdit.logging.discardLow", discardLowLimit);
+        AuditEventType.addDoubleSientificProperty(list, "pointEdit.logging.discardLow", discardLowLimit);
+        AuditEventType.addDoubleSientificProperty(list, "pointEdit.logging.discardHigh", discardHighLimit);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.engineeringUnits", engineeringUnits);
         AuditEventType.addPropertyMessage(list, "pointEdit.props.chartColour", chartColour);
 
@@ -284,27 +281,17 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.xid", from.xid, xid);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.points.name", from.name, name);
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.enabled", from.enabled, enabled);
-        AuditEventType.maybeAddExportCodeChangeMessage(list, "pointEdit.logging.type", LOGGING_TYPE_CODES,
-                from.loggingType, loggingType);
-        AuditEventType.maybeAddPeriodChangeMessage(list, "pointEdit.logging.period", from.intervalLoggingPeriodType,
-                from.intervalLoggingPeriod, intervalLoggingPeriodType, intervalLoggingPeriod);
-        AuditEventType.maybeAddExportCodeChangeMessage(list, "pointEdit.logging.valueType",
-                INTERVAL_LOGGING_TYPE_CODES, from.intervalLoggingType, intervalLoggingType);
+        AuditEventType.maybeAddExportCodeChangeMessage(list, "pointEdit.logging.type", LOGGING_TYPE_CODES, from.loggingType, loggingType);
+        AuditEventType.maybeAddPeriodChangeMessage(list, "pointEdit.logging.period", from.intervalLoggingPeriodType, from.intervalLoggingPeriod, intervalLoggingPeriodType, intervalLoggingPeriod);
+        AuditEventType.maybeAddExportCodeChangeMessage(list, "pointEdit.logging.valueType", INTERVAL_LOGGING_TYPE_CODES, from.intervalLoggingType, intervalLoggingType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.tolerance", from.tolerance, tolerance);
-        AuditEventType.maybeAddPeriodChangeMessage(list, "pointEdit.logging.purge", from.purgeType, from.purgePeriod,
-                purgeType, purgePeriod);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.defaultCache", from.defaultCacheSize,
-                defaultCacheSize);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.discard", from.discardExtremeValues,
-                discardExtremeValues);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.discardLow", from.discardLowLimit,
-                discardLowLimit);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.discardHigh", from.discardHighLimit,
-                discardHighLimit);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.engineeringUnits", from.engineeringUnits,
-                engineeringUnits);
-        AuditEventType
-                .maybeAddPropertyChangeMessage(list, "pointEdit.props.chartColour", from.chartColour, chartColour);
+        AuditEventType.maybeAddPeriodChangeMessage(list, "pointEdit.logging.purge", from.purgeType, from.purgePeriod, purgeType, purgePeriod);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.defaultCache", from.defaultCacheSize, defaultCacheSize);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.discard", from.discardExtremeValues, discardExtremeValues);
+        AuditEventType.evaluateDoubleScientific(list, "pointEdit.logging.discardLow", from.discardLowLimit, discardLowLimit);
+        AuditEventType.evaluateDoubleScientific(list, "pointEdit.logging.discardHigh", from.discardHighLimit, discardHighLimit);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.engineeringUnits", from.engineeringUnits, engineeringUnits);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.props.chartColour", from.chartColour, chartColour);
 
         pointLocator.addPropertyChanges(list, from.pointLocator);
     }

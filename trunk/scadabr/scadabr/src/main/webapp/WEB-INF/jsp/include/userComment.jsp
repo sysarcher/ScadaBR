@@ -58,7 +58,7 @@
           else if (commentTypeId == <%= UserComment.TYPE_POINT %>)
               commentsNode = $("pointComments"+ commentReferenceId);
           commentsNode.appendChild(content);
-          $("comment"+ comment.ts +"UserTime").innerHTML = comment.prettyTime +" <fmt:message key="notes.by"/> "+ comment.username;
+          $("comment"+ comment.ts +"UserTime").innerHTML = "<sbt:i18ntimestamp timestamp="${comment.ts}"/>" +" <fmt:message key="notes.by"/> "+ comment.username;
           $("comment"+ comment.ts +"Text").innerHTML = comment.comment;
       }
   }

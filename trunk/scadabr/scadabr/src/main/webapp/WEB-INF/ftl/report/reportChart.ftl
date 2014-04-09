@@ -238,7 +238,7 @@
                       <td valign="top" width="16"><img src="${inline}<@img src="comment.png"/>" alt="<@fmt key="notes.note"/>"/></td>
                       <td valign="top">
                         <span class="copyTitle">
-                          ${comment.prettyTime} <@fmt key="notes.by"/>
+                          <@fmt timestamp="comment.ts/> <@fmt key="notes.by"/>
                           <#if comment.username??>
                             ${comment.username}
                           <#else>

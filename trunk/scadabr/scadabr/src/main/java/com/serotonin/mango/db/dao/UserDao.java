@@ -18,10 +18,10 @@
  */
 package com.serotonin.mango.db.dao;
 
+import br.org.scadabr.util.StringUtils;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.List;
 
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -34,7 +34,6 @@ import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.vo.permission.DataPointAccess;
-import br.org.scadabr.web.taglib.Functions;
 import java.sql.Connection;
 import java.sql.Statement;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -247,7 +246,7 @@ public class UserDao extends BaseDao {
             + "values (?,?,?,?,?)";
 
     public void insertUserComment(int typeId, int referenceId, UserComment comment) {
-        comment.setComment(Functions.truncate(comment.getComment(), 1024));
+        comment.setComment(StringUtils.truncate(comment.getComment(), 1024));
         ejt.update(USER_COMMENT_INSERT, new Object[]{comment.getUserId(), typeId, referenceId, comment.getTs(),
             comment.getComment()});
     }

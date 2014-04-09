@@ -120,7 +120,7 @@ public class PachubeSenderRT extends PublisherRT<PachubePointVO> {
             PutMethod method = new PutMethod("http://www.pachube.com/api/feeds/" + point.getFeedId() + "/datastreams/"
                     + point.getDataStreamId() + ".csv");
             method.addRequestHeader(new Header(PachubeDataSourceRT.HEADER_API_KEY, vo.getApiKey()));
-            method.addRequestHeader("User-Agent", "Mango M2M Pachube publisher");
+            method.addRequestHeader("User-Agent", "ScadaBR Pachube publisher");
             try {
                 method.setRequestEntity(new StringRequestEntity(entry.getPvt().getValue().toString(), "text/csv",
                         "UTF-8"));
