@@ -46,8 +46,8 @@ public class BackgroundProcessing implements ILifecycle {
 
     final Log log = LogFactory.getLog(BackgroundProcessing.class);
 
-    private ThreadPoolExecutor mediumPriorityService;
-    private ExecutorService lowPriorityService;
+//    private ThreadPoolExecutor mediumPriorityService;
+//    private ExecutorService lowPriorityService;
 
     public void addWorkItem(final WorkItem item) {
         SystemRunnable runnable = new SystemRunnable() {
@@ -59,42 +59,48 @@ public class BackgroundProcessing implements ILifecycle {
                     try {
                         log.error("Error in work item", t);
                     } catch (RuntimeException e) {
-                        t.printStackTrace();
+                        log.error("BackgroundProcessing run item: ", t);
                     }
                 }
             }
         };
 
-        if (item.getPriority() == WorkItem.PRIORITY_HIGH) {
+            Common.systemCronPool.execute(runnable);
+/*
+            if (item.getPriority() == WorkItem.PRIORITY_HIGH) {
             Common.systemCronPool.execute(runnable);
         } else if (item.getPriority() == WorkItem.PRIORITY_MEDIUM) {
             mediumPriorityService.execute(runnable);
         } else {
             lowPriorityService.execute(runnable);
         }
+        */
     }
 
+/*
     public int getMediumPriorityServiceQueueSize() {
         return mediumPriorityService.getQueue().size();
     }
-
+*/
     @Override
     public void initialize() {
-        mediumPriorityService = new ThreadPoolExecutor(3, 30, 60L, TimeUnit.SECONDS,
+    /*    mediumPriorityService = new ThreadPoolExecutor(3, 30, 60L, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>());
         mediumPriorityService.allowCoreThreadTimeOut(true);
         lowPriorityService = Executors.newSingleThreadExecutor();
+            */
     }
 
     @Override
     public void terminate() {
         // Close the executor services.
-        mediumPriorityService.shutdown();
-        lowPriorityService.shutdown();
+     //   mediumPriorityService.shutdown();
+     //   lowPriorityService.shutdown();
     }
 
     @Override
     public void joinTermination() {
+    /*
         boolean medDone = false;
         boolean lowDone = false;
 
@@ -129,5 +135,6 @@ public class BackgroundProcessing implements ILifecycle {
         } catch (InterruptedException e) {
             log.info("", e);
         }
+            */
     }
 }

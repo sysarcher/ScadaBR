@@ -44,7 +44,7 @@ public class PointTimeSeriesCollection {
     public void addNumericTimeSeries(TimeSeries numericTimeSeries, Paint paint) {
         if (numericTimeSeriesCollection == null) {
             numericTimeSeriesCollection = new TimeSeriesCollection();
-            numericPaint = new ArrayList<Paint>();
+            numericPaint = new ArrayList<>();
         }
         numericTimeSeriesCollection.addSeries(numericTimeSeries);
         numericPaint.add(paint);
@@ -52,7 +52,7 @@ public class PointTimeSeriesCollection {
 
     public void addDiscreteTimeSeries(DiscreteTimeSeries discreteTimeSeries) {
         if (discreteTimeSeriesCollection == null) {
-            discreteTimeSeriesCollection = new ArrayList<DiscreteTimeSeries>();
+            discreteTimeSeriesCollection = new ArrayList<>();
         }
         discreteTimeSeriesCollection.add(discreteTimeSeries);
     }

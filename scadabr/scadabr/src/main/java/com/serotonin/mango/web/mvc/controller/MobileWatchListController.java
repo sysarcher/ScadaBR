@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.mvc.controller;
 
+import br.org.scadabr.web.l10n.Localizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,9 @@ import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.dwr.BaseDwr;
 import com.serotonin.mango.web.taglib.Functions;
 import java.util.Date;
+import java.util.Locale;
+import javax.servlet.jsp.jstl.core.Config;
+import javax.servlet.jsp.jstl.fmt.LocalizationContext;
 
 /**
  * @author Matthew Lohbihler
@@ -72,7 +76,7 @@ public class MobileWatchListController extends WatchListController {
         int watchListId = (Integer) model.get(KEY_SELECTED_WATCHLIST);
 
         // Get the point data.
-        List<MobileWatchListState> states = new ArrayList<MobileWatchListState>();
+        List<MobileWatchListState> states = new ArrayList<>();
         RuntimeManager rtm = Common.ctx.getRuntimeManager();
         for (DataPointVO pointVO : new WatchListDao().getWatchList(watchListId).getPointList()) {
             MobileWatchListState state = createState(request, rtm, pointVO);
@@ -95,7 +99,9 @@ public class MobileWatchListController extends WatchListController {
             state.setDisabled(true);
         } else {
             PointValueTime pvt = pointRT.getPointValue();
-            state.setTime(new Date(pvt.getTime()));
+            final Locale locale = ((LocalizationContext) Config.get(request, Config.FMT_LOCALIZATION_CONTEXT)).getLocale();
+
+            state.setTime(Localizer.localizeTimeStamp(pvt.getTime(), true, locale));
 
             if (pvt.getValue() instanceof ImageValue) {
                 // Text renderers don't help here. Create a thumbnail.

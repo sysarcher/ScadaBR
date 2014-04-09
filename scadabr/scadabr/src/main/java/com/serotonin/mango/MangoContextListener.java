@@ -78,6 +78,8 @@ import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import java.text.ParseException;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MangoContextListener implements ServletContextListener {
 
@@ -144,21 +146,32 @@ public class MangoContextListener implements ServletContextListener {
                     .currentTimeMillis(), false, new LocalizableMessageImpl(
                             "event.system.shutdown"));
         }
+        Logger.getLogger(MangoContextListener.class.getName()).log(Level.INFO, "Shutdown Event created");
 
         // Get a handle on the context.
         ContextWrapper ctx = new ContextWrapper(evt.getServletContext());
 
         // Stop everything.
         runtimeManagerTerminate(ctx);
+        Logger.getLogger(MangoContextListener.class.getName()).log(Level.INFO, "RuntimeManger terminated");
         eventManagerTerminate(ctx);
+        Logger.getLogger(MangoContextListener.class.getName()).log(Level.INFO, "EventManager terminated");
         utilitiesTerminate(ctx);
+        Logger.getLogger(MangoContextListener.class.getName()).log(Level.INFO, "utilitues terminated");
 
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MangoContextListener.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Logger.getLogger(MangoContextListener.class.getName()).log(Level.INFO, "waited 100ms now shutdown pools");
         //TODO move to Common
         Common.dataSourcePool.shutdown();
         Common.systemCronPool.shutdown();
         Common.eventCronPool.shutdown();
 
         databaseTerminate(ctx);
+        Logger.getLogger(MangoContextListener.class.getName()).log(Level.INFO, "Database terminated");
 
         Common.ctx = null;
 

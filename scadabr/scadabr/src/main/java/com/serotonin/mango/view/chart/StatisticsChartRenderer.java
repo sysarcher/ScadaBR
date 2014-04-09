@@ -46,10 +46,12 @@ public class StatisticsChartRenderer extends TimePeriodChartRenderer {
         return definition;
     }
 
+    @Override
     public String getTypeName() {
         return definition.getName();
     }
 
+    @Override
     public ImplDefinition getDef() {
         return definition;
     }
@@ -74,6 +76,7 @@ public class StatisticsChartRenderer extends TimePeriodChartRenderer {
         this.includeSum = includeSum;
     }
 
+    @Override
     public void addDataToModel(Map<String, Object> model, DataPointVO point) {
         long startTime = getStartTime();
         PointValueFacade pointValueFacade = new PointValueFacade(point.getId());
@@ -84,7 +87,7 @@ public class StatisticsChartRenderer extends TimePeriodChartRenderer {
 
         // The start value is the value of the point at the start of the period for this renderer.
         PointValueTime startValue = null;
-        if (values.size() == 0 || values.get(0).getTime() > startTime) {
+        if (values.isEmpty() || values.get(0).getTime() > startTime) {
             // Get the value of the point at the start time
             PointValueTime valueTime = pointValueFacade.getPointValueBefore(startTime);
             if (valueTime != null) {

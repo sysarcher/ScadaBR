@@ -25,10 +25,8 @@ import java.util.ResourceBundle;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.view.export.CsvWriter;
-import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.l10n.Localizer;
-import java.util.Locale;
 
 /**
  * @author Matthew Lohbihler

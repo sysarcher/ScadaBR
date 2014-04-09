@@ -29,7 +29,7 @@ public class MobileWatchListState {
     private String name;
     private boolean disabled;
     private String value;
-    private Date time;
+    private String time;
 
     public String getId() {
         return id;
@@ -55,11 +55,11 @@ public class MobileWatchListState {
         this.disabled = disabled;
     }
 
-    public Date getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(String time) {
         this.time = time;
     }
 

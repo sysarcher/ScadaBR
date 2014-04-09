@@ -18,33 +18,34 @@
  */
 package com.serotonin.mango.rt.event.handlers;
 
-import br.org.scadabr.timer.CronTask;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateTime;
-
+import br.org.scadabr.timer.cron.CronExpression;
+import br.org.scadabr.web.email.EmailInline;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.web.l10n.Localizer;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.MailingListDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.work.EmailWorkItem;
+import com.serotonin.mango.util.timeout.EventRunWithArgTask;
 import com.serotonin.mango.util.timeout.RunWithArgClient;
 import com.serotonin.mango.vo.event.EventHandlerVO;
 import com.serotonin.mango.web.email.MangoEmailContent;
 import com.serotonin.mango.web.email.UsedImagesDirective;
-import br.org.scadabr.timer.cron.CronExpression;
-import br.org.scadabr.web.email.EmailInline;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.l10n.Localizer;
-import com.serotonin.mango.util.timeout.EventRunWithArgTask;
+import freemarker.template.TemplateException;
+import java.io.File;
+import java.io.IOException;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import javax.mail.internet.AddressException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.joda.time.DateTime;
 
 public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<EventInstance> {
 
@@ -174,7 +175,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
         // Determine the subject to use.
         LocalizableMessage subjectMsg;
         LocalizableMessage notifTypeMsg = new LocalizableMessageImpl(notificationType.getKey());
-        if (alias.isEmpty()) {
+        if (alias == null) {
             if (evt.getId() == Common.NEW_ID) {
                 subjectMsg = new LocalizableMessageImpl("ftl.subject.default", notifTypeMsg);
             } else {
@@ -206,11 +207,11 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
                     Common.UTF8);
 
             for (String s : inlineImages.getImageList()) {
-                content.addInline(new EmailInline.FileInline(s, Common.ctx.getServletContext().getRealPath(s)));
+                content.addInline(new EmailInline.FileInline(s, new File(Common.ctx.getServletContext().getRealPath(s))));
             }
 
             EmailWorkItem.queueEmail(toAddrs, content);
-        } catch (Exception e) {
+        } catch (TemplateException | IOException | AddressException | RuntimeException e) {
             LOG.error("", e);
         }
     }

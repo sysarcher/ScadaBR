@@ -26,14 +26,14 @@ import java.util.Date;
 public class RenderedPointValueTime {
 
     private String value;
-    private Date time;
+    private String time;
     private String annotation;
 
     public RenderedPointValueTime() {
         // no op
     }
 
-    public RenderedPointValueTime(String value, Date time, String annotation) {
+    public RenderedPointValueTime(String value, String time, String annotation) {
         this.value = value;
         this.time = time;
         this.annotation = annotation;
@@ -47,11 +47,11 @@ public class RenderedPointValueTime {
         this.value = value;
     }
 
-    public Date getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(String time) {
         this.time = time;
     }
 

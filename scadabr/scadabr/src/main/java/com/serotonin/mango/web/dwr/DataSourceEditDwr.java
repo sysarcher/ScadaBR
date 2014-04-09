@@ -1760,7 +1760,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                 rfm.put("chipRevision", Integer.toString(res.getChipRevision()));
                 response.addData("rfm", rfm);
 
-                List<Map<String, String>> devices = new ArrayList<Map<String, String>>();
+                List<Map<String, String>> devices = new ArrayList<>();
                 for (ViconicsDevice device : rt.getDevices()) {
                     Map<String, String> dev = new HashMap<>();
                     dev.put("commAddr",
@@ -1932,7 +1932,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
         OpenV4JDiscovery discovery = OpenV4JDiscovery.detectDevice(
                 getResourceBundle(), commPortId);
-        ;
+
         user.setTestingUtility(discovery);
     }
 

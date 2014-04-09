@@ -20,7 +20,7 @@
 <%@page import="com.serotonin.mango.Common"%>
 <%@page import="com.serotonin.mango.rt.event.AlarmLevels"%>
 <%@page import="com.serotonin.mango.rt.event.type.EventType"%>
-<%@page import="com.serotonin.mango.util.freemarker.MangoEmailContent"%>
+<%@page import="com.serotonin.mango.web.email.MangoEmailContent"%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
 
 <tag:page dwr="SystemSettingsDwr" onload="init">

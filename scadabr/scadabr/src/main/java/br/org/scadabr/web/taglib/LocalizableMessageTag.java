@@ -55,7 +55,7 @@ public class LocalizableMessageTag extends TagSupport {
                 s = escapeAllQuotes(s);
             } else if (escapeQuotes) {
                 s = escapeSingleQuote(s);
-            } else {
+            } else if (escapeDQuotes){
                 s = escapeDoubleQuote(s);
             }
 

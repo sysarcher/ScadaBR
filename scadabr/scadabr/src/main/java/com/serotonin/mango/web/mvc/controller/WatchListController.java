@@ -37,7 +37,6 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.permission.Permissions;
-import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.l10n.Localizer;
 
 public class WatchListController extends ParameterizableViewController {

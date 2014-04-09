@@ -47,13 +47,10 @@ import com.serotonin.mango.vo.hierarchy.PointHierarchy;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.dwr.beans.DataExportDefinition;
 import com.serotonin.mango.web.dwr.beans.WatchListState;
-import com.serotonin.mango.web.taglib.Functions;
 import br.org.scadabr.util.ArrayUtils;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Objects;
 
 public class WatchListDwr extends BaseDwr {

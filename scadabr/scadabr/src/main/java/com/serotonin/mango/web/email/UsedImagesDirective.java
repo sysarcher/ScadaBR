@@ -45,7 +45,7 @@ public class UsedImagesDirective implements TemplateDirectiveModel, Iterable<Str
         TemplateModel src = (TemplateModel) params.get("src");
 
         if (src instanceof TemplateScalarModel) {
-            String s = "images/" + ((TemplateScalarModel) src).getAsString();
+            String s = "/images/" + ((TemplateScalarModel) src).getAsString();
             if (!imageList.contains(s)) {
                 imageList.add(s);
             }

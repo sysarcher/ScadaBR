@@ -36,20 +36,27 @@ public class EventInstanceComparator extends BaseComparator<EventInstance> {
     public EventInstanceComparator(ResourceBundle bundle, String sortField, boolean descending) {
         this.bundle = bundle;
 
-        if ("alarmLevel".equals(sortField)) {
-            sortType = SORT_ALARM_LEVEL;
-        } else if ("time".equals(sortField)) {
-            sortType = SORT_ACTIVE_TIME;
-        } else if ("msg".equals(sortField)) {
-            sortType = SORT_MESSAGE;
-        } else if ("id".equals(sortField)) {
-            sortType = SORT_ID;
-        } else if ("rtntime".equals(sortField)) {
-            sortType = SORT_RTN_TIME;
+        if (null != sortField) switch (sortField) {
+            case "alarmLevel":
+                sortType = SORT_ALARM_LEVEL;
+                break;
+            case "time":
+                sortType = SORT_ACTIVE_TIME;
+                break;
+            case "msg":
+                sortType = SORT_MESSAGE;
+                break;
+            case "id":
+                sortType = SORT_ID;
+                break;
+            case "rtntime":
+                sortType = SORT_RTN_TIME;
+                break;
         }
         this.descending = descending;
     }
 
+    @Override
     public int compare(EventInstance e1, EventInstance e2) {
         int result = 0;
         if (sortType == SORT_ALARM_LEVEL) {

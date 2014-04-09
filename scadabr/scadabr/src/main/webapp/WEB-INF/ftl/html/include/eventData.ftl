@@ -18,7 +18,7 @@
 -->
 <tr>
   <td><#include "alarmLevel.ftl"></td>
-  <td colspan="2">${evt.prettyActiveTimestamp} - <b><@fmt message=evt.message/></b></td>
+  <td colspan="2"><@fmt timestamp=evt.activeTimestamp/> - <b><@fmt message=evt.message/></b></td>
 </tr>
 <#if evt.eventComments??>
   <#list evt.eventComments as comment>
@@ -27,7 +27,7 @@
       <td valign="top" width="16"><img src="cid:<@img src="comment.png"/>" title="<@fmt key="notes.note"/>" alt="<@fmt key="notes.note"/>"/></td>
       <td valign="top">
         <span class="copyTitle">
-          ${comment.prettyTime} <@fmt key="notes.by"/>
+          <@fmt timestamp=comment.ts/> <@fmt key="notes.by"/>
           <#if comment.username??>
             ${comment.username}
           <#else>

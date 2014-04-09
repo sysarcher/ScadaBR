@@ -7,17 +7,35 @@ package br.org.scadabr.web.email;
 
 import br.org.scadabr.ImplementMeException;
 import java.io.File;
+import javax.mail.MessagingException;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 /**
  *
  * @author aploese
  */
-public class EmailAttachment {
+public abstract class EmailAttachment {
+
+    protected final String filename;
+
+    public EmailAttachment(String filename) {
+        this.filename = filename;
+    }
+
+    public abstract void attach(MimeMessageHelper helper) throws MessagingException;
 
     public static class FileAttachment extends EmailAttachment {
 
-        public FileAttachment(String string, File zipFile) {
-            throw new ImplementMeException();
+        private final File file;
+
+        public FileAttachment(String filename, File file) {
+            super(filename);
+            this.file = file;
+        }
+
+        @Override
+        public void attach(MimeMessageHelper helper) throws MessagingException {
+            helper.addAttachment(filename, file);
         }
     }
 

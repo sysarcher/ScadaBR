@@ -49,7 +49,7 @@ public class ImageChartServlet extends BaseInfoServlet {
     private static final long CACHE_PURGE_INTERVAL = 1000 * 60 * 10; // 10 minutes
 
     private long lastCachePurgeTime = 0;
-    private final Map<String, CacheElement> cachedImages = new ConcurrentHashMap<String, CacheElement>();
+    private final Map<String, CacheElement> cachedImages = new ConcurrentHashMap<>();
 
     /**
      * @TODO(security): Validate the point access against the user. If
@@ -155,9 +155,8 @@ public class ImageChartServlet extends BaseInfoServlet {
                     }
 
                     DataPointVO dp = new DataPointDao().getDataPoint(dataPointId);
-                    if (dp == null || dp.getName() == null)
-                        ; // no op
-                    else if (dp.getPointLocator().getDataTypeId() == DataTypes.NUMERIC) {
+                    if (dp == null || dp.getName() == null) {
+                    } else if (dp.getPointLocator().getDataTypeId() == DataTypes.NUMERIC) {
                         TimeSeries ts = new TimeSeries(dp.getName(), null, null, Second.class);
                         for (PointValueTime pv : data) {
                             ImageChartUtils.addSecond(ts, pv.getTime(), pv.getValue().numberValue());
@@ -174,11 +173,7 @@ public class ImageChartServlet extends BaseInfoServlet {
             }
 
             return ImageChartUtils.getChartData(ptsc, width, height);
-        } catch (StringIndexOutOfBoundsException e) {
-            // no op
-        } catch (NumberFormatException e) {
-            // no op
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (StringIndexOutOfBoundsException | NumberFormatException | ArrayIndexOutOfBoundsException e) {
             // no op
         }
 
