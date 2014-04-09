@@ -80,7 +80,7 @@ public class CustomViewPoint extends CustomViewComponent {
 
             if (pvt != null && pvt.getValue() instanceof ImageValue) {
                 // Text renderers don't help here. Create a thumbnail.
-                Map<String, Object> model = new HashMap<String, Object>();
+                Map<String, Object> model = new HashMap<>();
                 model.put("point", dataPointVO);
                 model.put("pointValue", pvt);
                 value = BaseDwr.generateContent(request, "imageValueThumbnail.jsp", model);

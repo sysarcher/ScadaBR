@@ -28,6 +28,7 @@ import com.serotonin.mango.web.email.MangoEmailContent;
 import br.org.scadabr.web.email.EmailContent;
 import br.org.scadabr.web.email.EmailSender;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.io.UnsupportedEncodingException;
 
 /**
  * @author Matthew Lohbihler
@@ -92,7 +93,7 @@ public class EmailWorkItem implements WorkItem {
                     SystemSettingsDao.getBooleanValue(SystemSettingsDao.EMAIL_TLS));
 
             emailSender.send(fromAddress, toAddresses, subject, content);
-        } catch (Exception e) {
+        } catch (UnsupportedEncodingException e) {
             String to = "";
             for (InternetAddress addr : toAddresses) {
                 if (to.length() > 0) {

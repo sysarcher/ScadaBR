@@ -106,6 +106,7 @@ public class StartsAndRuntimeList implements StatisticsGenerator {
 
         // Sort by value.
         Collections.sort(data, new Comparator<StartsAndRuntime>() {
+            @Override
             public int compare(StartsAndRuntime o1, StartsAndRuntime o2) {
                 return o1.value.compareTo(o2.value);
             }
@@ -185,7 +186,7 @@ public class StartsAndRuntimeList implements StatisticsGenerator {
 
         {
             BinaryValue startValue = BinaryValue.ONE;
-            List<PointValueTime> values = new ArrayList<PointValueTime>();
+            List<PointValueTime> values = new ArrayList<>();
             values.add(new PointValueTime(true, 2000));
             values.add(new PointValueTime(false, 3000));
             values.add(new PointValueTime(false, 5000));

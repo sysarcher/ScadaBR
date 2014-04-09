@@ -1,17 +1,17 @@
 package com.serotonin.mango.web.email;
 
+import br.org.scadabr.web.email.EmailContent;
 import java.io.IOException;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
-import br.org.scadabr.web.email.TemplateEmailContent;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
-public class MangoEmailContent extends TemplateEmailContent {
+public class MangoEmailContent extends EmailContent {
 
     public static final int CONTENT_TYPE_BOTH = 0;
     public static final int CONTENT_TYPE_HTML = 1;
@@ -22,7 +22,7 @@ public class MangoEmailContent extends TemplateEmailContent {
 
     public MangoEmailContent(String templateName, Map<String, Object> model, ResourceBundle bundle,
             String defaultSubject, String encoding) throws TemplateException, IOException {
-        super(encoding);
+        super(null, null, encoding);
 
         int type = SystemSettingsDao.getIntValue(SystemSettingsDao.EMAIL_CONTENT_TYPE);
 
@@ -33,11 +33,11 @@ public class MangoEmailContent extends TemplateEmailContent {
         model.put("subject", subjectDirective);
 
         if (type == CONTENT_TYPE_HTML || type == CONTENT_TYPE_BOTH) {
-            setHtmlTemplate(getTemplate(templateName, true), model);
+            htmlContent =  processHtmlTemplate(getHTMLTemplate(templateName), model);
         }
 
         if (type == CONTENT_TYPE_TEXT || type == CONTENT_TYPE_BOTH) {
-            setPlainTemplate(getTemplate(templateName, false), model);
+            plainContent = processPlainTemplate(getPlainTemplate(templateName), model);
         }
     }
 
@@ -49,14 +49,11 @@ public class MangoEmailContent extends TemplateEmailContent {
         return subject;
     }
 
-    private Template getTemplate(String name, boolean html) throws IOException {
-        if (html) {
-            name = "html/" + name + ".ftl";
-        } else {
-            name = "text/" + name + ".ftl";
-        }
-
-        return Common.ctx.getFreemarkerConfig().getTemplate(name);
+    private Template getPlainTemplate(String name) throws IOException {
+        return Common.ctx.getFreemarkerConfig().getTemplate(String.format("text/%s.ftl", name));
     }
 
+    private Template getHTMLTemplate(String name) throws IOException {
+        return Common.ctx.getFreemarkerConfig().getTemplate(String.format("html/%s.ftl", name));
+    }
 }

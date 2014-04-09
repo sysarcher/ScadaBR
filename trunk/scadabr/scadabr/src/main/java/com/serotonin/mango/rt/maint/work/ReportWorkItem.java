@@ -221,8 +221,7 @@ public class ReportWorkItem implements WorkItem {
     }
 
     private void addImage(EmailContent emailContent, String imagePath) {
-        emailContent.addInline(new EmailInline.FileInline(imagePath, Common.ctx.getServletContext().getRealPath(
-                imagePath)));
+        emailContent.addInline(new EmailInline.FileInline(imagePath, new File(Common.ctx.getServletContext().getRealPath(imagePath))));
     }
 
     private void addFileAttachment(EmailContent emailContent, String name, File file) {

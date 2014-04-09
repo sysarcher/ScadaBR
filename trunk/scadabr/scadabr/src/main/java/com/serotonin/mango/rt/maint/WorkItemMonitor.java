@@ -39,9 +39,9 @@ public class WorkItemMonitor extends SystemCronTask {
 
     @Override
     protected void run(long scheduledExecutionTime) {
-        BackgroundProcessing bp = Common.ctx.getBackgroundProcessing();
+        //BackgroundProcessing bp = Common.ctx.getBackgroundProcessing();
 
-        mediumPriorityServiceQueueSize.setValue(bp.getMediumPriorityServiceQueueSize());
+        mediumPriorityServiceQueueSize.setValue(0); //bp.getMediumPriorityServiceQueueSize());
         scheduledTimerTaskCount.setValue(Common.systemCronPool.getPoolSize());
         highPriorityServiceQueueSize.setValue(Common.systemCronPool.getActiveCount());
 

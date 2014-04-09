@@ -18,8 +18,6 @@
  */
 package com.serotonin.mango.vo;
 
-import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
-
 public class UserComment {
 
     public static final int TYPE_EVENT = 1;

@@ -16,12 +16,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see http://www.gnu.org/licenses/.
 -->
-<#include "alarmLevel.ftl">${evt.prettyActiveTimestamp} - <@fmt message=evt.message/>
+<#include "alarmLevel.ftl"><@fmt timestamp=evt.activeTimestamp/> - <@fmt message=evt.message/>
 
 <#if evt.eventComments??>
 <#list evt.eventComments as comment>
 
-********** <@fmt key="notes.note"/> - ${comment.prettyTime} <@fmt key="notes.by"/> ${comment.username}
+********** <@fmt key="notes.note"/> - <@fmt timestamp=comment.ts/> <@fmt key="notes.by"/> ${comment.username}
 ${comment.comment}
 
 </#list>

@@ -91,15 +91,15 @@
           </tr>
           <tr>
             <td class="label"><@fmt key="reports.runTimeStart"/></td>
-            <td>${instance.prettyRunStartTime}</td>
+            <td><@fmt timestamp=instance.runStartTime/></td>
           </tr>
           <tr>
             <td class="label"><@fmt key="reports.runDuration"/></td>
-            <td>${instance.prettyRunDuration}</td>
+            <td><@fmt timestamp=instance.runDuration/></td>
           </tr>
           <tr>
             <td class="label"><@fmt key="reports.dateRange"/></td>
-            <td>${instance.prettyReportStartTime} <@fmt key="reports.dateRangeTo"/> ${instance.prettyReportEndTime}</td>
+            <td><@fmt timestamp=instance.reportStartTime/> <@fmt key="reports.dateRangeTo"/> <@fmt timestamp=instance.reportEndTime/></td>
           </tr>
           <tr>
             <td class="label"><@fmt key="reports.reportRecords"/></td>
@@ -228,7 +228,7 @@
               <#else>(<@fmt key="common.alarmLevel.unknown"/>  ${event.alarmLevel})
               </#if>
             </td>
-            <td>${event.fullPrettyActiveTimestamp}</td>
+            <td><@fmt timestamp=event.activeTimestamp/></td>
             <td>
               <b><@fmt message=event.message/></b>
               <#if event.eventComments??>
@@ -258,12 +258,12 @@
                 <img src="${inline}<@img src="flag_white.png"/>" alt="<@fmt key="common.active"/>"/>
               <#elseif !event.rtnApplicable>
               <#else>
-                ${event.fullPrettyRtnTimestamp} - <@fmt message=event.rtnMessage/>
+                <@fmt timestamp=event.rtnTimestamp/> - <@fmt message=event.rtnMessage/>
               </#if>
             </td>
             <td>
               <#if event.acknowledged>
-                ${event.fullPrettyAcknowledgedTimestamp}
+                <@fmt timestamp=event.AcknowledgedTimestamp/>
                 <@fmt message=event.ackMessage/>
               </#if>
             </td>
@@ -284,7 +284,7 @@
             <td valign="top" width="16"><img src="${inline}<@img src="comment.png"/>" alt="<@fmt key="notes.note"/>"/></td>
             <td valign="top">
               <span class="copyTitle">
-                ${comment.prettyTime} <@fmt key="notes.by"/>
+                <@fmt timestamp=comment.ts/> <@fmt key="notes.by"/>
                 <#if comment.username??>
                   ${comment.username},
                 <#else>

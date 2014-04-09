@@ -72,44 +72,44 @@ public class RuntimeManager {
 
     private static final Log LOG = LogFactory.getLog(RuntimeManager.class);
 
-    private final List<DataSourceRT> runningDataSources = new CopyOnWriteArrayList<DataSourceRT>();
+    private final List<DataSourceRT> runningDataSources = new CopyOnWriteArrayList<>();
 
     /**
      * Provides a quick lookup map of the running data points.
      */
-    private final Map<Integer, DataPointRT> dataPoints = new ConcurrentHashMap<Integer, DataPointRT>();
+    private final Map<Integer, DataPointRT> dataPoints = new ConcurrentHashMap<>();
 
     /**
      * The list of point listeners, kept here such that listeners can be
      * notified of point initializations (i.e. a listener can register itself
      * before the point is enabled).
      */
-    private final Map<Integer, DataPointListener> dataPointListeners = new ConcurrentHashMap<Integer, DataPointListener>();
+    private final Map<Integer, DataPointListener> dataPointListeners = new ConcurrentHashMap<>();
 
     /**
      * Store of enabled event detectors.
      */
-    private final Map<String, SimpleEventDetector> simpleEventDetectors = new ConcurrentHashMap<String, SimpleEventDetector>();
+    private final Map<String, SimpleEventDetector> simpleEventDetectors = new ConcurrentHashMap<>();
 
     /**
      * Store of enabled compound event detectors.
      */
-    private final Map<Integer, CompoundEventDetectorRT> compoundEventDetectors = new ConcurrentHashMap<Integer, CompoundEventDetectorRT>();
+    private final Map<Integer, CompoundEventDetectorRT> compoundEventDetectors = new ConcurrentHashMap<>();
 
     /**
      * Store of enabled publishers
      */
-    private final List<PublisherRT<?>> runningPublishers = new CopyOnWriteArrayList<PublisherRT<?>>();
+    private final List<PublisherRT<?>> runningPublishers = new CopyOnWriteArrayList<>();
 
     /**
      * Store of enabled point links
      */
-    private final List<PointLinkRT> pointLinks = new CopyOnWriteArrayList<PointLinkRT>();
+    private final List<PointLinkRT> pointLinks = new CopyOnWriteArrayList<>();
 
     /**
      * Store of maintenance events
      */
-    private final List<MaintenanceEventRT> maintenanceEvents = new CopyOnWriteArrayList<MaintenanceEventRT>();
+    private final List<MaintenanceEventRT> maintenanceEvents = new CopyOnWriteArrayList<>();
 
     private boolean started = false;
 
@@ -127,7 +127,7 @@ public class RuntimeManager {
         // Initialize data sources that are enabled.
         DataSourceDao dataSourceDao = new DataSourceDao();
         List<DataSourceVO<?>> configs = dataSourceDao.getDataSources();
-        List<DataSourceVO<?>> pollingRound = new ArrayList<DataSourceVO<?>>();
+        List<DataSourceVO<?>> pollingRound = new ArrayList<>();
         for (DataSourceVO<?> config : configs) {
             if (config.isEnabled()) {
                 if (safe) {

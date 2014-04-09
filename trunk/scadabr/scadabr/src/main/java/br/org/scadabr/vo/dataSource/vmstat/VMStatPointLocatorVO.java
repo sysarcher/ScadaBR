@@ -34,11 +34,8 @@ import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import br.org.scadabr.rt.dataSource.vmstat.VMStatPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.LocalizableI18nKey;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 

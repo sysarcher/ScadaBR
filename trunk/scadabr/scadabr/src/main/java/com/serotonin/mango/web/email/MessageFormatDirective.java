@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.l10n.Localizer;
 
@@ -33,7 +32,9 @@ import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
+import freemarker.template.TemplateNumberModel;
 import freemarker.template.TemplateScalarModel;
+import java.util.Locale;
 
 /**
  * @author Matthew Lohbihler
@@ -47,38 +48,47 @@ public class MessageFormatDirective implements TemplateDirectiveModel {
     }
 
     @Override
-    public void execute(Environment env, @SuppressWarnings("rawtypes") Map params, TemplateModel[] loopVars,
+    public void execute(Environment env, Map params, TemplateModel[] loopVars,
             TemplateDirectiveBody body) throws TemplateException, IOException {
-        TemplateModel key = (TemplateModel) params.get("key");
 
-        String out;
-        if (key == null) {
-            // No key. Look for a message.
-            BeanModel model = (BeanModel) params.get("message");
-            if (model == null) {
-                if (params.containsKey("message")) // The parameter is there, but the value is null.
-                {
-                    out = "";
-                } else // The parameter wasn't given
-                {
-                    throw new TemplateModelException("One of key or message must be provided");
-                }
-            } else {
-                LocalizableMessage message = (LocalizableMessage) model.getWrappedObject();
-                if (message == null) {
-                    out = "";
-                } else {
-                    out = Localizer.localizeMessage(message, bundle);
-                }
-            }
-        } else {
-            if (key instanceof TemplateScalarModel) {
-                out = Localizer.localizeI18nKey(((TemplateScalarModel) key).getAsString(), bundle);
-            } else {
+        if (params.containsKey("key")) {
+            try {
+                final TemplateScalarModel key = (TemplateScalarModel) params.get("key");
+                env.getOut().write(Localizer.localizeI18nKey(((TemplateScalarModel) key).getAsString(), bundle));
+                return;
+            } catch (ClassCastException e) {
                 throw new TemplateModelException("key must be a string");
             }
         }
 
-        env.getOut().write(out);
+        if (params.containsKey("message")) {
+            final BeanModel model = (BeanModel) params.get("message");
+            if (model == null) {
+                // The parameter is there, but the value is null.
+                return;
+            }
+            LocalizableMessage message = (LocalizableMessage) model.getWrappedObject();
+            if (message == null) {
+                return;
+            } else {
+                env.getOut().write(Localizer.localizeMessage(message, bundle));
+                return;
+            }
+        }
+
+        if (params.containsKey("timestamp")) {
+            try {
+                final TemplateNumberModel timestamp = (TemplateNumberModel) params.get("timestamp");
+                env.getOut().write(Localizer.localizeTimeStamp(timestamp.getAsNumber().longValue(), false, bundle.getLocale()));
+                return;
+            } catch (ClassCastException e) {
+                throw new TemplateModelException("timestamp must be a long");
+
+            }
+        }
+
+        // The parameter wasn't given
+        throw new TemplateModelException("One of key or message must be provided");
+
     }
 }

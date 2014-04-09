@@ -48,7 +48,9 @@ import com.serotonin.mango.web.taglib.Functions;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.web.l10n.Localizer;
 import java.util.Date;
+import java.util.Locale;
 
 public class DataPointDetailsDwr extends BaseDwr {
 
@@ -93,10 +95,11 @@ public class DataPointDetailsDwr extends BaseDwr {
         List<RenderedPointValueTime> renderedData = new ArrayList<>(
                 rawData.size());
 
+        final Locale locale = getLocale();
         for (PointValueTime pvt : rawData) {
             RenderedPointValueTime rpvt = new RenderedPointValueTime();
             rpvt.setValue(Functions.getHtmlText(pointVO, pvt));
-            rpvt.setTime(new Date(pvt.getTime()));
+            rpvt.setTime(Localizer.localizeTimeStamp(pvt.getTime(), true, locale));
             if (pvt.isAnnotated()) {
                 AnnotatedPointValueTime apvt = (AnnotatedPointValueTime) pvt;
                 rpvt.setAnnotation(apvt.getAnnotation(getResourceBundle()));

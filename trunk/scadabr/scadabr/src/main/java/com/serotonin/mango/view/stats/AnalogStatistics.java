@@ -69,6 +69,7 @@ public class AnalogStatistics implements StatisticsGenerator {
         }
     }
 
+    @Override
     public void addValueTime(IValueTime vt) {
         if (vt.getValue() == null) {
             return;
@@ -113,6 +114,7 @@ public class AnalogStatistics implements StatisticsGenerator {
         lastTime = vt.getTime();
     }
 
+    @Override
     public void done() {
         if (lastValue != null) {
             if (realDuration == -1) {
@@ -188,7 +190,7 @@ public class AnalogStatistics implements StatisticsGenerator {
 
     public static void main(String[] args) {
         Double startValue = 10d;
-        List<PointValueTime> values = new ArrayList<PointValueTime>();
+        List<PointValueTime> values = new ArrayList<>();
         values.add(new PointValueTime(11d, 2000));
         values.add(new PointValueTime(12d, 3000));
         values.add(new PointValueTime(7d, 4000));

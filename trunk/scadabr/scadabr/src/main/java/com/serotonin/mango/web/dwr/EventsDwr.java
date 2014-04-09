@@ -36,10 +36,8 @@ import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.bean.LongPair;
 import com.serotonin.mango.web.dwr.beans.EventExportDefinition;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.dwr.MethodFilter;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 public class EventsDwr extends BaseDwr {
@@ -87,7 +85,7 @@ public class EventsDwr extends BaseDwr {
                 getKeywords(keywordStr), dateRange.getL1(), dateRange.getL2(), user.getId(), getResourceBundle(), from,
                 to, date);
 
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         int searchRowCount = eventDao.getSearchRowCount();
         int pages = (int) Math.ceil(((double) searchRowCount) / PAGE_SIZE);
 

@@ -46,7 +46,6 @@ import br.org.scadabr.io.StreamUtils;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.util.mindprod.StripEntities;
-import br.org.scadabr.util.StringUtils;
 
 /**
  * @author Matthew Lohbihler
