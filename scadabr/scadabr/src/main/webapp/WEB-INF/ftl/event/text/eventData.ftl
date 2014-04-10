@@ -21,7 +21,7 @@
 <#if evt.eventComments??>
 <#list evt.eventComments as comment>
 
-********** <@fmt key="notes.note"/> - <@fmt timestamp=comment.ts/> <@fmt key="notes.by"/> ${comment.username}
+********** <@fmt key="notes.note"/> - <@fmt timestamp="comment.ts"/> <@fmt key="notes.by"/> ${comment.username}
 ${comment.comment}
 
 </#list>

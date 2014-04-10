@@ -208,6 +208,6 @@ public class DataPointDetailsDwr extends BaseDwr {
     }
 
     private void addAsof(DwrResponseI18n response) {
-        response.addData("asof", new LocalizableMessageImpl("dsDetils.asof", new Date(System.currentTimeMillis())));
+        response.addData("asof", new LocalizableMessageImpl("dsDetails.asof", new Date(System.currentTimeMillis())));
     }
 }

@@ -24,9 +24,6 @@ import org.joda.time.DateTime;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.util.DateUtils;
-import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.l10n.Localizer;
-import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 
 /**
  * @author Matthew Lohbihler
@@ -49,8 +46,6 @@ public class ReportInstance {
     private long runEndTime = -1;
     private int recordCount = -1;
     private boolean preventPurge;
-
-    private ResourceBundle bundle;
 
     public ReportInstance() {
         // no op
@@ -100,10 +95,6 @@ public class ReportInstance {
             return STATE_FAILED;
         }
         return STATE_FINISHED;
-    }
-
-    public void setBundle(ResourceBundle bundle) {
-        this.bundle = bundle;
     }
 
     public boolean isFromInception() {
