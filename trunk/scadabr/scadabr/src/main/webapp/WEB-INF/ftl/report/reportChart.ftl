@@ -103,7 +103,7 @@
           </tr>
           <tr>
             <td class="label"><@fmt key="reports.reportRecords"/></td>
-            <td>${instance.prettyRecordCount}</td>
+            <td>${instance.recordCount}</td>
           </tr>
         </table>
       </td>
@@ -238,7 +238,7 @@
                       <td valign="top" width="16"><img src="${inline}<@img src="comment.png"/>" alt="<@fmt key="notes.note"/>"/></td>
                       <td valign="top">
                         <span class="copyTitle">
-                          <@fmt timestamp="comment.ts/> <@fmt key="notes.by"/>
+                          <@fmt timestamp="comment.ts"/> <@fmt key="notes.by"/>
                           <#if comment.username??>
                             ${comment.username}
                           <#else>
@@ -284,7 +284,7 @@
             <td valign="top" width="16"><img src="${inline}<@img src="comment.png"/>" alt="<@fmt key="notes.note"/>"/></td>
             <td valign="top">
               <span class="copyTitle">
-                <@fmt timestamp=comment.ts/> <@fmt key="notes.by"/>
+                <@fmt timestamp="comment.ts"/> <@fmt key="notes.by"/>
                 <#if comment.username??>
                   ${comment.username},
                 <#else>

@@ -8,6 +8,7 @@ package br.org.scadabr.util;
 import br.org.scadabr.ImplementMeException;
 import java.util.Properties;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -74,9 +75,9 @@ public class StringUtils {
         throw new ImplementMeException();
     }
 
-    public static String replaceMacro(String timestampSql, String field, String ts) {
-        throw new ImplementMeException();
-    }
+  public static String replaceMacro(final String s, final String name, final String replacement) {
+    return s.replaceAll(Pattern.quote("${" + name + "}"), replacement);
+  }
 
     public static Object[] truncate(String url, int i, String s) {
         throw new ImplementMeException();

@@ -60,11 +60,9 @@ import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.web.email.MessageFormatDirective;
 import com.serotonin.mango.web.email.UsedImagesDirective;
 import br.org.scadabr.util.ColorUtils;
-import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import java.util.Locale;
 
 /**
  * @author Matthew Lohbihler
@@ -115,8 +113,6 @@ public class ReportChartCreator {
     public void createContent(ReportInstance reportInstance, ReportDao reportDao, String inlinePrefix,
             boolean createExportFile) {
         this.inlinePrefix = inlinePrefix;
-
-        reportInstance.setBundle(bundle);
 
         // Use a stream handler to get the report data from the database.
         StreamHandler handler = new StreamHandler(reportInstance.getReportStartTime(),

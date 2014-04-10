@@ -53,7 +53,7 @@ public class ReportVO implements Serializable {
     private int id = Common.NEW_ID;
     private int userId;
     private String name;
-    private List<ReportPointVO> points = new ArrayList<ReportPointVO>();
+    private List<ReportPointVO> points = new ArrayList<>();
     private int includeEvents = EVENTS_ALARMS;
     private boolean includeUserComments = true;
     private int dateRangeType = DATE_RANGE_TYPE_RELATIVE;
@@ -84,7 +84,7 @@ public class ReportVO implements Serializable {
     private String scheduleCron;
 
     private boolean email;
-    private List<RecipientListEntryBean> recipients = new ArrayList<RecipientListEntryBean>();
+    private List<RecipientListEntryBean> recipients = new ArrayList<>();
     private boolean includeData = true;
     private boolean zipData = false;
 
@@ -612,7 +612,7 @@ public class ReportVO implements Serializable {
     }
 
     private static List<ReportPointVO> convertToReportPointVOs(List<Integer> ids) {
-        List<ReportPointVO> result = new ArrayList<ReportPointVO>();
+        List<ReportPointVO> result = new ArrayList<>();
         for (Integer id : ids) {
             ReportPointVO vo = new ReportPointVO();
             vo.setPointId(id);
@@ -621,7 +621,8 @@ public class ReportVO implements Serializable {
         return result;
     }
 
-    TimeZone getTimeZone() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    //TODO implement me!!
+    public TimeZone getTimeZone() {
+        return TimeZone.getDefault();
     }
 }

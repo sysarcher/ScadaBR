@@ -296,13 +296,9 @@ public class ReportDao extends BaseDao {
             if (!instance.isFromInception()) {
                 // Get the value just before the start of the report
                 PointValueTime pvt = pointValueDao.getPointValueBefore(point.getId(), instance.getReportStartTime());
-                if (pvt != null) {
+                if (pvt != null && DataTypes.getDataType(pvt.getValue()) != dataType) {
+                   // Make sure value is not null and the data types match
                     startValue = pvt.getValue();
-                }
-
-                // Make sure the data types match
-                if (DataTypes.getDataType(startValue) != dataType) {
-                    startValue = null;
                 }
             }
 
@@ -332,8 +328,12 @@ public class ReportDao extends BaseDao {
             });
 
             // Insert the reportInstanceData records
-            String insertSQL = "insert into reportInstanceData " + "  select id, " + reportPointId
-                    + ", pointValue, ts from pointValues " + "    where dataPointId=? and dataType=? "
+            String insertSQL = "insert into reportInstanceData \n"
+                    + " select\n"
+                    + "  id,\n" 
+                    + "  " + reportPointId + ",\n"
+                    + "  pointValue, ts from pointValues\n" 
+                    + " where dataPointId=? and dataType=?\n"
                     + StringUtils.replaceMacro(timestampSql, "field", "ts");
             count += ejt.update(insertSQL, appendParameters(timestampParams, point.getId(), dataType));
 
@@ -436,6 +436,7 @@ public class ReportDao extends BaseDao {
                     + "  join reportInstanceData rd on rp.id=rd.reportInstancePointId "
                     + "where rp.reportInstanceId=?", new Object[]{instance.getId()},
                     new RowCallbackHandler() {
+                        @Override
                         public void processRow(ResultSet rs) throws SQLException {
                             if (instance.isFromInception()) {
                                 instance.setReportStartTime(rs.getLong(1));

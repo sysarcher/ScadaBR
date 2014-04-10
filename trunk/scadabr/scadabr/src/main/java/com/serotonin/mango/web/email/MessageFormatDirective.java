@@ -79,6 +79,10 @@ public class MessageFormatDirective implements TemplateDirectiveModel {
         if (params.containsKey("timestamp")) {
             try {
                 final TemplateNumberModel timestamp = (TemplateNumberModel) params.get("timestamp");
+                if (timestamp == null) {
+                    // The parameter is there, but the value is null.
+                    return;
+                }
                 env.getOut().write(Localizer.localizeTimeStamp(timestamp.getAsNumber().longValue(), false, bundle.getLocale()));
                 return;
             } catch (ClassCastException e) {

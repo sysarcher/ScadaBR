@@ -52,11 +52,9 @@ import com.serotonin.mango.vo.report.ReportInstance;
 import com.serotonin.mango.vo.report.ReportPointVO;
 import com.serotonin.mango.vo.report.ReportVO;
 import br.org.scadabr.util.ColorUtils;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.email.EmailAttachment;
 import br.org.scadabr.web.email.EmailContent;
 import br.org.scadabr.web.email.EmailInline;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.l10n.Localizer;
 
 /**

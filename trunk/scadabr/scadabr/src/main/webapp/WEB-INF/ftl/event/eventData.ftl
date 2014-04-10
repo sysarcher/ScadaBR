@@ -26,7 +26,7 @@
       <td width="10"></td>
       <td valign="top" width="16"><img src="cid:<@img src="comment.png"/>" title="<@fmt key="notes.note"/>" alt="<@fmt key="notes.note"/>"/></td>
       <td valign="top">
-        <span class="copyTitle"><@fmt timestamp=comment.ts/> <@fmt key="notes.by"/> ${comment.username}</span><br/>
+        <span class="copyTitle"><@fmt timestamp="comment.ts"/> <@fmt key="notes.by"/> ${comment.username}</span><br/>
         ${comment.comment}
       </td>
     </tr>

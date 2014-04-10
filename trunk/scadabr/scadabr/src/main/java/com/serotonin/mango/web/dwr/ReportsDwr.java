@@ -41,9 +41,9 @@ import com.serotonin.mango.vo.report.ReportPointVO;
 import com.serotonin.mango.vo.report.ReportVO;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import br.org.scadabr.util.ColorUtils;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.l10n.Localizer;
+import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
@@ -100,7 +100,7 @@ public class ReportsDwr extends BaseDwr {
                 // Check the cron pattern.
                 try {
                     new CronParser().parse(scheduleCron, CronExpression.TIMEZONE_UTC);
-                } catch (Exception e) {
+                } catch (ParseException e) {
                     response.addContextual("scheduleCron", "reports.validate.cron", e);
                 }
             } else {
@@ -285,12 +285,7 @@ public class ReportsDwr extends BaseDwr {
     }
 
     private List<ReportInstance> getReportInstances(User user) {
-        List<ReportInstance> result = new ReportDao().getReportInstances(user.getId());
-        ResourceBundle bundle = getResourceBundle();
-        for (ReportInstance i : result) {
-            i.setBundle(bundle);
-        }
-        return result;
+        return new ReportDao().getReportInstances(user.getId());
     }
 
     public void setPreventPurge(int instanceId, boolean value) {

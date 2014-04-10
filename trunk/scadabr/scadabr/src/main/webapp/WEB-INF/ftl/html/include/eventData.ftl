@@ -27,7 +27,7 @@
       <td valign="top" width="16"><img src="cid:<@img src="comment.png"/>" title="<@fmt key="notes.note"/>" alt="<@fmt key="notes.note"/>"/></td>
       <td valign="top">
         <span class="copyTitle">
-          <@fmt timestamp=comment.ts/> <@fmt key="notes.by"/>
+          <@fmt timestamp="comment.ts"/> <@fmt key="notes.by"/>
           <#if comment.username??>
             ${comment.username}
           <#else>

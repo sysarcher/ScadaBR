@@ -56,15 +56,12 @@ import com.serotonin.mango.web.dwr.beans.BasePointState;
 import com.serotonin.mango.web.dwr.beans.DataPointBean;
 import com.serotonin.mango.web.dwr.beans.WatchListState;
 import com.serotonin.mango.web.taglib.Functions;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.content.ContentGenerator;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.l10n.Localizer;
-import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.TimeZone;
 
 abstract public class BaseDwr {
 
@@ -230,7 +227,7 @@ abstract public class BaseDwr {
      * @param comment
      * @return
      */
-    public UserComment addUserComment(int typeId, int referenceId, String comment) {
+    public Map<String, String> addUserComment(int typeId, int referenceId, String comment) {
         if (comment.isEmpty()) {
             return null;
         }
@@ -249,8 +246,10 @@ abstract public class BaseDwr {
         } else {
             throw new ShouldNeverHappenException("Invalid comment type: " + typeId);
         }
-
-        return c;
+        Map<String, String> result = new HashMap<>();
+        result.put("timeAndUsername", String.format("%s %s %s", Localizer.localizeTimeStamp(c.getTs(), true, getLocale()), Localizer.localizeI18nKey("notes.by", getResourceBundle()), user.getUsername()));
+        result.put("comment", c.getComment());
+        return result;
     }
 
     protected List<DataPointBean> getReadablePoints() {
