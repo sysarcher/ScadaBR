@@ -90,6 +90,25 @@ public class MessageFormatDirective implements TemplateDirectiveModel {
 
             }
         }
+        
+        if (params.containsKey("duration")) {
+            try {
+                final TemplateNumberModel duration = (TemplateNumberModel) params.get("duration");
+                if (duration == null) {
+                    // The parameter is there, but the value is null.
+                    return;
+                }
+                env.getOut().write(Long.toString(duration.getAsNumber().longValue() / 1000));
+                env.getOut().write(" s ");
+                env.getOut().write(Long.toString(duration.getAsNumber().longValue() % 1000));
+                env.getOut().write(" ms");
+                return;
+            } catch (ClassCastException e) {
+                throw new TemplateModelException("timestamp must be a long");
+
+            }
+        }
+        
 
         // The parameter wasn't given
         throw new TemplateModelException("One of key or message must be provided");
