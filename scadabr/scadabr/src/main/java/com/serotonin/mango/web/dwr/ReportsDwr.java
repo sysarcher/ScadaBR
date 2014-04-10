@@ -294,6 +294,7 @@ public class ReportsDwr extends BaseDwr {
         for (ReportInstance ri : ris) {
             final Map<String, Object> entry = new HashMap<>();
             entry.put("id", ri.getId());
+            entry.put("name", ri.getName());
             entry.put("reportStartTime", Localizer.localizeTimeStamp(ri.getReportStartTime(), true, locale));
             entry.put("reportEndTime", Localizer.localizeTimeStamp(ri.getReportEndTime(), true, locale));
             entry.put("runStartTime", Localizer.localizeTimeStamp(ri.getRunStartTime(), true, locale));
