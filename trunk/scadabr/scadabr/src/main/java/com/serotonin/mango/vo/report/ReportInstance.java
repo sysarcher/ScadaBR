@@ -18,7 +18,6 @@
  */
 package com.serotonin.mango.vo.report;
 
-import java.util.ResourceBundle;
 
 import org.joda.time.DateTime;
 
@@ -191,5 +190,9 @@ public class ReportInstance {
 
     public void setPreventPurge(boolean preventPurge) {
         this.preventPurge = preventPurge;
+    }
+
+    public long getRunDuration() {
+        return (runEndTime > 0 && runStartTime > 0) ? runEndTime - runStartTime : 0;
     }
 }

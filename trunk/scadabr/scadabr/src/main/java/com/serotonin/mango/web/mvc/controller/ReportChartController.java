@@ -55,7 +55,7 @@ public class ReportChartController extends AbstractController {
         ReportChartCreator creator = new ReportChartCreator(ControllerUtils.getResourceBundle(request));
         creator.createContent(instance, reportDao, null, false);
 
-        Map<String, byte[]> imageData = new HashMap<String, byte[]>();
+        Map<String, byte[]> imageData = new HashMap<>();
         imageData.put(creator.getChartName(), creator.getImageData());
         for (PointStatistics pointStatistics : creator.getPointStatistics()) {
             imageData.put(pointStatistics.getChartName(), pointStatistics.getImageData());

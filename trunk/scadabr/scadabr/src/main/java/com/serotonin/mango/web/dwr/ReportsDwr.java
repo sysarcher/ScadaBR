@@ -19,7 +19,6 @@
 package com.serotonin.mango.web.dwr;
 
 import java.util.List;
-import java.util.ResourceBundle;
 
 import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.timer.cron.CronExpression;
@@ -44,6 +43,10 @@ import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.l10n.Localizer;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Matthew Lohbihler
@@ -273,19 +276,36 @@ public class ReportsDwr extends BaseDwr {
         }
     }
 
-    public List<ReportInstance> deleteReportInstance(int instanceId) {
+    public List<Map<String, Object>> deleteReportInstance(int instanceId) {
         User user = Common.getUser();
         ReportDao reportDao = new ReportDao();
         reportDao.deleteReportInstance(instanceId, user.getId());
         return getReportInstances(user);
     }
 
-    public List<ReportInstance> getReportInstances() {
+    public List<Map<String, Object>> getReportInstances() {
         return getReportInstances(Common.getUser());
     }
 
-    private List<ReportInstance> getReportInstances(User user) {
-        return new ReportDao().getReportInstances(user.getId());
+    private List<Map<String, Object>> getReportInstances(User user) {
+        final List<ReportInstance> ris = new ReportDao().getReportInstances(user.getId());
+        final List<Map<String, Object>> result = new ArrayList<>(ris.size());
+        final Locale locale = getLocale();
+        for (ReportInstance ri : ris) {
+            final Map<String, Object> entry = new HashMap<>();
+            entry.put("id", ri.getId());
+            entry.put("reportStartTime", Localizer.localizeTimeStamp(ri.getReportStartTime(), true, locale));
+            entry.put("reportEndTime", Localizer.localizeTimeStamp(ri.getReportEndTime(), true, locale));
+            entry.put("runStartTime", Localizer.localizeTimeStamp(ri.getRunStartTime(), true, locale));
+            entry.put("runEndTime", Localizer.localizeTimeStamp(ri.getRunEndTime(), true, locale));
+            entry.put("state", ri.getState());
+            entry.put("runDuration", String.format("%d s %d ms", ri.getRunDuration() / 1000, ri.getRunDuration() % 1000));
+            entry.put("recordCount", ri.getRecordCount());
+            entry.put("includeEvents", ri.getIncludeEvents());
+            entry.put("includeUserComments", ri.isIncludeUserComments());
+            result.add(entry);
+        }
+        return result;
     }
 
     public void setPreventPurge(int instanceId, boolean value) {

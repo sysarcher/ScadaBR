@@ -237,11 +237,11 @@
             dwr.util.addRows("reportInstancesList", instanceArray,
                 [
                     function(ri) { return ri.name; },
-                    function(ri) { return ri.prettyRunStartTime; },
-                    function(ri) { return ri.prettyRunDuration; },
-                    function(ri) { return ri.prettyReportStartTime; },
-                    function(ri) { return ri.prettyReportEndTime; },
-                    function(ri) { return ri.prettyRecordCount; },
+                    function(ri) { return ri.runStartTime; },
+                    function(ri) { return ri.runDuration; },
+                    function(ri) { return ri.reportStartTime; },
+                    function(ri) { return ri.reportEndTime; },
+                    function(ri) { return ri.recordCount; },
                     function(ri) {
                         return "<input type='checkbox'"+ (ri.preventPurge ? " checked='checked'" : "") +
                                 " onclick='ReportsDwr.setPreventPurge("+ ri.id +", this.checked)'/>";
