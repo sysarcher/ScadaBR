@@ -27,13 +27,10 @@ import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.ip.IpParameters;
 import java.text.ParseException;
 
-public class ModbusIpDataSource extends ModbusDataSource {
+public class ModbusIpDataSource extends ModbusDataSource<ModbusIpDataSourceVO> {
 
-    private final ModbusIpDataSourceVO configuration;
-
-    public ModbusIpDataSource(ModbusIpDataSourceVO configuration) {
-        super(configuration);
-        this.configuration = configuration;
+    public ModbusIpDataSource(ModbusIpDataSourceVO vo) {
+        super(vo);
     }
 
     //
@@ -44,16 +41,16 @@ public class ModbusIpDataSource extends ModbusDataSource {
     @Override
     public void initialize() {
         IpParameters params = new IpParameters();
-        params.setHost(configuration.getHost());
-        params.setPort(configuration.getPort());
-        params.setEncapsulated(configuration.isEncapsulated());
+        params.setHost(vo.getHost());
+        params.setPort(vo.getPort());
+        params.setEncapsulated(vo.isEncapsulated());
 
         ModbusMaster modbusMaster;
-        if (configuration.getTransportType() == TransportType.UDP) {
+        if (vo.getTransportType() == TransportType.UDP) {
             modbusMaster = new ModbusFactory().createUdpMaster(params);
         } else {
             modbusMaster = new ModbusFactory().createTcpMaster(params,
-                    configuration.getTransportType() == TransportType.TCP_KEEP_ALIVE);
+                    vo.getTransportType() == TransportType.TCP_KEEP_ALIVE);
         }
 
         super.initialize(modbusMaster);

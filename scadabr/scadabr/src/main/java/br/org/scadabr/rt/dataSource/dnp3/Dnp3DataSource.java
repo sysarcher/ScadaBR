@@ -24,7 +24,7 @@ import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
-public class Dnp3DataSource extends PollingDataSource {
+public class Dnp3DataSource<T extends Dnp3DataSourceVO<T>> extends PollingDataSource<T> {
 
     private final Log LOG = LogFactory.getLog(Dnp3DataSource.class);
 
@@ -32,11 +32,9 @@ public class Dnp3DataSource extends PollingDataSource {
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 2;
 
     private DNP3Master dnp3Master;
-    private final Dnp3DataSourceVO<?> vo;
 
-    public Dnp3DataSource(Dnp3DataSourceVO<?> vo) {
+    public Dnp3DataSource(T vo) {
         super(vo);
-        this.vo = vo;
         setPollingPeriod(vo.getRbePeriodType(), vo.getRbePollPeriods(), vo
                 .isQuantize());
     }

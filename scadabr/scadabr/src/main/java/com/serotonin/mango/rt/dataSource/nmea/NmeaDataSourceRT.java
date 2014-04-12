@@ -38,20 +38,18 @@ import com.serotonin.mango.util.timeout.SystemRunTask;
 /**
  * @author Matthew Lohbihler
  */
-public class NmeaDataSourceRT extends EventDataSource implements NmeaMessageListener, RunClient {
+public class NmeaDataSourceRT extends EventDataSource<NmeaDataSourceVO> implements NmeaMessageListener, RunClient {
 
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int PARSE_EXCEPTION_EVENT = 2;
 
     private final Log log = LogFactory.getLog(NmeaDataSourceRT.class);
 
-    private final NmeaDataSourceVO vo;
     private NmeaReceiver nmeaReceiver;
     private SystemRunTask resetTask;
 
     public NmeaDataSourceRT(NmeaDataSourceVO vo) {
         super(vo);
-        this.vo = vo;
     }
 
     //

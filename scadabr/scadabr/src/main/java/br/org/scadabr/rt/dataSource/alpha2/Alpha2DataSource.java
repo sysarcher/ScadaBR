@@ -24,30 +24,27 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
-public class Alpha2DataSource extends PollingDataSource {
+public class Alpha2DataSource extends PollingDataSource<Alpha2DataSourceVO> {
 
     public static final int POINT_READ_EXCEPTION_EVENT = 1;
     public static final int POINT_WRITE_EXCEPTION_EVENT = 2;
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 3;
 
-    private final Alpha2DataSourceVO<?> vo;
     private Alpha2Master master;
 
-    public Alpha2DataSource(Alpha2DataSourceVO<?> vo) {
+    public Alpha2DataSource(Alpha2DataSourceVO vo) {
         super(vo);
-        this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 
     @Override
     protected void doPoll(long time) {
-        List<DeviceLocator> locators = new ArrayList<DeviceLocator>();
+        List<DeviceLocator> locators = new ArrayList<>();
 
-        Map<DeviceLocator, DataPointRT> map = new HashMap<DeviceLocator, DataPointRT>();
+        Map<DeviceLocator, DataPointRT> map = new HashMap<>();
 
         for (DataPointRT pointRT : dataPoints) {
             Alpha2PointLocatorVO dp = pointRT.getVO().getPointLocator();
@@ -84,7 +81,7 @@ public class Alpha2DataSource extends PollingDataSource {
             ErrorMessageReceivedException {
 
         final int maxNum = Alpha2Master.MAX_DEVICES_PER_READ_MESSAGE;
-        List<List<DeviceLocator>> messages = new ArrayList<List<DeviceLocator>>();
+        List<List<DeviceLocator>> messages = new ArrayList<>();
 
         int numMessages = devices.size() % maxNum == 0 ? ((int) (devices.size() / maxNum))
                 : ((int) (devices.size() / maxNum)) + 1;
@@ -101,7 +98,7 @@ public class Alpha2DataSource extends PollingDataSource {
             messages.add(temp);
         }
 
-        List<DeviceValue> values = new ArrayList<DeviceValue>();
+        List<DeviceValue> values = new ArrayList<>();
 
         for (List<DeviceLocator> message : messages) {
             values.addAll(master.read(message));
@@ -113,7 +110,7 @@ public class Alpha2DataSource extends PollingDataSource {
     @Override
     public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime,
             SetPointSource source) {
-        List<DeviceWrite> devices = new ArrayList<DeviceWrite>();
+        List<DeviceWrite> devices = new ArrayList<>();
         Alpha2PointLocatorVO dp = dataPoint.getVO().getPointLocator();
 
         boolean runStop = false;

@@ -54,7 +54,7 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.locator.BaseLocator;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
-abstract public class ModbusDataSource extends PollingDataSource implements MessagingExceptionHandler {
+abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends PollingDataSource<T> implements MessagingExceptionHandler {
 
     private final Log LOG = LogFactory.getLog(ModbusDataSource.class);
 
@@ -64,12 +64,10 @@ abstract public class ModbusDataSource extends PollingDataSource implements Mess
 
     private ModbusMaster modbusMaster;
     private BatchRead<ModbusPointLocatorRT> batchRead;
-    private final ModbusDataSourceVO<?> vo;
     private final Map<Integer, DataPointRT> slaveMonitors = new HashMap<>();
 
-    public ModbusDataSource(ModbusDataSourceVO<?> vo) {
+    public ModbusDataSource(T vo) {
         super(vo);
-        this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), vo.isQuantize());
     }
 

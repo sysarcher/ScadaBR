@@ -78,7 +78,6 @@ import com.serotonin.mango.vo.dataSource.viconics.ViconicsDataSourceVO;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualDataSourceVO;
 import br.org.scadabr.vo.datasource.vmstat.VMStatDataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.l10n.Localizer;

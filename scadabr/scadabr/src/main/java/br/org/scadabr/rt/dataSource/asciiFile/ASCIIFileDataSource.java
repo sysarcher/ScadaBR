@@ -20,20 +20,17 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
-public class ASCIIFileDataSource extends PollingDataSource {
+public class ASCIIFileDataSource extends PollingDataSource<ASCIIFileDataSourceVO> {
 
     private final Log LOG = LogFactory.getLog(ASCIIFileDataSource.class);
     public static final int POINT_READ_EXCEPTION_EVENT = 1;
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 2;
-    private final ASCIIFileDataSourceVO<?> vo;
 
-    public ASCIIFileDataSource(ASCIIFileDataSourceVO<?> vo) {
+    public ASCIIFileDataSource(ASCIIFileDataSourceVO vo) {
         super(vo);
-        this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), vo
                 .isQuantize());
     }

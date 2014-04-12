@@ -48,14 +48,13 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
  * @author Matthew Lohbihler
  *
  */
-public class SnmpDataSourceRT extends PollingDataSource {
+public class SnmpDataSourceRT extends PollingDataSource<SnmpDataSourceVO> {
 
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int PDU_EXCEPTION_EVENT = 2;
 
     private final Log log = LogFactory.getLog(SnmpDataSourceRT.class);
 
-    private final SnmpDataSourceVO vo;
     private final Version version;
     private String address;
     private Target target;
@@ -64,8 +63,7 @@ public class SnmpDataSourceRT extends PollingDataSource {
     public SnmpDataSourceRT(SnmpDataSourceVO vo) {
         super(vo);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
-        this.vo = vo;
-        version = Version.getVersion(vo.getSnmpVersion(), vo.getCommunity(),
+       version = Version.getVersion(vo.getSnmpVersion(), vo.getCommunity(),
                 vo.getSecurityName(), vo.getAuthProtocol(),
                 vo.getAuthPassphrase(), vo.getPrivProtocol(),
                 vo.getPrivPassphrase(), vo.getEngineId(),

@@ -33,7 +33,7 @@ import java.text.ParseException;
 /**
  * @author Matthew Lohbihler
  */
-public class InternalDataSourceRT extends PollingDataSource {
+public class InternalDataSourceRT extends PollingDataSource<InternalDataSourceVO> {
 
     public InternalDataSourceRT(InternalDataSourceVO vo) {
         super(vo);

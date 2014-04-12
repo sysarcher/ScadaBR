@@ -48,18 +48,16 @@ import net.sf.mbus4j.dataframes.datablocks.BcdValue;
 /**
  * TODO datatype NUMERIC_INT is missing TODO Starttime for timpepoints ???
  */
-public class MBusDataSourceRT extends PollingDataSource {
+public class MBusDataSourceRT extends PollingDataSource<MBusDataSourceVO> {
 
     private final static Log LOG = LogFactory.getLog(MBusDataSourceRT.class);
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int POINT_READ_EXCEPTION_EVENT = 2;
     public static final int POINT_WRITE_EXCEPTION_EVENT = 3;
-    private final MBusDataSourceVO vo;
     private final MBusMaster master = new MBusMaster();
 
     public MBusDataSourceRT(MBusDataSourceVO vo) {
         super(vo);
-        this.vo = vo;
     }
 
     public double calcCorretedValue(DataPointRT point, double value) {

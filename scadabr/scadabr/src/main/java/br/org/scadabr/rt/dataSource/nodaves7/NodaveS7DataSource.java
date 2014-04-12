@@ -20,20 +20,17 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
-public class NodaveS7DataSource extends PollingDataSource {
+public class NodaveS7DataSource extends PollingDataSource<NodaveS7DataSourceVO> {
 
     private final Log LOG = LogFactory.getLog(NodaveS7DataSource.class);
     public static final int POINT_READ_EXCEPTION_EVENT = 1;
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 2;
-    private final NodaveS7DataSourceVO<?> vo;
 
-    public NodaveS7DataSource(NodaveS7DataSourceVO<?> vo) {
+    public NodaveS7DataSource(NodaveS7DataSourceVO vo) {
         super(vo);
-        this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(),
                 vo.isQuantize());
     }

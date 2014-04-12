@@ -25,24 +25,21 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
-public class ASCIISerialDataSource extends PollingDataSource {
+public class ASCIISerialDataSource extends PollingDataSource<ASCIISerialDataSourceVO> {
 
     private final Log LOG = LogFactory.getLog(ASCIISerialDataSource.class);
     public static final int POINT_READ_EXCEPTION_EVENT = 1;
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 2;
-    private final ASCIISerialDataSourceVO<?> vo;
     private Enumeration portList;
     private InputStream inSerialStream;
     private OutputStream outSerialStream;
     private SerialPort sPort;
 
-    public ASCIISerialDataSource(ASCIISerialDataSourceVO<?> vo) {
+    public ASCIISerialDataSource(ASCIISerialDataSourceVO vo) {
         super(vo);
-        this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(),
                 vo.isQuantize());
 

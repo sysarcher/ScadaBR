@@ -26,8 +26,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
-public class NodaveS7DataSourceVO<T extends NodaveS7DataSourceVO<?>> extends
-        DataSourceVO<T> {
+public class NodaveS7DataSourceVO extends DataSourceVO<NodaveS7DataSourceVO> {
 
     public static final Type TYPE = Type.NODAVE_S7;
 
@@ -58,7 +57,7 @@ public class NodaveS7DataSourceVO<T extends NodaveS7DataSourceVO<?>> extends
     }
 
     @Override
-    protected void addPropertyChangesImpl(List<LocalizableMessage> list, T from) {
+    protected void addPropertyChangesImpl(List<LocalizableMessage> list, NodaveS7DataSourceVO from) {
         // TODO Auto-generated method stub
 
     }

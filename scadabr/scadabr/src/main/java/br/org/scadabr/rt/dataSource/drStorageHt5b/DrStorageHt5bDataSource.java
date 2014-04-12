@@ -20,16 +20,14 @@ import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
-public class DrStorageHt5bDataSource extends PollingDataSource {
+public class DrStorageHt5bDataSource extends PollingDataSource<DrStorageHt5bDataSourceVO> {
 
     private final Log LOG = LogFactory.getLog(DrStorageHt5bDataSource.class);
     public static final int POINT_READ_EXCEPTION_EVENT = 1;
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 2;
-    private final DrStorageHt5bDataSourceVO<?> vo;
     private Enumeration portList;
     private InputStream inSerialStream;
     private OutputStream outSerialStream;
@@ -37,10 +35,9 @@ public class DrStorageHt5bDataSource extends PollingDataSource {
     static final String HEXES = "0123456789ABCDEF";
     private ArrayList<Integer> valuesHt5b;
 
-    public DrStorageHt5bDataSource(DrStorageHt5bDataSourceVO<?> vo) {
+    public DrStorageHt5bDataSource(DrStorageHt5bDataSourceVO vo) {
 
         super(vo);
-        this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), vo
                 .isQuantize());
 

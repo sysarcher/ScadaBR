@@ -30,19 +30,16 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.EventDataSource;
 import com.serotonin.mango.vo.dataSource.http.HttpReceiverDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpReceiverPointLocatorVO;
-import br.org.scadabr.util.StringUtils;
 
 /**
  * @author Matthew Lohbihler
  */
-public class HttpReceiverDataSourceRT extends EventDataSource implements HttpMulticastListener {
+public class HttpReceiverDataSourceRT extends EventDataSource<HttpReceiverDataSourceVO> implements HttpMulticastListener {
 
     private final Log log = LogFactory.getLog(HttpReceiverDataSourceRT.class);
-    private final HttpReceiverDataSourceVO vo;
 
     public HttpReceiverDataSourceRT(HttpReceiverDataSourceVO vo) {
         super(vo);
-        this.vo = vo;
     }
 
     //
@@ -67,18 +64,22 @@ public class HttpReceiverDataSourceRT extends EventDataSource implements HttpMul
     // / HttpMulticastListener
     // /
     //
+    @Override
     public String[] getDeviceIdWhiteList() {
         return vo.getDeviceIdWhiteList();
     }
 
+    @Override
     public String[] getIpWhiteList() {
         return vo.getIpWhiteList();
     }
 
+    @Override
     public void ipWhiteListError(String message) {
         log.warn("Error checking white list: " + message);
     }
 
+    @Override
     public void data(HttpReceiverData data) {
         // Match data points in the received set with point locators.
         synchronized (pointListChangeLock) {

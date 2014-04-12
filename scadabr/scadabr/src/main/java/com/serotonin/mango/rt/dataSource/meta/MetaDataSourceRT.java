@@ -22,7 +22,6 @@ import br.org.scadabr.ImplementMeException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -30,11 +29,12 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.vo.dataSource.DataSourceVO;
 
 /**
  * @author Matthew Lohbihler
  */
-public class MetaDataSourceRT extends DataSourceRT {
+public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
 
     public static final int EVENT_TYPE_CONTEXT_POINT_DISABLED = 1;
     public static final int EVENT_TYPE_SCRIPT_ERROR = 2;

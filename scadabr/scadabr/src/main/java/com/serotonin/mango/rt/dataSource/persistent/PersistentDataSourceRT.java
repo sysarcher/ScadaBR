@@ -43,25 +43,21 @@ import com.serotonin.mango.vo.hierarchy.PointHierarchy;
 import br.org.scadabr.util.ArrayUtils;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.util.queue.ByteQueue;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.io.ByteArrayInputStream;
 
-public class PersistentDataSourceRT extends EventDataSource implements Runnable {
+public class PersistentDataSourceRT extends EventDataSource<PersistentDataSourceVO> implements Runnable {
 
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
 
     final Log log = LogFactory.getLog(PersistentDataSourceRT.class);
-    final PersistentDataSourceVO vo;
     volatile ServerSocket serverSocket;
     final Map<String, DataPointRT> pointXids = new ConcurrentHashMap<>();
     final List<ConnectionHandler> connectionHandlers = new CopyOnWriteArrayList<>();
 
     public PersistentDataSourceRT(PersistentDataSourceVO vo) {
         super(vo);
-        this.vo = vo;
     }
 
     public int getConnectionCount() {

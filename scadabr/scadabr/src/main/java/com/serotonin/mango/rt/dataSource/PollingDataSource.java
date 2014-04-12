@@ -33,7 +33,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-abstract public class PollingDataSource extends DataSourceRT {
+abstract public class PollingDataSource<T extends DataSourceVO<T>> extends DataSourceRT<T> {
 
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCARABR_DS_RT);
 
@@ -41,7 +41,7 @@ abstract public class PollingDataSource extends DataSourceRT {
     protected boolean pointListChanged = false;
     private DataSourceCronTask timerTask;
 
-    public PollingDataSource(DataSourceVO<?> vo) {
+    public PollingDataSource(T vo) {
         super(vo);
     }
 

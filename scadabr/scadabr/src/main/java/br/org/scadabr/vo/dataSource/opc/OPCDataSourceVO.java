@@ -21,14 +21,12 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
-public class OPCDataSourceVO<T extends OPCDataSourceVO<?>> extends
-        DataSourceVO<T> {
+public class OPCDataSourceVO extends DataSourceVO<OPCDataSourceVO> {
 
     public static final Type TYPE = Type.OPC;
 
@@ -213,7 +211,7 @@ public class OPCDataSourceVO<T extends OPCDataSourceVO<?>> extends
     }
 
     @Override
-    protected void addPropertyChangesImpl(List<LocalizableMessage> list, T from) {
+    protected void addPropertyChangesImpl(List<LocalizableMessage> list, OPCDataSourceVO from) {
         final OPCDataSourceVO fromVO = (OPCDataSourceVO) from;
         AuditEventType.maybeAddPeriodChangeMessage(list,
                 "dsEdit.dnp3.rbePeriod", fromVO.updatePeriodType,

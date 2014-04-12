@@ -62,7 +62,6 @@ import com.serotonin.mango.vo.hierarchy.PointHierarchy;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.util.StringUtils;
 import com.serotonin.viconics.RequestFailureException;
-import com.serotonin.viconics.ViconicsConfigurationException;
 import com.serotonin.viconics.ViconicsDevice;
 import com.serotonin.viconics.ViconicsNetwork;
 import com.serotonin.viconics.ViconicsNetworkListener;
@@ -79,7 +78,7 @@ import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNetworkListener {
+public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> implements ViconicsNetworkListener {
 
     private final Object newDeviceLock = new Object();
 
@@ -90,13 +89,11 @@ public class ViconicsDataSourceRT extends EventDataSource implements ViconicsNet
     public static final int DUPLICATE_COMM_ADDRESS_EVENT = 5;
 
     private final Log log = LogFactory.getLog(ViconicsDataSourceRT.class);
-    private final ViconicsDataSourceVO vo;
     private ViconicsNetwork network;
-    private final Map<PointKey, DataPointRT> pointLookup = new ConcurrentHashMap<PointKey, DataPointRT>();
+    private final Map<PointKey, DataPointRT> pointLookup = new ConcurrentHashMap<>();
 
     public ViconicsDataSourceRT(ViconicsDataSourceVO vo) {
         super(vo);
-        this.vo = vo;
     }
 
     //

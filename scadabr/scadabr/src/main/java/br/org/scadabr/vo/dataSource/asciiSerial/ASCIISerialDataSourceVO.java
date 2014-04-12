@@ -26,8 +26,7 @@ import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
-public class ASCIISerialDataSourceVO<T extends ASCIISerialDataSourceVO<?>>
-        extends DataSourceVO<T> {
+public class ASCIISerialDataSourceVO extends DataSourceVO<ASCIISerialDataSourceVO> {
 
     public static final Type TYPE = Type.ASCII_SERIAL;
 
@@ -314,7 +313,7 @@ public class ASCIISerialDataSourceVO<T extends ASCIISerialDataSourceVO<?>>
     }
 
     @Override
-    protected void addPropertyChangesImpl(List<LocalizableMessage> list, T from) {
+    protected void addPropertyChangesImpl(List<LocalizableMessage> list, ASCIISerialDataSourceVO from) {
         final ASCIISerialDataSourceVO fromVO = (ASCIISerialDataSourceVO) from;
         AuditEventType.maybeAddPeriodChangeMessage(list,
                 "dsEdit.dnp3.rbePeriod", fromVO.updatePeriodType,

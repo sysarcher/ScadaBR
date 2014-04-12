@@ -56,11 +56,11 @@ import br.org.scadabr.web.i18n.LocalizableMessageImpl;
  *
  * @author Matthew Lohbihler
  */
-abstract public class DataSourceRT implements ILifecycle {
+abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecycle {
 
     public static final String ATTR_UNRELIABLE_KEY = "UNRELIABLE";
 
-    protected final DataSourceVO<?> vo;
+    protected final T vo;
 
     /**
      * Under the expectation that most data sources will run in their own
@@ -90,7 +90,7 @@ abstract public class DataSourceRT implements ILifecycle {
 
     private final List<DataSourceEventType> eventTypes;
 
-    public DataSourceRT(DataSourceVO<?> vo) {
+    public DataSourceRT(T vo) {
         this.vo = vo;
 
         eventTypes = new ArrayList<>();

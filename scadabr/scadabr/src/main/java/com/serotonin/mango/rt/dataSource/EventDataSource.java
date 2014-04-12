@@ -26,11 +26,11 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 
-abstract public class EventDataSource extends DataSourceRT {
+abstract public class EventDataSource<T extends DataSourceVO<T>> extends DataSourceRT<T> {
 
-    protected List<DataPointRT> dataPoints = new ArrayList<DataPointRT>();
+    protected List<DataPointRT> dataPoints = new ArrayList<>();
 
-    public EventDataSource(DataSourceVO<?> vo) {
+    public EventDataSource(T vo) {
         super(vo);
     }
 

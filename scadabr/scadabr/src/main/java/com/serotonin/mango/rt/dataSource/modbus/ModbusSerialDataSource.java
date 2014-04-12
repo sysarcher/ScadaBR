@@ -27,13 +27,10 @@ import com.serotonin.modbus4j.ModbusFactory;
 import com.serotonin.modbus4j.ModbusMaster;
 import java.text.ParseException;
 
-public class ModbusSerialDataSource extends ModbusDataSource {
+public class ModbusSerialDataSource extends ModbusDataSource<ModbusSerialDataSourceVO> {
 
-    private final ModbusSerialDataSourceVO configuration;
-
-    public ModbusSerialDataSource(ModbusSerialDataSourceVO configuration) {
-        super(configuration);
-        this.configuration = configuration;
+    public ModbusSerialDataSource(ModbusSerialDataSourceVO vo) {
+        super(vo);
     }
 
     //
@@ -44,20 +41,20 @@ public class ModbusSerialDataSource extends ModbusDataSource {
     @Override
     public void initialize() {
         SerialParameters params = new SerialParameters();
-        params.setCommPortId(configuration.getCommPortId());
+        params.setCommPortId(vo.getCommPortId());
         params.setPortOwnerName("Mango Modbus Serial Data Source");
-        params.setBaudRate(configuration.getBaudRate());
-        params.setFlowControlIn(configuration.getFlowControlIn());
-        params.setFlowControlOut(configuration.getFlowControlOut());
-        params.setDataBits(configuration.getDataBits());
-        params.setStopBits(configuration.getStopBits());
-        params.setParity(configuration.getParity());
+        params.setBaudRate(vo.getBaudRate());
+        params.setFlowControlIn(vo.getFlowControlIn());
+        params.setFlowControlOut(vo.getFlowControlOut());
+        params.setDataBits(vo.getDataBits());
+        params.setStopBits(vo.getStopBits());
+        params.setParity(vo.getParity());
 
         ModbusMaster modbusMaster;
-        if (configuration.getEncoding() == EncodingType.ASCII) {
-            modbusMaster = new ModbusFactory().createAsciiMaster(params, configuration.getConcurrency());
+        if (vo.getEncoding() == EncodingType.ASCII) {
+            modbusMaster = new ModbusFactory().createAsciiMaster(params, vo.getConcurrency());
         } else {
-            modbusMaster = new ModbusFactory().createRtuMaster(params, configuration.getConcurrency());
+            modbusMaster = new ModbusFactory().createRtuMaster(params, vo.getConcurrency());
         }
 
         super.initialize(modbusMaster);

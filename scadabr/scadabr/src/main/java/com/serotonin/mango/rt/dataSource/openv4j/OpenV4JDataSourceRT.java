@@ -40,7 +40,6 @@ import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
@@ -49,20 +48,18 @@ import java.text.ParseException;
  * TODO datatype NUMERIC_INT is missing TODO Starttime for timpepoints ???
  *
  */
-public class OpenV4JDataSourceRT extends PollingDataSource {
+public class OpenV4JDataSourceRT extends PollingDataSource<OpenV4JDataSourceVO> {
 
     private final static Log LOG = LogFactory.getLog(OpenV4JDataSourceRT.class);
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int POINT_READ_EXCEPTION_EVENT = 2;
     public static final int POINT_WRITE_EXCEPTION_EVENT = 3;
-    private final OpenV4JDataSourceVO vo;
     // private final long nextRescan = 0;
     private SerialPort sPort;
     private final ProtocolHandler protocolHandler = new ProtocolHandler();
 
     public OpenV4JDataSourceRT(OpenV4JDataSourceVO vo) {
         super(vo);
-        this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 
