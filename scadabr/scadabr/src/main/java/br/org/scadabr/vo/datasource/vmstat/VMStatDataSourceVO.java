@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package br.org.scadabr.vo.dataSource.vmstat;
+package br.org.scadabr.vo.datasource.vmstat;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -25,7 +25,7 @@ import java.util.List;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
-import br.org.scadabr.rt.dataSource.vmstat.VMStatDataSourceRT;
+import br.org.scadabr.rt.datasource.vmstat.VMStatDataSourceRT;
 import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;

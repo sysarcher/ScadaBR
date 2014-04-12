@@ -18,7 +18,9 @@
  */
 package com.serotonin.mango.rt.dataSource.snmp;
 
+import br.org.scadabr.ImplementMeException;
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -29,6 +31,7 @@ import com.serotonin.mango.vo.dataSource.snmp.SnmpDataSourceVO;
 import com.serotonin.mango.vo.dataSource.snmp.SnmpPointLocatorVO;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.logging.Log;
@@ -312,5 +315,9 @@ public class SnmpDataSourceRT extends PollingDataSource {
         } catch (IOException e) {
             throw new ShouldNeverHappenException(e);
         }
+    }
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
     }
 }

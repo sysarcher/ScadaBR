@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.pachube;
 
+import br.org.scadabr.ImplementMeException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
@@ -44,6 +45,7 @@ import br.org.scadabr.json.JsonArray;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonValue;
+import br.org.scadabr.timer.cron.CronExpression;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -282,5 +284,9 @@ public class PachubeDataSourceRT extends PollingDataSource {
             raiseEvent(POINT_WRITE_EXCEPTION_EVENT, valueTime.getTime(), true, new LocalizableMessageImpl(
                     "event.exception2", dataPoint.getVO().getName(), e.getMessage()));
         }
+    }
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
     }
 }

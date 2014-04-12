@@ -5,13 +5,15 @@
  */
 package br.org.scadabr.timer.cron;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Date;
 import java.util.TimeZone;
 
 /**
- *
+ * calendar ans nextTimeStramp must alway be in sync, this class is not threadsave - your responible for mutithreade accerss ...
  * @author aploese
  */
 public class CronExpression {
@@ -158,32 +160,32 @@ public class CronExpression {
     }
 
     public long calcNextValidTimeAfter() {
-        doIncrementTime = true;
-        calcNextValidTime();
-        synchronized (calendar) {
-            nextTimeStamp.setCalendarToTimestamp(calendar);
-            return calendar.getTimeInMillis();
-        }
-    }
-
-    public long calcNextValidTimeIncludingCurrent() {
-        doIncrementTime = false;
-        calcNextValidTime();
-        synchronized (calendar) {
-            nextTimeStamp.setCalendarToTimestamp(calendar);
-            return calendar.getTimeInMillis();
-        }
-    }
-
-    public long calcNextValidTimeIncludingThis(long tileInMillis) {
-        doIncrementTime = false;
-        synchronized (calendar) {
-            calendar.setTimeInMillis(tileInMillis);
-            nextTimeStamp.setCurrentTime(calendar);
+            doIncrementTime = true;
             calcNextValidTime();
             nextTimeStamp.setCalendarToTimestamp(calendar);
             return calendar.getTimeInMillis();
-        }
+    }
+
+    public long calcNextValidTimeAfter(long timeInMillis) {
+            doIncrementTime = true;
+            if (calendar.getTimeInMillis() != timeInMillis) {
+                calendar.setTimeInMillis(timeInMillis);
+                nextTimeStamp.setCurrentTime(calendar);
+            }
+            calcNextValidTime();
+            nextTimeStamp.setCalendarToTimestamp(calendar);
+            return calendar.getTimeInMillis();
+    }
+
+    public long calcNextValidTimeIncludingThis(long timeInMillis) {
+            doIncrementTime = false;
+            if (calendar.getTimeInMillis() != timeInMillis) {
+                calendar.setTimeInMillis(timeInMillis);
+                nextTimeStamp.setCurrentTime(calendar);
+            }
+            calcNextValidTime();
+            nextTimeStamp.setCalendarToTimestamp(calendar);
+            return calendar.getTimeInMillis();
     }
 
     public CronField setMilliSecond(CronField field) {
@@ -198,16 +200,9 @@ public class CronExpression {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public void setCurrentTime(long millis) {
-        synchronized (calendar) {
-            calendar.setTimeInMillis(millis);
-            nextTimeStamp.setCurrentTime(calendar);
-        }
-    }
-
     public void setTimeZone(TimeZone tz) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        //        nextTimeStamp.setTimeZone(tz);
+        calendar.setTimeZone(tz);
+        nextTimeStamp.setCurrentTime(calendar);
     }
 
     void setField(CronFieldType ft, CronField f) {
@@ -364,10 +359,17 @@ public class CronExpression {
         return sb.toString();
     }
 
-    String getNextTimestampAsString() {
-        return String.format("%04d-%02d-%02d %02d:%02d:%02d.%03d", nextTimeStamp.getYear(), nextTimeStamp.getMonth(), nextTimeStamp.getDayOfMonth(), nextTimeStamp.getHourOfDay(), nextTimeStamp.getMinute(), nextTimeStamp.getSecond(), nextTimeStamp.getMillisecond());
+    //TODO add Timezone....
+    public String getNextTimestampAsString() {
+        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS z");
+        df.setTimeZone(calendar.getTimeZone());
+        return df.format(calendar.getTime());
     }
 
+    public long getNextTimestampinMillis() {
+        return calendar.getTimeInMillis();
+    }
+    
     private void calcNextMillisecond() {
         switch (millisecond.type) {
             case ANY:

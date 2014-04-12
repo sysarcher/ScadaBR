@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package br.org.scadabr.rt.dataSource.vmstat;
+package br.org.scadabr.rt.datasource.vmstat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,11 +29,11 @@ import org.apache.commons.logging.LogFactory;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataSource.EventDataSource;
-import br.org.scadabr.vo.dataSource.vmstat.VMStatDataSourceVO;
-import br.org.scadabr.vo.dataSource.vmstat.VMStatPointLocatorVO;
+import br.org.scadabr.vo.datasource.vmstat.VMStatDataSourceVO;
+import br.org.scadabr.vo.datasource.vmstat.VMStatPointLocatorVO;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.vo.dataSource.vmstat.Attribute;
+import br.org.scadabr.vo.datasource.vmstat.Attribute;
 import java.util.EnumMap;
 
 /**

@@ -1,5 +1,6 @@
 package br.org.scadabr.rt.dataSource.iec101;
 
+import br.org.scadabr.ImplementMeException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -8,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.protocol.iec101.session.database.DataElement;
+import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.vo.dataSource.iec101.IEC101DataSourceVO;
 import br.org.scadabr.vo.dataSource.iec101.IEC101PointLocatorVO;
 
@@ -18,6 +20,7 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 public class IEC101DataSource extends PollingDataSource {
 
@@ -137,4 +140,8 @@ public class IEC101DataSource extends PollingDataSource {
         }
     }
 
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
+    }
 }

@@ -240,6 +240,7 @@ public class AuditEventType extends EventType {
         }
     }
 
+    @Deprecated
     public static void maybeAddPeriodChangeMessage(List<LocalizableMessage> list, String propertyNameKey,
             int fromPeriodType, int fromPeriod, int toPeriodType, int toPeriod) {
         if (fromPeriodType != toPeriodType || fromPeriod != toPeriod) {

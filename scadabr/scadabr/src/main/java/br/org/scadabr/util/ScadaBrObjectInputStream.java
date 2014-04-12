@@ -5,8 +5,8 @@
  */
 package br.org.scadabr.util;
 
-import br.org.scadabr.vo.dataSource.vmstat.VMStatDataSourceVO;
-import br.org.scadabr.vo.dataSource.vmstat.VMStatPointLocatorVO;
+import br.org.scadabr.vo.datasource.vmstat.VMStatDataSourceVO;
+import br.org.scadabr.vo.datasource.vmstat.VMStatPointLocatorVO;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -26,9 +26,9 @@ class ScadaBrObjectInputStream extends ObjectInputStream {
     protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException {
         final ObjectStreamClass osc = super.readClassDescriptor();
         switch (osc.getName()) {
-            case "com.serotonin.mango.vo.dataSource.vmstat.VMStatDataSourceVO":
+            case "com.serotonin.mango.vo.datasource.mbus.VMStatDataSourceVO":
                 return ObjectStreamClass.lookup(VMStatDataSourceVO.class);
-            case "com.serotonin.mango.vo.dataSource.vmstat.VMStatPointLocatorVO":
+            case "com.serotonin.mango.vo.datasource.mbus.VMStatPointLocatorVO":
                 return ObjectStreamClass.lookup(VMStatPointLocatorVO.class);
             default:
                 return osc;

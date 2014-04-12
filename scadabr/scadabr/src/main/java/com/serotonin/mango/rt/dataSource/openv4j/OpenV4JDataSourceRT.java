@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.openv4j;
 
+import br.org.scadabr.ImplementMeException;
 import gnu.io.SerialPort;
 
 import java.util.Date;
@@ -33,6 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.timer.cron.CronExpression;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -40,6 +42,7 @@ import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 /**
  *
@@ -195,5 +198,9 @@ public class OpenV4JDataSourceRT extends PollingDataSource {
             sPort.close();
             sPort = null;
         }
+    }
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
     }
 }

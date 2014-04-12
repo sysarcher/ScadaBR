@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.maint;
 
+import br.org.scadabr.ImplementMeException;
 import br.org.scadabr.timer.cron.CronExpression;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -264,6 +265,11 @@ public class VersionCheck extends SystemCronTask {
 
         UUID uuid = UUID.nameUUIDFromBytes(queue.popAll());
         return uuid.toString();
+    }
+
+    @Override
+    protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
+        throw new ImplementMeException();
     }
 
     static class NI {

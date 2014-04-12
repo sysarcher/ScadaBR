@@ -80,4 +80,9 @@ public class ReportTask extends SystemCronTask {
     protected void run(long scheduledExecutionTime) {
         ReportWorkItem.queueReport(report);
     }
+        @Override
+        protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
+            throw new ImplementMeException();
+        }
+    
 }

@@ -16,10 +16,10 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package br.org.scadabr.rt.dataSource.vmstat;
+package br.org.scadabr.rt.datasource.vmstat;
 
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
-import br.org.scadabr.vo.dataSource.vmstat.VMStatPointLocatorVO;
+import br.org.scadabr.vo.datasource.vmstat.VMStatPointLocatorVO;
 
 /**
  * @author Matthew Lohbihler

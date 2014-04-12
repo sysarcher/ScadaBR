@@ -119,10 +119,10 @@ public class ViewEditController extends SimpleFormRedirectController {
                         filename += form.getBackgroundImageMP().getOriginalFilename().substring(dot);
                     }
 
-                    // Save the file.
-                    FileOutputStream fos = new FileOutputStream(new File(dir, filename));
-                    fos.write(bytes);
-                    fos.close();
+                    try ( // Save the file.
+                            FileOutputStream fos = new FileOutputStream(new File(dir, filename))) {
+                        fos.write(bytes);
+                    }
 
                     form.getView().setBackgroundFilename(uploadDirectory + filename);
                 }
@@ -180,19 +180,19 @@ public class ViewEditController extends SimpleFormRedirectController {
 
                     String[] names = uploadDir.list();
                     int index, dot;
-                    for (int i = 0; i < names.length; i++) {
-                        dot = names[i].lastIndexOf('.');
+                    for (String name : names) {
+                        dot = name.lastIndexOf('.');
                         try {
                             if (dot == -1) {
-                                index = Integer.parseInt(names[i]);
+                                index = Integer.parseInt(name);
                             } else {
-                                index = Integer.parseInt(names[i].substring(0, dot));
+                                index = Integer.parseInt(name.substring(0, dot));
                             }
                             if (index >= nextImageId) {
                                 nextImageId = index + 1;
                             }
-                        } catch (NumberFormatException e) { /* no op */
-
+                        }catch (NumberFormatException e) { /* no op */
+                            
                         }
                     }
                 }

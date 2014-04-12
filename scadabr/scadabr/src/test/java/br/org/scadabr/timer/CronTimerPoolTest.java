@@ -8,7 +8,6 @@ package br.org.scadabr.timer;
 import br.org.scadabr.timer.cron.CronExpression;
 import java.text.ParseException;
 import java.util.TimeZone;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -34,6 +33,11 @@ public class CronTimerPoolTest {
         @Override
         protected void run(long scheduledExecutionTime) {
             i++;
+        }
+
+        @Override
+        protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
 
     }

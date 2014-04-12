@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.sql;
 
+import br.org.scadabr.ImplementMeException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,6 +36,7 @@ import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.io.StreamUtils;
+import br.org.scadabr.timer.cron.CronExpression;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -52,6 +54,7 @@ import com.serotonin.mango.vo.dataSource.sql.SqlPointLocatorVO;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
@@ -394,5 +397,9 @@ public class SqlDataSourceRT extends PollingDataSource {
         } catch (SQLException e) {
             throw new ShouldNeverHappenException(e);
         }
+    }
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
     }
 }

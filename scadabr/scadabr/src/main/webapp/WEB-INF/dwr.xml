@@ -193,7 +193,7 @@
     </convert>
     
     <!-- VMStat stuff -->
-    <convert converter="enum" match="br.org.scadabr.vo.dataSource.vmstat.Attribute" />
+    <convert converter="enum" match="br.org.scadabr.vo.datasource.mbus.Attribute" />
     <!-- End VMStat stuff -->
     
     
@@ -208,9 +208,9 @@
     <convert converter="bean" match="net.sf.mbus4j.TcpIpConnection" javascript="TcpIpConnection">
       <param name="include" value="bitPerSecond,responseTimeOutOffset,host,port"/>
     </convert>
-    <convert converter="bean" match="com.serotonin.mango.vo.dataSource.mbus.MBusSearchByAddressing"/>
-    <convert converter="bean" match="com.serotonin.mango.vo.dataSource.mbus.PrimaryAddressingSearch" javascript="PrimaryAddressingSearch"/>
-    <convert converter="bean" match="com.serotonin.mango.vo.dataSource.mbus.SecondaryAddressingSearch" javascript="SecondaryAddressingSearch"/>
+    <convert converter="bean" match="br.org.scadabr.vo.datasource.mbus.MBusSearchByAddressing"/>
+    <convert converter="bean" match="br.org.scadabr.vo.datasource.mbus.PrimaryAddressingSearch" javascript="PrimaryAddressingSearch"/>
+    <convert converter="bean" match="br.org.scadabr.vo.datasource.mbus.SecondaryAddressingSearch" javascript="SecondaryAddressingSearch"/>
     <convert converter="enum" match="net.sf.mbus4j.dataframes.MBusMedium" />
     <convert converter="enum" match="net.sf.mbus4j.MBusAddressing" />
     <!-- End MBus4J stuff-->

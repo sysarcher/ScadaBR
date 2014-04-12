@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.org.scadabr.vo.dataSource.vmstat;
+package br.org.scadabr.vo.datasource.vmstat;
 
 import br.org.scadabr.web.i18n.LocalizableI18nKey;
 

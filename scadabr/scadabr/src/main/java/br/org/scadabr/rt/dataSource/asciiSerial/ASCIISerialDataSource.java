@@ -1,5 +1,7 @@
 package br.org.scadabr.rt.dataSource.asciiSerial;
 
+import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.timer.cron.CronExpression;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 
@@ -25,6 +27,7 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 public class ASCIISerialDataSource extends PollingDataSource {
 
@@ -306,4 +309,8 @@ public class ASCIISerialDataSource extends PollingDataSource {
         this.sPort = sPort;
     }
 
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
+    }
 }

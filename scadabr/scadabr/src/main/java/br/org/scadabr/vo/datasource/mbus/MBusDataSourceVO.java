@@ -16,7 +16,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.vo.dataSource.mbus;
+package br.org.scadabr.vo.datasource.mbus;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -24,17 +24,17 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.Common;
+import br.org.scadabr.logger.LogUtils;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
-import com.serotonin.mango.rt.dataSource.mbus.MBusDataSourceRT;
+import br.org.scadabr.rt.datasource.mbus.MBusDataSourceRT;
+import br.org.scadabr.timer.cron.CronExpression;
+import br.org.scadabr.timer.cron.CronParser;
+import br.org.scadabr.timer.cron.CronPatterns;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
@@ -43,8 +43,11 @@ import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.TimeZone;
+import java.util.logging.Logger;
 import net.sf.atmodem4j.spsw.SerialPortList;
 import net.sf.mbus4j.Connection;
 import net.sf.mbus4j.SerialPortConnection;
@@ -54,12 +57,11 @@ import net.sf.mbus4j.dataframes.MBusMedium;
 @JsonRemoteEntity
 public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
 
-    private final static Log LOG = LogFactory.getLog(MBusDataSourceVO.class);
+    private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCARABR_DS_MBUS);
 
     public static MBusDataSourceVO createNewDataSource() {
         MBusDataSourceVO result = new MBusDataSourceVO();
         result.setConnection(new TcpIpConnection("192.168.1.210", 10001, Connection.DEFAULT_BAUDRATE, TcpIpConnection.DEFAULT_RESPONSE_TIMEOUT_OFFSET));
-        LOG.fatal("TCP CONN");
         return result;
     }
     private static final ExportCodes EVENT_CODES = new ExportCodes();
@@ -70,12 +72,11 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
         EVENT_CODES.addElement(MBusDataSourceRT.POINT_READ_EXCEPTION_EVENT, "POINT_READ_EXCEPTION");
         EVENT_CODES.addElement(MBusDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, "POINT_WRITE_EXCEPTION");
     }
-    @JsonRemoteProperty
-    private int updatePeriodType = Common.TimePeriods.DAYS;
-    @JsonRemoteProperty
-    private int updatePeriods = 1;
-    // TODO JSON manually
+
     private Connection connection;
+    private String cronPattern = CronPatterns._5_MINUTES.getPattern();
+    private String cronTimeZone = CronExpression.TIMEZONE_UTC.getID();
+    private boolean keepSerialPortOpen;
 
     @Override
     public Type getType() {
@@ -115,30 +116,37 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
     @Override
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.mbus.connection", connection);
-        AuditEventType.addPeriodMessage(list, "dsEdit.updatePeriod", updatePeriodType, updatePeriods);
+        if (connection instanceof SerialPortConnection) {
+        AuditEventType.addPropertyMessage(list, "dsEdit.mbus.keepSerialOpen", keepSerialPortOpen);
+        }
+        AuditEventType.addPropertyMessage(list, "dsEdit.cronPattern", cronPattern);
+        AuditEventType.addPropertyMessage(list, "dsEdit.cronTimeZone", cronTimeZone);
     }
 
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, MBusDataSourceVO from) {
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.connection", from.connection, connection);
-        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", from.updatePeriodType,
-                from.updatePeriods, updatePeriodType, updatePeriods);
+        if (connection instanceof SerialPortConnection) {
+            AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.keepSerialOpen", from.keepSerialPortOpen, keepSerialPortOpen);
+        }
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.cronPattern", from.cronPattern, cronPattern);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.cronTimeZone", from.cronTimeZone, cronTimeZone);
     }
 
-    public int getUpdatePeriodType() {
-        return updatePeriodType;
+    public String getCronPattern() {
+        return cronPattern;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
-        this.updatePeriodType = updatePeriodType;
+    public void setCronPattern(String cronPattern) {
+        this.cronPattern = cronPattern;
     }
 
-    public int getUpdatePeriods() {
-        return updatePeriods;
+    public String getCronTimeZone() {
+        return cronTimeZone;
     }
 
-    public void setUpdatePeriods(int updatePeriods) {
-        this.updatePeriods = updatePeriods;
+    public void setCronTimeZone(String cronTimeZone) {
+        this.cronTimeZone = cronTimeZone;
     }
 
     @Override
@@ -148,11 +156,13 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
         if (connection == null) {
             response.addContextual("connection", "validate.required");
         }
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextual("updatePeriodType", "validate.invalidValue");
+        if (!TimeZone.getTimeZone(cronTimeZone).getID().equals(cronTimeZone)) {
+            response.addContextual("cronTimeZone", "validate.invalidValue");
         }
-        if (updatePeriods <= 0) {
-            response.addContextual("updatePeriods", "validate.greaterThanZero");
+        try {
+            new CronParser().parse(cronPattern, TimeZone.getTimeZone(cronTimeZone));
+        } catch (ParseException e) {
+            response.addContextual("cronPatternh", "validate.invalidValue");
         }
     }
     //
@@ -161,14 +171,15 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
     // /
     //
     private static final long serialVersionUID = -1;
-    private static final int SERIAL_VERSION = 1;
+    private static final int SERIAL_VERSION = 2;
 
     // Serialization for saveDataSource
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(SERIAL_VERSION);
         out.writeObject(connection);
-        out.writeInt(updatePeriodType);
-        out.writeInt(updatePeriods);
+        out.writeBoolean(keepSerialPortOpen);
+        out.writeObject(cronPattern);
+        out.writeObject(cronTimeZone);
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
@@ -176,8 +187,15 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
         try {
             switch (ver) {
                 case 1:
-                    readObjectVer1(in);
+                    connection = (Connection) in.readObject();
+                    final int updatePeriodType = in.readInt();
+                    final int updatePeriods = in.readInt();
                     break;
+                case 2:
+                    connection = (Connection) in.readObject();
+                    keepSerialPortOpen = in.readBoolean();
+                    cronPattern = (String) in.readObject();
+                    cronTimeZone = (String) in.readObject();
             }
         } catch (ClassNotFoundException ex) {
             throw new RuntimeException(ex);
@@ -189,14 +207,14 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
         super.jsonDeserialize(reader, json);
         JsonObject jsonConnection = null;
         if (!json.isNull("tcpConnection")) {
-            LOG.fatal("TCP FROM JSON");
+            LOG.severe("TCP FROM JSON");
             jsonConnection = json.getJsonObject("tcpConnection");
             TcpIpConnection tcpConnection = new TcpIpConnection();
             tcpConnection.setHost(jsonConnection.getString("host"));
             tcpConnection.setPort(jsonConnection.getInt("port"));
             connection = tcpConnection;
         } else {
-            LOG.fatal("NO TCP FROM JSON");
+            LOG.severe("NO TCP FROM JSON");
         }
         //TODO serial stuff
         connection.setBitPerSecond(jsonConnection.getInt("bitPerSecond"));
@@ -206,7 +224,7 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        Map<String, Object> connectionMap = new LinkedHashMap<String, Object>();
+        Map<String, Object> connectionMap = new LinkedHashMap<>();
         connectionMap.put("bitPerSecond", connection.getBitPerSecond());
         connectionMap.put("responseTimeOutOffset", connection.getResponseTimeOutOffset());
         if (connection instanceof TcpIpConnection) {
@@ -248,20 +266,27 @@ public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
         return connection;
     }
 
-    private void readObjectVer1(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        connection = (Connection) in.readObject();
-        updatePeriodType = in.readInt();
-        updatePeriods = in.readInt();
-    }
-
     public String[] getLabels() {
         MBusMedium[] val = MBusMedium.values();
         String[] result = new String[val.length];
         for (int i = 0; i < val.length; i++) {
             result[i] = val[i].getLabel();
         }
-        System.out.println("MBUSVALUEs: " + result.length);
         return result;
+    }
+
+    /**
+     * @return the keepSerialPortOpen
+     */
+    public boolean isKeepSerialPortOpen() {
+        return keepSerialPortOpen;
+    }
+
+    /**
+     * @param keepSerialPortOpen the keepSerialPortOpen to set
+     */
+    public void setKeepSerialPortOpen(boolean keepSerialPortOpen) {
+        this.keepSerialPortOpen = keepSerialPortOpen;
     }
 
 }

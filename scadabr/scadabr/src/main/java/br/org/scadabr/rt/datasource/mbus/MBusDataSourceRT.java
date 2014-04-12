@@ -16,8 +16,10 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.rt.dataSource.mbus;
+package br.org.scadabr.rt.datasource.mbus;
 
+import br.org.scadabr.timer.cron.CronExpression;
+import br.org.scadabr.timer.cron.CronParser;
 import java.io.IOException;
 
 import net.sf.mbus4j.dataframes.datablocks.BigDecimalDataBlock;
@@ -26,7 +28,7 @@ import net.sf.mbus4j.dataframes.datablocks.LongDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.RealDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.ShortDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.StringDataBlock;
-import com.serotonin.mango.vo.dataSource.mbus.MBusDataSourceVO;
+import br.org.scadabr.vo.datasource.mbus.MBusDataSourceVO;
 import net.sf.mbus4j.master.MBusMaster;
 import net.sf.mbus4j.master.ValueRequest;
 import net.sf.mbus4j.master.ValueRequestPointLocator;
@@ -38,8 +40,9 @@ import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
+import java.util.TimeZone;
 import net.sf.mbus4j.dataframes.datablocks.BcdValue;
 
 /**
@@ -57,19 +60,6 @@ public class MBusDataSourceRT extends PollingDataSource {
     public MBusDataSourceRT(MBusDataSourceVO vo) {
         super(vo);
         this.vo = vo;
-        setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
-    }
-
-    @Override
-    public void initialize() {
-        LOG.fatal("INITIALIZE MBusaDataSourceRT" + Thread.getAllStackTraces().get(Thread.currentThread()));
-        super.initialize();
-    }
-
-    @Override
-    public void terminate() {
-        LOG.fatal("TERMINATE MBusaDataSourceRT" + Thread.getAllStackTraces().get(Thread.currentThread()));
-        super.terminate();
     }
 
     public double calcCorretedValue(DataPointRT point, double value) {
@@ -190,5 +180,10 @@ public class MBusDataSourceRT extends PollingDataSource {
         } finally {
             master.setConnection(null);
         }
+    }
+
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        return new CronParser().parse(vo.getCronPattern(), TimeZone.getTimeZone(vo.getCronTimeZone()));
     }
 }

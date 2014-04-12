@@ -5,26 +5,29 @@
  */
 package br.org.scadabr.timer;
 
+import br.org.scadabr.logger.LogUtils;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author aploese
  */
 public class CronTimerPool<T extends CronTask, V extends Runnable> {
+    
+    private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_CORE);
 
     class TimerThread extends Thread {
 
         boolean newTasksMayBeScheduled = true;
 
         private final TaskQueue queue;
-
-        private final GregorianCalendar calendar = new GregorianCalendar();
 
         TimerThread(TaskQueue queue) {
             this.queue = queue;
@@ -34,13 +37,15 @@ public class CronTimerPool<T extends CronTask, V extends Runnable> {
         public void run() {
             try {
                 mainLoop();
+            } catch (Throwable t) {
+                LOG.log(Level.SEVERE, "CronTimePOOL EX", t);
             } finally {
                 // Someone killed this Thread, behave as if Timer cancelled
                 synchronized (queue) {
                     newTasksMayBeScheduled = false;
                     queue.clear();  // Eliminate obsolete references
                 }
-            }
+            } 
         }
 
         /**
@@ -72,17 +77,21 @@ public class CronTimerPool<T extends CronTask, V extends Runnable> {
                             executionTime = task.nextExecutionTime;
                             if (taskFired = (executionTime <= currentTime)) {
                                 queue.rescheduleMin(
-                                        task.calcNextExecutionTimeAfter(calendar));
+                                        task.calcNextExecutionTimeAfter());
                             }
                         }
-                        if (!taskFired) // Task hasn't yet fired; wait
-                        {
+                        if (!taskFired) {
+                            // Task hasn't yet fired; wait
                             queue.wait(executionTime - currentTime);
                         }
                     }
-                    if (taskFired) // Task fired; run it, holding no locks
-                    {
-                        tpe.execute(task.createRunner(executionTime));
+                    if (taskFired) {
+                        // Task fired; run it, holding no locks
+                        try {
+                            tpe.execute(task.createRunner(executionTime));
+                        } catch (CronTask.OverrideDieException e) {
+                            
+                        }
                     }
                 } catch (InterruptedException e) {
                 }
@@ -148,6 +157,7 @@ public class CronTimerPool<T extends CronTask, V extends Runnable> {
                 }
                 task.calcNextExecutionTimeIncludingNow(System.currentTimeMillis());
                 task.state = CronTask.SCHEDULED;
+                task.tpe = this.tpe;
             }
 
             queue.add(task);

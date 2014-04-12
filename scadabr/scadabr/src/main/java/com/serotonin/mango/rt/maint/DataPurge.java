@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.maint;
 
+import br.org.scadabr.ImplementMeException;
 import java.io.File;
 import java.text.ParseException;
 import java.util.Collections;
@@ -148,6 +149,11 @@ public class DataPurge {
         @Override
         protected void run(long scheduledExecutionTime) {
             new DataPurge().execute(scheduledExecutionTime);
+        }
+
+        @Override
+        protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
+            throw new ImplementMeException();
         }
     }
 }

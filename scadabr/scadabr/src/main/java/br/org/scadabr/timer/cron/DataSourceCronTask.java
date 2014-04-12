@@ -23,9 +23,19 @@ public class DataSourceCronTask extends CronTask {
         this.dataSource = dataSource;
     }
 
+    public DataSourceCronTask(PollingDataSource dataSource, CronExpression cronExpression) {
+        super(cronExpression);
+        this.dataSource = dataSource;
+    }
+
     @Override
     protected void run(long scheduledExecutionTime) {
         dataSource.collectData(scheduledExecutionTime);
+    }
+
+    @Override
+    protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
+        return dataSource.overrunDetected(lastExecutionTime, thisExecutionTime);
     }
 
 }

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr;
 
+import br.org.scadabr.logger.LogUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,8 +40,12 @@ import com.serotonin.mango.web.dwr.beans.EventExportDefinition;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EventsDwr extends BaseDwr {
+
+    private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_DWR);
 
     private static final int PAGE_SIZE = 50;
     private static final int PAGINATION_RADIUS = 3;
@@ -64,79 +69,85 @@ public class EventsDwr extends BaseDwr {
             int fromHour, int fromMinute, int fromSecond, boolean toNone, int toYear, int toMonth, int toDay,
             int toHour, int toMinute, int toSecond, int page, Date date) {
         DwrResponseI18n response = new DwrResponseI18n();
-        HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
-        User user = Common.getUser(request);
+        try {
+            HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
+            User user = Common.getUser(request);
 
-        int from = PAGE_SIZE * page;
-        int to = from + PAGE_SIZE;
+            int from = PAGE_SIZE * page;
+            int to = from + PAGE_SIZE;
 
         // This date is for the "jump to date" functionality. The date is set for the top of the day, which will end up 
-        // excluding all of the events for that day. So, // we need to add 1 day to it.
-        if (date != null) {
-            date = DateUtils.minus(new DateTime(date.getTime()), Common.TimePeriods.DAYS, -1).toDate();
-        }
+            // excluding all of the events for that day. So, // we need to add 1 day to it.
+            if (date != null) {
+                date = DateUtils.minus(new DateTime(date.getTime()), Common.TimePeriods.DAYS, -1).toDate();
+            }
 
-        LongPair dateRange = getDateRange(dateRangeType, relativeDateType, previousPeriodCount, previousPeriodType,
-                pastPeriodCount, pastPeriodType, fromNone, fromYear, fromMonth, fromDay, fromHour, fromMinute,
-                fromSecond, toNone, toYear, toMonth, toDay, toHour, toMinute, toSecond);
+            LongPair dateRange = getDateRange(dateRangeType, relativeDateType, previousPeriodCount, previousPeriodType,
+                    pastPeriodCount, pastPeriodType, fromNone, fromYear, fromMonth, fromDay, fromHour, fromMinute,
+                    fromSecond, toNone, toYear, toMonth, toDay, toHour, toMinute, toSecond);
 
-        EventDao eventDao = new EventDao();
-        List<EventInstance> results = eventDao.search(eventId, eventSourceType, status, alarmLevel,
-                getKeywords(keywordStr), dateRange.getL1(), dateRange.getL2(), user.getId(), getResourceBundle(), from,
-                to, date);
+            EventDao eventDao = new EventDao();
+            List<EventInstance> results = eventDao.search(eventId, eventSourceType, status, alarmLevel,
+                    getKeywords(keywordStr), dateRange.getL1(), dateRange.getL2(), user.getId(), getResourceBundle(), from,
+                    to, date);
 
-        Map<String, Object> model = new HashMap<>();
-        int searchRowCount = eventDao.getSearchRowCount();
-        int pages = (int) Math.ceil(((double) searchRowCount) / PAGE_SIZE);
+            Map<String, Object> model = new HashMap<>();
+            int searchRowCount = eventDao.getSearchRowCount();
+            int pages = (int) Math.ceil(((double) searchRowCount) / PAGE_SIZE);
 
-        if (date != null) {
-            int startRow = eventDao.getStartRow();
-            if (startRow == -1) {
-                page = pages - 1;
+            if (date != null) {
+                int startRow = eventDao.getStartRow();
+                if (startRow == -1) {
+                    page = pages - 1;
+                } else {
+                    page = eventDao.getStartRow() / PAGE_SIZE;
+                }
+            }
+
+            if (pages > 1) {
+                model.put("displayPagination", true);
+
+                if (page - PAGINATION_RADIUS > 1) {
+                    model.put("leftEllipsis", true);
+                } else {
+                    model.put("leftEllipsis", false);
+                }
+
+                int linkFrom = page + 1 - PAGINATION_RADIUS;
+                if (linkFrom < 2) {
+                    linkFrom = 2;
+                }
+                model.put("linkFrom", linkFrom);
+                int linkTo = page + 1 + PAGINATION_RADIUS;
+                if (linkTo >= pages) {
+                    linkTo = pages - 1;
+                }
+                model.put("linkTo", linkTo);
+
+                if (page + PAGINATION_RADIUS < pages - 2) {
+                    model.put("rightEllipsis", true);
+                } else {
+                    model.put("rightEllipsis", false);
+                }
+
+                model.put("numberOfPages", pages);
             } else {
-                page = eventDao.getStartRow() / PAGE_SIZE;
+                model.put("displayPagination", false);
             }
+
+            model.put("events", results);
+            model.put("page", page);
+            model.put("pendingEvents", false);
+
+            response.addData("content", generateContent(request, "eventList.jsp", model));
+            response.addData("resultCount", new LocalizableMessageImpl("events.search.resultCount", searchRowCount));
+
+            return response;
+        } catch (Throwable t) {
+            LOG.log(Level.SEVERE, "Caght ex", t);
+            response.addGeneric("EventsDWR.search", t);
+            return response;
         }
-
-        if (pages > 1) {
-            model.put("displayPagination", true);
-
-            if (page - PAGINATION_RADIUS > 1) {
-                model.put("leftEllipsis", true);
-            } else {
-                model.put("leftEllipsis", false);
-            }
-
-            int linkFrom = page + 1 - PAGINATION_RADIUS;
-            if (linkFrom < 2) {
-                linkFrom = 2;
-            }
-            model.put("linkFrom", linkFrom);
-            int linkTo = page + 1 + PAGINATION_RADIUS;
-            if (linkTo >= pages) {
-                linkTo = pages - 1;
-            }
-            model.put("linkTo", linkTo);
-
-            if (page + PAGINATION_RADIUS < pages - 2) {
-                model.put("rightEllipsis", true);
-            } else {
-                model.put("rightEllipsis", false);
-            }
-
-            model.put("numberOfPages", pages);
-        } else {
-            model.put("displayPagination", false);
-        }
-
-        model.put("events", results);
-        model.put("page", page);
-        model.put("pendingEvents", false);
-
-        response.addData("content", generateContent(request, "eventList.jsp", model));
-        response.addData("resultCount", new LocalizableMessageImpl("events.search.resultCount", searchRowCount));
-
-        return response;
     }
 
     @MethodFilter
