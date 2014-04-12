@@ -18,9 +18,9 @@
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
 
-<%@page import="br.org.scadabr.vo.dataSource.vmstat.VMStatDataSourceVO"%>
-<%@page import="br.org.scadabr.vo.dataSource.vmstat.VMStatPointLocatorVO"%>
-<%@page import="br.org.scadabr.vo.dataSource.vmstat.Attribute"%>
+<%@page import="br.org.scadabr.vo.datasource.mbus.VMStatDataSourceVO"%>
+<%@page import="br.org.scadabr.vo.datasource.mbus.VMStatPointLocatorVO"%>
+<%@page import="br.org.scadabr.vo.datasource.mbus.Attribute"%>
 <script type="text/javascript">
     function saveDataSourceImpl() {
         DataSourceEditDwr.saveVMStatDataSource($get("dataSourceName"), $get("dataSourceXid"), $get("pollSeconds"),  $get("outputScale"), saveDataSourceCB);

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.maint;
 
+import br.org.scadabr.ImplementMeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -56,4 +57,8 @@ public class MemoryCheck extends SystemCronTask {
         log.info("Free=" + rt.freeMemory() + ", total=" + rt.totalMemory() + ", max=" + rt.maxMemory());
     }
 
+        @Override
+        protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
+            throw new ImplementMeException();
+        }
 }

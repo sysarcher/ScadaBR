@@ -18,6 +18,8 @@
  */
 package com.serotonin.mango.rt.dataSource.pop3;
 
+import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.timer.cron.CronExpression;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
@@ -42,6 +44,7 @@ import com.serotonin.mango.vo.dataSource.pop3.Pop3DataSourceVO;
 import br.org.scadabr.web.i18n.LocalizableException;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
@@ -233,5 +236,9 @@ public class Pop3DataSourceRT extends PollingDataSource {
             // Save the new value
             dp.updatePointValue(new PointValueTime(value, valueTime));
         }
+    }
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
     }
 }

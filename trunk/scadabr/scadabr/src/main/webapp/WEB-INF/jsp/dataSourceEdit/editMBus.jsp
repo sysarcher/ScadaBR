@@ -44,11 +44,11 @@
 
     function getConnection() {
         conn = null;
-        if ($get("connectionType") == "TCP_IP") {
+        if ($get("connectionType") === "TCP_IP") {
             conn = new TcpIpConnection();
             conn.host = $get("ipAddressOrHostname");
             conn.port = $get("tcpPort");
-        } else if ($get("connectionType") == "SERIAL_DIRECT") {
+        } else if ($get("connectionType") === "SERIAL_DIRECT") {
             conn = new SerialDirectConnection();
             conn.portName = $get("commPortId");
         } else {
@@ -61,11 +61,11 @@
 
     function getSearchAddressing() {
         addressing = null;
-        if ($get("addressingType") == "PRIMARY") {
+        if ($get("addressingType") === "PRIMARY") {
             addressing = new PrimaryAddressingSearch();
             addressing.firstPrimaryAddress = $get("firstPrimaryAddress");
             addressing.lastPrimaryAddress = $get("lastPrimaryAddress");
-        } else if ($get("addressingType") == "SECONDARY") {
+        } else if ($get("addressingType") === "SECONDARY") {
             addressing = new SecondaryAddressingSearch();
             addressing.id = $get("secAddrId");
             addressing.manufacturer = $get("secAddrMan");
@@ -113,7 +113,7 @@
                 rowCreator: function(options) {
                     var tr = document.createElement("tr");
                     tr.id = "deviceIndex"+ options.rowData.id;
-                    tr.className = "row"+ (options.rowIndex % 2 == 0 ? "" : "Alt");
+                    tr.className = "row"+ (options.rowIndex % 2 === 0 ? "" : "Alt");
                     return tr;
                 }
             });
@@ -189,9 +189,10 @@
     }
 
     function saveDataSourceImpl() {
-            DataSourceEditDwr.saveMBusDataSource($get("dataSourceName"), $get("dataSourceXid"),
-            getConnection(),
-            $get("updatePeriodType"), $get("updatePeriods"), saveDataSourceCB);
+            DataSourceEditDwr.saveMBusDataSource($get("dataSourceName"), $get("dataSourceXid"), 
+            getConnection(), $get("keepSerialPortOpen"), 
+            $get("cronPattern"), $get("cronTimeZone"), 
+            saveDataSourceCB);
     }
 
 
@@ -276,13 +277,13 @@
 
     function updateAddressing() {
        //Primary Addressing
-       setDisabled("firstPrimaryAddress", $get("addressingType") != "PRIMARY");
-       setDisabled("lastPrimaryAddress", $get("addressingType") != "PRIMARY");
+       setDisabled("firstPrimaryAddress", $get("addressingType") !== "PRIMARY");
+       setDisabled("lastPrimaryAddress", $get("addressingType") !== "PRIMARY");
        //Secondary Addressing
-       setDisabled("secAddrId", $get("addressingType") != "SECONDARY");
-       setDisabled("secAddrMan", $get("addressingType") != "SECONDARY");
-       setDisabled("secAddrMedium", $get("addressingType") != "SECONDARY");
-       setDisabled("secAddrVersion", $get("addressingType") != "SECONDARY");
+       setDisabled("secAddrId", $get("addressingType") !== "SECONDARY");
+       setDisabled("secAddrMan", $get("addressingType") !== "SECONDARY");
+       setDisabled("secAddrMedium", $get("addressingType") !== "SECONDARY");
+       setDisabled("secAddrVersion", $get("addressingType") !== "SECONDARY");
     }
 
  </script>
@@ -318,7 +319,7 @@
 <tr>
     <td colspan="2">
         <input type="radio" name="connectionType" id="useTcpIpConnection" value="TCP_IP" <c:if test="${dataSource.tcpIp}">checked="checked"</c:if> onclick="updateConnetionType()" >
-        <label class="formLabelRequired" for="useDirectConnection"><fmt:message key="dsEdit.mbus.useTcpIpConnection"/></label>
+        <label class="formLabelRequired" for="useTcpIpConnection"><fmt:message key="dsEdit.mbus.useTcpIpConnection"/></label>
     </td>
 </tr>
 <tr>
@@ -361,17 +362,29 @@
     </c:choose>
   </td>
 </tr>
+<tr>
+    <td colspan="2">
+        <input type="checkbox" id="keepSerialPortOpen" <c:if test="${dataSource.keepSerialPortOpen}"> checked="checked" </c:if> />
+        <label class="formLabelRequired" for="keepSerialPortOpen"><fmt:message key="dsEdit.mbus.keepSerialPortOpen"/></label>
+    </td>
+    <td>
+<tr>
 
 
 
 <tr>
-    <td colspan="3">
-        <label class="formLabelRequired" for="updatePeriods" ><fmt:message key="dsEdit.updatePeriod"/></label>
-        <input class="formShort" type="text" id="updatePeriods" value="${dataSource.updatePeriods}" />
-        <sbt:select id="updatePeriodType" value="${dataSource.updatePeriodType}">
-            <tag:timePeriodOptions sst="true" s="true" min="true" h="true" d="true" w="true" mon="true"/>
+    <td class="formLabelRequired" for="updatePeriods" ><fmt:message key="dsEdit.cronPattern"/></td>
+    <td class="formField"> <input type="text" id="cronPattern" value="${dataSource.cronPattern}" /></td>
+</tr>
+<tr>
+  <td class="formLabelRequired"><fmt:message key="dsEdit.cronTimeZone"/></td>
+  <td class="formField">
+          <sbt:select id="cronTimeZone" value="${dataSource.cronTimeZone}">
+          <c:forEach items="<%= java.util.TimeZone.getAvailableIDs()%>" var="tz">
+            <sbt:option value="${tz}">${tz}</sbt:option>
+          </c:forEach>
         </sbt:select>
-    </td>
+  </td>
 </tr>
 
 </table>

@@ -16,7 +16,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.vo.dataSource.mbus;
+package br.org.scadabr.vo.datasource.mbus;
 
 import net.sf.mbus4j.MBusAddressing;
 import net.sf.mbus4j.MBusUtils;

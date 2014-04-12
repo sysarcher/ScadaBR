@@ -18,11 +18,14 @@
  */
 package com.serotonin.mango.rt.dataSource.modbus;
 
+import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.timer.cron.CronExpression;
 import com.serotonin.io.serial.SerialParameters;
 import com.serotonin.mango.vo.dataSource.modbus.ModbusSerialDataSourceVO;
 import com.serotonin.mango.vo.dataSource.modbus.ModbusSerialDataSourceVO.EncodingType;
 import com.serotonin.modbus4j.ModbusFactory;
 import com.serotonin.modbus4j.ModbusMaster;
+import java.text.ParseException;
 
 public class ModbusSerialDataSource extends ModbusDataSource {
 
@@ -60,4 +63,8 @@ public class ModbusSerialDataSource extends ModbusDataSource {
         super.initialize(modbusMaster);
     }
 
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
+    }
 }

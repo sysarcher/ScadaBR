@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.http;
 
+import br.org.scadabr.ImplementMeException;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.io.StreamUtils;
+import br.org.scadabr.timer.cron.CronExpression;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.ImageSaveException;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -46,6 +48,7 @@ import br.org.scadabr.util.image.PercentScaledImage;
 import br.org.scadabr.web.i18n.LocalizableException;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
@@ -103,7 +106,7 @@ public class HttpImageDataSourceRT extends PollingDataSource {
 
     class ImageRetrieverMonitor {
 
-        private final List<ImageRetriever> retrievers = new ArrayList<ImageRetriever>();
+        private final List<ImageRetriever> retrievers = new ArrayList<>();
         private LocalizableMessage retrievalFailure;
         private LocalizableMessage saveFailure;
 
@@ -124,9 +127,7 @@ public class HttpImageDataSourceRT extends PollingDataSource {
             }
 
             if (retrievers.isEmpty()) {
-                synchronized (this) {
                     notifyAll();
-                }
             }
         }
 
@@ -264,4 +265,10 @@ public class HttpImageDataSourceRT extends PollingDataSource {
 
         return data;
     }
+
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
+    }
+
 }

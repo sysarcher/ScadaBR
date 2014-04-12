@@ -16,14 +16,14 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.rt.dataSource.mbus;
+package br.org.scadabr.rt.datasource.mbus;
 
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
-import com.serotonin.mango.vo.dataSource.mbus.MBusPointLocatorVO;
+import br.org.scadabr.vo.datasource.mbus.MBusPointLocatorVO;
 import net.sf.mbus4j.master.ValueRequestPointLocator;
 
 import com.serotonin.mango.rt.dataImage.DataPointRT;

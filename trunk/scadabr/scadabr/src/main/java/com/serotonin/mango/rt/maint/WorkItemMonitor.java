@@ -1,5 +1,6 @@
 package com.serotonin.mango.rt.maint;
 
+import br.org.scadabr.ImplementMeException;
 import java.util.Collection;
 
 import com.serotonin.mango.Common;
@@ -56,4 +57,8 @@ public class WorkItemMonitor extends SystemCronTask {
         }
         maxStackHeight.setValue(max);
     }
+        @Override
+        protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
+            throw new ImplementMeException();
+        }
 }

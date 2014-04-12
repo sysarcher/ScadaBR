@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.bacnet;
 
+import br.org.scadabr.ImplementMeException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,8 +84,8 @@ import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.SystemCronTask;
 import com.serotonin.util.queue.ByteQueue;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -316,6 +317,11 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
         }
     }
 
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
+    }
+
     class DevicePoller implements WorkItem {
 
         private final RemoteDevice d;
@@ -469,6 +475,11 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
                     }
                 }
             }
+        }
+
+        @Override
+        protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
+            throw new ImplementMeException();
         }
     }
 

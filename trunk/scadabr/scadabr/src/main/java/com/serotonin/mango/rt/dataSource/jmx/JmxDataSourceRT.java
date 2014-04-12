@@ -18,6 +18,8 @@
  */
 package com.serotonin.mango.rt.dataSource.jmx;
 
+import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.timer.cron.CronExpression;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
@@ -44,6 +46,7 @@ import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.vo.dataSource.jmx.JmxDataSourceVO;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
@@ -296,5 +299,9 @@ public class JmxDataSourceRT extends PollingDataSource {
             }
         }
         return null;
+    }
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
     }
 }

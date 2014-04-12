@@ -16,7 +16,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.vo.dataSource.mbus;
+package br.org.scadabr.vo.datasource.mbus;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -38,7 +38,7 @@ import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
-import com.serotonin.mango.rt.dataSource.mbus.MBusPointLocatorRT;
+import br.org.scadabr.rt.datasource.mbus.MBusPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
@@ -239,23 +239,19 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.addressing", from.addressing, addressing);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.address", from.address, address);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.difCode", from.difCode, difCode);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.functionField", from.functionField,
-                functionField);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.functionField", from.functionField, functionField);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.deviceUnit", from.deviceUnit, deviceUnit);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.tariff", from.tariff, tariff);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.storageNumber", from.storageNumber,
-                storageNumber);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.storageNumber", from.storageNumber, storageNumber);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.vifType", from.vifType, vifType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.vifLabel", from.vifLabel, vifLabel);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.unitOfMeasurement", from.unitOfMeasurement,
-                unitOfMeasurement);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.unitOfMeasurement", from.unitOfMeasurement, unitOfMeasurement);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.siPrefix", from.siPrefix, siPrefix);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.exponent", from.exponent, exponent);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.vifeLabel", from.vifeLabels, vifeLabels);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.vifeLabel", from.vifeTypes, vifeTypes);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.medium", from.medium, medium);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.responseFrame", from.responseFrame,
-                responseFrame);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.responseFrame", from.responseFrame, responseFrame);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.version", from.version, version);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.id", from.identNumber, identNumber);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.mbus.manufacturer", from.manufacturer, manufacturer);

@@ -60,7 +60,7 @@ abstract public class DataSourceRT implements ILifecycle {
 
     public static final String ATTR_UNRELIABLE_KEY = "UNRELIABLE";
 
-    private final DataSourceVO<?> vo;
+    protected final DataSourceVO<?> vo;
 
     /**
      * Under the expectation that most data sources will run in their own

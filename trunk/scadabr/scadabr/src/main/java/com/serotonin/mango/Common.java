@@ -115,6 +115,7 @@ public class Common {
         String DATA_POINTS_NAME_ID_MAPPING = "DATAPOINTS_NAME_ID_MAPPING";
     }
 
+    @Deprecated
     public interface TimePeriods {
 
         int MILLISECONDS = 8;
@@ -127,6 +128,7 @@ public class Common {
         int YEARS = 7;
     }
 
+    @Deprecated
     public final static ExportCodes TIME_PERIOD_CODES = new ExportCodes();
 
     static {
@@ -153,10 +155,12 @@ public class Common {
      * @param numberOfPeriods
      * @return
      */
+    @Deprecated
     public static long getMillis(int periodType, int periods) {
         return getPeriod(periodType, periods).toDurationFrom(null).getMillis();
     }
 
+    @Deprecated
     public static Period getPeriod(int periodType, int periods) {
         switch (periodType) {
             case TimePeriods.MILLISECONDS:
@@ -181,6 +185,7 @@ public class Common {
         }
     }
 
+    @Deprecated
     public static LocalizableMessage getPeriodDescription(int periodType,
             int periods) {
         String periodKey;

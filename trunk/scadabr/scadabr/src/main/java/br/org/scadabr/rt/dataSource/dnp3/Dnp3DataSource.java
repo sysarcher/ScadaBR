@@ -1,5 +1,6 @@
 package br.org.scadabr.rt.dataSource.dnp3;
 
+import br.org.scadabr.ImplementMeException;
 import java.net.ConnectException;
 import java.util.Calendar;
 import java.util.Date;
@@ -9,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.dnp34j.master.session.database.DataElement;
+import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.vo.dataSource.dnp3.Dnp3DataSourceVO;
 import br.org.scadabr.vo.dataSource.dnp3.Dnp3PointLocatorVO;
 import br.org.scadabr.web.i18n.LocalizableException;
@@ -20,6 +22,7 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 public class Dnp3DataSource extends PollingDataSource {
 
@@ -124,4 +127,8 @@ public class Dnp3DataSource extends PollingDataSource {
         return DataSourceRT.wrapException(e);
     }
 
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
+    }
 }

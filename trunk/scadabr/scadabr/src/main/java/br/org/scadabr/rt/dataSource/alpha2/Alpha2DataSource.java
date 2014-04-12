@@ -1,5 +1,7 @@
 package br.org.scadabr.rt.dataSource.alpha2;
 
+import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.timer.cron.CronExpression;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +26,7 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 public class Alpha2DataSource extends PollingDataSource {
 
@@ -225,4 +228,8 @@ public class Alpha2DataSource extends PollingDataSource {
     // }
     //
     // }
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
+    }
 }

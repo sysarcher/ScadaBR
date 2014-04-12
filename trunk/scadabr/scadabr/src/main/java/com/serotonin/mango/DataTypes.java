@@ -23,6 +23,7 @@ import com.serotonin.mango.util.ExportCodes;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
+//TODO Make enum out of this ...
 public class DataTypes {
 
     public static final int UNKNOWN = 0;

@@ -1,5 +1,7 @@
 package br.org.scadabr.rt.dataSource.asciiFile;
 
+import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.timer.cron.CronExpression;
 import java.io.File;
 import java.io.FileReader;
 import java.text.SimpleDateFormat;
@@ -20,6 +22,7 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 public class ASCIIFileDataSource extends PollingDataSource {
 
@@ -149,4 +152,8 @@ public class ASCIIFileDataSource extends PollingDataSource {
         return sb.toString();
     }
 
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
+    }
 }

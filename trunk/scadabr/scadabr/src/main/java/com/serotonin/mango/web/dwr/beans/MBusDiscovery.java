@@ -32,9 +32,9 @@ import org.apache.commons.logging.LogFactory;
 import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.l10n.Localizer;
 import net.sf.mbus4j.Connection;
-import com.serotonin.mango.vo.dataSource.mbus.MBusSearchByAddressing;
-import com.serotonin.mango.vo.dataSource.mbus.PrimaryAddressingSearch;
-import com.serotonin.mango.vo.dataSource.mbus.SecondaryAddressingSearch;
+import br.org.scadabr.vo.datasource.mbus.MBusSearchByAddressing;
+import br.org.scadabr.vo.datasource.mbus.PrimaryAddressingSearch;
+import br.org.scadabr.vo.datasource.mbus.SecondaryAddressingSearch;
 
 /**
  * @author aploese

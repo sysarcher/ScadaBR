@@ -3,43 +3,66 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package br.org.scadabr.timer;
 
-import br.org.scadabr.ImplementMeException;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import java.text.ParseException;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  *
  * @author aploese
  */
 public abstract class CronTask {
+    
+    ThreadPoolExecutor tpe;
 
     protected abstract void run(long executionTime);
 
-    TaskRunner tr;
-
-    TaskRunner createRunner(long scheduledExecutionTime) {
-        return new TaskRunner(scheduledExecutionTime);
-    }
+    /**
+     * An Overrrun has occured, should this task run again???
+     *
+     * @return true, if Task should scheduled, false if it should not run.
+     */
+    protected abstract boolean overrunDetected(long lastExecutionTime, long thisExecutionTime);
     
+    public boolean isExecuting() {
+        synchronized (lock) {
+            return currentExecutedTaskRunner != null;
+        }
+        
+    }
+
+    TaskRunner currentExecutedTaskRunner;
+
+    TaskRunner createRunner(long scheduledExecutionTime) throws OverrideDieException {
+        synchronized (lock) {
+            if (currentExecutedTaskRunner != null) {
+                if (!overrunDetected(currentExecutedTaskRunner.executionTime, scheduledExecutionTime)) {
+                    currentExecutedTaskRunner = null;
+                    throw new OverrideDieException();
+                }
+            }
+            currentExecutedTaskRunner = new TaskRunner(scheduledExecutionTime);
+        }
+        return currentExecutedTaskRunner;
+    }
+
+    class OverrideDieException extends Exception {
+
+        public OverrideDieException() {
+        }
+    }
+
     class TaskRunner implements Runnable {
 
         final long executionTime;
-        
-        public TaskRunner(long executionTime) {
+
+        private TaskRunner(final long executionTime) {
             this.executionTime = executionTime;
-            synchronized (lock) {
-                if (tr == null) {
-                    tr = this;
-                } else {
-                    throw  new ImplementMeException(); // what should happen if the old run is not over and we called again???
-                }
-            }
         }
 
         @Override
@@ -47,31 +70,35 @@ public abstract class CronTask {
             try {
                 CronTask.this.run(executionTime);
             } finally {
-                synchronized(lock) {
-                    if (tr == this) {
-                        tr = null;
+                synchronized (lock) {
+                    if (currentExecutedTaskRunner == this) {
+                        currentExecutedTaskRunner = null;
                     }
                 }
             }
         }
+
+        private Exception OverrideDieException() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
     }
-    
+
     final Object lock = new Object();
 
     int state = VIRGIN;
 
     static final int VIRGIN = 0;
 
-    static final int SCHEDULED   = 1;
+    static final int SCHEDULED = 1;
 
-    static final int EXECUTED    = 2;
+    static final int EXECUTED = 2;
 
-    static final int CANCELLED   = 3;
-    
+    static final int CANCELLED = 3;
+
     CronExpression cronExpression;
 
     long nextExecutionTime;
-    
+
     protected CronTask(GregorianCalendar c) {
         cronExpression = new CronExpression(c);
     }
@@ -86,7 +113,8 @@ public abstract class CronTask {
     }
 
     public boolean cancel() {
-        synchronized(lock) {
+        tpe.remove(currentExecutedTaskRunner);
+        synchronized (lock) {
             boolean result = (state == SCHEDULED);
             state = CANCELLED;
             return result;
@@ -94,23 +122,25 @@ public abstract class CronTask {
     }
 
     public long calcNextExecutionTimeIncludingNow(long timeInMillis) {
-        synchronized(lock) {
+        synchronized (lock) {
             nextExecutionTime = cronExpression.calcNextValidTimeIncludingThis(timeInMillis);
             return nextExecutionTime;
         }
     }
-    
-    public long calcNextExecutionTimeAfter(GregorianCalendar c) {
-        synchronized(lock) {
-            nextExecutionTime =  cronExpression.calcNextValidTimeAfter();
+
+    public long calcNextExecutionTimeAfter() {
+        synchronized (lock) {
+            nextExecutionTime = cronExpression.calcNextValidTimeAfter();
             return nextExecutionTime;
         }
     }
-    
+
     public long getNextScheduledExecutionTime() {
-        synchronized(lock) {
+        synchronized (lock) {
             return nextExecutionTime;
         }
     }
+    
+    
 
 }

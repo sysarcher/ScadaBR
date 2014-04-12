@@ -1,5 +1,7 @@
 package br.org.scadabr.rt.dataSource.drStorageHt5b;
 
+import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.timer.cron.CronExpression;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 
@@ -20,6 +22,7 @@ import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 public class DrStorageHt5bDataSource extends PollingDataSource {
 
@@ -345,4 +348,8 @@ public class DrStorageHt5bDataSource extends PollingDataSource {
         this.sPort = sPort;
     }
 
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
+    }
 }

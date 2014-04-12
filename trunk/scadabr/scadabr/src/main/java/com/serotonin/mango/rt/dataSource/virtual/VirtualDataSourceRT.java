@@ -18,11 +18,14 @@
  */
 package com.serotonin.mango.rt.dataSource.virtual;
 
+import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.timer.cron.CronExpression;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualDataSourceVO;
+import java.text.ParseException;
 
 public class VirtualDataSourceRT extends PollingDataSource {
 
@@ -59,5 +62,9 @@ public class VirtualDataSourceRT extends PollingDataSource {
         }
 
         super.addDataPoint(dataPoint);
+    }
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
     }
 }

@@ -1,5 +1,6 @@
 package com.serotonin.mango.util.timeout;
 
+import br.org.scadabr.ImplementMeException;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.SystemCronTask;
 import java.text.ParseException;
@@ -25,5 +26,10 @@ public class SystemRunWithArgTask<T> extends SystemCronTask {
     @Override
     protected void run(long scheduledExecutionTime) {
         client.run(model, scheduledExecutionTime);
+    }
+
+    @Override
+    protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
+        throw new ImplementMeException();
     }
 }

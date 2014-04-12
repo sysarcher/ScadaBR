@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.ebro;
 
+import br.org.scadabr.ImplementMeException;
 import br.org.scadabr.web.i18n.LocalizableException;
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.NotImplementedException;
+import br.org.scadabr.timer.cron.CronExpression;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -42,6 +44,7 @@ import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
@@ -237,5 +240,9 @@ public class EBI25DataSourceRT extends PollingDataSource implements MessagingExc
     @Override
     public void receivedException(Exception e) {
         raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl("event.ebi25.master", e.getMessage()));
+    }
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
     }
 }

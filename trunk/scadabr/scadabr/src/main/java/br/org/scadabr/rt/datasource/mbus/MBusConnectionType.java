@@ -16,27 +16,13 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.vo.dataSource.mbus;
+package br.org.scadabr.rt.datasource.mbus;
 
-import net.sf.mbus4j.MBusAddressing;
+/**
+ *
+ * @author aploese
+ */
+public enum MBusConnectionType {
 
-public abstract class MBusSearchByAddressing {
-
-    private int maxTries;
-
-    /**
-     * @return the maxTries
-     */
-    public int getMaxTries() {
-        return maxTries;
-    }
-
-    /**
-     * @param maxTries the maxTries to set
-     */
-    public void setMaxTries(int maxTries) {
-        this.maxTries = maxTries;
-    }
-
-    public abstract MBusAddressing getAddressing();
+    SERIAL_DIRECT, TCP_IP;
 }

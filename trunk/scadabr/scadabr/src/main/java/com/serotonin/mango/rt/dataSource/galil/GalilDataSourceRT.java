@@ -18,6 +18,8 @@
  */
 package com.serotonin.mango.rt.dataSource.galil;
 
+import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.timer.cron.CronExpression;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -38,6 +40,7 @@ import com.serotonin.messaging.StreamTransport;
 import br.org.scadabr.web.i18n.LocalizableException;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
@@ -302,5 +305,9 @@ public class GalilDataSourceRT extends PollingDataSource implements MessagingExc
 
         conn = null;
         socket = null;
+    }
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
     }
 }

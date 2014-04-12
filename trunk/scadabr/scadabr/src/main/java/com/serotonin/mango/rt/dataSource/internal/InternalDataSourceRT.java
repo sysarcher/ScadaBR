@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.internal;
 
+import br.org.scadabr.ImplementMeException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -26,6 +27,8 @@ import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.vo.dataSource.internal.InternalDataSourceVO;
 import com.serotonin.mango.vo.dataSource.internal.InternalPointLocatorVO;
 import br.org.scadabr.monitor.IntegerMonitor;
+import br.org.scadabr.timer.cron.CronExpression;
+import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
@@ -54,5 +57,9 @@ public class InternalDataSourceRT extends PollingDataSource {
     @Override
     public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source) {
         // no op
+    }
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
     }
 }

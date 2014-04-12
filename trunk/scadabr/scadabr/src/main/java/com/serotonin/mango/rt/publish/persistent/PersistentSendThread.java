@@ -384,6 +384,11 @@ class PersistentSendThread extends SendThread {
         protected void run(long scheduledExecutionTime) {
             startSync();
         }
+
+        @Override
+        protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
+            throw new ImplementMeException();
+        }
     }
 
     synchronized boolean startSync() {

@@ -1,5 +1,6 @@
 package br.org.scadabr.rt.dataSource.opc;
 
+import br.org.scadabr.ImplementMeException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
@@ -9,6 +10,7 @@ import org.jinterop.dcom.common.JISystem;
 
 import br.org.scadabr.OPCMaster;
 import br.org.scadabr.RealOPCMaster;
+import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.vo.dataSource.opc.OPCDataSourceVO;
 import br.org.scadabr.vo.dataSource.opc.OPCPointLocatorVO;
 
@@ -20,6 +22,7 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 public class OPCDataSource extends PollingDataSource {
 
@@ -166,4 +169,8 @@ public class OPCDataSource extends PollingDataSource {
         }
     }
 
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
+    }
 }

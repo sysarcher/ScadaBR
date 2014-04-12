@@ -18,23 +18,24 @@
  */
 package com.serotonin.mango.web.filter;
 
+import br.org.scadabr.logger.LogUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.directwebremoting.AjaxFilter;
 import org.directwebremoting.AjaxFilterChain;
 
 import com.serotonin.mango.rt.RTException;
 import com.serotonin.mango.vo.permission.PermissionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Matthew Lohbihler
  */
 public class ExceptionDetectionFilter implements AjaxFilter {
 
-    private static final Log LOG = LogFactory.getLog(ExceptionDetectionFilter.class);
+    private static final Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_DWR);
 
     @Override
     public Object doFilter(Object obj, Method method, Object[] params, AjaxFilterChain chain) throws Exception {
@@ -43,12 +44,12 @@ public class ExceptionDetectionFilter implements AjaxFilter {
         } catch (PermissionException | RTException e) {
             throw e;
         } catch (Exception e) {
-            LOG.error("DWR invocation exception", e);
+            LOG.log(Level.SEVERE, "DWR invocation exception", e);
             Throwable e2 = e;
             if (e2 instanceof InvocationTargetException) {
                 e2 = ((InvocationTargetException) e).getTargetException();
             }
-            LOG.error("DWR invocation exception", e2);
+            LOG.log(Level.SEVERE, "DWR invocation exception", e2);
 
             throw e;
         }

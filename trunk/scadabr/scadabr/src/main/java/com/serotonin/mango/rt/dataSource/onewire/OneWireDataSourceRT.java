@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.onewire;
 
+import br.org.scadabr.ImplementMeException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +38,7 @@ import com.dalsemi.onewire.container.SwitchContainer;
 import com.dalsemi.onewire.container.TemperatureContainer;
 import com.dalsemi.onewire.utils.Address;
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.timer.cron.CronExpression;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -52,6 +54,7 @@ import com.serotonin.mango.vo.dataSource.onewire.OneWirePointLocatorVO;
 import br.org.scadabr.web.i18n.LocalizableException;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
@@ -442,5 +445,9 @@ public class OneWireDataSourceRT extends PollingDataSource {
 
     private void updateNextRescan(long time) {
         nextRescan = time + Common.getMillis(vo.getRescanPeriodType(), vo.getRescanPeriods());
+    }
+    @Override
+    protected CronExpression getCronExpression() throws ParseException {
+        throw new ImplementMeException();
     }
 }

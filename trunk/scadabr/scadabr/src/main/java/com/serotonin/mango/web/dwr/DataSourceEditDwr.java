@@ -142,9 +142,9 @@ import com.serotonin.mango.vo.dataSource.internal.InternalDataSourceVO;
 import com.serotonin.mango.vo.dataSource.internal.InternalPointLocatorVO;
 import com.serotonin.mango.vo.dataSource.jmx.JmxDataSourceVO;
 import com.serotonin.mango.vo.dataSource.jmx.JmxPointLocatorVO;
-import com.serotonin.mango.vo.dataSource.mbus.MBusDataSourceVO;
-import com.serotonin.mango.vo.dataSource.mbus.MBusPointLocatorVO;
-import com.serotonin.mango.vo.dataSource.mbus.MBusSearchByAddressing;
+import br.org.scadabr.vo.datasource.mbus.MBusDataSourceVO;
+import br.org.scadabr.vo.datasource.mbus.MBusPointLocatorVO;
+import br.org.scadabr.vo.datasource.mbus.MBusSearchByAddressing;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
 import com.serotonin.mango.vo.dataSource.modbus.ModbusIpDataSourceVO;
@@ -176,8 +176,8 @@ import com.serotonin.mango.vo.dataSource.viconics.ViconicsPointLocatorVO;
 import com.serotonin.mango.vo.dataSource.virtual.ChangeTypeVO;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualDataSourceVO;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualPointLocatorVO;
-import br.org.scadabr.vo.dataSource.vmstat.VMStatDataSourceVO;
-import br.org.scadabr.vo.dataSource.vmstat.VMStatPointLocatorVO;
+import br.org.scadabr.vo.datasource.vmstat.VMStatDataSourceVO;
+import br.org.scadabr.vo.datasource.vmstat.VMStatPointLocatorVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.dwr.beans.BACnetDiscovery;
@@ -1799,14 +1799,15 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     // MBus stuff
     //
     public DwrResponseI18n saveMBusDataSource(String name, String xid,
-            Connection connection, int updatePeriodType, int updatePeriods) {
+            Connection connection, Boolean keepSerialPortOpen, String cronPattern, String cronTimeZone) {
         MBusDataSourceVO ds = (MBusDataSourceVO) Common.getUser()
                 .getEditDataSource();
         ds.setXid(xid);
         ds.setName(name);
         ds.setConnection(connection);
-        ds.setUpdatePeriodType(updatePeriodType);
-        ds.setUpdatePeriods(updatePeriods);
+        ds.setKeepSerialPortOpen(keepSerialPortOpen);
+        ds.setCronPattern(cronPattern);
+        ds.setCronTimeZone(cronTimeZone);
         return tryDataSourceSave(ds);
     }
 

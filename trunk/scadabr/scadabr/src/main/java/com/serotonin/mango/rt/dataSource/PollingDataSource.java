@@ -20,10 +20,8 @@ package com.serotonin.mango.rt.dataSource;
 
 import br.org.scadabr.ImplementMeException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.DataSourceCronTask;
@@ -32,7 +30,6 @@ import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,52 +37,20 @@ abstract public class PollingDataSource extends DataSourceRT {
 
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCARABR_DS_RT);
 
-    private final DataSourceVO<?> vo;
     protected List<DataPointRT> dataPoints = new ArrayList<>();
     protected boolean pointListChanged = false;
-    private final String cronPattern; 
-    private final TimeZone timeZone;
     private DataSourceCronTask timerTask;
-    private Thread jobThread;
-    private long jobThreadStartTime;
 
-    @Deprecated
     public PollingDataSource(DataSourceVO<?> vo) {
         super(vo);
-        this.vo = vo;
-        cronPattern = "0 0 5 * * * * * *";// Default to 5 minutes just to have something here
-        timeZone = CronExpression.TIMEZONE_UTC;
     }
-
-    public PollingDataSource(DataSourceVO<?> vo, String cronPattern, TimeZone tz) {
-        super(vo);
-        this.vo = vo;
-        this.cronPattern = cronPattern;
-        this.timeZone = tz;
-    }
-
 
     public void collectData(long fireTime) {
-        if (jobThread != null) {
-            // There is another poll still running, so abort this one.
-            LOG.log(Level.WARNING, "{0}: poll at {1} aborted because a previous poll started at {2} is still running", new Object[]{vo.getName(), new Date(fireTime), new Date(jobThreadStartTime)});
-            return;
-        }
-
-        try {
-            jobThread = Thread.currentThread();
-            jobThreadStartTime = fireTime;
-
             // Check if there were changes to the data points list.
             synchronized (pointListChangeLock) {
                 updateChangedPoints();
                 doPoll(fireTime);
             }
-        } catch (Throwable t) {
-            System.err.println(t);
-        } finally {
-            jobThread = null;
-        }
     }
 
     abstract protected void doPoll(long time);
@@ -114,7 +79,7 @@ abstract public class PollingDataSource extends DataSourceRT {
     @Override
     public void beginPolling() {
         try {
-            timerTask = new DataSourceCronTask(this, cronPattern, timeZone);
+            timerTask = new DataSourceCronTask(this, getCronExpression());
             super.beginPolling();
             Common.dataSourcePool.schedule(timerTask);
         } catch (ParseException e) {
@@ -126,6 +91,9 @@ abstract public class PollingDataSource extends DataSourceRT {
     public void terminate() {
         if (timerTask != null) {
             timerTask.cancel();
+            if (!timerTask.isExecuting()) {
+                timerTask = null;
+            }
         }
         super.terminate();
     }
@@ -134,24 +102,32 @@ abstract public class PollingDataSource extends DataSourceRT {
     public void joinTermination() {
         super.joinTermination();
 
-        Thread localThread = jobThread;
-        if (localThread != null) {
-            try {
-                localThread.join(30000); // 30 seconds
-            } catch (InterruptedException e) { /* no op */
+        final DataSourceCronTask local = timerTask;
+        if (local != null) {
+//TODO ???
+            /*            try {
+                local.join(30000); // 30 seconds
+            } catch (InterruptedException e) { /* no op 
 
             }
-            if (jobThread != null) {
-                throw new ShouldNeverHappenException("Timeout waiting for data source to stop: id=" + getId()
-                        + ", type=" + getClass() + ", stackTrace=" + Arrays.toString(localThread.getStackTrace()));
+  */
+          if (timerTask != null) {
+//                throw new ShouldNeverHappenException("Timeout waiting for data source to stop: id=" + getId() + ", type=" + getClass() + ", stackTrace=" + Arrays.toString(localThread.getStackTrace()));
             }
         }
     }
-
+    
+    protected abstract CronExpression getCronExpression() throws ParseException;
+    
     @Deprecated
     protected void setPollingPeriod(int updatePeriodType, int updatePeriods, boolean quantize) {
         // Set cronpattern from this
         throw new ImplementMeException();
     }
 
+    public boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
+            LOG.log(Level.WARNING, "{0}: poll at {1} aborted because a previous poll started at {2} is still running", new Object[]{vo.getName(), new Date(thisExecutionTime), new Date(lastExecutionTime)});
+            return false;
+    }
+    
 }
