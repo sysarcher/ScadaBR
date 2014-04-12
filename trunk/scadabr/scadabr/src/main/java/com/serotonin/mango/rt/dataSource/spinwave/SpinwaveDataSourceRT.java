@@ -39,7 +39,7 @@ import br.org.scadabr.web.i18n.LocalizableMessageImpl;
  * @author Matthew Lohbihler
  *
  */
-public class SpinwaveDataSourceRT extends EventDataSource implements SwListener {
+public class SpinwaveDataSourceRT extends EventDataSource<SpinwaveDataSourceVO> implements SwListener {
 
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int SENSOR_HEARTBEAT_EVENT = 2;
@@ -48,12 +48,10 @@ public class SpinwaveDataSourceRT extends EventDataSource implements SwListener 
 
     private final Log log = LogFactory.getLog(SpinwaveDataSourceRT.class);
 
-    private final SpinwaveDataSourceVO vo;
     private SpinwaveReceiver spinwaveReceiver;
 
     public SpinwaveDataSourceRT(SpinwaveDataSourceVO vo) {
         super(vo);
-        this.vo = vo;
     }
 
     //
@@ -102,6 +100,7 @@ public class SpinwaveDataSourceRT extends EventDataSource implements SwListener 
     // / SwListener
     // /
     //
+    @Override
     public void receivedException(Exception e) {
         log.error("Exception from spinwave receiver", e);
     }
@@ -114,6 +113,7 @@ public class SpinwaveDataSourceRT extends EventDataSource implements SwListener 
         log.error("Exception from spinwave receiver", e);
     }
 
+    @Override
     public void receivedHeartbeat(long sensorAddress, boolean active) {
         // We don't use the given information because if two sensors are currently in timeout and one comes back,
         // the timeout on the other will be lost unless we maintain a list of sensors in timeout in this class.
@@ -128,6 +128,7 @@ public class SpinwaveDataSourceRT extends EventDataSource implements SwListener 
         }
     }
 
+    @Override
     public void receivedMessage(SwMessage message) {
         // Find points that are interested in this sensor.
         BaseSpinwavePointLocatorVO locator;

@@ -59,7 +59,7 @@ import java.text.ParseException;
 /**
  * @author Matthew Lohbihler
  */
-public class OneWireDataSourceRT extends PollingDataSource {
+public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> {
 
     private static final Log LOG = LogFactory.getLog(OneWireDataSourceRT.class);
 
@@ -67,13 +67,11 @@ public class OneWireDataSourceRT extends PollingDataSource {
     public static final int POINT_READ_EXCEPTION_EVENT = 2;
     public static final int POINT_WRITE_EXCEPTION_EVENT = 3;
 
-    private final OneWireDataSourceVO vo;
     private Network network;
     private long nextRescan = 0;
 
     public OneWireDataSourceRT(OneWireDataSourceVO vo) {
         super(vo);
-        this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 

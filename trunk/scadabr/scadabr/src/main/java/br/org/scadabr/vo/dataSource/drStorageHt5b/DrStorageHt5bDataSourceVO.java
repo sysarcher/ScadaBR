@@ -25,8 +25,7 @@ import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
-public class DrStorageHt5bDataSourceVO<T extends DrStorageHt5bDataSourceVO<?>>
-        extends DataSourceVO<T> {
+public class DrStorageHt5bDataSourceVO extends DataSourceVO<DrStorageHt5bDataSourceVO> {
 
     public static final Type TYPE = Type.DR_STORAGE_HT5B;
 
@@ -58,7 +57,7 @@ public class DrStorageHt5bDataSourceVO<T extends DrStorageHt5bDataSourceVO<?>>
     }
 
     @Override
-    protected void addPropertyChangesImpl(List<LocalizableMessage> list, T from) {
+    protected void addPropertyChangesImpl(List<LocalizableMessage> list, DrStorageHt5bDataSourceVO from) {
         // TODO Auto-generated method stub
 
     }

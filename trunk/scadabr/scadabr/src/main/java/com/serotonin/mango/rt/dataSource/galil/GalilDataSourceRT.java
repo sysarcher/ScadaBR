@@ -45,7 +45,7 @@ import java.text.ParseException;
 /**
  * @author Matthew Lohbihler
  */
-public class GalilDataSourceRT extends PollingDataSource implements MessagingExceptionHandler {
+public class GalilDataSourceRT extends PollingDataSource<GalilDataSourceVO> implements MessagingExceptionHandler {
 
     public static final Charset CHARSET = Charset.forName("US-ASCII");
 
@@ -55,13 +55,11 @@ public class GalilDataSourceRT extends PollingDataSource implements MessagingExc
     public static final int POINT_READ_EXCEPTION_EVENT = 2;
     public static final int POINT_WRITE_EXCEPTION_EVENT = 3;
 
-    private final GalilDataSourceVO vo;
     private Socket socket;
     private MessageControl conn;
 
     public GalilDataSourceRT(GalilDataSourceVO vo) {
         super(vo);
-        this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 

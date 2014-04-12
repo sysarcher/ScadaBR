@@ -53,7 +53,7 @@ import java.text.ParseException;
 /**
  * @author Matthew Lohbihler
  */
-public class HttpImageDataSourceRT extends PollingDataSource {
+public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSourceVO> {
 
     static final Log LOG = LogFactory.getLog(HttpImageDataSourceRT.class);
 

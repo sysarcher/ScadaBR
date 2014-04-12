@@ -47,26 +47,22 @@ import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
-import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.vo.dataSource.sql.SqlDataSourceVO;
 import com.serotonin.mango.vo.dataSource.sql.SqlPointLocatorVO;
-import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
  */
-public class SqlDataSourceRT extends PollingDataSource {
+public class SqlDataSourceRT extends PollingDataSource<SqlDataSourceVO> {
 
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int STATEMENT_EXCEPTION_EVENT = 2;
 
     private final Log log = LogFactory.getLog(SqlDataSourceRT.class);
 
-    private final SqlDataSourceVO vo;
     private Connection conn;
     private int timeoutCount = 0;
     private int timeoutsToReconnect = 3;
@@ -74,7 +70,6 @@ public class SqlDataSourceRT extends PollingDataSource {
     public SqlDataSourceRT(SqlDataSourceVO vo) {
         super(vo);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
-        this.vo = vo;
     }
 
     @Override

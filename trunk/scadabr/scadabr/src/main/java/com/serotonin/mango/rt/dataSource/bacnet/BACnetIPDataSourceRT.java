@@ -93,14 +93,13 @@ import java.util.logging.Logger;
 /**
  * @author Matthew Lohbihler
  */
-public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEventListener, ExceptionListener {
+public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO> implements DeviceEventListener, ExceptionListener {
 
     public static final int INITIALIZATION_EXCEPTION_EVENT = 1;
     public static final int MESSAGE_EXCEPTION_EVENT = 2;
     public static final int DEVICE_EXCEPTION_EVENT = 3;
 
     final Logger log = Logger.getLogger(LogUtils.LOGGER_SCARABR_BACNET_IP);
-    final BACnetIPDataSourceVO vo;
     private LocalDevice localDevice;
     private boolean initialized = false;
     final List<RemoteDevice> pollsInProgress = new ArrayList<>();
@@ -108,7 +107,6 @@ public class BACnetIPDataSourceRT extends PollingDataSource implements DeviceEve
 
     public BACnetIPDataSourceRT(BACnetIPDataSourceVO vo) {
         super(vo);
-        this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 

@@ -46,7 +46,7 @@ import com.serotonin.mango.vo.dataSource.fhz4j.Fhz4JDataSourceVO;
  * TODO datatype NUMERIC_INT is missing TODO Starttime for timpepoints ???
  *
  */
-public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListener {
+public class Fhz4JDataSourceRT extends EventDataSource<Fhz4JDataSourceVO> implements FhzDataListener {
 
     private final static Log LOG = LogFactory.getLog(Fhz4JDataSourceRT.class);
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
@@ -57,11 +57,9 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
     private SerialPort sPort;
     private FhzParser parser;
     private FhzWriter writer;
-    private Fhz4JDataSourceVO vo;
 
     public Fhz4JDataSourceRT(Fhz4JDataSourceVO vo) {
         super(vo);
-        this.vo = vo;
     }
 
     @Override
@@ -175,7 +173,7 @@ public class Fhz4JDataSourceRT extends EventDataSource implements FhzDataListene
     }
 
     private short[] getFhtDeviceHousecodes() {
-        Set<Short> housecodes = new HashSet<Short>();
+        Set<Short> housecodes = new HashSet<>();
         for (DataPointRT dp : dataPoints) {
             final Fhz4JPointLocatorRT loc = dp.getPointLocator();
             housecodes.add(loc.getHousecode());

@@ -43,19 +43,16 @@ import java.text.ParseException;
 /**
  * @author Matthew Lohbihler
  */
-public class HttpRetrieverDataSourceRT extends PollingDataSource {
+public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDataSourceVO> {
 
     private static final int READ_LIMIT = 1024 * 1024; // One MB
 
     public static final int DATA_RETRIEVAL_FAILURE_EVENT = 1;
     public static final int PARSE_EXCEPTION_EVENT = 2;
 
-    private final HttpRetrieverDataSourceVO vo;
-
     public HttpRetrieverDataSourceRT(HttpRetrieverDataSourceVO vo) {
         super(vo);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
-        this.vo = vo;
     }
 
     @Override

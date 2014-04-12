@@ -27,8 +27,7 @@ import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
-public class ASCIIFileDataSourceVO<T extends ASCIIFileDataSourceVO<?>> extends
-        DataSourceVO<T> {
+public class ASCIIFileDataSourceVO extends DataSourceVO<ASCIIFileDataSourceVO> {
 
     public static final Type TYPE = Type.ASCII_FILE;
 
@@ -59,7 +58,7 @@ public class ASCIIFileDataSourceVO<T extends ASCIIFileDataSourceVO<?>> extends
     }
 
     @Override
-    protected void addPropertyChangesImpl(List<LocalizableMessage> list, T from) {
+    protected void addPropertyChangesImpl(List<LocalizableMessage> list, ASCIIFileDataSourceVO from) {
         // TODO Auto-generated method stub
 
     }

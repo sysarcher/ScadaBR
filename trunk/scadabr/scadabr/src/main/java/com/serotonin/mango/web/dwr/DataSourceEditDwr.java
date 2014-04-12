@@ -2222,8 +2222,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             String host, String domain, String user, String password,
             String server, int updatePeriods, int updatePeriodType,
             boolean quantize) {
-        OPCDataSourceVO<?> ds = (OPCDataSourceVO<?>) Common.getUser()
-                .getEditDataSource();
+        OPCDataSourceVO ds = (OPCDataSourceVO) Common.getUser().getEditDataSource();
         ds.setXid(xid);
         ds.setName(name);
         ds.setHost(host);
@@ -2312,8 +2311,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             int[] dataTypes, boolean[] settables, OPCPointLocatorVO[] locators,
             String context, DataPointDefaulter defaulter) {
         DwrResponseI18n response = new DwrResponseI18n();
-        OPCDataSourceVO<?> ds = (OPCDataSourceVO<?>) Common.getUser()
-                .getEditDataSource();
+        OPCDataSourceVO ds = (OPCDataSourceVO) Common.getUser().getEditDataSource();
         if (ds.isNew()) {
             response.addContextual(context, "dsEdit.opc.validate.dataSourceNotSaved");
             return response;

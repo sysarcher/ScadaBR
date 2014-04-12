@@ -21,8 +21,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
-abstract public class IEC101DataSourceVO<T extends IEC101DataSourceVO<?>>
-        extends DataSourceVO<T> {
+abstract public class IEC101DataSourceVO<T extends IEC101DataSourceVO<T>> extends DataSourceVO<T> {
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {

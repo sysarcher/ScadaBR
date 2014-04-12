@@ -44,28 +44,25 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.vo.dataSource.jmx.JmxDataSourceVO;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
  */
-public class JmxDataSourceRT extends PollingDataSource {
+public class JmxDataSourceRT extends PollingDataSource<JmxDataSourceVO> {
 
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int POINT_READ_EXCEPTION_EVENT = 2;
     public static final int POINT_WRITE_EXCEPTION_EVENT = 3;
 
     private final Log log = LogFactory.getLog(JmxDataSourceRT.class);
-    private final JmxDataSourceVO vo;
 
     private JMXConnector connector;
     private MBeanServerConnection server;
 
     public JmxDataSourceRT(JmxDataSourceVO vo) {
         super(vo);
-        this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), vo.isQuantize());
     }
 

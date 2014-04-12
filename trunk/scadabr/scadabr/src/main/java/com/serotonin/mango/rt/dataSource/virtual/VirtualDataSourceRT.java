@@ -27,7 +27,7 @@ import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualDataSourceVO;
 import java.text.ParseException;
 
-public class VirtualDataSourceRT extends PollingDataSource {
+public class VirtualDataSourceRT extends PollingDataSource<VirtualDataSourceVO> {
 
     public VirtualDataSourceRT(VirtualDataSourceVO vo) {
         super(vo);

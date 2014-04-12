@@ -49,18 +49,15 @@ import java.text.ParseException;
 /**
  * @author Matthew Lohbihler
  */
-public class Pop3DataSourceRT extends PollingDataSource {
+public class Pop3DataSourceRT extends PollingDataSource<Pop3DataSourceVO> {
 
     public static final int INBOX_EXCEPTION_EVENT = 1;
     public static final int MESSAGE_READ_EXCEPTION_EVENT = 2;
     public static final int PARSE_EXCEPTION_EVENT = 3;
 
-    private final Pop3DataSourceVO vo;
-
     public Pop3DataSourceRT(Pop3DataSourceVO vo) {
         super(vo);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
-        this.vo = vo;
     }
 
     @Override

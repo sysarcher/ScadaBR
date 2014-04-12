@@ -39,13 +39,12 @@ import java.util.EnumMap;
 /**
  * @author Matthew Lohbihler
  */
-public class VMStatDataSourceRT extends EventDataSource implements Runnable {
+public class VMStatDataSourceRT extends EventDataSource<VMStatDataSourceVO> implements Runnable {
 
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 1;
     public static final int PARSE_EXCEPTION_EVENT = 2;
 
     private final Log log = LogFactory.getLog(VMStatDataSourceRT.class);
-    private final VMStatDataSourceVO vo;
     private Process vmstatProcess;
     private BufferedReader in;
     private Map<Attribute, Integer> attributePositions;
@@ -53,7 +52,6 @@ public class VMStatDataSourceRT extends EventDataSource implements Runnable {
 
     public VMStatDataSourceRT(VMStatDataSourceVO vo) {
         super(vo);
-        this.vo = vo;
     }
 
     //

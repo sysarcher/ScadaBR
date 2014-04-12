@@ -27,8 +27,7 @@ import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
-public class Alpha2DataSourceVO<T extends Alpha2DataSourceVO<?>> extends
-        DataSourceVO<T> {
+public class Alpha2DataSourceVO extends DataSourceVO<Alpha2DataSourceVO> {
 
     public static final Type TYPE = Type.ALPHA_2;
 
@@ -95,7 +94,7 @@ public class Alpha2DataSourceVO<T extends Alpha2DataSourceVO<?>> extends
     }
 
     @Override
-    protected void addPropertyChangesImpl(List<LocalizableMessage> list, T from) {
+    protected void addPropertyChangesImpl(List<LocalizableMessage> list, Alpha2DataSourceVO from) {
         final Alpha2DataSourceVO fromVO = (Alpha2DataSourceVO) from;
         AuditEventType.maybeAddPropertyChangeMessage(list,
                 "dsEdit.dnp3Serial.port", fromVO.commPortId, commPortId);

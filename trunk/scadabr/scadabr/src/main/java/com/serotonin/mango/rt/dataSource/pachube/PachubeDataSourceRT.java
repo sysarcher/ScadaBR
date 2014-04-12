@@ -54,14 +54,13 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.DataSourceUtils;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.vo.dataSource.pachube.PachubeDataSourceVO;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.http.HttpUtils;
 import br.org.scadabr.web.i18n.LocalizableException;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.util.Objects;
 
-public class PachubeDataSourceRT extends PollingDataSource {
+public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> {
 
     public static final int DATA_RETRIEVAL_FAILURE_EVENT = 1;
     public static final int PARSE_EXCEPTION_EVENT = 2;
@@ -70,14 +69,12 @@ public class PachubeDataSourceRT extends PollingDataSource {
     public static final String HEADER_API_KEY = "X-PachubeApiKey";
 
     final Log log = LogFactory.getLog(PachubeDataSourceRT.class);
-    final PachubeDataSourceVO vo;
     private final HttpClient httpClient;
     final SimpleDateFormat sdf;
 
     public PachubeDataSourceRT(PachubeDataSourceVO vo) {
         super(vo);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
-        this.vo = vo;
 
         httpClient = createHttpClient(vo.getTimeoutSeconds(), vo.getRetries());
 

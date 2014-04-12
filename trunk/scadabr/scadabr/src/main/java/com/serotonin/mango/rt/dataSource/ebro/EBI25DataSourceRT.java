@@ -42,14 +42,13 @@ import com.serotonin.modbus4j.BatchRead;
 import com.serotonin.modbus4j.BatchResults;
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
  */
-public class EBI25DataSourceRT extends PollingDataSource implements MessagingExceptionHandler {
+public class EBI25DataSourceRT extends PollingDataSource<EBI25DataSourceVO> implements MessagingExceptionHandler {
 
     private final Log LOG = LogFactory.getLog(EBI25DataSourceRT.class);
 
@@ -58,11 +57,9 @@ public class EBI25DataSourceRT extends PollingDataSource implements MessagingExc
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 3;
 
     private ModbusMaster modbusMaster;
-    private final EBI25DataSourceVO vo;
 
     public EBI25DataSourceRT(EBI25DataSourceVO vo) {
         super(vo);
-        this.vo = vo;
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 
