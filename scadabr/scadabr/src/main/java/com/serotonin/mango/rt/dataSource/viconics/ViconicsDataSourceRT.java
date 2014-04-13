@@ -378,7 +378,7 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
             // Mark all points for the device as unreliable.
             synchronized (dataPoints) {
                 for (DataPointRT rt : dataPoints) {
-                    ViconicsPointLocatorVO locator = rt.getVO().getPointLocator();
+                    ViconicsPointLocatorVO locator = rt.getVo().getPointLocator();
                     if (Arrays.equals(locator.getDeviceIeee(), device.getIeee())) {
                         rt.setAttribute(ATTR_UNRELIABLE_KEY, true);
                     }
@@ -424,7 +424,7 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
         }
 
         MangoValue mangoValue;
-        int dataTypeId = rt.getVO().getPointLocator().getDataTypeId();
+        int dataTypeId = rt.getVo().getPointLocator().getDataTypeId();
         if (point instanceof NumericPoint) {
             NumericPoint numericConfig = (NumericPoint) point;
             if (dataTypeId != DataTypes.NUMERIC) {
@@ -469,7 +469,7 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
     // Misc
     @Override
     public void setPointValue(DataPointRT dataPoint, PointValueTime pvt, SetPointSource source) {
-        ViconicsPointLocatorVO locator = dataPoint.getVO().getPointLocator();
+        ViconicsPointLocatorVO locator = dataPoint.getVo().getPointLocator();
 
         Object value = pvt.getValue().getObjectValue();
 
@@ -496,7 +496,7 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
 
     @Override
     public void forcePointRead(DataPointRT dataPoint) {
-        ViconicsPointLocatorVO locator = dataPoint.getVO().getPointLocator();
+        ViconicsPointLocatorVO locator = dataPoint.getVo().getPointLocator();
 
         try {
             // Ignore the result. It will be sent via the listener anyway.
@@ -523,7 +523,7 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
         private final int address;
 
         public PointKey(DataPointRT rt) {
-            ViconicsPointLocatorVO locator = rt.getVO().getPointLocator();
+            ViconicsPointLocatorVO locator = rt.getVo().getPointLocator();
             deviceIeee = locator.getDeviceIeee();
             address = locator.getPointAddress();
         }

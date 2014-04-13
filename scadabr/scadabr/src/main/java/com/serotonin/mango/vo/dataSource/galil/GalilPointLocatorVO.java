@@ -34,7 +34,6 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.galil.GalilPointLocatorRT;
-import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
@@ -50,6 +49,7 @@ public class GalilPointLocatorVO extends AbstractPointLocatorVO implements JsonS
 
     private static final Log LOG = LogFactory.getLog(GalilPointLocatorVO.class);
 
+    @Override
     public LocalizableMessage getConfigurationDescription() {
         PointTypeVO pointType = getPointType();
         if (pointType == null) {
@@ -80,8 +80,7 @@ public class GalilPointLocatorVO extends AbstractPointLocatorVO implements JsonS
 
     @Override
     public PointLocatorRT createRuntime() {
-        PointTypeRT changeType = getPointType().createRuntime();
-        return new GalilPointLocatorRT(changeType);
+        return new GalilPointLocatorRT(this, getPointType());
     }
 
     @Override

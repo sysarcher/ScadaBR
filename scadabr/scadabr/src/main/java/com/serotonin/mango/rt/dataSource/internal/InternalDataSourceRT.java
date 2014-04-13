@@ -45,7 +45,7 @@ public class InternalDataSourceRT extends PollingDataSource<InternalDataSourceVO
         for (DataPointRT dataPoint : dataPoints) {
             InternalPointLocatorRT locator = dataPoint.getPointLocator();
 
-            String monitorId = InternalPointLocatorVO.MONITOR_NAMES[locator.getPointLocatorVO().getAttributeId()];
+            String monitorId = InternalPointLocatorVO.MONITOR_NAMES[locator.getVo().getAttributeId()];
             // They are all integer monitors so far, so this is fine.
             IntegerMonitor m = (IntegerMonitor) Common.MONITORED_VALUES.getValueMonitor(monitorId);
             if (m != null) {

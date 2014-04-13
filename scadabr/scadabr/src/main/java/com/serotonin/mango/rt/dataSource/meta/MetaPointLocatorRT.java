@@ -48,14 +48,13 @@ import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListener {
+public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> implements DataPointListener {
 
     private static final ThreadLocal<List<Integer>> threadLocal = new ThreadLocal<>();
     private static final int MAX_RECURSION = 10;
 
     final Object LOCK = new Object();
 
-    final MetaPointLocatorVO vo;
     AbstractTimer timer;
     private MetaDataSourceRT dataSource;
     protected DataPointRT dataPoint;
@@ -64,16 +63,7 @@ public class MetaPointLocatorRT extends PointLocatorRT implements DataPointListe
     TimerTask timerTask;
 
     public MetaPointLocatorRT(MetaPointLocatorVO vo) {
-        this.vo = vo;
-    }
-
-    @Override
-    public boolean isSettable() {
-        return vo.isSettable();
-    }
-
-    public MetaPointLocatorVO getPointLocatorVO() {
-        return vo;
+        super(vo);
     }
 
     boolean isContextCreated() {

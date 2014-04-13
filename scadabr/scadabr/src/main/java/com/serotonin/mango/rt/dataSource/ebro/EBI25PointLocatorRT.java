@@ -24,20 +24,10 @@ import com.serotonin.mango.vo.dataSource.ebro.EBI25PointLocatorVO;
 /**
  * @author Matthew Lohbihler
  */
-public class EBI25PointLocatorRT extends PointLocatorRT {
-
-    private final EBI25PointLocatorVO vo;
+public class EBI25PointLocatorRT extends PointLocatorRT<EBI25PointLocatorVO> {
 
     public EBI25PointLocatorRT(EBI25PointLocatorVO vo) {
-        this.vo = vo;
+        super(vo);
     }
 
-    @Override
-    public boolean isSettable() {
-        return vo.isSettable();
-    }
-
-    public EBI25PointLocatorVO getVO() {
-        return vo;
-    }
 }

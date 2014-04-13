@@ -40,36 +40,25 @@ import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.snmp.SnmpPointLocatorVO;
-import br.org.scadabr.util.StringUtils;
 import java.util.Objects;
 
 /**
  * @author Matthew Lohbihler
  *
  */
-public class SnmpPointLocatorRT extends PointLocatorRT {
+public class SnmpPointLocatorRT extends PointLocatorRT<SnmpPointLocatorVO> {
 
     private static final Log LOG = LogFactory.getLog(SnmpPointLocatorRT.class);
 
-    private final SnmpPointLocatorVO vo;
     private final OID oid;
 
     public SnmpPointLocatorRT(SnmpPointLocatorVO vo) {
-        this.vo = vo;
+        super(vo);
         oid = new OID(vo.getOid());
-    }
-
-    @Override
-    public boolean isSettable() {
-        return vo.isSettable();
     }
 
     public OID getOid() {
         return oid;
-    }
-
-    public SnmpPointLocatorVO getVO() {
-        return vo;
     }
 
     public MangoValue variableToValue(Variable variable) {

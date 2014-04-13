@@ -24,17 +24,10 @@ import com.serotonin.mango.vo.dataSource.nmea.NmeaPointLocatorVO;
 /**
  * @author Matthew Lohbihler
  */
-public class NmeaPointLocatorRT extends PointLocatorRT {
-
-    private final NmeaPointLocatorVO vo;
+public class NmeaPointLocatorRT extends PointLocatorRT<NmeaPointLocatorVO> {
 
     public NmeaPointLocatorRT(NmeaPointLocatorVO vo) {
-        this.vo = vo;
-    }
-
-    @Override
-    public boolean isSettable() {
-        return vo.isSettable();
+        super(vo);
     }
 
     public String getMessageName() {

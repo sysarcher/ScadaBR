@@ -24,20 +24,10 @@ import com.serotonin.mango.vo.dataSource.sql.SqlPointLocatorVO;
 /**
  * @author Matthew Lohbihler
  */
-public class SqlPointLocatorRT extends PointLocatorRT {
-
-    private final SqlPointLocatorVO vo;
+public class SqlPointLocatorRT extends PointLocatorRT<SqlPointLocatorVO> {
 
     public SqlPointLocatorRT(SqlPointLocatorVO vo) {
-        this.vo = vo;
+        super(vo);
     }
 
-    @Override
-    public boolean isSettable() {
-        return vo.isSettable();
-    }
-
-    public SqlPointLocatorVO getVO() {
-        return vo;
-    }
 }

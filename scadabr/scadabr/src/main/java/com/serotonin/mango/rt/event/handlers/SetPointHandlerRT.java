@@ -64,7 +64,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
             return;
         }
 
-        int targetDataType = targetPoint.getVO().getPointLocator().getDataTypeId();
+        int targetDataType = targetPoint.getVo().getPointLocator().getDataTypeId();
 
         MangoValue value;
         if (vo.getActiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {
@@ -116,7 +116,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
             return;
         }
 
-        int targetDataType = targetPoint.getVO().getPointLocator().getDataTypeId();
+        int targetDataType = targetPoint.getVo().getPointLocator().getDataTypeId();
 
         MangoValue value;
         if (vo.getInactiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {

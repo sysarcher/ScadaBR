@@ -146,13 +146,13 @@ public class PersistentDataSourceRT extends EventDataSource<PersistentDataSource
     @Override
     public void addDataPoint(DataPointRT dataPoint) {
         super.addDataPoint(dataPoint);
-        pointXids.put(dataPoint.getVO().getXid(), dataPoint);
+        pointXids.put(dataPoint.getVo().getXid(), dataPoint);
     }
 
     @Override
     public void removeDataPoint(DataPointRT dataPoint) {
         super.removeDataPoint(dataPoint);
-        pointXids.remove(dataPoint.getVO().getXid());
+        pointXids.remove(dataPoint.getVo().getXid());
     }
 
     @Override
@@ -456,13 +456,13 @@ public class PersistentDataSourceRT extends EventDataSource<PersistentDataSource
 
             if (dprt != null) {
                 // Already exists. Check that the data types match.
-                if (dprt.getVO().getPointLocator().getDataTypeId() != newDpvo.getPointLocator().getDataTypeId()) {
+                if (dprt.getVo().getPointLocator().getDataTypeId() != newDpvo.getPointLocator().getDataTypeId()) {
                     // Data type mismatch. Abort
-                    throw new DoAbortException("event.persistent.dataTypeMismatch", xid, newDpvo.getDataTypeMessage(), dprt.getVO().getDataTypeMessage());
+                    throw new DoAbortException("event.persistent.dataTypeMismatch", xid, newDpvo.getDataTypeMessage(), dprt.getVo().getDataTypeMessage());
                 }
 
                 // We're good.
-                updatePoint(dprt.getVO(), newDpvo);
+                updatePoint(dprt.getVo(), newDpvo);
                 return;
             }
 
@@ -522,7 +522,7 @@ public class PersistentDataSourceRT extends EventDataSource<PersistentDataSource
                 {
                     dpvo = dataPointDao.getDataPoint(xid);
                 } else {
-                    dpvo = dprt.getVO();
+                    dpvo = dprt.getVo();
                 }
 
                 if (dpvo == null) {

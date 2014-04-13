@@ -30,23 +30,19 @@ import br.org.scadabr.util.StringUtils;
 /**
  * @author Matthew Lohbihler
  */
-public class Pop3PointLocatorRT extends PointLocatorRT {
+public class Pop3PointLocatorRT extends PointLocatorRT<Pop3PointLocatorVO> {
 
-    private final boolean findInSubject;
     private final Pattern valuePattern;
-    private final boolean ignoreIfMissing;
     private final int dataTypeId;
     private String binary0Value;
     private DecimalFormat valueFormat;
     private final Pattern timePattern;
     private final boolean useReceivedTime;
     private final SimpleDateFormat timeFormat;
-    private final boolean settable;
 
     public Pop3PointLocatorRT(Pop3PointLocatorVO vo) {
-        findInSubject = vo.isFindInSubject();
+        super(vo);
         valuePattern = Pattern.compile(vo.getValueRegex());
-        ignoreIfMissing = vo.isIgnoreIfMissing();
         dataTypeId = vo.getDataTypeId();
 
         if (dataTypeId == DataTypes.BINARY) {
@@ -64,16 +60,10 @@ public class Pop3PointLocatorRT extends PointLocatorRT {
             timeFormat = null;
         }
 
-        settable = vo.isSettable();
-    }
-
-    @Override
-    public boolean isSettable() {
-        return settable;
     }
 
     public boolean isFindInSubject() {
-        return findInSubject;
+        return vo.isFindInSubject();
     }
 
     public Pattern getValuePattern() {
@@ -81,7 +71,7 @@ public class Pop3PointLocatorRT extends PointLocatorRT {
     }
 
     public boolean isIgnoreIfMissing() {
-        return ignoreIfMissing;
+        return vo.isIgnoreIfMissing();
     }
 
     public DecimalFormat getValueFormat() {

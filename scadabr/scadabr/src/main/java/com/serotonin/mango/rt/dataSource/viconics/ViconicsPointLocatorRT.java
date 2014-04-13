@@ -24,16 +24,10 @@ import com.serotonin.mango.vo.dataSource.viconics.ViconicsPointLocatorVO;
 /**
  * @author Matthew Lohbihler
  */
-public class ViconicsPointLocatorRT extends PointLocatorRT {
-
-    private final ViconicsPointLocatorVO vo;
+public class ViconicsPointLocatorRT extends PointLocatorRT<ViconicsPointLocatorVO> {
 
     public ViconicsPointLocatorRT(ViconicsPointLocatorVO vo) {
-        this.vo = vo;
+        super(vo);
     }
 
-    @Override
-    public boolean isSettable() {
-        return vo.isSettable();
-    }
 }

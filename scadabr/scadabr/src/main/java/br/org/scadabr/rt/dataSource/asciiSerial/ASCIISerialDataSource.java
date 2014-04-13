@@ -77,7 +77,7 @@ public class ASCIISerialDataSource extends PollingDataSource<ASCIISerialDataSour
             if (getInSerialStream().available() == 0) {
 
                 for (DataPointRT dataPoint : dataPoints) {
-                    ASCIISerialPointLocatorVO dataPointVO = dataPoint.getVO()
+                    ASCIISerialPointLocatorVO dataPointVO = dataPoint.getVo()
                             .getPointLocator();
                     if (dataPointVO.getCommand() != null) {
                         getOutSerialStream().write(
@@ -127,7 +127,7 @@ public class ASCIISerialDataSource extends PollingDataSource<ASCIISerialDataSour
                     for (DataPointRT dataPoint : dataPoints) {
                         try {
                             ASCIISerialPointLocatorVO dataPointVO = dataPoint
-                                    .getVO().getPointLocator();
+                                    .getVo().getPointLocator();
                             if (dataPointVO.getCommand() != null) {
                                 getOutSerialStream().write(
                                         dataPointVO.getCommand().getBytes());

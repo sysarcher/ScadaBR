@@ -48,7 +48,7 @@ public class ASCIIFileDataSource extends PollingDataSource<ASCIIFileDataSourceVO
 
             for (DataPointRT dataPoint : dataPoints) {
                 try {
-                    ASCIIFilePointLocatorVO dataPointVO = dataPoint.getVO()
+                    ASCIIFilePointLocatorVO dataPointVO = dataPoint.getVo()
                             .getPointLocator();
                     MangoValue value;
                     value = getValue(dataPointVO, arquivo);

@@ -87,14 +87,14 @@ public class MBusDataSourceRT extends PollingDataSource<MBusDataSourceVO> {
 
                             raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, time, true,
                                     new LocalizableMessageImpl("event.exception2", vo.getName(),
-                                            "No datablock found for: ", vr.getReference().getVO().getName()));
+                                            "No datablock found for: ", vr.getReference().getVo().getName()));
 
                         } else if ((vr.getDb() instanceof BcdValue) && ((BcdValue) vr.getDb()).isBcdError()) {
                             pointError = true;
                             LOG.fatal("BCD Error : " + ((BcdValue) vr.getDb()).getBcdError());
                             raiseEvent(POINT_READ_EXCEPTION_EVENT, time, true,
                                     new LocalizableMessageImpl("event.exception2", vo.getName(),
-                                            String.format("BCD error %s value: ", vr.getReference().getVO().getName()), ((BcdValue) vr.getDb()).getBcdError()));
+                                            String.format("BCD error %s value: ", vr.getReference().getVo().getName()), ((BcdValue) vr.getDb()).getBcdError()));
                         } else if (vr.getDb() instanceof ShortDataBlock) {
                             vr.getReference().updatePointValue(
                                     new PointValueTime(calcCorretedValue(vr.getReference(), ((ShortDataBlock) vr.getDb()).getValue()), time));
@@ -114,10 +114,10 @@ public class MBusDataSourceRT extends PollingDataSource<MBusDataSourceVO> {
                             vr.getReference().updatePointValue(
                                     new PointValueTime(((StringDataBlock) vr.getDb()).getValue(), time));
                         } else {
-                            LOG.fatal("Dont know how to save: " + vr.getReference().getVO().getName());
+                            LOG.fatal("Dont know how to save: " + vr.getReference().getVo().getName());
                             raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true,
                                     new LocalizableMessageImpl("event.exception2", vo.getName(),
-                                            "Dont know how to save: ", vr.getReference().getVO().getName()));
+                                            "Dont know how to save: ", vr.getReference().getVo().getName()));
 
                         }
                     } catch (Exception ex) {

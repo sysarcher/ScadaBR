@@ -128,7 +128,7 @@ public class NmeaDataSourceRT extends EventDataSource<NmeaDataSourceVO> implemen
                     }
                 } catch (Exception e) {
                     if (parseError == null) {
-                        parseError = new LocalizableMessageImpl("event.exception2", dp.getVO().getName(), e.getMessage());
+                        parseError = new LocalizableMessageImpl("event.exception2", dp.getVoName(), e.getMessage());
                     }
                 }
             }
@@ -155,7 +155,7 @@ public class NmeaDataSourceRT extends EventDataSource<NmeaDataSourceVO> implemen
 
                 // Convert the value
                 MangoValue value = DataSourceUtils.getValue(valueStr, locator.getDataTypeId(),
-                        locator.getBinary0Value(), dp.getVO().getTextRenderer(), null, dp.getVO().getName());
+                        locator.getBinary0Value(), dp.getVo().getTextRenderer(), null, dp.getVoName());
 
                 // Save the new value
                 dp.updatePointValue(new PointValueTime(value, time));

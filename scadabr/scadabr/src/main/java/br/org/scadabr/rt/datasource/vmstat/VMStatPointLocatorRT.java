@@ -24,20 +24,10 @@ import br.org.scadabr.vo.datasource.vmstat.VMStatPointLocatorVO;
 /**
  * @author Matthew Lohbihler
  */
-public class VMStatPointLocatorRT extends PointLocatorRT {
-
-    private final VMStatPointLocatorVO vo;
+public class VMStatPointLocatorRT extends PointLocatorRT<VMStatPointLocatorVO> {
 
     public VMStatPointLocatorRT(VMStatPointLocatorVO vo) {
-        this.vo = vo;
+        super(vo);
     }
 
-    @Override
-    public boolean isSettable() {
-        return vo.isSettable();
-    }
-
-    public VMStatPointLocatorVO getPointLocatorVO() {
-        return vo;
-    }
 }

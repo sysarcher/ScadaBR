@@ -100,7 +100,7 @@ public class PersistentSenderRT extends PublisherRT<PersistentPointVO> {
 
         DataPointRT pointRT = Common.ctx.getRuntimeManager().getDataPoint(rt.getVo().getDataPointId());
         if (pointRT != null) {
-            updatePublishedPointVO(rt.getVo(), pointRT.getVO());
+            updatePublishedPointVO(rt.getVo(), pointRT.getVo());
 
             // Send the updated point info.
             ByteQueue queue = new ByteQueue();

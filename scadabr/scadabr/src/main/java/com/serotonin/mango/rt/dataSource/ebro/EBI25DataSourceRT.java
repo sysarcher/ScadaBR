@@ -71,9 +71,9 @@ public class EBI25DataSourceRT extends PollingDataSource<EBI25DataSourceVO> impl
 
         // Get a list of logger indices. The list of points does not include disabled points, so completely disabled
         // loggers will not be in the index list.
-        List<Integer> loggerIndices = new ArrayList<Integer>();
+        List<Integer> loggerIndices = new ArrayList<>();
         for (DataPointRT dp : dataPoints) {
-            int index = ((EBI25PointLocatorRT) dp.getPointLocator()).getVO().getIndex();
+            int index = ((EBI25PointLocatorRT) dp.getPointLocator()).getVo().getIndex();
             if (!loggerIndices.contains(index)) {
                 loggerIndices.add(index);
             }
@@ -100,7 +100,7 @@ public class EBI25DataSourceRT extends PollingDataSource<EBI25DataSourceVO> impl
                 int count = EBI25Constants.getIntResult(results, "count");
                 if (valuePoint != null && count > 0) {
                     // Value point is enabled.
-                    BatchRead<String> valueBatch = new BatchRead<String>();
+                    BatchRead<String> valueBatch = new BatchRead<>();
 
                     int pointer = EBI25Constants.getIntResult(results, "pointer");
                     for (int i = 0; i < count; i++) {
@@ -118,7 +118,7 @@ public class EBI25DataSourceRT extends PollingDataSource<EBI25DataSourceVO> impl
                             EBI25Constants.createLocator(loggerIndex, EBI25Constants.OFFSET_MEASUREMENT_COUNT, false),
                             0);
 
-                    EBI25PointLocatorVO locator = ((EBI25PointLocatorRT) valuePoint.getPointLocator()).getVO();
+                    EBI25PointLocatorVO locator = ((EBI25PointLocatorRT) valuePoint.getPointLocator()).getVo();
                     int sampleRateSeconds = EBI25Constants.getIntResult(results, "rate");
                     long valueTime = EBI25Constants.getTimeResult(results, "start");
                     for (int i = 0; i < count; i++) {
@@ -160,7 +160,7 @@ public class EBI25DataSourceRT extends PollingDataSource<EBI25DataSourceVO> impl
     private DataPointRT getLoggerPoint(int index, int type) {
         for (DataPointRT dp : dataPoints) {
             EBI25PointLocatorRT locator = dp.getPointLocator();
-            if (locator.getVO().getIndex() == index && locator.getVO().getType() == type) {
+            if (locator.getVo().getIndex() == index && locator.getVo().getType() == type) {
                 return dp;
             }
         }

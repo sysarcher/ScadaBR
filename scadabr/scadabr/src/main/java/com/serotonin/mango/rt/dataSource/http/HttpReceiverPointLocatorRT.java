@@ -24,20 +24,10 @@ import com.serotonin.mango.vo.dataSource.http.HttpReceiverPointLocatorVO;
 /**
  * @author Matthew Lohbihler
  */
-public class HttpReceiverPointLocatorRT extends PointLocatorRT {
-
-    private final HttpReceiverPointLocatorVO vo;
+public class HttpReceiverPointLocatorRT extends PointLocatorRT<HttpReceiverPointLocatorVO> {
 
     public HttpReceiverPointLocatorRT(HttpReceiverPointLocatorVO vo) {
-        this.vo = vo;
+        super(vo);
     }
 
-    @Override
-    public boolean isSettable() {
-        return vo.isSettable();
-    }
-
-    public HttpReceiverPointLocatorVO getPointLocatorVO() {
-        return vo;
-    }
 }

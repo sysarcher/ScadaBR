@@ -33,12 +33,10 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
-import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.snmp.SnmpPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -75,7 +73,7 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     @Override
-    public PointLocatorRT createRuntime() {
+    public SnmpPointLocatorRT createRuntime() {
         return new SnmpPointLocatorRT(this);
     }
 

@@ -377,7 +377,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
                 dataPointId);
         DataPointVO dp = null;
         if (dpRT != null) {
-            dp = dpRT.getVO();
+            dp = dpRT.getVo();
         } else {
             APIError error = new APIError();
             error.setCode(ErrorCode.INVALID_PARAMETER);

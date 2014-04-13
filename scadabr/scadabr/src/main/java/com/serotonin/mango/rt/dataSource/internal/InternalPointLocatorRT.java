@@ -24,20 +24,10 @@ import com.serotonin.mango.vo.dataSource.internal.InternalPointLocatorVO;
 /**
  * @author Matthew Lohbihler
  */
-public class InternalPointLocatorRT extends PointLocatorRT {
-
-    private final InternalPointLocatorVO vo;
+public class InternalPointLocatorRT extends PointLocatorRT<InternalPointLocatorVO> {
 
     public InternalPointLocatorRT(InternalPointLocatorVO vo) {
-        this.vo = vo;
+        super(vo);
     }
 
-    @Override
-    public boolean isSettable() {
-        return vo.isSettable();
-    }
-
-    public InternalPointLocatorVO getPointLocatorVO() {
-        return vo;
-    }
 }

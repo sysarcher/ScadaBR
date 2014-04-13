@@ -104,14 +104,14 @@ public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> 
     @Override
     public void forcePointRead(DataPointRT dataPoint) {
         PachubePointLocatorRT locator = dataPoint.getPointLocator();
-        List<DataPointRT> point = new ArrayList<DataPointRT>(1);
+        List<DataPointRT> point = new ArrayList<>(1);
         point.add(dataPoint);
         pollFeed(locator.getFeedId(), point, System.currentTimeMillis());
     }
 
     @Override
     protected void doPoll(long time) {
-        Map<Integer, List<DataPointRT>> devicePoints = new HashMap<Integer, List<DataPointRT>>();
+        Map<Integer, List<DataPointRT>> devicePoints = new HashMap<>();
 
         synchronized (pointListChangeLock) {
             for (DataPointRT dp : dataPoints) {
@@ -119,7 +119,7 @@ public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> 
 
                 List<DataPointRT> points = devicePoints.get(locator.getFeedId());
                 if (points == null) {
-                    points = new ArrayList<DataPointRT>();
+                    points = new ArrayList<>();
                     devicePoints.put(locator.getFeedId(), points);
                 }
 
@@ -171,7 +171,7 @@ public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> 
                 try {
                     // Get the value
                     MangoValue value = DataSourceUtils.getValue(dataValue.getValue(), locator.getDataTypeId(),
-                            locator.getBinary0Value(), dp.getVO().getTextRenderer(), null, dp.getVO().getName());
+                            locator.getBinary0Value(), dp.getVo().getTextRenderer(), null, dp.getVoName());
 
                     // Get the time.
                     long valueTime;
@@ -197,7 +197,7 @@ public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> 
                 } catch (ParseException e) {
                     if (parseErrorMessage == null) {
                         parseErrorMessage = new LocalizableMessageImpl("event.valueParse.timeParsePoint",
-                                dataValue.getTimestamp(), dp.getVO().getName());
+                                dataValue.getTimestamp(), dp.getVoName());
                     }
                     dp.setAttribute(ATTR_UNRELIABLE_KEY, true);
                 }
@@ -279,7 +279,7 @@ public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> 
         } catch (IOException e) {
             // Raise an event.
             raiseEvent(POINT_WRITE_EXCEPTION_EVENT, valueTime.getTime(), true, new LocalizableMessageImpl(
-                    "event.exception2", dataPoint.getVO().getName(), e.getMessage()));
+                    "event.exception2", dataPoint.getVoName(), e.getMessage()));
         }
     }
     @Override

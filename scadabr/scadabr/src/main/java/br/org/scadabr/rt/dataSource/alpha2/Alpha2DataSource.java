@@ -47,7 +47,7 @@ public class Alpha2DataSource extends PollingDataSource<Alpha2DataSourceVO> {
         Map<DeviceLocator, DataPointRT> map = new HashMap<>();
 
         for (DataPointRT pointRT : dataPoints) {
-            Alpha2PointLocatorVO dp = pointRT.getVO().getPointLocator();
+            Alpha2PointLocatorVO dp = pointRT.getVo().getPointLocator();
 
             if (dp.isReadable()) {
                 DeviceLocator locator = new DeviceLocator(DeviceCodes
@@ -111,7 +111,7 @@ public class Alpha2DataSource extends PollingDataSource<Alpha2DataSourceVO> {
     public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime,
             SetPointSource source) {
         List<DeviceWrite> devices = new ArrayList<>();
-        Alpha2PointLocatorVO dp = dataPoint.getVO().getPointLocator();
+        Alpha2PointLocatorVO dp = dataPoint.getVo().getPointLocator();
 
         boolean runStop = false;
 

@@ -84,8 +84,7 @@ public class HttpReceiverDataSourceRT extends EventDataSource<HttpReceiverDataSo
         // Match data points in the received set with point locators.
         synchronized (pointListChangeLock) {
             for (DataPointRT dp : dataPoints) {
-                HttpReceiverPointLocatorVO locator = ((HttpReceiverPointLocatorRT) dp.getPointLocator())
-                        .getPointLocatorVO();
+                HttpReceiverPointLocatorVO locator = ((HttpReceiverPointLocatorRT) dp.getPointLocator()).getVo();
                 String paramName = locator.getParameterName();
 
                 for (HttpReceiverPointSample sample : data.getData()) {

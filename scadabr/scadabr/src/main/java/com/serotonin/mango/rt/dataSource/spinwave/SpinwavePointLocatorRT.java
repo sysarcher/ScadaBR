@@ -24,20 +24,10 @@ import com.serotonin.mango.vo.dataSource.spinwave.BaseSpinwavePointLocatorVO;
 /**
  * @author Matthew Lohbihler
  */
-public class SpinwavePointLocatorRT extends PointLocatorRT {
-
-    private final BaseSpinwavePointLocatorVO vo;
+public class SpinwavePointLocatorRT extends PointLocatorRT<BaseSpinwavePointLocatorVO> {
 
     public SpinwavePointLocatorRT(BaseSpinwavePointLocatorVO vo) {
-        this.vo = vo;
+        super(vo);
     }
 
-    @Override
-    public boolean isSettable() {
-        return vo.isSettable();
-    }
-
-    public BaseSpinwavePointLocatorVO getPointLocatorVO() {
-        return vo;
-    }
 }

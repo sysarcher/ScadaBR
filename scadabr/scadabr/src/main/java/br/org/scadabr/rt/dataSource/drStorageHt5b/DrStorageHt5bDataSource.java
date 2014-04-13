@@ -78,7 +78,7 @@ public class DrStorageHt5bDataSource extends PollingDataSource<DrStorageHt5bData
 
                         try {
                             DrStorageHt5bPointLocatorVO dataPointVO = dataPoint
-                                    .getVO().getPointLocator();
+                                    .getVo().getPointLocator();
 
                             if (dataPointVO.getPointType()
                                     .equals("Temperature")) {

@@ -21,8 +21,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 
 @JsonRemoteEntity
-public class Dnp3PointLocatorVO extends AbstractPointLocatorVO implements
-        JsonSerializable {
+public class Dnp3PointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
     public static final int BINARY_INPUT = 0;
     public static final int BINARY_OUTPUT = 0x10;

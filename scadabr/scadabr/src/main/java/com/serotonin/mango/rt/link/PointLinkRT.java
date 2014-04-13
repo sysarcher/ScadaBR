@@ -105,7 +105,7 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
             return;
         }
 
-        int targetDataType = targetPoint.getVO().getPointLocator().getDataTypeId();
+        int targetDataType = targetPoint.getVo().getPointLocator().getDataTypeId();
 
         if (!vo.getScript().isEmpty()) {
             ScriptExecutor scriptExecutor = new ScriptExecutor();

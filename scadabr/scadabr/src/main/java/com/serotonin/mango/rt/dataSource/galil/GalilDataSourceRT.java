@@ -129,16 +129,16 @@ public class GalilDataSourceRT extends PollingDataSource<GalilDataSourceVO> impl
         GalilResponse response = (GalilResponse) conn.send(request);
 
         if (response.isErrorResponse()) {
-            return new LocalizableMessageImpl("event.galil.errorResponse", dataPoint.getVO().getName());
+            return new LocalizableMessageImpl("event.galil.errorResponse", dataPoint.getVo().getName());
         }
 
         try {
-            MangoValue value = locator.parsePollResponse(response.getResponseData(), dataPoint.getVO().getName());
+            MangoValue value = locator.parsePollResponse(response.getResponseData(), dataPoint.getVo().getName());
 
             // Update the data image with the new value.
             dataPoint.updatePointValue(new PointValueTime(value, time));
         } catch (LocalizableException e) {
-            return new LocalizableMessageImpl("event.galil.parsingError", dataPoint.getVO().getName(),
+            return new LocalizableMessageImpl("event.galil.parsingError", dataPoint.getVo().getName(),
                     response.getResponseData());
         }
 
@@ -182,7 +182,7 @@ public class GalilDataSourceRT extends PollingDataSource<GalilDataSourceVO> impl
                 openConnection();
             } catch (IOException e) {
                 raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
-                        "event.galil.setPointFailed", dataPoint.getVO().getName(), e.getMessage()));
+                        "event.galil.setPointFailed", dataPoint.getVo().getName(), e.getMessage()));
                 LOG.debug("Error while initializing data source", e);
                 return;
             }
@@ -194,14 +194,14 @@ public class GalilDataSourceRT extends PollingDataSource<GalilDataSourceVO> impl
         GalilRequest request = locator.getSetRequest(valueTime.getValue());
         if (request == null) {
             raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), false, new LocalizableMessageImpl(
-                    "event.galil.setRequest", dataPoint.getVO().getName(), valueTime.getValue()));
+                    "event.galil.setRequest", dataPoint.getVo().getName(), valueTime.getValue()));
         } else {
             try {
                 GalilResponse response = (GalilResponse) conn.send(request);
 
                 if (response.isErrorResponse()) {
                     raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), false, new LocalizableMessageImpl(
-                            "event.galil.setResponse", dataPoint.getVO().getName()));
+                            "event.galil.setResponse", dataPoint.getVo().getName()));
                 } else {
                     try {
                         // Update the data image with the new value.
@@ -214,13 +214,13 @@ public class GalilDataSourceRT extends PollingDataSource<GalilDataSourceVO> impl
                         }
                     } catch (LocalizableException e) {
                         raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), false,
-                                new LocalizableMessageImpl("event.galil.parsingError", dataPoint.getVO().getName(),
+                                new LocalizableMessageImpl("event.galil.parsingError", dataPoint.getVo().getName(),
                                         response.getResponseData()));
                     }
                 }
             } catch (IOException e) {
                 raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), false, new LocalizableMessageImpl(
-                        "event.galil.sendError", dataPoint.getVO().getName(), e.getMessage()));
+                        "event.galil.sendError", dataPoint.getVo().getName(), e.getMessage()));
             }
         }
     }

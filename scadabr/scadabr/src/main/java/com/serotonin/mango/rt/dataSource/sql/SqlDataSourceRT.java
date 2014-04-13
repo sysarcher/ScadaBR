@@ -79,8 +79,7 @@ public class SqlDataSourceRT extends PollingDataSource<SqlDataSourceVO> {
             return;
         }
 
-        SqlPointLocatorVO locatorVO = ((SqlPointLocatorRT) dataPoint
-                .getPointLocator()).getVO();
+        SqlPointLocatorVO locatorVO = ((SqlPointLocatorRT) dataPoint.getPointLocator()).getVo();
 
         PreparedStatement stmt = null;
         try {
@@ -107,19 +106,18 @@ public class SqlDataSourceRT extends PollingDataSource<SqlDataSourceVO> {
             if (rows == 0) {
                 raiseEvent(STATEMENT_EXCEPTION_EVENT, valueTime.getTime(),
                         false, new LocalizableMessageImpl(
-                                "event.sql.noRowsUpdated", dataPoint.getVO()
-                                .getName()));
+                                "event.sql.noRowsUpdated", dataPoint.getVoName()));
             } else {
                 dataPoint.setPointValue(valueTime, source);
             }
         } catch (IOException e) {
             raiseEvent(STATEMENT_EXCEPTION_EVENT, valueTime.getTime(), false,
                     new LocalizableMessageImpl("event.sql.setError", dataPoint
-                            .getVO().getName(), wrapException(e)));
+                            .getVoName(), wrapException(e)));
         } catch (SQLException e) {
             raiseEvent(STATEMENT_EXCEPTION_EVENT, valueTime.getTime(), false,
                     new LocalizableMessageImpl("event.sql.setError", dataPoint
-                            .getVO().getName(), wrapException(e)));
+                            .getVoName(), wrapException(e)));
         } finally {
             try {
                 if (stmt != null) {
@@ -186,7 +184,7 @@ public class SqlDataSourceRT extends PollingDataSource<SqlDataSourceVO> {
 
             for (DataPointRT dp : dataPoints) {
                 SqlPointLocatorRT locatorRT = dp.getPointLocator();
-                SqlPointLocatorVO locatorVO = locatorRT.getVO();
+                SqlPointLocatorVO locatorVO = locatorRT.getVo();
 
                 String fieldName = locatorVO.getFieldName();
                 if (!fieldName.isEmpty()) {
@@ -258,7 +256,7 @@ public class SqlDataSourceRT extends PollingDataSource<SqlDataSourceVO> {
             boolean found = false;
             for (DataPointRT dp : dataPoints) {
                 SqlPointLocatorRT locatorRT = dp.getPointLocator();
-                SqlPointLocatorVO locatorVO = locatorRT.getVO();
+                SqlPointLocatorVO locatorVO = locatorRT.getVo();
                 String fieldName = locatorVO.getFieldName();
 
                 if (!fieldName.isEmpty()

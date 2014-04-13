@@ -106,7 +106,7 @@ public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> 
         }
 
         // Create a local list of points so that we can remove those that we're done with.
-        List<DataPointRT> points = new ArrayList<DataPointRT>(dataPoints);
+        List<DataPointRT> points = new ArrayList<>(dataPoints);
 
         LocalizableMessage exceptionMessage = null;
         try {
@@ -154,7 +154,7 @@ public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> 
 
         if (exceptionMessage == null && points.size() > 0) // If any points are left in the list, they count as exceptions.
         {
-            exceptionMessage = new LocalizableMessageImpl("event.1wire.noPointData", points.get(0).getVO().getName());
+            exceptionMessage = new LocalizableMessageImpl("event.1wire.noPointData", points.get(0).getVoName());
         }
 
         // Event handling.
@@ -333,7 +333,7 @@ public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> 
                 path = localNetwork.getNetworkPath(locator.getAddress());
                 if (path == null) {
                     exceptionMessage = new LocalizableMessageImpl("event.1wire.noDevice", Address.toString(locator
-                            .getAddress()), dataPoint.getVO().getName());
+                            .getAddress()), dataPoint.getVoName());
                 } else {
                     path.open();
 
@@ -356,7 +356,7 @@ public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> 
                             pc.writeDevice(state);
                         } else {
                             exceptionMessage = new LocalizableMessageImpl("event.1wire.setWiper", Address.toString(locator
-                                    .getAddress()), dataPoint.getVO().getName());
+                                    .getAddress()), dataPoint.getVoName());
                         }
                     }
                 }
@@ -417,7 +417,6 @@ public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> 
             raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true,
                     wrapSerialException(e, vo.getCommPortId()));
             terminateNetwork();
-            return;
         }
     }
 

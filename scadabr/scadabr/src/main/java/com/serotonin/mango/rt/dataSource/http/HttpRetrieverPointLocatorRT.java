@@ -25,12 +25,11 @@ import java.util.regex.Pattern;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.http.HttpRetrieverPointLocatorVO;
-import br.org.scadabr.util.StringUtils;
 
 /**
  * @author Matthew Lohbihler
  */
-public class HttpRetrieverPointLocatorRT extends PointLocatorRT {
+public class HttpRetrieverPointLocatorRT extends PointLocatorRT<HttpRetrieverPointLocatorVO> {
 
     private final Pattern valuePattern;
     private final boolean ignoreIfMissing;
@@ -39,9 +38,9 @@ public class HttpRetrieverPointLocatorRT extends PointLocatorRT {
     private DecimalFormat valueFormat;
     private final Pattern timePattern;
     private final SimpleDateFormat timeFormat;
-    private final boolean settable;
 
     public HttpRetrieverPointLocatorRT(HttpRetrieverPointLocatorVO vo) {
+        super(vo);
         valuePattern = Pattern.compile(vo.getValueRegex());
         ignoreIfMissing = vo.isIgnoreIfMissing();
         dataTypeId = vo.getDataTypeId();
@@ -60,12 +59,6 @@ public class HttpRetrieverPointLocatorRT extends PointLocatorRT {
             timeFormat = null;
         }
 
-        settable = vo.isSettable();
-    }
-
-    @Override
-    public boolean isSettable() {
-        return settable;
     }
 
     public Pattern getValuePattern() {

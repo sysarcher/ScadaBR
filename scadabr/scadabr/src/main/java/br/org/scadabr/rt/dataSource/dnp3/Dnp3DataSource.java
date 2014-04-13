@@ -54,7 +54,7 @@ public class Dnp3DataSource<T extends Dnp3DataSourceVO<T>> extends PollingDataSo
 
         for (DataPointRT dataPoint : dataPoints) {
             Dnp3PointLocatorVO pointLocator = ((Dnp3PointLocatorVO) dataPoint
-                    .getVO().getPointLocator());
+                    .getVo().getPointLocator());
             List<DataElement> pointValues = dnp3Master.read(pointLocator
                     .getDnp3DataType(), pointLocator.getIndex());
 
@@ -95,7 +95,7 @@ public class Dnp3DataSource<T extends Dnp3DataSourceVO<T>> extends PollingDataSo
     public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime,
             SetPointSource source) {
         Dnp3PointLocatorVO pointLocator = (Dnp3PointLocatorVO) dataPoint
-                .getVO().getPointLocator();
+                .getVo().getPointLocator();
 
         int dataType = pointLocator.getDnp3DataType();
         int index = pointLocator.getIndex();

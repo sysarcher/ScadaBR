@@ -218,7 +218,7 @@ public class SnmpDataSourceRT extends PollingDataSource<SnmpDataSourceVO> {
     }
 
     private SnmpPointLocatorVO getLocatorVO(DataPointRT dp) {
-        return ((SnmpPointLocatorRT) dp.getPointLocator()).getVO();
+        return ((SnmpPointLocatorRT) dp.getPointLocator()).getVo();
     }
 
     int getTrapPort() {

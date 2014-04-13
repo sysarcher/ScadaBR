@@ -23,18 +23,11 @@ import net.sf.fhz4j.fht.FhtMessage;
 import com.serotonin.mango.vo.dataSource.fhz4j.Fhz4JPointLocatorVO;
 
 // No need to encapsulate as string like vo
-public class Fhz4JPointLocatorRT extends PointLocatorRT {
+public class Fhz4JPointLocatorRT extends PointLocatorRT<Fhz4JPointLocatorVO> {
 
-    private final Fhz4JPointLocatorVO vo;
 
     public Fhz4JPointLocatorRT(Fhz4JPointLocatorVO vo) {
-        super();
-        this.vo = vo;
-    }
-
-    @Override
-    public boolean isSettable() {
-        return vo.isSettable();
+        super(vo);
     }
 
     boolean isMyFhtMessage(FhtMessage fhtMessage) {

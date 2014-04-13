@@ -43,7 +43,7 @@ import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<?>> extends DataSourceVO<T> {
+abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extends DataSourceVO<T> {
 
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {

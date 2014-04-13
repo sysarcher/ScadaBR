@@ -28,23 +28,21 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.bacnet.BACnetIPPointLocatorVO;
 import br.org.scadabr.util.IpAddressUtils;
-import br.org.scadabr.util.StringUtils;
 
 /**
  * @author Matthew Lohbihler
  */
-public class BACnetIPPointLocatorRT extends PointLocatorRT {
+public class BACnetIPPointLocatorRT extends PointLocatorRT<BACnetIPPointLocatorVO> {
 
     private static int NEXT_COV_ID = 1;
 
-    private final BACnetIPPointLocatorVO vo;
     private RemoteDevice remoteDevice;
     private final ObjectIdentifier oid;
     private final PropertyIdentifier pid;
     private final int covId;
 
     public BACnetIPPointLocatorRT(BACnetIPPointLocatorVO vo) {
-        this.vo = vo;
+        super(vo);
         oid = new ObjectIdentifier(new ObjectType(vo.getObjectTypeId()), vo.getObjectInstanceNumber());
         pid = new PropertyIdentifier(vo.getPropertyIdentifierId());
 
@@ -100,11 +98,6 @@ public class BACnetIPPointLocatorRT extends PointLocatorRT {
 
     public int getCovId() {
         return covId;
-    }
-
-    @Override
-    public boolean isSettable() {
-        return vo.isSettable();
     }
 
     @Override

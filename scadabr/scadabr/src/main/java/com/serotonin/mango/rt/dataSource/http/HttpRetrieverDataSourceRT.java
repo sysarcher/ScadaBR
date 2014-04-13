@@ -93,12 +93,11 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
             try {
                 // Get the value
                 MangoValue value = DataSourceUtils.getValue(locator.getValuePattern(), data, locator.getDataTypeId(),
-                        locator.getBinary0Value(), dp.getVO().getTextRenderer(), locator.getValueFormat(), dp.getVO()
-                        .getName());
+                        locator.getBinary0Value(), dp.getVo().getTextRenderer(), locator.getValueFormat(), dp.getVoName());
 
                 // Get the time.
                 long valueTime = DataSourceUtils.getValueTime(time, locator.getTimePattern(), data,
-                        locator.getTimeFormat(), dp.getVO().getName());
+                        locator.getTimeFormat(), dp.getVoName());
 
                 // Save the new value
                 dp.updatePointValue(new PointValueTime(value, valueTime));

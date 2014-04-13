@@ -29,28 +29,14 @@ import net.sf.mbus4j.master.ValueRequestPointLocator;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 
-public class MBusPointLocatorRT extends PointLocatorRT {
-
-    private final MBusPointLocatorVO vo;
+public class MBusPointLocatorRT extends PointLocatorRT<MBusPointLocatorVO> {
 
     public MBusPointLocatorRT(MBusPointLocatorVO vo) {
-        this.vo = vo;
-    }
-
-    @Override
-    public boolean isSettable() {
-        return false;
-    }
-
-    /**
-     * @return the vo
-     */
-    public MBusPointLocatorVO getVo() {
-        return vo;
+        super(vo);
     }
 
     public ValueRequestPointLocator<DataPointRT> createValueRequestPointLocator(DataPointRT point) {
-        ValueRequestPointLocator<DataPointRT> result = new ValueRequestPointLocator<DataPointRT>();
+        ValueRequestPointLocator<DataPointRT> result = new ValueRequestPointLocator<>();
         result.setAddressing(vo.getAddressing());
         result.setAddress(vo.getAddress());
         result.setDeviceUnit(vo.getDeviceUnit());
