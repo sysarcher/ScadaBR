@@ -25,7 +25,7 @@ import com.serotonin.mango.util.ChangeComparableObject;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 
-public interface PointLocatorVO extends Serializable, ChangeComparableObject {
+public interface PointLocatorVO  extends Serializable, ChangeComparableObject {
 
     /**
      * One of the com.serotonin.mango.DataTypes

@@ -93,7 +93,7 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
             if (contextPointDisabledEventActive) // A context point has been terminated, was never enabled, or not longer exists.
             {
                 raiseEvent(EVENT_TYPE_CONTEXT_POINT_DISABLED, System.currentTimeMillis(), true, new LocalizableMessageImpl(
-                        "event.meta.pointUnavailable", problemPoint.getVO().getName()));
+                        "event.meta.pointUnavailable", problemPoint.getVo().getName()));
             } else // Everything is good
             {
                 returnToNormal(EVENT_TYPE_CONTEXT_POINT_DISABLED, System.currentTimeMillis());
@@ -103,11 +103,11 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
 
     public void raiseScriptError(long runtime, DataPointRT dataPoint, LocalizableMessage message) {
         raiseEvent(EVENT_TYPE_SCRIPT_ERROR, runtime, false, new LocalizableMessageImpl("event.meta.scriptError", dataPoint
-                .getVO().getName(), message));
+                .getVo().getName(), message));
     }
 
     public void raiseResultTypeError(long runtime, DataPointRT dataPoint, LocalizableMessage message) {
         raiseEvent(EVENT_TYPE_RESULT_TYPE_ERROR, runtime, false, new LocalizableMessageImpl("event.meta.typeError",
-                dataPoint.getVO().getName(), message));
+                dataPoint.getVo().getName(), message));
     }
 }

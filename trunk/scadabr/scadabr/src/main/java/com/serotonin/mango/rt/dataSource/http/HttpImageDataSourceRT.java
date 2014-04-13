@@ -168,7 +168,7 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
         }
 
         private void executeImpl() {
-            HttpImagePointLocatorVO vo = dp.getVO().getPointLocator();
+            HttpImagePointLocatorVO vo = dp.getVo().getPointLocator();
 
             byte[] data;
             try {

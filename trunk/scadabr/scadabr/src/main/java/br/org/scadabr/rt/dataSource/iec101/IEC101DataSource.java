@@ -49,7 +49,7 @@ public class IEC101DataSource<T extends IEC101DataSourceVO<T>> extends PollingDa
         }
 
         for (DataPointRT dataPoint : dataPoints) {
-            IEC101PointLocatorVO pointLocator = dataPoint.getVO()
+            IEC101PointLocatorVO pointLocator = dataPoint.getVo()
                     .getPointLocator();
 
             List<DataElement> elements = iec101Master.read(pointLocator
@@ -69,7 +69,7 @@ public class IEC101DataSource<T extends IEC101DataSourceVO<T>> extends PollingDa
     @Override
     public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime,
             SetPointSource source) {
-        IEC101PointLocatorVO pointLocator = dataPoint.getVO().getPointLocator();
+        IEC101PointLocatorVO pointLocator = dataPoint.getVo().getPointLocator();
 
         boolean select = false;
         int ioa = pointLocator.getObjectAddress() + pointLocator.getOffset();

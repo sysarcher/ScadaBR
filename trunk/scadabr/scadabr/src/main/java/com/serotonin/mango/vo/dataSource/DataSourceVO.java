@@ -84,7 +84,7 @@ import br.org.scadabr.web.l10n.Localizer;
 import com.serotonin.mango.vo.dataSource.fhz4j.Fhz4JDataSourceVO;
 import br.org.scadabr.vo.datasource.mbus.MBusDataSourceVO;
 
-abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
+abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         Serializable, Cloneable, JsonSerializable, ChangeComparable<T> {
 
     public enum Type {
@@ -367,7 +367,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<?>> implements
 
     abstract public PointLocatorVO createPointLocator();
 
-    abstract public DataSourceRT createDataSourceRT();
+    abstract public DataSourceRT<T> createDataSourceRT();
 
     abstract public ExportCodes getEventCodes();
 

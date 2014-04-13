@@ -24,28 +24,17 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.jmx.JmxPointLocatorVO;
 import br.org.scadabr.util.ArrayUtils;
-import br.org.scadabr.util.StringUtils;
 
 /**
  * @author Matthew Lohbihler
  */
-public class JmxPointLocatorRT extends PointLocatorRT {
+public class JmxPointLocatorRT extends PointLocatorRT<JmxPointLocatorVO> {
 
-    private final JmxPointLocatorVO vo;
     private ObjectName objectName;
     private String type;
 
     public JmxPointLocatorRT(JmxPointLocatorVO vo) {
-        this.vo = vo;
-    }
-
-    @Override
-    public boolean isSettable() {
-        return vo.isSettable();
-    }
-
-    public JmxPointLocatorVO getPointLocatorVO() {
-        return vo;
+        super(vo);
     }
 
     public ObjectName getObjectName() {

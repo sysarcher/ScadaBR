@@ -18,19 +18,49 @@
  */
 package com.serotonin.mango.rt.dataSource.virtual;
 
+import com.serotonin.mango.DataTypes;
+import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
+import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
+import com.serotonin.mango.rt.dataImage.types.MultistateValue;
+import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
+import com.serotonin.mango.vo.dataSource.virtual.VirtualPointLocatorVO;
 
-public class VirtualPointLocatorRT extends PointLocatorRT {
+public class VirtualPointLocatorRT extends PointLocatorRT<VirtualPointLocatorVO> {
 
     private final ChangeTypeRT changeType;
     private MangoValue currentValue;
-    private final boolean settable;
 
-    public VirtualPointLocatorRT(ChangeTypeRT changeType, MangoValue startValue, boolean settable) {
-        this.changeType = changeType;
-        currentValue = startValue;
-        this.settable = settable;
+    public VirtualPointLocatorRT(VirtualPointLocatorVO vo) {
+        super(vo);
+        changeType = vo.getChangeType().createRuntime();
+        String startValue = vo.getChangeType().getStartValue();
+        switch (vo.getDataTypeId()) {
+            case DataTypes.BINARY:
+                currentValue = BinaryValue.parseBinary(startValue);
+                break;
+            case DataTypes.MULTISTATE:
+                try {
+                    currentValue = MultistateValue.parseMultistate(startValue);
+                } catch (NumberFormatException e) {
+                    currentValue = new MultistateValue(0);
+                }
+                break;
+            case DataTypes.NUMERIC:
+                try {
+                    currentValue = NumericValue.parseNumeric(startValue);
+                } catch (NumberFormatException e) {
+                    currentValue = new NumericValue(0);
+                }
+                break;
+            default:
+                if (startValue == null) {
+                    currentValue = new AlphanumericValue("");
+                } else {
+                    currentValue = new AlphanumericValue(startValue);
+                }
+        }
     }
 
     public ChangeTypeRT getChangeType() {
@@ -49,8 +79,4 @@ public class VirtualPointLocatorRT extends PointLocatorRT {
         currentValue = changeType.change(currentValue);
     }
 
-    @Override
-    public boolean isSettable() {
-        return settable;
-    }
 }

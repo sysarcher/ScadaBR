@@ -56,7 +56,7 @@ public class NodaveS7DataSource extends PollingDataSource<NodaveS7DataSourceVO> 
 
             for (DataPointRT dataPoint : dataPoints) {
                 try {
-                    NodaveS7PointLocatorVO dataPointVO = dataPoint.getVO()
+                    NodaveS7PointLocatorVO dataPointVO = dataPoint.getVo()
                             .getPointLocator();
                     MangoValue value;
                     value = getValue(dataPointVO, arquivo);
@@ -145,28 +145,28 @@ public class NodaveS7DataSource extends PollingDataSource<NodaveS7DataSourceVO> 
 
         System.out
                 .println("AREA "
-                        + ((NodaveS7PointLocatorVO) dataPoint.getVO()
+                        + ((NodaveS7PointLocatorVO) dataPoint.getVo()
                         .getPointLocator()).getS7writeMemoryArea());
         System.out
                 .println("DBNUM "
-                        + ((NodaveS7PointLocatorVO) dataPoint.getVO()
+                        + ((NodaveS7PointLocatorVO) dataPoint.getVo()
                         .getPointLocator()).getS7writeDBNUM());
         System.out
                 .println("BYTES "
-                        + ((NodaveS7PointLocatorVO) dataPoint.getVO()
+                        + ((NodaveS7PointLocatorVO) dataPoint.getVo()
                         .getPointLocator()).getS7writeBytesQty());
         System.out
                 .println("STARTS "
-                        + ((NodaveS7PointLocatorVO) dataPoint.getVO()
+                        + ((NodaveS7PointLocatorVO) dataPoint.getVo()
                         .getPointLocator()).getS7writeStarts());
         System.out
                 .println("BIT "
-                        + ((NodaveS7PointLocatorVO) dataPoint.getVO()
+                        + ((NodaveS7PointLocatorVO) dataPoint.getVo()
                         .getPointLocator()).getS7writeBitOffset());
 
         System.out
                 .println("TYPE "
-                        + ((NodaveS7PointLocatorVO) dataPoint.getVO()
+                        + ((NodaveS7PointLocatorVO) dataPoint.getVo()
                         .getPointLocator()).getDataType());
 
         System.out.println(valueTime.toString());
@@ -176,10 +176,10 @@ public class NodaveS7DataSource extends PollingDataSource<NodaveS7DataSourceVO> 
         // (...)
 		// logica exclusiva para aplicacao com um
         // unico bit ativo na word especificada ex.: resets
-        if (((NodaveS7PointLocatorVO) dataPoint.getVO().getPointLocator())
+        if (((NodaveS7PointLocatorVO) dataPoint.getVo().getPointLocator())
                 .getDataType() == 1) {
             int converted = 0;
-            int bit = ((NodaveS7PointLocatorVO) dataPoint.getVO()
+            int bit = ((NodaveS7PointLocatorVO) dataPoint.getVo()
                     .getPointLocator()).getS7writeBitOffset();
             if (valueTime.getValue().getBooleanValue()) {
                 switch (bit) {
@@ -216,7 +216,7 @@ public class NodaveS7DataSource extends PollingDataSource<NodaveS7DataSourceVO> 
     }
 
     private String readFile(File file) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         FileReader reader;
         try {
             reader = new FileReader(file);

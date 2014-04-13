@@ -21,16 +21,19 @@ package com.serotonin.mango.rt.dataSource.galil;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import br.org.scadabr.web.i18n.LocalizableException;
+import com.serotonin.mango.vo.dataSource.galil.GalilPointLocatorVO;
+import com.serotonin.mango.vo.dataSource.galil.PointTypeVO;
 
 /**
  * @author Matthew Lohbihler
  */
-public class GalilPointLocatorRT extends PointLocatorRT {
+public class GalilPointLocatorRT extends PointLocatorRT<GalilPointLocatorVO> {
 
     private final PointTypeRT pointType;
 
-    public GalilPointLocatorRT(PointTypeRT pointType) {
-        this.pointType = pointType;
+    public GalilPointLocatorRT(GalilPointLocatorVO vo, PointTypeVO ptvo) {
+        super(vo);
+        this.pointType = ptvo.createRuntime();
     }
 
     public PointTypeRT getPointType() {

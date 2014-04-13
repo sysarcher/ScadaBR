@@ -207,8 +207,7 @@ public class Pop3DataSourceRT extends PollingDataSource<Pop3DataSourceVO> {
             MangoValue value;
             try {
                 value = DataSourceUtils.getValue(locator.getValuePattern(), content, locator.getDataTypeId(), locator
-                        .getBinary0Value(), dp.getVO().getTextRenderer(), locator.getValueFormat(), dp.getVO()
-                        .getName());
+                        .getBinary0Value(), dp.getVo().getTextRenderer(), locator.getValueFormat(), dp.getVoName());
             } catch (NoMatchException e) {
                 if (locator.isIgnoreIfMissing()) {
                     continue;
@@ -227,7 +226,7 @@ public class Pop3DataSourceRT extends PollingDataSource<Pop3DataSourceVO> {
                 }
             } else {
                 valueTime = DataSourceUtils.getValueTime(time, locator.getTimePattern(), pop3Email.getBody(),
-                        locator.getTimeFormat(), dp.getVO().getName());
+                        locator.getTimeFormat(), dp.getVoName());
             }
 
             // Save the new value

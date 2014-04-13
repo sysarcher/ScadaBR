@@ -76,7 +76,7 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
         super.addDataPoint(dataPoint);
 
         // Mark the point as unreliable.
-        ModbusPointLocatorVO locatorVO = dataPoint.getVO().getPointLocator();
+        ModbusPointLocatorVO locatorVO = dataPoint.getVo().getPointLocator();
         if (!locatorVO.isSlaveMonitor()) {
             dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
         }
@@ -133,7 +133,7 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
             super.removeDataPoint(dataPoint);
 
             // If this is a slave monitor point being removed, also remove it from the map.
-            ModbusPointLocatorVO locatorVO = dataPoint.getVO().getPointLocator();
+            ModbusPointLocatorVO locatorVO = dataPoint.getVo().getPointLocator();
             if (locatorVO.isSlaveMonitor()) {
                 slaveMonitors.put(locatorVO.getSlaveId(), null);
             }
@@ -171,8 +171,8 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
 
             for (DataPointRT dataPoint : dataPoints) {
                 locator = dataPoint.getPointLocator();
-                if (!locator.getVO().isSlaveMonitor()) {
-                    modbusLocator = createModbusLocator(locator.getVO());
+                if (!locator.getVo().isSlaveMonitor()) {
+                    modbusLocator = createModbusLocator(locator.getVo());
                     batchRead.addLocator(locator, modbusLocator);
                 }
             }
@@ -186,7 +186,7 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
 
             for (DataPointRT dataPoint : dataPoints) {
                 locator = dataPoint.getPointLocator();
-                if (locator.getVO().isSlaveMonitor()) {
+                if (locator.getVo().isSlaveMonitor()) {
                     continue;
                 }
 
@@ -197,18 +197,18 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
 
                     // Raise an event.
                     raiseEvent(POINT_READ_EXCEPTION_EVENT, time, true, new LocalizableMessageImpl("event.exception2",
-                            dataPoint.getVO().getName(), exceptionResult.getExceptionMessage()));
+                            dataPoint.getVo().getName(), exceptionResult.getExceptionMessage()));
 
                     dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
 
                     // A response, albeit an undesirable one, was received from the slave, so it is online.
-                    slaveStatuses.put(locator.getVO().getSlaveId(), true);
+                    slaveStatuses.put(locator.getVo().getSlaveId(), true);
                 } else if (result instanceof ModbusTransportException) {
                     ModbusTransportException e = (ModbusTransportException) result;
 
                     // Update the slave status. Only set to false if it is not true already.
-                    if (!slaveStatuses.containsKey(locator.getVO().getSlaveId())) {
-                        slaveStatuses.put(locator.getVO().getSlaveId(), false);
+                    if (!slaveStatuses.containsKey(locator.getVo().getSlaveId())) {
+                        slaveStatuses.put(locator.getVo().getSlaveId(), false);
                     }
 
                     // Raise an event.
@@ -221,7 +221,7 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
                     returnToNormal(POINT_READ_EXCEPTION_EVENT, time);
                     dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, false);
                     updatePointValue(dataPoint, locator, result, time);
-                    slaveStatuses.put(locator.getVO().getSlaveId(), true);
+                    slaveStatuses.put(locator.getVo().getSlaveId(), true);
                 }
             }
 
@@ -288,12 +288,12 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
     @Override
     public void forcePointRead(DataPointRT dataPoint) {
         ModbusPointLocatorRT pl = dataPoint.getPointLocator();
-        if (pl.getVO().isSlaveMonitor()) // Nothing to do
+        if (pl.getVo().isSlaveMonitor()) // Nothing to do
         {
             return;
         }
 
-        BaseLocator<?> ml = createModbusLocator(pl.getVO());
+        BaseLocator<?> ml = createModbusLocator(pl.getVo());
         long time = System.currentTimeMillis();
 
         synchronized (pointListChangeLock) {
@@ -306,7 +306,7 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
                 updatePointValue(dataPoint, pl, value, time);
             } catch (ErrorResponseException e) {
                 raiseEvent(POINT_READ_EXCEPTION_EVENT, time, true, new LocalizableMessageImpl("event.exception2", dataPoint
-                        .getVO().getName(), e.getMessage()));
+                        .getVo().getName(), e.getMessage()));
                 dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
             } catch (ModbusTransportException e) {
                 // Don't raise a data source exception. Polling should do that.
@@ -317,15 +317,15 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
     }
 
     private void updatePointValue(DataPointRT dataPoint, ModbusPointLocatorRT pl, Object value, long time) {
-        if (pl.getVO().getDataTypeId() == DataTypes.BINARY) {
+        if (pl.getVo().getDataTypeId() == DataTypes.BINARY) {
             dataPoint.updatePointValue(new PointValueTime((Boolean) value, time));
-        } else if (pl.getVO().getDataTypeId() == DataTypes.ALPHANUMERIC) {
+        } else if (pl.getVo().getDataTypeId() == DataTypes.ALPHANUMERIC) {
             dataPoint.updatePointValue(new PointValueTime((String) value, time));
         } else {
             // Apply arithmetic conversions.
             double newValue = ((Number) value).doubleValue();
-            newValue *= pl.getVO().getMultiplier();
-            newValue += pl.getVO().getAdditive();
+            newValue *= pl.getVo().getMultiplier();
+            newValue += pl.getVo().getAdditive();
             dataPoint.updatePointValue(new PointValueTime(newValue, time));
         }
     }
@@ -343,14 +343,14 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
     @Override
     public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source) {
         ModbusPointLocatorRT pl = dataPoint.getPointLocator();
-        BaseLocator<?> ml = createModbusLocator(pl.getVO());
+        BaseLocator<?> ml = createModbusLocator(pl.getVo());
 
         try {
             // See if this is a numeric value that needs to be converted.
             if (dataPoint.getDataTypeId() == DataTypes.NUMERIC) {
                 double convertedValue = valueTime.getDoubleValue();
-                convertedValue -= pl.getVO().getAdditive();
-                convertedValue /= pl.getVO().getMultiplier();
+                convertedValue -= pl.getVo().getAdditive();
+                convertedValue /= pl.getVo().getMultiplier();
                 modbusMaster.setValue(ml, convertedValue);
             } else if (dataPoint.getDataTypeId() == DataTypes.ALPHANUMERIC) {
                 modbusMaster.setValue(ml, valueTime.getStringValue());
@@ -364,11 +364,11 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
         } catch (ModbusTransportException e) {
             // Raise an event.
             raiseEvent(POINT_WRITE_EXCEPTION_EVENT, valueTime.getTime(), true, new LocalizableMessageImpl(
-                    "event.exception2", dataPoint.getVO().getName(), e.getMessage()));
+                    "event.exception2", dataPoint.getVo().getName(), e.getMessage()));
             LOG.info("Error setting point value", e);
         } catch (ErrorResponseException e) {
             raiseEvent(POINT_WRITE_EXCEPTION_EVENT, valueTime.getTime(), true, new LocalizableMessageImpl(
-                    "event.exception2", dataPoint.getVO().getName(), e.getErrorResponse().getExceptionMessage()));
+                    "event.exception2", dataPoint.getVo().getName(), e.getErrorResponse().getExceptionMessage()));
             LOG.info("Error setting point value", e);
         }
     }

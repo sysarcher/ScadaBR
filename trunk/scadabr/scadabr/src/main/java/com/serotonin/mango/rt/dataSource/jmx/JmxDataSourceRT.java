@@ -97,7 +97,7 @@ public class JmxDataSourceRT extends PollingDataSource<JmxDataSourceVO> {
 
             Object attr;
             try {
-                attr = server.getAttribute(loc.getObjectName(), loc.getPointLocatorVO().getAttributeName());
+                attr = server.getAttribute(loc.getObjectName(), loc.getVo().getAttributeName());
             } catch (Exception e) {
                 raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
                         "common.default", e.getMessage()));
@@ -113,7 +113,7 @@ public class JmxDataSourceRT extends PollingDataSource<JmxDataSourceVO> {
                 }
 
                 CompositeData cd = (CompositeData) attr;
-                value = cd.get(loc.getPointLocatorVO().getCompositeItemName());
+                value = cd.get(loc.getVo().getCompositeItemName());
             } else {
                 value = attr;
             }
@@ -127,7 +127,7 @@ public class JmxDataSourceRT extends PollingDataSource<JmxDataSourceVO> {
     public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source) {
         if (server == null) {
             raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
-                    "dsEdit.jmx.writeFailed", dataPoint.getVO().getName()));
+                    "dsEdit.jmx.writeFailed", dataPoint.getVoName()));
             return;
         }
 
@@ -135,23 +135,23 @@ public class JmxDataSourceRT extends PollingDataSource<JmxDataSourceVO> {
         JmxPointLocatorRT loc = dataPoint.getPointLocator();
         if (loc.getObjectName() == null) {
             raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
-                    "dsEdit.jmx.writeFailed", dataPoint.getVO().getName()));
+                    "dsEdit.jmx.writeFailed", dataPoint.getVoName()));
             return;
         }
 
         if (loc.isComposite()) {
             raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
-                    "dsEdit.jmx.writeFailed.composite", dataPoint.getVO().getName()));
+                    "dsEdit.jmx.writeFailed.composite", dataPoint.getVoName()));
             return;
         }
 
-        Attribute attr = new Attribute(loc.getPointLocatorVO().getAttributeName(),
+        Attribute attr = new Attribute(loc.getVo().getAttributeName(),
                 loc.mangoValueToManagementValue(valueTime.getValue()));
         try {
             server.setAttribute(loc.getObjectName(), attr);
         } catch (Exception e) {
             raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
-                    "dsEdit.jmx.writeFailed.msg", dataPoint.getVO().getName(), e.getMessage()));
+                    "dsEdit.jmx.writeFailed.msg", dataPoint.getVoName(), e.getMessage()));
         }
     }
 
@@ -201,15 +201,15 @@ public class JmxDataSourceRT extends PollingDataSource<JmxDataSourceVO> {
 
         if (loc.getObjectName() == null) {
             try {
-                loc.setObjectName(new ObjectName(loc.getPointLocatorVO().getObjectName()));
+                loc.setObjectName(new ObjectName(loc.getVo().getObjectName()));
             } catch (MalformedObjectNameException e) {
                 raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true,
-                        new LocalizableMessageImpl("dsEdit.jmx.objectNameError", loc.getPointLocatorVO().getObjectName(),
-                                dp.getVO().getName(), e.getMessage()));
+                        new LocalizableMessageImpl("dsEdit.jmx.objectNameError", loc.getVo().getObjectName(),
+                                dp.getVoName(), e.getMessage()));
                 return false;
             } catch (NullPointerException e) {
                 raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
-                        "dsEdit.jmx.objectNameNotFound", loc.getPointLocatorVO().getObjectName(), dp.getVO().getName()));
+                        "dsEdit.jmx.objectNameNotFound", loc.getVo().getObjectName(), dp.getVoName()));
                 return false;
             }
             updated = true;
@@ -225,11 +225,10 @@ public class JmxDataSourceRT extends PollingDataSource<JmxDataSourceVO> {
                 return false;
             }
 
-            MBeanAttributeInfo attr = getAttributeInfo(info, loc.getPointLocatorVO().getAttributeName());
+            MBeanAttributeInfo attr = getAttributeInfo(info, loc.getVo().getAttributeName());
             if (attr == null) {
                 raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
-                        "dsEdit.jmx.attributeNameNotFound", loc.getPointLocatorVO().getAttributeName(), dp.getVO()
-                        .getName()));
+                        "dsEdit.jmx.attributeNameNotFound", loc.getVo().getAttributeName(), dp.getVoName()));
                 return false;
             }
 
@@ -239,15 +238,14 @@ public class JmxDataSourceRT extends PollingDataSource<JmxDataSourceVO> {
 
                 if (!JmxPointLocatorRT.isValidType(type)) {
                     raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
-                            "dsEdit.jmx.attributeTypeNotSupported", type, dp.getVO().getName()));
+                            "dsEdit.jmx.attributeTypeNotSupported", type, dp.getVoName()));
                     return false;
                 }
 
             } else {
                 if (!attr.getType().equals("javax.management.openmbean.CompositeData")) {
                     raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
-                            "dsEdit.jmx.attributeNotComposite", loc.getPointLocatorVO().getAttributeName(), dp.getVO()
-                            .getName()));
+                            "dsEdit.jmx.attributeNotComposite", loc.getVo().getAttributeName(), dp.getVoName()));
                     return false;
                 }
 
@@ -260,11 +258,11 @@ public class JmxDataSourceRT extends PollingDataSource<JmxDataSourceVO> {
                     return false;
                 }
 
-                OpenType<?> openType = cd.getCompositeType().getType(loc.getPointLocatorVO().getCompositeItemName());
+                OpenType<?> openType = cd.getCompositeType().getType(loc.getVo().getCompositeItemName());
                 if (openType == null) {
                     raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
-                            "dsEdit.jmx.compositeNameNotFound", loc.getPointLocatorVO().getCompositeItemName(), dp
-                            .getVO().getName()));
+                            "dsEdit.jmx.compositeNameNotFound", loc.getVo().getCompositeItemName(), dp
+                            .getVoName()));
                     return false;
                 }
 
@@ -272,7 +270,7 @@ public class JmxDataSourceRT extends PollingDataSource<JmxDataSourceVO> {
 
                 if (!JmxPointLocatorRT.isValidType(type)) {
                     raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl(
-                            "dsEdit.jmx.compositeTypeNotSupported", type, dp.getVO().getName()));
+                            "dsEdit.jmx.compositeTypeNotSupported", type, dp.getVoName()));
                     return false;
                 }
             }

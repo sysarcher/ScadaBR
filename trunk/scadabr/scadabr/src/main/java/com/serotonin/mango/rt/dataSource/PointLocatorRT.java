@@ -18,17 +18,32 @@
  */
 package com.serotonin.mango.rt.dataSource;
 
+import com.serotonin.mango.vo.dataSource.PointLocatorVO;
+
 /**
  * This type provides the data source with the information that it needs to
  * locate the point data.
  *
  * @author mlohbihler
  */
-abstract public class PointLocatorRT {
+abstract public class PointLocatorRT<T extends PointLocatorVO> {
 
-    abstract public boolean isSettable();
+    protected final T vo;
+
+    public PointLocatorRT(T vo) {
+        this.vo = vo;
+    }
+
+    public boolean isSettable() {
+        return vo.isSettable();
+    }
+
 
     public boolean isRelinquishable() {
         return false;
+    }
+    
+    public T getVo() {
+        return vo;
     }
 }

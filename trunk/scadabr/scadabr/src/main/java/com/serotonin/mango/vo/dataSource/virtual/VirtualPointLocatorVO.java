@@ -35,13 +35,7 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.DataTypes;
-import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
-import com.serotonin.mango.rt.dataImage.types.BinaryValue;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import com.serotonin.mango.rt.dataImage.types.MultistateValue;
-import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
-import com.serotonin.mango.rt.dataSource.virtual.ChangeTypeRT;
 import com.serotonin.mango.rt.dataSource.virtual.VirtualPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.IntMessagePair;
@@ -65,7 +59,7 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
         return changeType.getDescription();
     }
 
-    private ChangeTypeVO getChangeType() {
+    public ChangeTypeVO getChangeType() {
         if (changeTypeId == ChangeTypeVO.Types.ALTERNATE_BOOLEAN) {
             return alternateBooleanChange;
         }
@@ -98,33 +92,11 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
         return alternateBooleanChange;
     }
 
+    
+    
     @Override
     public PointLocatorRT createRuntime() {
-        ChangeTypeRT changeType = getChangeType().createRuntime();
-        String startValue = getChangeType().getStartValue();
-        MangoValue startObject;
-        if (dataTypeId == DataTypes.BINARY) {
-            startObject = BinaryValue.parseBinary(startValue);
-        } else if (dataTypeId == DataTypes.MULTISTATE) {
-            try {
-                startObject = MultistateValue.parseMultistate(startValue);
-            } catch (NumberFormatException e) {
-                startObject = new MultistateValue(0);
-            }
-        } else if (dataTypeId == DataTypes.NUMERIC) {
-            try {
-                startObject = NumericValue.parseNumeric(startValue);
-            } catch (NumberFormatException e) {
-                startObject = new NumericValue(0);
-            }
-        } else {
-            if (startValue == null) {
-                startObject = new AlphanumericValue("");
-            } else {
-                startObject = new AlphanumericValue(startValue);
-            }
-        }
-        return new VirtualPointLocatorRT(changeType, startObject, isSettable());
+        return new VirtualPointLocatorRT(this);
     }
 
     @Override

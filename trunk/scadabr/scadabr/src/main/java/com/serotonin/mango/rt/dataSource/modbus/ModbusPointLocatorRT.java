@@ -22,24 +22,14 @@ import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.modbus.ModbusPointLocatorVO;
 import com.serotonin.modbus4j.code.DataType;
 
-public class ModbusPointLocatorRT extends PointLocatorRT {
-
-    private final ModbusPointLocatorVO vo;
+public class ModbusPointLocatorRT extends PointLocatorRT<ModbusPointLocatorVO> {
 
     public ModbusPointLocatorRT(ModbusPointLocatorVO vo) {
-        this.vo = vo;
+        super(vo);
     }
 
     public int getRegisterCount() {
         return DataType.getRegisterCount(vo.getModbusDataType());
     }
 
-    @Override
-    public boolean isSettable() {
-        return vo.isSettable();
-    }
-
-    public ModbusPointLocatorVO getVO() {
-        return vo;
-    }
 }

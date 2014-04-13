@@ -135,7 +135,7 @@ public class SpinwaveDataSourceRT extends EventDataSource<SpinwaveDataSourceVO> 
         boolean found = false;
         synchronized (pointListChangeLock) {
             for (DataPointRT dp : dataPoints) {
-                locator = ((SpinwavePointLocatorRT) dp.getPointLocator()).getPointLocatorVO();
+                locator = ((SpinwavePointLocatorRT) dp.getPointLocator()).getVo();
 
                 if (locator.getSensorAddress() == message.getSensorAddress()) {
                     found = true;

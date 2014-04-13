@@ -399,10 +399,14 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
         return vo.getDataSourceId();
     }
 
-    public DataPointVO getVO() {
+    public DataPointVO getVo() {
         return vo;
     }
 
+    public String getVoName() {
+        return vo.getName();
+    }
+    
     @Override
     public int getDataTypeId() {
         return vo.getPointLocator().getDataTypeId();

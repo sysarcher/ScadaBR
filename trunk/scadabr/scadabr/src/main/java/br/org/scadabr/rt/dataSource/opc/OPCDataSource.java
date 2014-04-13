@@ -44,10 +44,10 @@ public class OPCDataSource extends PollingDataSource<OPCDataSourceVO> {
 
     @Override
     protected void doPoll(long time) {
-        ArrayList<String> enabledTags = new ArrayList<String>();
+        ArrayList<String> enabledTags = new ArrayList<>();
 
         for (DataPointRT dataPoint : dataPoints) {
-            OPCPointLocatorVO dataPointVO = dataPoint.getVO().getPointLocator();
+            OPCPointLocatorVO dataPointVO = dataPoint.getVo().getPointLocator();
             enabledTags.add(dataPointVO.getTag());
         }
 
@@ -75,7 +75,7 @@ public class OPCDataSource extends PollingDataSource<OPCDataSourceVO> {
         }
 
         for (DataPointRT dataPoint : dataPoints) {
-            OPCPointLocatorVO dataPointVO = dataPoint.getVO().getPointLocator();
+            OPCPointLocatorVO dataPointVO = dataPoint.getVo().getPointLocator();
             MangoValue mangoValue = null;
             String value = "0";
 
@@ -97,7 +97,7 @@ public class OPCDataSource extends PollingDataSource<OPCDataSourceVO> {
     @Override
     public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime,
             SetPointSource source) {
-        String tag = ((OPCPointLocatorVO) dataPoint.getVO().getPointLocator())
+        String tag = ((OPCPointLocatorVO) dataPoint.getVo().getPointLocator())
                 .getTag();
         Object value = null;
         if (dataPoint.getDataTypeId() == DataTypes.NUMERIC) {

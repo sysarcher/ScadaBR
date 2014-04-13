@@ -217,7 +217,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
             try {
                 localDevice.sendUnconfirmed(address, null, new WhoIsRequest());
             } catch (BACnetException e) {
-                fireMessageExceptionEvent("event.bacnet.whoisPoint", dataPoint.getVO().getName(), e.getMessage());
+                fireMessageExceptionEvent("event.bacnet.whoisPoint", dataPoint.getVoName(), e.getMessage());
                 disablePoint(dataPoint);
                 return;
             }
@@ -398,9 +398,9 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
 
     private void dereferencePoint(DataPointRT dp, Encodable encodable, long time) {
         if (encodable == null) {
-            fireDeviceExceptionEvent("event.bacnet.readError", dp.getVO().getName(), "no value returned");
+            fireDeviceExceptionEvent("event.bacnet.readError", dp.getVo().getName(), "no value returned");
         } else if (encodable instanceof BACnetError) {
-            fireDeviceExceptionEvent("event.bacnet.readError", dp.getVO().getName(),
+            fireDeviceExceptionEvent("event.bacnet.readError", dp.getVo().getName(),
                     ((BACnetError) encodable).getErrorCode());
         } else {
             MangoValue value = encodableToValue(encodable, dp.getDataTypeId());
@@ -659,7 +659,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
     }
 
     private void disablePoint(DataPointRT dataPoint) {
-        DataPointVO dataPointVO = dataPoint.getVO();
+        DataPointVO dataPointVO = dataPoint.getVo();
         dataPointVO.setEnabled(false);
         Common.ctx.getRuntimeManager().saveDataPoint(dataPointVO);
     }
