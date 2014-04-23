@@ -26,6 +26,11 @@
     
     <repositories>
         <repository>
+            <id>sonatypeShnapshots</id>
+            <name>Snapshots from oss.sonatype.org</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+        <repository>
             <id>mbus4j</id>
             <name>mbus4j sourceforge snapshot repository</name>
             <url>http://mbus4j.sourceforge.net/snapshot-repository</url>
@@ -321,9 +326,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>br.org.scadabr.legacy</groupId>
+            <groupId>net.sf.fhz4j</groupId>
             <artifactId>fhz4j-core</artifactId>
-            <version>0.1.4-SNAPSHOT</version>
+            <version>0.1.5-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

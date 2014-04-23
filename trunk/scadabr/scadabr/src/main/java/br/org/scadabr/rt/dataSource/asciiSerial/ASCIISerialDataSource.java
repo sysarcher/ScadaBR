@@ -39,7 +39,7 @@ public class ASCIISerialDataSource extends PollingDataSource<ASCIISerialDataSour
     private SerialPort sPort;
 
     public ASCIISerialDataSource(ASCIISerialDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(),
                 vo.isQuantize());
 
@@ -69,14 +69,14 @@ public class ASCIISerialDataSource extends PollingDataSource<ASCIISerialDataSour
     }
 
     @Override
-    protected void doPoll(long time) {
-
+    public void doPoll(long time) {
+        updateChangedPoints();
         try {
 
             // no data
             if (getInSerialStream().available() == 0) {
 
-                for (DataPointRT dataPoint : dataPoints) {
+                for (DataPointRT dataPoint : enabledDataPoints.values()) {
                     ASCIISerialPointLocatorVO dataPointVO = dataPoint.getVo()
                             .getPointLocator();
                     if (dataPointVO.getCommand() != null) {
@@ -124,7 +124,7 @@ public class ASCIISerialDataSource extends PollingDataSource<ASCIISerialDataSour
                         }
                     }
 
-                    for (DataPointRT dataPoint : dataPoints) {
+                    for (DataPointRT dataPoint : enabledDataPoints.values()) {
                         try {
                             ASCIISerialPointLocatorVO dataPointVO = dataPoint
                                     .getVo().getPointLocator();
@@ -189,7 +189,7 @@ public class ASCIISerialDataSource extends PollingDataSource<ASCIISerialDataSour
         String valueRegex = point.getValueRegex();
         Pattern valuePattern = Pattern.compile(valueRegex);
         Matcher matcher = valuePattern.matcher(arquivo);
-		// System.out.println("Utilizando string: " + arquivo
+        // System.out.println("Utilizando string: " + arquivo
         // + "\n Utilizando regex: " + valueRegex);
         MangoValue value = null;
         String strValue = null;

@@ -47,8 +47,6 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.script.ScriptException;
 
-import net.sf.fhz4j.FhzDeviceTypes;
-import net.sf.fhz4j.FhzProperty;
 import net.sf.mbus4j.Connection;
 import net.sf.mbus4j.MBusAddressing;
 import net.sf.mbus4j.TcpIpConnection;
@@ -128,8 +126,8 @@ import com.serotonin.mango.vo.dataSource.bacnet.BACnetIPDataSourceVO;
 import com.serotonin.mango.vo.dataSource.bacnet.BACnetIPPointLocatorVO;
 import com.serotonin.mango.vo.dataSource.ebro.EBI25DataSourceVO;
 import com.serotonin.mango.vo.dataSource.ebro.EBI25PointLocatorVO;
-import com.serotonin.mango.vo.dataSource.fhz4j.Fhz4JDataSourceVO;
-import com.serotonin.mango.vo.dataSource.fhz4j.Fhz4JPointLocatorVO;
+import br.org.scadabr.vo.datasource.fhz4j.Fhz4JDataSourceVO;
+import br.org.scadabr.vo.datasource.fhz4j.Fhz4JPointLocatorVO;
 import com.serotonin.mango.vo.dataSource.galil.GalilDataSourceVO;
 import com.serotonin.mango.vo.dataSource.galil.GalilPointLocatorVO;
 import com.serotonin.mango.vo.dataSource.http.HttpImageDataSourceVO;
@@ -210,6 +208,7 @@ import com.serotonin.modbus4j.msg.ModbusRequest;
 import com.serotonin.modbus4j.msg.ReadResponse;
 import br.org.scadabr.util.IpAddressUtils;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.vo.datasource.fhz4j.FhtPointLocator;
 import com.serotonin.viconics.RequestFailureException;
 import com.serotonin.viconics.ViconicsDevice;
 import com.serotonin.viconics.ViconicsNetwork;
@@ -223,12 +222,13 @@ import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import java.util.Date;
-import java.util.TimeZone;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
 import javax.management.MBeanException;
 import javax.management.ReflectionException;
+import net.sf.fhz4j.fht.FhtDeviceTypes;
+import net.sf.fhz4j.fht.FhtProperty;
 
 /**
  * @author Matthew Lohbihler
@@ -2020,43 +2020,37 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     // /
     //
     @MethodFilter
-    public DwrResponseI18n saveFhz4JDataSource(String name, String xid,
-            String commPortId, String fhzHousecode, boolean fhzMaster) {
-        Fhz4JDataSourceVO ds = (Fhz4JDataSourceVO) Common.getUser()
-                .getEditDataSource();
+    public DwrResponseI18n saveFhz4JDataSource(String name, String xid, String commPort, String fhzHousecode, boolean fhzMaster) {
+        Fhz4JDataSourceVO ds = (Fhz4JDataSourceVO) Common.getUser().getEditDataSource();
 
         ds.setXid(xid);
         ds.setName(name);
-        ds.setCommPortId(commPortId);
+        ds.setCommPort(commPort);
         ds.setFhzHousecode(fhzHousecode);
         ds.setFhzMaster(fhzMaster);
         return tryDataSourceSave(ds);
     }
 
     @MethodFilter
-    public DataPointVO addFhz4JPoint(String deviceHousecode,
-            String deviceLocation, String deviceTypeLabel, String propertyLabel) {
-        // TODO what happends, if user edits 2 Datasources???
+    public DataPointVO addFhz4JFhtPoint(String deviceHousecode, String deviceLocation, String deviceTypeLabel, String propertyLabel) {
+        //TODO what happends, if user edits 2 Datasources???
         DataPointVO result = getPoint(Common.NEW_ID, null);
-        Fhz4JPointLocatorVO locator = (Fhz4JPointLocatorVO) result
-                .getPointLocator();
-
-        result.setName(String.format("%s %s", deviceLocation, propertyLabel));
+        FhtPointLocator locator = (FhtPointLocator) result.getPointLocator();
         locator.setDeviceHousecodeStr(deviceHousecode);
-        locator.setFhzDeviceTypeLabel(deviceTypeLabel);
-        locator.setFhzPropertyLabel(propertyLabel);
+        locator.setFhtDeviceTypeLabel(deviceTypeLabel);
+        locator.setPropertyLabel(propertyLabel);
+
+        //  result.setName(locator.defaultName());
 
         return result;
     }
 
     @MethodFilter
-    public String[] getFhz4JProperties(String deviceTypeLabel) {
-        return FhzProperty.Util.getFhzPropertyLabelsOf(FhzDeviceTypes
-                .fromLabel(deviceTypeLabel));
+    public String[] getFht4JProperties(String deviceTypeLabel) {
+        return FhtProperty.getFhtPropertyLabelsOf(FhtDeviceTypes.fromLabel(deviceTypeLabel));
     }
 
-    public DwrResponseI18n saveFhz4JPointLocator(int id, String xid,
-            String name, Fhz4JPointLocatorVO locator) {
+    public DwrResponseI18n saveFhz4JPointLocator(int id, String xid, String name, Fhz4JPointLocatorVO locator) {
         return validatePoint(id, xid, name, locator, null);
     }
 

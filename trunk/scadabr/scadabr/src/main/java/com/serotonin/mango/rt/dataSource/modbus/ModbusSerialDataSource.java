@@ -30,7 +30,7 @@ import java.text.ParseException;
 public class ModbusSerialDataSource extends ModbusDataSource<ModbusSerialDataSourceVO> {
 
     public ModbusSerialDataSource(ModbusSerialDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
     }
 
     //

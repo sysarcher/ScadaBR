@@ -15,6 +15,10 @@ public class ShouldNeverHappenException extends RuntimeException {
         super(message);
     }
 
+    public ShouldNeverHappenException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public ShouldNeverHappenException(Throwable cause) {
         super(cause);
     }

@@ -81,7 +81,7 @@ import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.l10n.Localizer;
-import com.serotonin.mango.vo.dataSource.fhz4j.Fhz4JDataSourceVO;
+import br.org.scadabr.vo.datasource.fhz4j.Fhz4JDataSourceVO;
 import br.org.scadabr.vo.datasource.mbus.MBusDataSourceVO;
 
 abstract public class DataSourceVO<T extends DataSourceVO<T>> implements

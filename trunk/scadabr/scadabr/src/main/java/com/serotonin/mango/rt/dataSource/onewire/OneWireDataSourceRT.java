@@ -71,7 +71,7 @@ public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> 
     private long nextRescan = 0;
 
     public OneWireDataSourceRT(OneWireDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 
@@ -80,7 +80,8 @@ public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> 
     }
 
     @Override
-    protected void doPoll(long time) {
+    public void doPoll(long time) {
+        updateChangedPoints();
         if (vo.getRescanPeriodType() != OneWireDataSourceVO.RESCAN_NONE) {
             if (nextRescan == 0) {
                 updateNextRescan(time);
@@ -106,7 +107,7 @@ public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> 
         }
 
         // Create a local list of points so that we can remove those that we're done with.
-        List<DataPointRT> points = new ArrayList<>(dataPoints);
+        List<DataPointRT> points = new ArrayList<>(enabledDataPoints.values());
 
         LocalizableMessage exceptionMessage = null;
         try {
@@ -315,6 +316,8 @@ public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> 
 
     @Override
     public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source) {
+        throw new ImplementMeException();
+        /*
         LocalizableMessage exceptionMessage = null;
 
         Network localNetwork = network;
@@ -381,6 +384,7 @@ public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> 
                 dataPoint.setPointValue(valueTime, source);
             }
         }
+                */
     }
 
     //

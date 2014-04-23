@@ -18,7 +18,6 @@
  */
 package com.serotonin.mango.rt.dataSource;
 
-import br.org.scadabr.web.i18n.LocalizableException;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 
@@ -28,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.rt.IDataPointLiveCycleListener;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -37,8 +37,10 @@ import com.serotonin.mango.rt.event.type.DataSourceEventType;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.ILifecycle;
+import br.org.scadabr.web.i18n.LocalizableException;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.vo.DataPointVO;
 
 /**
  * Data sources are things that produce data for consumption of this system.
@@ -56,42 +58,54 @@ import br.org.scadabr.web.i18n.LocalizableMessageImpl;
  *
  * @author Matthew Lohbihler
  */
-abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecycle {
+abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecycle, IDataPointLiveCycleListener {
 
     public static final String ATTR_UNRELIABLE_KEY = "UNRELIABLE";
-
     protected final T vo;
-
+    private final List<DataSourceEventType> eventTypes;
     /**
      * Under the expectation that most data sources will run in their own
      * threads, the addedPoints field is used as a cache for points that have
      * been added to the data source, so that at a convenient time for the data
      * source they can be included in the polling.
      *
+     * Access should be synchronized with the monitor of addedChangedPoints
+     *
      * Note that updated versions of data points that could already be running
      * may be added here, so implementations should always check for existing
      * instances.
      */
-    protected List<DataPointRT> addedChangedPoints = new ArrayList<>();
+    protected final Map<Integer, DataPointRT> enabledDataPointsCache = new HashMap<>();
+    protected final Map<Integer, DataPointRT> enabledDataPoints = new HashMap<>();
 
     /**
      * Under the expectation that most data sources will run in their own
      * threads, the removedPoints field is used as a cache for points that have
      * been removed from the data source, so that at a convenient time for the
      * data source they can be removed from the polling.
+     *
+     * Access should be synchronized with the monitor of removedPoints
+     *
      */
-    protected List<DataPointRT> removedPoints = new ArrayList<>();
+    protected final List<DataPointVO> disabledDataPointsCache = new ArrayList<>();
+    protected final Map<Integer, DataPointVO> disabledDataPoints = new HashMap<>();
+
+    protected final List<DataPointVO> deletedDataPointsCache = new ArrayList<>();
+
+    protected final Object dataPointsCacheLock = new Object();
+    private final boolean caching;
+    private boolean cacheChanged;
+    protected boolean enabledDataPointsChanged;
 
     /**
-     * Access to either the addedPoints or removedPoints lists should be
-     * synchronized with this object's monitor.
+     *
+     * @param vo
+     * @param doCache whether or not enabling/disabling of datapoints will be
+     * cached
      */
-    final protected Object pointListChangeLock = new Object();
-
-    private final List<DataSourceEventType> eventTypes;
-
-    public DataSourceRT(T vo) {
+    public DataSourceRT(T vo, boolean doCache) {
         this.vo = vo;
+        caching = doCache;
 
         eventTypes = new ArrayList<>();
         for (EventTypeVO etvo : vo.getEventTypes()) {
@@ -126,24 +140,81 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
         new DataSourceDao().savePersistentData(vo.getId(), persistentData);
     }
 
-    public void addDataPoint(DataPointRT dataPoint) {
-        synchronized (pointListChangeLock) {
-            addedChangedPoints.remove(dataPoint);
-            addedChangedPoints.add(dataPoint);
-            removedPoints.remove(dataPoint);
+    /*
+     * add activated DataPoints to this datasource
+     */
+    @Override
+    public void dataPointEnabled(DataPointRT dataPoint) {
+        synchronized (dataPointsCacheLock) {
+            if (caching) {
+                cacheChanged |= enabledDataPointsCache.put(dataPoint.getId(), dataPoint) == null;
+                cacheChanged |= disabledDataPointsCache.remove(dataPoint.getVo());
+                cacheChanged |= deletedDataPointsCache.remove(dataPoint.getVo());
+            } else {
+                enabledDataPoints.put(dataPoint.getId(), dataPoint);
+                disabledDataPoints.remove(dataPoint.getId());
+            }
         }
     }
 
-    public void removeDataPoint(DataPointRT dataPoint) {
-        synchronized (pointListChangeLock) {
-            addedChangedPoints.remove(dataPoint);
-            removedPoints.add(dataPoint);
+    /*
+     * remove disabled DataPoints from this datasource
+     */
+    @Override
+    public void dataPointDisabled(DataPointVO dataPoint) {
+        synchronized (dataPointsCacheLock) {
+            if (caching) {
+                cacheChanged |= enabledDataPointsCache.remove(dataPoint.getId()) != null;
+                cacheChanged |= disabledDataPointsCache.add(dataPoint);
+                cacheChanged |= deletedDataPointsCache.remove(dataPoint);
+            } else {
+                enabledDataPoints.remove(dataPoint.getId());
+                disabledDataPoints.put(dataPoint.getId(), dataPoint);
+            }
         }
     }
 
-    abstract public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source);
+    /*
+     * remove disabled DataPoints from this datasource
+     */
+    @Override
+    public void dataPointDeleted(DataPointVO dataPoint) {
+        synchronized (dataPointsCacheLock) {
+            if (caching) {
+                cacheChanged |= enabledDataPointsCache.remove(dataPoint.getId()) != null;
+                cacheChanged |= disabledDataPointsCache.remove(dataPoint);
+                cacheChanged |= deletedDataPointsCache.add(dataPoint);
+            } else {
+                enabledDataPoints.remove(dataPoint.getId());
+                disabledDataPoints.remove(dataPoint.getId());
+            }
+        }
+    }
 
-    public void relinquish(@SuppressWarnings("unused") DataPointRT dataPoint) {
+    /**
+     * No really need to synchronize with #cacheChanged
+     */
+    protected void updateChangedPoints() {
+        if (!cacheChanged) {
+            return;
+        }
+        cacheChanged = false;
+        synchronized (dataPointsCacheLock) {
+            enabledDataPoints.putAll(enabledDataPointsCache);
+            enabledDataPointsCache.clear();
+            enabledDataPointsChanged = true;
+            for (DataPointVO dpVo : disabledDataPointsCache) {
+                disabledDataPoints.remove(dpVo.getId());
+            }
+            disabledDataPointsCache.clear();
+        }
+    }
+
+    public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source) {
+        // no Op
+    }
+
+    public void relinquish(DataPointRT dataPoint) {
         throw new ShouldNeverHappenException("not implemented in " + getClass());
     }
 
@@ -215,4 +286,5 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
     public void beginPolling() {
         // no op
     }
+
 }

@@ -57,7 +57,7 @@ public class PersistentDataSourceRT extends EventDataSource<PersistentDataSource
     final List<ConnectionHandler> connectionHandlers = new CopyOnWriteArrayList<>();
 
     public PersistentDataSourceRT(PersistentDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
     }
 
     public int getConnectionCount() {
@@ -142,7 +142,7 @@ public class PersistentDataSourceRT extends EventDataSource<PersistentDataSource
             new Thread(this, "Persistent TCP data source").start();
         }
     }
-
+/*
     @Override
     public void addDataPoint(DataPointRT dataPoint) {
         super.addDataPoint(dataPoint);
@@ -154,7 +154,7 @@ public class PersistentDataSourceRT extends EventDataSource<PersistentDataSource
         super.removeDataPoint(dataPoint);
         pointXids.remove(dataPoint.getVo().getXid());
     }
-
+*/
     @Override
     public void run() {
         try {

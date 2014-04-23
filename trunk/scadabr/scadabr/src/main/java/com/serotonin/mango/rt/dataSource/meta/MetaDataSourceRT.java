@@ -44,7 +44,7 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
     private boolean contextPointDisabledEventActive;
 
     public MetaDataSourceRT(MetaDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
     }
 
     @Override
@@ -52,6 +52,7 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
         dataPoint.setPointValue(valueTime, source);
     }
 
+    /*
     @Override
     public void addDataPoint(DataPointRT dataPoint) {
         synchronized (pointListChangeLock) {
@@ -70,7 +71,7 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
             checkForDisabledPoints();
         }
     }
-
+*/
     private void remove(DataPointRT dataPoint) {
         MetaPointLocatorRT locator = dataPoint.getPointLocator();
         locator.terminate();

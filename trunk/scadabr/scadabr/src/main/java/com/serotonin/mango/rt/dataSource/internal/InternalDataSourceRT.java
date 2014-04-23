@@ -36,13 +36,14 @@ import java.text.ParseException;
 public class InternalDataSourceRT extends PollingDataSource<InternalDataSourceVO> {
 
     public InternalDataSourceRT(InternalDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 
     @Override
     public void doPoll(long time) {
-        for (DataPointRT dataPoint : dataPoints) {
+        updateChangedPoints();
+        for (DataPointRT dataPoint : enabledDataPoints.values()) {
             InternalPointLocatorRT locator = dataPoint.getPointLocator();
 
             String monitorId = InternalPointLocatorVO.MONITOR_NAMES[locator.getVo().getAttributeId()];

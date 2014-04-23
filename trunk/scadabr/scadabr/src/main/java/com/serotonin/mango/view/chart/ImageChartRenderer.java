@@ -38,6 +38,7 @@ public class ImageChartRenderer extends TimePeriodChartRenderer {
         return definition;
     }
 
+    @Override
     public String getTypeName() {
         return definition.getName();
     }
@@ -50,10 +51,12 @@ public class ImageChartRenderer extends TimePeriodChartRenderer {
         super(timePeriod, numberOfPeriods);
     }
 
+    @Override
     public void addDataToModel(Map<String, Object> model, DataPointVO point) {
         // Nothing to do.
     }
 
+    @Override
     public ImplDefinition getDef() {
         return definition;
     }

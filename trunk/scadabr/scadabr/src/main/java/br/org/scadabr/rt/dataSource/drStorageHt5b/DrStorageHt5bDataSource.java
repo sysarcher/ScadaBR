@@ -21,6 +21,7 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.io.IOException;
 import java.text.ParseException;
 
 public class DrStorageHt5bDataSource extends PollingDataSource<DrStorageHt5bDataSourceVO> {
@@ -37,7 +38,7 @@ public class DrStorageHt5bDataSource extends PollingDataSource<DrStorageHt5bData
 
     public DrStorageHt5bDataSource(DrStorageHt5bDataSourceVO vo) {
 
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), vo
                 .isQuantize());
 
@@ -48,8 +49,8 @@ public class DrStorageHt5bDataSource extends PollingDataSource<DrStorageHt5bData
     }
 
     @Override
-    protected void doPoll(long time) {
-
+    public void doPoll(long time) {
+        updateChangedPoints();
         try {
 
             if (getInSerialStream().available() == 0) {
@@ -74,7 +75,7 @@ public class DrStorageHt5bDataSource extends PollingDataSource<DrStorageHt5bData
                     String temp = getTemperature(getValuesHt5b());
                     String hum = getHumidity(getValuesHt5b());
 
-                    for (DataPointRT dataPoint : dataPoints) {
+                    for (DataPointRT dataPoint : enabledDataPoints.values()) {
 
                         try {
                             DrStorageHt5bPointLocatorVO dataPointVO = dataPoint
@@ -106,9 +107,8 @@ public class DrStorageHt5bDataSource extends PollingDataSource<DrStorageHt5bData
                     e.printStackTrace();
                 }
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new ImplementMeException(e);
         }
 
     }

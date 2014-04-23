@@ -49,7 +49,6 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -96,7 +95,11 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     @Override
     public LocalizableMessage getConfigurationDescription() {
-        return new LocalizableMessageImpl("common.default", "'" + StringUtils.truncate(script, 40) + "'");
+        if (script == null || script.length() < 40) {
+            return new LocalizableMessageImpl("common.default", "'" + script + "'");
+        } else {
+            return new LocalizableMessageImpl("common.default", "'" + script.substring(0, 40) + "'");
+        } 
     }
 
     public List<IntValuePair> getContext() {

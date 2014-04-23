@@ -59,10 +59,6 @@ public class StringUtils {
         throw new ImplementMeException();
     }
 
-    public static String escapeLT(String value) {
-        throw new ImplementMeException();
-    }
-
     public static int parseInt(String substring, int width) {
         throw new ImplementMeException();
     }
@@ -85,6 +81,11 @@ public class StringUtils {
 
     public static String toHex(short s) {
         throw new ImplementMeException();
+    }
+
+    //TODO escape all which may break outer  html to unicode??? ??
+    public static String escapeLT_GT(String value) {
+        return value.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
     }
 
 }

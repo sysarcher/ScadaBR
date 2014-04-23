@@ -36,17 +36,18 @@ public class Alpha2DataSource extends PollingDataSource<Alpha2DataSourceVO> {
     private Alpha2Master master;
 
     public Alpha2DataSource(Alpha2DataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 
     @Override
-    protected void doPoll(long time) {
+    public void doPoll(long time) {
+        updateChangedPoints();
         List<DeviceLocator> locators = new ArrayList<>();
 
         Map<DeviceLocator, DataPointRT> map = new HashMap<>();
 
-        for (DataPointRT pointRT : dataPoints) {
+        for (DataPointRT pointRT : enabledDataPoints.values()) {
             Alpha2PointLocatorVO dp = pointRT.getVo().getPointLocator();
 
             if (dp.isReadable()) {

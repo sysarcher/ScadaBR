@@ -7,6 +7,7 @@ package br.org.scadabr.timer;
 
 import br.org.scadabr.logger.LogUtils;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -156,6 +157,8 @@ public class CronTimerPool<T extends CronTask, V extends Runnable> {
                             "Task already scheduled or cancelled");
                 }
                 task.calcNextExecutionTimeIncludingNow(System.currentTimeMillis());
+                System.err.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+                System.err.println("NEXT EXECUTION TIME: " + new Date(task.nextExecutionTime));
                 task.state = CronTask.SCHEDULED;
                 task.tpe = this.tpe;
             }

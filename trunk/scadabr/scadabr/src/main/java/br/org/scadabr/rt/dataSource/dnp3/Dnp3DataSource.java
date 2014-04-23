@@ -33,14 +33,15 @@ public class Dnp3DataSource<T extends Dnp3DataSourceVO<T>> extends PollingDataSo
 
     private DNP3Master dnp3Master;
 
-    public Dnp3DataSource(T vo) {
-        super(vo);
+    public Dnp3DataSource(T vo, boolean doCache) {
+        super(vo, doCache);
         setPollingPeriod(vo.getRbePeriodType(), vo.getRbePollPeriods(), vo
                 .isQuantize());
     }
 
     @Override
-    protected void doPoll(long time) {
+    public void doPoll(long time) {
+        updateChangedPoints();
 
         try {
             dnp3Master.doPoll();
@@ -52,7 +53,7 @@ public class Dnp3DataSource<T extends Dnp3DataSourceVO<T>> extends PollingDataSo
                             .getMessage()));
         }
 
-        for (DataPointRT dataPoint : dataPoints) {
+        for (DataPointRT dataPoint : enabledDataPoints.values()) {
             Dnp3PointLocatorVO pointLocator = ((Dnp3PointLocatorVO) dataPoint
                     .getVo().getPointLocator());
             List<DataElement> pointValues = dnp3Master.read(pointLocator
@@ -70,7 +71,6 @@ public class Dnp3DataSource<T extends Dnp3DataSourceVO<T>> extends PollingDataSo
                 }
             }
         }
-
     }
 
     protected void initialize(DNP3Master dnp3Master) {

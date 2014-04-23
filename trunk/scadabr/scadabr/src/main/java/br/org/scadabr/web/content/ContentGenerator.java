@@ -5,12 +5,13 @@
  */
 package br.org.scadabr.web.content;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.logger.LogUtils;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,9 +21,11 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class ContentGenerator {
 
+    private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
     private final HttpServletRequest request;
     private final String contentJsp;
     private final Map<String, Object> model;
+    
 
     public ContentGenerator(HttpServletRequest request, String contentJsp, Map<String, Object> model) {
         this.request = request;
@@ -49,10 +52,14 @@ public class ContentGenerator {
         try {
             request.getRequestDispatcher(contentJsp).forward(request, response);
         } catch (MissingResourceException e) {
+            LOG.log(Level.SEVERE, "Missing resource {0}", contentJsp);
             return "Resource " + contentJsp + " not found";
-        } catch (NullPointerException e) {
-            //TODO LOG ???
-            return Arrays.deepToString(e.getStackTrace());
+        } catch (NullPointerException npe) {
+            LOG.log(Level.SEVERE, "NullPointerException {0}", contentJsp);
+            return "Got NullPointerException: " + contentJsp;
+        } catch (Throwable t) {
+            LOG.log(Level.SEVERE, "Throwable {0} {1}", new Object[] {t.getClass(), contentJsp});
+            return "Got Throwable: " + contentJsp;
         } finally {
             if (model != null) {
                 for (String key : model.keySet()) {

@@ -21,7 +21,7 @@ public class DaoUtils {
         ejt = new JdbcTemplate(dataSource);
     }
 
-    protected String createDelimitedList(Collection<?> values, String delimeter, String quote) {
+    protected String createDelimitedList(Collection<?> values, String delimeter) {
         final StringBuilder sb = new StringBuilder();
         boolean isFirst = true;
         for (Object o : values) {
@@ -30,7 +30,7 @@ public class DaoUtils {
             } else {
                 sb.append(delimeter);
             }
-            sb.append(quote).append(o).append(quote);
+            sb.append(o);
         }
         return sb.toString();
     }

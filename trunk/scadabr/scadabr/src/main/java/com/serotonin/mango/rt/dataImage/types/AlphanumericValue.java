@@ -29,7 +29,7 @@ public class AlphanumericValue extends MangoValue implements Comparable<Alphanum
     private final String value;
 
     public AlphanumericValue(String value) {
-        this.value = StringUtils.escapeLT(value);
+        this.value = StringUtils.escapeLT_GT(value);
     }
 
     @Override

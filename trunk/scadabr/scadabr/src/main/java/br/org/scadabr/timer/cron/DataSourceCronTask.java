@@ -30,7 +30,7 @@ public class DataSourceCronTask extends CronTask {
 
     @Override
     protected void run(long scheduledExecutionTime) {
-        dataSource.collectData(scheduledExecutionTime);
+        dataSource.doPoll(scheduledExecutionTime);
     }
 
     @Override

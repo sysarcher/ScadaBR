@@ -64,6 +64,7 @@ import com.serotonin.mango.vo.bean.LongPair;
 import br.org.scadabr.monitor.IntegerMonitor;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import org.springframework.dao.DataAccessException;
@@ -268,7 +269,7 @@ public class PointValueDao extends BaseDao {
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                PreparedStatement ps = con.prepareStatement(POINT_VALUE_INSERT);
+                PreparedStatement ps = con.prepareStatement(POINT_VALUE_INSERT, Statement.RETURN_GENERATED_KEYS);
                 ps.setInt(1, pointId);
                 ps.setInt(2, dataType);
                 ps.setDouble(3, dvalue);
@@ -555,7 +556,7 @@ public class PointValueDao extends BaseDao {
             Map<Integer, List<AnnotatedPointValueTime>> idMap) {
         // Get the description information from the database.
         List<IntValuePair> data = ejt.query(
-                sql + "(" + createDelimitedList(idMap.keySet(), ",", null)
+                sql + "(" + createDelimitedList(idMap.keySet(), ",")
                 + ")", new IntValuePairRowMapper());
 
         // Collate the data with the id map, and set the values in the
@@ -580,7 +581,7 @@ public class PointValueDao extends BaseDao {
 
     public void getPointValuesBetween(List<Integer> dataPointIds, long from,
             long to, final RowCallback<IdPointValueTime> callback) {
-        String ids = createDelimitedList(dataPointIds, ",", null);
+        String ids = createDelimitedList(dataPointIds, ",");
         ejt.query(POINT_ID_VALUE_SELECT + " where pv.dataPointId in (" + ids
                 + ") and pv.ts >= ? and pv.ts<? order by ts", new Object[]{
                     from, to}, new IdPointValueRowMapper() {
@@ -668,7 +669,7 @@ public class PointValueDao extends BaseDao {
         }
         return ejt
                 .queryForLong("select min(ts) from pointValues where dataPointId in ("
-                        + createDelimitedList(dataPointIds, ",", null) + ")");
+                        + createDelimitedList(dataPointIds, ",") + ")");
     }
 
     public long getEndTime(List<Integer> dataPointIds) {
@@ -677,7 +678,7 @@ public class PointValueDao extends BaseDao {
         }
         return ejt
                 .queryForLong("select max(ts) from pointValues where dataPointId in ("
-                        + createDelimitedList(dataPointIds, ",", null) + ")");
+                        + createDelimitedList(dataPointIds, ",") + ")");
     }
 
     public LongPair getStartAndEndTime(List<Integer> dataPointIds) {
@@ -687,7 +688,7 @@ public class PointValueDao extends BaseDao {
         try {
             return ejt.queryForObject(
                     "select min(ts), max(ts) from pointValues where dataPointId in ("
-                    + createDelimitedList(dataPointIds, ",", null) + ")",
+                    + createDelimitedList(dataPointIds, ",") + ")",
                     null, new RowMapper<LongPair>() {
                         @Override
                         public LongPair mapRow(ResultSet rs, int index)

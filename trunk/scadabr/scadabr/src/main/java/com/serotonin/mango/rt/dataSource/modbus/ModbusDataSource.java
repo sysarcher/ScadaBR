@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.modbus;
 
+import br.org.scadabr.ImplementMeException;
 import br.org.scadabr.web.i18n.LocalizableException;
 import java.net.ConnectException;
 import java.nio.charset.Charset;
@@ -66,82 +67,85 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
     private BatchRead<ModbusPointLocatorRT> batchRead;
     private final Map<Integer, DataPointRT> slaveMonitors = new HashMap<>();
 
-    public ModbusDataSource(T vo) {
-        super(vo);
+    public ModbusDataSource(T vo, boolean doCache) {
+        super(vo, doCache);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), vo.isQuantize());
     }
 
+    /*
+     @Override
+     public void addDataPoint(DataPointRT dataPoint) {
+     super.addDataPoint(dataPoint);
+
+     // Mark the point as unreliable.
+     ModbusPointLocatorVO locatorVO = dataPoint.getVo().getPointLocator();
+     if (!locatorVO.isSlaveMonitor()) {
+     dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
+     }
+
+     // Slave monitor points.
+     if (vo.isCreateSlaveMonitorPoints()) {
+     int slaveId = locatorVO.getSlaveId();
+
+     if (locatorVO.isSlaveMonitor()) // The monitor for this slave. Set it in the map.
+     {
+     slaveMonitors.put(slaveId, dataPoint);
+     } else if (!slaveMonitors.containsKey(slaveId)) {
+     // A new slave. Add null to the map to ensure we don't do this check again.
+     slaveMonitors.put(slaveId, null);
+
+     // Check if a monitor point already exists.
+     DataPointDao dataPointDao = new DataPointDao();
+     boolean found = false;
+
+     List<DataPointVO> points = dataPointDao.getDataPoints(vo.getId(), null);
+     for (DataPointVO dp : points) {
+     ModbusPointLocatorVO loc = dp.getPointLocator();
+     if (loc.getSlaveId() == slaveId && loc.isSlaveMonitor()) {
+     found = true;
+     break;
+     }
+     }
+
+     if (!found) {
+     // A monitor was not found, so create one
+     DataPointVO dp = new DataPointVO();
+     dp.setXid(dataPointDao.generateUniqueXid());
+     dp.setName(Common.getMessage("dsEdit.modbus.monitorPointName", slaveId));
+     dp.setDataSourceId(vo.getId());
+     dp.setEnabled(true);
+     dp.setLoggingType(LoggingTypes.ON_CHANGE);
+     dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
+
+     ModbusPointLocatorVO locator = new ModbusPointLocatorVO();
+     locator.setSlaveId(slaveId);
+     locator.setSlaveMonitor(true);
+     dp.setPointLocator(locator);
+
+     Common.ctx.getRuntimeManager().saveDataPoint(dp);
+     LOG.info("Monitor point added: " + dp.getXid());
+     }
+     }
+     }
+     }
+
+     @Override
+     public void removeDataPoint(DataPointRT dataPoint) {
+     synchronized (pointListChangeLock) {
+     super.removeDataPoint(dataPoint);
+
+     // If this is a slave monitor point being removed, also remove it from the map.
+     ModbusPointLocatorVO locatorVO = dataPoint.getVo().getPointLocator();
+     if (locatorVO.isSlaveMonitor()) {
+     slaveMonitors.put(locatorVO.getSlaveId(), null);
+     }
+     }
+     }
+     */
     @Override
-    public void addDataPoint(DataPointRT dataPoint) {
-        super.addDataPoint(dataPoint);
+    public void doPoll(long time) {
+        updateChangedPoints();
 
-        // Mark the point as unreliable.
-        ModbusPointLocatorVO locatorVO = dataPoint.getVo().getPointLocator();
-        if (!locatorVO.isSlaveMonitor()) {
-            dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
-        }
-
-        // Slave monitor points.
-        if (vo.isCreateSlaveMonitorPoints()) {
-            int slaveId = locatorVO.getSlaveId();
-
-            if (locatorVO.isSlaveMonitor()) // The monitor for this slave. Set it in the map.
-            {
-                slaveMonitors.put(slaveId, dataPoint);
-            } else if (!slaveMonitors.containsKey(slaveId)) {
-                // A new slave. Add null to the map to ensure we don't do this check again.
-                slaveMonitors.put(slaveId, null);
-
-                // Check if a monitor point already exists.
-                DataPointDao dataPointDao = new DataPointDao();
-                boolean found = false;
-
-                List<DataPointVO> points = dataPointDao.getDataPoints(vo.getId(), null);
-                for (DataPointVO dp : points) {
-                    ModbusPointLocatorVO loc = dp.getPointLocator();
-                    if (loc.getSlaveId() == slaveId && loc.isSlaveMonitor()) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    // A monitor was not found, so create one
-                    DataPointVO dp = new DataPointVO();
-                    dp.setXid(dataPointDao.generateUniqueXid());
-                    dp.setName(Common.getMessage("dsEdit.modbus.monitorPointName", slaveId));
-                    dp.setDataSourceId(vo.getId());
-                    dp.setEnabled(true);
-                    dp.setLoggingType(LoggingTypes.ON_CHANGE);
-                    dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
-
-                    ModbusPointLocatorVO locator = new ModbusPointLocatorVO();
-                    locator.setSlaveId(slaveId);
-                    locator.setSlaveMonitor(true);
-                    dp.setPointLocator(locator);
-
-                    Common.ctx.getRuntimeManager().saveDataPoint(dp);
-                    LOG.info("Monitor point added: " + dp.getXid());
-                }
-            }
-        }
-    }
-
-    @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
-        synchronized (pointListChangeLock) {
-            super.removeDataPoint(dataPoint);
-
-            // If this is a slave monitor point being removed, also remove it from the map.
-            ModbusPointLocatorVO locatorVO = dataPoint.getVo().getPointLocator();
-            if (locatorVO.isSlaveMonitor()) {
-                slaveMonitors.put(locatorVO.getSlaveId(), null);
-            }
-        }
-    }
-
-    @Override
-    protected void doPoll(long time) {
         if (!modbusMaster.isInitialized()) {
             if (vo.isCreateSlaveMonitorPoints()) {
                 // Set the slave monitors to offline
@@ -162,14 +166,13 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
         BaseLocator<?> modbusLocator;
         Object result;
 
-        if (batchRead == null || pointListChanged) {
-            pointListChanged = false;
+        if (batchRead == null) {
             batchRead = new BatchRead<>();
             batchRead.setContiguousRequests(vo.isContiguousBatches());
             batchRead.setErrorsInResults(true);
             batchRead.setExceptionsInResults(true);
 
-            for (DataPointRT dataPoint : dataPoints) {
+            for (DataPointRT dataPoint : enabledDataPoints.values()) {
                 locator = dataPoint.getPointLocator();
                 if (!locator.getVo().isSlaveMonitor()) {
                     modbusLocator = createModbusLocator(locator.getVo());
@@ -184,7 +187,7 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
             Map<Integer, Boolean> slaveStatuses = new HashMap<>();
             boolean dataSourceExceptions = false;
 
-            for (DataPointRT dataPoint : dataPoints) {
+            for (DataPointRT dataPoint : enabledDataPoints.values()) {
                 locator = dataPoint.getPointLocator();
                 if (locator.getVo().isSlaveMonitor()) {
                     continue;
@@ -287,33 +290,36 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
 
     @Override
     public void forcePointRead(DataPointRT dataPoint) {
-        ModbusPointLocatorRT pl = dataPoint.getPointLocator();
-        if (pl.getVo().isSlaveMonitor()) // Nothing to do
-        {
-            return;
-        }
+        throw new ImplementMeException();
+        /*
+         ModbusPointLocatorRT pl = dataPoint.getPointLocator();
+         if (pl.getVo().isSlaveMonitor()) // Nothing to do
+         {
+         return;
+         }
 
-        BaseLocator<?> ml = createModbusLocator(pl.getVo());
-        long time = System.currentTimeMillis();
+         BaseLocator<?> ml = createModbusLocator(pl.getVo());
+         long time = System.currentTimeMillis();
 
-        synchronized (pointListChangeLock) {
-            try {
-                Object value = modbusMaster.getValue(ml);
+         synchronized (pointListChangeLock) {
+         try {
+         Object value = modbusMaster.getValue(ml);
 
-                returnToNormal(POINT_READ_EXCEPTION_EVENT, time);
-                dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, false);
+         returnToNormal(POINT_READ_EXCEPTION_EVENT, time);
+         dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, false);
 
-                updatePointValue(dataPoint, pl, value, time);
-            } catch (ErrorResponseException e) {
-                raiseEvent(POINT_READ_EXCEPTION_EVENT, time, true, new LocalizableMessageImpl("event.exception2", dataPoint
-                        .getVo().getName(), e.getMessage()));
-                dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
-            } catch (ModbusTransportException e) {
-                // Don't raise a data source exception. Polling should do that.
-                LOG.warn("Error during forcePointRead", e);
-                dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
-            }
-        }
+         updatePointValue(dataPoint, pl, value, time);
+         } catch (ErrorResponseException e) {
+         raiseEvent(POINT_READ_EXCEPTION_EVENT, time, true, new LocalizableMessageImpl("event.exception2", dataPoint
+         .getVo().getName(), e.getMessage()));
+         dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
+         } catch (ModbusTransportException e) {
+         // Don't raise a data source exception. Polling should do that.
+         LOG.warn("Error during forcePointRead", e);
+         dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
+         }
+         }
+         */
     }
 
     private void updatePointValue(DataPointRT dataPoint, ModbusPointLocatorRT pl, Object value, long time) {

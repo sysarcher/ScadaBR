@@ -62,7 +62,7 @@ public class JmxDataSourceRT extends PollingDataSource<JmxDataSourceVO> {
     private MBeanServerConnection server;
 
     public JmxDataSourceRT(JmxDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), vo.isQuantize());
     }
 
@@ -82,13 +82,14 @@ public class JmxDataSourceRT extends PollingDataSource<JmxDataSourceVO> {
     }
 
     @Override
-    protected void doPoll(long time) {
+    public void doPoll(long time) {
+        updateChangedPoints();
         openServerConnection();
         if (server == null) {
             return;
         }
 
-        for (DataPointRT dprt : dataPoints) {
+        for (DataPointRT dprt : enabledDataPoints.values()) {
             if (!updateDataPoint(dprt)) {
                 continue;
             }

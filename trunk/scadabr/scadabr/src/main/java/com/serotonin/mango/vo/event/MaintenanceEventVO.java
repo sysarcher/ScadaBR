@@ -305,41 +305,34 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     }
 
     public LocalizableMessage getDescription() {
-        LocalizableMessage message;
-
-        if (!alias.isEmpty()) {
-            message = new LocalizableMessageImpl("common.default", alias);
-        } else if (scheduleType == TYPE_MANUAL) {
-            message = new LocalizableMessageImpl("maintenanceEvents.schedule.manual", dataSourceName);
-        } else if (scheduleType == TYPE_ONCE) {
-            message = new LocalizableMessageImpl("maintenanceEvents.schedule.onceUntil", dataSourceName, new DateTime(activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0).toDate(), 
-                    new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute, inactiveSecond, 0).toDate());
-        } else if (scheduleType == TYPE_HOURLY) {
-            String activeTime = StringUtils.pad(Integer.toString(activeMinute), '0', 2) + ":"
-                    + StringUtils.pad(Integer.toString(activeSecond), '0', 2);
-            message = new LocalizableMessageImpl("maintenanceEvents.schedule.hoursUntil", dataSourceName, activeTime,
-                    StringUtils.pad(Integer.toString(inactiveMinute), '0', 2) + ":"
-                    + StringUtils.pad(Integer.toString(inactiveSecond), '0', 2));
-        } else if (scheduleType == TYPE_DAILY) {
-            message = new LocalizableMessageImpl("maintenanceEvents.schedule.dailyUntil", dataSourceName, activeTime(),
-                    inactiveTime());
-        } else if (scheduleType == TYPE_WEEKLY) {
-            message = new LocalizableMessageImpl("maintenanceEvents.schedule.weeklyUntil", dataSourceName, weekday(true),
-                    activeTime(), weekday(false), inactiveTime());
-        } else if (scheduleType == TYPE_MONTHLY) {
-            message = new LocalizableMessageImpl("maintenanceEvents.schedule.monthlyUntil", dataSourceName, monthday(true),
-                    activeTime(), monthday(false), inactiveTime());
-        } else if (scheduleType == TYPE_YEARLY) {
-            message = new LocalizableMessageImpl("maintenanceEvents.schedule.yearlyUntil", dataSourceName, monthday(true),
-                    month(true), activeTime(), monthday(false), month(false), inactiveTime());
-        } else if (scheduleType == TYPE_CRON) {
-            message = new LocalizableMessageImpl("maintenanceEvents.schedule.cronUntil", dataSourceName, activeCron,
-                    inactiveCron);
-        } else {
-            throw new ShouldNeverHappenException("Unknown schedule type: " + scheduleType);
+        if (alias != null) {
+            return new LocalizableMessageImpl("common.default", alias);
         }
-
-        return message;
+        switch (scheduleType) {
+            case TYPE_MANUAL:
+                return new LocalizableMessageImpl("maintenanceEvents.schedule.manual", dataSourceName);
+            case TYPE_ONCE:
+                return new LocalizableMessageImpl("maintenanceEvents.schedule.onceUntil", dataSourceName, new DateTime(activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0).toDate(),
+                        new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute, inactiveSecond, 0).toDate());
+            case TYPE_HOURLY:
+                String activeTime = StringUtils.pad(Integer.toString(activeMinute), '0', 2) + ":"
+                        + StringUtils.pad(Integer.toString(activeSecond), '0', 2);
+                return new LocalizableMessageImpl("maintenanceEvents.schedule.hoursUntil", dataSourceName, activeTime,
+                        StringUtils.pad(Integer.toString(inactiveMinute), '0', 2) + ":"
+                        + StringUtils.pad(Integer.toString(inactiveSecond), '0', 2));
+            case TYPE_DAILY:
+                return new LocalizableMessageImpl("maintenanceEvents.schedule.dailyUntil", dataSourceName, activeTime(), inactiveTime());
+            case TYPE_WEEKLY:
+                return new LocalizableMessageImpl("maintenanceEvents.schedule.weeklyUntil", dataSourceName, weekday(true), activeTime(), weekday(false), inactiveTime());
+            case TYPE_MONTHLY:
+                return new LocalizableMessageImpl("maintenanceEvents.schedule.monthlyUntil", dataSourceName, monthday(true), activeTime(), monthday(false), inactiveTime());
+            case TYPE_YEARLY:
+                return new LocalizableMessageImpl("maintenanceEvents.schedule.yearlyUntil", dataSourceName, monthday(true), month(true), activeTime(), monthday(false), month(false), inactiveTime());
+            case TYPE_CRON:
+                return new LocalizableMessageImpl("maintenanceEvents.schedule.cronUntil", dataSourceName, activeCron, inactiveCron);
+            default:
+                throw new ShouldNeverHappenException("Unknown schedule type: " + scheduleType);
+        }
     }
 
     private LocalizableMessage getTypeMessage() {

@@ -59,12 +59,13 @@ public class GalilDataSourceRT extends PollingDataSource<GalilDataSourceVO> impl
     private MessageControl conn;
 
     public GalilDataSourceRT(GalilDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 
     @Override
-    synchronized protected void doPoll(long time) {
+    public void doPoll(long time) {
+        updateChangedPoints();
         if (socket == null) {
             try {
                 openConnection();
@@ -76,7 +77,7 @@ public class GalilDataSourceRT extends PollingDataSource<GalilDataSourceVO> impl
         Exception messageException = null;
         LocalizableMessage pointError = null;
 
-        for (DataPointRT dataPoint : dataPoints) {
+        for (DataPointRT dataPoint : enabledDataPoints.values()) {
             GalilPointLocatorRT locator = dataPoint.getPointLocator();
 
             GalilRequest request = locator.getPollRequest();

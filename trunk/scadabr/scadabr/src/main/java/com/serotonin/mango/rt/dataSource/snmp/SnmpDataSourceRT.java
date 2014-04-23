@@ -61,7 +61,7 @@ public class SnmpDataSourceRT extends PollingDataSource<SnmpDataSourceVO> {
     private Snmp snmp;
 
     public SnmpDataSourceRT(SnmpDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
        version = Version.getVersion(vo.getSnmpVersion(), vo.getCommunity(),
                 vo.getSecurityName(), vo.getAuthProtocol(),
@@ -94,7 +94,8 @@ public class SnmpDataSourceRT extends PollingDataSource<SnmpDataSourceVO> {
     }
 
     @Override
-    protected void doPoll(long time) {
+    public void doPoll(long time) {
+        updateChangedPoints();
         try {
             doPollImpl(time);
         } catch (Exception e) {
@@ -114,7 +115,7 @@ public class SnmpDataSourceRT extends PollingDataSource<SnmpDataSourceVO> {
         List<DataPointRT> requestPoints = new ArrayList<>();
 
         // Add OID to send in the PDU.
-        for (DataPointRT dp : dataPoints) {
+        for (DataPointRT dp : enabledDataPoints.values()) {
             if (!getLocatorVO(dp).isTrapOnly()) {
                 request.add(new VariableBinding(getOid(dp)));
                 requestPoints.add(dp);
@@ -234,6 +235,8 @@ public class SnmpDataSourceRT extends PollingDataSource<SnmpDataSourceVO> {
     }
 
     void receivedTrap(PDU trap) {
+        throw new ImplementMeException();
+        /*
         long time = System.currentTimeMillis();
         VariableBinding vb;
 
@@ -263,6 +266,7 @@ public class SnmpDataSourceRT extends PollingDataSource<SnmpDataSourceVO> {
                 }
             }
         }
+                */
     }
 
     private void updatePoint(DataPointRT dp, Variable variable, long time) {

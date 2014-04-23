@@ -51,23 +51,21 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
     public static final int PARSE_EXCEPTION_EVENT = 2;
 
     public HttpRetrieverDataSourceRT(HttpRetrieverDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 
+    /*
     @Override
     public void removeDataPoint(DataPointRT dataPoint) {
         returnToNormal(PARSE_EXCEPTION_EVENT, System.currentTimeMillis());
         super.removeDataPoint(dataPoint);
     }
+*/
 
     @Override
-    public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source) {
-        // no op
-    }
-
-    @Override
-    protected void doPoll(long time) {
+    public void doPoll(long time) {
+        updateChangedPoints();
         String data;
         try {
             data = getData(vo.getUrl(), vo.getTimeoutSeconds(), vo.getRetries());
@@ -87,7 +85,7 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
 
         // We have the data. Now run the regex.
         LocalizableMessage parseErrorMessage = null;
-        for (DataPointRT dp : dataPoints) {
+        for (DataPointRT dp : enabledDataPoints.values()) {
             HttpRetrieverPointLocatorRT locator = dp.getPointLocator();
 
             try {

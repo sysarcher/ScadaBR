@@ -93,7 +93,7 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
     private final Map<PointKey, DataPointRT> pointLookup = new ConcurrentHashMap<>();
 
     public ViconicsDataSourceRT(ViconicsDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
     }
 
     //
@@ -135,7 +135,7 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
          super.initialize();
          */
     }
-
+/*
     @Override
     public void addDataPoint(DataPointRT dataPoint) {
         super.addDataPoint(dataPoint);
@@ -154,7 +154,7 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
         // Remove the point from the lookup map.
         pointLookup.remove(new PointKey(dataPoint));
     }
-
+*/
     @Override
     public void terminate() {
         if (network != null) {
@@ -174,8 +174,8 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
     @Override
     public void viconicsNetworkStatus(boolean online) {
         // Mark all points as unreliable.
-        synchronized (dataPoints) {
-            for (DataPointRT rt : dataPoints) {
+        synchronized (dataPointsCacheLock) {
+            for (DataPointRT rt : enabledDataPoints.values()) {
                 rt.setAttribute(ATTR_UNRELIABLE_KEY, true);
             }
         }
@@ -376,8 +376,8 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
             returnToNormal(DEVICE_OFFLINE_EVENT, System.currentTimeMillis());
         } else {
             // Mark all points for the device as unreliable.
-            synchronized (dataPoints) {
-                for (DataPointRT rt : dataPoints) {
+            synchronized (dataPointsCacheLock) {
+                for (DataPointRT rt : enabledDataPoints.values()) {
                     ViconicsPointLocatorVO locator = rt.getVo().getPointLocator();
                     if (Arrays.equals(locator.getDeviceIeee(), device.getIeee())) {
                         rt.setAttribute(ATTR_UNRELIABLE_KEY, true);

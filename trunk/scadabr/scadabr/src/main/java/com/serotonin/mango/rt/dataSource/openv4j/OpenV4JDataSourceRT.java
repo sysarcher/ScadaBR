@@ -59,7 +59,7 @@ public class OpenV4JDataSourceRT extends PollingDataSource<OpenV4JDataSourceVO> 
     private final ProtocolHandler protocolHandler = new ProtocolHandler();
 
     public OpenV4JDataSourceRT(OpenV4JDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 
@@ -76,9 +76,10 @@ public class OpenV4JDataSourceRT extends PollingDataSource<OpenV4JDataSourceVO> 
     }
 
     @Override
-    protected synchronized void doPoll(long time) {
+    public void doPoll(long time) {
+        updateChangedPoints();
         final SegmentedDataContainer dc = new SegmentedDataContainer();
-        for (DataPointRT point : dataPoints) {
+        for (DataPointRT point : enabledDataPoints.values()) {
             final OpenV4JPointLocatorRT locator = point.getPointLocator();
             dc.addToDataContainer(locator.getDataPoint());
         }
@@ -94,7 +95,7 @@ public class OpenV4JDataSourceRT extends PollingDataSource<OpenV4JDataSourceVO> 
                                 new LocalizableMessageImpl("event.exception2", vo.getName(), ex.getMessage(), "HALLO"));
                     }
                 }
-                for (DataPointRT point : dataPoints) {
+                for (DataPointRT point : enabledDataPoints.values()) {
                     final OpenV4JPointLocatorRT locator = point.getPointLocator();
                     final Object decodedValue = locator.getDataPoint().decode(dc);
                     try {
@@ -136,7 +137,7 @@ public class OpenV4JDataSourceRT extends PollingDataSource<OpenV4JDataSourceVO> 
     }
 
     @Override
-    public synchronized void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source) {
+    public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source) {
         final SimpleDataContainer dc = new SimpleDataContainer();
         final OpenV4JPointLocatorRT locator = dataPoint.getPointLocator();
 

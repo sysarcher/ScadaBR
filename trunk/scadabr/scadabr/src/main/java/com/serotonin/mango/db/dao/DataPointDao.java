@@ -275,7 +275,7 @@ public class DataPointDao extends BaseDao {
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 List<Integer> pointIds = ejt.queryForList("select id from dataPoints where dataSourceId=?", Integer.class, dataSourceId);
                 if (pointIds.size() > 0) {
-                    deleteDataPointImpl(createDelimitedList(new HashSet<Integer>(pointIds), ",", null));
+                    deleteDataPointImpl(createDelimitedList(pointIds, ","));
                 }
             }
         });
@@ -680,4 +680,30 @@ public class DataPointDao extends BaseDao {
 
         return counts;
     }
+    
+    public void addPointToHierarchy(DataPointVO dp, String... pathToPoint) {
+        PointHierarchy ph = getPointHierarchy();
+        PointFolder pf = ph.getRoot();
+        for (String folderName: pathToPoint) {
+            boolean folderFound = false;
+            for (PointFolder subFolder : pf.getSubfolders()) {
+                if (subFolder.getName().equals(folderName)) {
+                    pf = subFolder;
+                    folderFound = true;
+                    break;
+                }
+            }
+            if (!folderFound) {
+                PointFolder newFolder = new PointFolder(Common.NEW_ID, folderName);
+                pf.addSubfolder(newFolder);
+                pf = newFolder;
+//                savePointFolder(newFolder, pf.getId());
+            }
+        }
+        pf.addDataPoint(new IntValuePair(dp.getId(), dp.getName()));
+        ph.getRoot().removeDataPoint(dp.getId());
+//        savePointsInFolder(pf);
+        savePointHierarchy(ph.getRoot());
+    }
+
 }

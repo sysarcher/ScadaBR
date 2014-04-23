@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.spinwave;
 
+import br.org.scadabr.ImplementMeException;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -51,7 +52,7 @@ public class SpinwaveDataSourceRT extends EventDataSource<SpinwaveDataSourceVO> 
     private SpinwaveReceiver spinwaveReceiver;
 
     public SpinwaveDataSourceRT(SpinwaveDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
     }
 
     //
@@ -130,6 +131,8 @@ public class SpinwaveDataSourceRT extends EventDataSource<SpinwaveDataSourceVO> 
 
     @Override
     public void receivedMessage(SwMessage message) {
+        throw  new ImplementMeException();
+        /*
         // Find points that are interested in this sensor.
         BaseSpinwavePointLocatorVO locator;
         boolean found = false;
@@ -157,5 +160,6 @@ public class SpinwaveDataSourceRT extends EventDataSource<SpinwaveDataSourceVO> 
             raiseEvent(UNKNOWN_SENSOR_EVENT, message.getTime(), false, new LocalizableMessageImpl(
                     "event.spinwave.unknownSensor", message.getSensorAddress()));
         }
+                */
     }
 }

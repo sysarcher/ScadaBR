@@ -19,14 +19,11 @@
 package com.serotonin.mango.rt.dataSource;
 
 import br.org.scadabr.ImplementMeException;
-import java.util.ArrayList;
-import java.util.List;
 
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.DataSourceCronTask;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.text.ParseException;
 import java.util.Date;
@@ -37,40 +34,13 @@ abstract public class PollingDataSource<T extends DataSourceVO<T>> extends DataS
 
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCARABR_DS_RT);
 
-    protected List<DataPointRT> dataPoints = new ArrayList<>();
-    protected boolean pointListChanged = false;
     private DataSourceCronTask timerTask;
 
-    public PollingDataSource(T vo) {
-        super(vo);
+    public PollingDataSource(T vo, boolean doCache) {
+        super(vo, doCache);
     }
 
-    public void collectData(long fireTime) {
-            // Check if there were changes to the data points list.
-            synchronized (pointListChangeLock) {
-                updateChangedPoints();
-                doPoll(fireTime);
-            }
-    }
-
-    abstract protected void doPoll(long time);
-
-    protected void updateChangedPoints() {
-        synchronized (pointListChangeLock) {
-            if (addedChangedPoints.size() > 0) {
-                // Remove any existing instances of the points.
-                dataPoints.removeAll(addedChangedPoints);
-                dataPoints.addAll(addedChangedPoints);
-                addedChangedPoints.clear();
-                pointListChanged = true;
-            }
-            if (removedPoints.size() > 0) {
-                dataPoints.removeAll(removedPoints);
-                removedPoints.clear();
-                pointListChanged = true;
-            }
-        }
-    }
+    abstract public void doPoll(long time);
 
     //
     //

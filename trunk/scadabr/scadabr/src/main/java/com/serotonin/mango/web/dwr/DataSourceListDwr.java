@@ -64,7 +64,7 @@ public class DataSourceListDwr extends BaseDwr {
 
         RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
         DataSourceVO<?> dataSource = runtimeManager.getDataSource(dataSourceId);
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
 
         dataSource.setEnabled(!dataSource.isEnabled());
         runtimeManager.saveDataSource(dataSource);
