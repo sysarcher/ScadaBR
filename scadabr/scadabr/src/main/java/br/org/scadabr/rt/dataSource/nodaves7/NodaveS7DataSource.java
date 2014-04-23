@@ -30,7 +30,7 @@ public class NodaveS7DataSource extends PollingDataSource<NodaveS7DataSourceVO> 
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 2;
 
     public NodaveS7DataSource(NodaveS7DataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(),
                 vo.isQuantize());
     }
@@ -44,7 +44,8 @@ public class NodaveS7DataSource extends PollingDataSource<NodaveS7DataSourceVO> 
     }
 
     @Override
-    protected void doPoll(long time) {
+    public void doPoll(long time) {
+        updateChangedPoints();
         File file = new File(vo.getFilePath());
 
         if (!file.exists()) {
@@ -54,7 +55,7 @@ public class NodaveS7DataSource extends PollingDataSource<NodaveS7DataSourceVO> 
         } else {
             String arquivo = readFile(file);
 
-            for (DataPointRT dataPoint : dataPoints) {
+            for (DataPointRT dataPoint : enabledDataPoints.values()) {
                 try {
                     NodaveS7PointLocatorVO dataPointVO = dataPoint.getVo()
                             .getPointLocator();

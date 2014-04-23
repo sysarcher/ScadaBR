@@ -7,7 +7,7 @@ import br.org.scadabr.vo.dataSource.iec101.IEC101SerialDataSourceVO;
 public class IEC101SerialDataSource extends IEC101DataSource<IEC101SerialDataSourceVO> {
 
     public IEC101SerialDataSource(IEC101SerialDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
     }
 
     @Override

@@ -23,4 +23,5 @@ public class LogUtils {
     public final static String LOGGER_SCADABR_DWR = "scadabe-dwr";
     
     public final static String LOGGER_SCADABR_WEB = "scadabe-web";
+    public final static String LOGGER_SCARABR_DS_FHZ4J = "sacadabr-ds-fhz4j";
 }

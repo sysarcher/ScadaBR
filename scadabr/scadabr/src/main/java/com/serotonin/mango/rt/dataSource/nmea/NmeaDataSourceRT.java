@@ -49,7 +49,7 @@ public class NmeaDataSourceRT extends EventDataSource<NmeaDataSourceVO> implemen
     private SystemRunTask resetTask;
 
     public NmeaDataSourceRT(NmeaDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
     }
 
     //
@@ -111,6 +111,8 @@ public class NmeaDataSourceRT extends EventDataSource<NmeaDataSourceVO> implemen
 
     @Override
     public void receivedMessage(NmeaMessage message) {
+        throw new ImplementMeException();
+        /*
         long time = System.currentTimeMillis();
 
         unscheduleTimeout();
@@ -137,6 +139,7 @@ public class NmeaDataSourceRT extends EventDataSource<NmeaDataSourceVO> implemen
         if (parseError != null) {
             raiseEvent(PARSE_EXCEPTION_EVENT, time, false, parseError);
         }
+                */
     }
 
     private void receivedMessageImpl(DataPointRT dp, NmeaMessage message, long time) throws Exception {

@@ -40,7 +40,7 @@ public class HttpReceiverData {
 
     public void addData(String key, String value, long time) {
         // Protect against XSS attacks.
-        value = StringUtils.escapeLT(value);
+        value = StringUtils.escapeLT_GT(value);
         data.add(new HttpReceiverPointSample(key, value, time));
         unconsumedKeys.add(key);
     }

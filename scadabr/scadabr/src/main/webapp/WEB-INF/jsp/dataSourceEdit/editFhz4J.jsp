@@ -110,23 +110,11 @@
 <tr>
     <td class="formLabelRequired"><fmt:message key="dsEdit.serial.port"/></td>
     <td class="formField">
-        <c:choose>
-            <c:when test="${!empty commPortError}">
-                <input id="commPortId" type="hidden" value=""/>
-                <span class="formError">${commPortError}</span>
-            </c:when>
-            <c:otherwise>
-                <sbt:select id="commPortId" value="${dataSource.commPortId}">
-                    <c:forEach items="${commPorts}" var="port">
-                        <sbt:option value="${port.name}">${port.name}</sbt:option>
-                    </c:forEach>
-                    <sbt:option value="/dev/ttyACM0">/dev/ttyACM0</sbt:option>
-                    <sbt:option value="/dev/ttyACM1">/dev/ttyACM1</sbt:option>
-                    <sbt:option value="/dev/ttyACM2">/dev/ttyACM2</sbt:option>
-                    <sbt:option value="/dev/ttyACM3">/dev/ttyACM3</sbt:option>
-                </sbt:select>
-            </c:otherwise>
-        </c:choose>
+    <sbt:select id="commPortId" value="${dataSource.commPort}">
+        <c:forEach items="${dataSource.commPorts}" var="port">
+                 <sbt:option value="${port}">${port}</sbt:option>
+        </c:forEach>
+    </sbt:select>
     </td>
 </tr>
 

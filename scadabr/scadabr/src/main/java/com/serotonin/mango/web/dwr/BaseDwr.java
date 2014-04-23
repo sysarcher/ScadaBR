@@ -322,7 +322,7 @@ abstract public class BaseDwr {
         try {
             return ContentGenerator.generateContent(request, "/WEB-INF/snippet/" + snippet, model);
         } catch (ServletException | IOException e) {
-            throw new ShouldNeverHappenException(e);
+            throw new ShouldNeverHappenException("/WEB-INF/snippet/" + snippet, e);
         }
     }
 

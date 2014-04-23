@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.http;
 
+import br.org.scadabr.ImplementMeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -39,7 +40,7 @@ public class HttpReceiverDataSourceRT extends EventDataSource<HttpReceiverDataSo
     private final Log log = LogFactory.getLog(HttpReceiverDataSourceRT.class);
 
     public HttpReceiverDataSourceRT(HttpReceiverDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
     }
 
     //
@@ -81,6 +82,8 @@ public class HttpReceiverDataSourceRT extends EventDataSource<HttpReceiverDataSo
 
     @Override
     public void data(HttpReceiverData data) {
+        throw new ImplementMeException();
+        /*
         // Match data points in the received set with point locators.
         synchronized (pointListChangeLock) {
             for (DataPointRT dp : dataPoints) {
@@ -116,5 +119,6 @@ public class HttpReceiverDataSourceRT extends EventDataSource<HttpReceiverDataSo
                 }
             }
         }
+                */
     }
 }

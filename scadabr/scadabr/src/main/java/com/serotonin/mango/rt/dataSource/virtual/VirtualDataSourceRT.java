@@ -30,13 +30,14 @@ import java.text.ParseException;
 public class VirtualDataSourceRT extends PollingDataSource<VirtualDataSourceVO> {
 
     public VirtualDataSourceRT(VirtualDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 
     @Override
     public void doPoll(long time) {
-        for (DataPointRT dataPoint : dataPoints) {
+        updateChangedPoints();
+        for (DataPointRT dataPoint : enabledDataPoints.values()) {
             VirtualPointLocatorRT locator = dataPoint.getPointLocator();
 
             // Change the point values according to their definitions.
@@ -54,6 +55,7 @@ public class VirtualDataSourceRT extends PollingDataSource<VirtualDataSourceVO> 
         dataPoint.setPointValue(valueTime, source);
     }
 
+    /*
     @Override
     public void addDataPoint(DataPointRT dataPoint) {
         if (dataPoint.getPointValue() != null) {
@@ -63,6 +65,7 @@ public class VirtualDataSourceRT extends PollingDataSource<VirtualDataSourceVO> 
 
         super.addDataPoint(dataPoint);
     }
+    */
     @Override
     protected CronExpression getCronExpression() throws ParseException {
         throw new ImplementMeException();

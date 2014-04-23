@@ -391,6 +391,7 @@ public class Common {
 
     //
     // Misc
+    @Deprecated
     public static List<CommPortProxy> getCommPorts()
             throws CommPortConfigException {
         try {

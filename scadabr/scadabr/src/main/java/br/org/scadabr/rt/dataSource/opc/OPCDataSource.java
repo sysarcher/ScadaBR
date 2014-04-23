@@ -29,12 +29,12 @@ public class OPCDataSource extends PollingDataSource<OPCDataSourceVO> {
     public static final int POINT_READ_EXCEPTION_EVENT = 1;
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 2;
     public static final int POINT_WRITE_EXCEPTION_EVENT = 3;
-    private OPCMaster opcMaster;
+    private final OPCMaster opcMaster;
     private int timeoutCount = 0;
-    private int timeoutsToReconnect = 3;
+    private final int timeoutsToReconnect = 3;
 
     public OPCDataSource(OPCDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(),
                 vo.isQuantize());
 
@@ -43,10 +43,11 @@ public class OPCDataSource extends PollingDataSource<OPCDataSourceVO> {
     }
 
     @Override
-    protected void doPoll(long time) {
+    public void doPoll(long time) {
+        updateChangedPoints();
         ArrayList<String> enabledTags = new ArrayList<>();
 
-        for (DataPointRT dataPoint : dataPoints) {
+        for (DataPointRT dataPoint : enabledDataPoints.values()) {
             OPCPointLocatorVO dataPointVO = dataPoint.getVo().getPointLocator();
             enabledTags.add(dataPointVO.getTag());
         }
@@ -74,7 +75,7 @@ public class OPCDataSource extends PollingDataSource<OPCDataSourceVO> {
             System.out.println("[OPC] Poll Failed !");
         }
 
-        for (DataPointRT dataPoint : dataPoints) {
+        for (DataPointRT dataPoint : enabledDataPoints.values()) {
             OPCPointLocatorVO dataPointVO = dataPoint.getVo().getPointLocator();
             MangoValue mangoValue = null;
             String value = "0";

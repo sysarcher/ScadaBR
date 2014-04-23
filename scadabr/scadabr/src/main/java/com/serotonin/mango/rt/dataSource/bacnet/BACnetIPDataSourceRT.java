@@ -106,7 +106,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
     private CovResubscriptionTask covResubscriptionTask;
 
     public BACnetIPDataSourceRT(BACnetIPDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 
@@ -200,6 +200,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
         LocalDevice.setExceptionListener(null);
     }
 
+    /*
     @Override
     public void addDataPoint(DataPointRT dataPoint) {
         if (!initialized) {
@@ -283,16 +284,18 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
             sendCovSubscription(dataPoint, true);
         }
     }
-
+*/
     //
     // /
     // / PollingDataSource
     // /
     //
     @Override
-    protected void doPoll(long time) {
+    public void doPoll(long time) {
+        updateChangedPoints();
         Map<RemoteDevice, List<DataPointRT>> devicePoints = new HashMap<>();
-
+        throw new ImplementMeException();
+        /*
         synchronized (pointListChangeLock) {
             for (DataPointRT dp : dataPoints) {
                 BACnetIPPointLocatorRT locator = dp.getPointLocator();
@@ -313,6 +316,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
         for (RemoteDevice d : devicePoints.keySet()) {
             Common.ctx.getBackgroundProcessing().addWorkItem(new DevicePoller(d, devicePoints.get(d), time));
         }
+        */
     }
 
     @Override
@@ -451,10 +455,6 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
         }
     }
 
-    List<DataPointRT> getDataPoints() {
-        return dataPoints;
-    }
-
     //
     // COV subscriptions
     class CovResubscriptionTask extends SystemCronTask {
@@ -465,6 +465,8 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
 
         @Override
         public void run(long executionTime) {
+            throw new ImplementMeException();
+            /*
             synchronized (pointListChangeLock) {
                 for (DataPointRT dp : getDataPoints()) {
                     BACnetIPPointLocatorRT locator = dp.getPointLocator();
@@ -473,6 +475,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
                     }
                 }
             }
+            */
         }
 
         @Override
@@ -520,7 +523,8 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
     public void covNotificationReceived(UnsignedInteger subscriberProcessIdentifier, RemoteDevice initiatingDevice,
             ObjectIdentifier monitoredObjectIdentifier, UnsignedInteger timeRemaining,
             SequenceOf<PropertyValue> listOfValues) {
-
+        throw new ImplementMeException();
+        /*
         int covId = subscriberProcessIdentifier.intValue();
 
         List<PropertyValue> values = listOfValues.getValues();
@@ -547,11 +551,12 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
                 // We got a cov notice for a point we don't have? Unsubscribe.
                 try {
                     sendCovSubscriptionImpl(initiatingDevice, monitoredObjectIdentifier, covId, true);
-                } catch (BACnetException e) { /* Ignore exceptions */
+                } catch (BACnetException e) { // Ignore exceptions 
 
                 }
             }
         }
+                */
     }
 
     @Override

@@ -31,14 +31,15 @@ public class IEC101DataSource<T extends IEC101DataSourceVO<T>> extends PollingDa
 
     private IEC101Master iec101Master;
 
-    public IEC101DataSource(T vo) {
-        super(vo);
+    public IEC101DataSource(T vo, boolean doCache) {
+        super(vo, doCache);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), vo
                 .isQuantize());
     }
 
     @Override
-    protected void doPoll(long time) {
+    public void doPoll(long time) {
+        updateChangedPoints();
         try {
             iec101Master.doPoll();
         } catch (Exception e) {
@@ -48,7 +49,7 @@ public class IEC101DataSource<T extends IEC101DataSourceVO<T>> extends PollingDa
             e.printStackTrace();
         }
 
-        for (DataPointRT dataPoint : dataPoints) {
+        for (DataPointRT dataPoint : enabledDataPoints.values()) {
             IEC101PointLocatorVO pointLocator = dataPoint.getVo()
                     .getPointLocator();
 

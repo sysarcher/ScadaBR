@@ -30,13 +30,15 @@ public class ASCIIFileDataSource extends PollingDataSource<ASCIIFileDataSourceVO
     public static final int DATA_SOURCE_EXCEPTION_EVENT = 2;
 
     public ASCIIFileDataSource(ASCIIFileDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), vo
                 .isQuantize());
     }
 
     @Override
-    protected void doPoll(long time) {
+    public void doPoll(long time) {
+        updateChangedPoints();
+
         File file = new File(vo.getFilePath());
 
         if (!file.exists()) {
@@ -46,7 +48,7 @@ public class ASCIIFileDataSource extends PollingDataSource<ASCIIFileDataSourceVO
         } else {
             String arquivo = readFile(file);
 
-            for (DataPointRT dataPoint : dataPoints) {
+            for (DataPointRT dataPoint : enabledDataPoints.values()) {
                 try {
                     ASCIIFilePointLocatorVO dataPointVO = dataPoint.getVo()
                             .getPointLocator();
@@ -76,7 +78,6 @@ public class ASCIIFileDataSource extends PollingDataSource<ASCIIFileDataSourceVO
 
             }
         }
-
     }
 
     private MangoValue getValue(ASCIIFilePointLocatorVO point, String arquivo)

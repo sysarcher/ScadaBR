@@ -26,14 +26,14 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.mango.rt.dataImage.DataPointRT;
-import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataSource.EventDataSource;
 import br.org.scadabr.vo.datasource.vmstat.VMStatDataSourceVO;
-import br.org.scadabr.vo.datasource.vmstat.VMStatPointLocatorVO;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.datasource.vmstat.Attribute;
+import br.org.scadabr.vo.datasource.vmstat.VMStatPointLocatorVO;
+import br.org.scadabr.web.i18n.LocalizableMessage;
+import com.serotonin.mango.rt.dataImage.DataPointRT;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import java.util.EnumMap;
 
 /**
@@ -51,7 +51,7 @@ public class VMStatDataSourceRT extends EventDataSource<VMStatDataSourceVO> impl
     private boolean terminated;
 
     public VMStatDataSourceRT(VMStatDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
     }
 
     //
@@ -213,29 +213,28 @@ public class VMStatDataSourceRT extends EventDataSource<VMStatDataSourceVO> impl
     private void readParts(String[] parts) {
         LocalizableMessage error = null;
         long time = System.currentTimeMillis();
+        updateChangedPoints();
 
-        synchronized (pointListChangeLock) {
-            for (DataPointRT dp : dataPoints) {
-                VMStatPointLocatorVO locator = ((VMStatPointLocatorRT) dp.getPointLocator()).getVo();
+        for (DataPointRT dp : enabledDataPoints.values()) {
+            VMStatPointLocatorVO locator = ((VMStatPointLocatorRT) dp.getPointLocator()).getVo();
 
-                Integer position = attributePositions.get(locator.getAttribute());
-                if (position == null) {
-                    if (error != null) {
-                        error = new LocalizableMessageImpl("event.vmstat.attributeNotFound", locator
-                                .getConfigurationDescription());
-                    }
-                } else {
-                    try {
-                        String data = parts[position];
-                        Double value = new Double(data);
-                        dp.updatePointValue(new PointValueTime(value, time));
-                    } catch (NumberFormatException e) {
-                        log.error("Weird. We couldn't parse the value " + parts[position]
-                                + " into a double. attribute=" + locator.getAttribute());
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        log.error("Weird. We need element " + position + " but the vmstat data is only " + parts.length
-                                + " elements long");
-                    }
+            Integer position = attributePositions.get(locator.getAttribute());
+            if (position == null) {
+                if (error != null) {
+                    error = new LocalizableMessageImpl("event.vmstat.attributeNotFound", locator
+                            .getConfigurationDescription());
+                }
+            } else {
+                try {
+                    String data = parts[position];
+                    Double value = new Double(data);
+                    dp.updatePointValue(new PointValueTime(value, time));
+                } catch (NumberFormatException e) {
+                    log.error("Weird. We couldn't parse the value " + parts[position]
+                            + " into a double. attribute=" + locator.getAttribute());
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    log.error("Weird. We need element " + position + " but the vmstat data is only " + parts.length
+                            + " elements long");
                 }
             }
         }
@@ -245,6 +244,7 @@ public class VMStatDataSourceRT extends EventDataSource<VMStatDataSourceVO> impl
         } else {
             raiseEvent(PARSE_EXCEPTION_EVENT, time, true, error);
         }
+
     }
 
     private void readError() {

@@ -73,7 +73,7 @@ public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> 
     final SimpleDateFormat sdf;
 
     public PachubeDataSourceRT(PachubeDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
 
         httpClient = createHttpClient(vo.getTimeoutSeconds(), vo.getRetries());
@@ -88,7 +88,7 @@ public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> 
                 new DefaultHttpMethodRetryHandler(retries, true));
         return httpClient;
     }
-
+/*
     @Override
     public void addDataPoint(DataPointRT dataPoint) {
         super.addDataPoint(dataPoint);
@@ -100,7 +100,7 @@ public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> 
         returnToNormal(PARSE_EXCEPTION_EVENT, System.currentTimeMillis());
         super.removeDataPoint(dataPoint);
     }
-
+*/
     @Override
     public void forcePointRead(DataPointRT dataPoint) {
         PachubePointLocatorRT locator = dataPoint.getPointLocator();
@@ -110,7 +110,9 @@ public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> 
     }
 
     @Override
-    protected void doPoll(long time) {
+    public void doPoll(long time) {
+        throw new ImplementMeException();
+        /*
         Map<Integer, List<DataPointRT>> devicePoints = new HashMap<>();
 
         synchronized (pointListChangeLock) {
@@ -130,6 +132,7 @@ public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> 
         for (Map.Entry<Integer, List<DataPointRT>> entry : devicePoints.entrySet()) {
             pollFeed(entry.getKey(), entry.getValue(), time);
         }
+                */
     }
 
     protected void pollFeed(int feedId, List<DataPointRT> points, long time) {

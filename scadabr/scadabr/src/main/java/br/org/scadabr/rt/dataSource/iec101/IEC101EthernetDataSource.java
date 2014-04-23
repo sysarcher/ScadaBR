@@ -6,7 +6,7 @@ import br.org.scadabr.vo.dataSource.iec101.IEC101EthernetDataSourceVO;
 public class IEC101EthernetDataSource extends IEC101DataSource<IEC101EthernetDataSourceVO> {
 
     public IEC101EthernetDataSource(IEC101EthernetDataSourceVO vo) {
-        super(vo);
+        super(vo, true);
     }
 
     @Override

@@ -59,12 +59,13 @@ public class EBI25DataSourceRT extends PollingDataSource<EBI25DataSourceVO> impl
     private ModbusMaster modbusMaster;
 
     public EBI25DataSourceRT(EBI25DataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 
     @Override
-    protected void doPoll(long time) {
+    public void doPoll(long time) {
+        updateChangedPoints();
         if (modbusMaster == null) {
             return;
         }
@@ -72,7 +73,7 @@ public class EBI25DataSourceRT extends PollingDataSource<EBI25DataSourceVO> impl
         // Get a list of logger indices. The list of points does not include disabled points, so completely disabled
         // loggers will not be in the index list.
         List<Integer> loggerIndices = new ArrayList<>();
-        for (DataPointRT dp : dataPoints) {
+        for (DataPointRT dp : enabledDataPoints.values()) {
             int index = ((EBI25PointLocatorRT) dp.getPointLocator()).getVo().getIndex();
             if (!loggerIndices.contains(index)) {
                 loggerIndices.add(index);
@@ -158,7 +159,8 @@ public class EBI25DataSourceRT extends PollingDataSource<EBI25DataSourceVO> impl
     }
 
     private DataPointRT getLoggerPoint(int index, int type) {
-        for (DataPointRT dp : dataPoints) {
+
+        for (DataPointRT dp : enabledDataPoints.values()) {
             EBI25PointLocatorRT locator = dp.getPointLocator();
             if (locator.getVo().getIndex() == index && locator.getVo().getType() == type) {
                 return dp;
@@ -238,6 +240,7 @@ public class EBI25DataSourceRT extends PollingDataSource<EBI25DataSourceVO> impl
     public void receivedException(Exception e) {
         raiseEvent(DATA_SOURCE_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl("event.ebi25.master", e.getMessage()));
     }
+
     @Override
     protected CronExpression getCronExpression() throws ParseException {
         throw new ImplementMeException();

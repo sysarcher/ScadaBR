@@ -56,22 +56,22 @@ public class Pop3DataSourceRT extends PollingDataSource<Pop3DataSourceVO> {
     public static final int PARSE_EXCEPTION_EVENT = 3;
 
     public Pop3DataSourceRT(Pop3DataSourceVO vo) {
-        super(vo);
+        super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
-
+/*
     @Override
     public void removeDataPoint(DataPointRT dataPoint) {
         returnToNormal(PARSE_EXCEPTION_EVENT, System.currentTimeMillis());
     }
-
+*/
     @Override
     public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source) {
         // no op
     }
 
     @Override
-    protected void doPoll(long time) {
+    public void doPoll(long time) {
         Folder folder = null;
         Store store = null;
 
@@ -193,7 +193,7 @@ public class Pop3DataSourceRT extends PollingDataSource<Pop3DataSourceVO> {
     }
 
     private void processMessage(Pop3Email pop3Email, long time) throws LocalizableException {
-        for (DataPointRT dp : dataPoints) {
+        for (DataPointRT dp : enabledDataPoints.values()) {
             Pop3PointLocatorRT locator = dp.getPointLocator();
 
             // Get the value

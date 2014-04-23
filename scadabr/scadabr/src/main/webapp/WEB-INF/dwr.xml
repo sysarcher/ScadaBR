@@ -193,7 +193,7 @@
     </convert>
     
     <!-- VMStat stuff -->
-    <convert converter="enum" match="br.org.scadabr.vo.datasource.mbus.Attribute" />
+    <convert converter="enum" match="br.org.scadabr.vo.datasource.vmstat.Attribute" />
     <!-- End VMStat stuff -->
     
     
@@ -232,7 +232,7 @@
     <![CDATA[
       import java.util.List;
       
-      import com.serotonin.db.IntValuePair;
+      import br.org.scadabr.db.IntValuePair;
       import com.serotonin.mango.web.dwr.DataPointEditDwr;
       import com.serotonin.mango.view.text.RangeValue;
       import com.serotonin.mango.view.text.MultistateValue;

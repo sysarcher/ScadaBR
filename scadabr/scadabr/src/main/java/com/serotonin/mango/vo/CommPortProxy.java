@@ -20,6 +20,7 @@ package com.serotonin.mango.vo;
 
 import gnu.io.CommPortIdentifier;
 
+@Deprecated
 public class CommPortProxy {
 
     private final String name;

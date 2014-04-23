@@ -16,25 +16,20 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.rt.dataSource.fhz4j;
+package br.org.scadabr.rt.datasource.fhz4j;
 
+import br.org.scadabr.vo.datasource.fhz4j.Fhz4JPointLocatorVO;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
-import net.sf.fhz4j.fht.FhtMessage;
-import com.serotonin.mango.vo.dataSource.fhz4j.Fhz4JPointLocatorVO;
+import net.sf.fhz4j.FhzProtocol;
 
-// No need to encapsulate as string like vo
 public class Fhz4JPointLocatorRT extends PointLocatorRT<Fhz4JPointLocatorVO> {
-
 
     public Fhz4JPointLocatorRT(Fhz4JPointLocatorVO vo) {
         super(vo);
     }
-
-    boolean isMyFhtMessage(FhtMessage fhtMessage) {
-        return (vo.getDeviceHousecode() == fhtMessage.getHousecode()) && (vo.getFhzProperty().equals(fhtMessage.getCommand()));
+    
+    public FhzProtocol getFhzProtocol() {
+        return vo.getFhzProtocol();
     }
-
-    public short getHousecode() {
-        return vo.getDeviceHousecode();
-    }
+    
 }

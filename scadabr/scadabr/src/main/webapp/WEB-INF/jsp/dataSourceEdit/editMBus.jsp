@@ -347,19 +347,11 @@
 <tr>
   <td class="formLabelRequired"><fmt:message key="dsEdit.serial.port"/></td>
   <td class="formField">
-    <c:choose>
-      <c:when test="${!empty commPortError}">
-        <input id="commPortId" type="hidden" value=""/>
-        <span class="formError">${commPortError}</span>
-      </c:when>
-      <c:otherwise>
           <sbt:select id="commPortId" value="${dataSource.serialDirect ? dataSource.connection.portName : ''}">
           <c:forEach items="${dataSource.commPorts}" var="port">
             <sbt:option value="${port}">${port}</sbt:option>
           </c:forEach>
         </sbt:select>
-      </c:otherwise>
-    </c:choose>
   </td>
 </tr>
 <tr>
