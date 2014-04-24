@@ -17,7 +17,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @author aploese
  */
 public abstract class CronTask {
-    
+
     ThreadPoolExecutor tpe;
 
     protected abstract void run(long executionTime);
@@ -28,12 +28,12 @@ public abstract class CronTask {
      * @return true, if Task should scheduled, false if it should not run.
      */
     protected abstract boolean overrunDetected(long lastExecutionTime, long thisExecutionTime);
-    
+
     public boolean isExecuting() {
         synchronized (lock) {
             return currentExecutedTaskRunner != null;
         }
-        
+
     }
 
     TaskRunner currentExecutedTaskRunner;
@@ -99,10 +99,6 @@ public abstract class CronTask {
 
     long nextExecutionTime;
 
-    protected CronTask(GregorianCalendar c) {
-        cronExpression = new CronExpression(c);
-    }
-
     protected CronTask(CronExpression ce) {
         cronExpression = ce;
     }
@@ -113,8 +109,11 @@ public abstract class CronTask {
     }
 
     public boolean cancel() {
-        tpe.remove(currentExecutedTaskRunner);
         synchronized (lock) {
+            if (tpe != null && currentExecutedTaskRunner != null) {
+                tpe.remove(currentExecutedTaskRunner);
+            }
+            currentExecutedTaskRunner = null;
             boolean result = (state == SCHEDULED);
             state = CANCELLED;
             return result;
@@ -140,7 +139,5 @@ public abstract class CronTask {
             return nextExecutionTime;
         }
     }
-    
-    
 
 }

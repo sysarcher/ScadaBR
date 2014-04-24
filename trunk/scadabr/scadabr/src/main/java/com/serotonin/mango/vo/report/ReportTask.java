@@ -24,16 +24,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.timer.CronTask;
+import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.timer.cron.SystemCronTask;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.maint.work.ReportWorkItem;
 import java.util.TimeZone;
+import java.util.logging.Logger;
 
 /**
  * @author Matthew Lohbihler
  */
 public class ReportTask extends SystemCronTask {
+    
+    private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_REPORTS);
 
     private static final Map<Integer, ReportTask> JOB_REGISTRY = new HashMap<>();
 
@@ -82,7 +85,8 @@ public class ReportTask extends SystemCronTask {
     }
         @Override
         protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
-            throw new ImplementMeException();
+            LOG.severe("Report Overrun detected");
+            return true;
         }
     
 }

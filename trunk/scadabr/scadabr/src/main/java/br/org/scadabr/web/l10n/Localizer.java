@@ -69,7 +69,7 @@ public class Localizer {
      * @return the pseudo translated key.
      */
     private static String logAndGetMessage(String i18nKey, Locale locale) {
-        LOG.log(Level.SEVERE, "Localizer found unknown I18N key {0} for locale: {2}.", new Object[]{i18nKey, locale});
+        LOG.log(Level.SEVERE, "Localizer found unknown I18N key {0} for locale: {1}.", new Object[]{i18nKey, locale});
         return String.format("!>>>%s:%s<<<!", locale, i18nKey);
     }
 

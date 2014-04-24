@@ -156,9 +156,10 @@ public class CronTimerPool<T extends CronTask, V extends Runnable> {
                     throw new IllegalStateException(
                             "Task already scheduled or cancelled");
                 }
-                task.calcNextExecutionTimeIncludingNow(System.currentTimeMillis());
-                System.err.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-                System.err.println("NEXT EXECUTION TIME: " + new Date(task.nextExecutionTime));
+                final long time = System.currentTimeMillis();
+                task.calcNextExecutionTimeIncludingNow(time);
+                System.err.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX "  + time + " " + new Date(time));
+                System.err.println("NEXT EXECUTION TIME: " + task.nextExecutionTime + " " + new Date(task.nextExecutionTime));
                 task.state = CronTask.SCHEDULED;
                 task.tpe = this.tpe;
             }

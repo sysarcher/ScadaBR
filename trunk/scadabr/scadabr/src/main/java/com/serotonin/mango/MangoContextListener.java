@@ -560,7 +560,8 @@ public class MangoContextListener implements ServletContextListener {
         // Processes are scheduled in the timer, so they are canceled when it
         // stops.
         try {
-            DataPurge.DataPurgeTask dpt = new DataPurge.DataPurgeTask("0 0 5 * * * * *", CronExpression.TIMEZONE_UTC);
+            DataPurge.DataPurgeTask dpt = new DataPurge.DataPurgeTask("0 0 */5 * * * * *", CronExpression.TIMEZONE_UTC);
+            System.err.println("CONTEXT DATA PURGE");
             Common.systemCronPool.schedule(dpt);
         } catch (ParseException e) {
             throw new RuntimeException(e);

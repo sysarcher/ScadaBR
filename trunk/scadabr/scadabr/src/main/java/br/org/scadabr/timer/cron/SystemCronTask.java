@@ -16,10 +16,6 @@ import java.util.TimeZone;
  */
 public abstract class SystemCronTask extends CronTask {
 
-    protected SystemCronTask(GregorianCalendar c) {
-        super(c);
-    }
-
     protected SystemCronTask(CronExpression ce) {
         super(ce);
     }

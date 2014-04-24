@@ -103,11 +103,10 @@ public class ViewEditController extends SimpleFormRedirectController {
                 byte[] bytes = form.getBackgroundImageMP().getBytes();
                 if (bytes != null && bytes.length > 0) {
                     // Create the path to the upload directory.
-                    String path = request.getSession().getServletContext().getRealPath(uploadDirectory);
+                    final String path = request.getSession().getServletContext().getRealPath(System.getProperty("file.separator") + uploadDirectory);
 
                     // Make sure the directory exists.
                     File dir = new File(path);
-                    dir.mkdirs();
 
                     // Get an image id.
                     int imageId = getNextImageId(dir);
@@ -119,8 +118,8 @@ public class ViewEditController extends SimpleFormRedirectController {
                         filename += form.getBackgroundImageMP().getOriginalFilename().substring(dot);
                     }
 
-                    try ( // Save the file.
-                            FileOutputStream fos = new FileOutputStream(new File(dir, filename))) {
+                    // Save the file.
+                    try (FileOutputStream fos = new FileOutputStream(new File(dir, filename))) {
                         fos.write(bytes);
                     }
 
@@ -191,8 +190,8 @@ public class ViewEditController extends SimpleFormRedirectController {
                             if (index >= nextImageId) {
                                 nextImageId = index + 1;
                             }
-                        }catch (NumberFormatException e) { /* no op */
-                            
+                        } catch (NumberFormatException e) { /* no op */
+
                         }
                     }
                 }
