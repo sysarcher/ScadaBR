@@ -235,7 +235,7 @@
     <property name="commandClass"><value>com.serotonin.mango.web.mvc.form.ViewEditForm</value></property>
     <property name="formView"><value>viewEdit</value></property>
     <property name="successUrl"><value>views.shtm</value></property>
-    <property name="uploadDirectory"><value>/uploads/</value></property>
+    <property name="uploadDirectory"><value>uploads/</value></property>
   </bean>
   
   <bean id="watchListController" class="com.serotonin.mango.web.mvc.controller.WatchListController">

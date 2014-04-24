@@ -18,16 +18,7 @@
  */
 package com.serotonin.mango.rt.maint;
 
-import br.org.scadabr.ImplementMeException;
-import java.io.File;
-import java.text.ParseException;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateTime;
-
+import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.timer.cron.SystemCronTask;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -39,11 +30,19 @@ import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.vo.DataPointVO;
+import java.io.File;
+import java.text.ParseException;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.joda.time.DateTime;
 
 public class DataPurge {
 
-    private final Log log = LogFactory.getLog(DataPurge.class);
+    private final static  Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_CORE);
     private long runtime;
 
     private final RuntimeManager rm = Common.ctx.getRuntimeManager();
@@ -54,7 +53,7 @@ public class DataPurge {
     }
 
     private void executeImpl() {
-        log.info("Data purge started");
+        LOG.info("Data purge started");
 
         // Get the data point information.
         DataPointDao dataPointDao = new DataPointDao();
@@ -66,7 +65,7 @@ public class DataPurge {
         // if (deleteCount > 0)
         // new PointValueDao().compressTables();
 
-        log.info("Data purge ended, " + deleteCount + " point values deleted");
+        LOG.log(Level.INFO, "Data purge ended, {0} point values deleted", deleteCount);
 
         // File data purge
         filedataPurge();
@@ -114,7 +113,7 @@ public class DataPurge {
         }
 
         if (deleteCount > 0) {
-            log.info("Filedata purge ended, " + deleteCount + " files deleted");
+            LOG.log(Level.INFO, "Filedata purge ended, {0} files deleted", deleteCount);
         }
     }
 
@@ -125,7 +124,7 @@ public class DataPurge {
 
         int deleteCount = new EventDao().purgeEventsBefore(cutoff.getMillis());
         if (deleteCount > 0) {
-            log.info("Event purge ended, " + deleteCount + " events deleted");
+            LOG.log(Level.INFO, "Event purge ended, {0} events deleted", deleteCount);
         }
     }
 
@@ -136,7 +135,7 @@ public class DataPurge {
 
         int deleteCount = new ReportDao().purgeReportsBefore(cutoff.getMillis());
         if (deleteCount > 0) {
-            log.info("Report purge ended, " + deleteCount + " report instances deleted");
+            LOG.log(Level.INFO, "Report purge ended, {0} report instances deleted", deleteCount);
         }
     }
 
@@ -153,7 +152,8 @@ public class DataPurge {
 
         @Override
         protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
-            throw new ImplementMeException();
+            LOG.log(Level.SEVERE, "DataPurge overrun last{0} current:{1}", new Object[]{new Date(lastExecutionTime), new Date(thisExecutionTime)});
+            return false;
         }
     }
 }

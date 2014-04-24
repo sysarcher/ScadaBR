@@ -72,8 +72,8 @@ public class CronTimerPoolTest {
         instance.schedule(task);
         Thread.sleep(5000);
         instance.shutdown();
-        assertTrue("times called:  " + task.i, task.i < 6);
-        assertTrue("times called:  " + task.i, task.i > 4);
+        assertTrue("times called:  " + task.i, task.i <= 6);
+        assertTrue("times called:  " + task.i, task.i >= 4);
     }
 
 }

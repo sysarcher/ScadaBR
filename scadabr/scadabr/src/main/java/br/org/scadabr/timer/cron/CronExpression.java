@@ -125,7 +125,7 @@ public class CronExpression {
     public CronExpression(GregorianCalendar c) {
         calendar = c;
         nextTimeStamp = new CronCalendar();
-        nextTimeStamp.setCurrentTime(c);
+        nextTimeStamp.setCurrentTime(calendar);
         millisecond = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getMillisecond());
         second = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getSecond());
         minute = new CronField(CronField.Type.VALUE).setValue(nextTimeStamp.getMinute());
@@ -139,11 +139,13 @@ public class CronExpression {
     CronExpression(TimeZone tz) {
         nextTimeStamp = new CronCalendar();
         calendar = new GregorianCalendar(tz);
+        nextTimeStamp.setCurrentTime(calendar);
     }
 
     CronExpression(CronCalendar nextTimeStamp, TimeZone tz) {
         this.nextTimeStamp = nextTimeStamp;
         calendar = new GregorianCalendar(tz);
+        nextTimeStamp.setCurrentTime(calendar);
     }
 
     private void calcNextValidTime() {

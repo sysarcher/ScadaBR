@@ -48,10 +48,7 @@ import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
@@ -159,7 +156,7 @@ abstract public class ViewComponent implements Serializable, JsonSerializable {
 
     public static List<String> getExportTypes() {
         List<ImplDefinition> definitions = getImplementations();
-        List<String> result = new ArrayList<String>(definitions.size());
+        List<String> result = new ArrayList<>(definitions.size());
         for (ImplDefinition def : definitions) {
             result.add(def.getExportName());
         }
