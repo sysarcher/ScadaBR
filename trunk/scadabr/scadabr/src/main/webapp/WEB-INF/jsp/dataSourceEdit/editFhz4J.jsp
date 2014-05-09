@@ -29,18 +29,18 @@
 
     function assembleDevice() {
         dwr.util.removeAllRows("fhz4jValues");
-        DataSourceEditDwr.getFhz4JProperties($get("deviceType"), assembleDeviceCB);
+        DataSourceEditDwr.getFhz4JProperties($get("fhzProtocol"), assembleDeviceCB);
     }
 
     function assembleDeviceCB(propertyLabels) {
             dwr.util.addRows("fhz4jValues", propertyLabels, [
                 function(propertyLabel) { return $get(deviceHousecode); },
                 function(propertyLabel) { return $get(deviceLocation); },
-                function(propertyLabel) { return $get(deviceType); },
+                function(propertyLabel) { return $get(fhzProtocol); },
                 function(propertyLabel) { return propertyLabel; },
                 function(propertyLabel) {
-                    return writeImage("scanDeviceImg_"+ $get(deviceHousecode) + "_" +  $get(deviceType) + "_" + propertyLabel, null, "icon_comp_add",
-                         "<fmt:message key="common.add"/>", "addPoint({'deviceHousecode': '" + $get(deviceHousecode) + "', 'deviceLocation': '" + $get(deviceLocation) + "', 'deviceType': '" + $get(deviceType) + "', 'propertyLabel': '"+ propertyLabel + "'})");
+                    return writeImage("scanDeviceImg_"+ $get(deviceHousecode) + "_" +  $get(fhzProtocol) + "_" + propertyLabel, null, "icon_comp_add",
+                         "<fmt:message key="common.add"/>", "addPoint({'deviceHousecode': '" + $get(deviceHousecode) + "', 'deviceLocation': '" + $get(deviceLocation) + "', 'fhzProtocol': '" + $get(fhzProtocol) + "', 'propertyLabel': '"+ propertyLabel + "'})");
            }
             ],
             {
@@ -55,15 +55,15 @@
     function saveDataSourceImpl() {
         DataSourceEditDwr.saveFhz4JDataSource($get("dataSourceName"),
         $get("dataSourceXid"), $get("commPortId"),
-        $get("fhzHousecode"), $get("fhzMaster"), saveDataSourceCB);
+        $get("fhzHousecode"), $get("fhtMaster"), saveDataSourceCB);
     }
 
     function appendPointListColumnFunctions(pointListColumnHeaders, pointListColumnFunctions) {
         pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.fhz4j.deviceHousecode'/>";
         pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.deviceHousecodeStr; };
 
-        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.fhz4j.deviceType'/>";
-        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.fhzDeviceTypeLabel; };
+        pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.fhz4j.fhzProtocol'/>";
+        pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.fhzFhzProtocolLabel; };
 
         pointListColumnHeaders[pointListColumnHeaders.length] = "<fmt:message key='dsEdit.fhz4j.deviceProperty'/>";
         pointListColumnFunctions[pointListColumnFunctions.length] = function(p) { return p.pointLocator.fhzPropertyLabel; };
@@ -77,13 +77,13 @@
      * indicies passed from addPoint(indicies)
      */
     function addPointImpl(indicies) {
-        DataSourceEditDwr.addFhz4JPoint(indicies.deviceHousecode, indicies.deviceLocation, indicies.deviceType, indicies.propertyLabel, editPointCB);
+        DataSourceEditDwr.addFhz4JPoint(indicies.deviceHousecode, indicies.deviceLocation, indicies.fhzProtocol, indicies.propertyLabel, editPointCB);
     }
 
  
     function editPointCBImpl(locator) {
         $set("editDeviceHousecode", locator.deviceHousecodeStr);
-        $set("editDeviceTypeLabel", locator.fhzDeviceTypeLabel);
+        $set("editFhzProtocolLabel", locator.fhzProtocolLabel);
         $set("editFhzPropertyLabel", locator.fhzPropertyLabel);
         $set("editDataPointSettable", locator.settable);
     }
@@ -92,9 +92,9 @@
         //TODO avoid double settings use annotations of dwr 3.0+ ?
         delete locator.deviceHousecode;
         delete locator.fhzProperty;
-        delete locator.fhzDeviceType;
+        delete locator.fhzProtocol;
         locator.fhzPropertyLabel = $get("editFhzPropertyLabel");
-        locator.fhzDeviceTypeLabel = $get("editDeviceTypeLabel");
+        locator.fhzProtocolLabel = $get("editFhzProtocolLabel");
         locator.deviceHousecodeStr = $get("editDeviceHousecode");
         locator.settable = $get("editDataPointSettable");
 
@@ -127,7 +127,7 @@
 
 <tr>
     <td colspan="2" />
-<input type="checkbox" id="fhzMaster" <c:if test="${dataSource.fhzMaster}"> checked="checked"</c:if> class="formShort" ><fmt:message key="dsEdit.fhz4j.fhzMaster"/></input>
+<input type="checkbox" id="fhtMaster" <c:if test="${dataSource.fhtMaster}"> checked="checked"</c:if> class="formShort" ><fmt:message key="dsEdit.fhz4j.fhtMaster"/></input>
 </td>
 </tr>
 
@@ -150,9 +150,9 @@
                     <input type="text" id="deviceLocation" class="formShort"/>
                 </td>
                 <td class="formField">
-                    <sbt:select id="deviceType" value="UNKNOWN">
-                        <c:forEach items="${dataSource.deviceTypes}" var="deviceType">
-                            <sbt:option value="${deviceType.label}">${deviceType.label}</sbt:option>
+                    <sbt:select id="fhzProtocol" value="UNKNOWN">
+                        <c:forEach items="${dataSource.fhzProtocols}" var="fhzProtocol">
+                            <sbt:option value="${fhzProtocol.label}">${fhzProtocol.label}</sbt:option>
                         </c:forEach>
                     </sbt:select>
                 </td>
@@ -169,7 +169,7 @@
                         <tr class="rowHeader">
                             <td><fmt:message key="dsEdit.fhz4j.deviceHousecode"/></td>
                             <td><fmt:message key="dsEdit.fhz4j.deviceLocation"/></td>
-                            <td><fmt:message key="dsEdit.fhz4j.deviceType"/></td>
+                            <td><fmt:message key="dsEdit.fhz4j.fhzProtocol"/></td>
                             <td><fmt:message key="dsEdit.fhz4j.property"/></td>
                             <td><fmt:message key="dsEdit.fhz4j.add"/></td>
                         </tr>
@@ -190,8 +190,8 @@
                         <td class="formField"><input id="editDeviceHousecode" disabled="disabled"/></td>
                     </tr>
                     <tr>
-                        <td class="formLabelRequired"><fmt:message key="dsEdit.fhz4j.deviceType"/></td>
-                        <td class="formField"><input id="editDeviceTypeLabel" disabled="disabled"/></td>
+                        <td class="formLabelRequired"><fmt:message key="dsEdit.fhz4j.fhzProtocol"/></td>
+                        <td class="formField"><input id="editFhzProtocolLabel" disabled="disabled"/></td>
                     </tr>
                     <tr>
                         <td class="formLabelRequired"><fmt:message key="dsEdit.fhz4j.property"/></td>

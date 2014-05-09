@@ -201,6 +201,12 @@ public class ImageValue extends MangoValue implements Comparable<ImageValue> {
     }
 
     @Override
+    public float getFloatValue() {
+        throw new RuntimeException(
+                "ImageValue has no float value. Use hasDoubleRepresentation() to check before calling this method");
+    }
+
+    @Override
     public double getDoubleValue() {
         throw new RuntimeException(
                 "ImageValue has no double value. Use hasDoubleRepresentation() to check before calling this method");
@@ -222,8 +228,23 @@ public class ImageValue extends MangoValue implements Comparable<ImageValue> {
     }
 
     @Override
+    public byte getByteValue() {
+        throw new RuntimeException("ImageValue has no byte value.");
+    }
+
+    @Override
+    public short getShortValue() {
+        throw new RuntimeException("ImageValue has no short value.");
+    }
+
+    @Override
     public int getIntegerValue() {
         throw new RuntimeException("ImageValue has no int value.");
+    }
+
+    @Override
+    public long getLongValue() {
+        throw new RuntimeException("ImageValue has no long value.");
     }
 
     @Override

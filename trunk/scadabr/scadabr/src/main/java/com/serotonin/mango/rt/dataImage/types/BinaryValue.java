@@ -50,6 +50,11 @@ public class BinaryValue extends MangoValue implements Comparable<BinaryValue> {
     }
 
     @Override
+    public float getFloatValue() {
+        return value ? 1 : 0;
+    }
+
+    @Override
     public double getDoubleValue() {
         return value ? 1 : 0;
     }
@@ -70,7 +75,22 @@ public class BinaryValue extends MangoValue implements Comparable<BinaryValue> {
     }
 
     @Override
+    public byte getByteValue() {
+        return (byte)(value ? 1 : 0);
+    }
+
+    @Override
+    public short getShortValue() {
+        return (short)(value ? 1 : 0);
+    }
+
+    @Override
     public int getIntegerValue() {
+        return value ? 1 : 0;
+    }
+
+    @Override
+    public long getLongValue() {
         return value ? 1 : 0;
     }
 

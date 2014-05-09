@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view;
 
+import br.org.scadabr.logger.LogUtils;
 import java.awt.Container;
 import java.awt.Image;
 import java.awt.MediaTracker;
@@ -28,13 +29,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 public class ViewGraphicLoader {
 
-    private static final Log LOG = LogFactory.getLog(ViewGraphicLoader.class);
+    private static final Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
 
     private static final String GRAPHICS_PATH = "graphics";
     private static final String INFO_FILE_NAME = "info.txt";
@@ -46,7 +47,7 @@ public class ViewGraphicLoader {
 
     public List<ViewGraphic> loadViewGraphics(String path) {
         this.path = path;
-        viewGraphics = new ArrayList<ViewGraphic>();
+        viewGraphics = new ArrayList<>();
 
         File graphicsPath = new File(path, GRAPHICS_PATH);
         File[] dirs = graphicsPath.listFiles();
@@ -56,7 +57,10 @@ public class ViewGraphicLoader {
                     loadDirectory(dir, "");
                 }
             } catch (Exception e) {
-                LOG.warn("Failed to load image set at " + dir, e);
+                final LogRecord lr = new LogRecord(Level.SEVERE, "Failed to load image set at {0}");
+                lr.setParameters(new Object[]{dir});
+                lr.setThrown(e);
+                LOG.log(lr);
             }
         }
 
@@ -74,7 +78,7 @@ public class ViewGraphicLoader {
 
         File[] files = dir.listFiles();
         Arrays.sort(files);
-        List<String> imageFiles = new ArrayList<String>();
+        List<String> imageFiles = new ArrayList<>();
         for (File file : files) {
             if (file.isDirectory()) {
                 loadDirectory(file, id + ".");
@@ -116,21 +120,25 @@ public class ViewGraphicLoader {
                 }
             }
 
+            //TODO animated gif???? Fan ...
             if (width == -1 || height == -1) {
                 throw new Exception("Unable to derive image dimensions");
             }
 
             String[] imageFileArr = imageFiles.toArray(new String[imageFiles.size()]);
-            ViewGraphic g;
-            if ("imageSet".equals(typeStr)) {
-                g = new ImageSet(id, name, imageFileArr, width, height, textX, textY);
-            } else if ("dynamic".equals(typeStr)) {
-                g = new DynamicImage(id, name, imageFileArr[0], width, height, textX, textY);
-            } else {
-                throw new Exception("Invalid type: " + typeStr);
+            if (null != typeStr) {
+                switch (typeStr) {
+                    case "imageSet":
+                        viewGraphics.add(new ImageSet(id, name, imageFileArr, width, height, textX, textY));
+                        break;
+                    case "dynamic":
+                        viewGraphics.add(new DynamicImage(id, name, imageFileArr[0], width, height, textX, textY));
+                        break;
+                    default:
+                        throw new Exception("Invalid type: " + typeStr);
+                }
             }
 
-            viewGraphics.add(g);
         }
     }
 

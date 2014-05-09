@@ -67,11 +67,19 @@ abstract public class MangoValue {
 
     abstract public boolean hasDoubleRepresentation();
 
+    abstract public float getFloatValue();
+
     abstract public double getDoubleValue();
 
     abstract public String getStringValue();
 
+    abstract public byte getByteValue();
+
+    abstract public short getShortValue();
+    
     abstract public int getIntegerValue();
+
+    abstract public long getLongValue();
 
     abstract public boolean getBooleanValue();
 

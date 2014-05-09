@@ -24,6 +24,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import br.org.scadabr.util.SerializationHelper;
+import java.awt.Color;
 
 public class MultistateValue implements Serializable {
 
@@ -36,6 +37,12 @@ public class MultistateValue implements Serializable {
      */
     public MultistateValue() {
         // no op
+    }
+
+    MultistateValue(int key, String text, Color colour) {
+        this.key = key;
+        this.text = text;
+        this.colour = String.format("#%06x", colour.getRGB());
     }
 
     /**

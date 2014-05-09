@@ -367,7 +367,7 @@ public class RuntimeManager {
             // Stop the data points.
             for (DataPointRT p : dataPoints.values()) {
                 if (p.getDataSourceId() == id) {
-                    stopDataPoint(p.getId());
+                    stopDataPoint(p.getVo());
                 }
             }
 
@@ -384,7 +384,7 @@ public class RuntimeManager {
     // Data points
     //
     public DataPointRT saveDataPoint(DataPointVO point) {
-        stopDataPoint(point.getId());
+        stopDataPoint(point);
 
         // Since the point's data type may have changed, we must ensure that the
         // other attrtibutes are still ok with
@@ -427,7 +427,11 @@ public class RuntimeManager {
 
     public void deleteDataPoint(DataPointVO point) {
         if (point.isEnabled()) {
-            stopDataPoint(point.getId());
+            stopDataPoint(point);
+        }
+        final DataSourceRT dsRt = getRunningDataSource(point.getDataSourceId());
+        if (dsRt != null) {
+            dsRt.dataPointDeleted(point);
         }
         new DataPointDao().deleteDataPoint(point.getId());
         Common.ctx.getEventManager().cancelEventsForDataPoint(point.getId());
@@ -441,8 +445,7 @@ public class RuntimeManager {
             DataSourceRT ds = getRunningDataSource(vo.getDataSourceId());
             if (ds != null) {
                 // Change the VO into a data point implementation.
-                DataPointRT dataPoint = new DataPointRT(vo, vo
-                        .getPointLocator().createRuntime());
+                DataPointRT dataPoint = new DataPointRT(vo, vo.getPointLocator().createRuntime());
 
                 // Add/update it in the data image.
                 dataPoints.put(dataPoint.getId(), dataPoint);
@@ -480,16 +483,16 @@ public class RuntimeManager {
         }
     }
 
-    private void stopDataPoint(int dataPointId) {
+    private void stopDataPoint(DataPointVO dpVo) {
         synchronized (dataPoints) {
             // Remove this point from the data image if it is there. If not,
             // just quit.
-            DataPointRT p = dataPoints.remove(dataPointId);
+            DataPointRT p = dataPoints.remove(dpVo.getId());
 
             // Remove it from the data source, and terminate it.
             if (p != null) {
-                getRunningDataSource(p.getDataSourceId());
-                DataPointListener l = getDataPointListeners(dataPointId);
+                getRunningDataSource(p.getDataSourceId()).dataPointDisabled(p.getVo());
+                DataPointListener l = getDataPointListeners(dpVo.getId());
                 if (l != null) {
                     l.pointTerminated();
                 }

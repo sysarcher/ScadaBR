@@ -49,6 +49,11 @@ public class MultistateValue extends MangoValue implements Comparable<Multistate
     }
 
     @Override
+    public float getFloatValue() {
+        return value;
+    }
+
+    @Override
     public double getDoubleValue() {
         return value;
     }
@@ -67,9 +72,23 @@ public class MultistateValue extends MangoValue implements Comparable<Multistate
     public Object getObjectValue() {
         return value;
     }
+    @Override
+    public byte getByteValue() {
+        return (byte)value;
+    }
+
+    @Override
+    public short getShortValue() {
+        return (short)value;
+    }
 
     @Override
     public int getIntegerValue() {
+        return value;
+    }
+
+    @Override
+    public long getLongValue() {
         return value;
     }
 

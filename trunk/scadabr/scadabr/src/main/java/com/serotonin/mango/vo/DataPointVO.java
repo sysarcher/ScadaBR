@@ -219,6 +219,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         lastValue = pvt;
     }
 
+    @Deprecated //TODO Make name with hirearchy path
     public String getExtendedName() {
         return deviceName + " - " + name;
     }

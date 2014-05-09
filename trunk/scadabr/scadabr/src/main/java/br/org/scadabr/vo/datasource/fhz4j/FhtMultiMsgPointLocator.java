@@ -1,6 +1,7 @@
 package br.org.scadabr.vo.datasource.fhz4j;
 
 import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.web.i18n.LocalizableI18nKey;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import java.io.IOException;
@@ -10,18 +11,16 @@ import java.util.List;
 import java.util.logging.Logger;
 import net.sf.fhz4j.Fhz1000;
 import net.sf.fhz4j.FhzProtocol;
-import net.sf.fhz4j.fht.FhtDeviceTypes;
-import net.sf.fhz4j.fht.FhtTempPropery;
+import net.sf.fhz4j.fht.FhtMultiMsgProperty;
 
 
 /**
  *
  * @author aploese
  */
-public class FhtMeasuredTempPointLocator extends ProtocolLocator<FhtTempPropery> {
+public class FhtMultiMsgPointLocator extends ProtocolLocator<FhtMultiMsgProperty> {
 
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCARABR_DS_FHZ4J);
-    private FhtDeviceTypes fhtDeviceType;
     private short housecode;
    
     /**
@@ -32,7 +31,7 @@ public class FhtMeasuredTempPointLocator extends ProtocolLocator<FhtTempPropery>
     }
 
     public String defaultName() {
-        return getProperty() == null ? "FHZ dataPoint" : String.format("%s %s", Fhz1000.houseCodeToString(housecode), getProperty().getLabel());
+        return getProperty() == null ? "FHT Unknown Multi Message " : getProperty().getLabel();
     }
     
     /**
@@ -40,20 +39,6 @@ public class FhtMeasuredTempPointLocator extends ProtocolLocator<FhtTempPropery>
      */
     public void setHousecode(short housecode) {
         this.housecode = housecode;
-    }
-
-    /**
-     * @return the fhtDeviceType
-     */
-    public FhtDeviceTypes getFhtDeviceType() {
-        return fhtDeviceType;
-    }
-
-    /**
-     * @param fhtDeviceType the fhtDeviceType to set
-     */
-    public void setFhtDeviceType(FhtDeviceTypes fhtDeviceType) {
-        this.fhtDeviceType = fhtDeviceType;
     }
 
     public void setDeviceHousecodeStr(String deviceHousecode) {
@@ -64,21 +49,17 @@ public class FhtMeasuredTempPointLocator extends ProtocolLocator<FhtTempPropery>
         return Fhz1000.houseCodeToString(housecode);
     }
 
-    public String getFhtDeviceTypeLabel() {
-        return fhtDeviceType.getLabel();
-    }
-
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addPropertyMessage(list, "dsEdit.hfz4j.dataPoint", housecode);
-        AuditEventType.addPropertyMessage(list, "dsEdit.hfz4j.dataPoint", fhtDeviceType);
+        super.addProperties(list);
+        AuditEventType.addPropertyMessage(list, "dsEdit.fhz4j.fht.housecode", getHousecodeStr());
     }
 
     @Override
-    public void addPropertyChanges(List<LocalizableMessage> list, ProtocolLocator o) {
-        FhtMeasuredTempPointLocator from = (FhtMeasuredTempPointLocator)o;
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.housecode, housecode);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.fhtDeviceType, fhtDeviceType);
+    public void addPropertyChanges(List<LocalizableMessage> list, ProtocolLocator<FhtMultiMsgProperty> o) {
+        super.addPropertyChanges(list, o);
+        FhtMultiMsgPointLocator from = (FhtMultiMsgPointLocator)o;
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.fht.housecode", from.getHousecodeStr(), getHousecodeStr());
     }
     //
     // /
@@ -91,7 +72,6 @@ public class FhtMeasuredTempPointLocator extends ProtocolLocator<FhtTempPropery>
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(SERIAL_VERSION);
         out.writeShort(housecode);
-        out.writeObject(fhtDeviceType);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -101,7 +81,6 @@ public class FhtMeasuredTempPointLocator extends ProtocolLocator<FhtTempPropery>
         switch (ver) {
             case 1:
                 housecode = in.readShort();
-                fhtDeviceType = (FhtDeviceTypes) in.readObject();
          break;
             default:
                 throw new RuntimeException("Cant handle version");
@@ -110,6 +89,10 @@ public class FhtMeasuredTempPointLocator extends ProtocolLocator<FhtTempPropery>
 
     @Override
     public FhzProtocol getFhzProtocol() {
-        return FhzProtocol.FHT_TEMP;
+        return FhzProtocol.FHT_MULTI_MSG;
+    }
+
+    private String getHousecodeStr() {
+        return Fhz1000.houseCodeToString(housecode);
     }
 }

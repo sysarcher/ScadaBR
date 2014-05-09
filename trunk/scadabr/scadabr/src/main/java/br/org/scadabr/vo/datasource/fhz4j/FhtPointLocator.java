@@ -5,6 +5,7 @@
 package br.org.scadabr.vo.datasource.fhz4j;
 
 import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.web.i18n.LocalizableI18nKey;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.util.logging.Logger;
 import net.sf.fhz4j.Fhz1000;
 import net.sf.fhz4j.FhzProtocol;
 
-import net.sf.fhz4j.fht.FhtDeviceTypes;
+import net.sf.fhz4j.fht.FhtDeviceType;
 import net.sf.fhz4j.fht.FhtProperty;
 
 /**
@@ -25,7 +26,7 @@ import net.sf.fhz4j.fht.FhtProperty;
 public class FhtPointLocator extends ProtocolLocator<FhtProperty> {
 
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCARABR_DS_FHZ4J);
-    private FhtDeviceTypes fhtDeviceType;
+    private FhtDeviceType fhtDeviceType;
     private short housecode;
     private String fhtDeviceTypeLabel;
     private String propertyLabel;
@@ -38,7 +39,7 @@ public class FhtPointLocator extends ProtocolLocator<FhtProperty> {
     }
 
     public String defaultName() {
-        return getProperty() == null ? "FHZ dataPoint" : String.format("%s %s", Fhz1000.houseCodeToString(housecode), getProperty().getLabel());
+        return getProperty() == null ? "FHT unknown" : getProperty().getLabel();
     }
     
     /**
@@ -51,22 +52,22 @@ public class FhtPointLocator extends ProtocolLocator<FhtProperty> {
     /**
      * @return the fhtDeviceType
      */
-    public FhtDeviceTypes getFhtDeviceType() {
+    public FhtDeviceType getFhtDeviceType() {
         return fhtDeviceType;
     }
 
     /**
      * @param fhtDeviceType the fhtDeviceType to set
      */
-    public void setFhtDeviceType(FhtDeviceTypes fhtDeviceType) {
+    public void setFhtDeviceType(FhtDeviceType fhtDeviceType) {
         this.fhtDeviceType = fhtDeviceType;
     }
 
-    public void setDeviceHousecodeStr(String deviceHousecode) {
+    public void setHousecodeStr(String deviceHousecode) {
         this.housecode = Fhz1000.parseHouseCode(deviceHousecode);
     }
 
-    public String getDeviceHousecodeStr() {
+    public String getHousecodeStr() {
         return Fhz1000.houseCodeToString(housecode);
     }
 
@@ -90,7 +91,7 @@ public class FhtPointLocator extends ProtocolLocator<FhtProperty> {
 
     private void tryFromDwr() {
         if ((propertyLabel != null) && (fhtDeviceTypeLabel != null)) {
-            fhtDeviceType = FhtDeviceTypes.fromLabel(fhtDeviceTypeLabel);
+            fhtDeviceType = FhtDeviceType.fromLabel(fhtDeviceTypeLabel);
             fhtDeviceTypeLabel = null;
             propertyLabel = null;
         }
@@ -98,15 +99,17 @@ public class FhtPointLocator extends ProtocolLocator<FhtProperty> {
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addPropertyMessage(list, "dsEdit.hfz4j.dataPoint", housecode);
-        AuditEventType.addPropertyMessage(list, "dsEdit.hfz4j.dataPoint", fhtDeviceType);
+        super.addProperties(list);
+        AuditEventType.addPropertyMessage(list, "dsEdit.fhz4j.fht.housecode", getHousecodeStr());
+        AuditEventType.addPropertyMessage(list, "dsEdit.fhz4j.fht.devicetype", fhtDeviceType);
     }
 
     @Override
-    public void addPropertyChanges(List<LocalizableMessage> list, ProtocolLocator o) {
+    public void addPropertyChanges(List<LocalizableMessage> list, ProtocolLocator<FhtProperty> o) {
+        super.addPropertyChanges(list, o);
         FhtPointLocator from = (FhtPointLocator)o;
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.housecode, housecode);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.fhtDeviceType, fhtDeviceType);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.fht.housecode", from.getHousecodeStr(), getHousecodeStr());
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.fht.devicetype", from.fhtDeviceType, fhtDeviceType);
     }
     //
     // /
@@ -129,7 +132,7 @@ public class FhtPointLocator extends ProtocolLocator<FhtProperty> {
         switch (ver) {
             case 1:
                 housecode = in.readShort();
-                fhtDeviceType = (FhtDeviceTypes) in.readObject();
+                fhtDeviceType = (FhtDeviceType) in.readObject();
          break;
             default:
                 throw new RuntimeException("Cant handle version");
@@ -141,4 +144,10 @@ public class FhtPointLocator extends ProtocolLocator<FhtProperty> {
     public FhzProtocol getFhzProtocol() {
         return FhzProtocol.FHT;
     }
+    
+    @Override
+    public boolean isSettable() {
+        return true;
+    }
+
 }

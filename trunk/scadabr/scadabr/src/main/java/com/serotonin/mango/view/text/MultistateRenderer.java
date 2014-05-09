@@ -29,6 +29,7 @@ import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.ImplDefinition;
+import java.awt.Color;
 
 @JsonRemoteEntity
 public class MultistateRenderer extends BaseTextRenderer {
@@ -52,6 +53,10 @@ public class MultistateRenderer extends BaseTextRenderer {
     private List<MultistateValue> multistateValues = new ArrayList<MultistateValue>();
 
     public void addMultistateValue(int key, String text, String colour) {
+        multistateValues.add(new MultistateValue(key, text, colour));
+    }
+
+    public void addMultistateValue(int key, String text, Color colour) {
         multistateValues.add(new MultistateValue(key, text, colour));
     }
 

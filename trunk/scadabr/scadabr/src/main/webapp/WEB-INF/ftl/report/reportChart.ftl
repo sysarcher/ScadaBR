@@ -20,12 +20,13 @@
 
 <html>
 <head>
-  <title><@fmt key="header.title"/></title>
+  <title><@fmt key="header.title" /></title>
   
   <!-- Meta -->
   <meta http-equiv="content-type" content="application/xhtml+xml;charset=utf-8"/>
   <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta name="Copyright" content="&copy;2006-2011 Serotonin Software Technologies Inc."/>
+  <meta name="Copyright" content="&copy;2012-2014 ScadaBR"/>
   
   <!-- Style -->
   <link rel="icon" href="images/favicon.ico"/>
