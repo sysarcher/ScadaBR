@@ -46,8 +46,8 @@
 
         <dependency>
             <groupId>net.sf.atmodem4j</groupId>
-            <artifactId>spsw-native-lib-resources</artifactId>
-            <version>0.0.4-SNAPSHOT</version>
+            <artifactId>spsw-nativelibs-bundle</artifactId>
+            <version>0.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
