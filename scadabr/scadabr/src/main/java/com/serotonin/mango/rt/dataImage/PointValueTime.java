@@ -79,6 +79,10 @@ public class PointValueTime implements Serializable, IValueTime,
         this(new MultistateValue(value), time);
     }
 
+    public PointValueTime(float value, long time) {
+        this(new NumericValue(value), time);
+    }
+
     public PointValueTime(double value, long time) {
         this(new NumericValue(value), time);
     }
@@ -99,6 +103,10 @@ public class PointValueTime implements Serializable, IValueTime,
 
     public boolean isAnnotated() {
         return false;
+    }
+
+    public float getFloatValue() {
+        return value.getFloatValue();
     }
 
     public double getDoubleValue() {

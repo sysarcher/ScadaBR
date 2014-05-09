@@ -95,7 +95,16 @@
           for (i=0; i<folder.points.length; i++)
               pointNames[folder.points[i].key] = folder.points[i].value;
           for (i=0; i<folder.subfolders.length; i++)
-              addPointNames(folder.subfolders[i]);
+              addPointNamesSub(folder.subfolders[i], "");
+      }
+      
+      function addPointNamesSub(folder, path) {
+          path = path + folder.name + ".";
+          var i;
+          for (i=0; i<folder.points.length; i++)
+              pointNames[folder.points[i].key] = path + folder.points[i].value;
+          for (i=0; i<folder.subfolders.length; i++)
+              addPointNamesSub(folder.subfolders[i], path);
       }
       
       function addFolder(folder, parent) {

@@ -21,7 +21,7 @@
 
 <html>
 <head>
-  <title><fmt:message key="header.title"/></title>
+    <title><fmt:message key="header.title"/></title>
   
   <!-- Style -->
   <link rel="icon" href="images/favicon.ico"/>

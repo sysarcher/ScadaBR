@@ -100,7 +100,7 @@ public class PointHierarchy {
     public List<String> getPath(int pointId) {
         List<PointFolder> path = getFolderPath(pointId);
 
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         // Skip the root.
         for (int i = 1; i < path.size(); i++) {
             result.add(path.get(i).getName());
@@ -110,7 +110,7 @@ public class PointHierarchy {
     }
 
     public List<PointFolder> getFolderPath(int pointId) {
-        List<PointFolder> path = new ArrayList<PointFolder>();
+        List<PointFolder> path = new ArrayList<>();
         root.findPoint(path, pointId);
         if (path.isEmpty()) {
             path.add(root);
@@ -132,7 +132,7 @@ public class PointHierarchy {
             sub = folder.getSubfolders().get(i);
             parseEmptyFoldersRecursive(sub);
 
-            if (sub.getPoints().size() == 0 && sub.getSubfolders().size() == 0) {
+            if (sub.getPoints().isEmpty() && sub.getSubfolders().isEmpty()) {
                 folder.getSubfolders().remove(i);
             }
         }

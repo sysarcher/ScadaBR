@@ -65,8 +65,7 @@ public class WatchListDwr extends BaseDwr {
                 DataPointExtendedNameComparator.instance, false);
         for (DataPointVO point : points) {
             if (Permissions.hasDataPointReadPermission(user, point)) {
-                ph.addDataPoint(point.getId(), point.getPointFolderId(),
-                        point.getExtendedName());
+                ph.addDataPoint(point.getId(), point.getPointFolderId(), point.getName());
             }
         }
 

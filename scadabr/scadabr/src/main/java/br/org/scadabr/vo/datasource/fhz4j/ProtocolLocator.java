@@ -33,13 +33,13 @@ public class ProtocolLocator<T extends ScadaProperty> implements Serializable, J
     private boolean settable = false;
 
     void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addPropertyMessage(list, "dsEdit.hfz4j.dataPoint", settable);
-        AuditEventType.addPropertyMessage(list, "dsEdit.hfz4j.dataPoint", property);
+        AuditEventType.addPropertyMessage(list, "dsEdit.settable", settable);
+        AuditEventType.addPropertyMessage(list, "dsEdit.fhz4j.property", property.getLabel());
     }
 
-    void addPropertyChanges(List<LocalizableMessage> list, ProtocolLocator from) {
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.isSettable(), settable);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.getProperty(), property);
+    void addPropertyChanges(List<LocalizableMessage> list, ProtocolLocator<T> from) {
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.setable", from.isSettable(), settable);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.property", from.getProperty().getLabel(), property.getLabel());
     }
 
     /**

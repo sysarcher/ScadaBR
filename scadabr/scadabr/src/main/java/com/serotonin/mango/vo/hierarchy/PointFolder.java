@@ -48,9 +48,9 @@ public class PointFolder implements JsonSerializable {
     private String name;
 
     @JsonRemoteProperty(innerType = PointFolder.class)
-    private List<PointFolder> subfolders = new ArrayList<PointFolder>();
+    private List<PointFolder> subfolders = new ArrayList<>();
 
-    private List<IntValuePair> points = new ArrayList<IntValuePair>();
+    private List<IntValuePair> points = new ArrayList<>();
 
     public PointFolder() {
         // no op

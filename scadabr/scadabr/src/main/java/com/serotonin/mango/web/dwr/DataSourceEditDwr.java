@@ -227,7 +227,7 @@ import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
 import javax.management.MBeanException;
 import javax.management.ReflectionException;
-import net.sf.fhz4j.fht.FhtDeviceTypes;
+import net.sf.fhz4j.fht.FhtDeviceType;
 import net.sf.fhz4j.fht.FhtProperty;
 
 /**
@@ -2020,23 +2020,23 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     // /
     //
     @MethodFilter
-    public DwrResponseI18n saveFhz4JDataSource(String name, String xid, String commPort, String fhzHousecode, boolean fhzMaster) {
+    public DwrResponseI18n saveFhz4JDataSource(String name, String xid, String commPort, String fhzHousecode, boolean fhtMaster) {
         Fhz4JDataSourceVO ds = (Fhz4JDataSourceVO) Common.getUser().getEditDataSource();
 
         ds.setXid(xid);
         ds.setName(name);
         ds.setCommPort(commPort);
         ds.setFhzHousecode(fhzHousecode);
-        ds.setFhzMaster(fhzMaster);
+        ds.setFhtMaster(fhtMaster);
         return tryDataSourceSave(ds);
     }
 
     @MethodFilter
-    public DataPointVO addFhz4JFhtPoint(String deviceHousecode, String deviceLocation, String deviceTypeLabel, String propertyLabel) {
+    public DataPointVO addFhz4JFhtPoint(String housecode, String deviceLocation, String deviceTypeLabel, String propertyLabel) {
         //TODO what happends, if user edits 2 Datasources???
         DataPointVO result = getPoint(Common.NEW_ID, null);
         FhtPointLocator locator = (FhtPointLocator) result.getPointLocator();
-        locator.setDeviceHousecodeStr(deviceHousecode);
+        locator.setHousecodeStr(housecode);
         locator.setFhtDeviceTypeLabel(deviceTypeLabel);
         locator.setPropertyLabel(propertyLabel);
 
@@ -2047,7 +2047,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
     @MethodFilter
     public String[] getFht4JProperties(String deviceTypeLabel) {
-        return FhtProperty.getFhtPropertyLabelsOf(FhtDeviceTypes.fromLabel(deviceTypeLabel));
+        return FhtProperty.getFhtPropertyLabelsOf(FhtDeviceType.fromLabel(deviceTypeLabel));
     }
 
     public DwrResponseI18n saveFhz4JPointLocator(int id, String xid, String name, Fhz4JPointLocatorVO locator) {

@@ -39,11 +39,10 @@ import net.sf.atmodem4j.spsw.SerialPortList;
 
 import net.sf.fhz4j.Fhz1000;
 import net.sf.fhz4j.FhzProtocol;
-import net.sf.fhz4j.fht.FhtDeviceTypes;
 
 public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
 
-    private final static int MAX_FHZ_ADDR = 9999;
+    private final static int MAX_FHZ_ADDR = Fhz1000.parseHouseCode("9999");
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCARABR_DS_FHZ4J);
     private static final ExportCodes EVENT_CODES = new ExportCodes();
 
@@ -54,8 +53,8 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
     }
     
     private String commPort;
-    private short fhzHousecode;
-    private boolean fhzMaster;
+    private short fhzHousecode = (short)0x1234;
+    private boolean fhtMaster;
 
     @Override
     public Type getType() {
@@ -79,14 +78,18 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
         return new Fhz4JPointLocatorVO();
     }
 
-    public Fhz4JPointLocatorVO createPontLocator(FhzProtocol fhzProtocol) {
+    public Fhz4JPointLocatorVO<?> createPointLocator(FhzProtocol fhzProtocol) {
         switch (fhzProtocol) {
+            case FS20:
+                return new Fhz4JPointLocatorVO(new FS20PointLocator());
+            case EM:
+                return new Fhz4JPointLocatorVO(new EmPointLocator());
             case FHT:
                 return new Fhz4JPointLocatorVO(new FhtPointLocator());
             case HMS:
                 return new Fhz4JPointLocatorVO(new HmsPointLocator());
-            case FHT_TEMP:
-                return new Fhz4JPointLocatorVO(new FhtMeasuredTempPointLocator());
+            case FHT_MULTI_MSG:
+                return new Fhz4JPointLocatorVO(new FhtMultiMsgPointLocator());
             default:
                 throw new RuntimeException("Unknown protocol");
         }
@@ -107,14 +110,14 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.fhz4j.port", commPort);
         AuditEventType.addPropertyMessage(list, "dsEdit.fhz4j.fhzHousecode", fhzHousecode);
-        AuditEventType.addPropertyMessage(list, "dsEdit.fhz4j.fhzMaster", fhzMaster);
+        AuditEventType.addPropertyMessage(list, "dsEdit.fhz4j.fhtMaster", fhtMaster);
     }
 
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, Fhz4JDataSourceVO from) {
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.port", from.commPort, commPort);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.fhzHousecode", from.fhzHousecode, fhzHousecode);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.fhzMaster", from.fhzMaster, fhzMaster);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.fhtMaster", from.fhtMaster, fhtMaster);
     }
 
     public String getCommPort() {
@@ -146,7 +149,7 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
         out.writeInt(SERIAL_VERSION);
         out.writeUTF(commPort);
         out.writeShort(fhzHousecode);
-        out.writeBoolean(fhzMaster);
+        out.writeBoolean(fhtMaster);
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
@@ -157,7 +160,7 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
             case 1:
                 commPort = in.readUTF();
                 fhzHousecode = in.readShort();
-                fhzMaster = in.readBoolean();
+                fhtMaster = in.readBoolean();
                 break;
             default:
                 throw new RuntimeException("Cant read object from stream");
@@ -190,21 +193,22 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
     }
 
     /**
-     * @return the fhzMaster
+     * @return the fhtMaster
      */
-    public boolean isFhzMaster() {
-        return fhzMaster;
+    public boolean isFhtMaster() {
+        return fhtMaster;
     }
 
     /**
-     * @param fhzMaster the fhzMaster to set
+     * @param fhtMaster the fhtMaster to set
      */
-    public void setFhzMaster(boolean fhzMaster) {
-        this.fhzMaster = fhzMaster;
+    public void setFhtMaster(boolean fhtMaster) {
+        this.fhtMaster = fhtMaster;
     }
-
-    public FhtDeviceTypes[] getDeviceTypes() {
-        return FhtDeviceTypes.values();
+    
+    //TODO helper for JSP
+    public FhzProtocol[] getFhzProtocols()  {
+        return FhzProtocol.values();
     }
 
     public void setFhzHousecode(String fhzHousecode) {

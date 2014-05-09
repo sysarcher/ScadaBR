@@ -29,6 +29,8 @@ import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import br.org.scadabr.util.ColorUtils;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -259,8 +261,11 @@ public class SystemSettingsDao extends BaseDao {
         DEFAULT_VALUES.put(FUTURE_DATE_LIMIT_PERIODS, 24);
         DEFAULT_VALUES.put(FUTURE_DATE_LIMIT_PERIOD_TYPE,
                 Common.TimePeriods.HOURS);
-        DEFAULT_VALUES.put(INSTANCE_DESCRIPTION,
-                "ScadaBR - Powered by Serotonin's ScadaBR");
+        try {
+            DEFAULT_VALUES.put(INSTANCE_DESCRIPTION, String.format("ScadaBR @%s",  InetAddress.getLocalHost().getCanonicalHostName()));
+        } catch (UnknownHostException uhe) {
+            DEFAULT_VALUES.put(INSTANCE_DESCRIPTION, "ScadaBR @Unknown host");
+        }
 
         DEFAULT_VALUES.put(CHART_BACKGROUND_COLOUR, "white");
         DEFAULT_VALUES.put(PLOT_BACKGROUND_COLOUR, "white");

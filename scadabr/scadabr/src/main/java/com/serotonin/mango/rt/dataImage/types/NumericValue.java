@@ -53,6 +53,7 @@ public class NumericValue extends MangoValue implements Comparable<NumericValue>
         return value;
     }
 
+    @Override
     public float getFloatValue() {
         return (float) value;
     }
@@ -73,8 +74,23 @@ public class NumericValue extends MangoValue implements Comparable<NumericValue>
     }
 
     @Override
+    public byte getByteValue() {
+        return (byte) value;
+    }
+
+    @Override
+    public short getShortValue() {
+        return (short) value;
+    }
+
+    @Override
     public int getIntegerValue() {
         return (int) value;
+    }
+
+    @Override
+    public long getLongValue() {
+        return (long) value;
     }
 
     @Override

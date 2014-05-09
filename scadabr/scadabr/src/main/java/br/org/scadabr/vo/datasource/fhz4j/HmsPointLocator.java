@@ -35,7 +35,7 @@ public class HmsPointLocator extends ProtocolLocator<HmsProperty> {
     }
     
     public String defaultName() {
-        return getProperty() == null ? "HMS dataPoint" : String.format("%s %s", getHousecodeStr(), getProperty().getLabel());
+        return getProperty() == null ? "HMS unknown" : getProperty().getLabel();
     }
 
     /**
@@ -45,30 +45,27 @@ public class HmsPointLocator extends ProtocolLocator<HmsProperty> {
         this.housecode = housecode;
     }
 
-    public void setHousecodeStr(String deviceHousecode) {
-        this.housecode = (short)Integer.parseInt(deviceHousecode, 16);
+    public void setHousecodeStr(String housecode) {
+        this.housecode = (short)Integer.parseInt(housecode, 16);
     }
     
     public String getHousecodeStr() {
         return String.format("%04X", housecode);
     }
 
-    public String getDeviceHousecodeStr() {
-        return Fhz1000.houseCodeToString(housecode);
-    }
-
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addPropertyMessage(list, "dsEdit.hfz4j.dataPoint", housecode);
-        AuditEventType.addPropertyMessage(list, "dsEdit.hfz4j.dataPoint", hmsDeviceType);
+        super.addProperties(list);
+        AuditEventType.addPropertyMessage(list, "dsEdit.fhz4j.hms.housecode", getHousecodeStr());
+        AuditEventType.addPropertyMessage(list, "dsEdit.fhz4j.hms.devicetype", hmsDeviceType);
     }
 
     @Override
-    public void addPropertyChanges(List<LocalizableMessage> list, ProtocolLocator o) {
+    public void addPropertyChanges(List<LocalizableMessage> list, ProtocolLocator<HmsProperty> o) {
         super.addPropertyChanges(list, o);
         final HmsPointLocator from = (HmsPointLocator)o;
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.housecode, housecode);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.dataPoint", from.hmsDeviceType, hmsDeviceType);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.hms.housecode", from.getHousecodeStr(), getHousecodeStr());
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.fhz4j.hms.devicetype", from.hmsDeviceType, hmsDeviceType);
     }
     
     //
@@ -151,7 +148,7 @@ public class HmsPointLocator extends ProtocolLocator<HmsProperty> {
     
     @Override
     public String toString() {
-        return String.format("%s [housecode: %x, devicetype: property %s]", getClass().getName(), housecode, hmsDeviceType, getProperty());
+        return String.format("%s [housecode: %s, devicetype: property %s]", getClass().getName(), getHousecodeStr(), hmsDeviceType, getProperty());
     }
 
  }
