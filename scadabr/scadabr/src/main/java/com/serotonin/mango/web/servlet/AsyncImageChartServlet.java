@@ -42,8 +42,8 @@ public class AsyncImageChartServlet extends BaseInfoServlet {
 
     private static final long serialVersionUID = -1;
 
-    final DataPointDao dataPointDao = new DataPointDao();
-    final PointValueDao pointValueDao = new PointValueDao();
+    final DataPointDao dataPointDao = DataPointDao.getInstance();
+    final PointValueDao pointValueDao = PointValueDao.getInstance();
 
     /**
      * @TODO(security): Validate the point access against the user. If
@@ -96,8 +96,8 @@ public class AsyncImageChartServlet extends BaseInfoServlet {
             int height = getIntRequestParameter(request, "h", 100);
 
             // Create the datasets
-            Synchronizer<PointDataRetriever> tasks = new Synchronizer<PointDataRetriever>();
-            List<Integer> dataPointIds = new ArrayList<Integer>();
+            Synchronizer<PointDataRetriever> tasks = new Synchronizer<>();
+            List<Integer> dataPointIds = new ArrayList<>();
             for (int i = pointIdStart; i < imageBits.length; i++) {
                 if (imageBits[i].startsWith("w")) {
                     width = StringUtils.parseInt(imageBits[i].substring(1), width);

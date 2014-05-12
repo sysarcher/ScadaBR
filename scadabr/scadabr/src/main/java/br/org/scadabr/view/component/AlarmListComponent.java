@@ -43,10 +43,10 @@ public class AlarmListComponent extends CustomComponent {
 
     @Override
     public String generateContent() {
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         WebContext webContext = WebContextFactory.get();
         HttpServletRequest request = webContext.getHttpServletRequest();
-        List<EventInstance> events = new EventDao().getPendingEvents(Common
+        List<EventInstance> events = EventDao.getInstance().getPendingEvents(Common
                 .getUser().getId());
 
         filter(events, minAlarmLevel);
@@ -84,7 +84,7 @@ public class AlarmListComponent extends CustomComponent {
     }
 
     private void removeAlarmLevel(List<EventInstance> source, int alarmLevel) {
-        List<EventInstance> copy = new ArrayList<EventInstance>();
+        List<EventInstance> copy = new ArrayList<>();
 
         for (EventInstance eventInstance : source) {
             if (eventInstance.getAlarmLevel() == alarmLevel) {

@@ -51,7 +51,7 @@ public class DataPointEventType extends EventType {
     @Override
     public int getDataSourceId() {
         if (dataSourceId == -1) {
-            dataSourceId = new DataPointDao().getDataPoint(dataPointId).getDataSourceId();
+            dataSourceId = DataPointDao.getInstance().getDataPoint(dataPointId).getDataSourceId();
         }
         return dataSourceId;
     }
@@ -109,10 +109,7 @@ public class DataPointEventType extends EventType {
             return false;
         }
         DataPointEventType other = (DataPointEventType) obj;
-        if (pointEventDetectorId != other.pointEventDetectorId) {
-            return false;
-        }
-        return true;
+        return pointEventDetectorId == other.pointEventDetectorId;
     }
 
     //
@@ -123,7 +120,7 @@ public class DataPointEventType extends EventType {
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
         map.put("dataPointXID", dataPointDao.getDataPoint(dataPointId).getXid());
         map.put("detectorXID", dataPointDao.getDetectorXid(pointEventDetectorId));
     }

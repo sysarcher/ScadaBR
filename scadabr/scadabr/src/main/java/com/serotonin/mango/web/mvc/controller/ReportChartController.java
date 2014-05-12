@@ -46,7 +46,7 @@ public class ReportChartController extends AbstractController {
             throws Exception {
 
         int instanceId = Integer.parseInt(request.getParameter("instanceId"));
-        ReportDao reportDao = new ReportDao();
+        ReportDao reportDao = ReportDao.getInstance();
         ReportInstance instance = reportDao.getReportInstance(instanceId);
 
         User user = Common.getUser(request);

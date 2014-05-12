@@ -95,7 +95,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
     @Override
     public void eventRaised(EventInstance evt) {
         // Get the email addresses to send to
-        activeRecipients = new MailingListDao().getRecipientAddresses(vo.getActiveRecipients(),
+        activeRecipients = MailingListDao.getInstance().getRecipientAddresses(vo.getActiveRecipients(),
                 new DateTime(evt.getActiveTimestamp()));
 
         // Send an email to the active recipients.
@@ -104,7 +104,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
         // If an inactive notification is to be sent, save the active recipients.
         if (vo.isSendInactive()) {
             if (vo.isInactiveOverride()) {
-                inactiveRecipients = new MailingListDao().getRecipientAddresses(vo.getInactiveRecipients(),
+                inactiveRecipients = MailingListDao.getInstance().getRecipientAddresses(vo.getInactiveRecipients(),
                         new DateTime(evt.getActiveTimestamp()));
             } else {
                 inactiveRecipients = activeRecipients;
@@ -126,7 +126,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
     @Override
     synchronized public void run(EventInstance evt, long fireTime) {
         // Get the email addresses to send to
-        Set<String> addresses = new MailingListDao().getRecipientAddresses(vo.getEscalationRecipients(), new DateTime(
+        Set<String> addresses = MailingListDao.getInstance().getRecipientAddresses(vo.getEscalationRecipients(), new DateTime(
                 fireTime));
 
         // Send the escalation.

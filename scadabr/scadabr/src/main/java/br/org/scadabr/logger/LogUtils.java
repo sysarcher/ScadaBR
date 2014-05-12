@@ -29,4 +29,6 @@ public class LogUtils {
     
     public final static String LOGGER_SCADABR_WEB = "scadabe-web";
     
+    public final static String LOGGER_SCADABR_DAO= "scadabr-dao";
+    
 }

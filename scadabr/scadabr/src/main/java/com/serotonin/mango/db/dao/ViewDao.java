@@ -22,7 +22,6 @@ import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.List;
 
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -37,11 +36,13 @@ import com.serotonin.mango.view.View;
 import br.org.scadabr.util.SerializationHelper;
 import java.sql.Connection;
 import java.sql.Statement;
+import javax.inject.Named;
+import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
+@Named
 public class ViewDao extends BaseDao {
 
     //
@@ -52,6 +53,20 @@ public class ViewDao extends BaseDao {
     private static final String VIEW_SELECT = "select data, id, xid, name, background, userId, anonymousAccess from mangoViews";
     private static final String USER_ID_COND = " where userId=? or id in (select mangoViewId from mangoViewUsers where userId=?)";
 
+    public ViewDao() {
+        super();
+    }
+    
+   @Deprecated
+    private ViewDao(DataSource dataSource) {
+        super(dataSource);
+    }
+
+   @Deprecated
+     public static ViewDao getInstance() {
+        return new ViewDao(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     public List<View> getViews() {
         List<View> views = ejt.query(VIEW_SELECT, new ViewRowMapper());
         setViewUsers(views);

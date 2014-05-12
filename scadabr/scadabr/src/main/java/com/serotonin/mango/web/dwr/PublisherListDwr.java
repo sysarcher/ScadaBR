@@ -28,13 +28,16 @@ import com.serotonin.mango.util.IntMessagePair;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import javax.inject.Inject;
 
 /**
  * @author Matthew Lohbihler
  */
 public class PublisherListDwr extends BaseDwr {
+    
+    @Inject
+    private PublisherDao publisherDao;
 
     public DwrResponseI18n init() {
         DwrResponseI18n response = new DwrResponseI18n();
@@ -45,7 +48,7 @@ public class PublisherListDwr extends BaseDwr {
         }
 
         response.addData("types", translatedTypes);
-        response.addData("publishers", new PublisherDao().getPublishers(new PublisherDao.PublisherNameComparator()));
+        response.addData("publishers", publisherDao.getPublishers(new PublisherDao.PublisherNameComparator()));
 
         return response;
     }
@@ -69,4 +72,19 @@ public class PublisherListDwr extends BaseDwr {
         Common.ctx.getRuntimeManager().deletePublisher(publisherId);
         return publisherId;
     }
+
+    /**
+     * @return the publisherDao
+     */
+    public PublisherDao getPublisherDao() {
+        return publisherDao;
+    }
+
+    /**
+     * @param publisherDao the publisherDao to set
+     */
+    public void setPublisherDao(PublisherDao publisherDao) {
+        this.publisherDao = publisherDao;
+    }
+
 }

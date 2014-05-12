@@ -158,8 +158,8 @@ public class PointFolder implements JsonSerializable {
     //
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        DataPointDao dataPointDao = new DataPointDao();
-        List<String> pointList = new ArrayList<String>();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
+        List<String> pointList = new ArrayList<>();
         for (IntValuePair p : points) {
             DataPointVO dp = dataPointDao.getDataPoint(p.getKey());
             if (dp != null) {
@@ -174,7 +174,7 @@ public class PointFolder implements JsonSerializable {
         JsonArray jsonPoints = json.getJsonArray("points");
         if (jsonPoints != null) {
             points.clear();
-            DataPointDao dataPointDao = new DataPointDao();
+            DataPointDao dataPointDao = DataPointDao.getInstance();
 
             for (JsonValue jv : jsonPoints.getElements()) {
                 String xid = jv.toJsonString().getValue();

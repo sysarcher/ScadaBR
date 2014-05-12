@@ -40,17 +40,33 @@ import com.serotonin.mango.vo.mailingList.UserEntry;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import java.sql.Connection;
 import java.sql.Statement;
+import javax.inject.Named;
+import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
  * @author Matthew Lohbihler
  */
+@Named
 public class MailingListDao extends BaseDao {
 
+    public MailingListDao() {
+        super();
+    }
+    
+   @Deprecated
+    private MailingListDao(DataSource dataSource) {
+        super(dataSource);
+    }
+
+   @Deprecated
+     public static MailingListDao getInstance() {
+        return new MailingListDao(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     public String generateUniqueXid() {
         return generateUniqueXid(MailingList.XID_PREFIX, "mailingLists");
     }
@@ -147,12 +163,12 @@ public class MailingListDao extends BaseDao {
     }
 
     public Set<String> getRecipientAddresses(List<RecipientListEntryBean> beans, DateTime sendTime) {
-        List<EmailRecipient> entries = new ArrayList<EmailRecipient>(beans.size());
+        List<EmailRecipient> entries = new ArrayList<>(beans.size());
         for (RecipientListEntryBean bean : beans) {
             entries.add(bean.createEmailRecipient());
         }
         populateEntrySubclasses(entries);
-        Set<String> addresses = new HashSet<String>();
+        Set<String> addresses = new HashSet<>();
         for (EmailRecipient entry : entries) {
             entry.appendAddresses(addresses, sendTime);
         }
@@ -161,7 +177,7 @@ public class MailingListDao extends BaseDao {
 
     public void populateEntrySubclasses(List<EmailRecipient> entries) {
         // Update the user type entries with their respective user objects.
-        UserDao userDao = new UserDao();
+        UserDao userDao = UserDao.getInstance();
         for (EmailRecipient e : entries) {
             if (e instanceof MailingList) // NOTE: this does not set the mailing list name.
             {
@@ -211,7 +227,7 @@ public class MailingListDao extends BaseDao {
         ejt.update("delete from mailingListInactive where mailingListId=?", new Object[]{ml.getId()});
 
         // Save what is in the mailing list object.
-        final List<Integer> intervalIds = new ArrayList<Integer>(ml.getInactiveIntervals());
+        final List<Integer> intervalIds = new ArrayList<>(ml.getInactiveIntervals());
         ejt.batchUpdate(MAILING_LIST_INACTIVE_INSERT, new BatchPreparedStatementSetter() {
             @Override
             public int getBatchSize() {

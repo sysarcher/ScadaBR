@@ -40,7 +40,6 @@ import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.DataPointAccess;
-import br.org.scadabr.util.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 abstract public class DatabaseAccess {
@@ -142,7 +141,7 @@ abstract public class DatabaseAccess {
                     user.setDisabled(false);
                     user.setDataSourcePermissions(new LinkedList<Integer>());
                     user.setDataPointPermissions(new LinkedList<DataPointAccess>());
-                    new UserDao().saveUser(user);
+                    UserDao.getInstance().saveUser(user);
 
                     // Record the current version.
                     new SystemSettingsDao().setValue(

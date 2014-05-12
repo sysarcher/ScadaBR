@@ -221,8 +221,8 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
         if (parameters.getOptions() == null) {
             parameters.setOptions(new WriteDataOptions());
         }
-        ArrayList<ItemValue> newItemValuesList = new ArrayList<ItemValue>();
-        ArrayList<APIError> errors = new ArrayList<APIError>();
+        ArrayList<ItemValue> newItemValuesList = new ArrayList<>();
+        ArrayList<APIError> errors = new ArrayList<>();
 
         for (ItemValue itemValue : parameters.getItemsList()) {
             try {
@@ -269,8 +269,8 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
         if (parameters.getOptions() == null) {
             parameters.setOptions(new WriteDataOptions());
         }
-        ArrayList<ItemStringValue> newItemValuesList = new ArrayList<ItemStringValue>();
-        ArrayList<APIError> errors = new ArrayList<APIError>();
+        ArrayList<ItemStringValue> newItemValuesList = new ArrayList<>();
+        ArrayList<APIError> errors = new ArrayList<>();
 
         for (ItemStringValue itemValue : parameters.getItemsList()) {
             try {
@@ -334,8 +334,8 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
             maxReturn = parameters.getOptions().getMaxReturn();
         }
 
-        List<ItemInfo> itemInfoList = new ArrayList<ItemInfo>();
-        List<APIError> errors = new ArrayList<APIError>();
+        List<ItemInfo> itemInfoList = new ArrayList<>();
+        List<APIError> errors = new ArrayList<>();
 
         try {
             itemInfoList = (ArrayList<ItemInfo>) dataDao.browseTags(parameters
@@ -406,8 +406,8 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
             maxReturn = parameters.getOptions().getMaxReturn();
         }
 
-        List<ItemValue> itemValueList = new ArrayList<ItemValue>();
-        ArrayList<APIError> errors = new ArrayList<APIError>();
+        List<ItemValue> itemValueList = new ArrayList<>();
+        ArrayList<APIError> errors = new ArrayList<>();
 
         try {
             itemValueList = (ArrayList<ItemValue>) dataDao
@@ -475,8 +475,8 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
             alarmLevel = AlarmLevel.NONE;
         }
 
-        List<EventNotification> alarms = new ArrayList<EventNotification>();
-        ArrayList<APIError> errors = new ArrayList<APIError>();
+        List<EventNotification> alarms = new ArrayList<>();
+        ArrayList<APIError> errors = new ArrayList<>();
 
         try {
             alarms = dataDao.getEventNotifications(alarmLevel);
@@ -543,8 +543,8 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
             returnEventDetails = parameters.getOptions().isReturnEventDetails();
         }
         Integer[] ids = parameters.getEventsId();
-        ArrayList<APIError> errors = new ArrayList<APIError>();
-        ArrayList<EventNotification> events = new ArrayList<EventNotification>();
+        ArrayList<APIError> errors = new ArrayList<>();
+        ArrayList<EventNotification> events = new ArrayList<>();
 
         for (Integer eventId : ids) {
             try {
@@ -616,8 +616,8 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
             maxReturn = parameters.getOptions().getMaxReturn();
         }
 
-        List<EventNotification> events = new ArrayList<EventNotification>();
-        List<APIError> errors = new ArrayList<APIError>();
+        List<EventNotification> events = new ArrayList<>();
+        List<APIError> errors = new ArrayList<>();
         try {
             events = dataDao.getEventsHistory(options.getAlarmLevel(),
                     initialDate, finalDate, maxReturn);
@@ -673,8 +673,8 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
         if (parameters.getOptions() != null) {
             eventType = parameters.getOptions().getEventType();
         }
-        List<APIError> errors = new ArrayList<APIError>();
-        List<EventDefinition> events = new ArrayList<EventDefinition>();
+        List<APIError> errors = new ArrayList<>();
+        List<EventDefinition> events = new ArrayList<>();
 
         try {
             events = dataDao.getEventDefinitions(eventType);
@@ -729,7 +729,7 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
         }
 
         EventMessage[] messages = null;
-        List<APIError> errors = new ArrayList<APIError>();
+        List<APIError> errors = new ArrayList<>();
         try {
             messages = dataDao.annotateEvent(parameters.getEventId(),
                     parameters.getMessage());
@@ -964,7 +964,7 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
         ReplyBase rb = new ReplyBase();
         rb.setRcvTime(Calendar.getInstance());
 
-        FlexProjectDao dao = new FlexProjectDao();
+        FlexProjectDao dao = FlexProjectDao.getInstance();
         FlexProject project = dao.getFlexProject(projectId);
 
         if (project == null) {
@@ -986,7 +986,7 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
         ReplyBase rb = new ReplyBase();
         rb.setRcvTime(Calendar.getInstance());
 
-        FlexProjectDao dao = new FlexProjectDao();
+        FlexProjectDao dao = FlexProjectDao.getInstance();
         List<FlexProject> list = dao.getFlexProjects();
 
         FlexProject[] projects = new FlexProject[list.size()];
@@ -1008,7 +1008,7 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
 
         int projectId = params.getProject().getId();
 
-        FlexProjectDao dao = new FlexProjectDao();
+        FlexProjectDao dao = FlexProjectDao.getInstance();
         FlexProject project = params.getProject();
         int id = dao.saveFlexProject(project.getId(), project.getName(),
                 project.getDescription(), project.getXmlConfig());
@@ -1026,7 +1026,7 @@ public class ScadaBRAPIImpl implements br.org.scadabr.api.ScadaBRAPI,
         ReplyBase rb = new ReplyBase();
         rb.setRcvTime(Calendar.getInstance());
 
-        FlexProjectDao dao = new FlexProjectDao();
+        FlexProjectDao dao = FlexProjectDao.getInstance();
         dao.deleteFlexProject(id);
 
         rb.setReplyTime(Calendar.getInstance());

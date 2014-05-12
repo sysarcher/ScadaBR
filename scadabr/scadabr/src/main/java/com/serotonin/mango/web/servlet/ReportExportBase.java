@@ -49,7 +49,7 @@ abstract public class ReportExportBase extends HttpServlet {
         int instanceId = Integer.parseInt(request.getParameter("instanceId"));
 
         // Get the report instance
-        ReportDao reportDao = new ReportDao();
+        ReportDao reportDao = ReportDao.getInstance();
         ReportInstance instance = reportDao.getReportInstance(instanceId);
 
         // Ensure the user is allowed access.

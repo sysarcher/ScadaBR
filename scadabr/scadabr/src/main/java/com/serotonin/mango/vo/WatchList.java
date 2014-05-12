@@ -129,7 +129,7 @@ public class WatchList implements JsonSerializable {
             response.addContextual("xid", "validate.required");
         } else if (xid.length() >  50) {
             response.addContextual("xid", "validate.notLongerThan", 50);
-        } else if (!new WatchListDao().isXidUnique(xid, id)) {
+        } else if (!WatchListDao.getInstance().isXidUnique(xid, id)) {
             response.addContextual("xid", "validate.xidUsed");
         }
 
@@ -146,7 +146,7 @@ public class WatchList implements JsonSerializable {
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
 
-        map.put("user", new UserDao().getUser(userId).getUsername());
+        map.put("user", UserDao.getInstance().getUser(userId).getUsername());
 
         List<String> dpXids = new ArrayList<>();
         for (DataPointVO dpVO : pointList) {
@@ -163,7 +163,7 @@ public class WatchList implements JsonSerializable {
         if (username.isEmpty()) {
             throw new LocalizableJsonException("emport.error.missingValue", "user");
         }
-        User user = new UserDao().getUser(username);
+        User user = UserDao.getInstance().getUser(username);
         if (user == null) {
             throw new LocalizableJsonException("emport.error.missingUser", username);
         }
@@ -172,7 +172,7 @@ public class WatchList implements JsonSerializable {
         JsonArray jsonDataPoints = json.getJsonArray("dataPoints");
         if (jsonDataPoints != null) {
             pointList.clear();
-            DataPointDao dataPointDao = new DataPointDao();
+            DataPointDao dataPointDao = DataPointDao.getInstance();
             for (JsonValue jv : jsonDataPoints.getElements()) {
                 String xid = jv.toJsonString().getValue();
                 DataPointVO dpVO = dataPointDao.getDataPoint(xid);

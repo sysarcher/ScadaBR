@@ -39,7 +39,7 @@ public class PublicViewController extends ParameterizableViewController {
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) {
-        ViewDao viewDao = new ViewDao();
+        ViewDao viewDao = ViewDao.getInstance();
 
         // Get the view by id.
         String vid = request.getParameter("viewId");

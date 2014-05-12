@@ -555,7 +555,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             response.addContextual("xid", "validate.required");
         } else if (xid.length() > 50) {
             response.addContextual("xid", "validate.notLongerThan", 50);
-        } else if (!new DataPointDao().isXidUnique(xid, id)) {
+        } else if (!DataPointDao.getInstance().isXidUnique(xid, id)) {
             response.addContextual("xid", "validate.xidUsed");
         }
 

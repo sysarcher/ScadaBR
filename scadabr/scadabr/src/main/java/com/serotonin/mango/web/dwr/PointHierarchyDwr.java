@@ -21,6 +21,7 @@ package com.serotonin.mango.web.dwr;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.vo.hierarchy.PointFolder;
 import com.serotonin.mango.vo.hierarchy.PointHierarchy;
+import javax.inject.Inject;
 
 /**
  * @author Matthew Lohbihler
@@ -28,14 +29,30 @@ import com.serotonin.mango.vo.hierarchy.PointHierarchy;
  */
 public class PointHierarchyDwr {
 
+    @Inject
+    private DataPointDao dataPointDao;
+    
     public PointFolder getPointHierarchy() {
-        DataPointDao dataPointDao = new DataPointDao();
         PointHierarchy ph = dataPointDao.getPointHierarchy();
         return ph.getRoot();
     }
 
     public PointFolder savePointHierarchy(PointFolder rootFolder) {
-        new DataPointDao().savePointHierarchy(rootFolder);
+        dataPointDao.savePointHierarchy(rootFolder);
         return rootFolder;
+    }
+
+    /**
+     * @return the dataPointDao
+     */
+    public DataPointDao getDataPointDao() {
+        return dataPointDao;
+    }
+
+    /**
+     * @param dataPointDao the dataPointDao to set
+     */
+    public void setDataPointDao(DataPointDao dataPointDao) {
+        this.dataPointDao = dataPointDao;
     }
 }

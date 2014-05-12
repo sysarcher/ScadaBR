@@ -2,7 +2,6 @@ package br.org.scadabr.db.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.List;
 
 import org.springframework.transaction.TransactionStatus;
@@ -16,16 +15,31 @@ import br.org.scadabr.util.SerializationHelper;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import javax.inject.Named;
+import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
+@Named
 public class ScriptDao extends BaseDao {
 
     private static final String SCRIPT_SELECT = "select id, xid, name, script, userId, data from scripts ";
 
+    public ScriptDao() {
+        super();
+    }
+    
+   @Deprecated
+    private ScriptDao(DataSource dataSource) {
+        super(dataSource);
+    }
+
+     public static ScriptDao getInstance() {
+        return new ScriptDao(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     public void saveScript(final ScriptVO<?> vo) {
         // Decide whether to insert or update.
         if (vo.getId() == Common.NEW_ID) {

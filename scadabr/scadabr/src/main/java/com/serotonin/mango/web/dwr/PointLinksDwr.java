@@ -43,19 +43,25 @@ import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.db.dao.EventDao;
+import com.serotonin.mango.db.dao.UserDao;
 import java.util.Date;
+import javax.inject.Inject;
 
 /**
  * @author Matthew Lohbihler
  */
 public class PointLinksDwr extends BaseDwr {
+    
+    @Inject
+    private PointLinkDao pointLinkDao;
 
     public Map<String, Object> init() {
         User user = Common.getUser();
         Map<String, Object> data = new HashMap<>();
 
         // Get the points that this user can access.
-        List<DataPointVO> allPoints = new DataPointDao().getDataPoints(DataPointExtendedNameComparator.instance, false);
+        List<DataPointVO> allPoints = dataPointDao.getDataPoints(DataPointExtendedNameComparator.instance, false);
         List<IntValuePair> sourcePoints = new ArrayList<>();
         List<IntValuePair> targetPoints = new ArrayList<>();
         for (DataPointVO point : allPoints) {
@@ -72,7 +78,7 @@ public class PointLinksDwr extends BaseDwr {
 
         // Get the existing point links.
         List<PointLinkVO> pointLinks = new ArrayList<>();
-        for (PointLinkVO pointLink : new PointLinkDao().getPointLinks()) {
+        for (PointLinkVO pointLink : pointLinkDao.getPointLinks()) {
             if (containsPoint(sourcePoints, pointLink.getSourcePointId())
                     && containsPoint(targetPoints, pointLink.getTargetPointId())) {
                 pointLinks.add(pointLink);
@@ -95,7 +101,6 @@ public class PointLinksDwr extends BaseDwr {
 
     public PointLinkVO getPointLink(int id) {
         PointLinkVO vo;
-        PointLinkDao pointLinkDao = new PointLinkDao();
         if (id == Common.NEW_ID) {
             vo = new PointLinkVO();
             vo.setXid(pointLinkDao.generateUniqueXid());
@@ -118,7 +123,6 @@ public class PointLinksDwr extends BaseDwr {
         vo.setDisabled(disabled);
 
         DwrResponseI18n response = new DwrResponseI18n();
-        PointLinkDao pointLinkDao = new PointLinkDao();
 
         if (xid.isEmpty()) {
             response.addContextual("xid", "validate.required");
@@ -153,7 +157,7 @@ public class PointLinksDwr extends BaseDwr {
         } else {
             Map<String, IDataPoint> context = new HashMap<>();
             context.put(PointLinkRT.CONTEXT_VAR_NAME, point);
-            int targetDataType = new DataPointDao().getDataPoint(targetPointId).getPointLocator().getDataTypeId();
+            int targetDataType = dataPointDao.getDataPoint(targetPointId).getPointLocator().getDataTypeId();
 
             try {
                 PointValueTime pvt = scriptExecutor.execute(script, context, System.currentTimeMillis(),
@@ -175,4 +179,19 @@ public class PointLinksDwr extends BaseDwr {
         response.addContextual("script", message.getI18nKey(), message.getArgs());
         return response;
     }
+
+    /**
+     * @return the pointLinkDao
+     */
+    public PointLinkDao getPointLinkDao() {
+        return pointLinkDao;
+    }
+
+    /**
+     * @param pointLinkDao the pointLinkDao to set
+     */
+    public void setPointLinkDao(PointLinkDao pointLinkDao) {
+        this.pointLinkDao = pointLinkDao;
+    }
+
 }

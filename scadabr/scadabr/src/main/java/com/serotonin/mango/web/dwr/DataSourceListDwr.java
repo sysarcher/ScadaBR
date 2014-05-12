@@ -25,20 +25,22 @@ import java.util.Map;
 
 import br.org.scadabr.db.IntValuePair;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
+import javax.inject.Inject;
 
 /**
  * @author Matthew Lohbihler
  */
 public class DataSourceListDwr extends BaseDwr {
+    
+    @Inject
+    private DataSourceDao dataSourceDao;
 
     public DwrResponseI18n init() {
         DwrResponseI18n response = new DwrResponseI18n();
@@ -81,7 +83,7 @@ public class DataSourceListDwr extends BaseDwr {
     }
 
     public DwrResponseI18n toggleDataPoint(int dataPointId) {
-        DataPointVO dataPoint = new DataPointDao().getDataPoint(dataPointId);
+        DataPointVO dataPoint = dataPointDao.getDataPoint(dataPointId);
         Permissions.ensureDataSourcePermission(Common.getUser(), dataPoint.getDataSourceId());
 
         RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
@@ -96,8 +98,23 @@ public class DataSourceListDwr extends BaseDwr {
 
     public int copyDataSource(int dataSourceId) {
         Permissions.ensureDataSourcePermission(Common.getUser(), dataSourceId);
-        int dsId = new DataSourceDao().copyDataSource(dataSourceId, getResourceBundle());
-        new UserDao().populateUserPermissions(Common.getUser());
+        int dsId = dataSourceDao.copyDataSource(dataSourceId, getResourceBundle());
+        userDao.populateUserPermissions(Common.getUser());
         return dsId;
     }
+
+    /**
+     * @return the dataSourceDao
+     */
+    public DataSourceDao getDataSourceDao() {
+        return dataSourceDao;
+    }
+
+    /**
+     * @param dataSourceDao the dataSourceDao to set
+     */
+    public void setDataSourceDao(DataSourceDao dataSourceDao) {
+        this.dataSourceDao = dataSourceDao;
+    }
+
 }

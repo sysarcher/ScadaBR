@@ -55,6 +55,8 @@ import br.org.scadabr.web.l10n.Localizer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import javax.inject.Named;
+import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -62,6 +64,7 @@ import org.springframework.jdbc.core.RowMapper;
 /**
  * @author Matthew Lohbihler
  */
+@Named
 public class ReportDao extends BaseDao {
 
     //
@@ -70,6 +73,20 @@ public class ReportDao extends BaseDao {
     //
     private static final String REPORT_SELECT = "select data, id, userId, name from reports ";
 
+    public ReportDao() {
+        super();
+    }
+    
+   @Deprecated
+    private ReportDao(DataSource dataSource) {
+        super(dataSource);
+    }
+
+   @Deprecated
+     public static ReportDao getInstance() {
+        return new ReportDao(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     public List<ReportVO> getReports() {
         return ejt.query(REPORT_SELECT, new ReportRowMapper());
     }
@@ -263,7 +280,7 @@ public class ReportDao extends BaseDao {
     }
 
     public int runReport(final ReportInstance instance, List<PointInfo> points, ResourceBundle bundle) {
-        PointValueDao pointValueDao = new PointValueDao();
+        PointValueDao pointValueDao = PointValueDao.getInstance();
         int count = 0;
         String userLabel = Localizer.localizeI18nKey("common.user", bundle);
         String setPointLabel = Localizer.localizeI18nKey("annotation.eventHandler", bundle);
@@ -482,6 +499,7 @@ public class ReportDao extends BaseDao {
         // Retrieve point information.
         List<ReportPointInfo> pointInfos = ejt.query(REPORT_INSTANCE_POINT_SELECT + "where reportInstanceId=?",
                 new Object[]{instanceId}, new RowMapper<ReportPointInfo>() {
+                    @Override
                     public ReportPointInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
                         ReportPointInfo rp = new ReportPointInfo();
                         rp.setReportPointId(rs.getInt(1));
@@ -508,6 +526,7 @@ public class ReportDao extends BaseDao {
             final int dataType = point.getDataType();
             ejt.query(REPORT_INSTANCE_DATA_SELECT + "where rd.reportInstancePointId=? order by rd.ts",
                     new Object[]{point.getReportPointId()}, new RowCallbackHandler() {
+                        @Override
                         public void processRow(ResultSet rs) throws SQLException {
                             switch (dataType) {
                                 case (DataTypes.NUMERIC):
@@ -559,6 +578,7 @@ public class ReportDao extends BaseDao {
                 new EventDao.EventInstanceRowMapper());
         // Add in the comments.
         ejt.query(EVENT_COMMENT_SELECT, new Object[]{instanceId, UserComment.TYPE_EVENT}, new RowCallbackHandler() {
+            @Override
             public void processRow(ResultSet rs) throws SQLException {
                 // Create the comment
                 UserComment c = new UserComment();

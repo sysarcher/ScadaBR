@@ -73,7 +73,7 @@ public class ReportWorkItem implements WorkItem {
         LOG.info("Queuing report with id " + report.getId());
 
         // Verify that the user is not disabled.
-        User user = new UserDao().getUser(report.getUserId());
+        User user = UserDao.getInstance().getUser(report.getUserId());
         if (user.isDisabled()) {
             return;
         }
@@ -86,7 +86,7 @@ public class ReportWorkItem implements WorkItem {
         ReportInstance reportInstance = new ReportInstance(report);
 
         item.user = user;
-        item.reportDao = new ReportDao();
+        item.reportDao = ReportDao.getInstance();
         item.reportDao.saveReportInstance(reportInstance);
 
         // Start the report work item out of process.
@@ -111,7 +111,7 @@ public class ReportWorkItem implements WorkItem {
         ResourceBundle bundle = Common.getBundle();
 
         // Create a list of DataPointVOs to which the user has permission.
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
         List<ReportDao.PointInfo> points = new ArrayList<>(reportConfig.getPoints().size());
         for (ReportPointVO reportPoint : reportConfig.getPoints()) {
             DataPointVO point = dataPointDao.getDataPoint(reportPoint.getPointId());
@@ -154,7 +154,7 @@ public class ReportWorkItem implements WorkItem {
             creator.createContent(reportInstance, reportDao, inlinePrefix, reportConfig.isIncludeData());
 
             // Create the to list
-            Set<String> addresses = new MailingListDao().getRecipientAddresses(reportConfig.getRecipients(),
+            Set<String> addresses = MailingListDao.getInstance().getRecipientAddresses(reportConfig.getRecipients(),
                     new DateTime(reportInstance.getReportStartTime()));
             String[] toAddrs = addresses.toArray(new String[0]);
 

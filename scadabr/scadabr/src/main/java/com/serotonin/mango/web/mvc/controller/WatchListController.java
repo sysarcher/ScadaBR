@@ -54,7 +54,7 @@ public class WatchListController extends ParameterizableViewController {
         User user = Common.getUser(request);
 
         // The user's permissions may have changed since the last session, so make sure the watch lists are correct.
-        WatchListDao watchListDao = new WatchListDao();
+        WatchListDao watchListDao = WatchListDao.getInstance();
         List<WatchList> watchLists = watchListDao.getWatchLists(user.getId());
 
         if (watchLists.isEmpty()) {
@@ -99,7 +99,7 @@ public class WatchListController extends ParameterizableViewController {
             // The list will always contain at least one, so just use the id of the first in the list.
             selected = watchLists.get(0).getId();
             user.setSelectedWatchList(selected);
-            new WatchListDao().saveSelectedWatchList(user.getId(), selected);
+            WatchListDao.getInstance().saveSelectedWatchList(user.getId(), selected);
         }
 
         model.put(KEY_WATCHLISTS, watchListNames);

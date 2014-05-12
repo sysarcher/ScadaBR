@@ -381,7 +381,7 @@ public class EventHandlerVO implements Serializable,
 
     public void validate(DwrResponseI18n response) {
         if (handlerType == TYPE_SET_POINT) {
-            DataPointVO dp = new DataPointDao().getDataPoint(targetPointId);
+            DataPointVO dp = DataPointDao.getInstance().getDataPoint(targetPointId);
 
             if (dp == null) {
                 response.addGeneric("eventHandlers.noTargetPoint");
@@ -413,8 +413,7 @@ public class EventHandlerVO implements Serializable,
                 }
 
                 if (activeAction == SET_ACTION_POINT_VALUE) {
-                    DataPointVO dpActive = new DataPointDao()
-                            .getDataPoint(activePointId);
+                    DataPointVO dpActive = DataPointDao.getInstance().getDataPoint(activePointId);
 
                     if (dpActive == null) {
                         response.addGeneric("eventHandlers.invalidActiveSource");
@@ -444,8 +443,7 @@ public class EventHandlerVO implements Serializable,
                 }
 
                 if (inactiveAction == SET_ACTION_POINT_VALUE) {
-                    DataPointVO dpInactive = new DataPointDao()
-                            .getDataPoint(inactivePointId);
+                    DataPointVO dpInactive = DataPointDao.getInstance().getDataPoint(inactivePointId);
 
                     if (dpInactive == null) {
                         response.addGeneric("eventHandlers.invalidInactiveSource");
@@ -487,7 +485,7 @@ public class EventHandlerVO implements Serializable,
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "eventHandlers.alias", alias);
         AuditEventType.addPropertyMessage(list, "eventHandlers.type",
@@ -560,7 +558,7 @@ public class EventHandlerVO implements Serializable,
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list,
             EventHandlerVO from) {
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.xid",
                 from.xid, xid);
         AuditEventType.maybeAddPropertyChangeMessage(list,
@@ -638,8 +636,8 @@ public class EventHandlerVO implements Serializable,
 
     private static LocalizableMessage createRecipientMessage(
             List<RecipientListEntryBean> recipients) {
-        MailingListDao mailingListDao = new MailingListDao();
-        UserDao userDao = new UserDao();
+        MailingListDao mailingListDao = MailingListDao.getInstance();
+        UserDao userDao = UserDao.getInstance();
         ArrayList<LocalizableMessage> params = new ArrayList<>();
         for (RecipientListEntryBean recip : recipients) {
             LocalizableMessage msg;
@@ -793,8 +791,8 @@ public class EventHandlerVO implements Serializable,
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        DataPointDao dataPointDao = new DataPointDao();
-        map.put("eventType", new EventDao().getEventHandlerType(id));
+        DataPointDao dataPointDao = DataPointDao.getInstance();
+        map.put("eventType", EventDao.getInstance().getEventHandlerType(id));
 
         map.put("xid", xid);
         map.put("handlerType", TYPE_CODES.getCode(handlerType));
@@ -855,7 +853,7 @@ public class EventHandlerVO implements Serializable,
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json)
             throws JsonException {
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
 
         String text = json.getString("handlerType");
         if (text != null) {

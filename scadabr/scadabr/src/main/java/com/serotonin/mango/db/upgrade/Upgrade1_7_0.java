@@ -18,37 +18,47 @@
  */
 package com.serotonin.mango.db.upgrade;
 
+import com.serotonin.mango.Common;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.serotonin.mango.db.DatabaseAccess;
+import javax.sql.DataSource;
 
 /**
  * @author Matthew Lohbihler
  */
 public class Upgrade1_7_0 extends DBUpgrade {
 
-    private final Log log = LogFactory.getLog(getClass());
 
+    private Upgrade1_7_0() {
+        super();
+    }
+    
+   @Deprecated
+    private Upgrade1_7_0(DataSource dataSource) {
+        super(dataSource);
+    }
+
+     public static Upgrade1_7_0 getInstance() {
+        return new Upgrade1_7_0(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     @Override
     public void upgrade() throws Exception {
-        OutputStream out = createUpdateLogOutputStream("1_7_0");
-
-        log.info("Running script 1");
-        runScript(script1, out);
-
-        log.info("Running script 2");
-        Map<String, String[]> script2 = new HashMap<String, String[]>();
-        script2.put(DatabaseAccess.DatabaseType.DERBY.name(), derbyScript2);
-        script2.put(DatabaseAccess.DatabaseType.MYSQL.name(), mysqlScript2);
-        runScript(script2, out);
-
-        out.flush();
-        out.close();
+        try (OutputStream out = createUpdateLogOutputStream("1_7_0")) {
+            LOG.info("Running script 1");
+            runScript(script1, out);
+            
+            LOG.info("Running script 2");
+            Map<String, String[]> script2 = new HashMap<String, String[]>();
+            script2.put(DatabaseAccess.DatabaseType.DERBY.name(), derbyScript2);
+            script2.put(DatabaseAccess.DatabaseType.MYSQL.name(), mysqlScript2);
+            runScript(script2, out);
+            
+            out.flush();
+        }
     }
 
     @Override

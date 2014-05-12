@@ -51,7 +51,9 @@ import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
 import java.util.Date;
 import java.util.Locale;
+import javax.inject.Named;
 
+@Named
 public class DataPointDetailsDwr extends BaseDwr {
 
     @MethodFilter
@@ -210,4 +212,5 @@ public class DataPointDetailsDwr extends BaseDwr {
     private void addAsof(DwrResponseI18n response) {
         response.addData("asof", new LocalizableMessageImpl("dsDetails.asof", new Date(System.currentTimeMillis())));
     }
+
 }

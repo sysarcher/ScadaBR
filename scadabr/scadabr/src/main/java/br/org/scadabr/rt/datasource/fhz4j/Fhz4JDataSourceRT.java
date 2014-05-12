@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
-import net.sf.fhz4j.Fhz1000;
 import net.sf.fhz4j.FhzDataListener;
 import net.sf.fhz4j.FhzParser;
 import net.sf.fhz4j.FhzProtocol;
@@ -53,6 +52,7 @@ import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.view.chart.ImageChartRenderer;
 import com.serotonin.mango.view.text.AnalogRenderer;
+import com.serotonin.mango.view.text.BinaryTextRenderer;
 import com.serotonin.mango.view.text.MultistateRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
@@ -306,6 +306,9 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
                 case FHT:
                     FhtPointLocator fhtLocator = (FhtPointLocator) locator.getProtocolLocator();
                     Map<FhtProperty, DataPointRT> fhtPropertyMap = fhtPoints.get(fhtLocator.getHousecode());
+                    if (fhtPropertyMap == null) {
+                        return;//TODO Whats going on here ???
+                    }
                     fhtPropertyMap.remove(fhtLocator.getProperty());
                     if (fhtPropertyMap.isEmpty()) {
                         fhtPoints.remove(fhtLocator.getHousecode());
@@ -442,19 +445,19 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
                 MultistateRenderer mr = new MultistateRenderer();
                 switch (fhtLocator.getProperty()) {
                     case MODE:
-                    mr.addMultistateValue(Fht80bModes.AUTO.getValue(), Fht80bModes.AUTO.getLabel(), Color.GREEN.darker());
-                    mr.addMultistateValue(Fht80bModes.MANUAL.getValue(), Fht80bModes.MANUAL.getLabel(), Color.BLACK);
-                    mr.addMultistateValue(Fht80bModes.HOLIDAY.getValue(), Fht80bModes.HOLIDAY.getLabel(), Color.RED);
-                    mr.addMultistateValue(Fht80bModes.PARTY.getValue(), Fht80bModes.PARTY.getLabel(), Color.RED);
+                        mr.addMultistateValue(Fht80bModes.AUTO.getValue(), Fht80bModes.AUTO.getLabel(), Color.GREEN.darker());
+                        mr.addMultistateValue(Fht80bModes.MANUAL.getValue(), Fht80bModes.MANUAL.getLabel(), Color.BLACK);
+                        mr.addMultistateValue(Fht80bModes.HOLIDAY.getValue(), Fht80bModes.HOLIDAY.getLabel(), Color.RED);
+                        mr.addMultistateValue(Fht80bModes.PARTY.getValue(), Fht80bModes.PARTY.getLabel(), Color.RED);
                         break;
-                    case WARNINGS: 
-                    mr.addMultistateValue(Fht80bWarnings.NONE.getValue(), Fht80bWarnings.NONE.getLabel(), Color.GREEN.darker());
-                    mr.addMultistateValue(Fht80bWarnings.BATT_LOW.getValue(), Fht80bWarnings.BATT_LOW.getLabel(), Color.RED);
+                    case WARNINGS:
+                        mr.addMultistateValue(Fht80bWarnings.NONE.getValue(), Fht80bWarnings.NONE.getLabel(), Color.GREEN.darker());
+                        mr.addMultistateValue(Fht80bWarnings.BATT_LOW.getValue(), Fht80bWarnings.BATT_LOW.getLabel(), Color.RED);
                         break;
                     default:
                 }
-                    dp.setTextRenderer(mr);
-                    dp.setChartRenderer(new ImageChartRenderer(Common.TimePeriods.DAYS, 1));
+                dp.setTextRenderer(mr);
+                dp.setChartRenderer(new ImageChartRenderer(Common.TimePeriods.DAYS, 1));
                 break;
             default:
         }
@@ -523,7 +526,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         dp.setXid(String.format("%04x-%s", emMessage.getAddress(), prop.getName()));
         dp.setDataSourceId(vo.getId());
         dp.setEnabled(true);
-        dp.setLoggingType(DataPointVO.LoggingTypes.ON_CHANGE);
+        dp.setLoggingType(DataPointVO.LoggingTypes.ALL);
         dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
 
         dp.setPointLocator(fhzLocator);
@@ -538,7 +541,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         if (dataPointRT != null) {
             updateValue(dataPointRT, emMessage, prop);
         }
-        LOG.log(Level.SEVERE, "HMS point added: {0}", dp.getXid());
+        LOG.log(Level.SEVERE, "Em point added: {0}", dp.getXid());
     }
 
     private Iterable<Short> getFhtDeviceHousecodes() {
@@ -614,7 +617,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
             returnToNormal(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis());
         } catch (Throwable t) {
             raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl("event.exception2", vo.getName(), t.getMessage()));
-            final LogRecord lr = new LogRecord(Level.SEVERE, "FHZ hms parsed: {0}");
+            final LogRecord lr = new LogRecord(Level.SEVERE, "FHZ fht parsed: {0}");
             lr.setParameters(new Object[]{fhtMessage});
             lr.setThrown(t);
             LOG.log(lr);
@@ -636,7 +639,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
             returnToNormal(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis());
         } catch (Throwable t) {
             raiseEvent(POINT_READ_EXCEPTION_EVENT, System.currentTimeMillis(), true, new LocalizableMessageImpl("event.exception2", vo.getName(), t.getMessage()));
-            final LogRecord lr = new LogRecord(Level.SEVERE, "FHZ hms parsed: {0}");
+            final LogRecord lr = new LogRecord(Level.SEVERE, "FHZ fht multi message parsed: {0}");
             lr.setParameters(new Object[]{fhtMultiMsgMessage});
             lr.setThrown(t);
             LOG.log(lr);
@@ -732,13 +735,18 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         dp.setXid(String.format("%04x-%s-%s", hmsMessage.getHousecode(), hmsMessage.getDeviceType().getName(), prop.getName()));
         dp.setDataSourceId(vo.getId());
         dp.setEnabled(true);
-        dp.setLoggingType(DataPointVO.LoggingTypes.ON_CHANGE);
+        dp.setLoggingType(DataPointVO.LoggingTypes.ALL);
         dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
 
         dp.setPointLocator(fhzLocator);
-        if (dp.getPointLocator().getDataTypeId() == DataTypes.NUMERIC) {
-            dp.setTextRenderer(new AnalogRenderer("#,##0.0", prop.getUnitOfMeasurement()));
-            dp.setChartRenderer(new ImageChartRenderer(Common.TimePeriods.DAYS, 1));
+        switch (dp.getPointLocator().getDataTypeId()) {
+            case DataTypes.NUMERIC:
+                dp.setTextRenderer(new AnalogRenderer("#,##0.0", prop.getUnitOfMeasurement()));
+                dp.setChartRenderer(new ImageChartRenderer(Common.TimePeriods.DAYS, 1));
+                break;
+            case DataTypes.BINARY:
+                dp.setTextRenderer(new BinaryTextRenderer("0", null, "1", null));
+            default:;
         }
 
         DataPointRT dataPointRT = Common.ctx.getRuntimeManager().saveDataPoint(dp);

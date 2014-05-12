@@ -62,6 +62,7 @@ import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.l10n.Localizer;
 import java.util.Locale;
 import java.util.Objects;
+import javax.inject.Inject;
 
 abstract public class BaseDwr {
 
@@ -69,11 +70,14 @@ abstract public class BaseDwr {
     public static final String MODEL_ATTR_HAS_UNACKED_EVENT = "hasUnacknowledgedEvent";
     public static final String MODEL_ATTR_RESOURCE_BUNDLE = "bundle";
 
-    protected static EventDao EVENT_DAO;
+    @Inject
+    protected EventDao eventDao;
+    @Inject
+    protected UserDao userDao;
+    @Inject
+    protected DataPointDao dataPointDao;
 
-    public static void initialize() {
-        EVENT_DAO = new EventDao();
-    }
+    public BaseDwr() {}
 
     protected ResourceBundle changeSnippetMap = ResourceBundle.getBundle("changeSnippetMap");
     protected ResourceBundle chartSnippetMap = ResourceBundle.getBundle("chartSnippetMap");
@@ -116,7 +120,7 @@ abstract public class BaseDwr {
         if (user != null) {
             userId = user.getId();
         }
-        List<EventInstance> events = EVENT_DAO.getPendingEventsForDataPoint(pointVO.getId(), userId);
+        List<EventInstance> events = eventDao.getPendingEventsForDataPoint(pointVO.getId(), userId);
         if (events != null) {
             model.put(MODEL_ATTR_EVENTS, events);
             for (EventInstance event : events) {
@@ -186,7 +190,7 @@ abstract public class BaseDwr {
     @MethodFilter
     public int setPoint(int pointId, int componentId, String valueStr) {
         User user = Common.getUser();
-        DataPointVO point = new DataPointDao().getDataPoint(pointId);
+        DataPointVO point = dataPointDao.getDataPoint(pointId);
 
         // Check permissions.
         Permissions.ensureDataPointSetPermission(user, point);
@@ -212,7 +216,7 @@ abstract public class BaseDwr {
     @MethodFilter
     public void forcePointRead(int pointId) {
         User user = Common.getUser();
-        DataPointVO point = new DataPointDao().getDataPoint(pointId);
+        DataPointVO point = dataPointDao.getDataPoint(pointId);
 
         // Check permissions.
         Permissions.ensureDataPointReadPermission(user, point);
@@ -240,9 +244,9 @@ abstract public class BaseDwr {
         c.setUsername(user.getUsername());
 
         if (typeId == UserComment.TYPE_EVENT) {
-            EVENT_DAO.insertEventComment(referenceId, c);
+            eventDao.insertEventComment(referenceId, c);
         } else if (typeId == UserComment.TYPE_POINT) {
-            new UserDao().insertUserComment(UserComment.TYPE_POINT, referenceId, c);
+            userDao.insertUserComment(UserComment.TYPE_POINT, referenceId, c);
         } else {
             throw new ShouldNeverHappenException("Invalid comment type: " + typeId);
         }
@@ -255,7 +259,7 @@ abstract public class BaseDwr {
     protected List<DataPointBean> getReadablePoints() {
         User user = Common.getUser();
 
-        List<DataPointVO> points = new DataPointDao().getDataPoints(DataPointExtendedNameComparator.instance, false);
+        List<DataPointVO> points = dataPointDao.getDataPoints(DataPointExtendedNameComparator.instance, false);
         if (!Permissions.hasAdmin(user)) {
             List<DataPointVO> userPoints = new ArrayList<>();
             for (DataPointVO dp : points) {
@@ -328,7 +332,7 @@ abstract public class BaseDwr {
 
     protected List<User> getShareUsers(User excludeUser) {
         List<User> users = new ArrayList<>();
-        for (User u : new UserDao().getUsers()) {
+        for (User u : userDao.getUsers()) {
             if (u.getId() != excludeUser.getId()) {
                 users.add(u);
             }
@@ -351,4 +355,47 @@ abstract public class BaseDwr {
         }
         return dt;
     }
+
+    /**
+     * @return the eventDao
+     */
+    public EventDao getEventDao() {
+        return eventDao;
+    }
+
+    /**
+     * @param eventDao the eventDao to set
+     */
+    public void setEventDao(EventDao eventDao) {
+        this.eventDao = eventDao;
+    }
+
+    /**
+     * @return the userDao
+     */
+    public UserDao getUserDao() {
+        return userDao;
+    }
+
+    /**
+     * @param userDao the userDao to set
+     */
+    public void setUserDao(UserDao userDao) {
+        this.userDao = userDao;
+    }
+
+    /**
+     * @return the dataPointDao
+     */
+    public DataPointDao getDataPointDao() {
+        return dataPointDao;
+    }
+
+    /**
+     * @param dataPointDao the dataPointDao to set
+     */
+    public void setDataPointDao(DataPointDao dataPointDao) {
+        this.dataPointDao = dataPointDao;
+    }
+    
 }

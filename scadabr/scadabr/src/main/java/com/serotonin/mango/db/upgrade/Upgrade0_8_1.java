@@ -18,28 +18,38 @@
  */
 package com.serotonin.mango.db.upgrade;
 
+import com.serotonin.mango.Common;
 import java.io.OutputStream;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.sql.DataSource;
 
 /**
  * @author Matthew Lohbihler
  */
 public class Upgrade0_8_1 extends DBUpgrade {
 
-    private static final Log log = LogFactory.getLog(Upgrade0_8_1.class);
+    public Upgrade0_8_1() {
+        super();
+    }
+    
+   @Deprecated
+    private Upgrade0_8_1(DataSource dataSource) {
+        super(dataSource);
+    }
 
+     public static Upgrade0_8_1 getInstance() {
+        return new Upgrade0_8_1(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     @Override
     public void upgrade() throws Exception {
-        OutputStream out = createUpdateLogOutputStream("0_8_1");
-
         // Run the script.
-        log.info("Running script");
-        runScript(script, out);
-
-        out.flush();
-        out.close();
+        try (OutputStream out = createUpdateLogOutputStream("0_8_1")) {
+            // Run the script.
+            LOG.info("Running script");
+            runScript(script, out);
+            
+            out.flush();
+        }
     }
 
     @Override

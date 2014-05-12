@@ -40,7 +40,7 @@ public class WebcamLiveFeedController extends ParameterizableViewController {
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         int pointId = Integer.parseInt(request.getParameter("pointId"));
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
         DataPointVO dp = dataPointDao.getDataPoint(pointId);
 
         if (!(dp.getPointLocator() instanceof HttpImagePointLocatorVO)) {

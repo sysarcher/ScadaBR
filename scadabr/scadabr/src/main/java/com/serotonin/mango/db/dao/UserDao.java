@@ -36,15 +36,32 @@ import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.vo.permission.DataPointAccess;
 import java.sql.Connection;
 import java.sql.Statement;
+import javax.inject.Named;
+import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 
+@Named
 public class UserDao extends BaseDao {
 
     private static final String USER_SELECT = "select id, username, password, email, phone, admin, disabled, selectedWatchList, homeUrl, lastLogin, "
             + "  receiveAlarmEmails, receiveOwnAuditEvents " + "from users ";
 
+    public UserDao() {
+        super();
+    }
+    
+   @Deprecated
+    private UserDao(DataSource dataSource) {
+        super(dataSource);
+    }
+
+   @Deprecated
+     public static UserDao getInstance() {
+        return new UserDao(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     public User getUser(int id) {
         try {
             User user = ejt.queryForObject(USER_SELECT + "where id=?", new UserRowMapper(), id);

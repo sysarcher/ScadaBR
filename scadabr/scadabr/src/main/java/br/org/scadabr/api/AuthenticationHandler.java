@@ -70,7 +70,7 @@ public class AuthenticationHandler extends BasicHandler {
             String username = Common.getEnvironmentString("api.username", "admin");
             String password = Common.getEnvironmentString("api.password", "admin");
 
-            User user = new UserDao().getUser(username);
+            User user = UserDao.getInstance().getUser(username);
             if (user == null) {
                 throw new AxisFault("Invalid Default Username!");
             }
@@ -88,7 +88,7 @@ public class AuthenticationHandler extends BasicHandler {
         String username = getUsername(hel);
         String password = getPassword(hel);
 
-        User user = new UserDao().getUser(username);
+        User user = UserDao.getInstance().getUser(username);
 
         if (user == null) {
             throw new AxisFault("Invalid Username!");

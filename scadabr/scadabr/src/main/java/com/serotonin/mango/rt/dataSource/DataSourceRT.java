@@ -126,7 +126,7 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
      * using the setPersistentData method.
      */
     public Object getPersistentData() {
-        return new DataSourceDao().getPersistentData(vo.getId());
+        return DataSourceDao.getInstance().getPersistentData(vo.getId());
     }
 
     /**
@@ -137,7 +137,7 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
      * failover purposes.
      */
     protected void setPersistentData(Object persistentData) {
-        new DataSourceDao().savePersistentData(vo.getId(), persistentData);
+        DataSourceDao.getInstance().savePersistentData(vo.getId(), persistentData);
     }
 
     /*

@@ -16,7 +16,7 @@ public class ScriptHandlerRT extends EventHandlerRT {
 
     @Override
     public void eventInactive(EventInstance evt) {
-        ScriptVO<?> script = new ScriptDao().getScript(vo
+        ScriptVO<?> script = ScriptDao.getInstance().getScript(vo
                 .getInactiveScriptCommand());
         if (script != null) {
             try {
@@ -29,8 +29,7 @@ public class ScriptHandlerRT extends EventHandlerRT {
 
     @Override
     public void eventRaised(EventInstance evt) {
-        ScriptVO<?> script = new ScriptDao().getScript(vo
-                .getActiveScriptCommand());
+        ScriptVO<?> script = ScriptDao.getInstance().getScript(vo.getActiveScriptCommand());
         if (script != null) {
             try {
                 script.createScriptRT().execute();

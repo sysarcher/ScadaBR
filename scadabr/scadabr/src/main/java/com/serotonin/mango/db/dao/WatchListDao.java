@@ -33,17 +33,33 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.WatchList;
 import java.sql.Connection;
 import java.sql.Statement;
+import javax.inject.Named;
+import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
  * @author Matthew Lohbihler
  */
+@Named
 public class WatchListDao extends BaseDao {
 
+    public WatchListDao() {
+        super();
+    }
+    
+   @Deprecated
+    private WatchListDao(DataSource dataSource) {
+        super(dataSource);
+    }
+
+   @Deprecated
+     public static WatchListDao getInstance() {
+        return new WatchListDao(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     public String generateUniqueXid() {
         return generateUniqueXid(WatchList.XID_PREFIX, "watchLists");
     }
@@ -94,7 +110,7 @@ public class WatchListDao extends BaseDao {
                 "select dataPointId from watchListPoints where watchListId=? order by sortOrder",
                 new Object[]{watchList.getId()}, Integer.class);
         List<DataPointVO> points = watchList.getPointList();
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
         for (Integer pointId : pointIds) {
             points.add(dataPointDao.getDataPoint(pointId));
         }
@@ -116,6 +132,7 @@ public class WatchListDao extends BaseDao {
 
     class WatchListRowMapper implements RowMapper<WatchList> {
 
+        @Override
         public WatchList mapRow(ResultSet rs, int rowNum) throws SQLException {
             WatchList wl = new WatchList();
             wl.setId(rs.getInt(1));

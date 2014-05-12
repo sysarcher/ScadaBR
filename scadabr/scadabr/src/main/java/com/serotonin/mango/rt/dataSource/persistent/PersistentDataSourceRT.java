@@ -181,8 +181,8 @@ public class PersistentDataSourceRT extends EventDataSource<PersistentDataSource
         private OutputStream out;
         int version = 3;
         private final ByteQueue writeBuffer = new ByteQueue();
-        private final List<String> indexedXids = new ArrayList<String>();
-        final PointValueDao pointValueDao = new PointValueDao();
+        private final List<String> indexedXids = new ArrayList<>();
+        final PointValueDao pointValueDao = PointValueDao.getInstance();
         private final long connectionTime;
         private long packetsReceived;
 
@@ -467,7 +467,7 @@ public class PersistentDataSourceRT extends EventDataSource<PersistentDataSource
             }
 
             // Doesn't exist in the RT list. Check if it exists at all.
-            DataPointVO oldDpvo = new DataPointDao().getDataPoint(xid);
+            DataPointVO oldDpvo = DataPointDao.getInstance().getDataPoint(xid);
 
             if (oldDpvo != null) {
                 // The point exists. Make sure it belongs to this data source.
@@ -513,7 +513,7 @@ public class PersistentDataSourceRT extends EventDataSource<PersistentDataSource
         private void updatePointHierarchy(String xid, List<String> path) {
             // Only update if we accept point updates.
             if (PersistentDataSourceRT.this.vo.isAcceptPointUpdates()) {
-                DataPointDao dataPointDao = new DataPointDao();
+                DataPointDao dataPointDao = DataPointDao.getInstance();
 
                 // Get the point vo.
                 DataPointRT dprt = pointXids.get(xid);

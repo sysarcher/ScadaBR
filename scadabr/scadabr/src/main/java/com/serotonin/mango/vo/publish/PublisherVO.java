@@ -271,7 +271,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
 
         if (xid.isEmpty()) {
             response.addContextual("xid", "validate.required");
-        } else if (!new PublisherDao().isXidUnique(xid, id)) {
+        } else if (!PublisherDao.getInstance().isXidUnique(xid, id)) {
             response.addContextual("xid", "validate.xidUsed");
         } else if (xid.length() > 50) {
             response.addContextual("xid", "validate.notLongerThan", 50);

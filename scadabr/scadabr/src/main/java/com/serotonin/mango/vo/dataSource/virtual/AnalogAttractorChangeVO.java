@@ -107,7 +107,7 @@ public class AnalogAttractorChangeVO extends ChangeTypeVO {
     }
 
     private String getAttractionPointName() {
-        DataPointVO dp = new DataPointDao().getDataPoint(attractionPointId);
+        DataPointVO dp = DataPointDao.getInstance().getDataPoint(attractionPointId);
         if (dp == null) {
             return "";
         }
@@ -145,7 +145,7 @@ public class AnalogAttractorChangeVO extends ChangeTypeVO {
         super.jsonDeserialize(reader, json);
         String text = json.getString("attractionPointId");
         if (text != null) {
-            DataPointVO dp = new DataPointDao().getDataPoint(text);
+            DataPointVO dp = DataPointDao.getInstance().getDataPoint(text);
             if (dp == null) {
                 throw new LocalizableJsonException("emport.error.attractor.missingPoint", "attractionPointId", text);
             }
@@ -156,7 +156,7 @@ public class AnalogAttractorChangeVO extends ChangeTypeVO {
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        DataPointVO dp = new DataPointDao().getDataPoint(attractionPointId);
+        DataPointVO dp = DataPointDao.getInstance().getDataPoint(attractionPointId);
         if (dp == null) {
             map.put("attractionPointId", null);
         } else {

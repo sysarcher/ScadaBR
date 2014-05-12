@@ -22,7 +22,6 @@ import java.io.Serializable;
 import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -36,23 +35,37 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.Objects;
+import javax.inject.Named;
+import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
  * @author Matthew Lohbihler
  */
+@Named
 public class PublisherDao extends BaseDao {
 
+    public PublisherDao() {
+        super();
+    }
+    
+   @Deprecated
+    private PublisherDao(DataSource dataSource) {
+        super(dataSource);
+    }
+
+   @Deprecated
+     public static PublisherDao getInstance() {
+        return new PublisherDao(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     public String generateUniqueXid() {
         return generateUniqueXid(PublisherVO.XID_PREFIX, "publishers");
     }

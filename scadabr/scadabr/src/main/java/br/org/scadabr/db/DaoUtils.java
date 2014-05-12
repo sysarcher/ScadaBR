@@ -1,7 +1,10 @@
 package br.org.scadabr.db;
 
+import com.serotonin.mango.db.DatabaseAccessFactory;
 import java.util.Collection;
 import java.util.List;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -12,15 +15,30 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Deprecated
 public class DaoUtils {
 
+    @Inject
+    protected DatabaseAccessFactory daf;
     protected DataSource dataSource;
     protected JdbcTemplate ejt;
     protected DataSourceTransactionManager tm;
 
-    public DaoUtils(DataSource dataSource) {
+    public DaoUtils() {
+        
+    }
+    
+    @Deprecated
+    protected DaoUtils(DataSource dataSource) {
         this.dataSource = dataSource;
-        ejt = new JdbcTemplate(dataSource);
+        init();
     }
 
+    @PostConstruct
+    public void init() {
+        if (dataSource == null) {
+            dataSource = daf.getDatabaseAccess().getDataSource();
+        }
+        ejt = new JdbcTemplate(dataSource);
+    }
+    
     protected String createDelimitedList(Collection<?> values, String delimeter) {
         final StringBuilder sb = new StringBuilder();
         boolean isFirst = true;

@@ -15,16 +15,31 @@ import com.serotonin.mango.db.dao.BaseDao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import javax.inject.Named;
+import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
+@Named
 public class FlexProjectDao extends BaseDao {
 
     private static final String FLEX_PROJECT_SELECT = "select id, name, description, xmlConfig from flexProjects ";
 
+    public FlexProjectDao() {
+        super();
+    }
+    
+   @Deprecated
+    private FlexProjectDao(DataSource dataSource) {
+        super(dataSource);
+    }
+
+     public static FlexProjectDao getInstance() {
+        return new FlexProjectDao(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     public int saveFlexProject(int id, String name, String description,
             String xmlConfig) {
         if (id == Common.NEW_ID) {

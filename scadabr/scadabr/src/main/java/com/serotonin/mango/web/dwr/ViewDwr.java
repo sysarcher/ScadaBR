@@ -49,7 +49,6 @@ import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.db.KeyValuePair;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.ViewDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -85,6 +84,8 @@ import com.serotonin.mango.web.dwr.beans.ViewComponentState;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.dwr.MethodFilter;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * This class is so not threadsafe. Do not use class fields except for the
@@ -92,8 +93,17 @@ import br.org.scadabr.web.dwr.MethodFilter;
  *
  * @author mlohbihler
  */
+@Named
 public class ViewDwr extends BaseDwr {
-	//
+    
+    @Inject
+    private ViewDao viewDao;
+    @Inject
+    private ScriptDao scriptDao;
+    @Inject
+    private FlexProjectDao flexProjectDao;
+
+    //
     //
     // /
     // / Anonymous views
@@ -129,7 +139,6 @@ public class ViewDwr extends BaseDwr {
 
     @MethodFilter
     public List<IntValuePair> getViews() {
-        ViewDao viewDao = new ViewDao();
         User user = Common.getUser();
 
         List<IntValuePair> views = viewDao.getViewNames(user.getId());
@@ -139,12 +148,12 @@ public class ViewDwr extends BaseDwr {
 
     @MethodFilter
     public List<ScriptVO<?>> getScripts() {
-        return new ScriptDao().getScripts();
+        return scriptDao.getScripts();
     }
 
     @MethodFilter
     public List<FlexProject> getFlexProjects() {
-        return new FlexProjectDao().getFlexProjects();
+        return flexProjectDao.getFlexProjects();
     }
 
     /**
@@ -381,7 +390,7 @@ public class ViewDwr extends BaseDwr {
     @MethodFilter
     public void deleteViewShare() {
         User user = Common.getUser();
-        new ViewDao().removeUserFromView(user.getView().getId(), user.getId());
+        viewDao.removeUserFromView(user.getView().getId(), user.getId());
     }
 
 	//
@@ -409,7 +418,7 @@ public class ViewDwr extends BaseDwr {
         result.put("componentTypes", components);
 
         // Available points
-        List<DataPointVO> allPoints = new DataPointDao().getDataPoints(
+        List<DataPointVO> allPoints = dataPointDao.getDataPoints(
                 DataPointExtendedNameComparator.instance, false);
         List<DataPointBean> availablePoints = new ArrayList<>();
         for (DataPointVO dataPoint : allPoints) {
@@ -455,7 +464,7 @@ public class ViewDwr extends BaseDwr {
         PointComponent pc = (PointComponent) getViewComponent(pointComponentId);
         User user = Common.getUser();
 
-        DataPointVO dp = new DataPointDao().getDataPoint(dataPointId);
+        DataPointVO dp = dataPointDao.getDataPoint(dataPointId);
         if (dp == null || !Permissions.hasDataPointReadPermission(user, dp)) {
             response.addContextual("settingsPointList", "validate.required");
         } else {
@@ -941,7 +950,7 @@ public class ViewDwr extends BaseDwr {
                 // no op
             }
 
-            DataPointVO dp = new DataPointDao().getDataPoint(dataPointId);
+            DataPointVO dp = dataPointDao.getDataPoint(dataPointId);
 
             if (dp == null || !Permissions.hasDataPointReadPermission(user, dp)) {
                 c.setDataPoint(kvp.getKey(), null);
@@ -981,7 +990,7 @@ public class ViewDwr extends BaseDwr {
     }
 
     public boolean executeScript(String xid) {
-        ScriptVO<?> script = new ScriptDao().getScript(xid);
+        ScriptVO<?> script = scriptDao.getScript(xid);
 
         try {
             if (script != null) {
@@ -1011,7 +1020,7 @@ public class ViewDwr extends BaseDwr {
 
             List<DataPointVO> dps = new ArrayList<>();
             for (Integer dpId : dataPoints) {
-                DataPointVO dp = new DataPointDao().getDataPoint(dpId);
+                DataPointVO dp = dataPointDao.getDataPoint(dpId);
                 dps.add(dp);
             }
 
@@ -1056,5 +1065,48 @@ public class ViewDwr extends BaseDwr {
 
         return htmlData.toString();
     }
+
+    /**
+     * @return the viewDao
+     */
+    public ViewDao getViewDao() {
+        return viewDao;
+    }
+
+    /**
+     * @param viewDao the viewDao to set
+     */
+    public void setViewDao(ViewDao viewDao) {
+        this.viewDao = viewDao;
+    }
+
+    /**
+     * @return the scriptDao
+     */
+    public ScriptDao getScriptDao() {
+        return scriptDao;
+    }
+
+    /**
+     * @param scriptDao the scriptDao to set
+     */
+    public void setScriptDao(ScriptDao scriptDao) {
+        this.scriptDao = scriptDao;
+    }
+
+    /**
+     * @return the flexProjectDao
+     */
+    public FlexProjectDao getFlexProjectDao() {
+        return flexProjectDao;
+    }
+
+    /**
+     * @param flexProjectDao the flexProjectDao to set
+     */
+    public void setFlexProjectDao(FlexProjectDao flexProjectDao) {
+        this.flexProjectDao = flexProjectDao;
+    }
+
 
 }

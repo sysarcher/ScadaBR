@@ -96,7 +96,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
             }
         }
 
-        return new PointValueDao().getPointValueBefore(vo.getId(), time);
+        return PointValueDao.getInstance().getPointValueBefore(vo.getId(), time);
     }
 
     public PointValueTime getPointValueAt(long time) {
@@ -106,12 +106,12 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
             }
         }
 
-        return new PointValueDao().getPointValueAt(vo.getId(), time);
+        return PointValueDao.getInstance().getPointValueAt(vo.getId(), time);
     }
 
     @Override
     public List<PointValueTime> getPointValues(long since) {
-        List<PointValueTime> result = new PointValueDao().getPointValues(vo.getId(), since);
+        List<PointValueTime> result = PointValueDao.getInstance().getPointValues(vo.getId(), since);
 
         for (PointValueTime pvt : valueCache.getCacheContents()) {
             if (pvt.getTime() >= since) {
@@ -127,7 +127,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
 
     @Override
     public List<PointValueTime> getPointValuesBetween(long from, long to) {
-        List<PointValueTime> result = new PointValueDao().getPointValuesBetween(vo.getId(), from, to);
+        List<PointValueTime> result = PointValueDao.getInstance().getPointValuesBetween(vo.getId(), from, to);
 
         for (PointValueTime pvt : valueCache.getCacheContents()) {
             if (pvt.getTime() >= from && pvt.getTime() < to) {

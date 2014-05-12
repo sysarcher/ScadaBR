@@ -144,7 +144,7 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO>, JsonSerializa
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "pointLinks.source", dataPointDao.getExtendedPointName(sourcePointId));
         AuditEventType.addPropertyMessage(list, "pointLinks.target", dataPointDao.getExtendedPointName(targetPointId));
@@ -155,7 +155,7 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO>, JsonSerializa
 
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, PointLinkVO from) {
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.xid", from.xid, xid);
         AuditEventType
                 .maybeAddPropertyChangeMessage(list, "pointLinks.source",
@@ -175,7 +175,7 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO>, JsonSerializa
     // Serialization
     //
     public void jsonSerialize(Map<String, Object> map) {
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
 
         map.put("xid", xid);
 
@@ -193,7 +193,7 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO>, JsonSerializa
     }
 
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
 
         String xid = json.getString("sourcePointId");
         if (xid != null) {

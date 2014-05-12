@@ -154,7 +154,7 @@ public class ImageChartServlet extends BaseInfoServlet {
                         data = pointValueFacade.getPointValuesBetween(from, to);
                     }
 
-                    DataPointVO dp = new DataPointDao().getDataPoint(dataPointId);
+                    DataPointVO dp = DataPointDao.getInstance().getDataPoint(dataPointId);
                     if (dp == null || dp.getName() == null) {
                     } else if (dp.getPointLocator().getDataTypeId() == DataTypes.NUMERIC) {
                         TimeSeries ts = new TimeSeries(dp.getName(), null, null, Second.class);

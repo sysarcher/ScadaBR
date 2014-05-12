@@ -31,7 +31,6 @@ import org.directwebremoting.WebContextFactory;
 import org.joda.time.DateTime;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.vo.User;
@@ -86,7 +85,6 @@ public class EventsDwr extends BaseDwr {
                     pastPeriodCount, pastPeriodType, fromNone, fromYear, fromMonth, fromDay, fromHour, fromMinute,
                     fromSecond, toNone, toYear, toMonth, toDay, toHour, toMinute, toSecond);
 
-            EventDao eventDao = new EventDao();
             List<EventInstance> results = eventDao.search(eventId, eventSourceType, status, alarmLevel,
                     getKeywords(keywordStr), dateRange.getL1(), dateRange.getL2(), user.getId(), getResourceBundle(), from,
                     to, date);
@@ -218,4 +216,5 @@ public class EventsDwr extends BaseDwr {
 
         return range;
     }
+
 }

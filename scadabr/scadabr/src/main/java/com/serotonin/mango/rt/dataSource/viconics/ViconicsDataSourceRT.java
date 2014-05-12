@@ -199,9 +199,9 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
             String folderName = watchListName + " - added " + sdf.format(new Date());
 
             // Get a list of all existing points.
-            DataPointDao dataPointDao = new DataPointDao();
-            UserDao userDao = new UserDao();
-            WatchListDao watchListDao = new WatchListDao();
+            DataPointDao dataPointDao = DataPointDao.getInstance();
+            UserDao userDao = UserDao.getInstance();
+            WatchListDao watchListDao = WatchListDao.getInstance();
             List<DataPointVO> points = dataPointDao.getDataPoints(vo.getId(), null);
 
             // Add a point for each address if it doesn't already exist.

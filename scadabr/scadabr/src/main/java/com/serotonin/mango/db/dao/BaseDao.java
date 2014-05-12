@@ -31,9 +31,10 @@ public class BaseDao extends DaoUtils {
      * Public constructor for code that needs to get stuff from the database.
      */
     public BaseDao() {
-        super(Common.ctx.getDatabaseAccess().getDataSource());
+        super();
     }
 
+    @Deprecated
     protected BaseDao(DataSource dataSource) {
         super(dataSource);
     }

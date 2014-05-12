@@ -37,8 +37,8 @@ public class ChartExportServlet extends HttpServlet {
             return;
         }
 
-        DataPointDao dataPointDao = new DataPointDao();
-        PointValueDao pointValueDao = new PointValueDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
+        PointValueDao pointValueDao = PointValueDao.getInstance();
 
         long from = def.getFrom() == null ? -1 : def.getFrom().getMillis();
         long to = def.getTo() == null ? System.currentTimeMillis() : def.getTo().getMillis();

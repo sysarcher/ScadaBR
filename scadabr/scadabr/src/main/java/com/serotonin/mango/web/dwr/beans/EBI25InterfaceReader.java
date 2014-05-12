@@ -83,7 +83,7 @@ public class EBI25InterfaceReader {
             dataSource.setHardwareVersion(hardwareVersion);
             dataSource.setFirmwareVersion(firmwareVersion);
 
-            dataPointDao = new DataPointDao();
+            dataPointDao = DataPointDao.getInstance();
             RuntimeManager rtm = Common.ctx.getRuntimeManager();
 
             // Get the list of existing data points for the data source. We remove points from this list as they are

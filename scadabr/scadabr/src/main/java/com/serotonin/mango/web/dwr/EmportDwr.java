@@ -59,6 +59,7 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.dwr.beans.ImportTask;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
+import javax.inject.Inject;
 
 /**
  * @author Matthew Lohbihler
@@ -82,6 +83,9 @@ public class EmportDwr extends BaseDwr {
     public static final String POINT_VALUES = "pointValues";
     public static final String SYSTEM_SETTINGS = "systemSettings";
 
+    @Inject
+    private DataSourceDao dataSourceDao;
+    
     public String createExportData(int prettyIndent, boolean graphicalViews,
             boolean eventHandlers, boolean dataSources, boolean dataPoints,
             boolean scheduledEvents, boolean compoundEventDetectors,
@@ -107,13 +111,13 @@ public class EmportDwr extends BaseDwr {
         Map<String, Object> data = new LinkedHashMap<>();
 
         if (graphicalViews) {
-            data.put(GRAPHICAL_VIEWS, new ViewDao().getViews());
+            data.put(GRAPHICAL_VIEWS, ViewDao.getInstance().getViews());
         }
         if (dataSources) {
-            data.put(DATA_SOURCES, new DataSourceDao().getDataSources());
+            data.put(DATA_SOURCES, DataSourceDao.getInstance().getDataSources());
         }
 
-        List<DataPointVO> allDataPoints = new DataPointDao().getDataPoints(
+        List<DataPointVO> allDataPoints = DataPointDao.getInstance().getDataPoints(
                 null, true);
 
         if (dataPoints) {
@@ -121,50 +125,49 @@ public class EmportDwr extends BaseDwr {
         }
         if (scheduledEvents) {
             data.put(SCHEDULED_EVENTS,
-                    new ScheduledEventDao().getScheduledEvents());
+                    ScheduledEventDao.getInstance().getScheduledEvents());
         }
         if (compoundEventDetectors) {
             data.put(COMPOUND_EVENT_DETECTORS,
-                    new CompoundEventDetectorDao().getCompoundEventDetectors());
+                    CompoundEventDetectorDao.getInstance().getCompoundEventDetectors());
         }
         if (pointLinks) {
-            data.put(POINT_LINKS, new PointLinkDao().getPointLinks());
+            data.put(POINT_LINKS, PointLinkDao.getInstance().getPointLinks());
         }
         if (users) {
-            data.put(USERS, new UserDao().getUsers());
+            data.put(USERS, UserDao.getInstance().getUsers());
         }
         if (mailingLists) {
-            data.put(MAILING_LISTS, new MailingListDao().getMailingLists());
+            data.put(MAILING_LISTS, MailingListDao.getInstance().getMailingLists());
         }
         if (publishers) {
-            data.put(PUBLISHERS, new PublisherDao().getPublishers());
+            data.put(PUBLISHERS, PublisherDao.getInstance().getPublishers());
         }
         if (pointHierarchy) {
-            data.put(POINT_HIERARCHY, new DataPointDao().getPointHierarchy()
+            data.put(POINT_HIERARCHY, DataPointDao.getInstance().getPointHierarchy()
                     .getRoot().getSubfolders());
         }
         if (eventHandlers) {
-            data.put(EVENT_HANDLERS, new EventDao().getEventHandlers());
+            data.put(EVENT_HANDLERS, EventDao.getInstance().getEventHandlers());
         }
         if (watchLists) {
-            WatchListDao watchListDao = new WatchListDao();
+            WatchListDao watchListDao = WatchListDao.getInstance();
             List<WatchList> wls = watchListDao.getWatchLists();
             watchListDao.populateWatchlistData(wls);
             data.put(WATCH_LISTS, wls);
         }
         if (maintenanceEvents) {
-            data.put(MAINTENANCE_EVENTS,
-                    new MaintenanceEventDao().getMaintenanceEvents());
+            data.put(MAINTENANCE_EVENTS, MaintenanceEventDao.getInstance().getMaintenanceEvents());
         }
 
         if (scripts) {
-            data.put(SCRIPTS, new ScriptDao().getScripts());
+            data.put(SCRIPTS, ScriptDao.getInstance().getScripts());
         }
         if (pointValues) {
             List<PointValueJSONWrapper> allWrappedValues = new ArrayList<>();
 
             long antes = System.currentTimeMillis();
-            PointValueDao dao = new PointValueDao();
+            PointValueDao dao = PointValueDao.getInstance();
             for (DataPointVO dataPointVO : allDataPoints) {
                 allWrappedValues.addAll(PointValueJSONWrapper.wrapPointValues(
                         dataPointVO.getXid(), dao.getLatestPointValues(
@@ -260,7 +263,7 @@ public class EmportDwr extends BaseDwr {
         try {
 
             stopRunningDataSources();
-            new SystemSettingsDao().resetDataBase();
+            SystemSettingsDao.getInstance().resetDataBase();
             importer.importProject();
         } catch (Exception e) {
             e.printStackTrace();
@@ -275,8 +278,7 @@ public class EmportDwr extends BaseDwr {
     }
 
     private void stopRunningDataSources() {
-        List<DataSourceVO<?>> dataSources = new DataSourceDao()
-                .getDataSources();
+        List<DataSourceVO<?>> dataSources = dataSourceDao.getDataSources();
 
         RuntimeManager rtm = Common.ctx.getRuntimeManager();
         for (DataSourceVO<?> dataSourceVO : dataSources) {
@@ -286,4 +288,19 @@ public class EmportDwr extends BaseDwr {
         }
 
     }
+
+    /**
+     * @return the dataSourceDao
+     */
+    public DataSourceDao getDataSourceDao() {
+        return dataSourceDao;
+    }
+
+    /**
+     * @param dataSourceDao the dataSourceDao to set
+     */
+    public void setDataSourceDao(DataSourceDao dataSourceDao) {
+        this.dataSourceDao = dataSourceDao;
+    }
+
 }

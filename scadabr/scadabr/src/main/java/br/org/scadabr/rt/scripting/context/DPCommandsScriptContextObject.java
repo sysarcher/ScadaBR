@@ -17,7 +17,7 @@ public class DPCommandsScriptContextObject extends ScriptContextObject {
     }
 
     public void writeDataPoint(String xid, String stringValue) {
-        DataPointVO dataPoint = new DataPointDao().getDataPoint(xid);
+        DataPointVO dataPoint = DataPointDao.getInstance().getDataPoint(xid);
         if (dataPoint != null) {
             Permissions.ensureDataPointSetPermission(user, dataPoint);
             RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
@@ -29,7 +29,7 @@ public class DPCommandsScriptContextObject extends ScriptContextObject {
     }
 
     public void enableDataPoint(String xid) {
-        DataPointVO dataPoint = new DataPointDao().getDataPoint(xid);
+        DataPointVO dataPoint = DataPointDao.getInstance().getDataPoint(xid);
         if (dataPoint != null) {
             Permissions.ensureDataPointReadPermission(user, dataPoint);
             RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
@@ -40,7 +40,7 @@ public class DPCommandsScriptContextObject extends ScriptContextObject {
     }
 
     public void disableDataPoint(String xid) {
-        DataPointVO dataPoint = new DataPointDao().getDataPoint(xid);
+        DataPointVO dataPoint = DataPointDao.getInstance().getDataPoint(xid);
         if (dataPoint != null) {
             Permissions.ensureDataPointReadPermission(user, dataPoint);
             RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();

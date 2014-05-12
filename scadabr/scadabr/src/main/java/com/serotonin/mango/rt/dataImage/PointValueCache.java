@@ -46,12 +46,12 @@ public class PointValueCache {
      * cache object. Further, since the cache object can be replaced from time
      * to time, always use a local copy of the variable for read purposes.
      */
-    private List<PointValueTime> cache = new ArrayList<PointValueTime>();
+    private List<PointValueTime> cache = new ArrayList<>();
 
     public PointValueCache(int dataPointId, int defaultSize) {
         this.dataPointId = dataPointId;
         this.defaultSize = defaultSize;
-        dao = new PointValueDao();
+        dao = PointValueDao.getInstance();
 
         if (defaultSize > 0) {
             refreshCache(defaultSize);

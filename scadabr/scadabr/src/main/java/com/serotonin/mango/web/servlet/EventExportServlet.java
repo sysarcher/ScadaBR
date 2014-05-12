@@ -32,7 +32,7 @@ public class EventExportServlet extends HttpServlet {
         }
 
         final ResourceBundle bundle = Common.getBundle();
-        List<EventInstance> events = new EventDao().search(def.getEventId(), def.getEventSourceType(), def.getStatus(),
+        List<EventInstance> events = EventDao.getInstance().search(def.getEventId(), def.getEventSourceType(), def.getStatus(),
                 def.getAlarmLevel(), def.getKeywords(), def.getDateFrom(), def.getDateTo(), user.getId(), bundle, 0,
                 Integer.MAX_VALUE, null);
 

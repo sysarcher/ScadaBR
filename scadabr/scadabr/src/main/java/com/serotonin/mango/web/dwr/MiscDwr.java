@@ -69,6 +69,7 @@ import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
 import java.util.Objects;
+import javax.inject.Inject;
 
 public class MiscDwr extends BaseDwr {
 
@@ -76,10 +77,16 @@ public class MiscDwr extends BaseDwr {
     private static final String LONG_POLL_DATA_KEY = "LONG_POLL_DATA";
     private static final String LONG_POLL_DATA_TIMEOUT_KEY = "LONG_POLL_DATA_TIMEOUT";
 
-    private final WatchListDwr watchListDwr = new WatchListDwr();
-    private final DataPointDetailsDwr dataPointDetailsDwr = new DataPointDetailsDwr();
-    private final ViewDwr viewDwr = new ViewDwr();
-    private final CustomViewDwr customViewDwr = new CustomViewDwr();
+    @Inject
+    protected WatchListDwr watchListDwr;
+    @Inject
+    protected DataPointDetailsDwr dataPointDetailsDwr;
+    @Inject
+    protected ViewDwr viewDwr;
+    @Inject
+    protected CustomViewDwr customViewDwr;
+    @Inject
+    private MailingListDao mailingListDao;
 
     public DwrResponseI18n toggleSilence(int eventId) {
         DwrResponseI18n response = new DwrResponseI18n();
@@ -87,7 +94,7 @@ public class MiscDwr extends BaseDwr {
 
         User user = Common.getUser();
         if (user != null) {
-            boolean result = new EventDao().toggleSilence(eventId, user.getId());
+            boolean result = eventDao.toggleSilence(eventId, user.getId());
             resetLastAlarmLevelChange();
             response.addData("silenced", result);
         } else {
@@ -101,7 +108,6 @@ public class MiscDwr extends BaseDwr {
     public DwrResponseI18n silenceAll() {
         List<Integer> silenced = new ArrayList<>();
         User user = Common.getUser();
-        EventDao eventDao = new EventDao();
         for (EventInstance evt : eventDao.getPendingEvents(user.getId())) {
             if (!evt.isSilenced()) {
                 eventDao.toggleSilence(evt.getId(), user.getId());
@@ -119,7 +125,7 @@ public class MiscDwr extends BaseDwr {
     public int acknowledgeEvent(int eventId) {
         User user = Common.getUser();
         if (user != null) {
-            new EventDao().ackEvent(eventId, System.currentTimeMillis(), user.getId(), 0);
+            eventDao.ackEvent(eventId, System.currentTimeMillis(), user.getId(), 0);
             resetLastAlarmLevelChange();
         }
         return eventId;
@@ -128,7 +134,6 @@ public class MiscDwr extends BaseDwr {
     public void acknowledgeAllPendingEvents() {
         User user = Common.getUser();
         if (user != null) {
-            EventDao eventDao = new EventDao();
             long now = System.currentTimeMillis();
             for (EventInstance evt : eventDao.getPendingEvents(user.getId())) {
                 eventDao.ackEvent(evt.getId(), now, user.getId(), 0);
@@ -200,7 +205,7 @@ public class MiscDwr extends BaseDwr {
     public DwrResponseI18n sendTestEmail(List<RecipientListEntryBean> recipientList, String prefix, String message) {
         DwrResponseI18n response = new DwrResponseI18n();
 
-        String[] toAddrs = new MailingListDao().getRecipientAddresses(recipientList, null).toArray(new String[0]);
+        String[] toAddrs = mailingListDao.getRecipientAddresses(recipientList, null).toArray(new String[0]);
         if (toAddrs.length == 0) {
             response.addGeneric("js.email.noRecipForEmail");
         } else {
@@ -258,7 +263,7 @@ public class MiscDwr extends BaseDwr {
         }
 
         // Save the result
-        new UserDao().saveHomeUrl(Common.getUser().getId(), url);
+        userDao.saveHomeUrl(Common.getUser().getId(), url);
     }
 
     @MethodFilter
@@ -286,7 +291,6 @@ public class MiscDwr extends BaseDwr {
         HttpServletRequest httpRequest = WebContextFactory.get().getHttpServletRequest();
         User user = Common.getUser(httpRequest);
         EventManager eventManager = Common.ctx.getEventManager();
-        EventDao eventDao = new EventDao();
 
         LongPollData data = getLongPollData(pollSessionId, false);
         data.updateTimestamp();
@@ -580,4 +584,75 @@ public class MiscDwr extends BaseDwr {
             }
         }
     }
+
+    /**
+     * @return the dataPointDetailsDwr
+     */
+    public DataPointDetailsDwr getDataPointDetailsDwr() {
+        return dataPointDetailsDwr;
+    }
+
+    /**
+     * @param dataPointDetailsDwr the dataPointDetailsDwr to set
+     */
+    public void setDataPointDetailsDwr(DataPointDetailsDwr dataPointDetailsDwr) {
+        this.dataPointDetailsDwr = dataPointDetailsDwr;
+    }
+
+    /**
+     * @return the viewDwr
+     */
+    public ViewDwr getViewDwr() {
+        return viewDwr;
+    }
+
+    /**
+     * @param viewDwr the viewDwr to set
+     */
+    public void setViewDwr(ViewDwr viewDwr) {
+        this.viewDwr = viewDwr;
+    }
+
+    /**
+     * @return the customViewDwr
+     */
+    public CustomViewDwr getCustomViewDwr() {
+        return customViewDwr;
+    }
+
+    /**
+     * @param customViewDwr the customViewDwr to set
+     */
+    public void setCustomViewDwr(CustomViewDwr customViewDwr) {
+        this.customViewDwr = customViewDwr;
+    }
+
+    /**
+     * @return the watchListDwr
+     */
+    public WatchListDwr getWatchListDwr() {
+        return watchListDwr;
+    }
+
+    /**
+     * @param watchListDwr the watchListDwr to set
+     */
+    public void setWatchListDwr(WatchListDwr watchListDwr) {
+        this.watchListDwr = watchListDwr;
+    }
+
+    /**
+     * @return the mailingListDao
+     */
+    public MailingListDao getMailingListDao() {
+        return mailingListDao;
+    }
+
+    /**
+     * @param mailingListDao the mailingListDao to set
+     */
+    public void setMailingListDao(MailingListDao mailingListDao) {
+        this.mailingListDao = mailingListDao;
+    }
+
 }

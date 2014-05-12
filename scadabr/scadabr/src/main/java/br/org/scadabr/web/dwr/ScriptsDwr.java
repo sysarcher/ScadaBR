@@ -13,29 +13,33 @@ import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.web.dwr.BaseDwr;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
+import javax.inject.Inject;
 
 public class ScriptsDwr extends BaseDwr {
+    
+    @Inject
+    private ScriptDao scriptDao;
+    
 
     public List<DataPointVO> getPoints() {
-        List<DataPointVO> allPoints = new DataPointDao().getDataPoints(
+        List<DataPointVO> allPoints = DataPointDao.getInstance().getDataPoints(
                 DataPointExtendedNameComparator.instance, false);
         return allPoints;
     }
 
     public List<ScriptVO<?>> getScripts() {
-        List<ScriptVO<?>> scripts = new ScriptDao().getScripts();
+        List<ScriptVO<?>> scripts = scriptDao.getScripts();
         return scripts;
     }
 
     public ScriptVO<?> getScript(int id) {
         if (id == Common.NEW_ID) {
             ContextualizedScriptVO vo = new ContextualizedScriptVO();
-            vo.setXid(new ScriptDao().generateUniqueXid());
+            vo.setXid(scriptDao.generateUniqueXid());
             return vo;
         }
 
-        return new ScriptDao().getScript(id);
+        return scriptDao.getScript(id);
     }
 
     public DwrResponseI18n saveScript(int id, String xid, String name,
@@ -56,7 +60,7 @@ public class ScriptsDwr extends BaseDwr {
         vo.validate(response);
 
         if (response.isEmpty()) {
-            new ScriptDao().saveScript(vo);
+            scriptDao.saveScript(vo);
         }
 
         response.addData("seId", vo.getId());
@@ -64,11 +68,11 @@ public class ScriptsDwr extends BaseDwr {
     }
 
     public void deleteScript(int scriptId) {
-        new ScriptDao().deleteScript(scriptId);
+        scriptDao.deleteScript(scriptId);
     }
 
     public boolean executeScript(int scriptId) {
-        ScriptVO<?> script = new ScriptDao().getScript(scriptId);
+        ScriptVO<?> script = scriptDao.getScript(scriptId);
 
         try {
             if (script != null) {
@@ -82,4 +86,19 @@ public class ScriptsDwr extends BaseDwr {
 
         return false;
     }
+
+    /**
+     * @return the scriptDao
+     */
+    public ScriptDao getScriptDao() {
+        return scriptDao;
+    }
+
+    /**
+     * @param scriptDao the scriptDao to set
+     */
+    public void setScriptDao(ScriptDao scriptDao) {
+        this.scriptDao = scriptDao;
+    }
+
 }

@@ -32,7 +32,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.MailingListDao;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.maint.work.EmailWorkItem;
 import com.serotonin.mango.vo.mailingList.EmailRecipient;
 import com.serotonin.mango.vo.mailingList.MailingList;
@@ -41,15 +40,19 @@ import com.serotonin.mango.web.email.MangoEmailContent;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
+import javax.inject.Inject;
 
 public class MailingListsDwr extends BaseDwr {
 
     private final Log log = LogFactory.getLog(MailingListsDwr.class);
 
+    @Inject
+    private MailingListDao mailingListDao;
+    
     public DwrResponseI18n init() {
         DwrResponseI18n response = new DwrResponseI18n();
-        response.addData("lists", new MailingListDao().getMailingLists());
-        response.addData("users", new UserDao().getUsers());
+        response.addData("lists", mailingListDao.getMailingLists());
+        response.addData("users", userDao.getUsers());
         return response;
     }
 
@@ -57,17 +60,16 @@ public class MailingListsDwr extends BaseDwr {
         if (id == Common.NEW_ID) {
             MailingList ml = new MailingList();
             ml.setId(Common.NEW_ID);
-            ml.setXid(new MailingListDao().generateUniqueXid());
+            ml.setXid(mailingListDao.generateUniqueXid());
             ml.setEntries(new LinkedList<EmailRecipient>());
             return ml;
         }
-        return new MailingListDao().getMailingList(id);
+        return mailingListDao.getMailingList(id);
     }
 
     public DwrResponseI18n saveMailingList(int id, String xid, String name, List<RecipientListEntryBean> entryBeans,
             List<Integer> inactiveIntervals) {
         DwrResponseI18n response = new DwrResponseI18n();
-        MailingListDao mailingListDao = new MailingListDao();
 
         // Validate the given information. If there is a problem, return an appropriate error message.
         MailingList ml = createMailingList(id, xid, name, entryBeans);
@@ -91,14 +93,14 @@ public class MailingListsDwr extends BaseDwr {
     }
 
     public void deleteMailingList(int mlId) {
-        new MailingListDao().deleteMailingList(mlId);
+        mailingListDao.deleteMailingList(mlId);
     }
 
     public DwrResponseI18n sendTestEmail(int id, String name, List<RecipientListEntryBean> entryBeans) {
         DwrResponseI18n response = new DwrResponseI18n();
 
         MailingList ml = createMailingList(id, null, name, entryBeans);
-        new MailingListDao().populateEntrySubclasses(ml.getEntries());
+        mailingListDao.populateEntrySubclasses(ml.getEntries());
 
         Set<String> addresses = new HashSet<>();
         ml.appendAddresses(addresses, null);
@@ -138,4 +140,19 @@ public class MailingListsDwr extends BaseDwr {
 
         return ml;
     }
+
+    /**
+     * @return the mailingListDao
+     */
+    public MailingListDao getMailingListDao() {
+        return mailingListDao;
+    }
+
+    /**
+     * @param mailingListDao the mailingListDao to set
+     */
+    public void setMailingListDao(MailingListDao mailingListDao) {
+        this.mailingListDao = mailingListDao;
+    }
+
 }

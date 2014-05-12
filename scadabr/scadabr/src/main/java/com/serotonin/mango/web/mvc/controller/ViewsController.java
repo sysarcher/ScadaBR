@@ -41,8 +41,8 @@ public class ViewsController extends ParameterizableViewController {
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
-        Map<String, Object> model = new HashMap<String, Object>();
-        ViewDao viewDao = new ViewDao();
+        Map<String, Object> model = new HashMap<>();
+        ViewDao viewDao = ViewDao.getInstance();
         User user = Common.getUser(request);
 
         List<IntValuePair> views = viewDao.getViewNames(user.getId());

@@ -57,19 +57,27 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.Tuple;
 import java.sql.Connection;
 import java.sql.Statement;
+import javax.inject.Named;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 
+@Named
 public class DataPointDao extends BaseDao {
 
     public DataPointDao() {
         super();
     }
 
-    public DataPointDao(DataSource dataSource) {
+    @Deprecated
+    protected DataPointDao(DataSource dataSource) {
         super(dataSource);
+    }
+
+    @Deprecated
+    public static DataPointDao getInstance() {
+        return new DataPointDao(Common.ctx.getDatabaseAccess().getDataSource());
     }
 
     //
@@ -162,7 +170,7 @@ public class DataPointDao extends BaseDao {
             // The spinwave changes were not correctly implemented, so we need to handle potential errors here.
             if (dp.getPointLocator() == null) {
                 // Use the data source tpe id to determine what type of locator is needed.
-                dp.setPointLocator(new DataSourceDao().getDataSource(dp.getDataSourceId()).createPointLocator());
+                dp.setPointLocator(DataSourceDao.getInstance().getDataSource(dp.getDataSourceId()).createPointLocator());
             }
 
             return dp;
@@ -229,11 +237,11 @@ public class DataPointDao extends BaseDao {
     void updateDataPoint(final DataPointVO dp) {
         DataPointVO old = getDataPoint(dp.getId());
 
-        if (old.getPointLocator().getDataTypeId() != dp.getPointLocator().getDataTypeId()) // Delete any point values where data type doesn't match the vo, just in case the data type was changed.
-        // Only do this if the data type has actually changed because it is just really slow if the database is
-        // big or busy.
-        {
-            new PointValueDao().deletePointValuesWithMismatchedType(dp.getId(), dp.getPointLocator().getDataTypeId());
+        if (old.getPointLocator().getDataTypeId() != dp.getPointLocator().getDataTypeId()) {
+            // Delete any point values where data type doesn't match the vo, just in case the data type was changed.
+            // Only do this if the data type has actually changed because it is just really slow if the database is
+            // big or busy.
+            PointValueDao.getInstance().deletePointValuesWithMismatchedType(dp.getId(), dp.getPointLocator().getDataTypeId());
         }
 
         // Save the VO information.
@@ -302,7 +310,7 @@ public class DataPointDao extends BaseDao {
     }
 
     private void beforePointDelete(int dataPointId) {
-        for (PointLinkVO link : new PointLinkDao().getPointLinksForPoint(dataPointId)) {
+        for (PointLinkVO link : PointLinkDao.getInstance().getPointLinksForPoint(dataPointId)) {
             Common.ctx.getRuntimeManager().deletePointLink(link.getId());
         }
     }
@@ -680,11 +688,11 @@ public class DataPointDao extends BaseDao {
 
         return counts;
     }
-    
+
     public void addPointToHierarchy(DataPointVO dp, String... pathToPoint) {
         PointHierarchy ph = getPointHierarchy();
         PointFolder pf = ph.getRoot();
-        for (String folderName: pathToPoint) {
+        for (String folderName : pathToPoint) {
             boolean folderFound = false;
             for (PointFolder subFolder : pf.getSubfolders()) {
                 if (subFolder.getName().equals(folderName)) {
