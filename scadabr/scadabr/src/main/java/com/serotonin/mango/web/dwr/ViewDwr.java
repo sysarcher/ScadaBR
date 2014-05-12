@@ -175,7 +175,6 @@ public class ViewDwr extends BaseDwr {
         HttpServletRequest request = webContext.getHttpServletRequest();
         List<ViewComponentState> states = new ArrayList<>();
         Map<String, Object> model = new HashMap<>();
-        RuntimeManager rtm = Common.ctx.getRuntimeManager();
 
         for (ViewComponent viewComponent : view.getViewComponents()) {
             if (viewComponent.isCompoundComponent()
@@ -187,8 +186,7 @@ public class ViewDwr extends BaseDwr {
                 // Add states for each of the children
                 for (CompoundChild child : compoundComponent
                         .getChildComponents()) {
-                    addPointComponentState(child.getViewComponent(), rtm,
-                            model, request, view, user, states, edit,
+                    addPointComponentState(child.getViewComponent(), model, request, view, user, states, edit,
                             !imageChart);
                 }
 
@@ -238,10 +236,10 @@ public class ViewDwr extends BaseDwr {
                 // }
                 states.add(state);
             } else if (viewComponent.isPointComponent()) {
-                addPointComponentState(viewComponent, rtm, model, request,
+                addPointComponentState(viewComponent, model, request,
                         view, user, states, edit, true);
             } else if (viewComponent.isCustomComponent()) {
-                addCustomComponentState(viewComponent, rtm, model, request,
+                addCustomComponentState(viewComponent, model, request,
                         view, user, states, edit, true);
             }
         }
@@ -249,8 +247,7 @@ public class ViewDwr extends BaseDwr {
         return states;
     }
 
-    private void addPointComponentState(ViewComponent viewComponent,
-            RuntimeManager rtm, Map<String, Object> model,
+    private void addPointComponentState(ViewComponent viewComponent, Map<String, Object> model,
             HttpServletRequest request, View view, User user,
             List<ViewComponentState> states, boolean edit, boolean add) {
 
@@ -260,8 +257,7 @@ public class ViewDwr extends BaseDwr {
 
             DataPointRT dataPointRT = null;
             if (pointComponent.tgetDataPoint() != null) {
-                dataPointRT = rtm.getDataPoint(pointComponent.tgetDataPoint()
-                        .getId());
+                dataPointRT = runtimeManager.getDataPoint(pointComponent.tgetDataPoint().getId());
             }
 
             ViewComponentState state = preparePointComponentState(
@@ -329,8 +325,7 @@ public class ViewDwr extends BaseDwr {
         return state;
     }
 
-    private void addCustomComponentState(ViewComponent viewComponent,
-            RuntimeManager rtm, Map<String, Object> model,
+    private void addCustomComponentState(ViewComponent viewComponent, Map<String, Object> model,
             HttpServletRequest request, View view, User user,
             List<ViewComponentState> states, boolean edit, boolean add) {
 

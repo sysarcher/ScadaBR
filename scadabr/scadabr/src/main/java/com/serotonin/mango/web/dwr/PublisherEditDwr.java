@@ -49,7 +49,7 @@ public class PublisherEditDwr extends BaseDwr {
 
         p.validate(response);
         if (response.isEmpty()) {
-            Common.ctx.getRuntimeManager().savePublisher(p);
+            runtimeManager.savePublisher(p);
             response.addData("id", p.getId());
         }
 
@@ -175,7 +175,7 @@ public class PublisherEditDwr extends BaseDwr {
 
     public DwrResponseI18n getPersistentSenderStatus() {
         PersistentSenderVO p = (PersistentSenderVO) Common.getUser().getEditPublisher();
-        PersistentSenderRT rt = (PersistentSenderRT) Common.ctx.getRuntimeManager().getRunningPublisher(p.getId());
+        PersistentSenderRT rt = (PersistentSenderRT) runtimeManager.getRunningPublisher(p.getId());
 
         DwrResponseI18n response = new DwrResponseI18n();
         if (rt == null) {
@@ -205,7 +205,7 @@ public class PublisherEditDwr extends BaseDwr {
 
     public DwrResponseI18n startPersistentSync() {
         PersistentSenderVO p = (PersistentSenderVO) Common.getUser().getEditPublisher();
-        PersistentSenderRT rt = (PersistentSenderRT) Common.ctx.getRuntimeManager().getRunningPublisher(p.getId());
+        PersistentSenderRT rt = (PersistentSenderRT) runtimeManager.getRunningPublisher(p.getId());
 
         DwrResponseI18n response = new DwrResponseI18n();
         if (rt == null) {

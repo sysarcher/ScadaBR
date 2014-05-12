@@ -38,7 +38,6 @@ import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.timer.CronTimerPool;
 import br.org.scadabr.timer.cron.CronExpression;
-import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.ReportDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
@@ -91,6 +90,9 @@ public class MangoContextListener implements ServletContextListener {
     private SystemSettingsDao systemSettingsDao;
     @Inject
     private DatabaseAccessFactory databaseAccessFactory;
+    @Inject
+    private RuntimeManager runtimeManager;
+    
     
     @Override
     public void contextInitialized(ServletContextEvent evt) {
@@ -400,6 +402,7 @@ public class MangoContextListener implements ServletContextListener {
     //
     // Event manager
     //
+    @Deprecated
     private void eventManagerInitialize(ServletContext ctx) {
         EventManager em = new EventManager();
         ctx.setAttribute(Common.ContextKeys.EVENT_MANAGER, em);
@@ -419,8 +422,7 @@ public class MangoContextListener implements ServletContextListener {
     // Runtime manager
     //
     private void runtimeManagerInitialize(ServletContext ctx) {
-        RuntimeManager rtm = new RuntimeManager();
-        ctx.setAttribute(Common.ContextKeys.RUNTIME_MANAGER, rtm);
+        ctx.setAttribute(Common.ContextKeys.RUNTIME_MANAGER, runtimeManager);
 
         File safeFile = null;
         // Check for safe mode.
@@ -458,7 +460,7 @@ public class MangoContextListener implements ServletContextListener {
             if (safe) {
                 BackgroundContext.set("common.safeMode");
             }
-            rtm.initialize(safe);
+            runtimeManager.initialize(safe);
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "RuntimeManager initialization failure", e);
         } finally {

@@ -47,7 +47,7 @@ public class CustomViewDwr extends BaseDwr {
 
         HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
         List<CustomComponentState> states = new ArrayList<>();
-        RuntimeManager rtm = Common.ctx.getRuntimeManager();
+        RuntimeManager rtm = runtimeManager;
 
         for (CustomViewComponent comp : view.getComponents()) {
             states.add(comp.createState(rtm, request));

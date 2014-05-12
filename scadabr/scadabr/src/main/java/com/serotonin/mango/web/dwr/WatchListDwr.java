@@ -123,14 +123,12 @@ public class WatchListDwr extends BaseDwr {
         HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
         User user = Common.getUser(request);
 
-        RuntimeManager rtm = Common.ctx.getRuntimeManager();
-
         WatchListState state;
         List<WatchListState> states = new ArrayList<>(watchList.getPointList().size());
         Map<String, Object> model = new HashMap<>();
         for (DataPointVO point : watchList.getPointList()) {
             // Create the watch list state.
-            state = createWatchListState(request, point, rtm, model, user);
+            state = createWatchListState(request, point, model, user);
             states.add(state);
         }
 
@@ -233,9 +231,7 @@ public class WatchListDwr extends BaseDwr {
         updateSetPermission(point, watchList.getUserAccess(user), getUserDao().getUser(watchList.getUserId()));
 
         // Return the watch list state for it.
-        return createWatchListState(request, point,
-                Common.ctx.getRuntimeManager(), new HashMap<String, Object>(),
-                user);
+        return createWatchListState(request, point, new HashMap<String, Object>(), user);
     }
 
     public void removeFromWatchList(int pointId) {
@@ -294,10 +290,10 @@ public class WatchListDwr extends BaseDwr {
      * Convenience method for creating a populated view state.
      */
     private WatchListState createWatchListState(HttpServletRequest request,
-            DataPointVO pointVO, RuntimeManager rtm, Map<String, Object> model,
+            DataPointVO pointVO, Map<String, Object> model,
             User user) {
         // Get the data point status from the data image.
-        DataPointRT point = rtm.getDataPoint(pointVO.getId());
+        DataPointRT point = runtimeManager.getDataPoint(pointVO.getId());
 
         WatchListState state = new WatchListState();
         state.setId(Integer.toString(pointVO.getId()));

@@ -129,12 +129,11 @@ public class DataPointEditDwr extends BaseDwr {
     //
     public long purgeNow(int purgeType, int purgePeriod, boolean allData) {
         DataPointVO point = getDataPoint();
-        RuntimeManager rm = Common.ctx.getRuntimeManager();
         Long count;
         if (allData) {
-            count = rm.purgeDataPointValues(point.getId());
+            count = runtimeManager.purgeDataPointValues(point.getId());
         } else {
-            count = rm.purgeDataPointValues(point.getId(), purgeType, purgePeriod);
+            count = runtimeManager.purgeDataPointValues(point.getId(), purgeType, purgePeriod);
         }
         return count;
     }
@@ -144,7 +143,7 @@ public class DataPointEditDwr extends BaseDwr {
     //
     public void clearPointCache() {
         DataPointVO point = getDataPoint();
-        DataPointRT rt = Common.ctx.getRuntimeManager().getDataPoint(point.getId());
+        DataPointRT rt = runtimeManager.getDataPoint(point.getId());
         if (rt != null) {
             rt.resetValues();
         }

@@ -135,7 +135,7 @@ public class CompoundEventsDwr extends BaseDwr {
 
         // Save it
         if (response.isEmpty()) {
-            boolean success = Common.ctx.getRuntimeManager().saveCompoundEventDetector(ced);
+            boolean success = getRuntimeManager().saveCompoundEventDetector(ced);
 
             if (!success) {
                 response.addData("warning", new LocalizableMessageImpl("compoundDetectors.validation.initError"));
@@ -149,7 +149,7 @@ public class CompoundEventsDwr extends BaseDwr {
     public void deleteCompoundEvent(int cedId) {
         Permissions.ensureDataSourcePermission(Common.getUser());
         compoundEventDetectorDao.deleteCompoundEventDetector(cedId);
-        Common.ctx.getRuntimeManager().stopCompoundEventDetector(cedId);
+        runtimeManager.stopCompoundEventDetector(cedId);
     }
 
     public DwrResponseI18n validateCondition(String condition) {

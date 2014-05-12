@@ -64,7 +64,6 @@ public class DataSourceListDwr extends BaseDwr {
     public Map<String, Object> toggleDataSource(int dataSourceId) {
         Permissions.ensureDataSourcePermission(Common.getUser(), dataSourceId);
 
-        RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
         DataSourceVO<?> dataSource = runtimeManager.getDataSource(dataSourceId);
         Map<String, Object> result = new HashMap<>();
 
@@ -78,7 +77,7 @@ public class DataSourceListDwr extends BaseDwr {
 
     public int deleteDataSource(int dataSourceId) {
         Permissions.ensureDataSourcePermission(Common.getUser(), dataSourceId);
-        Common.ctx.getRuntimeManager().deleteDataSource(dataSourceId);
+        runtimeManager.deleteDataSource(dataSourceId);
         return dataSourceId;
     }
 
@@ -86,7 +85,6 @@ public class DataSourceListDwr extends BaseDwr {
         DataPointVO dataPoint = dataPointDao.getDataPoint(dataPointId);
         Permissions.ensureDataSourcePermission(Common.getUser(), dataPoint.getDataSourceId());
 
-        RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
         dataPoint.setEnabled(!dataPoint.isEnabled());
         runtimeManager.saveDataPoint(dataPoint);
 

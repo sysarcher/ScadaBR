@@ -280,10 +280,9 @@ public class EmportDwr extends BaseDwr {
     private void stopRunningDataSources() {
         List<DataSourceVO<?>> dataSources = dataSourceDao.getDataSources();
 
-        RuntimeManager rtm = Common.ctx.getRuntimeManager();
         for (DataSourceVO<?> dataSourceVO : dataSources) {
             if (dataSourceVO.isEnabled()) {
-                rtm.stopDataSource(dataSourceVO.getId());
+                runtimeManager.stopDataSource(dataSourceVO.getId());
             }
         }
 

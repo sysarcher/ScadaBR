@@ -374,7 +374,7 @@ public class SystemSettingsDwr extends BaseDwr {
     @MethodFilter
     public LocalizableMessage purgeAllData() {
         Permissions.ensureAdmin();
-        long cnt = Common.ctx.getRuntimeManager().purgeDataPointValues();
+        long cnt = runtimeManager.purgeDataPointValues();
         return new LocalizableMessageImpl("systemSettings.purgeDataComplete", cnt);
     }
 

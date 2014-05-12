@@ -255,7 +255,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         ds.validate(response);
 
         if (response.isEmpty()) {
-            Common.ctx.getRuntimeManager().saveDataSource(ds);
+            runtimeManager.saveDataSource(ds);
             response.addData("id", ds.getId());
         }
 
@@ -286,7 +286,6 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                 Permissions.ensureDataSourcePermission(Common.getUser(),
                         dataPointVO.getDataSourceId());
 
-                RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
                 dataPointVO.setEnabled(true);
                 runtimeManager.saveDataPoint(dataPointVO);
             }
@@ -363,7 +362,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         locator.validate(response);
 
         if (response.isEmpty()) {
-            Common.ctx.getRuntimeManager().saveDataPoint(dp);
+            runtimeManager.saveDataPoint(dp);
             response.addData("id", dp.getId());
             response.addData("points", getPoints());
         }
@@ -375,7 +374,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     public List<DataPointVO> deletePoint(int id) {
         DataPointVO dp = getPoint(id, null);
         if (dp != null) {
-            Common.ctx.getRuntimeManager().deleteDataPoint(dp);
+            runtimeManager.deleteDataPoint(dp);
         }
 
         return getPoints();
@@ -1064,8 +1063,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             // Check for an RT that already has a network.
             OneWireDataSourceVO ds = (OneWireDataSourceVO) Common.getUser()
                     .getEditDataSource();
-            OneWireDataSourceRT rt = (OneWireDataSourceRT) Common.ctx
-                    .getRuntimeManager().getRunningDataSource(ds.getId());
+            OneWireDataSourceRT rt = (OneWireDataSourceRT) runtimeManager.getRunningDataSource(ds.getId());
             if (rt != null) // Use the existing one if it exists (i.e. initialized properly)
             {
                 network = rt.getNetwork();
@@ -1737,8 +1735,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         ViconicsDataSourceVO ds = (ViconicsDataSourceVO) Common.getUser()
                 .getEditDataSource();
 
-        ViconicsDataSourceRT rt = (ViconicsDataSourceRT) Common.ctx
-                .getRuntimeManager().getRunningDataSource(ds.getId());
+        ViconicsDataSourceRT rt = (ViconicsDataSourceRT) runtimeManager.getRunningDataSource(ds.getId());
         DwrResponseI18n response = new DwrResponseI18n();
 
         if (rt == null) {
@@ -2194,7 +2191,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             locators[i].validate(response);
 
             if (response.isEmpty()) {
-                Common.ctx.getRuntimeManager().saveDataPoint(dp);
+                runtimeManager.saveDataPoint(dp);
                 response.addData("id", dp.getId());
                 response.addData("points", getPoints());
             }
@@ -2324,7 +2321,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
             // locators[i].validate(response);
             if (response.isEmpty()) {
-                Common.ctx.getRuntimeManager().saveDataPoint(dp);
+                runtimeManager.saveDataPoint(dp);
                 response.addData("id", dp.getId());
                 response.addData("points", getPoints());
             }
