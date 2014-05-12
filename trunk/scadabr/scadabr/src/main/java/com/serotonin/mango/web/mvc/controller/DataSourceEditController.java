@@ -64,10 +64,10 @@ public class DataSourceEditController extends ParameterizableViewController {
                 // A new data source
                 dataSourceVO = DataSourceVO.createDataSourceVO(typeId);
                 dataSourceVO.setId(Common.NEW_ID);
-                dataSourceVO.setXid(new DataSourceDao().generateUniqueXid());
+                dataSourceVO.setXid(DataSourceDao.getInstance().generateUniqueXid());
             } else {
                 int pid = Integer.parseInt(pidStr);
-                DataPointVO dp = new DataPointDao().getDataPoint(pid);
+                DataPointVO dp = DataPointDao.getInstance().getDataPoint(pid);
                 if (dp == null) {
                     throw new ShouldNeverHappenException("DataPoint not found with id " + pid);
                 }
@@ -90,7 +90,7 @@ public class DataSourceEditController extends ParameterizableViewController {
         user.setEditDataSource(dataSourceVO);
 
         // Create the model.
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
 
         // The data source
         model.put("dataSource", dataSourceVO);
@@ -102,9 +102,9 @@ public class DataSourceEditController extends ParameterizableViewController {
             model.put("commPortError", e.getMessage());
         }
 
-        List<DataPointVO> allPoints = new DataPointDao().getDataPoints(DataPointExtendedNameComparator.instance, false);
-        List<DataPointVO> userPoints = new LinkedList<DataPointVO>();
-        List<DataPointVO> analogPoints = new LinkedList<DataPointVO>();
+        List<DataPointVO> allPoints = DataPointDao.getInstance().getDataPoints(DataPointExtendedNameComparator.instance, false);
+        List<DataPointVO> userPoints = new LinkedList<>();
+        List<DataPointVO> analogPoints = new LinkedList<>();
         for (DataPointVO dp : allPoints) {
             if (Permissions.hasDataPointReadPermission(user, dp)) {
                 userPoints.add(dp);

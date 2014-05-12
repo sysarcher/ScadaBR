@@ -75,7 +75,7 @@ public class ShareUser implements JsonSerializable {
         if (text == null) {
             throw new LocalizableJsonException("emport.error.viewShare.missing", "user");
         }
-        User user = new UserDao().getUser(text);
+        User user = UserDao.getInstance().getUser(text);
         if (user == null) {
             throw new LocalizableJsonException("emport.error.missingUser", text);
         }
@@ -95,7 +95,7 @@ public class ShareUser implements JsonSerializable {
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        map.put("user", new UserDao().getUser(userId).getUsername());
+        map.put("user", UserDao.getInstance().getUser(userId).getUsername());
         map.put("accessType", ACCESS_CODES.getCode(accessType));
     }
 }

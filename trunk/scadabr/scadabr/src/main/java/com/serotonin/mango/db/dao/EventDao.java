@@ -63,16 +63,33 @@ import br.org.scadabr.web.i18n.LocalizableMessageParseException;
 import br.org.scadabr.web.l10n.Localizer;
 import java.sql.Connection;
 import java.sql.Statement;
+import javax.inject.Named;
+import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.support.TransactionCallback;
 
+@Named
 public class EventDao extends BaseDao {
 
     private static final int MAX_PENDING_EVENTS = 100;
 
+    public EventDao() {
+        super();
+    }
+    
+   @Deprecated
+    private EventDao(DataSource dataSource) {
+        super(dataSource);
+    }
+
+   @Deprecated
+     public static EventDao getInstance() {
+        return new EventDao(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     public void saveEvent(EventInstance event) {
         if (event.getId() == Common.NEW_ID) {
             insertEvent(event);
@@ -400,7 +417,7 @@ public class EventDao extends BaseDao {
     }
 
     public EventInstance insertEventComment(int eventId, UserComment comment) {
-        new UserDao().insertUserComment(UserComment.TYPE_EVENT, eventId,
+        UserDao.getInstance().insertUserComment(UserComment.TYPE_EVENT, eventId,
                 comment);
         return getEventInstance(eventId);
     }

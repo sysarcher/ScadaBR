@@ -36,8 +36,8 @@ public class ContextualizedScriptVO extends ScriptVO<ContextualizedScriptVO>
         return TYPE;
     }
 
-    private List<IntValuePair> pointsOnContext = new ArrayList<IntValuePair>();
-    private List<IntValuePair> objectsOnContext = new ArrayList<IntValuePair>();
+    private List<IntValuePair> pointsOnContext = new ArrayList<>();
+    private List<IntValuePair> objectsOnContext = new ArrayList<>();
 
 	//
     // /
@@ -111,7 +111,7 @@ public class ContextualizedScriptVO extends ScriptVO<ContextualizedScriptVO>
         JsonArray jsonContext = json.getJsonArray("pointsOnContext");
         if (jsonContext != null) {
             pointsOnContext.clear();
-            DataPointDao dataPointDao = new DataPointDao();
+            DataPointDao dataPointDao = DataPointDao.getInstance();
 
             for (JsonValue jv : jsonContext.getElements()) {
                 JsonObject jo = jv.toJsonObject();
@@ -168,11 +168,11 @@ public class ContextualizedScriptVO extends ScriptVO<ContextualizedScriptVO>
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        List<Map<String, Object>> pointList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> pointList = new ArrayList<>();
         for (IntValuePair p : pointsOnContext) {
-            DataPointVO dp = new DataPointDao().getDataPoint(p.getKey());
+            DataPointVO dp = DataPointDao.getInstance().getDataPoint(p.getKey());
             if (dp != null) {
-                Map<String, Object> point = new HashMap<String, Object>();
+                Map<String, Object> point = new HashMap<>();
                 pointList.add(point);
                 point.put("varName", p.getValue());
                 point.put("dataPointXid", dp.getXid());
@@ -180,9 +180,9 @@ public class ContextualizedScriptVO extends ScriptVO<ContextualizedScriptVO>
         }
         map.put("pointsOnContext", pointList);
 
-        List<Map<String, Object>> objectsList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> objectsList = new ArrayList<>();
         for (IntValuePair p : objectsOnContext) {
-            Map<String, Object> point = new HashMap<String, Object>();
+            Map<String, Object> point = new HashMap<>();
             objectsList.add(point);
             point.put("varName", p.getValue());
             point.put("objectId", p.getKey());

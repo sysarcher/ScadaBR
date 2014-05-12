@@ -30,9 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.directwebremoting.WebContextFactory;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.maint.work.EmailWorkItem;
 import com.serotonin.mango.vo.DataPointNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
@@ -42,33 +40,33 @@ import com.serotonin.mango.vo.permission.DataPointAccess;
 import com.serotonin.mango.vo.permission.PermissionException;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.email.MangoEmailContent;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
 import freemarker.template.TemplateException;
 import java.io.IOException;
+import javax.inject.Inject;
 import javax.mail.internet.AddressException;
 
 public class UsersDwr extends BaseDwr {
 
+    @Inject
+    private DataSourceDao dataSourceDao;
+    
     public Map<String, Object> getInitData() {
-        Map<String, Object> initData = new HashMap<String, Object>();
+        Map<String, Object> initData = new HashMap<>();
 
         User user = Common.getUser();
         if (Permissions.hasAdmin(user)) {
             // Users
             initData.put("admin", true);
-            initData.put("users", new UserDao().getUsers());
+            initData.put("users", userDao.getUsers());
 
             // Data sources
-            List<DataSourceVO<?>> dataSourceVOs = new DataSourceDao().getDataSources();
+            List<DataSourceVO<?>> dataSourceVOs = dataSourceDao.getDataSources();
             List<Map<String, Object>> dataSources = new ArrayList<>(dataSourceVOs.size());
             Map<String, Object> ds, dp;
             List<Map<String, Object>> points;
-            DataPointDao dataPointDao = new DataPointDao();
             for (DataSourceVO<?> dsvo : dataSourceVOs) {
                 ds = new HashMap<>();
                 ds.put("id", dsvo.getId());
@@ -100,7 +98,7 @@ public class UsersDwr extends BaseDwr {
             user.setDataPointPermissions(new ArrayList<DataPointAccess>(0));
             return user;
         }
-        return new UserDao().getUser(id);
+        return userDao.getUser(id);
     }
 
     public DwrResponseI18n saveUserAdmin(int id, String username, String password, String email, String phone,
@@ -111,7 +109,6 @@ public class UsersDwr extends BaseDwr {
         // Validate the given information. If there is a problem, return an appropriate error message.
         HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
         User currentUser = Common.getUser(request);
-        UserDao userDao = new UserDao();
 
         User user;
         if (id == Common.NEW_ID) {
@@ -175,7 +172,6 @@ public class UsersDwr extends BaseDwr {
             throw new PermissionException("Cannot update a different user", user);
         }
 
-        UserDao userDao = new UserDao();
         User updateUser = userDao.getUser(id);
         if (!password.isEmpty()) {
             updateUser.setPassword(Common.encrypt(password));
@@ -223,9 +219,24 @@ public class UsersDwr extends BaseDwr {
         {
             response.addGeneric("users.validate.badDelete");
         } else {
-            new UserDao().deleteUser(id);
+            userDao.deleteUser(id);
         }
 
         return response;
     }
+
+    /**
+     * @return the dataSourceDao
+     */
+    public DataSourceDao getDataSourceDao() {
+        return dataSourceDao;
+    }
+
+    /**
+     * @param dataSourceDao the dataSourceDao to set
+     */
+    public void setDataSourceDao(DataSourceDao dataSourceDao) {
+        this.dataSourceDao = dataSourceDao;
+    }
+
 }

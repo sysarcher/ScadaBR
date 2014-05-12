@@ -22,7 +22,7 @@ public class SystemSettingsJSONWrapper implements JsonSerializable {
 
         Set<Entry<String, Object>> defaultValues = SystemSettingsDao.DEFAULT_VALUES
                 .entrySet();
-        SystemSettingsDao dao = new SystemSettingsDao();
+        SystemSettingsDao dao = SystemSettingsDao.getInstance();
 
         for (Entry<String, Object> entry : defaultValues) {
             if (entry.getValue() instanceof Integer) {
@@ -42,7 +42,7 @@ public class SystemSettingsJSONWrapper implements JsonSerializable {
 
         Set<Entry<String, Object>> defaultValues = SystemSettingsDao.DEFAULT_VALUES
                 .entrySet();
-        SystemSettingsDao dao = new SystemSettingsDao();
+        SystemSettingsDao dao = SystemSettingsDao.getInstance();
 
         for (Entry<String, Object> entry : defaultValues) {
             String key = entry.getKey();

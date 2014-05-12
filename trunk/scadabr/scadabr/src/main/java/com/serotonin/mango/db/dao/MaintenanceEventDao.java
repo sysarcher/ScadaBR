@@ -15,12 +15,14 @@ import com.serotonin.mango.vo.event.MaintenanceEventVO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import javax.inject.Named;
+import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
+@Named
 public class MaintenanceEventDao extends BaseDao {
 
     private static final String MAINTENANCE_EVENT_SELECT = //
@@ -30,6 +32,20 @@ public class MaintenanceEventDao extends BaseDao {
             + "  m.inactiveMinute, m.inactiveSecond, m.inactiveCron, d.dataSourceType, d.name, d.xid " //
             + "from maintenanceEvents m join dataSources d on m.dataSourceId=d.id ";
 
+    public MaintenanceEventDao() {
+        super();
+    }
+    
+   @Deprecated
+    private MaintenanceEventDao(DataSource dataSource) {
+        super(dataSource);
+    }
+
+   @Deprecated
+     public static MaintenanceEventDao getInstance() {
+        return new MaintenanceEventDao(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     public String generateUniqueXid() {
         return generateUniqueXid(MaintenanceEventVO.XID_PREFIX, "maintenanceEvents");
     }

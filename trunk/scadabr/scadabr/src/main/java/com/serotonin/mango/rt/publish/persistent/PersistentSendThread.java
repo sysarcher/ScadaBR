@@ -420,7 +420,7 @@ class PersistentSendThread extends SendThread {
         Common.systemCronPool.execute(new SystemRunnable() {
             @Override
             public void run() {
-                writePointHierarchy(new DataPointDao().getPointHierarchy());
+                writePointHierarchy(DataPointDao.getInstance().getPointHierarchy());
             }
         });
     }

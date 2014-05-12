@@ -85,19 +85,19 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
     private final ResourceBundle bundle;
     private final User user;
     private final DwrResponseI18n response;
-    private final UserDao userDao = new UserDao();
-    private final DataSourceDao dataSourceDao = new DataSourceDao();
-    private final DataPointDao dataPointDao = new DataPointDao();
-    private final ViewDao viewDao = new ViewDao();
-    private final PointLinkDao pointLinkDao = new PointLinkDao();
-    private final ScheduledEventDao scheduledEventDao = new ScheduledEventDao();
-    private final CompoundEventDetectorDao compoundEventDetectorDao = new CompoundEventDetectorDao();
-    private final EventDao eventDao = new EventDao();
-    private final MailingListDao mailingListDao = new MailingListDao();
-    private final PublisherDao publisherDao = new PublisherDao();
-    private final WatchListDao watchListDao = new WatchListDao();
-    private final MaintenanceEventDao maintenanceEventDao = new MaintenanceEventDao();
-    private final ScriptDao scriptDao = new ScriptDao();
+    private final UserDao userDao = UserDao.getInstance();
+    private final DataSourceDao dataSourceDao = DataSourceDao.getInstance();
+    private final DataPointDao dataPointDao = DataPointDao.getInstance();
+    private final ViewDao viewDao = ViewDao.getInstance();
+    private final PointLinkDao pointLinkDao = PointLinkDao.getInstance();
+    private final ScheduledEventDao scheduledEventDao = ScheduledEventDao.getInstance();
+    private final CompoundEventDetectorDao compoundEventDetectorDao = CompoundEventDetectorDao.getInstance();
+    private final EventDao eventDao = EventDao.getInstance();
+    private final MailingListDao mailingListDao = MailingListDao.getInstance();
+    private final PublisherDao publisherDao = PublisherDao.getInstance();
+    private final WatchListDao watchListDao = WatchListDao.getInstance();
+    private final MaintenanceEventDao maintenanceEventDao = MaintenanceEventDao.getInstance();
+    private final ScriptDao scriptDao = ScriptDao.getInstance();
 
     private final List<JsonValue> users;
     private int userIndexPass1;
@@ -922,13 +922,13 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
 
     private void importPointValues(JsonObject json) {
         String pointXid = json.getString("pointXid");
-        DataPointVO dp = new DataPointDao().getDataPoint(pointXid);
+        DataPointVO dp = DataPointDao.getInstance().getDataPoint(pointXid);
         if (dp == null) {
             response.addGeneric("emport.script.xid");
         } else {
             long time = json.getLong("timestamp");
             String value = json.getString("value");
-            PointValueDao dao = new PointValueDao();
+            PointValueDao dao = PointValueDao.getInstance();
             PointValueTime pointValue = new PointValueTime(
                     MangoValue.stringToValue(value, dp.getPointLocator()
                             .getDataTypeId()), time);

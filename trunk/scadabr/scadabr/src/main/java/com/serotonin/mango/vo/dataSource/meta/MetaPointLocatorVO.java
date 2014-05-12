@@ -252,7 +252,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     private String contextToString() {
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (IntValuePair ivp : context) {
@@ -355,7 +355,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         JsonArray jsonContext = json.getJsonArray("context");
         if (jsonContext != null) {
             context.clear();
-            DataPointDao dataPointDao = new DataPointDao();
+            DataPointDao dataPointDao = DataPointDao.getInstance();
 
             for (JsonValue jv : jsonContext.getElements()) {
                 JsonObject jo = jv.toJsonObject();
@@ -385,7 +385,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
         map.put("updateEvent", UPDATE_EVENT_CODES.getCode(updateEvent));
 
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
         List<Map<String, Object>> pointList = new ArrayList<>();
         for (IntValuePair p : context) {
             DataPointVO dp = dataPointDao.getDataPoint(p.getKey());

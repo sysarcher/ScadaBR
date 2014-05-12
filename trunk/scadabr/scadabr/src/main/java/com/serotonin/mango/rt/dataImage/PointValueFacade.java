@@ -35,7 +35,7 @@ public class PointValueFacade {
     public PointValueFacade(int dataPointId) {
         this.dataPointId = dataPointId;
         point = Common.ctx.getRuntimeManager().getDataPoint(dataPointId);
-        pointValueDao = new PointValueDao();
+        pointValueDao = PointValueDao.getInstance();
     }
 
     public List<PointValueTime> getPointValues(long since) {

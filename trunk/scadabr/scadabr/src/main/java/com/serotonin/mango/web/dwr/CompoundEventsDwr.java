@@ -25,7 +25,6 @@ import java.util.Map;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.ScheduledEventDao;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
@@ -38,12 +37,18 @@ import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.dwr.beans.EventSourceBean;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import javax.inject.Inject;
 
 /**
  * @author Matthew Lohbihler
  */
 public class CompoundEventsDwr extends BaseDwr {
 
+    
+    @Inject
+    private CompoundEventDetectorDao compoundEventDetectorDao;
+    @Inject
+    private ScheduledEventDao scheduledEventDao;
     //
     // /
     // / Public methods
@@ -56,12 +61,12 @@ public class CompoundEventsDwr extends BaseDwr {
         Map<String, Object> model = new HashMap<>();
 
         // All existing compound events.
-        model.put("compoundEvents", new CompoundEventDetectorDao().getCompoundEventDetectors());
+        model.put("compoundEvents", compoundEventDetectorDao.getCompoundEventDetectors());
 
         // Get the data points
         List<EventSourceBean> dataPoints = new LinkedList<>();
         EventSourceBean source;
-        for (DataPointVO dp : new DataPointDao().getDataPoints(DataPointExtendedNameComparator.instance, true)) {
+        for (DataPointVO dp : dataPointDao.getDataPoints(DataPointExtendedNameComparator.instance, true)) {
             if (!Permissions.hasDataSourcePermission(user, dp.getDataSourceId())) {
                 continue;
             }
@@ -83,7 +88,7 @@ public class CompoundEventsDwr extends BaseDwr {
 
         // Get the scheduled events
         List<EventTypeVO> scheduledEvents = new LinkedList<>();
-        List<ScheduledEventVO> ses = new ScheduledEventDao().getScheduledEvents();
+        List<ScheduledEventVO> ses = scheduledEventDao.getScheduledEvents();
         for (ScheduledEventVO se : ses) {
             scheduledEvents.add(se.getEventType());
         }
@@ -97,10 +102,10 @@ public class CompoundEventsDwr extends BaseDwr {
 
         if (id == Common.NEW_ID) {
             CompoundEventDetectorVO vo = new CompoundEventDetectorVO();
-            vo.setXid(new CompoundEventDetectorDao().generateUniqueXid());
+            vo.setXid(compoundEventDetectorDao.generateUniqueXid());
             return vo;
         }
-        return new CompoundEventDetectorDao().getCompoundEventDetector(id);
+        return compoundEventDetectorDao.getCompoundEventDetector(id);
     }
 
     public DwrResponseI18n saveCompoundEvent(int id, String xid, String name, int alarmLevel, boolean returnToNormal,
@@ -119,8 +124,6 @@ public class CompoundEventsDwr extends BaseDwr {
 
         // Check that condition is ok.
         DwrResponseI18n response = new DwrResponseI18n();
-
-        CompoundEventDetectorDao compoundEventDetectorDao = new CompoundEventDetectorDao();
 
         if (xid.isEmpty()) {
             response.addContextual("xid", "validate.required");
@@ -145,7 +148,7 @@ public class CompoundEventsDwr extends BaseDwr {
 
     public void deleteCompoundEvent(int cedId) {
         Permissions.ensureDataSourcePermission(Common.getUser());
-        new CompoundEventDetectorDao().deleteCompoundEventDetector(cedId);
+        compoundEventDetectorDao.deleteCompoundEventDetector(cedId);
         Common.ctx.getRuntimeManager().stopCompoundEventDetector(cedId);
     }
 
@@ -154,4 +157,33 @@ public class CompoundEventsDwr extends BaseDwr {
         CompoundEventDetectorVO.validate(condition, response);
         return response;
     }
+
+    /**
+     * @return the compoundEventDetectorDao
+     */
+    public CompoundEventDetectorDao getCompoundEventDetectorDao() {
+        return compoundEventDetectorDao;
+    }
+
+    /**
+     * @param compoundEventDetectorDao the compoundEventDetectorDao to set
+     */
+    public void setCompoundEventDetectorDao(CompoundEventDetectorDao compoundEventDetectorDao) {
+        this.compoundEventDetectorDao = compoundEventDetectorDao;
+    }
+
+    /**
+     * @return the scheduledEventDao
+     */
+    public ScheduledEventDao getScheduledEventDao() {
+        return scheduledEventDao;
+    }
+
+    /**
+     * @param scheduledEventDao the scheduledEventDao to set
+     */
+    public void setScheduledEventDao(ScheduledEventDao scheduledEventDao) {
+        this.scheduledEventDao = scheduledEventDao;
+    }
+
 }

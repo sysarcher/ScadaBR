@@ -27,6 +27,7 @@ import com.serotonin.mango.db.dao.ScheduledEventDao;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
+import javax.inject.Inject;
 
 /**
  * @author Matthew Lohbihler
@@ -34,6 +35,9 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
  */
 public class ScheduledEventsDwr extends BaseDwr {
 
+    
+    @Inject
+    private ScheduledEventDao scheduledEventDao;
     //
     // /
     // / Public methods
@@ -41,7 +45,7 @@ public class ScheduledEventsDwr extends BaseDwr {
     //
     public List<ScheduledEventVO> getScheduledEvents() {
         Permissions.ensureDataSourcePermission(Common.getUser());
-        return new ScheduledEventDao().getScheduledEvents();
+        return scheduledEventDao.getScheduledEvents();
     }
 
     public ScheduledEventVO getScheduledEvent(int id) {
@@ -50,14 +54,14 @@ public class ScheduledEventsDwr extends BaseDwr {
         if (id == Common.NEW_ID) {
             DateTime dt = new DateTime();
             ScheduledEventVO se = new ScheduledEventVO();
-            se.setXid(new ScheduledEventDao().generateUniqueXid());
+            se.setXid(scheduledEventDao.generateUniqueXid());
             se.setActiveYear(dt.getYear());
             se.setInactiveYear(dt.getYear());
             se.setActiveMonth(dt.getMonthOfYear());
             se.setInactiveMonth(dt.getMonthOfYear());
             return se;
         }
-        return new ScheduledEventDao().getScheduledEvent(id);
+        return scheduledEventDao.getScheduledEvent(id);
     }
 
     public DwrResponseI18n saveScheduledEvent(int id, String xid, String alias, int alarmLevel, int scheduleType,
@@ -91,7 +95,6 @@ public class ScheduledEventsDwr extends BaseDwr {
         se.setInactiveCron(inactiveCron);
 
         DwrResponseI18n response = new DwrResponseI18n();
-        ScheduledEventDao scheduledEventDao = new ScheduledEventDao();
 
         if (xid.isEmpty()) {
             response.addContextual("xid", "validate.required");
@@ -112,7 +115,22 @@ public class ScheduledEventsDwr extends BaseDwr {
 
     public void deleteScheduledEvent(int seId) {
         Permissions.ensureDataSourcePermission(Common.getUser());
-        new ScheduledEventDao().deleteScheduledEvent(seId);
+        scheduledEventDao.deleteScheduledEvent(seId);
         Common.ctx.getRuntimeManager().stopSimpleEventDetector(ScheduledEventVO.getEventDetectorKey(seId));
     }
+
+    /**
+     * @return the scheduledEventDao
+     */
+    public ScheduledEventDao getScheduledEventDao() {
+        return scheduledEventDao;
+    }
+
+    /**
+     * @param scheduledEventDao the scheduledEventDao to set
+     */
+    public void setScheduledEventDao(ScheduledEventDao scheduledEventDao) {
+        this.scheduledEventDao = scheduledEventDao;
+    }
+
 }

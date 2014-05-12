@@ -462,7 +462,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
     public void validate(DwrResponseI18n response) {
         if (xid.isEmpty()) {
             response.addContextual("xid", "validate.required");
-        } else if (!new DataSourceDao().isXidUnique(xid, id)) {
+        } else if (!DataSourceDao.getInstance().isXidUnique(xid, id)) {
             response.addContextual("xid", "validate.xidUsed");
         } else if (xid.length() > 50) {
             response.addContextual("xid", "validate.notLongerThan", 50);

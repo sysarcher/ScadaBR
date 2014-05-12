@@ -66,14 +66,14 @@ public class ViewEditController extends SimpleFormRedirectController {
             String viewIdStr = request.getParameter("viewId");
             if (viewIdStr != null) {
                 // An existing view.
-                view = new ViewDao().getView(Integer.parseInt(viewIdStr));
+                view = ViewDao.getInstance().getView(Integer.parseInt(viewIdStr));
                 Permissions.ensureViewEditPermission(user, view);
             } else {
                 // A new view.
                 view = new View();
                 view.setId(Common.NEW_ID);
                 view.setUserId(user.getId());
-                view.setXid(new ViewDao().generateUniqueXid());
+                view.setXid(ViewDao.getInstance().generateUniqueXid());
             }
             user.setView(view);
             view.validateViewComponents(false);
@@ -148,7 +148,7 @@ public class ViewEditController extends SimpleFormRedirectController {
     protected ModelAndView onSubmit(HttpServletRequest request, HttpServletResponse response, Object command,
             BindException errors) throws Exception {
         ViewEditForm form = (ViewEditForm) command;
-        ViewDao viewDao = new ViewDao();
+        ViewDao viewDao = ViewDao.getInstance();
 
         if (hasSubmitParameter(request, SUBMIT_CANCEL)) {
             return getSuccessRedirectView("viewId=" + form.getView().getId());

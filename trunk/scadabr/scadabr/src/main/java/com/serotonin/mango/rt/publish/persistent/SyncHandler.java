@@ -29,7 +29,7 @@ class SyncHandler implements SystemRunnable {
 
     final PersistentSendThread sendThread;
 
-    final PointValueDao pointValueDao = new PointValueDao();
+    final PointValueDao pointValueDao = PointValueDao.getInstance();
     long cutoff;
 
     int recordsSynced;

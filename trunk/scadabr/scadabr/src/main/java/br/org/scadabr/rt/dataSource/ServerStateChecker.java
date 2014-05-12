@@ -55,7 +55,7 @@ public class ServerStateChecker implements org.quartz.SchedulerListener, Job {
     private static boolean isDatabaseRunning() {
         boolean result = true;
         try {
-            List<User> users = new UserDao().getUsers();
+            List<User> users = UserDao.getInstance().getUsers();
             if (users.size() < 1) {
                 result = false;
             }

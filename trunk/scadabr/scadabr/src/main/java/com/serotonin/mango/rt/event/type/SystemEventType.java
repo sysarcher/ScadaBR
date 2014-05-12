@@ -108,7 +108,7 @@ public class SystemEventType extends EventType {
         EventTypeVO et = getEventType(type);
         et.setAlarmLevel(alarmLevel);
 
-        SystemSettingsDao dao = new SystemSettingsDao();
+        SystemSettingsDao dao = SystemSettingsDao.getInstance();
         dao.setIntValue(SYSTEM_SETTINGS_PREFIX + type, alarmLevel);
     }
 

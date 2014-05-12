@@ -70,7 +70,7 @@ abstract public class PublishedPointVO implements Serializable, JsonSerializable
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
         DataPointVO dp = dataPointDao.getDataPoint(dataPointId);
         String xid;
         if (dp == null) {
@@ -84,7 +84,7 @@ abstract public class PublishedPointVO implements Serializable, JsonSerializable
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws LocalizableJsonException {
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
         String xid = json.getString("dataPointId");
         if (xid == null) {
             throw new LocalizableJsonException("emport.error.publishedPoint.missing", "dataPointId");

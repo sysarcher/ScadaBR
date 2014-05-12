@@ -69,7 +69,7 @@ public class LoginController extends SimpleFormController {
                 ((LoginForm) errors.getTarget()).setUsername(username);
 
                 // The user is logged into Crowd. Make sure the username is valid in this instance.
-                User user = new UserDao().getUser(username);
+                User user = UserDao.getInstance().getUser(username);
                 if (user == null) {
                     ValidationUtils.rejectValue(errors, "username", "login.validation.noSuchUser");
                 } else {
@@ -112,7 +112,7 @@ public class LoginController extends SimpleFormController {
         boolean crowdAuthenticated = false;
 
         // Check if the user exists
-        User user = new UserDao().getUser(login.getUsername());
+        User user = UserDao.getInstance().getUser(login.getUsername());
         if (user == null) {
             ValidationUtils.rejectValue(errors, "username", "login.validation.noSuchUser");
         } else if (user.isDisabled()) {
@@ -154,9 +154,9 @@ public class LoginController extends SimpleFormController {
                 logger.debug("User is already logged in, not relogging in");
             }
         } else {
-            UserDao userDao = new UserDao();
+            UserDao userDao = UserDao.getInstance();
             // Get the user data from the app server.
-            user = new UserDao().getUser(username);
+            user = UserDao.getInstance().getUser(username);
 
             // Update the last login time.
             userDao.recordLogin(user.getId());

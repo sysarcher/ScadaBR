@@ -63,11 +63,25 @@ import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import javax.inject.Inject;
 
 public class EventHandlersDwr extends BaseDwr {
 
     private static final Log LOG = LogFactory.getLog(EventHandlersDwr.class);
-
+    
+    @Inject
+    private ScheduledEventDao scheduledEventDao;
+    @Inject
+    private CompoundEventDetectorDao compoundEventDetectorDao;
+    @Inject
+    private DataSourceDao dataSourceDao;
+    @Inject
+    private PublisherDao publisherDao;
+    @Inject
+    private MaintenanceEventDao maintenanceEventDao;
+    @Inject
+    private MailingListDao mailingListDao;
+            
     private final ResourceBundle setPointSnippetMap = ResourceBundle
             .getBundle("setPointSnippetMap");
 
@@ -75,13 +89,12 @@ public class EventHandlersDwr extends BaseDwr {
         User user = Common.getUser();
         Permissions.ensureDataSourcePermission(user);
 
-        EventDao eventDao = new EventDao();
         Map<String, Object> model = new HashMap<>();
 
         // Get the data points
         List<DataPointBean> allPoints = new ArrayList<>();
         List<EventSourceBean> dataPoints = new ArrayList<>();
-        List<DataPointVO> dps = new DataPointDao().getDataPoints(
+        List<DataPointVO> dps = dataPointDao.getDataPoints(
                 DataPointExtendedNameComparator.instance, true);
         for (DataPointVO dp : dps) {
             if (!Permissions
@@ -108,8 +121,7 @@ public class EventHandlersDwr extends BaseDwr {
 
         // Get the scheduled events
         List<EventTypeVO> scheduledEvents = new ArrayList<>();
-        List<ScheduledEventVO> ses = new ScheduledEventDao()
-                .getScheduledEvents();
+        List<ScheduledEventVO> ses = scheduledEventDao.getScheduledEvents();
         for (ScheduledEventVO se : ses) {
             EventTypeVO et = se.getEventType();
             et.setHandlers(eventDao.getEventHandlers(et));
@@ -119,8 +131,7 @@ public class EventHandlersDwr extends BaseDwr {
 
         // Get the compound event detectors
         List<EventTypeVO> compoundEvents = new ArrayList<>();
-        List<CompoundEventDetectorVO> ceds = new CompoundEventDetectorDao()
-                .getCompoundEventDetectors();
+        List<CompoundEventDetectorVO> ceds = compoundEventDetectorDao.getCompoundEventDetectors();
         for (CompoundEventDetectorVO ced : ceds) {
             EventTypeVO et = ced.getEventType();
             et.setHandlers(eventDao.getEventHandlers(et));
@@ -130,7 +141,7 @@ public class EventHandlersDwr extends BaseDwr {
 
         // Get the data sources
         List<EventSourceBean> dataSources = new ArrayList<>();
-        for (DataSourceVO<?> ds : new DataSourceDao().getDataSources()) {
+        for (DataSourceVO<?> ds : dataSourceDao.getDataSources()) {
             if (!Permissions.hasDataSourcePermission(user, ds.getId())) {
                 continue;
             }
@@ -152,8 +163,7 @@ public class EventHandlersDwr extends BaseDwr {
         if (Permissions.hasAdmin(user)) {
             // Get the publishers
             List<EventSourceBean> publishers = new ArrayList<>();
-            for (PublisherVO<? extends PublishedPointVO> p : new PublisherDao()
-                    .getPublishers(new PublisherDao.PublisherNameComparator())) {
+            for (PublisherVO<? extends PublishedPointVO> p : publisherDao.getPublishers(new PublisherDao.PublisherNameComparator())) {
                 if (p.getEventTypes().size() > 0) {
                     EventSourceBean source = new EventSourceBean();
                     source.setId(p.getId());
@@ -171,8 +181,7 @@ public class EventHandlersDwr extends BaseDwr {
 
             // Get the maintenance events
             List<EventTypeVO> maintenanceEvents = new ArrayList<>();
-            List<MaintenanceEventVO> mes = new MaintenanceEventDao()
-                    .getMaintenanceEvents();
+            List<MaintenanceEventVO> mes = maintenanceEventDao.getMaintenanceEvents();
             for (MaintenanceEventVO me : mes) {
                 EventTypeVO et = me.getEventType();
                 et.setHandlers(eventDao.getEventHandlers(et));
@@ -198,10 +207,10 @@ public class EventHandlersDwr extends BaseDwr {
         }
 
         // Get the mailing lists.
-        model.put("mailingLists", new MailingListDao().getMailingLists());
+        model.put("mailingLists", mailingListDao.getMailingLists());
 
         // Get the users.
-        model.put("users", new UserDao().getUsers());
+        model.put("users", userDao.getUsers());
 
         model.put("allPoints", allPoints);
         model.put("dataPoints", dataPoints);
@@ -212,7 +221,7 @@ public class EventHandlersDwr extends BaseDwr {
 
     public String createSetValueContent(int pointId, String valueStr,
             String idSuffix) {
-        DataPointVO pointVO = new DataPointDao().getDataPoint(pointId);
+        DataPointVO pointVO = dataPointDao.getDataPoint(pointId);
         Permissions.ensureDataSourcePermission(Common.getUser(),
                 pointVO.getDataSourceId());
 
@@ -305,7 +314,6 @@ public class EventHandlersDwr extends BaseDwr {
         EventTypeVO type = new EventTypeVO(eventSourceId, eventTypeRef1,
                 eventTypeRef2);
         Permissions.ensureEventTypePermission(Common.getUser(), type);
-        EventDao eventDao = new EventDao();
 
         vo.setId(handlerId);
         vo.setXid(xid.isEmpty() ? eventDao.generateUniqueXid() : xid);
@@ -324,7 +332,6 @@ public class EventHandlersDwr extends BaseDwr {
     }
 
     public void deleteEventHandler(int handlerId) {
-        EventDao eventDao = new EventDao();
         Permissions.ensureEventTypePermission(Common.getUser(),
                 eventDao.getEventHandlerType(handlerId));
         eventDao.deleteEventHandler(handlerId);
@@ -343,4 +350,89 @@ public class EventHandlersDwr extends BaseDwr {
             return new LocalizableMessageImpl("common.default", e.getMessage());
         }
     }
+
+    /**
+     * @return the scheduledEventDao
+     */
+    public ScheduledEventDao getScheduledEventDao() {
+        return scheduledEventDao;
+    }
+
+    /**
+     * @param scheduledEventDao the scheduledEventDao to set
+     */
+    public void setScheduledEventDao(ScheduledEventDao scheduledEventDao) {
+        this.scheduledEventDao = scheduledEventDao;
+    }
+
+    /**
+     * @return the compoundEventDetectorDao
+     */
+    public CompoundEventDetectorDao getCompoundEventDetectorDao() {
+        return compoundEventDetectorDao;
+    }
+
+    /**
+     * @param compoundEventDetectorDao the compoundEventDetectorDao to set
+     */
+    public void setCompoundEventDetectorDao(CompoundEventDetectorDao compoundEventDetectorDao) {
+        this.compoundEventDetectorDao = compoundEventDetectorDao;
+    }
+
+    /**
+     * @return the dataSourceDao
+     */
+    public DataSourceDao getDataSourceDao() {
+        return dataSourceDao;
+    }
+
+    /**
+     * @param dataSourceDao the dataSourceDao to set
+     */
+    public void setDataSourceDao(DataSourceDao dataSourceDao) {
+        this.dataSourceDao = dataSourceDao;
+    }
+
+    /**
+     * @return the publisherDao
+     */
+    public PublisherDao getPublisherDao() {
+        return publisherDao;
+    }
+
+    /**
+     * @param publisherDao the publisherDao to set
+     */
+    public void setPublisherDao(PublisherDao publisherDao) {
+        this.publisherDao = publisherDao;
+    }
+
+    /**
+     * @return the maintenanceEventDao
+     */
+    public MaintenanceEventDao getMaintenanceEventDao() {
+        return maintenanceEventDao;
+    }
+
+    /**
+     * @param maintenanceEventDao the maintenanceEventDao to set
+     */
+    public void setMaintenanceEventDao(MaintenanceEventDao maintenanceEventDao) {
+        this.maintenanceEventDao = maintenanceEventDao;
+    }
+
+    /**
+     * @return the mailingListDao
+     */
+    public MailingListDao getMailingListDao() {
+        return mailingListDao;
+    }
+
+    /**
+     * @param mailingListDao the mailingListDao to set
+     */
+    public void setMailingListDao(MailingListDao mailingListDao) {
+        this.mailingListDao = mailingListDao;
+    }
+
 }

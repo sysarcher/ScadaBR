@@ -7,7 +7,6 @@ import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.HistoricalDataPoint;
-import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
@@ -29,8 +28,8 @@ public class HistoricalMetaPointLocatorRT extends MetaPointLocatorRT {
         initializeTimerTask();
 
         context = new HashMap<>();
-        DataPointDao dataPointDao = new DataPointDao();
-        PointValueDao pointValueDao = new PointValueDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
+        PointValueDao pointValueDao = PointValueDao.getInstance();
         for (IntValuePair contextEntry : vo.getContext()) {
             DataPointVO cvo = dataPointDao.getDataPoint(contextEntry.getKey());
             HistoricalDataPoint point = new HistoricalDataPoint(cvo.getId(), cvo.getPointLocator().getDataTypeId(),

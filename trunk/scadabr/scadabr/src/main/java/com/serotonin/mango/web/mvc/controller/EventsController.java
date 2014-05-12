@@ -51,7 +51,7 @@ public class EventsController extends PaginatedListController {
 //        }
 //        else
 //            data = Common.ctx.getEventManager().getActiveEvents(Common.getUser(request));
-        List<EventInstance> data = new EventDao().getPendingEvents(Common.getUser(request).getId());
+        List<EventInstance> data = EventDao.getInstance().getPendingEvents(Common.getUser(request).getId());
         sortData(bundle, data, paging);
         return new PaginatedData<>(data, data.size());
     }

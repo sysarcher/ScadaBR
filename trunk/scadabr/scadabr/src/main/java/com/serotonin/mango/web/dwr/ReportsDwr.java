@@ -24,10 +24,8 @@ import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.MailingListDao;
 import com.serotonin.mango.db.dao.ReportDao;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.rt.maint.work.ReportWorkItem;
 import com.serotonin.mango.vo.DataPointVO;
@@ -47,20 +45,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import javax.inject.Inject;
 
 /**
  * @author Matthew Lohbihler
  */
 public class ReportsDwr extends BaseDwr {
 
+    @Inject
+    private ReportDao reportDao; 
+    @Inject
+    private MailingListDao mailingListDao;
+    @Inject
+    private WatchListDao watchListDao;
+    
     public DwrResponseI18n init() {
         DwrResponseI18n response = new DwrResponseI18n();
-        ReportDao reportDao = new ReportDao();
         User user = Common.getUser();
 
         response.addData("points", getReadablePoints());
-        response.addData("mailingLists", new MailingListDao().getMailingLists());
-        response.addData("users", new UserDao().getUsers());
+        response.addData("mailingLists", mailingListDao.getMailingLists());
+        response.addData("users", userDao.getUsers());
         response.addData("reports", reportDao.getReports(user.getId()));
         response.addData("instances", getReportInstances(user));
 
@@ -73,7 +78,7 @@ public class ReportsDwr extends BaseDwr {
             report = new ReportVO();
             report.setName(getMessage("common.newName"));
         } else {
-            report = new ReportDao().getReport(id);
+            report = reportDao.getReport(id);
 
             if (copy) {
                 report.setId(Common.NEW_ID);
@@ -124,7 +129,6 @@ public class ReportsDwr extends BaseDwr {
         }
 
         User user = Common.getUser();
-        ReportDao reportDao = new ReportDao();
         ReportVO report;
         if (id == Common.NEW_ID) {
             report = new ReportVO();
@@ -226,7 +230,6 @@ public class ReportsDwr extends BaseDwr {
     }
 
     public void deleteReport(int id) {
-        ReportDao reportDao = new ReportDao();
 
         ReportVO report = reportDao.getReport(id);
         if (report != null) {
@@ -262,7 +265,6 @@ public class ReportsDwr extends BaseDwr {
         }
 
         User user = Common.getUser();
-        DataPointDao dataPointDao = new DataPointDao();
         for (ReportPointVO point : points) {
             Permissions.ensureDataPointReadPermission(user, dataPointDao.getDataPoint(point.getPointId()));
 
@@ -278,7 +280,6 @@ public class ReportsDwr extends BaseDwr {
 
     public List<Map<String, Object>> deleteReportInstance(int instanceId) {
         User user = Common.getUser();
-        ReportDao reportDao = new ReportDao();
         reportDao.deleteReportInstance(instanceId, user.getId());
         return getReportInstances(user);
     }
@@ -288,7 +289,7 @@ public class ReportsDwr extends BaseDwr {
     }
 
     private List<Map<String, Object>> getReportInstances(User user) {
-        final List<ReportInstance> ris = new ReportDao().getReportInstances(user.getId());
+        final List<ReportInstance> ris = reportDao.getReportInstances(user.getId());
         final List<Map<String, Object>> result = new ArrayList<>(ris.size());
         final Locale locale = getLocale();
         for (ReportInstance ri : ris) {
@@ -310,11 +311,11 @@ public class ReportsDwr extends BaseDwr {
     }
 
     public void setPreventPurge(int instanceId, boolean value) {
-        new ReportDao().setReportInstancePreventPurge(instanceId, value, Common.getUser().getId());
+        reportDao.setReportInstancePreventPurge(instanceId, value, Common.getUser().getId());
     }
 
     public ReportVO createReportFromWatchlist(int watchListId) {
-        WatchList watchList = new WatchListDao().getWatchList(watchListId);
+        WatchList watchList = watchListDao.getWatchList(watchListId);
         if (watchList == null) {
             return null;
         }
@@ -331,4 +332,47 @@ public class ReportsDwr extends BaseDwr {
 
         return report;
     }
+
+    /**
+     * @return the reportDao
+     */
+    public ReportDao getReportDao() {
+        return reportDao;
+    }
+
+    /**
+     * @param reportDao the reportDao to set
+     */
+    public void setReportDao(ReportDao reportDao) {
+        this.reportDao = reportDao;
+    }
+
+    /**
+     * @return the mailingListDao
+     */
+    public MailingListDao getMailingListDao() {
+        return mailingListDao;
+    }
+
+    /**
+     * @param mailingListDao the mailingListDao to set
+     */
+    public void setMailingListDao(MailingListDao mailingListDao) {
+        this.mailingListDao = mailingListDao;
+    }
+
+    /**
+     * @return the watchListDao
+     */
+    public WatchListDao getWatchListDao() {
+        return watchListDao;
+    }
+
+    /**
+     * @param watchListDao the watchListDao to set
+     */
+    public void setWatchListDao(WatchListDao watchListDao) {
+        this.watchListDao = watchListDao;
+    }
+
 }

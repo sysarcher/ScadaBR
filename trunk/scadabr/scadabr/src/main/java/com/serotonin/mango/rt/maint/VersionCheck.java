@@ -152,8 +152,8 @@ public class VersionCheck extends SystemCronTask {
         postMethod.addParameter("instanceVersion", Common.getVersion());
 
         StringBuilder datasourceTypes = new StringBuilder();
-        DataPointDao dataPointDao = new DataPointDao();
-        for (DataSourceVO<?> config : new DataSourceDao().getDataSources()) {
+        DataPointDao dataPointDao = DataPointDao.getInstance();
+        for (DataSourceVO<?> config : DataSourceDao.getInstance().getDataSources()) {
             if (config.isEnabled()) {
                 int points = 0;
                 for (DataPointVO point : dataPointDao.getDataPoints(config.getId(), null)) {
@@ -171,7 +171,7 @@ public class VersionCheck extends SystemCronTask {
         postMethod.addParameter("datasourceTypes", datasourceTypes.toString());
 
         StringBuilder publisherTypes = new StringBuilder();
-        for (PublisherVO<?> config : new PublisherDao().getPublishers()) {
+        for (PublisherVO<?> config : PublisherDao.getInstance().getPublishers()) {
             if (config.isEnabled()) {
                 if (publisherTypes.length() > 0) {
                     publisherTypes.append(',');

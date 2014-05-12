@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 /**
  *
@@ -61,6 +62,7 @@ public class SchedulerTest {
     }
 
      @Test
+     @Ignore // takes 10 sec ....
      public void hello() throws Exception {
          Date d = new Date();
          d .setHours(d.getHours() -1);

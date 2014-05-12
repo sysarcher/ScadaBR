@@ -31,9 +31,12 @@ import com.serotonin.mango.Common;
 import br.org.scadabr.util.ColorUtils;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import javax.inject.Named;
+import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+@Named
 public class SystemSettingsDao extends BaseDao {
 
     // Database schema version
@@ -94,7 +97,21 @@ public class SystemSettingsDao extends BaseDao {
     public static final String PLOT_GRIDLINE_COLOUR = "plotGridlineColour";
 
     // Value cache
-    private static final Map<String, String> cache = new HashMap<String, String>();
+    private static final Map<String, String> cache = new HashMap<>();
+
+    public SystemSettingsDao() {
+        super();
+    }
+
+    @Deprecated
+    private SystemSettingsDao(DataSource dataSource) {
+        super(dataSource);
+    }
+
+    @Deprecated
+    public static SystemSettingsDao getInstance() {
+        return new SystemSettingsDao(Common.ctx.getDatabaseAccess().getDataSource());
+    }
 
     public static String getValue(String key) {
         return getValue(key, (String) DEFAULT_VALUES.get(key));
@@ -106,7 +123,7 @@ public class SystemSettingsDao extends BaseDao {
             if (!cache.containsKey(key)) {
                 try {
                     //TODOD was BaseDao
-                    result = new SystemSettingsDao().ejt.queryForObject("select settingValue from systemSettings where settingName=?", String.class, key);
+                    result = SystemSettingsDao.getInstance().ejt.queryForObject("select settingValue from systemSettings where settingName=?", String.class, key);
                 } catch (EmptyResultDataAccessException e) {
                     result = null;
                 }
@@ -262,7 +279,7 @@ public class SystemSettingsDao extends BaseDao {
         DEFAULT_VALUES.put(FUTURE_DATE_LIMIT_PERIOD_TYPE,
                 Common.TimePeriods.HOURS);
         try {
-            DEFAULT_VALUES.put(INSTANCE_DESCRIPTION, String.format("ScadaBR @%s",  InetAddress.getLocalHost().getCanonicalHostName()));
+            DEFAULT_VALUES.put(INSTANCE_DESCRIPTION, String.format("ScadaBR @%s", InetAddress.getLocalHost().getCanonicalHostName()));
         } catch (UnknownHostException uhe) {
             DEFAULT_VALUES.put(INSTANCE_DESCRIPTION, "ScadaBR @Unknown host");
         }

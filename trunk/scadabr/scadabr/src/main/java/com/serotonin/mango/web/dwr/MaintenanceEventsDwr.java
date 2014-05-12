@@ -28,7 +28,6 @@ import org.joda.time.DateTime;
 
 import br.org.scadabr.db.IntValuePair;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.db.dao.MaintenanceEventDao;
 import com.serotonin.mango.rt.event.maintenance.MaintenanceEventRT;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
@@ -36,11 +35,18 @@ import com.serotonin.mango.vo.event.MaintenanceEventVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.l10n.Localizer;
+import com.serotonin.mango.db.dao.DataSourceDao;
+import javax.inject.Inject;
 
 /**
  * @author Matthew Lohbihler
  */
 public class MaintenanceEventsDwr extends BaseDwr {
+    
+    @Inject
+    private MaintenanceEventDao maintenanceEventDao;
+    @Inject
+    private DataSourceDao dataSourceDao;
 
     public DwrResponseI18n getMaintenanceEvents() {
         Permissions.ensureAdmin();
@@ -48,7 +54,7 @@ public class MaintenanceEventsDwr extends BaseDwr {
         DwrResponseI18n response = new DwrResponseI18n();
         final ResourceBundle bundle = getResourceBundle();
 
-        List<MaintenanceEventVO> events = new MaintenanceEventDao().getMaintenanceEvents();
+        List<MaintenanceEventVO> events = maintenanceEventDao.getMaintenanceEvents();
         Collections.sort(events, new Comparator<MaintenanceEventVO>() {
             @Override
             public int compare(MaintenanceEventVO m1, MaintenanceEventVO m2) {
@@ -59,7 +65,7 @@ public class MaintenanceEventsDwr extends BaseDwr {
         response.addData("events", events);
 
         List<IntValuePair> dataSources = new ArrayList<>();
-        for (DataSourceVO<?> ds : new DataSourceDao().getDataSources()) {
+        for (DataSourceVO<?> ds : dataSourceDao.getDataSources()) {
             dataSources.add(new IntValuePair(ds.getId(), ds.getName()));
         }
         response.addData("dataSources", dataSources);
@@ -77,13 +83,13 @@ public class MaintenanceEventsDwr extends BaseDwr {
         if (id == Common.NEW_ID) {
             DateTime dt = new DateTime();
             me = new MaintenanceEventVO();
-            me.setXid(new MaintenanceEventDao().generateUniqueXid());
+            me.setXid(maintenanceEventDao.generateUniqueXid());
             me.setActiveYear(dt.getYear());
             me.setInactiveYear(dt.getYear());
             me.setActiveMonth(dt.getMonthOfYear());
             me.setInactiveMonth(dt.getMonthOfYear());
         } else {
-            me = new MaintenanceEventDao().getMaintenanceEvent(id);
+            me = maintenanceEventDao.getMaintenanceEvent(id);
 
             MaintenanceEventRT rt = Common.ctx.getRuntimeManager().getRunningMaintenanceEvent(me.getId());
             if (rt != null) {
@@ -127,7 +133,6 @@ public class MaintenanceEventsDwr extends BaseDwr {
         e.setInactiveCron(inactiveCron);
 
         DwrResponseI18n response = new DwrResponseI18n();
-        MaintenanceEventDao maintenanceEventDao = new MaintenanceEventDao();
 
         if (xid.isEmpty()) {
             response.addContextual("xid", "validate.required");
@@ -167,4 +172,33 @@ public class MaintenanceEventsDwr extends BaseDwr {
 
         return response;
     }
+
+    /**
+     * @return the maintenanceEventDao
+     */
+    public MaintenanceEventDao getMaintenanceEventDao() {
+        return maintenanceEventDao;
+    }
+
+    /**
+     * @param maintenanceEventDao the maintenanceEventDao to set
+     */
+    public void setMaintenanceEventDao(MaintenanceEventDao maintenanceEventDao) {
+        this.maintenanceEventDao = maintenanceEventDao;
+    }
+
+    /**
+     * @return the dataSourceDao
+     */
+    public DataSourceDao getDataSourceDao() {
+        return dataSourceDao;
+    }
+
+    /**
+     * @param dataSourceDao the dataSourceDao to set
+     */
+    public void setDataSourceDao(DataSourceDao dataSourceDao) {
+        this.dataSourceDao = dataSourceDao;
+    }
+
 }

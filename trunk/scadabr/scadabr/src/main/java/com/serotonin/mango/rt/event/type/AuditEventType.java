@@ -107,7 +107,7 @@ public class AuditEventType extends EventType {
         EventTypeVO et = getEventType(type);
         et.setAlarmLevel(alarmLevel);
 
-        SystemSettingsDao dao = new SystemSettingsDao();
+        SystemSettingsDao dao = SystemSettingsDao.getInstance();
         dao.setIntValue(AUDIT_SETTINGS_PREFIX + type, alarmLevel);
     }
 

@@ -87,17 +87,19 @@ public class RecipientListEntryBean implements Serializable, JsonSerializable {
         referenceId = refId;
     }
 
+    @Override
     public void jsonSerialize(Map<String, Object> map) {
         map.put("recipientType", EmailRecipient.TYPE_CODES.getCode(recipientType));
         if (recipientType == EmailRecipient.TYPE_MAILING_LIST) {
-            map.put("mailingList", new MailingListDao().getMailingList(referenceId).getXid());
+            map.put("mailingList", MailingListDao.getInstance().getMailingList(referenceId).getXid());
         } else if (recipientType == EmailRecipient.TYPE_USER) {
-            map.put("username", new UserDao().getUser(referenceId).getUsername());
+            map.put("username", UserDao.getInstance().getUser(referenceId).getUsername());
         } else if (recipientType == EmailRecipient.TYPE_ADDRESS) {
             map.put("address", referenceAddress);
         }
     }
 
+    @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("recipientType");
         if (text == null) {
@@ -117,7 +119,7 @@ public class RecipientListEntryBean implements Serializable, JsonSerializable {
                 throw new LocalizableJsonException("emport.error.recipient.missing.reference", "mailingList");
             }
 
-            MailingList ml = new MailingListDao().getMailingList(text);
+            MailingList ml = MailingListDao.getInstance().getMailingList(text);
             if (ml == null) {
                 throw new LocalizableJsonException("emport.error.recipient.invalid.reference", "mailingList", text);
             }
@@ -129,7 +131,7 @@ public class RecipientListEntryBean implements Serializable, JsonSerializable {
                 throw new LocalizableJsonException("emport.error.recipient.missing.reference", "username");
             }
 
-            User user = new UserDao().getUser(text);
+            User user = UserDao.getInstance().getUser(text);
             if (user == null) {
                 throw new LocalizableJsonException("emport.error.recipient.invalid.reference", "user", text);
             }

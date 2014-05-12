@@ -144,7 +144,7 @@ public class View implements Serializable, JsonSerializable {
      * the components that render them
      */
     public void validateViewComponents(boolean makeReadOnly) {
-        User owner = new UserDao().getUser(userId);
+        User owner = UserDao.getInstance().getUser(userId);
         for (ViewComponent viewComponent : viewComponents) {
             viewComponent.validateDataPoint(owner, makeReadOnly);
         }
@@ -221,7 +221,7 @@ public class View implements Serializable, JsonSerializable {
             response.addContextual("xid", "validate.required");
         } else if (xid.length() >  50) {
             response.addContextual("xid", "validate.notLongerThan", 50);
-        } else if (!new ViewDao().isXidUnique(xid, id)) {
+        } else if (!ViewDao.getInstance().isXidUnique(xid, id)) {
             response.addContextual("xid", "validate.xidUsed");
         }
 
@@ -265,7 +265,7 @@ public class View implements Serializable, JsonSerializable {
                 throw new LocalizableJsonException("emport.error.missingValue",
                         "user");
             }
-            User user = new UserDao().getUser(username);
+            User user = UserDao.getInstance().getUser(username);
             if (user == null) {
                 throw new LocalizableJsonException("emport.error.missingUser",
                         username);
@@ -309,7 +309,7 @@ public class View implements Serializable, JsonSerializable {
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        map.put("user", new UserDao().getUser(userId).getUsername());
+        map.put("user", UserDao.getInstance().getUser(userId).getUsername());
         map.put("anonymousAccess", ShareUser.ACCESS_CODES
                 .getCode(anonymousAccess));
         map.put("viewComponents", viewComponents);

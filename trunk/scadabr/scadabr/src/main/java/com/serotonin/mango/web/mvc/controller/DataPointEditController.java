@@ -46,7 +46,6 @@ import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.propertyEditor.DoubleFormatEditor;
 import br.org.scadabr.propertyEditor.IntegerFormatEditor;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.util.ValidationUtils;
 
 public class DataPointEditController extends SimpleFormController {
@@ -66,7 +65,7 @@ public class DataPointEditController extends SimpleFormController {
             dataPoint.setDiscardExtremeValues(false); // Checkbox
         } else {
             int id;
-            DataPointDao dataPointDao = new DataPointDao();
+            DataPointDao dataPointDao = DataPointDao.getInstance();
 
             // Get the id.
             String idStr = request.getParameter("dpid");
@@ -95,7 +94,7 @@ public class DataPointEditController extends SimpleFormController {
 
     @Override
     protected Map referenceData(HttpServletRequest request, Object command, Errors errors) {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
         DataPointVO point = (DataPointVO) command;
 
         result.put("dataSource", Common.ctx.getRuntimeManager().getDataSource(point.getDataSourceId()));

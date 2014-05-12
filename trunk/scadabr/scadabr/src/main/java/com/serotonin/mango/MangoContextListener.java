@@ -78,20 +78,34 @@ import java.text.ParseException;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Inject;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+import com.serotonin.mango.db.DatabaseAccessFactory;
+
 
 public class MangoContextListener implements ServletContextListener {
 
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_CORE);
-
+    
+    @Inject
+    private SystemSettingsDao systemSettingsDao;
+    @Inject
+    private DatabaseAccessFactory databaseAccessFactory;
+    
     @Override
     public void contextInitialized(ServletContextEvent evt) {
         LOG.info("Mango context starting");
-
+        
         // Get a handle on the context.
         ServletContext ctx = evt.getServletContext();
 
         // Create the common reference to the context
         Common.ctx = new ContextWrapper(ctx);
+
+        
+        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+
+        
         // Once the threadpool was shut down no its dead, so create them new here....
         Common.dataSourcePool = new CronTimerPool(2, 5, 30, TimeUnit.SECONDS);
         Common.systemCronPool = new CronTimerPool(2, 5, 30, TimeUnit.SECONDS);
@@ -101,19 +115,18 @@ public class MangoContextListener implements ServletContextListener {
         constantsInitialize(ctx);
         freemarkerInitialize(ctx);
         imageSetInitialize(ctx);
-        databaseInitialize(ctx);
+        databaseAccessFactory.startDB();
 
         // Check if the known servlet context path has changed.
-        String knownContextPath = SystemSettingsDao
-                .getValue(SystemSettingsDao.SERVLET_CONTEXT_PATH);
+        String knownContextPath = systemSettingsDao.getValue(systemSettingsDao.SERVLET_CONTEXT_PATH);
         if (knownContextPath != null) {
             String contextPath = ctx.getContextPath();
             if (!Objects.equals(knownContextPath, contextPath)) {
                 LOG.log(Level.SEVERE, "Mango''s known servlet context path has changed from {0} to {1}. Are there two instances of Mango running?", new Object[]{knownContextPath, contextPath});
             }
         }
-        new SystemSettingsDao().setValue(
-                SystemSettingsDao.SERVLET_CONTEXT_PATH, ctx.getContextPath());
+        
+        systemSettingsDao.setValue(SystemSettingsDao.SERVLET_CONTEXT_PATH, ctx.getContextPath());
 
         utilitiesInitialize(ctx);
         eventManagerInitialize(ctx);
@@ -198,7 +211,7 @@ public class MangoContextListener implements ServletContextListener {
         Common.eventCronPool = null;
         Common.systemCronPool = null;
 
-        databaseTerminate(ctx);
+        databaseAccessFactory.stopDB();
         LOG.info("Database terminated");
 
         Common.ctx = null;
@@ -208,8 +221,8 @@ public class MangoContextListener implements ServletContextListener {
 
     @Deprecated // unused???
     private void dataPointsNameToIdMapping(ServletContext ctx) {
-        PointHierarchy pH = new DataPointDao().getPointHierarchy();
-        List<DataPointVO> datapoints = new DataPointDao().getDataPoints(null,
+        PointHierarchy pH = DataPointDao.getInstance().getPointHierarchy();
+        List<DataPointVO> datapoints = DataPointDao.getInstance().getDataPoints(null,
                 false);
 
         Map<String, Integer> mapping = new HashMap<>();
@@ -360,24 +373,6 @@ public class MangoContextListener implements ServletContextListener {
 
     //
     //
-    // Database.
-    //
-    private void databaseInitialize(ServletContext ctx) {
-        DatabaseAccess databaseAccess = DatabaseAccess
-                .createDatabaseAccess(ctx);
-        ctx.setAttribute(Common.ContextKeys.DATABASE_ACCESS, databaseAccess);
-        databaseAccess.initialize();
-    }
-
-    private void databaseTerminate(ContextWrapper ctx) {
-        DatabaseAccess databaseAccess = ctx.getDatabaseAccess();
-        if (databaseAccess != null) {
-            databaseAccess.terminate();
-        }
-    }
-
-    //
-    //
     // Utilities.
     //
     private void utilitiesInitialize(ServletContext ctx) {
@@ -391,7 +386,6 @@ public class MangoContextListener implements ServletContextListener {
         // HTTP receiver multicaster
         ctx.setAttribute(Common.ContextKeys.HTTP_RECEIVER_MULTICASTER, new HttpReceiverMulticaster());
 
-        BaseDwr.initialize();
     }
 
     private void utilitiesTerminate(ContextWrapper ctx) {
@@ -541,7 +535,7 @@ public class MangoContextListener implements ServletContextListener {
     // Reports
     //
     private void reportsInitialize() {
-        List<ReportVO> reports = new ReportDao().getReports();
+        List<ReportVO> reports = ReportDao.getInstance().getReports();
         for (ReportVO report : reports) {
             try {
                 ReportTask.scheduleReportJob(report);

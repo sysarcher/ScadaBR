@@ -95,7 +95,7 @@ public class UserEntry extends EmailRecipient {
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
         if (user == null) {
-            user = new UserDao().getUser(userId);
+            user = UserDao.getInstance().getUser(userId);
         }
         map.put("username", user.getUsername());
     }
@@ -109,7 +109,7 @@ public class UserEntry extends EmailRecipient {
             throw new LocalizableJsonException("emport.error.recipient.missing.reference", "username");
         }
 
-        user = new UserDao().getUser(username);
+        user = UserDao.getInstance().getUser(username);
         if (user == null) {
             throw new LocalizableJsonException("emport.error.recipient.invalid.reference", "username", username);
         }

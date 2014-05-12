@@ -18,11 +18,27 @@
  */
 package com.serotonin.mango.db.upgrade;
 
+import com.serotonin.mango.Common;
+import javax.sql.DataSource;
+
 /**
  * @author Matthew Lohbihler
  */
 public class Upgrade1_2_3 extends DBUpgrade {
 
+    private Upgrade1_2_3() {
+        super();
+    }
+    
+   @Deprecated
+    private Upgrade1_2_3(DataSource dataSource) {
+        super(dataSource);
+    }
+
+     public static Upgrade1_2_3 getInstance() {
+        return new Upgrade1_2_3(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     @Override
     public void upgrade() {
         // no op

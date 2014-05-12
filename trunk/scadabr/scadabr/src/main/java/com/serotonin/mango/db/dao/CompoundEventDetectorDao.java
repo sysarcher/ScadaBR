@@ -33,19 +33,35 @@ import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import javax.inject.Named;
+import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
  * @author Matthew Lohbihler
  */
+@Named
 public class CompoundEventDetectorDao extends BaseDao {
 
     private static final String COMPOUND_EVENT_DETECTOR_SELECT = "select id, xid, name, alarmLevel, returnToNormal, disabled, conditionText from compoundEventDetectors ";
 
+    public CompoundEventDetectorDao() {
+        super();
+    }
+    
+   @Deprecated
+    private CompoundEventDetectorDao(DataSource dataSource) {
+        super(dataSource);
+    }
+
+   @Deprecated
+     public static CompoundEventDetectorDao getInstance() {
+        return new CompoundEventDetectorDao(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     public String generateUniqueXid() {
         return generateUniqueXid(CompoundEventDetectorVO.XID_PREFIX, "compoundEventDetectors");
     }

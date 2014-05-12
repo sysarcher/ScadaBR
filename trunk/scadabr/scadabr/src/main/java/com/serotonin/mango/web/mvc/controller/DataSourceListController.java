@@ -41,12 +41,13 @@ import br.org.scadabr.web.util.PaginatedData;
 import br.org.scadabr.web.util.PaginatedListController;
 import br.org.scadabr.web.util.PagingDataForm;
 
+//TODO Use @Controller and @RequestMapping
 public class DataSourceListController extends PaginatedListController {
 
     @Override
     protected PaginatedData getData(HttpServletRequest request, PagingDataForm paging, String orderByClause, int offset, int limit, BindException errors) throws Exception {
         User user = Common.getUser(request);
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
 
         List<DataSourceVO<?>> data = Common.ctx.getRuntimeManager().getDataSources();
         List<ListParent<DataSourceVO<?>, DataPointVO>> dataSources = new ArrayList<>();

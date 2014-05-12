@@ -81,7 +81,7 @@ public class MaintenanceEventType extends EventType {
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        map.put("XID", new MaintenanceEventDao().getMaintenanceEvent(maintenanceId).getXid());
+        map.put("XID", MaintenanceEventDao.getInstance().getMaintenanceEvent(maintenanceId).getXid());
     }
 
     @Override

@@ -259,9 +259,10 @@ public class EventManager implements ILifecycle {
     //
     // Lifecycle interface
     //
+    @Override
     public void initialize() {
-        eventDao = new EventDao();
-        userDao = new UserDao();
+        eventDao = EventDao.getInstance();
+        userDao = UserDao.getInstance();
 
         // Get all active events from the database.
         activeEvents.addAll(eventDao.getActiveEvents());
@@ -269,10 +270,12 @@ public class EventManager implements ILifecycle {
         resetHighestAlarmLevel(lastAlarmTimestamp, true);
     }
 
+    @Override
     public void terminate() {
         // no op
     }
 
+    @Override
     public void joinTermination() {
         // no op
     }
@@ -295,7 +298,7 @@ public class EventManager implements ILifecycle {
     }
 
     private List<EventInstance> getAll(EventType type) {
-        List<EventInstance> result = new ArrayList<EventInstance>();
+        List<EventInstance> result = new ArrayList<>();
         for (EventInstance e : activeEvents) {
             if (e.getEventType().equals(type)) {
                 result.add(e);
@@ -327,7 +330,7 @@ public class EventManager implements ILifecycle {
         for (EventHandlerVO vo : vos) {
             if (!vo.isDisabled()) {
                 if (rts == null) {
-                    rts = new ArrayList<EventHandlerRT>();
+                    rts = new ArrayList<>();
                 }
                 rts.add(vo.createRuntime());
             }

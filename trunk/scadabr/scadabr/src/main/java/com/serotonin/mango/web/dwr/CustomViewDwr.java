@@ -31,10 +31,12 @@ import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.view.custom.CustomView;
 import com.serotonin.mango.view.custom.CustomViewComponent;
 import com.serotonin.mango.web.dwr.beans.CustomComponentState;
+import javax.inject.Named;
 
 /**
  * @author Matthew Lohbihler
  */
+@Named
 public class CustomViewDwr extends BaseDwr {
 
     public List<CustomComponentState> getViewPointData() {
@@ -58,4 +60,5 @@ public class CustomViewDwr extends BaseDwr {
         CustomView view = Common.getCustomView();
         setPointImpl(view.getPoint(xid), valueStr, view.getAuthorityUser());
     }
+
 }

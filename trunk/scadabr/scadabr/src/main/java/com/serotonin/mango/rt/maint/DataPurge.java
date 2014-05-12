@@ -56,7 +56,7 @@ public class DataPurge {
         LOG.info("Data purge started");
 
         // Get the data point information.
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
         List<DataPointVO> dataPoints = dataPointDao.getDataPoints(null, false);
         int deleteCount = 0;
         for (DataPointVO dataPoint : dataPoints) {
@@ -96,7 +96,7 @@ public class DataPurge {
         int deleteCount = 0;
 
         // Find all ids for which there should be a corresponding file
-        List<Long> validIds = new PointValueDao().getFiledataIds();
+        List<Long> validIds = PointValueDao.getInstance().getFiledataIds();
 
         // Get all of the existing filenames.
         File dir = new File(Common.getFiledataPath());
@@ -122,7 +122,7 @@ public class DataPurge {
         cutoff = DateUtils.minus(cutoff, SystemSettingsDao.getIntValue(SystemSettingsDao.EVENT_PURGE_PERIOD_TYPE),
                 SystemSettingsDao.getIntValue(SystemSettingsDao.EVENT_PURGE_PERIODS));
 
-        int deleteCount = new EventDao().purgeEventsBefore(cutoff.getMillis());
+        int deleteCount = EventDao.getInstance().purgeEventsBefore(cutoff.getMillis());
         if (deleteCount > 0) {
             LOG.log(Level.INFO, "Event purge ended, {0} events deleted", deleteCount);
         }
@@ -133,7 +133,7 @@ public class DataPurge {
         cutoff = DateUtils.minus(cutoff, SystemSettingsDao.getIntValue(SystemSettingsDao.REPORT_PURGE_PERIOD_TYPE),
                 SystemSettingsDao.getIntValue(SystemSettingsDao.REPORT_PURGE_PERIODS));
 
-        int deleteCount = new ReportDao().purgeReportsBefore(cutoff.getMillis());
+        int deleteCount = ReportDao.getInstance().purgeReportsBefore(cutoff.getMillis());
         if (deleteCount > 0) {
             LOG.log(Level.INFO, "Report purge ended, {0} report instances deleted", deleteCount);
         }

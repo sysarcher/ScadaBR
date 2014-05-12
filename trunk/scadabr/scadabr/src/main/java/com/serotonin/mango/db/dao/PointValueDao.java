@@ -67,6 +67,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.ArrayDeque;
 import java.util.Queue;
+import javax.inject.Named;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -74,6 +75,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.support.TransactionCallback;
 
+@Named
 public class PointValueDao extends BaseDao {
 
     private final static List<UnsavedPointValue> UNSAVED_POINT_VALUES = new ArrayList<>();
@@ -89,11 +91,17 @@ public class PointValueDao extends BaseDao {
     public PointValueDao() {
         super();
     }
-
-    public PointValueDao(DataSource dataSource) {
+    
+   @Deprecated
+    private PointValueDao(DataSource dataSource) {
         super(dataSource);
     }
 
+   @Deprecated
+     public static PointValueDao getInstance() {
+        return new PointValueDao(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     /**
      * Only the PointValueCache should call this method during runtime. Do not
      * use.

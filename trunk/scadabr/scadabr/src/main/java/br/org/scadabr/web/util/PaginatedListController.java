@@ -5,7 +5,6 @@
  */
 package br.org.scadabr.web.util;
 
-import br.org.scadabr.ImplementMeException;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

@@ -279,7 +279,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             return null;
         }
 
-        List<DataPointVO> points = new DataPointDao().getDataPoints(ds.getId(),
+        List<DataPointVO> points = dataPointDao.getDataPoints(ds.getId(),
                 DataPointNameComparator.instance);
         for (DataPointVO dataPointVO : points) {
             if (!dataPointVO.isEnabled()) {
@@ -306,7 +306,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             return null;
         }
 
-        List<DataPointVO> points = new DataPointDao().getDataPoints(ds.getId(),
+        List<DataPointVO> points = dataPointDao.getDataPoints(ds.getId(),
                 DataPointNameComparator.instance);
         return points;
     }
@@ -322,7 +322,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         DataPointVO dp;
         if (pointId == Common.NEW_ID) {
             dp = new DataPointVO();
-            dp.setXid(new DataPointDao().generateUniqueXid());
+            dp.setXid(dataPointDao.generateUniqueXid());
             dp.setDataSourceId(ds.getId());
             dp.setPointLocator(ds.createPointLocator());
             dp.setEventDetectors(new ArrayList<PointEventDetectorVO>(0));
@@ -330,7 +330,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                 defaulter.setDefaultValues(dp);
             }
         } else {
-            dp = new DataPointDao().getDataPoint(pointId);
+            dp = dataPointDao.getDataPoint(pointId);
             if (dp != null && dp.getDataSourceId() != ds.getId()) {
                 throw new RuntimeException("Data source id mismatch");
             }
@@ -350,7 +350,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
         if (xid.isEmpty()) {
             response.addContextual("xid", "validate.required");
-        } else if (!new DataPointDao().isXidUnique(xid, id)) {
+        } else if (!dataPointDao.isXidUnique(xid, id)) {
             response.addContextual("xid", "validate.xidUsed");
         } else if (xid.length() > 50) {
             response.addContextual("xid", "validate.notLongerThan", 50);
@@ -397,9 +397,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     @MethodFilter
     public List<EventInstanceBean> getAlarms() {
         DataSourceVO<?> ds = Common.getUser().getEditDataSource();
-        List<EventInstance> events = new EventDao()
-                .getPendingEventsForDataSource(ds.getId(), Common.getUser()
-                        .getId());
+        List<EventInstance> events = eventDao.getPendingEventsForDataSource(ds.getId(), Common.getUser().getId());
         List<EventInstanceBean> beans = new ArrayList<>();
         if (events != null) {
             for (EventInstance event : events) {
@@ -1287,8 +1285,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
                 result.addData("deviceNetworkAddress",
                         network.getNetworkAddressDottedString());
             }
-            result.addData("deviceInstanceNumber", d.getObjectIdentifier()
-                    .getInstanceNumber());
+            result.addData("deviceInstanceNumber", d.getObjectIdentifier().getInstanceNumber());
             result.addData("deviceDescription",
                     BACnetDiscovery.getDeviceDescription(d));
             result.addData("deviceDetails", details);
@@ -2187,8 +2184,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
             if (dp.getXid().isEmpty()) {
                 response.addContextual("xid", "validate.required");
-            } else if (!new DataPointDao()
-                    .isXidUnique(dp.getXid(), Common.NEW_ID)) {
+            } else if (!dataPointDao.isXidUnique(dp.getXid(), Common.NEW_ID)) {
                 response.addContextual("xid", "validate.xidUsed");
             } else if (dp.getXid().length() > 50) {
                 response.addContextual("xid", "validate.notLongerThan",
@@ -2320,8 +2316,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
             if (dp.getXid().isEmpty()) {
                 response.addContextual("xid", "validate.required");
-            } else if (!new DataPointDao()
-                    .isXidUnique(dp.getXid(), Common.NEW_ID)) {
+            } else if (!dataPointDao.isXidUnique(dp.getXid(), Common.NEW_ID)) {
                 response.addContextual("xid", "validate.xidUsed");
             } else if (dp.getXid().length() > 50) {
                 response.addContextual("xid", "validate.notLongerThan", 50);

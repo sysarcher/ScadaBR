@@ -42,18 +42,17 @@ import com.serotonin.mango.view.chart.TableChartRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
-import br.org.scadabr.util.StringUtils;
 
 public class DataPointDetailsController extends ParameterizableViewController {
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         User user = Common.getUser(request);
 
         int id;
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
         String idStr = request.getParameter("dpid");
         DataPointVO point = null;
 
@@ -89,8 +88,8 @@ public class DataPointDetailsController extends ParameterizableViewController {
             model.put("point", point);
 
             // Get the views for this user that contain this point.
-            List<View> userViews = new ViewDao().getViews(user.getId());
-            List<View> views = new LinkedList<View>();
+            List<View> userViews = ViewDao.getInstance().getViews(user.getId());
+            List<View> views = new LinkedList<>();
             for (View view : userViews) {
                 view.validateViewComponents(false);
                 if (view.containsValidVisibleDataPoint(id)) {
@@ -100,14 +99,14 @@ public class DataPointDetailsController extends ParameterizableViewController {
             model.put("views", views);
 
             // Get the users that have access to this point.
-            List<User> allUsers = new UserDao().getUsers();
-            List<Map<String, Object>> users = new LinkedList<Map<String, Object>>();
+            List<User> allUsers = UserDao.getInstance().getUsers();
+            List<Map<String, Object>> users = new LinkedList<>();
             Map<String, Object> userData;
             int accessType;
             for (User mangoUser : allUsers) {
                 accessType = Permissions.getDataPointAccessType(mangoUser, point);
                 if (accessType != Permissions.DataPointAccessTypes.NONE) {
-                    userData = new HashMap<String, Object>();
+                    userData = new HashMap<>();
                     userData.put("user", mangoUser);
                     userData.put("accessType", accessType);
                     users.add(userData);
@@ -119,7 +118,7 @@ public class DataPointDetailsController extends ParameterizableViewController {
             model.put("pointEditor", Permissions.hasDataSourcePermission(user, point.getDataSourceId()));
 
             // Put the events in the model.
-            model.put("events", new EventDao().getEventsForDataPoint(id, user.getId()));
+            model.put("events", EventDao.getInstance().getEventsForDataPoint(id, user.getId()));
 
             // Put the default history table count into the model. Default to 10.
             int historyLimit = 10;

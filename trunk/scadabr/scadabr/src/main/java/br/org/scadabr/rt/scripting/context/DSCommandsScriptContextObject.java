@@ -17,7 +17,7 @@ public class DSCommandsScriptContextObject extends ScriptContextObject {
 
     public void enableDataSource(String xid) {
         RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
-        DataSourceVO<?> dataSource = new DataSourceDao().getDataSource(xid);
+        DataSourceVO<?> dataSource = DataSourceDao.getInstance().getDataSource(xid);
         if (dataSource != null) {
             Permissions.ensureDataSourcePermission(Common.getUser(), dataSource
                     .getId());
@@ -29,7 +29,7 @@ public class DSCommandsScriptContextObject extends ScriptContextObject {
 
     public void disableDataSource(String xid) {
         RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
-        DataSourceVO<?> dataSource = new DataSourceDao().getDataSource(xid);
+        DataSourceVO<?> dataSource = DataSourceDao.getInstance().getDataSource(xid);
         if (dataSource != null) {
             Permissions.ensureDataSourcePermission(Common.getUser(), dataSource
                     .getId());

@@ -23,15 +23,16 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.logger.LogUtils;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.db.dao.BaseDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import br.org.scadabr.util.StringUtils;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sql.DataSource;
 
 /**
  * Base class for instances that perform database upgrades. The naming of
@@ -43,18 +44,27 @@ import br.org.scadabr.util.StringUtils;
  */
 abstract public class DBUpgrade extends BaseDao {
 
-    private static final Log LOG = LogFactory.getLog(DBUpgrade.class);
+    protected static final Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_DAO);
     protected static final String DEFAULT_DATABASE_TYPE = "*";
 
+    public DBUpgrade() {
+        super();
+    }
+
+    @Deprecated
+    protected DBUpgrade(DataSource dataSource) {
+        super(dataSource);
+    }
+
     public static void checkUpgrade() {
-		// If this is a very old version of the system, there may be multiple
+        // If this is a very old version of the system, there may be multiple
         // upgrades to run, so start a loop.
         while (true) {
             // Get the current schema version.
             String schemaVersion = SystemSettingsDao
                     .getValue(SystemSettingsDao.DATABASE_SCHEMA_VERSION);
 
-			// Convert the schema version to the class name convention. This
+            // Convert the schema version to the class name convention. This
             // simply means replacing dots with
             // underscores and prefixing 'Upgrade' and this package.
             String upgradeClassname = DBUpgrade.class.getPackage().getName()
@@ -72,24 +82,21 @@ abstract public class DBUpgrade extends BaseDao {
             if (clazz != null) {
                 try {
                     upgrade = (DBUpgrade) clazz.newInstance();
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     // Should never happen so wrap in a runtime and rethrow.
                     throw new ShouldNeverHappenException(e);
                 }
             }
 
             if (upgrade == null) {
-                LOG.info("Starting instance with version " + schemaVersion);
+                LOG.log(Level.INFO, "Starting instance with version {0}", schemaVersion);
                 break;
             }
 
             try {
-                LOG.warn("Upgrading instance from " + schemaVersion + " to "
-                        + upgrade.getNewSchemaVersion());
+                LOG.log(Level.WARNING, "Upgrading instance from {0} to {1}", new Object[]{schemaVersion, upgrade.getNewSchemaVersion()});
                 upgrade.upgrade();
-                new SystemSettingsDao().setValue(
-                        SystemSettingsDao.DATABASE_SCHEMA_VERSION,
-                        upgrade.getNewSchemaVersion());
+                SystemSettingsDao.getInstance().setValue(SystemSettingsDao.DATABASE_SCHEMA_VERSION, upgrade.getNewSchemaVersion());
             } catch (Exception e) {
                 throw new ShouldNeverHappenException(e);
             }
@@ -128,17 +135,17 @@ abstract public class DBUpgrade extends BaseDao {
 
         File logDir = new File(dir);
         File logFile = new File(logDir, "Update" + version + ".log");
-        LOG.info("Writing upgrade log to " + logFile.getAbsolutePath());
+        LOG.log(Level.INFO, "Writing upgrade log to {0}", logFile.getAbsolutePath());
 
         try {
             if (logDir.isDirectory() && logDir.canWrite()) {
                 return new FileOutputStream(logFile);
             }
-        } catch (Exception e) {
-            LOG.error("Failed to create database upgrade log file.", e);
+        } catch (Throwable e) {
+            LOG.log(Level.SEVERE, "Failed to create database upgrade log file.", e);
         }
 
-        LOG.warn("Failing over to console for printing database upgrade messages");
+        LOG.severe("Failing over to console for printing database upgrade messages");
         return System.out;
     }
 

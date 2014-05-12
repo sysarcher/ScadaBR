@@ -66,7 +66,7 @@ public class CustomView {
             }
         }
 
-        DataPointVO dp = new DataPointDao().getDataPoint(xid);
+        DataPointVO dp = DataPointDao.getInstance().getDataPoint(xid);
         if (dp != null) {
             // Check permissions.
             Permissions.ensureDataPointSetPermission(authorityUser, dp);

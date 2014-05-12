@@ -82,17 +82,16 @@ public class ChartComparatorComponent extends HtmlComponent {
     }
 
     private String createDataPointsSelectComponent(String idPrefix) {
-        List<DataPointVO> dataPoints = new DataPointDao().getDataPoints(null,
+        List<DataPointVO> dataPoints = DataPointDao.getInstance().getDataPoints(null,
                 false);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("<select style='float:left;'  id='" + idPrefix + "'>");
+        sb.append("<select style='float:left;'  id='").append(idPrefix).append("'>");
 
         sb.append("<option value='0'> &nbsp; </option>");
 
         for (DataPointVO dp : dataPoints) {
-            sb.append("<option value='" + dp.getId() + "'> " + dp.getName()
-                    + "</option>");
+            sb.append("<option value='").append(dp.getId()).append("'> ").append(dp.getName()).append("</option>");
         }
         sb.append("</select>");
 

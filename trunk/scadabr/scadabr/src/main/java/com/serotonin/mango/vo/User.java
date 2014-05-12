@@ -53,7 +53,6 @@ import com.serotonin.mango.web.dwr.beans.DataExportDefinition;
 import com.serotonin.mango.web.dwr.beans.EventExportDefinition;
 import com.serotonin.mango.web.dwr.beans.ImportTask;
 import com.serotonin.mango.web.dwr.beans.TestingUtility;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
@@ -118,10 +117,12 @@ public class User implements SetPointSource, HttpSessionBindingListener,
     // / SetPointSource implementation
     // /
     //
+    @Override
     public int getSetPointSourceId() {
         return id;
     }
 
+    @Override
     public int getSetPointSourceType() {
         return SetPointSource.Types.USER;
     }
@@ -447,7 +448,7 @@ public class User implements SetPointSource, HttpSessionBindingListener,
                     .getJsonArray("dataSourcePermissions");
             if (jsonDataSources != null) {
                 dataSourcePermissions.clear();
-                DataSourceDao dataSourceDao = new DataSourceDao();
+                DataSourceDao dataSourceDao = DataSourceDao.getInstance();
 
                 for (JsonValue jv : jsonDataSources.getElements()) {
                     String xid = jv.toJsonString().getValue();
@@ -464,7 +465,7 @@ public class User implements SetPointSource, HttpSessionBindingListener,
             if (jsonPoints != null) {
                 // Get a list of points to which permission already exists due
                 // to data source access.
-                DataPointDao dataPointDao = new DataPointDao();
+                DataPointDao dataPointDao = DataPointDao.getInstance();
                 List<Integer> permittedPoints = new ArrayList<>();
                 for (Integer dsId : dataSourcePermissions) {
                     for (DataPointVO dp : dataPointDao
@@ -490,8 +491,8 @@ public class User implements SetPointSource, HttpSessionBindingListener,
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         if (!admin) {
-            List<String> dsXids = new ArrayList<String>();
-            DataSourceDao dataSourceDao = new DataSourceDao();
+            List<String> dsXids = new ArrayList<>();
+            DataSourceDao dataSourceDao = DataSourceDao.getInstance();
             for (Integer dsId : dataSourcePermissions) {
                 dsXids.add(dataSourceDao.getDataSource(dsId).getXid());
             }

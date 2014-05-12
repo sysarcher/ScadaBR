@@ -50,6 +50,7 @@ public class ContextWrapper {
         ctx = request.getSession().getServletContext();
     }
 
+    @Deprecated
     public DatabaseAccess getDatabaseAccess() {
         return (DatabaseAccess) ctx
                 .getAttribute(Common.ContextKeys.DATABASE_ACCESS);

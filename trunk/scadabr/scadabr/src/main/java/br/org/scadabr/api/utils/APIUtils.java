@@ -640,8 +640,7 @@ public final class APIUtils {
 
     public static String toCondition(PointEventDetectorVO pointEvent) {
 
-        DataPointVO dp = new DataPointDao().getDataPoint(new DataPointDao()
-                .getDataPointIdFromDetectorId(pointEvent.getId()));
+        DataPointVO dp = DataPointDao.getInstance().getDataPoint(DataPointDao.getInstance().getDataPointIdFromDetectorId(pointEvent.getId()));
 
         String config = "[" + dp.getName() + " - ";
         switch (pointEvent.getDetectorType()) {
@@ -789,8 +788,7 @@ public final class APIUtils {
             int pointDetectorId = eventInstance.getEventType()
                     .getReferenceId2();
 
-            List<PointEventDetectorVO> peDetectors = new DataPointDao()
-                    .getDataPoint(dataPointId).getEventDetectors();
+            List<PointEventDetectorVO> peDetectors = DataPointDao.getInstance().getDataPoint(dataPointId).getEventDetectors();
 
             for (PointEventDetectorVO pointEventDetectorVO : peDetectors) {
                 if (pointEventDetectorVO.getId() == pointDetectorId) {
@@ -807,14 +805,12 @@ public final class APIUtils {
             event.setEventType(EventType.POINT_CONDITION_EVENT);
             int compoundId = eventInstance.getEventType()
                     .getCompoundEventDetectorId();
-            event.setAlias(new CompoundEventDetectorDao()
-                    .getCompoundEventDetector(compoundId).getName());
+            event.setAlias(CompoundEventDetectorDao.getInstance().getCompoundEventDetector(compoundId).getName());
 
         } else if (eventInstance.getEventType().getScheduleId() != -1) {
             event.setEventType(EventType.SCHEDULED_EVENT);
             int scheduleId = eventInstance.getEventType().getScheduleId();
-            event.setAlias(new ScheduledEventDao()
-                    .getScheduledEvent(scheduleId).getAlias());
+            event.setAlias(ScheduledEventDao.getInstance().getScheduledEvent(scheduleId).getAlias());
         } else {
             event.setEventType(EventType.SYSTEM_EVENT);
             event.setAlias(eventInstance.getMessage().getI18nKey());

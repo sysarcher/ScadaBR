@@ -23,8 +23,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import com.serotonin.mango.Common;
@@ -53,6 +51,7 @@ import com.serotonin.mango.view.graphic.ScriptRenderer;
 import com.serotonin.mango.view.graphic.ThumbnailRenderer;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.util.SerializationHelper;
+import javax.sql.DataSource;
 
 /**
  * @author Matthew Lohbihler
@@ -60,26 +59,37 @@ import br.org.scadabr.util.SerializationHelper;
 @SuppressWarnings("deprecation")
 public class Upgrade1_5_0 extends DBUpgrade {
 
-    private final Log log = LogFactory.getLog(getClass());
+    private Upgrade1_5_0() {
+        super();
+    }
+    
+   @Deprecated
+    private Upgrade1_5_0(DataSource dataSource) {
+        super(dataSource);
+    }
 
+     public static Upgrade1_5_0 getInstance() {
+        return new Upgrade1_5_0(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     @Override
     public void upgrade() throws Exception {
-        OutputStream out = createUpdateLogOutputStream("1_5_0");
-
         // Run the script.
-        log.info("Running script 1");
-        runScript(script1, out);
-
-        xid();
-        viewData();
-        eventData();
-
-        // Run the script.
-        log.info("Running script 2");
-        runScript(script2, out);
-
-        out.flush();
-        out.close();
+        try (OutputStream out = createUpdateLogOutputStream("1_5_0")) {
+            // Run the script.
+            LOG.info("Running script 1");
+            runScript(script1, out);
+            
+            xid();
+            viewData();
+            eventData();
+            
+            // Run the script.
+            LOG.info("Running script 2");
+            runScript(script2, out);
+            
+            out.flush();
+        }
     }
 
     @Override
@@ -161,14 +171,14 @@ public class Upgrade1_5_0 extends DBUpgrade {
 
     private void xid() {
         // Default the xid values.
-        DataSourceDao dataSourceDao = new DataSourceDao();
+        DataSourceDao dataSourceDao = DataSourceDao.getInstance();
         List<Integer> dsids = ejt.queryForList("select id from dataSources", Integer.class);
         for (Integer dsid : dsids) {
             ejt.update("update dataSources set xid=? where id=?", new Object[]{dataSourceDao.generateUniqueXid(),
                 dsid});
         }
 
-        DataPointDao dataPointDao = new DataPointDao();
+        DataPointDao dataPointDao = DataPointDao.getInstance();
         List<Integer> dpids = ejt.queryForList("select id from dataPoints", Integer.class);
         for (Integer dpid : dpids) {
             ejt.update("update dataPoints set xid=? where id=?",
@@ -183,8 +193,8 @@ public class Upgrade1_5_0 extends DBUpgrade {
     }
 
     private void viewData() {
-        ViewDao viewDao = new ViewDao();
-        final DataPointDao dataPointDao = new DataPointDao();
+        ViewDao viewDao = ViewDao.getInstance();
+        final DataPointDao dataPointDao = DataPointDao.getInstance();
         List<View> views = viewDao.getViews();
 
         // Pull all point/static view data from these tables and convert to view component versions.

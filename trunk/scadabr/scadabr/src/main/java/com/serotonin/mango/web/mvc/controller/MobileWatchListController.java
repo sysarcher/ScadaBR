@@ -56,7 +56,7 @@ public class MobileWatchListController extends WatchListController {
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) {
         User user = Common.getUser(request);
-        WatchListDao watchListDao = new WatchListDao();
+        WatchListDao watchListDao = WatchListDao.getInstance();
 
         // Check for a watchlist id parameter. If given, update the user.
         try {
@@ -78,7 +78,7 @@ public class MobileWatchListController extends WatchListController {
         // Get the point data.
         List<MobileWatchListState> states = new ArrayList<>();
         RuntimeManager rtm = Common.ctx.getRuntimeManager();
-        for (DataPointVO pointVO : new WatchListDao().getWatchList(watchListId).getPointList()) {
+        for (DataPointVO pointVO : WatchListDao.getInstance().getWatchList(watchListId).getPointList()) {
             MobileWatchListState state = createState(request, rtm, pointVO);
             states.add(state);
         }

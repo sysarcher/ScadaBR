@@ -50,9 +50,14 @@ import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
+import com.serotonin.mango.db.dao.UserDao;
+import javax.inject.Inject;
 
 public class SystemSettingsDwr extends BaseDwr {
 
+    @Inject
+    private SystemSettingsDao systemSettingsDao;
+    
     @MethodFilter
     public Map<String, Object> getSettings() {
         Permissions.ensureAdmin();
@@ -178,8 +183,7 @@ public class SystemSettingsDwr extends BaseDwr {
                 DirectoryUtils.bytesDescription(dbSize + filedataSize));
 
         // Point history counts.
-        List<PointHistoryCount> counts = new DataPointDao()
-                .getTopPointHistoryCounts();
+        List<PointHistoryCount> counts = dataPointDao.getTopPointHistoryCounts();
         int sum = 0;
         for (PointHistoryCount c : counts) {
             sum += c.getCount();
@@ -187,7 +191,7 @@ public class SystemSettingsDwr extends BaseDwr {
 
         data.put("historyCount", sum);
         data.put("topPoints", counts);
-        data.put("eventCount", new EventDao().getEventCount());
+        data.put("eventCount", eventDao.getEventCount());
 
         return data;
     }
@@ -197,7 +201,6 @@ public class SystemSettingsDwr extends BaseDwr {
             String name, boolean auth, String username, String password,
             boolean tls, int contentType) {
         Permissions.ensureAdmin();
-        SystemSettingsDao systemSettingsDao = new SystemSettingsDao();
         systemSettingsDao.setValue(SystemSettingsDao.EMAIL_SMTP_HOST, host);
         systemSettingsDao.setIntValue(SystemSettingsDao.EMAIL_SMTP_PORT, port);
         systemSettingsDao.setValue(SystemSettingsDao.EMAIL_FROM_ADDRESS, from);
@@ -266,17 +269,11 @@ public class SystemSettingsDwr extends BaseDwr {
     public void saveHttpSettings(boolean useProxy, String host, int port,
             String username, String password) {
         Permissions.ensureAdmin();
-        SystemSettingsDao systemSettingsDao = new SystemSettingsDao();
-        systemSettingsDao.setBooleanValue(
-                SystemSettingsDao.HTTP_CLIENT_USE_PROXY, useProxy);
-        systemSettingsDao.setValue(SystemSettingsDao.HTTP_CLIENT_PROXY_SERVER,
-                host);
-        systemSettingsDao.setIntValue(SystemSettingsDao.HTTP_CLIENT_PROXY_PORT,
-                port);
-        systemSettingsDao.setValue(
-                SystemSettingsDao.HTTP_CLIENT_PROXY_USERNAME, username);
-        systemSettingsDao.setValue(
-                SystemSettingsDao.HTTP_CLIENT_PROXY_PASSWORD, password);
+        systemSettingsDao.setBooleanValue( SystemSettingsDao.HTTP_CLIENT_USE_PROXY, useProxy);
+        systemSettingsDao.setValue(SystemSettingsDao.HTTP_CLIENT_PROXY_SERVER, host);
+        systemSettingsDao.setIntValue(SystemSettingsDao.HTTP_CLIENT_PROXY_PORT, port);
+        systemSettingsDao.setValue(SystemSettingsDao.HTTP_CLIENT_PROXY_USERNAME, username);
+        systemSettingsDao.setValue(SystemSettingsDao.HTTP_CLIENT_PROXY_PASSWORD, password);
     }
 
     @MethodFilter
@@ -285,27 +282,14 @@ public class SystemSettingsDwr extends BaseDwr {
             int reportPurgePeriods, int uiPerformance, boolean groveLogging,
             int futureDateLimitPeriodType, int futureDateLimitPeriods) {
         Permissions.ensureAdmin();
-        SystemSettingsDao systemSettingsDao = new SystemSettingsDao();
-        systemSettingsDao
-                .setIntValue(SystemSettingsDao.EVENT_PURGE_PERIOD_TYPE,
-                        eventPurgePeriodType);
-        systemSettingsDao.setIntValue(SystemSettingsDao.EVENT_PURGE_PERIODS,
-                eventPurgePeriods);
-        systemSettingsDao.setIntValue(
-                SystemSettingsDao.REPORT_PURGE_PERIOD_TYPE,
-                reportPurgePeriodType);
-        systemSettingsDao.setIntValue(SystemSettingsDao.REPORT_PURGE_PERIODS,
-                reportPurgePeriods);
-        systemSettingsDao.setIntValue(SystemSettingsDao.UI_PERFORAMANCE,
-                uiPerformance);
-        systemSettingsDao.setBooleanValue(SystemSettingsDao.GROVE_LOGGING,
-                groveLogging);
-        systemSettingsDao.setIntValue(
-                SystemSettingsDao.FUTURE_DATE_LIMIT_PERIOD_TYPE,
-                futureDateLimitPeriodType);
-        systemSettingsDao.setIntValue(
-                SystemSettingsDao.FUTURE_DATE_LIMIT_PERIODS,
-                futureDateLimitPeriods);
+        systemSettingsDao.setIntValue(SystemSettingsDao.EVENT_PURGE_PERIOD_TYPE, eventPurgePeriodType);
+        systemSettingsDao.setIntValue(SystemSettingsDao.EVENT_PURGE_PERIODS, eventPurgePeriods);
+        systemSettingsDao.setIntValue(SystemSettingsDao.REPORT_PURGE_PERIOD_TYPE, reportPurgePeriodType);
+        systemSettingsDao.setIntValue(SystemSettingsDao.REPORT_PURGE_PERIODS, reportPurgePeriods);
+        systemSettingsDao.setIntValue(SystemSettingsDao.UI_PERFORAMANCE, uiPerformance);
+        systemSettingsDao.setBooleanValue(SystemSettingsDao.GROVE_LOGGING, groveLogging);
+        systemSettingsDao.setIntValue(SystemSettingsDao.FUTURE_DATE_LIMIT_PERIOD_TYPE, futureDateLimitPeriodType);
+        systemSettingsDao.setIntValue(SystemSettingsDao.FUTURE_DATE_LIMIT_PERIODS, futureDateLimitPeriods);
     }
 
     @MethodFilter
@@ -334,7 +318,6 @@ public class SystemSettingsDwr extends BaseDwr {
         }
 
         if (response.isEmpty()) {
-            SystemSettingsDao systemSettingsDao = new SystemSettingsDao();
             systemSettingsDao.setValue(
                     SystemSettingsDao.CHART_BACKGROUND_COLOUR,
                     chartBackgroundColour);
@@ -352,7 +335,6 @@ public class SystemSettingsDwr extends BaseDwr {
     public void saveInfoSettings(String newVersionNotificationLevel,
             String instanceDescription) {
         Permissions.ensureAdmin();
-        SystemSettingsDao systemSettingsDao = new SystemSettingsDao();
         systemSettingsDao.setValue(
                 SystemSettingsDao.NEW_VERSION_NOTIFICATION_LEVEL,
                 newVersionNotificationLevel);
@@ -378,7 +360,6 @@ public class SystemSettingsDwr extends BaseDwr {
     @MethodFilter
     public void saveLanguageSettings(String language) {
         Permissions.ensureAdmin();
-        SystemSettingsDao systemSettingsDao = new SystemSettingsDao();
         systemSettingsDao.setValue(SystemSettingsDao.LANGUAGE, language);
         Common.setSystemLanguage(language);
     }
@@ -424,4 +405,19 @@ public class SystemSettingsDwr extends BaseDwr {
     public String getAppServer() {
         return Common.ctx.getServletContext().getServerInfo();
     }
+
+    /**
+     * @return the systemSettingsDao
+     */
+    public SystemSettingsDao getSystemSettingsDao() {
+        return systemSettingsDao;
+    }
+
+    /**
+     * @param systemSettingsDao the systemSettingsDao to set
+     */
+    public void setSystemSettingsDao(SystemSettingsDao systemSettingsDao) {
+        this.systemSettingsDao = systemSettingsDao;
+    }
+
 }

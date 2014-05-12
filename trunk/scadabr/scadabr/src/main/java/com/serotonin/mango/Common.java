@@ -533,7 +533,7 @@ public class Common {
             throw new IllegalArgumentException(
                     "Locale for given language not found: " + language);
         }
-        new SystemSettingsDao().setValue(SystemSettingsDao.LANGUAGE, language);
+        SystemSettingsDao.getInstance().setValue(SystemSettingsDao.LANGUAGE, language);
         systemLanguage = null;
         systemBundle = null;
     }

@@ -29,15 +29,31 @@ import com.serotonin.mango.vo.link.PointLinkVO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import javax.inject.Named;
+import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
  * @author Matthew Lohbihler
  */
+@Named
 public class PointLinkDao extends BaseDao {
+
+    public PointLinkDao() {
+        super();
+    }
+
+    @Deprecated
+    private PointLinkDao(DataSource dataSource) {
+        super(dataSource);
+    }
+
+    @Deprecated
+    public static PointLinkDao getInstance() {
+        return new PointLinkDao(Common.ctx.getDatabaseAccess().getDataSource());
+    }
 
     public String generateUniqueXid() {
         return generateUniqueXid(PointLinkVO.XID_PREFIX, "pointLinks");

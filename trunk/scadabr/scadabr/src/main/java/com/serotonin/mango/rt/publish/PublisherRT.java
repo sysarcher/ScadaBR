@@ -87,7 +87,7 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
     public Object getPersistentData(String key) {
         synchronized (persistentDataLock) {
             @SuppressWarnings("unchecked")
-            Map<String, Object> map = (Map<String, Object>) new PublisherDao().getPersistentData(vo.getId());
+            Map<String, Object> map = (Map<String, Object>) PublisherDao.getInstance().getPersistentData(vo.getId());
             if (map != null) {
                 return map.get(key);
             }
@@ -105,7 +105,7 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
      * @param key
      */
     public void setPersistentData(String key, Object persistentData) {
-        PublisherDao dao = new PublisherDao();
+        PublisherDao dao = PublisherDao.getInstance();
         synchronized (persistentDataLock) {
             @SuppressWarnings("unchecked")
             Map<String, Object> map = (Map<String, Object>) dao.getPersistentData(vo.getId());

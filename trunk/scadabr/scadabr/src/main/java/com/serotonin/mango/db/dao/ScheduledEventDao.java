@@ -33,16 +33,18 @@ import com.serotonin.mango.vo.event.ScheduledEventVO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import javax.inject.Named;
+import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
  * @author Matthew Lohbihler
  *
  */
+@Named
 public class ScheduledEventDao extends BaseDao {
 
     private static final String SCHEDULED_EVENT_SELECT = "select id, xid, alias, alarmLevel, scheduleType, "
@@ -50,6 +52,20 @@ public class ScheduledEventDao extends BaseDao {
             + "  activeCron, inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute, inactiveSecond, "
             + "inactiveCron from scheduledEvents ";
 
+    public ScheduledEventDao() {
+        super();
+    }
+    
+   @Deprecated
+    private ScheduledEventDao(DataSource dataSource) {
+        super(dataSource);
+    }
+
+   @Deprecated
+     public static ScheduledEventDao getInstance() {
+        return new ScheduledEventDao(Common.ctx.getDatabaseAccess().getDataSource());
+    }
+    
     public String generateUniqueXid() {
         return generateUniqueXid(ScheduledEventVO.XID_PREFIX, "scheduledEvents");
     }
