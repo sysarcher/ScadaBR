@@ -35,7 +35,6 @@ import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.integration.CrowdUtils;
 import com.serotonin.mango.web.mvc.form.LoginForm;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.util.ValidationUtils;
 
 public class LoginController extends SimpleFormController {

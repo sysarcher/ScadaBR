@@ -92,6 +92,8 @@ public class MangoContextListener implements ServletContextListener {
     private DatabaseAccessFactory databaseAccessFactory;
     @Inject
     private RuntimeManager runtimeManager;
+    @Inject
+    private EventManager eventManager;
     
     
     @Override
@@ -150,7 +152,7 @@ public class MangoContextListener implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent evt) {
         LOG.info("Mango context terminating");
 
-        if (Common.ctx.getEventManager() != null) {
+        if (eventManager != null) {
             // Notify the event manager of the shutdown.
             SystemEventType.raiseEvent(new SystemEventType(
                     SystemEventType.TYPE_SYSTEM_SHUTDOWN), System
@@ -404,16 +406,14 @@ public class MangoContextListener implements ServletContextListener {
     //
     @Deprecated
     private void eventManagerInitialize(ServletContext ctx) {
-        EventManager em = new EventManager();
-        ctx.setAttribute(Common.ContextKeys.EVENT_MANAGER, em);
-        em.initialize();
+        ctx.setAttribute(Common.ContextKeys.EVENT_MANAGER, eventManager);
+        eventManager.initialize();
     }
 
     private void eventManagerTerminate(ContextWrapper ctx) {
-        EventManager em = ctx.getEventManager();
-        if (em != null) {
-            em.terminate();
-            em.joinTermination();
+        if (eventManager != null) {
+            eventManager.terminate();
+            eventManager.joinTermination();
         }
     }
 

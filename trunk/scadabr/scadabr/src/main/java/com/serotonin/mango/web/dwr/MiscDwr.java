@@ -87,6 +87,8 @@ public class MiscDwr extends BaseDwr {
     protected CustomViewDwr customViewDwr;
     @Inject
     private MailingListDao mailingListDao;
+    @Inject
+    private EventManager eventManager;
 
     public DwrResponseI18n toggleSilence(int eventId) {
         DwrResponseI18n response = new DwrResponseI18n();
@@ -290,7 +292,6 @@ public class MiscDwr extends BaseDwr {
         Map<String, Object> response = new HashMap<>();
         HttpServletRequest httpRequest = WebContextFactory.get().getHttpServletRequest();
         User user = Common.getUser(httpRequest);
-        EventManager eventManager = Common.ctx.getEventManager();
 
         LongPollData data = getLongPollData(pollSessionId, false);
         data.updateTimestamp();
@@ -653,6 +654,20 @@ public class MiscDwr extends BaseDwr {
      */
     public void setMailingListDao(MailingListDao mailingListDao) {
         this.mailingListDao = mailingListDao;
+    }
+
+    /**
+     * @return the eventManager
+     */
+    public EventManager getEventManager() {
+        return eventManager;
+    }
+
+    /**
+     * @param eventManager the eventManager to set
+     */
+    public void setEventManager(EventManager eventManager) {
+        this.eventManager = eventManager;
     }
 
 }
