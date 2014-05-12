@@ -56,7 +56,6 @@ public class PublisherListDwr extends BaseDwr {
     public DwrResponseI18n togglePublisher(int publisherId) {
         DwrResponseI18n response = new DwrResponseI18n();
 
-        RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
         PublisherVO<? extends PublishedPointVO> publisher = runtimeManager.getPublisher(publisherId);
 
         publisher.setEnabled(!publisher.isEnabled());
@@ -69,7 +68,7 @@ public class PublisherListDwr extends BaseDwr {
     }
 
     public int deletePublisher(int publisherId) {
-        Common.ctx.getRuntimeManager().deletePublisher(publisherId);
+        runtimeManager.deletePublisher(publisherId);
         return publisherId;
     }
 

@@ -143,7 +143,7 @@ public class PointLinksDwr extends BaseDwr {
     }
 
     public void deletePointLink(int id) {
-        Common.ctx.getRuntimeManager().deletePointLink(id);
+        runtimeManager.deletePointLink(id);
     }
 
     public DwrResponseI18n validateScript(String script, int sourcePointId, int targetPointId) {
@@ -151,7 +151,7 @@ public class PointLinksDwr extends BaseDwr {
         LocalizableMessage message;
         ScriptExecutor scriptExecutor = new ScriptExecutor();
 
-        DataPointRT point = Common.ctx.getRuntimeManager().getDataPoint(sourcePointId);
+        DataPointRT point = runtimeManager.getDataPoint(sourcePointId);
         if (point == null) {
             message = new LocalizableMessageImpl("event.pointLink.sourceUnavailable");
         } else {

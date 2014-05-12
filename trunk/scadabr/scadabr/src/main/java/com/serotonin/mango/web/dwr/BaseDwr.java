@@ -60,6 +60,7 @@ import br.org.scadabr.web.content.ContentGenerator;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.l10n.Localizer;
+import com.serotonin.mango.rt.RuntimeManager;
 import java.util.Locale;
 import java.util.Objects;
 import javax.inject.Inject;
@@ -76,6 +77,8 @@ abstract public class BaseDwr {
     protected UserDao userDao;
     @Inject
     protected DataPointDao dataPointDao;
+    @Inject
+    protected RuntimeManager runtimeManager; 
 
     public BaseDwr() {}
 
@@ -205,11 +208,11 @@ abstract public class BaseDwr {
         }
 
         if (valueStr == null) {
-            Common.ctx.getRuntimeManager().relinquish(point.getId());
+            runtimeManager.relinquish(point.getId());
         } else {
             // Convert the string value into an object.
             MangoValue value = MangoValue.stringToValue(valueStr, point.getPointLocator().getDataTypeId());
-            Common.ctx.getRuntimeManager().setDataPointValue(point.getId(), value, source);
+            runtimeManager.setDataPointValue(point.getId(), value, source);
         }
     }
 
@@ -221,7 +224,7 @@ abstract public class BaseDwr {
         // Check permissions.
         Permissions.ensureDataPointReadPermission(user, point);
 
-        Common.ctx.getRuntimeManager().forcePointRead(pointId);
+        runtimeManager.forcePointRead(pointId);
     }
 
     /**
@@ -396,6 +399,20 @@ abstract public class BaseDwr {
      */
     public void setDataPointDao(DataPointDao dataPointDao) {
         this.dataPointDao = dataPointDao;
+    }
+
+    /**
+     * @return the runtimeManager
+     */
+    public RuntimeManager getRuntimeManager() {
+        return runtimeManager;
+    }
+
+    /**
+     * @param runtimeManager the runtimeManager to set
+     */
+    public void setRuntimeManager(RuntimeManager runtimeManager) {
+        this.runtimeManager = runtimeManager;
     }
     
 }

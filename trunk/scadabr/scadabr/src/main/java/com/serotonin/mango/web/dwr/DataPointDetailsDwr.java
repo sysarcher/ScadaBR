@@ -65,7 +65,7 @@ public class DataPointDetailsDwr extends BaseDwr {
         DataPointVO pointVO = user.getEditPoint();
 
         // Create the watch list state.
-        RuntimeManager rtm = Common.ctx.getRuntimeManager();
+        RuntimeManager rtm = runtimeManager;
         Map<String, Object> model = new HashMap<>();
 
         // Get the data point status from the data image.

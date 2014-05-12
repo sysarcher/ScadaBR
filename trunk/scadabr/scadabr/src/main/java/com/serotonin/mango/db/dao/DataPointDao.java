@@ -55,8 +55,10 @@ import com.serotonin.mango.vo.hierarchy.PointHierarchyEventDispatcher;
 import com.serotonin.mango.vo.link.PointLinkVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.Tuple;
+import com.serotonin.mango.rt.RuntimeManager;
 import java.sql.Connection;
 import java.sql.Statement;
+import javax.inject.Inject;
 import javax.inject.Named;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -66,6 +68,9 @@ import org.springframework.jdbc.core.RowMapper;
 @Named
 public class DataPointDao extends BaseDao {
 
+    @Inject
+    private RuntimeManager runtimeManager;
+    
     public DataPointDao() {
         super();
     }
@@ -73,6 +78,7 @@ public class DataPointDao extends BaseDao {
     @Deprecated
     protected DataPointDao(DataSource dataSource) {
         super(dataSource);
+        this.runtimeManager = Common.ctx.getRuntimeManager();
     }
 
     @Deprecated
@@ -311,7 +317,7 @@ public class DataPointDao extends BaseDao {
 
     private void beforePointDelete(int dataPointId) {
         for (PointLinkVO link : PointLinkDao.getInstance().getPointLinksForPoint(dataPointId)) {
-            Common.ctx.getRuntimeManager().deletePointLink(link.getId());
+            runtimeManager.deletePointLink(link.getId());
         }
     }
 

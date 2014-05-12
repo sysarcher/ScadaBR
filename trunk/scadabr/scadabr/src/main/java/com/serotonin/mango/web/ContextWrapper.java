@@ -103,11 +103,13 @@ public class ContextWrapper {
         return null;
     }
 
+    @Deprecated
     public RuntimeManager getRuntimeManager() {
         return (RuntimeManager) ctx
                 .getAttribute(Common.ContextKeys.RUNTIME_MANAGER);
     }
 
+    @Deprecated
     public EventManager getEventManager() {
         return (EventManager) ctx
                 .getAttribute(Common.ContextKeys.EVENT_MANAGER);

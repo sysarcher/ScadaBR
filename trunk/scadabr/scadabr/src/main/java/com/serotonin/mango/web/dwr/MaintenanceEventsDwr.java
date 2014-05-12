@@ -91,7 +91,7 @@ public class MaintenanceEventsDwr extends BaseDwr {
         } else {
             me = maintenanceEventDao.getMaintenanceEvent(id);
 
-            MaintenanceEventRT rt = Common.ctx.getRuntimeManager().getRunningMaintenanceEvent(me.getId());
+            MaintenanceEventRT rt = runtimeManager.getRunningMaintenanceEvent(me.getId());
             if (rt != null) {
                 activated = rt.isEventActive();
             }
@@ -144,7 +144,7 @@ public class MaintenanceEventsDwr extends BaseDwr {
 
         // Save the maintenance event
         if (response.isEmpty()) {
-            Common.ctx.getRuntimeManager().saveMaintenanceEvent(e);
+            runtimeManager.saveMaintenanceEvent(e);
             response.addData("meId", e.getId());
         }
 
@@ -153,14 +153,14 @@ public class MaintenanceEventsDwr extends BaseDwr {
 
     public void deleteMaintenanceEvent(int meId) {
         Permissions.ensureAdmin();
-        Common.ctx.getRuntimeManager().deleteMaintenanceEvent(meId);
+        runtimeManager.deleteMaintenanceEvent(meId);
     }
 
     public DwrResponseI18n toggleMaintenanceEvent(int id) {
         Permissions.ensureAdmin();
         DwrResponseI18n response = new DwrResponseI18n();
 
-        MaintenanceEventRT rt = Common.ctx.getRuntimeManager().getRunningMaintenanceEvent(id);
+        MaintenanceEventRT rt = runtimeManager.getRunningMaintenanceEvent(id);
         boolean activated = false;
         if (rt == null) {
             response.addGeneric("maintenanceEvents.toggle.disabled");

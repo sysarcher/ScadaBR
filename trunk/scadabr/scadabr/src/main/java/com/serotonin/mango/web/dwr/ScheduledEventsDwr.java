@@ -106,7 +106,7 @@ public class ScheduledEventsDwr extends BaseDwr {
 
         // Save the scheduled event
         if (response.isEmpty()) {
-            Common.ctx.getRuntimeManager().saveScheduledEvent(se);
+            runtimeManager.saveScheduledEvent(se);
         }
 
         response.addData("seId", se.getId());
@@ -116,7 +116,7 @@ public class ScheduledEventsDwr extends BaseDwr {
     public void deleteScheduledEvent(int seId) {
         Permissions.ensureDataSourcePermission(Common.getUser());
         scheduledEventDao.deleteScheduledEvent(seId);
-        Common.ctx.getRuntimeManager().stopSimpleEventDetector(ScheduledEventVO.getEventDetectorKey(seId));
+        runtimeManager.stopSimpleEventDetector(ScheduledEventVO.getEventDetectorKey(seId));
     }
 
     /**

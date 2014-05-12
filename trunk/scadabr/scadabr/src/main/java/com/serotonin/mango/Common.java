@@ -102,11 +102,14 @@ public class Common {
 
     public interface ContextKeys {
 
+        @Deprecated
         String DATABASE_ACCESS = "DATABASE_ACCESS";
         String IMAGE_SETS = "IMAGE_SETS";
         String DYNAMIC_IMAGES = "DYNAMIC_IMAGES";
+        @Deprecated
         String RUNTIME_MANAGER = "RUNTIME_MANAGER";
         String SCHEDULER = "SCHEDULER";
+        @Deprecated
         String EVENT_MANAGER = "EVENT_MANAGER";
         String FREEMARKER_CONFIG = "FREEMARKER_CONFIG";
         String BACKGROUND_PROCESSING = "BACKGROUND_PROCESSING";
