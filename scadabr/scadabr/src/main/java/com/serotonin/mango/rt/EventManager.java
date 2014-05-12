@@ -46,16 +46,21 @@ import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * @author Matthew Lohbihler
  */
+@Named
 public class EventManager implements ILifecycle {
 
     private final Log log = LogFactory.getLog(EventManager.class);
 
     private final List<EventInstance> activeEvents = new CopyOnWriteArrayList<>();
+    @Inject
     private EventDao eventDao;
+    @Inject
     private UserDao userDao;
     private long lastAlarmTimestamp = 0;
     private int highestActiveAlarmLevel = 0;
@@ -261,9 +266,6 @@ public class EventManager implements ILifecycle {
     //
     @Override
     public void initialize() {
-        eventDao = EventDao.getInstance();
-        userDao = UserDao.getInstance();
-
         // Get all active events from the database.
         activeEvents.addAll(eventDao.getActiveEvents());
         lastAlarmTimestamp = System.currentTimeMillis();

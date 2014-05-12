@@ -132,6 +132,8 @@ public class RuntimeManager {
     private DataPointDao dataPointDao;
     @Inject
     private PointValueDao pointValueDao;
+    @Inject
+    private EventManager eventManager;
     
     public RuntimeManager() {
         
@@ -313,7 +315,7 @@ public class RuntimeManager {
 
     public void deleteDataSource(int dataSourceId) {
         stopDataSource(dataSourceId);
-        Common.ctx.getEventManager().cancelEventsForDataSource(dataSourceId);
+        eventManager.cancelEventsForDataSource(dataSourceId);
         dataSourceDao.deleteDataSource(dataSourceId);
     }
 
@@ -452,7 +454,7 @@ public class RuntimeManager {
             dsRt.dataPointDeleted(point);
         }
         dataPointDao.deleteDataPoint(point.getId());
-        Common.ctx.getEventManager().cancelEventsForDataPoint(point.getId());
+        eventManager.cancelEventsForDataPoint(point.getId());
     }
 
     private DataPointRT startDataPoint(DataPointVO vo) {
@@ -776,7 +778,7 @@ public class RuntimeManager {
     public void deletePublisher(int publisherId) {
         stopPublisher(publisherId);
         publisherDao.deletePublisher(publisherId);
-        Common.ctx.getEventManager().cancelEventsForPublisher(publisherId);
+        eventManager.cancelEventsForPublisher(publisherId);
     }
 
     public void savePublisher(PublisherVO<? extends PublishedPointVO> vo) {

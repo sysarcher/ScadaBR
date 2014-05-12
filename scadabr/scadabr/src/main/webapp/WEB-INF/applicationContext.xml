@@ -113,6 +113,7 @@
         <property name="dataPointDao" ref="dataPointDao" />
         <property name="dataPointDetailsDwr" ref="dataPointDetailsDwr" />
         <property name="eventDao" ref="eventDao" />
+        <property name="eventManager" ref="eventManager">
         <property name="mailingListDao" ref="mailingListDao" />
         <property name="runtimeManager" ref="runtimeManager" />
         <property name="userDao" ref="userDao"/>
