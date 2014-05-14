@@ -104,7 +104,7 @@ public class SystemSettingsDao extends BaseDao {
     }
 
     @Deprecated
-    private SystemSettingsDao(DataSource dataSource) {
+    public SystemSettingsDao(DataSource dataSource) {
         super(dataSource);
     }
 

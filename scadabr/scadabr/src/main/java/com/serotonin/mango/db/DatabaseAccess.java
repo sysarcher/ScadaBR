@@ -134,17 +134,17 @@ abstract public class DatabaseAccess {
                     user.setId(Common.NEW_ID);
                     user.setUsername("admin");
                     user.setPassword(Common.encrypt("admin"));
-                    user.setEmail("admin@yourMangoDomain.com");
+                    user.setEmail("admin@yourScadaBRDomain.com");
                     user.setHomeUrl("");
                     user.setPhone("");
                     user.setAdmin(true);
                     user.setDisabled(false);
                     user.setDataSourcePermissions(new LinkedList<Integer>());
                     user.setDataPointPermissions(new LinkedList<DataPointAccess>());
-                    UserDao.getInstance().saveUser(user);
+                    new UserDao(this.getDataSource()).saveUser(user);
 
                     // Record the current version.
-                    new SystemSettingsDao().setValue(
+                    new SystemSettingsDao(this.getDataSource()).setValue(
                             SystemSettingsDao.DATABASE_SCHEMA_VERSION,
                             Common.getVersion());
                 }

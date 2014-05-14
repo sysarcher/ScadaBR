@@ -215,8 +215,11 @@ public class MangoContextListener implements ServletContextListener {
         Common.eventCronPool = null;
         Common.systemCronPool = null;
 
-        databaseAccessFactory.stopDB();
-        LOG.info("Database terminated");
+        if (databaseAccessFactory != null) {
+            databaseAccessFactory.stopDB();
+            databaseAccessFactory = null;
+            LOG.info("Database terminated");
+        }
 
         Common.ctx = null;
 
