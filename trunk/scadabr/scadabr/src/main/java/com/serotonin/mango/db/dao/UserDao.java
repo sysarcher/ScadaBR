@@ -53,7 +53,7 @@ public class UserDao extends BaseDao {
     }
     
    @Deprecated
-    private UserDao(DataSource dataSource) {
+    public UserDao(DataSource dataSource) {
         super(dataSource);
     }
 
