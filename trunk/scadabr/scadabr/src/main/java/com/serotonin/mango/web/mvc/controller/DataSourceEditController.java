@@ -40,12 +40,19 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.permission.Permissions;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-public class DataSourceEditController extends ParameterizableViewController {
+@Controller
+@RequestMapping("/data_source_edit.shtm")
+public class DataSourceEditController {
 
-    @Override
-    protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
-            throws Exception {
+    
+ //   @Override
+    @RequestMapping(method = RequestMethod.GET)
+    public String showForm(ModelMap modelMap, HttpServletRequest request) {
         DataSourceVO<?> dataSourceVO = null;
         User user = Common.getUser(request);
 
@@ -89,17 +96,14 @@ public class DataSourceEditController extends ParameterizableViewController {
         // Set the id of the data source in the user object for the DWR.
         user.setEditDataSource(dataSourceVO);
 
-        // Create the model.
-        Map<String, Object> model = new HashMap<>();
-
         // The data source
-        model.put("dataSource", dataSourceVO);
+        modelMap.addAttribute("dataSource", dataSourceVO);
 
         // Reference data
         try {
-            model.put("commPorts", Common.getCommPorts());
+            modelMap.addAttribute("commPorts", Common.getCommPorts());
         } catch (CommPortConfigException e) {
-            model.put("commPortError", e.getMessage());
+            modelMap.addAttribute("commPortError", e.getMessage());
         }
 
         List<DataPointVO> allPoints = DataPointDao.getInstance().getDataPoints(DataPointExtendedNameComparator.instance, false);
@@ -113,9 +117,9 @@ public class DataSourceEditController extends ParameterizableViewController {
                 }
             }
         }
-        model.put("userPoints", userPoints);
-        model.put("analogPoints", analogPoints);
+        modelMap.addAttribute("userPoints", userPoints);
+        modelMap.addAttribute("analogPoints", analogPoints);
 
-        return new ModelAndView(getViewName(), model);
+        return "dataSourceEdit";
     }
 }

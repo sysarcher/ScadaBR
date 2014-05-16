@@ -42,10 +42,12 @@ abstract public class LoggedInFilter implements Filter {
 
     private String forwardUrl;
 
+    @Override
     public void init(FilterConfig config) {
         forwardUrl = config.getInitParameter("forwardUrl");
     }
 
+    @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
         // Assume an http request.

@@ -18,19 +18,24 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 -->
 
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-
-<!--
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/mvc 
+			http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
+   
+    <!--
   - Application context definition for DispatcherServlet.
   -->
-<beans>
   
   <!-- View resolver -->
-  <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-    <property name="viewClass"><value>org.springframework.web.servlet.view.JstlView</value></property>
-    <property name="prefix"><value>/WEB-INF/jsp/</value></property>
-    <property name="suffix"><value>.jsp</value></property>
-  </bean>
+  <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+    p:viewClass="org.springframework.web.servlet.view.JstlView"
+    p:prefix="/WEB-INF/jsp/"
+    p:suffix=".jsp" />
   
   <!-- Default message code resolver -->
   <bean id="defaultMessageCodeResolver" class="br.org.scadabr.propertyEditor.DefaultMessageCodesResolver"/>
@@ -38,24 +43,16 @@
   <!-- 
       URL mappings to controllers
   -->
-  <bean id="publicUrlMappings" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+  <!--bean id="publicUrlMappings" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
     <property name="mappings">
       <props>
-        <!-- All user URLs -->
         <prop key="/compound_events.shtm">compoundEventsController</prop>
-        <prop key="/data_point_details.shtm">dataPointDetailsController</prop>
         <prop key="/data_point_edit.shtm">dataPointEditController</prop>
-        <prop key="/data_source_edit.shtm">dataSourceEditController</prop>
-        <prop key="/data_sources.shtm">dataSourceListController</prop>
         <prop key="/emport.shtm">emportController</prop>
         <prop key="/event_handlers.shtm">eventHandlersController</prop>
-        <prop key="/events.shtm">eventsController</prop>
-        <prop key="/help.shtm">helpController</prop>
-        <prop key="/login.htm">loginController</prop>
         <prop key="/logout.htm">logoutController</prop>
         <prop key="/mailing_lists.shtm">mailingListsController</prop>
         <prop key="/maintenance_events.shtm">maintenanceEventsController</prop>
-        <prop key="/point_hierarchy.shtm">pointHierarchyController</prop>
         <prop key="/point_links.shtm">pointLinksController</prop>
         <prop key="/public_view.htm">publicViewController</prop>
         <prop key="/publisher_edit.shtm">publisherEditController</prop>
@@ -74,7 +71,6 @@
         <prop key="/export_project.htm">projectExporterController</prop>
         <prop key="/import_project.htm">projectImporterController</prop>
         
-        <!-- Mobile user URLs -->
         <prop key="/mobile_login.htm">mobileLoginController</prop>
         <prop key="/mobile_logout.htm">mobileLogoutController</prop>
         <prop key="/mobile_watch_list.shtm">mobileWatchListController</prop>
@@ -86,14 +82,19 @@
         <ref bean="commonData"/>
       </list>
     </property>
-  </bean>
+  </bean-->
   
+  	<!-- Configures Handler Interceptors -->	
+	<mvc:interceptors>
+              <bean id="commonData" class="com.serotonin.mango.web.mvc.interceptor.CommonDataInterceptor"/>
+	</mvc:interceptors>
+
   <!--
      Controllers
   -->
   <!-- Public Controllers -->
   
-  <bean id="projectExporterController" class="br.org.scadabr.web.mvc.controller.ProjectExporterController">
+  <!--bean id="projectExporterController" class="br.org.scadabr.web.mvc.controller.ProjectExporterController">
   </bean>
   <bean id="projectImporterController" class="br.org.scadabr.web.mvc.controller.ProjectImporterController">
   </bean>
@@ -244,7 +245,7 @@
   
   <bean id="webcamLiveFeedController" class="com.serotonin.mango.web.mvc.controller.WebcamLiveFeedController">
     <property name="viewName"><value>webcamLiveFeed</value></property>
-  </bean>
+  </bean-->
   
   
   
@@ -253,6 +254,4 @@
     <property name="maxUploadSize"><value>100000000</value></property>
   </bean>
   
-  <!-- Interceptors -->
-  <bean id="commonData" class="com.serotonin.mango.web.mvc.interceptor.CommonDataInterceptor"/>
 </beans>

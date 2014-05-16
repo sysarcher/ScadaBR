@@ -42,17 +42,31 @@ import com.serotonin.mango.view.chart.TableChartRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
+import javax.inject.Inject;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-public class DataPointDetailsController extends ParameterizableViewController {
+@Controller
+@RequestMapping("/data_point_details.shtm")
+public class DataPointDetailsController {
+    
+    @Inject
+    private UserDao userDao; 
+    @Inject
+    private DataPointDao dataPointDao;
+    @Inject
+    private ViewDao viewDao;
+    @Inject
+    private EventDao eventDao;
 
-    @Override
-    protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
+    @RequestMapping(method = RequestMethod.GET)
+    protected String handleRequestInternal(ModelMap modelMap, HttpServletRequest request)
             throws Exception {
-        Map<String, Object> model = new HashMap<>();
         User user = Common.getUser(request);
 
         int id;
-        DataPointDao dataPointDao = DataPointDao.getInstance();
         String idStr = request.getParameter("dpid");
         DataPointVO point = null;
 
@@ -66,7 +80,7 @@ public class DataPointDetailsController extends ParameterizableViewController {
                     throw new ShouldNeverHappenException("One of dpid, dpxid, or pedid must be provided for this view");
                 }
 
-                model.put("currentXid", xid);
+                modelMap.addAttribute("currentXid", xid);
                 point = dataPointDao.getDataPoint(xid);
                 id = point == null ? -1 : point.getId();
             } else {
@@ -85,10 +99,10 @@ public class DataPointDetailsController extends ParameterizableViewController {
         if (point != null) {
             Permissions.ensureDataPointReadPermission(user, point);
 
-            model.put("point", point);
+            modelMap.addAttribute("point", point);
 
             // Get the views for this user that contain this point.
-            List<View> userViews = ViewDao.getInstance().getViews(user.getId());
+            List<View> userViews = viewDao.getViews(user.getId());
             List<View> views = new LinkedList<>();
             for (View view : userViews) {
                 view.validateViewComponents(false);
@@ -96,10 +110,10 @@ public class DataPointDetailsController extends ParameterizableViewController {
                     views.add(view);
                 }
             }
-            model.put("views", views);
+            modelMap.addAttribute("views", views);
 
             // Get the users that have access to this point.
-            List<User> allUsers = UserDao.getInstance().getUsers();
+            List<User> allUsers = userDao.getUsers();
             List<Map<String, Object>> users = new LinkedList<>();
             Map<String, Object> userData;
             int accessType;
@@ -112,13 +126,13 @@ public class DataPointDetailsController extends ParameterizableViewController {
                     users.add(userData);
                 }
             }
-            model.put("users", users);
+            modelMap.addAttribute("users", users);
 
             // Determine whether the link to edit the point should be displayed
-            model.put("pointEditor", Permissions.hasDataSourcePermission(user, point.getDataSourceId()));
+            modelMap.addAttribute("pointEditor", Permissions.hasDataSourcePermission(user, point.getDataSourceId()));
 
             // Put the events in the model.
-            model.put("events", EventDao.getInstance().getEventsForDataPoint(id, user.getId()));
+            modelMap.addAttribute("events", eventDao.getEventsForDataPoint(id, user.getId()));
 
             // Put the default history table count into the model. Default to 10.
             int historyLimit = 10;
@@ -127,7 +141,7 @@ public class DataPointDetailsController extends ParameterizableViewController {
             } else if (point.getChartRenderer() instanceof ImageFlipbookRenderer) {
                 historyLimit = ((ImageFlipbookRenderer) point.getChartRenderer()).getLimit();
             }
-            model.put("historyLimit", historyLimit);
+            modelMap.addAttribute("historyLimit", historyLimit);
 
             // Determine our image chart rendering capabilities.
             if (ImageChartRenderer.getDefinition().supports(point.getPointLocator().getDataTypeId())) {
@@ -139,24 +153,24 @@ public class DataPointDetailsController extends ParameterizableViewController {
                     periodType = r.getTimePeriod();
                     periodCount = r.getNumberOfPeriods();
                 }
-                model.put("periodType", periodType);
-                model.put("periodCount", periodCount);
+                modelMap.addAttribute("periodType", periodType);
+                modelMap.addAttribute("periodCount", periodCount);
             }
 
             // Determine out flipbook rendering capabilities
             if (ImageFlipbookRenderer.getDefinition().supports(point.getPointLocator().getDataTypeId())) {
-                model.put("flipbookLimit", 10);
+                modelMap.addAttribute("flipbookLimit", 10);
             }
 
-            model.put("currentXid", point.getXid());
+            modelMap.addAttribute("currentXid", point.getXid());
         }
 
         // Set the point in the session for the dwr.
         user.setEditPoint(point);
 
         // Find accessible points for the goto list
-        ControllerUtils.addPointListDataToModel(user, id, model);
+        ControllerUtils.addPointListDataToModel(user, id, modelMap);
 
-        return new ModelAndView(getViewName(), model);
+        return "dataPointDetails";
     }
 }

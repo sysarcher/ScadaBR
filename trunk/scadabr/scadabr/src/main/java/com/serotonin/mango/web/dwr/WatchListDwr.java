@@ -71,13 +71,6 @@ public class WatchListDwr extends BaseDwr {
     private WatchListDao watchListDao;
 
     public Map<String, Object> init() {
-        if (getDataPointDao() == null) {
-            throw new RuntimeException("WatchListDwr SYSDAO IS NULL");
-        } else {
-            LOG.log(Level.SEVERE, "WatchListDwr INITIALIZED");
-        }
-        
-        
         Map<String, Object> data = new HashMap<>();
 
         PointHierarchy ph = getDataPointDao().getPointHierarchy().copyFoldersOnly();

@@ -35,7 +35,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.AbstractFormController;
 import org.springframework.web.util.WebUtils;
 
 import br.org.scadabr.db.spring.ConnectionCallbackVoid;
@@ -46,7 +45,7 @@ import com.serotonin.mango.web.mvc.form.SqlForm;
 import br.org.scadabr.util.SerializationHelper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-public class SqlController extends AbstractFormController {
+public class SqlController {
 
     private static final Log LOG = LogFactory.getLog(SqlController.class);
     private String formView;
@@ -55,15 +54,13 @@ public class SqlController extends AbstractFormController {
         this.formView = formView;
     }
 
-    @Override
-    protected ModelAndView showForm(HttpServletRequest request, HttpServletResponse response, BindException errors)
+    protected String showForm(HttpServletRequest request, HttpServletResponse response, BindException errors)
             throws Exception {
         Permissions.ensureAdmin(request);
-        return showForm(request, errors, formView);
+        return "";
     }
 
-    @Override
-    protected ModelAndView processFormSubmission(HttpServletRequest request, HttpServletResponse response,
+    protected String processFormSubmission(HttpServletRequest request, HttpServletResponse response,
             Object command, BindException errors) throws Exception {
         Permissions.ensureAdmin(request);
 
@@ -117,6 +114,6 @@ public class SqlController extends AbstractFormController {
             LOG.debug(e);
         }
 
-        return showForm(request, response, errors);
+        return "";
     }
 }

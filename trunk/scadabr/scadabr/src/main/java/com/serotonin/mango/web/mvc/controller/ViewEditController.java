@@ -56,7 +56,6 @@ public class ViewEditController extends SimpleFormRedirectController {
         this.uploadDirectory = uploadDirectory;
     }
 
-    @Override
     protected Object formBackingObject(HttpServletRequest request) {
         View view;
         User user = Common.getUser(request);
@@ -86,7 +85,6 @@ public class ViewEditController extends SimpleFormRedirectController {
         return form;
     }
 
-    @Override
     protected Map referenceData(HttpServletRequest request, Object command, Errors errors) {
         Map<String, Object> model = new HashMap<>();
         model.put("imageSets", Common.ctx.getImageSets());
@@ -94,7 +92,6 @@ public class ViewEditController extends SimpleFormRedirectController {
         return model;
     }
 
-    @Override
     protected void onBindAndValidate(HttpServletRequest request, Object command, BindException errors) throws Exception {
         ViewEditForm form = (ViewEditForm) command;
 
@@ -139,12 +136,10 @@ public class ViewEditController extends SimpleFormRedirectController {
         }
     }
 
-    @Override
     protected boolean isFormChangeRequest(HttpServletRequest request) {
         return hasSubmitParameter(request, SUBMIT_UPLOAD) || hasSubmitParameter(request, SUBMIT_CLEAR_IMAGE);
     }
 
-    @Override
     protected ModelAndView onSubmit(HttpServletRequest request, HttpServletResponse response, Object command,
             BindException errors) throws Exception {
         ViewEditForm form = (ViewEditForm) command;
@@ -198,5 +193,9 @@ public class ViewEditController extends SimpleFormRedirectController {
             }
         }
         return nextImageId++;
+    }
+
+    private boolean isFormSubmission(HttpServletRequest request) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

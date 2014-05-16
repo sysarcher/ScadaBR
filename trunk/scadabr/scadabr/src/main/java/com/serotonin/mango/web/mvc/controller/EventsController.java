@@ -18,51 +18,21 @@
  */
 package com.serotonin.mango.web.mvc.controller;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.validation.BindException;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.EventDao;
-import com.serotonin.mango.rt.event.EventInstance;
-import com.serotonin.mango.web.comparators.EventInstanceComparator;
-import br.org.scadabr.web.util.PaginatedData;
-import br.org.scadabr.web.util.PaginatedListController;
-import br.org.scadabr.web.util.PagingDataForm;
+@Controller
+@RequestMapping("/events.shtm")
+public class EventsController {
 
-public class EventsController extends PaginatedListController {
-
-    @Override
-    protected PaginatedData getData(HttpServletRequest request, PagingDataForm paging, String orderByClause, int offset, int limit, BindException errors) throws Exception {
-//        List<EventInstance> data;
-        ResourceBundle bundle = ControllerUtils.getResourceBundle(request);
-//        if (((EventsForm)paging).isInactive()) {
-//            User user = Common.getUser(request);
-//            List<EventInstance> allInactive = new EventDao().getInactiveEvents();
-//            data = new ArrayList<EventInstance>();
-//            for (EventInstance evt : allInactive) {
-//                if (evt.isAlarm() && Permissions.hasEventTypePermission(user, evt.getEventType()))
-//                    data.add(evt);
-//            }
-//        }
-//        else
-//            data = Common.ctx.getEventManager().getActiveEvents(Common.getUser(request));
-        List<EventInstance> data = EventDao.getInstance().getPendingEvents(Common.getUser(request).getId());
-        sortData(bundle, data, paging);
-        return new PaginatedData<>(data, data.size());
+    @RequestMapping(method = RequestMethod.GET)
+    public String showForm(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
+        return "events";
     }
-
-    @SuppressWarnings("unchecked")
-    private void sortData(ResourceBundle bundle, List<EventInstance> data, final PagingDataForm paging) {
-        EventInstanceComparator comp = new EventInstanceComparator(bundle, paging.getSortField(), paging.getSortDesc());
-        if (!comp.canSort()) {
-            return;
-        }
-        Collections.sort(data, comp);
-    }
-
 }
