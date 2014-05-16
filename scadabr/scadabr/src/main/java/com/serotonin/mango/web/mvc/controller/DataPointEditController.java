@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.util.WebUtils;
 
 import br.org.scadabr.ShouldNeverHappenException;
@@ -47,15 +46,25 @@ import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.propertyEditor.DoubleFormatEditor;
 import br.org.scadabr.propertyEditor.IntegerFormatEditor;
 import br.org.scadabr.util.ValidationUtils;
+import javax.inject.Inject;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-public class DataPointEditController extends SimpleFormController {
+//TODO implement proper
+@Controller
+@RequestMapping("/data_point_edit.shtm")
+public class DataPointEditController {
 
     public static final String SUBMIT_SAVE = "save";
     public static final String SUBMIT_DISABLE = "disable";
     public static final String SUBMIT_ENABLE = "enable";
     public static final String SUBMIT_RESTART = "restart";
 
-    @Override
+    @Inject
+    private DataPointDao dataPointDao;
+    
+    @RequestMapping(method = RequestMethod.GET)
     protected Object formBackingObject(HttpServletRequest request) {
         DataPointVO dataPoint;
         User user = Common.getUser(request);
@@ -65,7 +74,6 @@ public class DataPointEditController extends SimpleFormController {
             dataPoint.setDiscardExtremeValues(false); // Checkbox
         } else {
             int id;
-            DataPointDao dataPointDao = DataPointDao.getInstance();
 
             // Get the id.
             String idStr = request.getParameter("dpid");
@@ -92,7 +100,7 @@ public class DataPointEditController extends SimpleFormController {
         return dataPoint;
     }
 
-    @Override
+//    @Override
     protected Map referenceData(HttpServletRequest request, Object command, Errors errors) {
         Map<String, Object> result = new HashMap<>();
         DataPointVO point = (DataPointVO) command;
@@ -108,7 +116,7 @@ public class DataPointEditController extends SimpleFormController {
         return result;
     }
 
-    @Override
+//    @Override
     protected void initBinder(HttpServletRequest request, ServletRequestDataBinder binder) {
         binder.registerCustomEditor(Double.TYPE, "tolerance", new DoubleFormatEditor(new DecimalFormat("#.##"), false));
         binder.registerCustomEditor(Integer.TYPE, "purgePeriod", new IntegerFormatEditor(new DecimalFormat("#"), false));
@@ -118,7 +126,7 @@ public class DataPointEditController extends SimpleFormController {
                 false));
     }
 
-    @Override
+//    @Override
     protected void onBindAndValidate(HttpServletRequest request, Object command, BindException errors) throws Exception {
         DataPointVO point = (DataPointVO) command;
 
@@ -211,5 +219,9 @@ public class DataPointEditController extends SimpleFormController {
 
             rtm.saveDataPoint(point);
         }
+    }
+
+    private boolean isFormSubmission(HttpServletRequest request) {
+        return false;
     }
 }

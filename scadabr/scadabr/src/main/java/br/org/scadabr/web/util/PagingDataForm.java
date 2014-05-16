@@ -5,6 +5,9 @@
  */
 package br.org.scadabr.web.util;
 
+import com.serotonin.mango.vo.DataPointVO;
+import com.serotonin.mango.vo.ListParent;
+import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -13,7 +16,7 @@ import java.util.List;
  *
  * @author aploese
  */
-public class PagingDataForm<T> {
+public class PagingDataForm<P, T extends PaginatedData<P>> {
 
     private List<T> data;
     private int page;
@@ -39,11 +42,19 @@ public class PagingDataForm<T> {
 
     public void setData(List<T> data) {
         this.data = data;
+        // Set default
+        numberOfItems = data.size();
+    }
+
+    public void setData(List<T> data, int numberOfItems) {
+        this.data = data;
+        // Set default
+        this.numberOfItems = numberOfItems;
     }
 
     public void setNumberOfItems(int numberOfItems) {
         this.numberOfItems = numberOfItems;
-
+        
         numberOfPages = ((numberOfItems - 1) / itemsPerPage + 1);
         if (page >= numberOfPages) {
             page = (numberOfPages - 1);
@@ -192,4 +203,5 @@ public class PagingDataForm<T> {
     public void setStartYear(int startYear) {
         this.startYear = startYear;
     }
+
 }

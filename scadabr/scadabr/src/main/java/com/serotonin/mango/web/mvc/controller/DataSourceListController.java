@@ -25,7 +25,6 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.validation.BindException;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -37,19 +36,39 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.comparators.BaseComparator;
 import br.org.scadabr.web.l10n.Localizer;
-import br.org.scadabr.web.util.PaginatedData;
-import br.org.scadabr.web.util.PaginatedListController;
 import br.org.scadabr.web.util.PagingDataForm;
+import com.serotonin.mango.rt.RuntimeManager;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-//TODO Use @Controller and @RequestMapping
-public class DataSourceListController extends PaginatedListController {
+@Controller
+@RequestMapping("/data_sources.shtm")
+public class DataSourceListController {
 
-    @Override
-    protected PaginatedData getData(HttpServletRequest request, PagingDataForm paging, String orderByClause, int offset, int limit, BindException errors) throws Exception {
+    @Inject
+    private RuntimeManager runtimeManager;
+    @Inject
+    private DataPointDao dataPointDao;
+    
+    @RequestMapping(method = RequestMethod.GET)
+    public String showForm(ModelMap modelMap, HttpServletRequest request) {
+        PagingDataForm pagingDataForm = new PagingDataForm();
+        pagingDataForm.setSortField("name");
+        fillDataForm(request, pagingDataForm);
+        modelMap.addAttribute("paging", pagingDataForm);
+        return "dataSourceList";
+    }
+
+   
+    
+    private void fillDataForm(HttpServletRequest request, PagingDataForm paging) {
         User user = Common.getUser(request);
-        DataPointDao dataPointDao = DataPointDao.getInstance();
-
-        List<DataSourceVO<?>> data = Common.ctx.getRuntimeManager().getDataSources();
+        
+        List<DataSourceVO<?>> data = runtimeManager.getDataSources();
         List<ListParent<DataSourceVO<?>, DataPointVO>> dataSources = new ArrayList<>();
         ListParent<DataSourceVO<?>, DataPointVO> listParent;
         for (DataSourceVO<?> ds : data) {
@@ -63,7 +82,7 @@ public class DataSourceListController extends PaginatedListController {
 
         sortData(ControllerUtils.getResourceBundle(request), dataSources, paging);
 
-        return new PaginatedData<>(dataSources, data.size());
+        paging.setData(dataSources, data.size());
     }
 
     private void sortData(ResourceBundle bundle, List<ListParent<DataSourceVO<?>, DataPointVO>> data,
@@ -75,7 +94,7 @@ public class DataSourceListController extends PaginatedListController {
         Collections.sort(data, comp);
     }
 
-    @Override
+//    @Override
     protected Object getCommand(HttpServletRequest request) {
         PagingDataForm form = new PagingDataForm();
         form.setItemsPerPage(20);

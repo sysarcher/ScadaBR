@@ -21,11 +21,11 @@ package com.serotonin.mango.web.mvc;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.WebUtils;
 
-public class SimpleFormRedirectController extends SimpleFormController {
+@Deprecated
+public class SimpleFormRedirectController {
 
     private String successUrl;
 

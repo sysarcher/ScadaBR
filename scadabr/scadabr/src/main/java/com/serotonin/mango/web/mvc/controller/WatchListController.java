@@ -19,15 +19,9 @@
 package com.serotonin.mango.web.mvc.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.ParameterizableViewController;
 
 import br.org.scadabr.db.IntValuePair;
 import com.serotonin.mango.Common;
@@ -38,23 +32,32 @@ import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.web.l10n.Localizer;
+import javax.inject.Inject;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-public class WatchListController extends ParameterizableViewController {
+@Controller
+@RequestMapping("/watch_list.shtm")
+public class WatchListController {
 
+    @Inject
+    protected WatchListDao watchListDao;
+    
     public static final String KEY_WATCHLISTS = "watchLists";
     public static final String KEY_SELECTED_WATCHLIST = "selectedWatchList";
 
-    @Override
-    protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) {
-        return new ModelAndView(getViewName(), createModel(request));
+    @RequestMapping(method = RequestMethod.GET)
+    public String initializeForm(ModelMap model, HttpServletRequest request) {
+        createModel(request, model);
+        return "watchList";
     }
 
-    protected Map<String, Object> createModel(HttpServletRequest request) {
-        Map<String, Object> model = new HashMap<>();
+    protected void createModel(HttpServletRequest request, ModelMap modelMap) {
         User user = Common.getUser(request);
 
         // The user's permissions may have changed since the last session, so make sure the watch lists are correct.
-        WatchListDao watchListDao = WatchListDao.getInstance();
         List<WatchList> watchLists = watchListDao.getWatchLists(user.getId());
 
         if (watchLists.isEmpty()) {
@@ -99,12 +102,11 @@ public class WatchListController extends ParameterizableViewController {
             // The list will always contain at least one, so just use the id of the first in the list.
             selected = watchLists.get(0).getId();
             user.setSelectedWatchList(selected);
-            WatchListDao.getInstance().saveSelectedWatchList(user.getId(), selected);
+            watchListDao.saveSelectedWatchList(user.getId(), selected);
         }
 
-        model.put(KEY_WATCHLISTS, watchListNames);
-        model.put(KEY_SELECTED_WATCHLIST, selected);
-
-        return model;
+        modelMap.put(KEY_WATCHLISTS, watchListNames);
+        modelMap.put(KEY_SELECTED_WATCHLIST, selected);
+        modelMap.put("NEW_ID", Common.NEW_ID);
     }
 }

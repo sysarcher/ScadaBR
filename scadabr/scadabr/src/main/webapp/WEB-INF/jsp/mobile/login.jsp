@@ -18,7 +18,7 @@
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
 <mobileTag:page>
-  <form action="mobile_login.htm" method="post">
+  <form action="login.htm" method="post">
     <table>
       <spring:bind path="login.username">
         <tr>

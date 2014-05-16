@@ -125,9 +125,9 @@
                 subfolder.subfolders = new Array();
                 subfolder.points = new Array();
                 gatherTreeData(treeNode.children[i], subfolder);
-            }
-            else
+            } else {
                 folder.points[folder.points.length] = treeNode.children[i].object;
+            }
         }
     }
     

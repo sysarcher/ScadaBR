@@ -18,7 +18,6 @@
  */
 package com.serotonin.mango.web.mvc.controller;
 
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,9 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.validation.BindException;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.SimpleFormController;
-import org.springframework.web.servlet.view.RedirectView;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.UserDao;
@@ -36,18 +32,29 @@ import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.integration.CrowdUtils;
 import com.serotonin.mango.web.mvc.form.LoginForm;
 import br.org.scadabr.util.ValidationUtils;
+import javax.inject.Inject;
+import javax.validation.Valid;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-public class LoginController extends SimpleFormController {
+@Controller
+@RequestMapping("/login.htm")
+public class LoginController {
 
+    public LoginController() {
+        super();
+    }
+    
     private static final Log logger = LogFactory.getLog(LoginController.class);
 
-    private boolean mobile;
-    private String successUrl;
-    private String newUserUrl;
-
-    public void setMobile(boolean mobile) {
-        this.mobile = mobile;
-    }
+    private String successUrl ="redirect:watch_list.shtm";
+    private String newUserUrl = "redirect:help.shtm";
+    private String loginView = "login";
+    @Inject
+    private UserDao userDao;
+	
 
     public void setSuccessUrl(String url) {
         successUrl = url;
@@ -57,38 +64,38 @@ public class LoginController extends SimpleFormController {
         this.newUserUrl = newUserUrl;
     }
 
-    @Override
-    protected ModelAndView showForm(HttpServletRequest request, HttpServletResponse response, BindException errors,
-            @SuppressWarnings("rawtypes") Map controlModel) throws Exception {
-        // Check if Crowd is enabled
+    @RequestMapping(method = RequestMethod.GET)
+    protected String showForm(ModelMap map, HttpServletRequest request, HttpServletResponse response) throws Exception {
+            // Check if Crowd is enabled
         if (CrowdUtils.isCrowdEnabled()) {
             String username = CrowdUtils.getCrowdUsername(request);
 
             if (username != null) {
-                ((LoginForm) errors.getTarget()).setUsername(username);
+                map.addAttribute("login", new LoginForm(username));
 
                 // The user is logged into Crowd. Make sure the username is valid in this instance.
-                User user = UserDao.getInstance().getUser(username);
+                User user = userDao.getUser(username);
                 if (user == null) {
-                    ValidationUtils.rejectValue(errors, "username", "login.validation.noSuchUser");
+//                    ValidationUtils.rejectValue(errors, "username", "login.validation.noSuchUser");
                 } else {
                     // Validate some stuff about the user.
                     if (user.isDisabled()) {
-                        ValidationUtils.reject(errors, "login.validation.accountDisabled");
+//                        ValidationUtils.reject(errors, "login.validation.accountDisabled");
                     } else {
                         if (CrowdUtils.isAuthenticated(request, response)) {
-                            ModelAndView mav = performLogin(request, username);
+                            String result = performLogin(request, username);
                             CrowdUtils.setCrowdAuthenticated(Common.getUser(request));
-                            return mav;
+                            return result;
                         }
                     }
                 }
             }
+        } else {
+            map.addAttribute("login", new LoginForm());
         }
-        return super.showForm(request, response, errors, controlModel);
+        return loginView;
     }
 
-    @Override
     protected void onBindAndValidate(HttpServletRequest request, Object command, BindException errors) {
         LoginForm login = (LoginForm) command;
 
@@ -103,48 +110,48 @@ public class LoginController extends SimpleFormController {
         }
     }
 
-    @Override
-    protected ModelAndView onSubmit(HttpServletRequest request, HttpServletResponse response, Object command,
-            BindException errors) throws Exception {
-        LoginForm login = (LoginForm) command;
+    //TODO @Valid does not work with <spring:bind ????
+    
+    @RequestMapping(method = RequestMethod.POST)
+    public String onSubmit(@Valid LoginForm loginForm, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         boolean crowdAuthenticated = false;
 
         // Check if the user exists
-        User user = UserDao.getInstance().getUser(login.getUsername());
+        User user = userDao.getUser(loginForm.getUsername());
         if (user == null) {
-            ValidationUtils.rejectValue(errors, "username", "login.validation.noSuchUser");
+//            ValidationUtils.rejectValue(errors, "username", "login.validation.noSuchUser");
         } else if (user.isDisabled()) {
-            ValidationUtils.reject(errors, "login.validation.accountDisabled");
+//            ValidationUtils.reject(errors, "login.validation.accountDisabled");
         } else {
             if (CrowdUtils.isCrowdEnabled()) // First attempt authentication with Crowd.
             {
-                crowdAuthenticated = CrowdUtils.authenticate(request, response, login.getUsername(),
-                        login.getPassword());
+                crowdAuthenticated = CrowdUtils.authenticate(request, response, loginForm.getUsername(),
+                        loginForm.getPassword());
             }
 
             if (!crowdAuthenticated) {
-                String passwordHash = Common.encrypt(login.getPassword());
+                String passwordHash = Common.encrypt(loginForm.getPassword());
 
                 // Validating the password against the database.
                 if (!passwordHash.equals(user.getPassword())) {
-                    ValidationUtils.reject(errors, "login.validation.invalidLogin");
+//                    ValidationUtils.reject(errors, "login.validation.invalidLogin");
                 }
             }
         }
-
+/*
         if (errors.hasErrors()) {
-            return showForm(request, response, errors);
+            return "login";
         }
-
-        ModelAndView mav = performLogin(request, login.getUsername());
+*/
+        String result = performLogin(request, loginForm.getUsername());
         if (crowdAuthenticated) {
             CrowdUtils.setCrowdAuthenticated(Common.getUser(request));
         }
-        return mav;
+        return result;
     }
 
-    private ModelAndView performLogin(HttpServletRequest request, String username) {
+    private String performLogin(HttpServletRequest request, String username) {
         // Check if the user is already logged in.
         User user = Common.getUser(request);
         if (user != null && user.getUsername().equals(username)) {
@@ -153,10 +160,11 @@ public class LoginController extends SimpleFormController {
                 logger.debug("User is already logged in, not relogging in");
             }
         } else {
-            UserDao userDao = UserDao.getInstance();
             // Get the user data from the app server.
-            user = UserDao.getInstance().getUser(username);
-
+            user = userDao.getUser(username);
+            if (user == null) {
+                return "redirect:login.htm";
+            }
             // Update the last login time.
             userDao.recordLogin(user.getId());
 
@@ -168,15 +176,14 @@ public class LoginController extends SimpleFormController {
             }
         }
 
-        if (!mobile) {
             if (user.isFirstLogin()) {
-                return new ModelAndView(new RedirectView(newUserUrl));
+                return newUserUrl;
             }
             if (!user.getHomeUrl().isEmpty()) {
-                return new ModelAndView(new RedirectView(user.getHomeUrl()));
+                return "redirect:" + user.getHomeUrl();
             }
-        }
 
-        return new ModelAndView(new RedirectView(successUrl));
+        return successUrl;
     }
+
 }

@@ -183,7 +183,7 @@ public class ImageChartServlet extends BaseInfoServlet {
     private void tryCachePurge() {
         long now = System.currentTimeMillis();
         if (lastCachePurgeTime + CACHE_PURGE_INTERVAL < now) {
-            List<String> toBePurged = new ArrayList<String>();
+            List<String> toBePurged = new ArrayList<>();
             for (String key : cachedImages.keySet()) {
                 CacheElement ce = cachedImages.get(key);
                 if (ce.getLastAccessTime() + CACHE_PURGE_INTERVAL < now) {

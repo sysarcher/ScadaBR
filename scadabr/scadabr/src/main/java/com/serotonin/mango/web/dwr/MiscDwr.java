@@ -44,10 +44,8 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import br.org.scadabr.io.StreamUtils;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.db.dao.MailingListDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.maint.work.EmailWorkItem;

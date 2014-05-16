@@ -20,13 +20,31 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans 
            http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
            http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+           http://www.springframework.org/schema/context/spring-context-3.2.xsd
+           http://www.springframework.org/schema/mvc
+           http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
                
     <context:annotation-config/>
     <context:component-scan base-package="com.serotonin,br.org.scadabr" />
+    
+    <!-- Configures the annotation-driven Spring MVC Controller programming model.
+    Note that, with Spring 3.0, this tag works in Servlet MVC only!  
+    See Spring Reference 15.12 Configuring Spring MVC
+    @ http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/mvc.html#mvc-annotation-driven-->
+    <mvc:annotation-driven /> 
+	
+    <!-- Without the following adapter, we'll get a "Does your handler implement a supported interface like Controller?"
+    This is because mvc:annotation-driven element doesn't declare a SimpleControllerHandlerAdapter
+    For more info 
+    See http://stackoverflow.com/questions/3896013/no-adapter-for-handler-exception 
+    See http://forum.springsource.org/showthread.php?t=48372&highlight=UrlFilenameViewController -->
+    <bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter" />
+
+
    
     <!-- DWR -->
     <bean id="CompoundEventsDwr" class="com.serotonin.mango.web.dwr.CompoundEventsDwr">

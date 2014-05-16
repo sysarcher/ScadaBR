@@ -17,6 +17,11 @@ public class PaginatedData<T> {
     private final List<T> data;
     private final int rowCount;
 
+    public PaginatedData(List<T> data) {
+        this.data = data;
+        this.rowCount = data.size();
+    }
+
     public PaginatedData(List<T> data, int rowCount) {
         this.data = data;
         this.rowCount = rowCount;

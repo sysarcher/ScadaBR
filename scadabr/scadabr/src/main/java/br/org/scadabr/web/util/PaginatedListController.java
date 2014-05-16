@@ -5,19 +5,19 @@
  */
 package br.org.scadabr.web.util;
 
+import freemarker.ext.beans.MapModel;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.AbstractCommandController;
 
 /**
  *
  * @author aploese
  */
 @Deprecated
-public abstract class PaginatedListController extends AbstractCommandController {
+public abstract class PaginatedListController {
 
     private String viewName;
 
@@ -25,10 +25,10 @@ public abstract class PaginatedListController extends AbstractCommandController 
         this.viewName = viewName;
     }
 
-    @Override
-    protected ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object command, BindException errors)
+  //  @Override
+    protected ModelAndView handle(MapModel mapModel, HttpServletRequest request, HttpServletResponse response, BindException errors)
             throws Exception {
-        PagingDataForm paging = (PagingDataForm) command;
+        PagingDataForm paging = getPagingDataForm();
 
         PaginatedData data = getData(request, paging, paging.getOrderByClause(), paging.getOffset(), paging.getItemsPerPage(), errors);
 
@@ -36,10 +36,13 @@ public abstract class PaginatedListController extends AbstractCommandController 
         paging.setNumberOfItems(data.getRowCount());
 
         Map model = errors.getModel();
-        model.put(getCommandName(), command);
+//        model.put(getCommandName(), command);
 
         return new ModelAndView(viewName, model);
     }
 
     protected abstract PaginatedData getData(HttpServletRequest request, PagingDataForm paging, String orderByClause, int offset, int limit, BindException errors) throws Exception;
+    
+    protected abstract PagingDataForm getPagingDataForm();
+    
 }
