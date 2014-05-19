@@ -55,13 +55,7 @@
                                 <td class="formField">
                                     <input id="username" type="text" name="username" value="${status.value}" maxlength="40"/>
                                 </td>
-                                <td class="formError">
-                                    <c:if test="${status.error}">
-                                        <c:forEach items="${status.errorMessages}" var="error">
-                                            <c:out value="${error}"/>
-                                        </c:forEach>
-                                    </c:if>
-                                </td>
+                                <td class="formError">${status.errorMessage}</td>
                             </tr>
                         </spring:bind>
 
@@ -71,13 +65,7 @@
                                 <td class="formField">
                                     <input id="password" type="password" name="password" value="${status.value}" maxlength="20"/>
                                 </td>
-                                <td class="formError">
-                                    <c:if test="${status.error}">
-                                        <c:forEach items="${status.errorMessages}" var="error">
-                                            <c:out value="${error}"/>
-                                        </c:forEach>
-                                    </c:if>
-                                </td>
+                                <td class="formError">${status.errorMessage}</td>
                             </tr>
                         </spring:bind>
 

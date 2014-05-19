@@ -237,6 +237,11 @@
   </servlet-mapping>
 
   <servlet-mapping>
+    <servlet-name>springDispatcher</servlet-name>
+    <url-pattern>*.json</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>dwr-invoker</servlet-name>
     <url-pattern>/dwr/*</url-pattern>
   </servlet-mapping>

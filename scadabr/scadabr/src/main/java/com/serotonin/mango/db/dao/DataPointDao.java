@@ -70,7 +70,7 @@ public class DataPointDao extends BaseDao {
 
     @Inject
     private RuntimeManager runtimeManager;
-    
+
     public DataPointDao() {
         super();
     }
@@ -150,6 +150,22 @@ public class DataPointDao extends BaseDao {
         }
         setRelationalData(dp);
         return dp;
+    }
+
+    public PointFolder getRootFolder() {
+
+        final PointFolder root = new PointFolder(0, "ROOT");
+
+        // Get the folder list.
+        ejt.query("select id, name from pointHierarchy where parentId = 0", new RowCallbackHandler() {
+
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                PointFolder f = new PointFolder(rs.getInt(1), rs.getString(2));
+                root.addSubfolder(f);
+            }
+        });
+        return root;
     }
 
     class DataPointRowMapper implements RowMapper<DataPointVO> {
@@ -553,11 +569,12 @@ public class DataPointDao extends BaseDao {
     //
     // Point hierarchy
     //
+    @Deprecated
     static PointHierarchy cachedPointHierarchy;
 
     public PointHierarchy getPointHierarchy() {
         if (cachedPointHierarchy == null) {
-            final Map<Integer, List<PointFolder>> folders = new HashMap<Integer, List<PointFolder>>();
+            final Map<Integer, List<PointFolder>> folders = new HashMap<>();
 
             // Get the folder list.
             ejt.query("select id, parentId, name from pointHierarchy", new RowCallbackHandler() {
@@ -567,7 +584,7 @@ public class DataPointDao extends BaseDao {
                     int parentId = rs.getInt(2);
                     List<PointFolder> folderList = folders.get(parentId);
                     if (folderList == null) {
-                        folderList = new LinkedList<PointFolder>();
+                        folderList = new LinkedList<>();
                         folders.put(parentId, folderList);
                     }
                     folderList.add(f);

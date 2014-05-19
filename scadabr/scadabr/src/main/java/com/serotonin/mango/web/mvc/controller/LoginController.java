@@ -35,7 +35,10 @@ import br.org.scadabr.util.ValidationUtils;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -65,13 +68,13 @@ public class LoginController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    protected String showForm(ModelMap map, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    protected String showForm(Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
             // Check if Crowd is enabled
         if (CrowdUtils.isCrowdEnabled()) {
             String username = CrowdUtils.getCrowdUsername(request);
 
             if (username != null) {
-                map.addAttribute("login", new LoginForm(username));
+                model.addAttribute("login", new LoginForm(username));
 
                 // The user is logged into Crowd. Make sure the username is valid in this instance.
                 User user = userDao.getUser(username);
@@ -91,11 +94,12 @@ public class LoginController {
                 }
             }
         } else {
-            map.addAttribute("login", new LoginForm());
+            model.addAttribute("login", new LoginForm());
         }
         return loginView;
     }
 
+    /*
     protected void onBindAndValidate(HttpServletRequest request, Object command, BindException errors) {
         LoginForm login = (LoginForm) command;
 
@@ -109,12 +113,15 @@ public class LoginController {
             ValidationUtils.rejectValue(errors, "password", "login.validation.noPassword");
         }
     }
-
+*/
     //TODO @Valid does not work with <spring:bind ????
     
     @RequestMapping(method = RequestMethod.POST)
-    public String onSubmit(@Valid LoginForm loginForm, HttpServletRequest request, HttpServletResponse response) throws Exception {
-
+    public String onSubmit(@ModelAttribute("login") @Valid LoginForm loginForm, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response) throws BindException {
+        if (bindingResult.hasErrors()) {
+            return "login";
+        }
+        
         boolean crowdAuthenticated = false;
 
         // Check if the user exists
