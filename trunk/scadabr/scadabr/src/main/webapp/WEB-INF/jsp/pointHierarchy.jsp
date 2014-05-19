@@ -19,202 +19,230 @@
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
 <%@page import="com.serotonin.mango.Common"%>
 <tag:page dwr="PointHierarchyDwr" onload="init">
-  <script type="text/javascript">
-    var selectedFolderNode;
-    
-    function init() {
-        PointHierarchyDwr.getPointHierarchy(initCB);
-        var tree = dojo.widget.manager.getWidgetById('tree');
-        dojo.event.topic.subscribe("tree/titleClick", new TreeClickHandler(), 'handle');
-        setErrorMessage();
-    }
-    
-    var TreeClickHandler = function() {
-        this.handle = function(message) {
+    <script type="text/javascript">
+        var selectedFolderNode;
+
+        function init() {
+            require(["dojo/request", "dojo/json",
+                "dojo/_base/array", "dojo/domReady!"],
+                    function(request, JSON, arrayUtil) {
+
+                        // Request the JSON data from the server
+                        request.get("point_hierarchy.shtm/rootNode.json", {
+                            // Parse data from JSON to a JavaScript object
+                            handleAs: "json"
+                        }).then(function(data) {
+                            var tree = dojo.widget.manager.getWidgetById('tree');
+                            var i;
+
+                            for (i = 0; i < rootFolder.subfolders.length; i++)
+                                addFolder(rootFolder.subfolders[i], tree);
+
+                            for (i = 0; i < rootFolder.points.length; i++)
+                                addPoint(rootFolder.points[i], tree);
+
+                            hide("loadingImg");
+                            show("treeDiv");
+                        },
+                                function(error) {
+                                    hide("loadingImg");
+                                    show("treeDiv");
+                                });
+                    }
+            );
+
+            //       PointHierarchyDwr.getPointHierarchy(initCB);
+            var tree = dojo.widget.manager.getWidgetById('tree');
+            dojo.event.topic.subscribe("tree/titleClick", new TreeClickHandler(), 'handle');
             setErrorMessage();
-            var widget = message.source;
-            if (widget.isFolder) {
-                selectedFolderNode = widget;
-                $set("folderName", widget.object.name);
-                show("folderEditDiv");
-            }
-            else
-                hide("folderEditDiv");
         }
-    }
-    
-    function initCB(rootFolder) {
-        var tree = dojo.widget.manager.getWidgetById('tree');
-        var i;
-        
-        for (i=0; i<rootFolder.subfolders.length; i++)
-            addFolder(rootFolder.subfolders[i], tree);
-        
-        for (i=0; i<rootFolder.points.length; i++)
-            addPoint(rootFolder.points[i], tree);
-        
-        hide("loadingImg");
-        show("treeDiv");
-    }
-    
-    function addFolder(folder, parent) {
-        var i;
-        var folderNode = dojo.widget.createWidget("TreeNode", {
-                title: "<img src='images/folder_brick.png'/> "+ folder.name,
+
+        var TreeClickHandler = function() {
+            this.handle = function(message) {
+                setErrorMessage();
+                var widget = message.source;
+                if (widget.isFolder) {
+                    selectedFolderNode = widget;
+                    $set("folderName", widget.object.name);
+                    show("folderEditDiv");
+                }
+                else
+                    hide("folderEditDiv");
+            }
+        }
+
+        function initCB(rootFolder) {
+            var tree = dojo.widget.manager.getWidgetById('tree');
+            var i;
+
+            for (i = 0; i < rootFolder.subfolders.length; i++)
+                addFolder(rootFolder.subfolders[i], tree);
+
+            for (i = 0; i < rootFolder.points.length; i++)
+                addPoint(rootFolder.points[i], tree);
+
+            hide("loadingImg");
+            show("treeDiv");
+        }
+
+        function addFolder(folder, parent) {
+            var i;
+            var folderNode = dojo.widget.createWidget("TreeNode", {
+                title: "<img src='images/folder_brick.png'/> " + folder.name,
                 isFolder: "true",
                 object: folder
-        });
-        parent.addChild(folderNode);
-        
-        if (folder.subfolders) {
-            for (i=0; i<folder.subfolders.length; i++)
-                addFolder(folder.subfolders[i], folderNode);
+            });
+            parent.addChild(folderNode);
+
+            if (folder.subfolders) {
+                for (i = 0; i < folder.subfolders.length; i++)
+                    addFolder(folder.subfolders[i], folderNode);
+            }
+
+            if (folder.points) {
+                for (i = 0; i < folder.points.length; i++)
+                    addPoint(folder.points[i], folderNode);
+            }
+
+            folder.subfolders = null;
+            folder.points = null;
         }
-        
-        if (folder.points) {
-            for (i=0; i<folder.points.length; i++)
-                addPoint(folder.points[i], folderNode);
-        }
-        
-        folder.subfolders = null;
-        folder.points = null;
-    }
-    
-    function addPoint(point, parent) {
-        var pointNode = dojo.widget.createWidget("TreeNode", {
-                title: "<img src='images/icon_comp.png'/> "+ point.value,
+
+        function addPoint(point, parent) {
+            var pointNode = dojo.widget.createWidget("TreeNode", {
+                title: "<img src='images/icon_comp.png'/> " + point.value,
                 object: point
-        });
-        parent.addChild(pointNode);
-    }
-    
-    function newFolder() {
-        setErrorMessage();
-        var folder = {
-            id: <c:out value="<%= Common.NEW_ID %>"/>,
-            name: "<fmt:message key="pointHierarchy.defaultName"/>"
-        };
-        var tree = dojo.widget.manager.getWidgetById('tree');
-        addFolder(folder, tree);
-    }
-    
-    function save() {
-        setErrorMessage();
-        hide("folderEditDiv");
-        var tree = dojo.widget.manager.getWidgetById('tree');
-        var rootFolder = { id: 0, name: "root", subfolders: new Array(), points: new Array() };
-        gatherTreeData(tree, rootFolder);
-        PointHierarchyDwr.savePointHierarchy(rootFolder, saveCB);
-    }
-    
-    function saveCB(rootFolder) {
-        setErrorMessage("<fmt:message key="pointHierarchy.saved"/>");
-        
-        var tree = dojo.widget.manager.getWidgetById('tree');
-        while (tree.children.length > 0)
-            tree.removeNode(tree.children[0]);
-        
-        initCB(rootFolder);
-    }
-    
-    function gatherTreeData(treeNode, folder) {
-        for (var i=0; i<treeNode.children.length; i++) {
-            if (treeNode.children[i].isFolder) {
-                var subfolder = treeNode.children[i].object;
-                folder.subfolders[folder.subfolders.length] = subfolder;
-                subfolder.subfolders = new Array();
-                subfolder.points = new Array();
-                gatherTreeData(treeNode.children[i], subfolder);
-            } else {
-                folder.points[folder.points.length] = treeNode.children[i].object;
+            });
+            parent.addChild(pointNode);
+        }
+
+        function newFolder() {
+            setErrorMessage();
+            var folder = {
+                id: <c:out value="<%= Common.NEW_ID%>"/>,
+                name: "<fmt:message key="pointHierarchy.defaultName"/>"
+            };
+            var tree = dojo.widget.manager.getWidgetById('tree');
+            addFolder(folder, tree);
+        }
+
+        function save() {
+            setErrorMessage();
+            hide("folderEditDiv");
+            var tree = dojo.widget.manager.getWidgetById('tree');
+            var rootFolder = {id: 0, name: "root", subfolders: new Array(), points: new Array()};
+            gatherTreeData(tree, rootFolder);
+            PointHierarchyDwr.savePointHierarchy(rootFolder, saveCB);
+        }
+
+        function saveCB(rootFolder) {
+            setErrorMessage("<fmt:message key="pointHierarchy.saved"/>");
+
+            var tree = dojo.widget.manager.getWidgetById('tree');
+            while (tree.children.length > 0)
+                tree.removeNode(tree.children[0]);
+
+            initCB(rootFolder);
+        }
+
+        function gatherTreeData(treeNode, folder) {
+            for (var i = 0; i < treeNode.children.length; i++) {
+                if (treeNode.children[i].isFolder) {
+                    var subfolder = treeNode.children[i].object;
+                    folder.subfolders[folder.subfolders.length] = subfolder;
+                    subfolder.subfolders = new Array();
+                    subfolder.points = new Array();
+                    gatherTreeData(treeNode.children[i], subfolder);
+                } else {
+                    folder.points[folder.points.length] = treeNode.children[i].object;
+                }
             }
         }
-    }
-    
-    function deleteFolder() {
-        setErrorMessage();
-        if (selectedFolderNode.children.length > 0) {
-            if (!confirm("<fmt:message key="pointHierarchy.deleteConfirm"/>"))
-                return;
+
+        function deleteFolder() {
+            setErrorMessage();
+            if (selectedFolderNode.children.length > 0) {
+                if (!confirm("<fmt:message key="pointHierarchy.deleteConfirm"/>"))
+                    return;
+            }
+
+            while (selectedFolderNode.children.length > 0) {
+                var child = selectedFolderNode.children[0];
+                selectedFolderNode.removeNode(child);
+                selectedFolderNode.parent.addChild(child);
+            }
+
+            selectedFolderNode.parent.removeNode(selectedFolderNode);
+            hide("folderEditDiv");
         }
-        
-        while (selectedFolderNode.children.length > 0) {
-            var child = selectedFolderNode.children[0];
-            selectedFolderNode.removeNode(child);
-            selectedFolderNode.parent.addChild(child);
+
+        function saveFolder() {
+            setErrorMessage();
+            var name = $get("folderName");
+            if (!name || name == "")
+                alert("<fmt:message key="pointHierarchy.noName"/>");
+            else {
+                selectedFolderNode.object.name = name;
+                selectedFolderNode.titleNode.innerHTML =
+                        "<img src='images/folder_brick.png'/> " + selectedFolderNode.object.name;
+            }
         }
-        
-        selectedFolderNode.parent.removeNode(selectedFolderNode);
-        hide("folderEditDiv");
-    }
-    
-    function saveFolder() {
-        setErrorMessage();
-        var name = $get("folderName");
-        if (!name || name == "")
-            alert("<fmt:message key="pointHierarchy.noName"/>");
-        else {
-          selectedFolderNode.object.name = name;
-          selectedFolderNode.titleNode.innerHTML =
-                  "<img src='images/folder_brick.png'/> "+ selectedFolderNode.object.name;
+
+        function setErrorMessage(message) {
+            if (!message)
+                hide("errorMessage");
+            else {
+                $("errorMessage").innerHTML = message;
+                show("errorMessage");
+            }
         }
-    }
-    
-    function setErrorMessage(message) {
-        if (!message)
-            hide("errorMessage");
-        else {
-            $("errorMessage").innerHTML = message;
-            show("errorMessage");
-        }
-    }
-  </script>
-  
-  <table>
-    <tr>
-      <td valign="top">
-        <div class="borderDivPadded">
-          <table width="100%">
-            <tr>
-              <td>
-                <span class="smallTitle"><fmt:message key="pointHierarchy.hierarchy"/></span>
-                <tag:help id="pointHierarchy"/>
-              </td>
-              <td align="right">
-                <tag:img png="folder_add" title="common.add" onclick="newFolder()"/>
-                <tag:img png="save" title="common.save" onclick="save()"/>
-              </td>
-            </tr>
-            <tr><td class="formError" id="errorMessage"></td></tr>
-          </table>
-        
-          <tag:img png="hourglass" id="loadingImg"/>
-          <div id="treeDiv" style="display:none;">
-            <div dojoType="Tree" DNDMode="between" toggle="wipe" DNDAcceptTypes="tree" widgetId="tree"></div>
-          </div>
-        </div>
-      </td>
-      
-      <td valign="top">
-        <div id="folderEditDiv" class="borderDivPadded" style="display:none;">
-          <table width="100%">
-            <tr>
-              <td class="smallTitle"><fmt:message key="pointHierarchy.details"/></td>
-              <td align="right">
-                <tag:img id="deleteImg" png="delete" title="common.delete" onclick="deleteFolder();"/>
-                <tag:img id="saveImg" png="save" title="common.save" onclick="saveFolder();"/>
-              </td>
-            </tr>
-          </table>
-          
-          <table>
-            <tr>
-              <td class="formLabelRequired"><fmt:message key="pointHierarchy.name"/></td>
-              <td class="formField"><input id="folderName" type="text"/></td>
-            </tr>
-          </table>
-        </div>
-      </td>
-    </tr>
-  </table>
+    </script>
+
+    <table>
+        <tr>
+            <td valign="top">
+                <div class="borderDivPadded">
+                    <table width="100%">
+                        <tr>
+                            <td>
+                                <span class="smallTitle"><fmt:message key="pointHierarchy.hierarchy"/></span>
+                                <tag:help id="pointHierarchy"/>
+                            </td>
+                            <td align="right">
+                                <tag:img png="folder_add" title="common.add" onclick="init()"/>
+                                <tag:img png="save" title="common.save" onclick="save()"/>
+                            </td>
+                        </tr>
+                        <tr><td class="formError" id="errorMessage"></td></tr>
+                    </table>
+
+                    <tag:img png="hourglass" id="loadingImg"/>
+                    <div id="treeDiv" style="display:none;">
+                        <div dojoType="Tree" DNDMode="between" toggle="wipe" DNDAcceptTypes="tree" widgetId="tree"></div>
+                    </div>
+                </div>
+            </td>
+
+            <td valign="top">
+                <div id="folderEditDiv" class="borderDivPadded" style="display:none;">
+                    <table width="100%">
+                        <tr>
+                            <td class="smallTitle"><fmt:message key="pointHierarchy.details"/></td>
+                            <td align="right">
+                                <tag:img id="deleteImg" png="delete" title="common.delete" onclick="deleteFolder();"/>
+                                <tag:img id="saveImg" png="save" title="common.save" onclick="saveFolder();"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table>
+                        <tr>
+                            <td class="formLabelRequired"><fmt:message key="pointHierarchy.name"/></td>
+                            <td class="formField"><input id="folderName" type="text"/></td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
 </tag:page>
