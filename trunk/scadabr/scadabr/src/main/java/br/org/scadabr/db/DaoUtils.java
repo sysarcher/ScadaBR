@@ -1,8 +1,10 @@
 package br.org.scadabr.db;
 
+import br.org.scadabr.logger.LogUtils;
 import com.serotonin.mango.db.DatabaseAccessFactory;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -15,6 +17,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Deprecated
 public class DaoUtils {
 
+    protected final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_DAO);
     @Inject
     protected DatabaseAccessFactory daf;
     protected DataSource dataSource;

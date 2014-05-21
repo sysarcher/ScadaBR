@@ -30,7 +30,7 @@
   
   <!-- Script -->
   <script type="text/javascript">var djConfig = { isDebug: true };</script>
-  <script type="text/javascript" src="http://o.aolcdn.com/dojo/0.4.2/dojo.js"></script>
+  <script type="text/javascript" src="resources/dojo-1.9.3/dojo/dojo.js">data-dojo-config="async: true"</script>
   <script type="text/javascript" src="dwr/engine.js"></script>
   <script type="text/javascript" src="dwr/util.js"></script>
   <script type="text/javascript" src="resources/common.js"></script>

@@ -36,8 +36,10 @@
     See Spring Reference 15.12 Configuring Spring MVC
     @ http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/mvc.html#mvc-annotation-driven-->
     <mvc:annotation-driven /> 
-	
-    <!-- Without the following adapter, we'll get a "Does your handler implement a supported interface like Controller?"
+	<mvc:resources mapping="/resources/**" location="/resources/*" />
+	<mvc:resources mapping="/images/**" location="/images/*" />
+
+            <!-- Without the following adapter, we'll get a "Does your handler implement a supported interface like Controller?"
     This is because mvc:annotation-driven element doesn't declare a SimpleControllerHandlerAdapter
     For more info 
     See http://stackoverflow.com/questions/3896013/no-adapter-for-handler-exception 

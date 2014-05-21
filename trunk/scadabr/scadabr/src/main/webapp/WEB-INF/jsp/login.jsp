@@ -17,12 +17,16 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
-<tag:page onload="setFocus">
+<tag:page >
     <script type="text/javascript">
-        compatible = false;
+        
+    var compatible = false;
+  
+    window.onload = function() {
+            require(["dojo/dom", "dojo/domReady"], function(dom){    
+                dom.byId("username").focus();
+            });
 
-        function setFocus() {
-            $("username").focus();
             BrowserDetect.init();
 
             $set("browser", BrowserDetect.browser + " " + BrowserDetect.version + " <fmt:message key="login.browserOnPlatform"/> " + BrowserDetect.OS);
@@ -31,19 +35,19 @@
                 $("browserImg").src = "images/accept.png";
                 show("okMsg");
                 compatible = true;
-            }
-            else {
+            } else {
                 $("browserImg").src = "images/thumb_down.png";
                 show("warnMsg");
             }
         }
-
+    
         function nag() {
             if (!compatible)
                 alert('<fmt:message key="login.nag"/>');
         }
+        
     </script>
-
+    
     <table cellspacing="0" cellpadding="0" border="0">
         <tr>
             <td>
