@@ -1,21 +1,22 @@
+// SEEL http://acodingblog.wordpress.com/2010/05/28/upgrading-dojo-0-4-to-1-4/
 /*
-    Mango - Open Source M2M - http://mango.serotoninsoftware.com
-    Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
-    @author Matthew Lohbihler
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ Mango - Open Source M2M - http://mango.serotoninsoftware.com
+ Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
+ @author Matthew Lohbihler
+ 
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 var mango = {};
 
@@ -25,7 +26,7 @@ var mango = {};
 String.prototype.startsWith = function(str) {
     if (str.length > this.length)
         return false;
-    for (var i=0; i<str.length; i++) {
+    for (var i = 0; i < str.length; i++) {
         if (str.charAt(i) != this.charAt(i))
             return false;
     }
@@ -33,16 +34,16 @@ String.prototype.startsWith = function(str) {
 }
 
 String.prototype.trim = function() {
-    return this.replace(/^\s+|\s+$/g,"");
+    return this.replace(/^\s+|\s+$/g, "");
 }
 
-String.prototype.replaceAll = function(de, para){
-	str = this;
+String.prototype.replaceAll = function(de, para) {
+    str = this;
     var pos = str.indexOf(de);
-    while (pos > -1){
-		str = str.replace(de, para);
-		pos = str.indexOf(de);
-	}
+    while (pos > -1) {
+        str = str.replace(de, para);
+        pos = str.indexOf(de);
+    }
     return (str);
 }
 
@@ -51,10 +52,10 @@ String.prototype.replaceAll = function(de, para){
 //
 function errorToString(e) {
     try {
-        return e.name +": "+ e.message +" ("+ e.fileName +":"+ e.lineNumber +")";
+        return e.name + ": " + e.message + " (" + e.fileName + ":" + e.lineNumber + ")";
     }
     catch (e2) {
-        return e.name +": "+ e.message +" ("+ e.fileName +")";
+        return e.name + ": " + e.message + " (" + e.fileName + ")";
     }
 }
 
@@ -67,7 +68,9 @@ mango.longPoll.pollSessionId = Math.round(Math.random() * 1000000000);
 
 mango.longPoll.start = function() {
     MiscDwr.initializeLongPoll(mango.longPoll.pollSessionId, mango.longPoll.pollRequest, mango.longPoll.pollCB);
-    dojo.addOnUnload(function() { MiscDwr.terminateLongPoll(mango.longPoll.pollSessionId); });
+    dojo.addOnUnload(function() {
+        MiscDwr.terminateLongPoll(mango.longPoll.pollSessionId);
+    });
 };
 
 mango.longPoll.poll = function() {
@@ -78,15 +81,15 @@ mango.longPoll.poll = function() {
 mango.longPoll.pollCB = function(response) {
     if (response.terminated)
         return;
-    
-    if (typeof(response.highestUnsilencedAlarmLevel) != "undefined") {
+
+    if (typeof (response.highestUnsilencedAlarmLevel) != "undefined") {
         if (response.highestUnsilencedAlarmLevel > 0) {
             setAlarmLevelImg(response.highestUnsilencedAlarmLevel, $("__header__alarmLevelImg"));
             setAlarmLevelText(response.highestUnsilencedAlarmLevel, $("__header__alarmLevelText"));
             if (!mango.header.evtVisualizer.started)
-                mango.header.evtVisualizer.start();
+                // mango.header.evtVisualizer.start();
             show("__header__alarmLevelDiv");
-            mango.soundPlayer.play("level"+ response.highestUnsilencedAlarmLevel);
+            mango.soundPlayer.play("level" + response.highestUnsilencedAlarmLevel);
         }
         else {
             hide("__header__alarmLevelDiv");
@@ -94,22 +97,22 @@ mango.longPoll.pollCB = function(response) {
             mango.soundPlayer.stop();
         }
     }
-    
+
     if (response.watchListStates)
         mango.view.watchList.setData(response.watchListStates);
-    
+
     if (response.pointDetailsState)
         mango.view.pointDetails.setData(response.pointDetailsState);
-    
+
     if (response.viewStates)
         mango.view.setData(response.viewStates);
-    
-    if (typeof(response.pendingAlarmsContent) != "undefined")
+
+    if (typeof (response.pendingAlarmsContent) != "undefined")
         updatePendingAlarmsContent(response.pendingAlarmsContent);
-    
+
     if (response.customViewStates)
         mango.view.setData(response.customViewStates);
-    
+
     if (mango.longPoll.lastPoll) {
         var duration = new Date().getTime() - mango.longPoll.lastPoll;
         if (duration < 300) {
@@ -128,24 +131,25 @@ mango.longPoll.pollCB = function(response) {
 // Input control
 //
 function setDisabled(node, disabled) {
-    node = getNodeIfString(node);
+  require(["dojo/dom-class", "dojo/dom"], function(domClass, dom){
+    node = dom.byId(node);
     if (disabled) {
-        node.disabled = true;
-        dojo.html.addClass(node, "formDisabled");
+      node.disabled = true;
+      domClass.add(node, "formDisabled");
+    } else {
+      node.disabled = false;
+      domClass.remove(node, "formDisabled");
     }
-    else {
-        node.disabled = false;
-        dojo.html.removeClass(node, "formDisabled");
-    }
+  });
 }
 
 function dump(o) {
     for (var p in o)
-        dojo.debug(p +"="+ o[p]);
+        dojo.debug(p + "=" + o[p]);
 }
 
 function contains(arr, e) {
-    for (var i=0; i<arr.length; i++) {
+    for (var i = 0; i < arr.length; i++) {
         if (arr[i] == e)
             return true;
     }
@@ -154,13 +158,13 @@ function contains(arr, e) {
 
 // onmouseover and onmouseout betterment.
 function isMouseLeaveOrEnter(e, handler) {
-	  if (e.type != 'mouseout' && e.type != 'mouseover')
-		  return false;
-	  var reltg = e.relatedTarget ? e.relatedTarget : e.type == 'mouseout' ? e.toElement : e.fromElement;
-	  while (reltg && reltg != handler)
-		  reltg = reltg.parentNode;
-	  return (reltg != handler);
-}      
+    if (e.type != 'mouseout' && e.type != 'mouseover')
+        return false;
+    var reltg = e.relatedTarget ? e.relatedTarget : e.type == 'mouseout' ? e.toElement : e.fromElement;
+    while (reltg && reltg != handler)
+        reltg = reltg.parentNode;
+    return (reltg != handler);
+}
 
 //
 // Common functions (delegates to Dojo functions)
@@ -176,7 +180,7 @@ function hide(node) {
         getNodeIfString(node).style.display = 'none';
     }
     catch (err) {
-        throw "hide failed for node "+ node +", "+ err.message;
+        throw "hide failed for node " + node + ", " + err.message;
     }
 }
 
@@ -188,17 +192,20 @@ function display(node, showNode, styleType) {
 }
 
 function showMenu(node, xoffset, yoffset) {
-    node = getNodeIfString(node);
-    var bounds = dojo.html.abs(node.parentNode);
+  require(["dojo/dom-geometry", "dojo/dom"], function(domGeom, dom){
+    node = dom.byId(node);
+    var includeScroll = false;
+    var bounds = domGeom.position(node, includeScroll);
     var anc = findRelativeAncestor(node);
     if (anc) {
-        var rbounds = dojo.html.abs(anc);
+        var rbounds = domGeom.position(anc, includeScroll);
         bounds.x -= rbounds.x;
         bounds.y -= rbounds.y;
     }
-    node.style.left = (bounds.x + xoffset) +"px";
-    node.style.top = (bounds.y + yoffset) +"px";
+    node.style.left = (bounds.x + xoffset) + "px";
+    node.style.top = (bounds.y + yoffset) + "px";
     showLayer(node);
+  });
 }
 
 function showLayer(node) {
@@ -232,18 +239,25 @@ function findRelativeAncestor(node) {
 // in all situations.
 //
 function getNodeBounds(node) {
-    node = getNodeIfString(node);
-    var box = dojo.html.getContentBox(node);
+  require(["dojo/dom-geometry", "dojo/dom", "dojo/dom-style"], function(domGeom, dom, style){
+    node = dom.byId(node);
+    var computedStyle = style.getComputedStyle(node);
+    var box = domGeom.getContentBox(node, computedStyle);
     return {
-        x : dojo.html.getPixelValue(node, "left", dojo.html.isPositionAbsolute(node)),
-        y : dojo.html.getPixelValue(node, "top", dojo.html.isPositionAbsolute(node)),
-        w : box.width,
-        h : box.height
+        x: html.getPixelValue(node, "left", html.isPositionAbsolute(node)),
+        y: html.getPixelValue(node, "top", html.isPositionAbsolute(node)),
+        w: box.width,
+        h: box.height
     };
+  });
 }
 
 function getAbsoluteNodeBounds(node) {
-    var box = dojo.html.getContentBox(node);
+  var result;
+  require(["dojo/dom-geometry", "dojo/dom", "dojo/dom-style"], function(domGeom, dom, style){
+    node = dom.byId(node);
+    var computedStyle = style.getComputedStyle(node);
+    var box = domGeom.getContentBox(node, computedStyle);
     var x = y = 0;
     var tempNode = node;
     while (tempNode) {
@@ -251,12 +265,14 @@ function getAbsoluteNodeBounds(node) {
         y += tempNode.offsetTop;
         tempNode = tempNode.offsetParent;
     }
-    return {
-        x : x,
-        y : y,
-        w : box.width,
-        h : box.height
+    result = {
+        x: x,
+        y: y,
+        w: box.width,
+        h: box.height
     };
+  });
+  return result;
 }
 
 
@@ -271,11 +287,11 @@ function IEBlinker(/*element*/node, /*milliseconds*/onTime, /*milliseconds*/offT
     this.off = offTime;
     if (!this.off)
         this.off = 300;
-    
+
     this.state = true;
     this.timeoutId;
     this.started = false;
-    
+
     this.start = function() {
         this.started = true;
         this.timeoutId = null;
@@ -286,7 +302,7 @@ function IEBlinker(/*element*/node, /*milliseconds*/onTime, /*milliseconds*/offT
             hideLayer(this.target);
         this.timeoutId = setTimeout(dojo.lang.hitch(this, "start"), this.state ? this.on : this.off);
     };
-    
+
     this.stop = function() {
         if (this.started) {
             this.started = false;
@@ -323,6 +339,8 @@ function stopIEBlinker(node) {
 }
 
 function ImageFader(/*element*/imgNode, /*milliseconds*/cycleRate, /*0<float<1*/cycleStep) {
+  require(["dojo/dom-style", "dojo/dom", "dojo/on", "dojo/domReady!"],
+    function(style, dom, on){
     this.im = imgNode;
     this.rate = cycleRate;
     if (!this.rate)
@@ -330,45 +348,46 @@ function ImageFader(/*element*/imgNode, /*milliseconds*/cycleRate, /*0<float<1*/
     this.step = cycleStep;
     if (!this.step)
         this.step = 0.1;
-    
+
     this.increasing = false;
     this.timeoutId;
     this.started = false;
-    
+
     this.start = function() {
         this.started = true;
         this.timeoutId = null;
-        
-        var op = dojo.html.getOpacity(this.im, "opacity");
+
+        var op = style.get(this.im, "opacity");
         if (op >= 1)
             this.increasing = false;
         else if (op <= 0)
             this.increasing = true;
-    
+
         if (this.increasing)
             op += this.step;
         else
             op -= this.step;
-        
-        dojo.html.setOpacity(this.im, op);
-    
+
+        style.set(this.im, "opacity", op);
+
         this.timeoutId = setTimeout(dojo.lang.hitch(this, "start"), this.rate);
     };
-    
+
     this.stop = function() {
         if (this.started) {
             this.started = false;
             clearTimeout(this.timeoutId);
             this.timeoutId = null;
         }
-        dojo.html.setOpacity(this.im, 1);
+        style.set(this.im, "opacity", 1);
     };
+  });
 }
 
 function startImageFader(node, disableOnclick) {
     if (disableOnclick)
         this.disableOnclick(node);
-    
+
     node = getNodeIfString(node);
     var fader = new ImageFader(node);
     if (node.fader)
@@ -402,17 +421,18 @@ function disableOnclick(node) {
 function enableOnclick(node) {
     if (node.disabledOnclick) {
         node.onclick = node.disabledOnclick;
-        node.disabledOnclick = null;;
+        node.disabledOnclick = null;
+        ;
     }
 }
 
 function updateTemplateNode(elem, replaceText) {
     var i;
-    for (i=0; i<elem.attributes.length; i++) {
+    for (i = 0; i < elem.attributes.length; i++) {
         if (elem.attributes[i].value && elem.attributes[i].value.indexOf('_TEMPLATE_') != -1)
             elem.attributes[i].value = elem.attributes[i].value.replace(/_TEMPLATE_/, replaceText);
     }
-    for (var i=0; i<elem.childNodes.length; i++) {
+    for (var i = 0; i < elem.childNodes.length; i++) {
         if (elem.childNodes[i].attributes)
             updateTemplateNode(elem.childNodes[i], replaceText);
     }
@@ -423,7 +443,7 @@ function getElementsByMangoName(node, mangoName, result) {
         result = new Array();
     if (node.mangoName == mangoName)
         result[result.length] = node;
-    for (var i=0; i<node.childNodes.length; i++)
+    for (var i = 0; i < node.childNodes.length; i++)
         getElementsByMangoName(node.childNodes[i], mangoName, result);
     return result;
 }
@@ -470,7 +490,7 @@ function setAlarmLevelText(alarmLevel, textNode) {
     else if (alarmLevel == 4)
         textNode.innerHTML = mango.i18n["common.alarmLevel.lifeSafety"];
     else
-        textNode.innerHTML = "Unknown alarm level: "+ alarmLevel;
+        textNode.innerHTML = "Unknown alarm level: " + alarmLevel;
 }
 
 function setUserImg(admin, disabled, imgNode) {
@@ -584,17 +604,17 @@ function getSelectionRange(node) {
     node.focus();
     if (typeof node.selectionStart != "undefined")
         // FF
-        return { start: node.selectionStart, end: node.selectionEnd };
+        return {start: node.selectionStart, end: node.selectionEnd};
     if (!document.selection)
-        return { start: 0, end: 0 };
-    
+        return {start: 0, end: 0};
+
     // IE
     var range = document.selection.createRange();
     var rangeCopy = range.duplicate();
     rangeCopy.moveToElementText(tt);
     rangeCopy.setEndPoint('EndToEnd', range);
     var start = rangeCopy.text.length - range.text.length;
-    return { start: start, end: start + range.text.length };
+    return {start: start, end: start + range.text.length};
 }
 
 function setSelectionRange(node, start, end) {
@@ -632,7 +652,7 @@ function getElement(arr, id, idName) {
     if (!idName)
         idName = "id";
 
-    for (var i=0; i<arr.length; i++) {
+    for (var i = 0; i < arr.length; i++) {
         if (arr[i][idName] == id)
             return arr[i];
     }
@@ -640,7 +660,7 @@ function getElement(arr, id, idName) {
 }
 
 function updateElement(arr, id, key, value, dobreak) {
-    for (var i=0; i<arr.length; i++) {
+    for (var i = 0; i < arr.length; i++) {
         if (arr[i].id == id) {
             arr[i][key] = value;
             if (dobreak)
@@ -650,7 +670,7 @@ function updateElement(arr, id, key, value, dobreak) {
 }
 
 function removeElement(arr, id) {
-    for (var i=arr.length-1; i>=0; i--) {
+    for (var i = arr.length - 1; i >= 0; i--) {
         if (arr[i].id == id)
             arr.splice(i, 1);
     }
@@ -665,9 +685,9 @@ function showMessage(node, msg) {
     else
         hide(node);
 }
-  
+
 function getNodeIfString(node) {
-    if (typeof(node) == "string")
+    if (typeof (node) == "string")
         return $(node);
     return node;
 }
@@ -675,26 +695,26 @@ function getNodeIfString(node) {
 function escapeQuotes(str) {
     if (!str)
         return "";
-    return str.replace(/\'/g,"\\'");
+    return str.replace(/\'/g, "\\'");
 }
 
 function escapeDQuotes(str) {
     if (!str)
         return "";
-    return str.replace(/\"/g,"\\\"");
+    return str.replace(/\"/g, "\\\"");
 }
 
 function encodeQuotes(str) {
     if (!str)
         return "";
-    return str.replace(/\'/g,"%27").replace(/\"/g,"%22");
+    return str.replace(/\'/g, "%27").replace(/\"/g, "%22");
 }
 
 function encodeHtml(str) {
     if (!str)
         return "";
-    str = str.replace(/&/g,"&amp;");
-    return str.replace(/</g,"&lt;");
+    str = str.replace(/&/g, "&amp;");
+    return str.replace(/</g, "&lt;");
 }
 
 function appendNewElement(/*string*/type, /*node*/parent) {
@@ -706,35 +726,35 @@ function appendNewElement(/*string*/type, /*node*/parent) {
 function writeImage(id, src, png, title, onclick) {
     var result = '<img class="ptr"';
     if (id)
-        result += ' id="'+ id +'"';
+        result += ' id="' + id + '"';
     if (src)
-        result += ' src="'+ src +'"';
+        result += ' src="' + src + '"';
     if (png && !src)
-        result += ' src="images/'+ png +'.png"';
+        result += ' src="images/' + png + '.png"';
     if (title)
-        result += ' alt="'+ title +'" title="'+ title +'"';
-    result += ' onclick="'+ onclick +'"/>';
+        result += ' alt="' + title + '" title="' + title + '"';
+    result += ' onclick="' + onclick + '"/>';
     return result;
 }
 
 function writeImageSQuote(id, src, png, title, onclick) {
     var result = "<img class='ptr'";
     if (id)
-        result += " id='"+ id +"'";
+        result += " id='" + id + "'";
     if (src)
-        result += " src='"+ src +"'";
+        result += " src='" + src + "'";
     if (png && !src)
-        result += " src='images/"+ png +".png'";
+        result += " src='images/" + png + ".png'";
     if (title)
-        result += " alt='"+ title +"' title='"+ title +"'";
-    result += " onclick='"+ onclick +"'/>";
+        result += " alt='" + title + "' title='" + title + "'";
+    result += " onclick='" + onclick + "'/>";
     return result;
 }
 
 function hideContextualMessages(parent) {
     parent = getNodeIfString(parent);
     var nodes = dojo.html.getElementsByClass("ctxmsg", parent);
-    for (var i=0; i<nodes.length; i++)
+    for (var i = 0; i < nodes.length; i++)
         dojo.html.hide(nodes[i]);
 }
 
@@ -745,10 +765,10 @@ function hideGenericMessages(genericMessageNode) {
 function createContextualMessageNode(field, fieldId) {
     field = getNodeIfString(field);
     var node = document.createElement("div");
-    node.id = fieldId +"Ctxmsg";
+    node.id = fieldId + "Ctxmsg";
     node.className = "ctxmsg formError";
     dojo.html.hide(node);
-    
+
     var next = field.nextSibling;
     if (next)
         next.parentNode.insertBefore(node, next);
@@ -760,16 +780,16 @@ function createContextualMessageNode(field, fieldId) {
 function showDwrMessages(/*DwrResponseI18n.messages*/messages, /*tbody*/genericMessageNode) {
     var m, field, node, next;
     var genericMessages = new Array();
-    for (var i=0; i<messages.length; i++) {
+    for (var i = 0; i < messages.length; i++) {
         m = messages[i];
         if (m.contextKey) {
-            node = $(m.contextKey +"Ctxmsg");
+            node = $(m.contextKey + "Ctxmsg");
             if (!node) {
                 field = $(m.contextKey);
                 if (field) {
                     node = createContextualMessageNode(field, m.contextKey);
                 } else {
-                    alert("No contextual field found for key "+ m.contextKey);
+                    alert("No contextual field found for key " + m.contextKey);
                 }
             } else {
                 node.innerHTML = m.contextualMessage;
@@ -779,21 +799,23 @@ function showDwrMessages(/*DwrResponseI18n.messages*/messages, /*tbody*/genericM
             genericMessages[genericMessages.length] = m.genericMessage;
         }
     }
-    
+
     if (genericMessages.length > 0) {
         if (!genericMessageNode) {
             alert("generic messages node not defined");
         }
         genericMessageNode = getNodeIfString(genericMessageNode);
         dwr.util.removeAllRows(genericMessageNode);
-        dwr.util.addRows(genericMessageNode, genericMessages, [ function(data) { return data; } ],
-            {
-                cellCreator:function(options) {
-                    var td = document.createElement("td");
-                    td.className = "formError";
-                    return td;
-                }
-            });
+        dwr.util.addRows(genericMessageNode, genericMessages, [function(data) {
+                return data;
+            }],
+                {
+                    cellCreator: function(options) {
+                        var td = document.createElement("td");
+                        td.className = "formError";
+                        return td;
+                    }
+                });
         dojo.html.show(genericMessageNode);
     }
 }
@@ -805,7 +827,7 @@ function setDateRange(data) {
     $set("fromHour", data.fromHour);
     $set("fromMinute", data.fromMinute);
     $set("fromSecond", data.fromMinute);
-    
+
     $set("toYear", data.toYear);
     $set("toMonth", data.toMonth);
     $set("toDay", data.toDay);
@@ -824,7 +846,7 @@ function updateDateRange() {
     setDisabled("fromMinute", inception);
     setDisabled("fromSecond", inception);
     setDisabled("fromNone", false);
-    
+
     var now = $get("toNone");
     setDisabled("toYear", now);
     setDisabled("toMonth", now);
@@ -836,11 +858,13 @@ function updateDateRange() {
 }
 
 function toggleSilence(eventId) {
-    MiscDwr.toggleSilence(eventId, function(response) { setSilenced(response.data.eventId, response.data.silenced); });
+    MiscDwr.toggleSilence(eventId, function(response) {
+        setSilenced(response.data.eventId, response.data.silenced);
+    });
 }
 
 function setSilenced(eventId, silenced) {
-    var imgNode = $("silenceImg"+ eventId);
+    var imgNode = $("silenceImg" + eventId);
     if (silenced)
         updateImg(imgNode, "images/sound_mute.png", mango.i18n["events.unsilence"], true, "inline");
     else
@@ -857,10 +881,11 @@ function setUserMuted(muted) {
 }
 
 function ackEvent(eventId) {
-    hide("silenceImg"+ eventId);
-    var imgNode = $("ackImg"+ eventId);
+    hide("silenceImg" + eventId);
+    var imgNode = $("ackImg" + eventId);
     updateImg(imgNode, "images/tick_off.png", mango.i18n["events.acknowledged"], true, "inline");
-    imgNode.onclick = function() {};
+    imgNode.onclick = function() {
+    };
     dojo.html.removeClass(imgNode, "ptr");
     MiscDwr.acknowledgeEvent(eventId);
 }
@@ -897,35 +922,37 @@ mango.share.writeSharedUsers = function(sharedUsers) {
         hide("sharedUsersTableEmpty");
         show("sharedUsersTableHeaders");
         dwr.util.addRows("sharedUsersTable", sharedUsers,
-            [
-                function(data) { return getElement(mango.share.users, data.userId).username; },
-                function(data) {
-                    var s = '<select onchange="mango.share.updateUserAccess(this, '+ data.userId +')">';
-                    s += '<option value="1"'; // ShareUser.ACCESS_READ
-                    if (data.accessType == 1) // ShareUser.ACCESS_READ
-                        s += ' selected="selected"';
-                    s += '>'+ mango.i18n["common.access.read"] +'</option>';
-                    
-                    s += '<option value="2"'; // ShareUser.ACCESS_SET
-                    if (data.accessType == 2) // ShareUser.ACCESS_SET
-                        s += ' selected="selected"';
-                    s += '>'+ mango.i18n["common.access.set"] +'</option>';
-                    
-                    s += '</select>';
-                    return s;
-                },
-                function(data) {
-                    return "<img src='images/bullet_delete.png' class='ptr' "+
-                            "onclick='mango.share.removeFromSharedUsers("+ data.userId +")'/>";
+                [
+                    function(data) {
+                        return getElement(mango.share.users, data.userId).username;
+                    },
+                    function(data) {
+                        var s = '<select onchange="mango.share.updateUserAccess(this, ' + data.userId + ')">';
+                        s += '<option value="1"'; // ShareUser.ACCESS_READ
+                        if (data.accessType == 1) // ShareUser.ACCESS_READ
+                            s += ' selected="selected"';
+                        s += '>' + mango.i18n["common.access.read"] + '</option>';
+
+                        s += '<option value="2"'; // ShareUser.ACCESS_SET
+                        if (data.accessType == 2) // ShareUser.ACCESS_SET
+                            s += ' selected="selected"';
+                        s += '>' + mango.i18n["common.access.set"] + '</option>';
+
+                        s += '</select>';
+                        return s;
+                    },
+                    function(data) {
+                        return "<img src='images/bullet_delete.png' class='ptr' " +
+                                "onclick='mango.share.removeFromSharedUsers(" + data.userId + ")'/>";
+                    }
+                ],
+                {
+                    rowCreator: function(options) {
+                        var tr = document.createElement("tr");
+                        tr.className = "smRow" + (options.rowIndex % 2 == 0 ? "" : "Alt");
+                        return tr;
+                    }
                 }
-            ],
-            {
-                rowCreator:function(options) {
-                    var tr = document.createElement("tr");
-                    tr.className = "smRow"+ (options.rowIndex % 2 == 0 ? "" : "Alt");
-                    return tr;
-                }
-            }
         );
     }
     mango.share.updateUserList(sharedUsers);
@@ -934,15 +961,15 @@ mango.share.writeSharedUsers = function(sharedUsers) {
 mango.share.updateUserList = function(sharedUsers) {
     dwr.util.removeAllOptions("allShareUsersList");
     var availUsers = [];
-    for (var i=0; i<mango.share.users.length; i++) {
+    for (var i = 0; i < mango.share.users.length; i++) {
         var found = false;
-        for (var j=0; j<sharedUsers.length; j++) {
+        for (var j = 0; j < sharedUsers.length; j++) {
             if (sharedUsers[j].userId == mango.share.users[i].id) {
                 found = true;
                 break;
             }
         }
-        
+
         if (!found)
             availUsers.push(mango.share.users[i]);
     }
@@ -950,58 +977,58 @@ mango.share.updateUserList = function(sharedUsers) {
 }
 
 function createValidationMessage(node, message) {
-    return {contextKey:node, contextualMessage:message};
+    return {contextKey: node, contextualMessage: message};
 }
 
 
 
 function updateChartComparatorComponent(idPrefix, width, height) {
-	var fromDate = $get(idPrefix+"_fromDate1");
-	var toDate = $get(idPrefix+"_toDate1");
-	var fromDate2 = $get(idPrefix+"_fromDate2");
-	var toDate2 = $get(idPrefix+"_toDate2");
-	
-	var fromDateMatch = fromDate.match(/^(\d\d)\/(\d\d)\/(\d{4}) (\d\d):(\d\d):(\d\d)$/);
-	var toDateMatch = toDate.match(/^(\d\d)\/(\d\d)\/(\d{4}) (\d\d):(\d\d):(\d\d)$/);
-	var fromDateMatch2 = fromDate2.match(/^(\d\d)\/(\d\d)\/(\d{4}) (\d\d):(\d\d):(\d\d)$/);
-	var toDateMatch2 = toDate2.match(/^(\d\d)\/(\d\d)\/(\d{4}) (\d\d):(\d\d):(\d\d)$/);
-	
-	
-	if(fromDateMatch == null || toDateMatch == null || fromDateMatch2 == null || toDateMatch2 == null) {
-		alert("Data inválida! (dd/MM/yyyy hh:mm:ss)");
-		return;
-	}
-	
-	var dps = new Array();
-	
-	var dp1 = $get(idPrefix+"_dp1");
-	var dp2 = $get(idPrefix+"_dp2");
-	var dp3 = $get(idPrefix+"_dp3");
-	var dp4 = $get(idPrefix+"_dp4");
-	
-	if(dp1 > 0)
-		dps.push(dp1);
-	if(dp2 > 0)
-		dps.push(dp2);
-	if(dp3 > 0)
-		dps.push(dp3);
-	if(dp4 > 0)
-		dps.push(dp4);
-	
-	//alert(fromDate +" to " +toDate +" (" +dp1 +"," +dp2 +","+dp3+","+dp4+")");
-	if(dps.length == 0) {
-		alert('Selecione pelo menos um datapoint!');
-		return;
-	}
-	
-	ViewDwr.getChartData(dps,fromDate,toDate, fromDate2, toDate2,width,height,
-			function(response) {	
+    var fromDate = $get(idPrefix + "_fromDate1");
+    var toDate = $get(idPrefix + "_toDate1");
+    var fromDate2 = $get(idPrefix + "_fromDate2");
+    var toDate2 = $get(idPrefix + "_toDate2");
+
+    var fromDateMatch = fromDate.match(/^(\d\d)\/(\d\d)\/(\d{4}) (\d\d):(\d\d):(\d\d)$/);
+    var toDateMatch = toDate.match(/^(\d\d)\/(\d\d)\/(\d{4}) (\d\d):(\d\d):(\d\d)$/);
+    var fromDateMatch2 = fromDate2.match(/^(\d\d)\/(\d\d)\/(\d{4}) (\d\d):(\d\d):(\d\d)$/);
+    var toDateMatch2 = toDate2.match(/^(\d\d)\/(\d\d)\/(\d{4}) (\d\d):(\d\d):(\d\d)$/);
+
+
+    if (fromDateMatch == null || toDateMatch == null || fromDateMatch2 == null || toDateMatch2 == null) {
+        alert("Data inválida! (dd/MM/yyyy hh:mm:ss)");
+        return;
+    }
+
+    var dps = new Array();
+
+    var dp1 = $get(idPrefix + "_dp1");
+    var dp2 = $get(idPrefix + "_dp2");
+    var dp3 = $get(idPrefix + "_dp3");
+    var dp4 = $get(idPrefix + "_dp4");
+
+    if (dp1 > 0)
+        dps.push(dp1);
+    if (dp2 > 0)
+        dps.push(dp2);
+    if (dp3 > 0)
+        dps.push(dp3);
+    if (dp4 > 0)
+        dps.push(dp4);
+
+    //alert(fromDate +" to " +toDate +" (" +dp1 +"," +dp2 +","+dp3+","+dp4+")");
+    if (dps.length == 0) {
+        alert('Selecione pelo menos um datapoint!');
+        return;
+    }
+
+    ViewDwr.getChartData(dps, fromDate, toDate, fromDate2, toDate2, width, height,
+            function(response) {
 //			alert(response[0]);
-			$(idPrefix+"_chart1").src = response[0];
-			$(idPrefix+"_chart2").src = response[1];
-	});
-	
-	//alert(dps.length);
-	
+                $(idPrefix + "_chart1").src = response[0];
+                $(idPrefix + "_chart2").src = response[1];
+            });
+
+    //alert(dps.length);
+
 }
 

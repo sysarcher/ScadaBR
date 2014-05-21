@@ -18,184 +18,138 @@
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
 <%@page import="com.serotonin.mango.Common"%>
-<tag:page dwr="PointHierarchyDwr" onload="init">
+<tag:page >
     <script type="text/javascript">
         var selectedFolderNode;
+        var tree;
+        var myRestStore;
+        var observableStore;
+        var myModel;
+        var myStore;
 
-        function init() {
-            require(["dojo/request", "dojo/json",
-                "dojo/_base/array", "dojo/domReady!"],
-                    function(request, JSON, arrayUtil) {
+    window.onload = function() {
+  
+  
+  require([
+    "dojo/dom",
+    "dojo/store/JsonRest",
+    "dojo/store/Memory",
+    "dojo/store/Observable",
+    "dijit/tree/ObjectStoreModel", 
+    "dijit/Tree",
+    "dojo/domReady!"
+], function(dom, JsonRest, Memory, Observable, ObjectStoreModel, Tree){
 
-                        // Request the JSON data from the server
-                        request.get("point_hierarchy.shtm/rootNode.json", {
-                            // Parse data from JSON to a JavaScript object
-                            handleAs: "json"
-                        }).then(function(data) {
-                            var tree = dojo.widget.manager.getWidgetById('tree');
-                            var i;
-
-                            for (i = 0; i < rootFolder.subfolders.length; i++)
-                                addFolder(rootFolder.subfolders[i], tree);
-
-                            for (i = 0; i < rootFolder.points.length; i++)
-                                addPoint(rootFolder.points[i], tree);
-
-                            hide("loadingImg");
-                            show("treeDiv");
-                        },
-                                function(error) {
-                                    hide("loadingImg");
-                                    show("treeDiv");
-                                });
-                    }
-            );
-
-            //       PointHierarchyDwr.getPointHierarchy(initCB);
-            var tree = dojo.widget.manager.getWidgetById('tree');
-            dojo.event.topic.subscribe("tree/titleClick", new TreeClickHandler(), 'handle');
-            setErrorMessage();
+    // Create test store, adding the getChildren() method required by ObjectStoreModel
+    myStore = new Memory({
+      data: [
+        { id: 0, name:'The earth', nodeType:'planet'},
+          { id: 1, name:'Africa', nodeType:'continent', parentId: 0},
+            { id: 7, name:'Egypt', nodeType:'country', parentId: 1 },
+            { id: 8, name:'Kenya', nodeType:'country', parentId: 1 },
+              { id: 11, name:'Nairobi', nodeType:'city', parentId: 8 },
+              { id: 12, name:'Mombasa', nodeType:'city', parentId: 8 },
+            { id: 9, name:'Sudan', nodeType:'country', parentId: 1 },
+              { id: 13, name:'Khartoum', nodeType:'city', parentId: 9 },
+          { id: 2, name:'Asia', nodeType:'continent', parentId: 0 },
+            { id: 10, name:'China', nodeType:'country', parentId: 2 },
+            { id: 14, name:'India', nodeType:'country', parentId: 2 },
+            { id: 15, name:'Russia', nodeType:'country', parentId: 2 },
+            { id: 16, name:'Mongolia', nodeType:'country', parentId: 2 },
+          { id: 3, name:'Oceania', nodeType:'continent', parentId: 0},
+          { id: 4, name:'Europe', nodeType:'continent', parentId: 0 },
+            { id: 17, name:'Germany', nodeType:'country', parentId: 4 },
+            { id: 18, name:'France', nodeType:'country', parentId: 4 },
+            { id: 19, name:'Spain', nodeType:'country', parentId: 4 },
+            { id: 20, name:'Italy', nodeType:'country', parentId: 4 },
+          { id: 5, name:'North America', nodeType:'continent', parentId: 0 },
+          { id: 6, name:'South America', nodeType:'continent', parentId: 0 }
+      ],
+      getChildren: function(object){
+        var result = this.query({parentId: object.id});
+        return result;
+      },
+      mayHaveChildren: function(object){
+        console.log("MAY HAVE CHILDREN CALLED");
+        // if true, we might be missing the data, false and nothing should be done
+        return true; //object.type = "PF";
+      },
+      getRoot: function(onItem, onError){
+        console.log("GET ROOT CALLED ");
+        var result = this.query({id: 0});
+        if (result != null) {
+          onItem(result[0]);
+        } else {
+            onError(null);
         }
+      },
+      getLabel: function(object){
+        console.log("GET LABEL CALLED " + object);
+        // just get the name
+        return object.name;
+      }
+    });
 
-        var TreeClickHandler = function() {
-            this.handle = function(message) {
-                setErrorMessage();
-                var widget = message.source;
-                if (widget.isFolder) {
-                    selectedFolderNode = widget;
-                    $set("folderName", widget.object.name);
-                    show("folderEditDiv");
-                }
-                else
-                    hide("folderEditDiv");
-            }
-        }
 
-        function initCB(rootFolder) {
-            var tree = dojo.widget.manager.getWidgetById('tree');
-            var i;
+    myRestStore = new JsonRest({
+      target: "dstree/",
+      getChildren: function(object, onComplete, onError){
+        console.log("GET CHILDREN CALLED " + object);
+        this.query({parentId: object.id}).then(function(children){
+            console.log("CHILDS: " + children);
+        });
+        this.query({parentId: object.id}).then(onComplete, onError);
+      },
+      mayHaveChildren: function(object){
+        console.log("MAY HAVE CHILDREN CALLED");
+        // if true, we might be missing the data, false and nothing should be done
+        return object.nodeType === "PF";
+      },
+      getRoot: function(onItem, onError){
+        console.log("GET ROOT CALLED ");
+        // get the root object, we will do a get() and callback the result
+        this.get("root").then(onItem, onError);
+      },
+      getLabel: function(object){
+        console.log("GET LABEL CALLED " + object);
+        // just get the name
+        return object.name;
+      }
+    });
+    
+    
+    //Direct connected will work ???
+    observableStore = new Observable(myStore);
 
-            for (i = 0; i < rootFolder.subfolders.length; i++)
-                addFolder(rootFolder.subfolders[i], tree);
+    // Create the model
+    myModel = new ObjectStoreModel({
+        store: observableStore,
+        query: {id: 0}
+    });
 
-            for (i = 0; i < rootFolder.points.length; i++)
-                addPoint(rootFolder.points[i], tree);
 
-            hide("loadingImg");
-            show("treeDiv");
-        }
+    // Create the Tree.
+    tree = new Tree({
+        model: myRestStore
+    }, "treeDiv");
+    tree.startup();
+});
+}  
 
-        function addFolder(folder, parent) {
-            var i;
-            var folderNode = dojo.widget.createWidget("TreeNode", {
-                title: "<img src='images/folder_brick.png'/> " + folder.name,
-                isFolder: "true",
-                object: folder
-            });
-            parent.addChild(folderNode);
-
-            if (folder.subfolders) {
-                for (i = 0; i < folder.subfolders.length; i++)
-                    addFolder(folder.subfolders[i], folderNode);
-            }
-
-            if (folder.points) {
-                for (i = 0; i < folder.points.length; i++)
-                    addPoint(folder.points[i], folderNode);
-            }
-
-            folder.subfolders = null;
-            folder.points = null;
-        }
-
-        function addPoint(point, parent) {
-            var pointNode = dojo.widget.createWidget("TreeNode", {
-                title: "<img src='images/icon_comp.png'/> " + point.value,
-                object: point
-            });
-            parent.addChild(pointNode);
-        }
-
-        function newFolder() {
-            setErrorMessage();
-            var folder = {
-                id: <c:out value="<%= Common.NEW_ID%>"/>,
-                name: "<fmt:message key="pointHierarchy.defaultName"/>"
-            };
-            var tree = dojo.widget.manager.getWidgetById('tree');
-            addFolder(folder, tree);
-        }
-
-        function save() {
-            setErrorMessage();
-            hide("folderEditDiv");
-            var tree = dojo.widget.manager.getWidgetById('tree');
-            var rootFolder = {id: 0, name: "root", subfolders: new Array(), points: new Array()};
-            gatherTreeData(tree, rootFolder);
-            PointHierarchyDwr.savePointHierarchy(rootFolder, saveCB);
-        }
-
-        function saveCB(rootFolder) {
-            setErrorMessage("<fmt:message key="pointHierarchy.saved"/>");
-
-            var tree = dojo.widget.manager.getWidgetById('tree');
-            while (tree.children.length > 0)
-                tree.removeNode(tree.children[0]);
-
-            initCB(rootFolder);
-        }
-
-        function gatherTreeData(treeNode, folder) {
-            for (var i = 0; i < treeNode.children.length; i++) {
-                if (treeNode.children[i].isFolder) {
-                    var subfolder = treeNode.children[i].object;
-                    folder.subfolders[folder.subfolders.length] = subfolder;
-                    subfolder.subfolders = new Array();
-                    subfolder.points = new Array();
-                    gatherTreeData(treeNode.children[i], subfolder);
-                } else {
-                    folder.points[folder.points.length] = treeNode.children[i].object;
-                }
-            }
-        }
-
-        function deleteFolder() {
-            setErrorMessage();
-            if (selectedFolderNode.children.length > 0) {
-                if (!confirm("<fmt:message key="pointHierarchy.deleteConfirm"/>"))
-                    return;
-            }
-
-            while (selectedFolderNode.children.length > 0) {
-                var child = selectedFolderNode.children[0];
-                selectedFolderNode.removeNode(child);
-                selectedFolderNode.parent.addChild(child);
-            }
-
-            selectedFolderNode.parent.removeNode(selectedFolderNode);
-            hide("folderEditDiv");
-        }
-
-        function saveFolder() {
-            setErrorMessage();
-            var name = $get("folderName");
-            if (!name || name == "")
-                alert("<fmt:message key="pointHierarchy.noName"/>");
-            else {
-                selectedFolderNode.object.name = name;
-                selectedFolderNode.titleNode.innerHTML =
-                        "<img src='images/folder_brick.png'/> " + selectedFolderNode.object.name;
-            }
-        }
-
-        function setErrorMessage(message) {
-            if (!message)
-                hide("errorMessage");
-            else {
-                $("errorMessage").innerHTML = message;
-                show("errorMessage");
-            }
-        }
+function showRoot() {
+    console.log("MODEL.root " + myModel.root);
+    myRestStore.get(0).then(function(item){
+        console.log(item);
+        myRestStore.getChildren(item).then(function(children) {
+            
+        });
+    });
+    
+    myRestStore.get(0);
+    console.log(myRestStore.get(0));
+    console.log(myRestStore.getChildren(myRestStore.get(0)));
+    console.log("MODEL.root " + myModel.root);
+}
     </script>
 
     <table>
@@ -209,17 +163,14 @@
                                 <tag:help id="pointHierarchy"/>
                             </td>
                             <td align="right">
-                                <tag:img png="folder_add" title="common.add" onclick="init()"/>
+                                <tag:img png="folder_add" title="common.add" onclick="showRoot()"/>
                                 <tag:img png="save" title="common.save" onclick="save()"/>
                             </td>
                         </tr>
                         <tr><td class="formError" id="errorMessage"></td></tr>
                     </table>
-
-                    <tag:img png="hourglass" id="loadingImg"/>
-                    <div id="treeDiv" style="display:none;">
-                        <div dojoType="Tree" DNDMode="between" toggle="wipe" DNDAcceptTypes="tree" widgetId="tree"></div>
-                    </div>
+                    <div id="treeDiv"></div>
+                    <div data-dojo-type="dijit/Tree" id="myTree" data-dojo-props="model: myModel"></div>
                 </div>
             </td>
 

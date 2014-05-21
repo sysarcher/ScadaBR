@@ -21,7 +21,6 @@
 <%@attribute name="styles" fragment="true" %>
 <%@attribute name="dwr" %>
 <%@attribute name="js" %>
-<%@attribute name="onload" %>
 
 <html>
 <head>
@@ -45,12 +44,11 @@
   
   <!-- Scripts -->
   <script type="text/javascript">var djConfig = { isDebug: false, extraLocale: ['en-us', 'nl', 'nl-nl', 'ja-jp', 'fi-fi', 'sv-se', 'zh-cn', 'zh-tw','xx'] };</script>
-  <!-- script type="text/javascript" src="http://o.aolcdn.com/dojo/0.4.2/dojo.js"></script -->
-  <script type="text/javascript" src="resources/dojo/dojo.js"></script>
+  <script type="text/javascript" src="resources/dojo-1.9.3/dojo/dojo.js.uncompressed.js">data-dojo-config="async: true"</script>
   <script type="text/javascript" src="dwr/engine.js"></script>
   <script type="text/javascript" src="dwr/util.js"></script>
   <script type="text/javascript" src="dwr/interface/MiscDwr.js"></script>
-  <script type="text/javascript" src="resources/soundmanager2-nodebug-jsmin.js"></script>
+  <script type="text/javascript" src="resources/soundmanager2-nodebug-jsmin.js">data-dojo-config="async: true"</script>
   <script type="text/javascript" src="resources/common.js"></script>
   <c:forEach items="${dwr}" var="dwrname">
     <script type="text/javascript" src="dwr/interface/${dwrname}.js"></script></c:forEach>
@@ -175,9 +173,6 @@
     <td colspan="2" class="footer" align="center">&copy;2009-2011 Funda&ccedil;&atilde;o Certi, MCA Sistemas, Unis Sistemas, Conetec. <fmt:message key="footer.rightsReserved"/></td>
   </tr>
 </table>
-<c:if test="${!empty onload}">
-  <script type="text/javascript">dojo.addOnLoad(${onload});</script>
-</c:if>
 
 </body>
 </html>

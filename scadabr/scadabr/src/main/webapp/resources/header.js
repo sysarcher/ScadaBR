@@ -16,7 +16,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-dojo.require("dojo.widget.FloatingPane");
 
 //
 // Error handling
@@ -31,10 +30,7 @@ window.onerror = function mangoHandler(desc, page, line)  {
 
 mango.header = {};
 mango.header.onLoad = function() {
-    if (dojo.render.html.ie)
-        mango.header.evtVisualizer = new IEBlinker($("__header__alarmLevelDiv"), 500, 200);
-    else
-        mango.header.evtVisualizer = new ImageFader($("__header__alarmLevelDiv"), 75, .2);
+    mango.header.evtVisualizer = new ImageFader($("__header__alarmLevelDiv"), 75, .2);
     mango.longPoll.start();
 };
 
@@ -80,8 +76,8 @@ function help(documentId, source) {
             displayCloseAction: true, displayMinimizeAction: false, displayMaximizeAction: false, resizable: true,
             hasShadow: true, iconSrc: "images/help_doc.png"};
     
-    dojo.widget.createWidget("FloatingPane", params, div);
-    helpImpl(documentId);
+//TODO update from dojo.widget to dojoc.layout     dojo.widget.createWidget("FloatingPane", params, div);
+//    helpImpl(documentId);
 };
 
 function helpImpl(documentId) {
