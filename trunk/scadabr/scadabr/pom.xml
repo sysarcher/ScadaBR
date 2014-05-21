@@ -386,6 +386,33 @@
     <build>
     
         <plugins>
+                        <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.dojotoolkit</groupId>
+                                    <artifactId>dojo</artifactId>
+                                    <version>1.9.3</version>
+                                    <type>zip</type>
+                                    <classifier>distribution</classifier>
+                                    <outputDirectory>${project.build.directory}/scada</outputDirectory>
+                                </artifactItem>
+
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- use bundled resources How find the lib in WEB-INF/lib as resource ???  plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>

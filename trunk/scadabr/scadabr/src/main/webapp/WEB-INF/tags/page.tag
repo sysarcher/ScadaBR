@@ -44,7 +44,7 @@
   
   <!-- Scripts -->
   <script type="text/javascript">var djConfig = { isDebug: false, extraLocale: ['en-us', 'nl', 'nl-nl', 'ja-jp', 'fi-fi', 'sv-se', 'zh-cn', 'zh-tw','xx'] };</script>
-  <script type="text/javascript" src="resources/dojo-1.9.3/dojo/dojo.js.uncompressed.js">data-dojo-config="async: true"</script>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/dojo/1.9.3/dojo/dojo.js">data-dojo-config="async: true"</script>
   <script type="text/javascript" src="dwr/engine.js"></script>
   <script type="text/javascript" src="dwr/util.js"></script>
   <script type="text/javascript" src="dwr/interface/MiscDwr.js"></script>

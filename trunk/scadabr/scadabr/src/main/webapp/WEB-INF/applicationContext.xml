@@ -38,8 +38,12 @@
     <mvc:annotation-driven /> 
 	<mvc:resources mapping="/resources/**" location="/resources/*" />
 	<mvc:resources mapping="/images/**" location="/images/*" />
-
-            <!-- Without the following adapter, we'll get a "Does your handler implement a supported interface like Controller?"
+        <mvc:resources mapping="/soundmanager2.swf" location="/soundmanager2.swf" />
+        <mvc:resources mapping="/favicon_small.ico" location="/favicon_small.ico" />
+        <mvc:resources mapping="/audio/**" location="/audio/*" />
+        
+    
+    <!-- Without the following adapter, we'll get a "Does your handler implement a supported interface like Controller?"
     This is because mvc:annotation-driven element doesn't declare a SimpleControllerHandlerAdapter
     For more info 
     See http://stackoverflow.com/questions/3896013/no-adapter-for-handler-exception 
