@@ -7,21 +7,15 @@ package com.serotonin.mango.web.mvc.controller;
 
 import br.org.scadabr.logger.LogUtils;
 import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.vo.hierarchy.PointFolder;
 import com.serotonin.mango.web.LazyTreeNode;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.logging.Logger;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  *

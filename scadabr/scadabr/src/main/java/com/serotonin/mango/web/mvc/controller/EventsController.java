@@ -19,20 +19,38 @@
 package com.serotonin.mango.web.mvc.controller;
 
 
+import com.serotonin.mango.Common;
+import com.serotonin.mango.db.dao.EventDao;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping("/events.shtm")
 public class EventsController {
 
-    @RequestMapping(method = RequestMethod.GET)
-    public String showForm(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
+    @Inject
+    private EventDao eventDao;
+    
+    @RequestMapping(value  = "/events.shtm")
+    public String showForm(Model model) {
         return "events";
     }
+    
+        @RequestMapping(value = "/events", method = RequestMethod.GET)
+    public @ResponseBody Object getNodeById(HttpServletRequest request, @RequestParam(value = "id", required = false) Integer id) {
+        if (id != null) {
+            return eventDao.getEventInstance(id);
+        }
+        return eventDao.getPendingEvents(Common.getUser(request).getId());
+    }
+
+
 }
