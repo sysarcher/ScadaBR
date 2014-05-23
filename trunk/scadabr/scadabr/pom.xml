@@ -386,15 +386,16 @@
     <build>
     
         <plugins>
-                        <plugin>
+<!-- HINT: All dependencies to dojo are handled with cpm see:   https://github.com/kriszyp/cpm         
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy</id>
+                        <id>unpack</id>
                         <phase>prepare-package</phase>
                         <goals>
-                            <goal>copy</goal>
+                            <goal>unpack</goal>
                         </goals>
                         <configuration>
                             <artifactItems>
@@ -404,7 +405,7 @@
                                     <version>1.9.3</version>
                                     <type>zip</type>
                                     <classifier>distribution</classifier>
-                                    <outputDirectory>${project.build.directory}/scada</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/${project.build.finalName}/resources/</outputDirectory>
                                 </artifactItem>
 
                             </artifactItems>
@@ -412,7 +413,7 @@
                     </execution>
                 </executions>
             </plugin>
-
+-->
             <!-- use bundled resources How find the lib in WEB-INF/lib as resource ???  plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>

@@ -312,7 +312,7 @@ public class EventDao extends BaseDao {
         return results;
     }
 
-    private EventInstance getEventInstance(int eventId) {
+    public EventInstance getEventInstance(int eventId) {
         return ejt.queryForObject(BASIC_EVENT_SELECT + "where e.id=?",
                 new EventInstanceRowMapper(), eventId);
     }

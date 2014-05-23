@@ -69,20 +69,20 @@ import org.springframework.jdbc.core.RowMapper;
 
 @Named
 public class DataPointDao extends BaseDao {
-    
+
     @Inject
     private RuntimeManager runtimeManager;
-    
+
     public DataPointDao() {
         super();
     }
-    
+
     @Deprecated
     protected DataPointDao(DataSource dataSource) {
         super(dataSource);
         this.runtimeManager = Common.ctx.getRuntimeManager();
     }
-    
+
     @Deprecated
     public static DataPointDao getInstance() {
         return new DataPointDao(Common.ctx.getDatabaseAccess().getDataSource());
@@ -95,11 +95,11 @@ public class DataPointDao extends BaseDao {
     public String generateUniqueXid() {
         return generateUniqueXid(DataPointVO.XID_PREFIX, "dataPoints");
     }
-    
+
     public boolean isXidUnique(String xid, int excludeId) {
         return isXidUnique(xid, excludeId, "dataPoints");
     }
-    
+
     public String getExtendedPointName(int dataPointId) {
         DataPointVO vo = getDataPoint(dataPointId);
         if (vo == null) {
@@ -107,11 +107,11 @@ public class DataPointDao extends BaseDao {
         }
         return vo.getExtendedName();
     }
-    
+
     private static final String DATA_POINT_SELECT = "select dp.id, dp.xid, dp.dataSourceId, dp.data, ds.name, " //
             + "ds.xid, ds.dataSourceType " //
             + "from dataPoints dp join dataSources ds on ds.id = dp.dataSourceId ";
-    
+
     public List<DataPointVO> getDataPoints(Comparator<DataPointVO> comparator, boolean includeRelationalData) {
         List<DataPointVO> dps = ejt.query(DATA_POINT_SELECT, new DataPointRowMapper());
         if (includeRelationalData) {
@@ -122,7 +122,7 @@ public class DataPointDao extends BaseDao {
         }
         return dps;
     }
-    
+
     public List<DataPointVO> getDataPoints(int dataSourceId, Comparator<DataPointVO> comparator) {
         List<DataPointVO> dps = ejt.query(DATA_POINT_SELECT + " where dp.dataSourceId=?", new DataPointRowMapper(), dataSourceId);
         setRelationalData(dps);
@@ -131,7 +131,7 @@ public class DataPointDao extends BaseDao {
         }
         return dps;
     }
-    
+
     public DataPointVO getDataPoint(int id) {
         DataPointVO dp;
         try {
@@ -142,7 +142,7 @@ public class DataPointDao extends BaseDao {
         setRelationalData(dp);
         return dp;
     }
-    
+
     public DataPointVO getDataPoint(String xid) {
         DataPointVO dp;
         try {
@@ -156,7 +156,7 @@ public class DataPointDao extends BaseDao {
 
     //TODO Quick and dirty
     public Collection<LazyTreeNode> getAllFoldersAndDp() {
-        
+
         final Collection<LazyTreeNode> result = new LinkedList<>();
         LazyTreeNode root = new LazyTreeNode();
         root.setId(0);
@@ -166,7 +166,7 @@ public class DataPointDao extends BaseDao {
 
         // Get the folder list.
         ejt.query("select id, parentId, name from pointHierarchy", new RowCallbackHandler() {
-            
+
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 LazyTreeNode n = new LazyTreeNode();
@@ -177,16 +177,16 @@ public class DataPointDao extends BaseDao {
                 result.add(n);
             }
         });
-        //TODO DataPoints
+        //TODO add dp?
         return result;
     }
 
     //TODO Quick and dirty
     public LazyTreeNode getFolderById(int id) {
-        
+
         final LazyTreeNode result = new LazyTreeNode();
         result.setId(id);
-        
+
         if (id == 0) {
             result.setName("ROOT");
             result.setNodeType("PF");
@@ -194,7 +194,7 @@ public class DataPointDao extends BaseDao {
         }
         // Get the folder list.
         ejt.query("select parentId, name from pointHierarchy where id =?", new RowCallbackHandler() {
-            
+
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 result.setParentId(rs.getInt(1));
@@ -207,12 +207,12 @@ public class DataPointDao extends BaseDao {
 
     //TODO Quick and dirty
     public Collection<LazyTreeNode> getFoldersAndDpByParentId(final int parentId) {
-        
+
         final Collection<LazyTreeNode> result = new LinkedList<>();
 
         // Get the folder list.      
         ejt.query("select id, name from pointHierarchy where parentId = ?", new RowCallbackHandler() {
-            
+
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 LazyTreeNode n = new LazyTreeNode();
@@ -223,13 +223,24 @@ public class DataPointDao extends BaseDao {
                 result.add(n);
             }
         }, parentId);
-        //TODO DataPoints
-        LOG.severe("PBY PARENT: " + result.size());
+        //TODO the folderID is saved in the blob ... workaround: reasd all dp ... DataPoints
+        // This will change the db...
+        List<DataPointVO> points = getDataPoints(DataPointExtendedNameComparator.instance, false);
+        for (DataPointVO dp : points) {
+            if (dp.getPointFolderId() == parentId) {
+                LazyTreeNode n = new LazyTreeNode();
+                n.setParentId(parentId);
+                n.setId(dp.getId());
+                n.setName(dp.getName());
+                n.setNodeType("DP");
+                result.add(n);
+            }
+        }
         return result;
     }
-    
+
     class DataPointRowMapper implements RowMapper<DataPointVO> {
-        
+
         @Override
         public DataPointVO mapRow(ResultSet rs, int rowNum) throws SQLException {
             DataPointVO dp;
@@ -254,17 +265,17 @@ public class DataPointDao extends BaseDao {
                 // Use the data source tpe id to determine what type of locator is needed.
                 dp.setPointLocator(DataSourceDao.getInstance().getDataSource(dp.getDataSourceId()).createPointLocator());
             }
-            
+
             return dp;
         }
     }
-    
+
     private void setRelationalData(List<DataPointVO> dps) {
         for (DataPointVO dp : dps) {
             setRelationalData(dp);
         }
     }
-    
+
     private void setRelationalData(DataPointVO dp) {
         if (dp == null) {
             return;
@@ -272,7 +283,7 @@ public class DataPointDao extends BaseDao {
         setEventDetectors(dp);
         setPointComments(dp);
     }
-    
+
     public void saveDataPoint(final DataPointVO dp) {
         getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
             @Override
@@ -288,7 +299,7 @@ public class DataPointDao extends BaseDao {
             }
         });
     }
-    
+
     void insertDataPoint(final DataPointVO dp) {
         // Create a default text renderer
         if (dp.getTextRenderer() == null) {
@@ -297,9 +308,9 @@ public class DataPointDao extends BaseDao {
 
         // Insert the main data point record.
         final int id = doInsert(new PreparedStatementCreator() {
-            
+
             final static String SQL_INSERT = "insert into dataPoints (xid, dataSourceId, data) values (?,?,?)";
-            
+
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
@@ -312,13 +323,13 @@ public class DataPointDao extends BaseDao {
         dp.setId(id);
         // Save the relational information.
         saveEventDetectors(dp);
-        
+
         AuditEventType.raiseAddedEvent(AuditEventType.TYPE_DATA_POINT, dp);
     }
-    
+
     void updateDataPoint(final DataPointVO dp) {
         DataPointVO old = getDataPoint(dp.getId());
-        
+
         if (old.getPointLocator().getDataTypeId() != dp.getPointLocator().getDataTypeId()) {
             // Delete any point values where data type doesn't match the vo, just in case the data type was changed.
             // Only do this if the data type has actually changed because it is just really slow if the database is
@@ -328,16 +339,16 @@ public class DataPointDao extends BaseDao {
 
         // Save the VO information.
         updateDataPointShallow(dp);
-        
+
         AuditEventType.raiseChangedEvent(AuditEventType.TYPE_DATA_POINT, old, dp);
 
         // Save the relational information.
         saveEventDetectors(dp);
     }
-    
+
     public void updateDataPointShallow(final DataPointVO dp) {
         ejt.update(new PreparedStatementCreator() {
-            
+
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareStatement("update dataPoints set xid=?, data=? where id=?");
@@ -348,17 +359,17 @@ public class DataPointDao extends BaseDao {
             }
         });
     }
-    
+
     public void deleteDataPoints(final int dataSourceId) {
         List<DataPointVO> old = getDataPoints(dataSourceId, null);
         for (DataPointVO dp : old) {
             beforePointDelete(dp.getId());
         }
-        
+
         for (DataPointVO dp : old) {
             deletePointHistory(dp.getId());
         }
-        
+
         getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
             @SuppressWarnings("synthetic-access")
             @Override
@@ -369,12 +380,12 @@ public class DataPointDao extends BaseDao {
                 }
             }
         });
-        
+
         for (DataPointVO dp : old) {
             AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_DATA_POINT, dp);
         }
     }
-    
+
     public void deleteDataPoint(final int dataPointId) {
         DataPointVO dp = getDataPoint(dataPointId);
         if (dp != null) {
@@ -386,24 +397,24 @@ public class DataPointDao extends BaseDao {
                     deleteDataPointImpl(Integer.toString(dataPointId));
                 }
             });
-            
+
             AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_DATA_POINT, dp);
         }
     }
-    
+
     private void beforePointDelete(int dataPointId) {
         for (PointLinkVO link : PointLinkDao.getInstance().getPointLinksForPoint(dataPointId)) {
             runtimeManager.deletePointLink(link.getId());
         }
     }
-    
+
     void deletePointHistory(int dataPointId) {
         Object[] p = new Object[]{dataPointId};
         long min = ejt.queryForLong("select min(ts) from pointValues where dataPointId=?", p);
         long max = ejt.queryForLong("select max(ts) from pointValues where dataPointId=?", p);
         deletePointHistory(dataPointId, min, max);
     }
-    
+
     void deletePointHistory(int dataPointId, long min, long max) {
         while (true) {
             try {
@@ -420,7 +431,7 @@ public class DataPointDao extends BaseDao {
             }
         }
     }
-    
+
     void deleteDataPointImpl(String dataPointIdList) {
         dataPointIdList = "(" + dataPointIdList + ")";
         ejt.update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.DATA_POINT
@@ -430,7 +441,7 @@ public class DataPointDao extends BaseDao {
         ejt.update("delete from dataPointUsers where dataPointId in " + dataPointIdList);
         ejt.update("delete from watchListPoints where dataPointId in " + dataPointIdList);
         ejt.update("delete from dataPoints where id in " + dataPointIdList);
-        
+
         cachedPointHierarchy = null;
     }
 
@@ -441,7 +452,7 @@ public class DataPointDao extends BaseDao {
     public int getDataPointIdFromDetectorId(int pedId) {
         return ejt.queryForObject("select dataPointId from pointEventDetectors where id=?", Integer.class, pedId);
     }
-    
+
     public String getDetectorXid(int pedId) {
         try {
             return ejt.queryForObject("select xid from pointEventDetectors where id=?", String.class, pedId);
@@ -449,7 +460,7 @@ public class DataPointDao extends BaseDao {
             return null;
         }
     }
-    
+
     public int getDetectorId(String pedXid, int dataPointId) {
         try {
             return ejt.queryForObject("select id from pointEventDetectors where xid=? and dataPointId=?", Integer.class, pedXid, dataPointId);
@@ -457,7 +468,7 @@ public class DataPointDao extends BaseDao {
             return -1;
         }
     }
-    
+
     public String generateEventDetectorUniqueXid(int dataPointId) {
         String xid = Common.generateXid(PointEventDetectorVO.XID_PREFIX);
         while (!isEventDetectorXidUnique(dataPointId, xid, -1)) {
@@ -465,15 +476,15 @@ public class DataPointDao extends BaseDao {
         }
         return xid;
     }
-    
+
     public boolean isEventDetectorXidUnique(int dataPointId, String xid, int excludeId) {
         return ejt.queryForObject("select count(*) from pointEventDetectors where dataPointId=? and xid=? and id<>?", Integer.class, dataPointId, xid, excludeId) == 0;
     }
-    
+
     private void setEventDetectors(DataPointVO dp) {
         dp.setEventDetectors(getEventDetectors(dp));
     }
-    
+
     private List<PointEventDetectorVO> getEventDetectors(DataPointVO dp) {
         return ejt.query(
                 "select id, xid, alias, detectorType, alarmLevel, stateLimit, duration, durationType, binaryState, " //
@@ -483,15 +494,15 @@ public class DataPointDao extends BaseDao {
                 + "order by id",
                 new EventDetectorRowMapper(dp), dp.getId());
     }
-    
+
     class EventDetectorRowMapper implements RowMapper<PointEventDetectorVO> {
-        
+
         private final DataPointVO dp;
-        
+
         public EventDetectorRowMapper(DataPointVO dp) {
             this.dp = dp;
         }
-        
+
         @Override
         public PointEventDetectorVO mapRow(ResultSet rs, int rowNum) throws SQLException {
             PointEventDetectorVO detector = new PointEventDetectorVO();
@@ -513,7 +524,7 @@ public class DataPointDao extends BaseDao {
             return detector;
         }
     }
-    
+
     private void saveEventDetectors(final DataPointVO dp) {
         // Get the ids of the existing detectors for this point.
         final List<PointEventDetectorVO> existingDetectors = getEventDetectors(dp);
@@ -523,12 +534,12 @@ public class DataPointDao extends BaseDao {
             if (ped.getId() < 0) {
                 // Insert the record.
                 final int id = doInsert(new PreparedStatementCreator() {
-                    
+
                     final static String SQL_INSERT = "insert into pointEventDetectors "
                             + "  (xid, alias, dataPointId, detectorType, alarmLevel, stateLimit, duration, durationType, "
                             + "  binaryState, multistateState, changeCount, alphanumericState, weight) "
                             + "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                    
+
                     @Override
                     public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                         PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
@@ -552,7 +563,7 @@ public class DataPointDao extends BaseDao {
                 AuditEventType.raiseAddedEvent(AuditEventType.TYPE_POINT_EVENT_DETECTOR, ped);
             } else {
                 PointEventDetectorVO old = removeFromList(existingDetectors, ped.getId());
-                
+
                 ejt.update(
                         "update pointEventDetectors set xid=?, alias=?, alarmLevel=?, stateLimit=?, duration=?, "
                         + "  durationType=?, binaryState=?, multistateState=?, changeCount=?, alphanumericState=?, "
@@ -563,7 +574,7 @@ public class DataPointDao extends BaseDao {
                             ped.getWeight(), ped.getId()}, new int[]{Types.VARCHAR, Types.VARCHAR,
                             Types.INTEGER, Types.DOUBLE, Types.INTEGER, Types.INTEGER, Types.VARCHAR,
                             Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.DOUBLE, Types.INTEGER});
-                
+
                 AuditEventType.raiseChangedEvent(AuditEventType.TYPE_POINT_EVENT_DETECTOR, old, ped);
             }
         }
@@ -573,11 +584,11 @@ public class DataPointDao extends BaseDao {
             ejt.update("delete from eventHandlers " + "where eventTypeId=" + EventType.EventSources.DATA_POINT
                     + " and eventTypeRef1=? and eventTypeRef2=?", new Object[]{dp.getId(), ped.getId()});
             ejt.update("delete from pointEventDetectors where id=?", new Object[]{ped.getId()});
-            
+
             AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_POINT_EVENT_DETECTOR, ped);
         }
     }
-    
+
     private PointEventDetectorVO removeFromList(List<PointEventDetectorVO> list, int id) {
         for (PointEventDetectorVO ped : list) {
             if (ped.getId() == id) {
@@ -587,7 +598,7 @@ public class DataPointDao extends BaseDao {
         }
         return null;
     }
-    
+
     public void copyPermissions(final int fromDataPointId, final int toDataPointId) {
         final List<Tuple<Integer, Integer>> ups;
         ups = ejt.query(
@@ -598,13 +609,13 @@ public class DataPointDao extends BaseDao {
                         return new Tuple<>(rs.getInt(1), rs.getInt(2));
                     }
                 }, fromDataPointId);
-        
+
         ejt.batchUpdate("insert into dataPointUsers values (?,?,?)", new BatchPreparedStatementSetter() {
             @Override
             public int getBatchSize() {
                 return ups.size();
             }
-            
+
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 ps.setInt(1, toDataPointId);
@@ -620,7 +631,7 @@ public class DataPointDao extends BaseDao {
     //
     private static final String POINT_COMMENT_SELECT = UserCommentRowMapper.USER_COMMENT_SELECT
             + "where uc.commentType= " + UserComment.TYPE_POINT + " and uc.typeKey=? " + "order by uc.ts";
-    
+
     private void setPointComments(DataPointVO dp) {
         dp.setComments(ejt.query(POINT_COMMENT_SELECT, new UserCommentRowMapper(), dp.getId()));
     }
@@ -631,7 +642,7 @@ public class DataPointDao extends BaseDao {
     //
     @Deprecated
     static PointHierarchy cachedPointHierarchy;
-    
+
     public PointHierarchy getPointHierarchy() {
         if (cachedPointHierarchy == null) {
             final Map<Integer, List<PointFolder>> folders = new HashMap<>();
@@ -660,25 +671,25 @@ public class DataPointDao extends BaseDao {
             for (DataPointVO dp : points) {
                 ph.addDataPoint(dp.getId(), dp.getPointFolderId(), dp.getExtendedName());
             }
-            
+
             cachedPointHierarchy = ph;
         }
-        
+
         return cachedPointHierarchy;
     }
-    
+
     private void addFoldersToHeirarchy(PointHierarchy ph, int parentId, Map<Integer, List<PointFolder>> folders) {
         List<PointFolder> folderList = folders.remove(parentId);
         if (folderList == null) {
             return;
         }
-        
+
         for (PointFolder f : folderList) {
             ph.addPointFolder(f, parentId);
             addFoldersToHeirarchy(ph, f.getId(), folders);
         }
     }
-    
+
     public void savePointHierarchy(final PointFolder root) {
         final JdbcTemplate ejt2 = ejt;
         getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
@@ -694,19 +705,19 @@ public class DataPointDao extends BaseDao {
 
         // Save the point folders. This is not done in the transaction because it can cause deadlocks in Derby.
         savePointsInFolder(root);
-        
+
         cachedPointHierarchy = null;
         cachedPointHierarchy = getPointHierarchy();
         PointHierarchyEventDispatcher.firePointHierarchySaved(root);
     }
-    
+
     void savePointFolder(final PointFolder folder, final int parentId) {
         // Save the folder.
         if (folder.getId() == Common.NEW_ID) {
             final int id = doInsert(new PreparedStatementCreator() {
-                
+
                 final static String SQL_INSERT = "insert into pointHierarchy (parentId, name) values (?,?)";
-                
+
                 @Override
                 public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                     PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
@@ -725,7 +736,7 @@ public class DataPointDao extends BaseDao {
             savePointFolder(sf, folder.getId());
         }
     }
-    
+
     void savePointsInFolder(PointFolder folder) {
         // Save the points in the subfolders
         for (PointFolder sf : folder.getSubfolders()) {
@@ -743,7 +754,7 @@ public class DataPointDao extends BaseDao {
             }
         }
     }
-    
+
     public List<PointHistoryCount> getTopPointHistoryCounts() {
         List<PointHistoryCount> counts = ejt.query(
                 "select dataPointId, count(*) from pointValues group by dataPointId order by 2 desc",
@@ -756,7 +767,7 @@ public class DataPointDao extends BaseDao {
                         return c;
                     }
                 });
-        
+
         List<DataPointVO> points = getDataPoints(DataPointExtendedNameComparator.instance, false);
 
         // Collate in the point names.
@@ -768,10 +779,10 @@ public class DataPointDao extends BaseDao {
                 }
             }
         }
-        
+
         return counts;
     }
-    
+
     public void addPointToHierarchy(DataPointVO dp, String... pathToPoint) {
         PointHierarchy ph = getPointHierarchy();
         PointFolder pf = ph.getRoot();
@@ -796,5 +807,5 @@ public class DataPointDao extends BaseDao {
 //        savePointsInFolder(pf);
         savePointHierarchy(ph.getRoot());
     }
-    
+
 }

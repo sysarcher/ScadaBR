@@ -131,8 +131,8 @@ public class LoginController {
         } else if (user.isDisabled()) {
 //            ValidationUtils.reject(errors, "login.validation.accountDisabled");
         } else {
-            if (CrowdUtils.isCrowdEnabled()) // First attempt authentication with Crowd.
-            {
+            if (CrowdUtils.isCrowdEnabled()) {
+                // First attempt authentication with Crowd.
                 crowdAuthenticated = CrowdUtils.authenticate(request, response, loginForm.getUsername(),
                         loginForm.getPassword());
             }
