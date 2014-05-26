@@ -2,7 +2,7 @@
     Mango - Open Source M2M - http://mango.serotoninsoftware.com
     Copyright (C) 2006-2011 Serotonin Software Technologies Inc.
     @author Matthew Lohbihler
-    
+    y
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -21,58 +21,171 @@
 <%@page import="com.serotonin.mango.rt.event.type.EventType"%>
 <%@page import="com.serotonin.mango.web.dwr.EventsDwr"%>
 <tag:page>
-    <%@ include file="/WEB-INF/jsp/include/userComment.jsp" %>
+    <!--%@ include file="/WEB-INF/jsp/include/userComment.jsp" %-->
     <style>
         .incrementControl { width: 2em; }
     </style>
     <script type="text/javascript">
-
+        //Todo make pagination work with jsonrest
         require([
+            "dojo/dom",
+            "dojo/dom-construct",
             "dojo/_base/declare",
-            "dojo/store/JsonRest",
+            "dojo/request",
+            "dojo/store/Memory",
+            "dojo/store/Observable",
             "dgrid/Grid",
             "dgrid/extensions/Pagination",
             "dgrid/Keyboard",
             "dgrid/Selection",
+            "dojo/rpc/JsonService",
+            "dojo/on",
             "dojo/domReady!"
-        ], function(declare, JsonRest, Grid, Pagination, Keyboard, Selection) {
-            myRestStore = new JsonRest({
-                target: "events/",
+        ], function(dom, domConstruct, declare, request, Memory, Observable, Grid, Pagination, Keyboard, Selection, JsonService, on) {
+            var grid;
+            request("events/", {
+                handleAs: "json"
+            }).then(function(response) {
+                // Once the response is received, build an in-memory store
+                // with the data
+                var store = new Memory({data: response});
+                // Create a Grid instance using Pagination,
+                // referencing the store
+                grid = new (declare([Grid, Pagination, Keyboard, Selection]))({
+                    store: store,
+                    columns: {
+                        id: {
+                            label: "<fmt:message key="common.id"/>",
+                            resizable: true, 
+                            width: 50
+                        },
+                        alarmLevel: {
+                            label: "<fmt:message key="common.alarmLevel"/>",
+                            resizable: true, 
+                            width: 200,
+                            renderCell: function(object, value, default_node, options) {
+                                var node = domConstruct.create("img");
+                                var imgName;
+                                switch (value) {
+                                    case 1:
+                                        imgName = 'flag_blue';
+                                        node.alt = '<fmt:message key="common.alarmLevel.info"/>';
+                                        break;
+                                    case  2:
+                                        imgName = 'flag_yellow';
+                                        node.alt = '<fmt:message key="common.alarmLevel.urgent"/>';
+                                        break;
+                                    case  3:
+                                        imgName = 'flag_orange';
+                                        node.alt = '<fmt:message key="common.alarmLevel.critical"/>';
+                                        break;
+                                    case  4:
+                                        imgName = 'flag_red';
+                                        node.alt = '<fmt:message key="common.alarmLevel.lifeSafety"/>';
+                                        break;
+                                    default :
+                                        node.alt = value;
+                                        return  node;
+                                }
+                                node.src = 'images/' + imgName + (object.active ? '' : '_off') + '.png';
+                                return node;
+                            }
+                        },
+                        activeTimestamp: {
+                            label: "Active timestamp",
+                            resizable: true 
+                        },
+                        rtnTimestamp: {
+                            label: "Rtn timestamp"
+                                    //TODO show image and state
+                        },
+                        message: {
+                            label: "Message",
+                            resizable: true,
+                            formatter: function(msg) {
+                                return msg;
+                            }
+                        }
+                    },
+                    loadingMessage: "Loading data...",
+                    noDataMessage: "No results found.",
+                    selectionMode: "single", // for Selection; only select a single row at a time
+                    cellNavigation: false, // for Keyboard; allow only row-level keyboard navigation
+                    pagingLinks: 1,
+                    pagingTextBox: true,
+                    firstLastArrows: true,
+                    pageSizeOptions: [10, 25, 50, 100]
+                }, "pendingAlarms");
             });
+            on(dom.byId("acknowledgeAllPendingEventsImg"), "click", function() {
 
-            // Create a Grid instance using Pagination,
-            // referencing the store
-            var grid = new (declare([Grid, Pagination, Keyboard, Selection]))({
-                store: myRestStore,
-                columns: {
-                    id: "ID",
-                    alarmLevel: "AlarmLevel",
-                    activeTimesta: "Active timestamp",
-                    rtnTimestamp: "Rtn Timestamp",
-                    message: "Message"
-                },
-                loadingMessage: "Loading data...",
-                noDataMessage: "No results found.",
-                selectionMode: "single", // for Selection; only select a single row at a time
-                cellNavigation: false, // for Keyboard; allow only row-level keyboard navigation
-                pagingLinks: 1,
-                pagingTextBox: true,
-                firstLastArrows: true,
-                pageSizeOptions: [10, 15, 25]
-            }, "grid");
-            grid.on("dgrid-select", function(event) {
-                // Report the item from the selected row to the console.
-                console.log("Row selected: ", event.rows[0].data);
+                var svc = new JsonService({
+                    serviceUrl: 'events/rpc', // Adress of the RPC service end point
+                    timeout: 1000,
+                    strictArgChecks: true,
+                    methods: [{
+                            name: 'acknowledgeAllPendingEvents',
+                            parameters: []
+                        }
+                    ]
+                });
+                svc.acknowledgeAllPendingEvents().then(function(result) {
+                    console.log("CALL BACK " + result);
+                    grid.setStore(new Memory(result.result));
+                    console.log("Setting new Store" + result);
+                });
             });
-            grid.on("dgrid-deselect", function(event) {
-                console.log("Row de-selected: ", event.rows[0].data);
-            });
-            grid.on(".dgrid-row:click", function(event) {
-                var row = grid.row(event);
-                console.log("Row clicked:", row.id);
-            });
-            grid.startup();
         });
+        /*
+         require([
+         "dojo/_base/declare",
+         "dojo/store/JsonRest",
+         "dgrid/Grid",
+         "dgrid/extensions/Pagination",
+         "dgrid/Keyboard",
+         "dgrid/Selection",
+         "dojo/domReady!"
+         ], function(declare, JsonRest, Grid, Pagination, Keyboard, Selection) {
+         myRestStore = new JsonRest({
+         target: "events/"
+         });
+         
+         // Create a Grid instance using Pagination,
+         // referencing the store
+         var grid = new (declare([Grid, Pagination, Keyboard, Selection]))({
+         store: myRestStore,
+         columns: {
+         id: "ID",
+         alarmLevel: "AlarmLevel",
+         activeTimestamp: "Active timestamp",
+         rtnTimestamp: "Rtn Timestamp",
+         message: "Message"
+         },
+         loadingMessage: "Loading data...",
+         noDataMessage: "No results found.",
+         selectionMode: "single", // for Selection; only select a single row at a time
+         cellNavigation: false, // for Keyboard; allow only row-level keyboard navigation
+         pagingLinks: 1,
+         pagingTextBox: true,
+         firstLastArrows: true,
+         pageSizeOptions: [10, 25, 50, 100]
+         }, "pendingAlarms");
+         
+         grid.on("dgrid-select", function(event) {
+         // Report the item from the selected row to the console.
+         console.log("Row selected: ", event.rows[0].data);
+         });
+         grid.on("dgrid-deselect", function(event) {
+         console.log("Row de-selected: ", event.rows[0].data);
+         });
+         grid.on(".dgrid-row:click", function(event) {
+         var row = grid.row(event);
+         console.log("Row clicked:", row.id);
+         });
+         });
+         */
+
+
 
         /*
          // Tell the log poll that we're interested in monitoring pending alarms.
@@ -157,82 +270,75 @@
          */
     </script>
 
-    <div id="grid" />
+    <div class="borderDiv marB" >
+        <div class="smallTitle titlePadding" style="float:left;">
+            <tag:img png="flag_white" title="events.alarms"/>
+            <fmt:message key="events.pending"/>
+        </div>
+        <div id="ackAllDiv" class="titlePadding" style="float:right;">
+            <fmt:message key="events.acknowledgeAll"/>
+            <tag:img png="tick" id="acknowledgeAllPendingEventsImg" title="events.acknowledgeAll"/>&nbsp;
+            <fmt:message key="events.silenceAll"/>
+            <tag:img png="sound_mute" onclick="silenceAll()" title="events.silenceAll"/><br/>
+        </div>
+        <div id="pendingAlarms" style="clear:both;"/>
+    </div>
 
-    <!--
-<div class="borderDiv marB" style="float:left;">
-  <div class="smallTitle titlePadding" style="float:left;">
-    <tag:img png="flag_white" title="events.alarms"/>
-    <fmt:message key="events.pending"/>
-  </div>
-  <div id="ackAllDiv" class="titlePadding" style="display:none;float:right;">
-    <fmt:message key="events.acknowledgeAll"/>
-    <tag:img png="tick" onclick="MiscDwr.acknowledgeAllPendingEvents()" title="events.acknowledgeAll"/>&nbsp;
-    <fmt:message key="events.silenceAll"/>
-    <tag:img png="sound_mute" onclick="silenceAll()" title="events.silenceAll"/><br/>
-  </div>
-  <div id="pendingAlarms" style="clear:both;"></div>
-  <div id="noAlarms" style="display:none;padding:6px;text-align:center;">
-    <b><fmt:message key="events.emptyList"/></b>
-  </div>
-  <div id="hourglass" style="padding:6px;text-align:center;"><tag:img png="hourglass"/></div>
-</div>
+    <div class="borderDiv" style="clear:left;float:left;">
+        <div class="smallTitle titlePadding"><fmt:message key="events.search"/></div>
+        <div>
+            <table>
+                <tr>
+                    <td class="formLabel"><fmt:message key="events.id"/></td>
+                    <td class="formField"><input id="eventId" type="text"></td>
+                </tr>
+                <tr>
+                    <td class="formLabel"><fmt:message key="events.search.type"/></td>
+                    <td class="formField">
+                        <select id="eventSourceType">
+                            <option value="-1"><fmt:message key="common.all"/></option>
+                            <option value="<c:out value="<%= EventType.EventSources.DATA_POINT%>"/>"><fmt:message key="eventHandlers.pointEventDetector"/></option>
+                            <option value="<c:out value="<%= EventType.EventSources.SCHEDULED%>"/>"><fmt:message key="scheduledEvents.ses"/></option>
+                            <option value="<c:out value="<%= EventType.EventSources.COMPOUND%>"/>"><fmt:message key="compoundDetectors.compoundEventDetectors"/></option>
+                            <option value="<c:out value="<%= EventType.EventSources.DATA_SOURCE%>"/>"><fmt:message key="eventHandlers.dataSourceEvents"/></option>
+                            <option value="<c:out value="<%= EventType.EventSources.PUBLISHER%>"/>"><fmt:message key="eventHandlers.publisherEvents"/></option>
+                            <option value="<c:out value="<%= EventType.EventSources.MAINTENANCE%>"/>"><fmt:message key="eventHandlers.maintenanceEvents"/></option>
+                            <option value="<c:out value="<%= EventType.EventSources.SYSTEM%>"/>"><fmt:message key="eventHandlers.systemEvents"/></option>
+                            <option value="<c:out value="<%= EventType.EventSources.AUDIT%>"/>"><fmt:message key="eventHandlers.auditEvents"/></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="formLabel"><fmt:message key="common.status"/></td>
+                    <td class="formField">
+                        <select id="eventStatus">
+                            <option value="<c:out value="<%= EventsDwr.STATUS_ALL%>"/>"><fmt:message key="common.all"/></option>
+                            <option value="<c:out value="<%= EventsDwr.STATUS_ACTIVE%>"/>"><fmt:message key="common.active"/></option>
+                            <option value="<c:out value="<%= EventsDwr.STATUS_RTN%>"/>"><fmt:message key="event.rtn.rtn"/></option>
+                            <option value="<c:out value="<%= EventsDwr.STATUS_NORTN%>"/>"><fmt:message key="common.nortn"/></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="formLabel"><fmt:message key="common.alarmLevel"/></td>
+                    <td class="formField"><select id="alarmLevel"><tag:alarmLevelOptions allOption="true"/></select></td>
+                </tr>
+                <tr>
+                    <td class="formLabel"><fmt:message key="events.search.keywords"/></td>
+                    <td class="formField"><input id="keywords" type="text"/></td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">
+                        <input id="searchBtn" type="button" value="<fmt:message key="events.search.search"/>" onclick="newSearch()"/>
+                        <span id="searchMessage" class="formError"></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="searchResults"></div>
+    </div>
+    <!--div id="datePickerDiv" style="position:absolute; top:0px; left:0px;" onmouseover="cancelDatePickerExpiry()" onmouseout="expireDatePicker()">
+        <div widgetId="datePicker" dojoType="datepicker" dayWidth="narrow" lang="${lang}"></div>
+    </div-->
 
-<div class="borderDiv" style="clear:left;float:left;">
-  <div class="smallTitle titlePadding"><fmt:message key="events.search"/></div>
-  <div>
-    <table>
-      <tr>
-        <td class="formLabel"><fmt:message key="events.id"/></td>
-        <td class="formField"><input id="eventId" type="text"></td>
-      </tr>
-      <tr>
-        <td class="formLabel"><fmt:message key="events.search.type"/></td>
-        <td class="formField">
-          <select id="eventSourceType">
-            <option value="-1"><fmt:message key="common.all"/></option>
-            <option value="<c:out value="<%= EventType.EventSources.DATA_POINT%>"/>"><fmt:message key="eventHandlers.pointEventDetector"/></option>
-            <option value="<c:out value="<%= EventType.EventSources.SCHEDULED%>"/>"><fmt:message key="scheduledEvents.ses"/></option>
-            <option value="<c:out value="<%= EventType.EventSources.COMPOUND%>"/>"><fmt:message key="compoundDetectors.compoundEventDetectors"/></option>
-            <option value="<c:out value="<%= EventType.EventSources.DATA_SOURCE%>"/>"><fmt:message key="eventHandlers.dataSourceEvents"/></option>
-            <option value="<c:out value="<%= EventType.EventSources.PUBLISHER%>"/>"><fmt:message key="eventHandlers.publisherEvents"/></option>
-            <option value="<c:out value="<%= EventType.EventSources.MAINTENANCE%>"/>"><fmt:message key="eventHandlers.maintenanceEvents"/></option>
-            <option value="<c:out value="<%= EventType.EventSources.SYSTEM%>"/>"><fmt:message key="eventHandlers.systemEvents"/></option>
-            <option value="<c:out value="<%= EventType.EventSources.AUDIT%>"/>"><fmt:message key="eventHandlers.auditEvents"/></option>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td class="formLabel"><fmt:message key="common.status"/></td>
-        <td class="formField">
-          <select id="eventStatus">
-            <option value="<c:out value="<%= EventsDwr.STATUS_ALL%>"/>"><fmt:message key="common.all"/></option>
-            <option value="<c:out value="<%= EventsDwr.STATUS_ACTIVE%>"/>"><fmt:message key="common.active"/></option>
-            <option value="<c:out value="<%= EventsDwr.STATUS_RTN%>"/>"><fmt:message key="event.rtn.rtn"/></option>
-            <option value="<c:out value="<%= EventsDwr.STATUS_NORTN%>"/>"><fmt:message key="common.nortn"/></option>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td class="formLabel"><fmt:message key="common.alarmLevel"/></td>
-        <td class="formField"><select id="alarmLevel"><tag:alarmLevelOptions allOption="true"/></select></td>
-      </tr>
-      <tr>
-        <td class="formLabel"><fmt:message key="events.search.keywords"/></td>
-        <td class="formField"><input id="keywords" type="text"/></td>
-      </tr>
-      <tr>
-        <td colspan="2" align="center">
-          <input id="searchBtn" type="button" value="<fmt:message key="events.search.search"/>" onclick="newSearch()"/>
-          <span id="searchMessage" class="formError"></span>
-        </td>
-      </tr>
-    </table>
-  </div>
-  <div id="searchResults"></div>
-</div>
-<div id="datePickerDiv" style="position:absolute; top:0px; left:0px;" onmouseover="cancelDatePickerExpiry()" onmouseout="expireDatePicker()">
-  <div widgetId="datePicker" dojoType="datepicker" dayWidth="narrow" lang="${lang}"></div>
-</div>
-    -->
 </tag:page>
