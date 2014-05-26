@@ -25,10 +25,10 @@ public class JsonRpcResponse<R, E> {
         return r;
     }
 
-    public static <E> JsonRpcResponse<?, E> createErrorResponse(int id, E error) {
-        JsonRpcResponse<?, E> r = new JsonRpcResponse<>();
+    public static JsonRpcResponse<?, String> createErrorResponse(int id, Object error) {
+        JsonRpcResponse<?, String> r = new JsonRpcResponse<>();
         r.id = id;
-        r.error = error;
+        r.error = error.toString();
         return r;
     }
 

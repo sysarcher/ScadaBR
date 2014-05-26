@@ -56,8 +56,6 @@
             var tree;
             var myRestStore;
 
-            window.onload = function() {
-
                 require([
                     "dojo/store/JsonRest",
                     "dijit/Tree",
@@ -85,7 +83,6 @@
                     }, "treeDiv");
                     tree.startup();
                 });
-            }
 
         </script>
 

@@ -15,11 +15,10 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see http://www.gnu.org/licenses/.
---%><%@include file="/WEB-INF/tags/decl.tagf"%><%--
---%><%@tag body-content="empty"%><%--
---%><%@attribute name="href" required="true"%><%--
---%><%@attribute name="png" required="true"%><%--
---%><%@attribute name="key" required="true"%><%--
---%><c:set var="text"><fmt:message key="${key}"/></c:set><%--
---%><a href="${href}"><tag:img png="${png}" onmouseout="if (typeof hMD == 'function') hMD();"
-        onmouseover="if (typeof hMD == 'function') hMD('${text}', this);"/></a>
+--%>
+<%@include file="/WEB-INF/tags/decl.tagf"%>
+<%@tag body-content="empty"%>
+<%@attribute name="href" required="true"%>
+<%@attribute name="png" required="true"%>
+<%@attribute name="key" required="true"%>
+<c:set var="text"><fmt:message key="${key}"/></c:set><a href="${href}"><tag:img png="${png}" onmouseout="if (typeof hMD == 'function') hMD();" onmouseover="if (typeof hMD == 'function') hMD('${text}', this);"/></a>

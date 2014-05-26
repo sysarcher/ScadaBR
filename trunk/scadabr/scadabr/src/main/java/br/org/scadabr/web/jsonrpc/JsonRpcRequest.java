@@ -16,7 +16,7 @@ public class JsonRpcRequest {
     
     private int id;
     private String method;
-    private List<String> params;
+    private List<Object> params;
 
     /**
      * @return the id
@@ -49,14 +49,14 @@ public class JsonRpcRequest {
     /**
      * @return the params
      */
-    public List<String> getParams() {
+    public List<Object> getParams() {
         return params;
     }
 
     /**
      * @param params the params to set
      */
-    public void setParams(List<String> params) {
+    public void setParams(List<Object> params) {
         this.params = params;
     }
 }
