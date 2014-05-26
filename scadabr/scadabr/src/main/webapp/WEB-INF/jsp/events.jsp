@@ -24,6 +24,15 @@
     <!--%@ include file="/WEB-INF/jsp/include/userComment.jsp" %-->
     <style>
         .incrementControl { width: 2em; }
+        .dgrid-column-id {
+            width: 10em;
+        }
+        .dgrid-column-alarmLevel {
+            width: 5em;
+        }
+        .dgrid-column-acknowledged {
+            width: 20px;
+        }
     </style>
     <script type="text/javascript">
         //Todo make pagination work with jsonrest
@@ -43,6 +52,7 @@
             "dojo/domReady!"
         ], function(dom, domConstruct, declare, request, Memory, Observable, Grid, Pagination, Keyboard, Selection, JsonService, on) {
             var grid;
+            var svc;
             request("events/", {
                 handleAs: "json"
             }).then(function(response) {
@@ -55,49 +65,58 @@
                     store: store,
                     columns: {
                         id: {
-                            label: "<fmt:message key="common.id"/>",
-                            resizable: true, 
-                            width: 50
+                            label: "<fmt:message key="events.id"/>"
                         },
                         alarmLevel: {
                             label: "<fmt:message key="common.alarmLevel"/>",
-                            resizable: true, 
-                            width: 200,
-                            renderCell: function(object, value, default_node, options) {
+                            renderCell: function(event, alarmLevel, default_node, options) {
                                 var node = domConstruct.create("img");
                                 var imgName;
-                                switch (value) {
+                                switch (alarmLevel) {
                                     case 1:
                                         imgName = 'flag_blue';
-                                        node.alt = '<fmt:message key="common.alarmLevel.info"/>';
+                                        if (event.active) {
+                                            node.alt = '<fmt:message key="common.alarmLevel.info"/>';
+                                        } else {
+                                            node.alt = '<fmt:message key="common.alarmLevel.info.rtn"/>';
+                                        }
                                         break;
                                     case  2:
                                         imgName = 'flag_yellow';
-                                        node.alt = '<fmt:message key="common.alarmLevel.urgent"/>';
+                                        if (event.active) {
+                                            node.alt = '<fmt:message key="common.alarmLevel.urgent"/>';
+                                        } else {
+                                            node.alt = '<fmt:message key="common.alarmLevel.urgent.rtn"/>';
+                                        }
                                         break;
                                     case  3:
+                                        if (event.active) {
+                                            node.alt = '<fmt:message key="common.alarmLevel.critical"/>';
+                                        } else {
+                                            node.alt = '<fmt:message key="common.alarmLevel.critical.rtn"/>';
+                                        }
                                         imgName = 'flag_orange';
-                                        node.alt = '<fmt:message key="common.alarmLevel.critical"/>';
                                         break;
                                     case  4:
+                                        if (event.active) {
+                                            node.alt = '<fmt:message key="common.alarmLevel.lifeSafety"/>';
+                                        } else {
+                                            node.alt = '<fmt:message key="common.alarmLevel.lifeSafety.rtn"/>';
+                                        }
                                         imgName = 'flag_red';
-                                        node.alt = '<fmt:message key="common.alarmLevel.lifeSafety"/>';
                                         break;
                                     default :
-                                        node.alt = value;
+                                        node.alt = alarmLevel;
                                         return  node;
                                 }
-                                node.src = 'images/' + imgName + (object.active ? '' : '_off') + '.png';
+                                node.src = 'images/' + imgName + (event.active ? '' : '_off') + '.png';
+                                node.title = node.alt;
                                 return node;
                             }
                         },
                         activeTimestamp: {
-                            label: "Active timestamp",
-                            resizable: true 
-                        },
-                        rtnTimestamp: {
-                            label: "Rtn timestamp"
-                                    //TODO show image and state
+                            label: '<fmt:message key="common.time"/>',
+                            resizable: true
                         },
                         message: {
                             label: "Message",
@@ -105,35 +124,101 @@
                             formatter: function(msg) {
                                 return msg;
                             }
+                        },
+                        rtnTimestamp: {
+                            label: '<fmt:message key="common.inactiveTime"/>',
+                            renderCell: function(event, timestamp, default_node, options) {
+                                var node = domConstruct.create("div");
+
+                                if (event.active) {
+                                    node.innerHTML = '<fmt:message key="common.active"/>';
+                                    var img = domConstruct.create("img", null, node);
+                                    img.src = "images/flag_white.png";
+                                    img.title = '<fmt:message key="common.active"/>';
+                                } else {
+                                    if (!event.rtnApplicable) {
+                                        node.innerHTML = '<fmt:message key="common.nortn"/>';
+                                    } else {
+                                        node.innerHTML = timestamp + ' - ' + event.rtnMessage;
+
+                                    }
+                                }
+                                return node;
+                            }
+                        },
+                        acknowledged: {
+                            label: '',
+                            renderCell: function(event, acknowledged, default_node, options) {
+                                var img = domConstruct.create("img");
+
+                                if (acknowledged) {
+                                    img.src = "images/tick_off.png";
+                                    img.alt = '<fmt:message key="events.acknowledged"/>';
+                                } else {
+                                    img.src = "images/tick.png";
+                                    img.alt = '<fmt:message key="events.acknowledge"/>';
+                                }
+                                img.title = img.alt;
+
+                                return img;
+                            }
                         }
                     },
                     loadingMessage: "Loading data...",
                     noDataMessage: "No results found.",
-                    selectionMode: "single", // for Selection; only select a single row at a time
-                    cellNavigation: false, // for Keyboard; allow only row-level keyboard navigation
+                    //selectionMode: "single", // for Selection; only select a single row at a time
+                    //cellNavigation: false, // for Keyboard; allow only row-level keyboard navigation
                     pagingLinks: 1,
                     pagingTextBox: true,
                     firstLastArrows: true,
                     pageSizeOptions: [10, 25, 50, 100]
                 }, "pendingAlarms");
-            });
-            on(dom.byId("acknowledgeAllPendingEventsImg"), "click", function() {
 
-                var svc = new JsonService({
+                svc = new JsonService({
                     serviceUrl: 'events/rpc', // Adress of the RPC service end point
                     timeout: 1000,
                     strictArgChecks: true,
                     methods: [{
+                            name: 'acknowledgePendingEvent',
+                            parameters: [
+                                {
+                                    name: 'id',
+                                    type: 'INTEGER'
+                                }
+                            ]
+                        },
+                        {
                             name: 'acknowledgeAllPendingEvents',
                             parameters: []
                         }
                     ]
                 });
-                svc.acknowledgeAllPendingEvents().then(function(result) {
-                    console.log("CALL BACK " + result);
-                    grid.setStore(new Memory(result.result));
-                    console.log("Setting new Store" + result);
+
+                grid.on("dgrid-error", function(event) {
+                    console.log(event.error.message);
                 });
+                grid.on(".dgrid-cell:click", function(evt) {
+                    var cell = grid.cell(evt);
+                    var data = cell.row.data;
+                    if (cell.column.field === 'acknowledged') {
+                        if (!data.acknowledged) {
+                            svc.acknowledgePendingEvent(data.id).then(function(result) {
+                                grid.setStore(new Memory({data: result}));
+                            });
+                        }
+                    }
+                });
+
+
+
+
+                on(dom.byId("acknowledgeAllPendingEventsImg"), "click", function() {
+
+                    svc.acknowledgeAllPendingEvents().then(function(result) {
+                        grid.setStore(new Memory({data: result}));
+                    });
+                });
+
             });
         });
         /*

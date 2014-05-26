@@ -21,15 +21,16 @@ package com.serotonin.mango.web.mvc.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.AbstractController;
-import org.springframework.web.servlet.view.RedirectView;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.integration.CrowdUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-public class LogoutController extends AbstractController {
+@Controller()
+@RequestMapping("/logout.htm")
+public class LogoutController  {
 
     private String redirectUrl;
 
@@ -37,8 +38,8 @@ public class LogoutController extends AbstractController {
         this.redirectUrl = redirectUrl;
     }
 
-    @Override
-    protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping()
+    protected String handleRequestInternal(HttpServletRequest request, HttpServletResponse response) {
         // Check if the user is logged in.
         User user = Common.getUser(request);
         if (user != null) {
@@ -51,6 +52,6 @@ public class LogoutController extends AbstractController {
         }
 
         // Regardless of what happened above, forward to the configured view.
-        return new ModelAndView(new RedirectView(redirectUrl));
+        return "redirect:login.htm";
     }
 }

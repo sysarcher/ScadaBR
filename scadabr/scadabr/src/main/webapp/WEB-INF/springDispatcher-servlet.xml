@@ -50,7 +50,6 @@
         <prop key="/data_point_edit.shtm">dataPointEditController</prop>
         <prop key="/emport.shtm">emportController</prop>
         <prop key="/event_handlers.shtm">eventHandlersController</prop>
-        <prop key="/logout.htm">logoutController</prop>
         <prop key="/mailing_lists.shtm">mailingListsController</prop>
         <prop key="/maintenance_events.shtm">maintenanceEventsController</prop>
         <prop key="/point_links.shtm">pointLinksController</prop>
