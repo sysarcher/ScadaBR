@@ -56,13 +56,14 @@
                 "dojo/store/Observable",
                 "dojo/store/JsonRest",
                 "dijit/Tree",
-                "dgrid/Grid",
+                "dgrid/OnDemandGrid",
+                "dgrid/extensions/Pagination",
                 "dgrid/Keyboard",
                 "dgrid/Selection",
                 "dojo/rpc/JsonService",
                 "dojo/on",
                 "dojo/domReady!"
-            ], function(dom, domConstruct, declare, request, Memory, Observable, JsonRest, Tree, Grid, Keyboard, Selection, JsonService, on) {
+            ], function(dom, domConstruct, declare, request, Memory, Observable, JsonRest, Tree, OnDemandGrid, Pagination, Keyboard, Selection, JsonService, on) {
                 var grid;
                 var svc;
                 request("events/", {
@@ -73,7 +74,7 @@
                     var store = new Memory({data: response});
                     // Create a Grid instance using Pagination,
                     // referencing the store
-                    grid = new (declare([Grid, Keyboard, Selection]))({
+                    grid = new (declare([OnDemandGrid, Keyboard, Selection]))({
                         store: store,
                         showHeader: false,
                         columns: {
@@ -187,6 +188,7 @@
                         selectionMode: "single" // for Selection; only select a single row at a time
                                 //cellNavigation: false, // for Keyboard; allow only row-level keyboard navigation
                     }, "watchListTable");
+                    grid.startup();
 
                     //TODO move smd to server ...
                     svc = new JsonService({
@@ -223,12 +225,6 @@
                                 });
                             }
                         }
-                    });
-
-                    on(dom.byId("acknowledgeAllPendingEventsImg"), "click", function() {
-                        svc.acknowledgeAllPendingEvents().then(function(result) {
-                            grid.setStore(new Memory({data: result}));
-                        });
                     });
 
                 });
