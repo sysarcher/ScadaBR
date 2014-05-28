@@ -23,20 +23,26 @@
     <jsp:body>
         <style>
 
-        #watchListContainer {
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+            #watchListContainer {
+                width: 100%;
+                height: 100%;
+            }
+
+            .dgrid-cell {
+                border: none;
+            }
+
+
+        </style>
 
         <script type="text/javascript">
-            
+
             require(["dojo/parser",
                 "dijit/layout/BorderContainer",
                 "dijit/layout/ContentPane"
             ]);
-    
-    
+
+
             var selectedFolderNode;
             var tree;
             var myRestStore;
@@ -51,13 +57,12 @@
                 "dojo/store/JsonRest",
                 "dijit/Tree",
                 "dgrid/Grid",
-                "dgrid/extensions/Pagination",
                 "dgrid/Keyboard",
                 "dgrid/Selection",
                 "dojo/rpc/JsonService",
                 "dojo/on",
                 "dojo/domReady!"
-            ], function(dom, domConstruct, declare, request, Memory, Observable, JsonRest, Tree, Grid, Pagination, Keyboard, Selection, JsonService, on) {
+            ], function(dom, domConstruct, declare, request, Memory, Observable, JsonRest, Tree, Grid, Keyboard, Selection, JsonService, on) {
                 var grid;
                 var svc;
                 request("events/", {
@@ -68,8 +73,9 @@
                     var store = new Memory({data: response});
                     // Create a Grid instance using Pagination,
                     // referencing the store
-                    grid = new (declare([Grid, Pagination, Keyboard, Selection]))({
+                    grid = new (declare([Grid, Keyboard, Selection]))({
                         store: store,
+                        showHeader: false,
                         columns: {
                             id: {
                                 label: "<fmt:message key="events.id"/>"
@@ -178,12 +184,8 @@
                         },
                         loadingMessage: "Loading data...",
                         noDataMessage: "No results found.",
-                        selectionMode: "single", // for Selection; only select a single row at a time
-                        //cellNavigation: false, // for Keyboard; allow only row-level keyboard navigation
-                        pagingLinks: 1,
-                        pagingTextBox: true,
-                        firstLastArrows: true,
-                        pageSizeOptions: [10, 25, 50, 100]
+                        selectionMode: "single" // for Selection; only select a single row at a time
+                                //cellNavigation: false, // for Keyboard; allow only row-level keyboard navigation
                     }, "watchListTable");
 
                     //TODO move smd to server ...
@@ -257,15 +259,18 @@
 
         <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design: 'sidebar', gutters:true, liveSplitters:true" id="watchListContainer" >
             <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region: 'left'"  style="width: 200px;">
-           <div id="dataPointTree"></div>
-            </div>
-            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region:'top'">
-            TOP
+                <div id="dataPointTree"></div>
             </div>
             <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'center'">
-           <div id="watchListTable"></div>
-           </div>
+                <div data-dojo-type="dijit/layout/LayoutContainer" data-dojo-props="design:'headline'" id="wl">
+                    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'top'">
+                        TOP
+                    </div>
+                    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'center'">
+                        <div id="watchListTable"></div>
+                    </div>
+                </div>
+            </div>
         </div>
-    
-</jsp:body>
+    </jsp:body>
 </tag:page>

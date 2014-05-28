@@ -34,6 +34,9 @@
         .dgrid-column-acknowledged {
             width: 20px;
         }
+        .dgrid-row-odd {
+            background: #F2F5F9;
+        }
     </style>
     <script type="text/javascript">
 
@@ -376,34 +379,34 @@
     </div>
 </div>
 
-    <div class="smallTitle titlePadding"><fmt:message key="events.search"/></div>
-        
-            <div data-dojo-type="dijit/form/Form" id="myForm" data-dojo-id="myForm"
-         encType="multipart/form-data" >
-        <div data-dojo-type="dojox.layout.TableContainer" data-dojo-props="cols:1" id="tc1">
-                <div data-dojo-type="dijit.form.TextBox" name="eventId" title="<fmt:message key="events.id"/>:" ></div>
+<div class="smallTitle titlePadding"><fmt:message key="events.search"/></div>
 
-                    <select id="eventSourceType" data-dojo-type="dijit/form/Select" title="<fmt:message key="events.search.type"/>">
-                        <option value="-1"><fmt:message key="common.all"/></option>
-                        <option value="<c:out value="<%= EventType.EventSources.DATA_POINT%>"/>"><fmt:message key="eventHandlers.pointEventDetector"/></option>
-                        <option value="<c:out value="<%= EventType.EventSources.SCHEDULED%>"/>"><fmt:message key="scheduledEvents.ses"/></option>
-                        <option value="<c:out value="<%= EventType.EventSources.COMPOUND%>"/>"><fmt:message key="compoundDetectors.compoundEventDetectors"/></option>
-                        <option value="<c:out value="<%= EventType.EventSources.DATA_SOURCE%>"/>"><fmt:message key="eventHandlers.dataSourceEvents"/></option>
-                        <option value="<c:out value="<%= EventType.EventSources.PUBLISHER%>"/>"><fmt:message key="eventHandlers.publisherEvents"/></option>
-                        <option value="<c:out value="<%= EventType.EventSources.MAINTENANCE%>"/>"><fmt:message key="eventHandlers.maintenanceEvents"/></option>
-                        <option value="<c:out value="<%= EventType.EventSources.SYSTEM%>"/>"><fmt:message key="eventHandlers.systemEvents"/></option>
-                        <option value="<c:out value="<%= EventType.EventSources.AUDIT%>"/>"><fmt:message key="eventHandlers.auditEvents"/></option>
-                    </select>
-                    <select id="eventStatus" data-dojo-type="dijit/form/Select" title="<fmt:message key="common.status"/>">
-                        <option value="<c:out value="<%= EventsDwr.STATUS_ALL%>"/>"><fmt:message key="common.all"/></option>
-                        <option value="<c:out value="<%= EventsDwr.STATUS_ACTIVE%>"/>"><fmt:message key="common.active"/></option>
-                        <option value="<c:out value="<%= EventsDwr.STATUS_RTN%>"/>"><fmt:message key="event.rtn.rtn"/></option>
-                        <option value="<c:out value="<%= EventsDwr.STATUS_NORTN%>"/>"><fmt:message key="common.nortn"/></option>
-                    </select>
-                <select id="alarmLevel" data-dojo-type="dijit/form/Select" title="<fmt:message key="common.alarmLevel"/>"><tag:alarmLevelOptions allOption="true"/></select>
-                <div id="keywords" data-dojo-type="dijit/form/TextBox" title="<fmt:message key="events.search.keywords"/>"></div>
-                    <div data-dojo-type="dijit/form/Button"><fmt:message key="events.search.search"/></div>
-                    <span id="searchMessage" class="formError"></span>
+<div data-dojo-type="dijit/form/Form" id="myForm" data-dojo-id="myForm"
+     encType="multipart/form-data" >
+    <div data-dojo-type="dojox.layout.TableContainer" data-dojo-props="cols:1" id="tc1">
+        <input data-dojo-type="dijit.form.TextBox" name="eventId" title="<fmt:message key="events.id"/>:"/>
+
+        <select id="eventSourceType" data-dojo-type="dijit/form/Select" title="<fmt:message key="events.search.type"/>">
+            <option value="-1"><fmt:message key="common.all"/></option>
+            <option value="<c:out value="<%= EventType.EventSources.DATA_POINT%>"/>"><fmt:message key="eventHandlers.pointEventDetector"/></option>
+            <option value="<c:out value="<%= EventType.EventSources.SCHEDULED%>"/>"><fmt:message key="scheduledEvents.ses"/></option>
+            <option value="<c:out value="<%= EventType.EventSources.COMPOUND%>"/>"><fmt:message key="compoundDetectors.compoundEventDetectors"/></option>
+            <option value="<c:out value="<%= EventType.EventSources.DATA_SOURCE%>"/>"><fmt:message key="eventHandlers.dataSourceEvents"/></option>
+            <option value="<c:out value="<%= EventType.EventSources.PUBLISHER%>"/>"><fmt:message key="eventHandlers.publisherEvents"/></option>
+            <option value="<c:out value="<%= EventType.EventSources.MAINTENANCE%>"/>"><fmt:message key="eventHandlers.maintenanceEvents"/></option>
+            <option value="<c:out value="<%= EventType.EventSources.SYSTEM%>"/>"><fmt:message key="eventHandlers.systemEvents"/></option>
+            <option value="<c:out value="<%= EventType.EventSources.AUDIT%>"/>"><fmt:message key="eventHandlers.auditEvents"/></option>
+        </select>
+        <select id="eventStatus" data-dojo-type="dijit/form/Select" title="<fmt:message key="common.status"/>">
+            <option value="<c:out value="<%= EventsDwr.STATUS_ALL%>"/>"><fmt:message key="common.all"/></option>
+            <option value="<c:out value="<%= EventsDwr.STATUS_ACTIVE%>"/>"><fmt:message key="common.active"/></option>
+            <option value="<c:out value="<%= EventsDwr.STATUS_RTN%>"/>"><fmt:message key="event.rtn.rtn"/></option>
+            <option value="<c:out value="<%= EventsDwr.STATUS_NORTN%>"/>"><fmt:message key="common.nortn"/></option>
+        </select>
+        <select id="alarmLevel" data-dojo-type="dijit/form/Select" title="<fmt:message key="common.alarmLevel"/>"><tag:alarmLevelOptions allOption="true"/></select>
+        <input id="keywords" data-dojo-type="dijit/form/TextBox" title="<fmt:message key="events.search.keywords"/>"/>
+        <button data-dojo-type="dijit/form/Button"><fmt:message key="events.search.search"/></button>
+        <span id="searchMessage" class="formError"></span>
     </div>
     <div id="searchResults"></div>
 </div>
