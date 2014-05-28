@@ -16,6 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see http://www.gnu.org/licenses/.
 --%>
+<%@ taglib prefix="tag" tagdir="/WEB-INF/tags" %>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
 <%@page import="com.serotonin.mango.vo.UserComment"%>
 <%@page import="com.serotonin.mango.rt.event.type.EventType"%>
@@ -35,6 +36,7 @@
         }
     </style>
     <script type="text/javascript">
+
         //Todo make pagination work with jsonrest
         require([
             "dojo/dom",
@@ -135,6 +137,11 @@
                                     var img = domConstruct.create("img", null, node);
                                     img.src = "images/flag_white.png";
                                     img.title = '<fmt:message key="common.active"/>';
+                                    /*                                    
+                                     on(img, "click", function(evt){
+                                     console.log("CKLICKED: " + evt);
+                                     });
+                                     */
                                 } else {
                                     if (!event.rtnApplicable) {
                                         node.innerHTML = '<fmt:message key="common.nortn"/>';
@@ -166,7 +173,7 @@
                     },
                     loadingMessage: "Loading data...",
                     noDataMessage: "No results found.",
-                    //selectionMode: "single", // for Selection; only select a single row at a time
+                    selectionMode: "single", // for Selection; only select a single row at a time
                     //cellNavigation: false, // for Keyboard; allow only row-level keyboard navigation
                     pagingLinks: 1,
                     pagingTextBox: true,
@@ -174,6 +181,7 @@
                     pageSizeOptions: [10, 25, 50, 100]
                 }, "pendingAlarms");
 
+                //TODO move smd to server ...
                 svc = new JsonService({
                     serviceUrl: 'events/rpc', // Adress of the RPC service end point
                     timeout: 1000,
@@ -197,6 +205,7 @@
                 grid.on("dgrid-error", function(event) {
                     console.log(event.error.message);
                 });
+
                 grid.on(".dgrid-cell:click", function(evt) {
                     var cell = grid.cell(evt);
                     var data = cell.row.data;
@@ -209,11 +218,7 @@
                     }
                 });
 
-
-
-
                 on(dom.byId("acknowledgeAllPendingEventsImg"), "click", function() {
-
                     svc.acknowledgeAllPendingEvents().then(function(result) {
                         grid.setStore(new Memory({data: result}));
                     });
@@ -221,6 +226,7 @@
 
             });
         });
+
         /*
          require([
          "dojo/_base/declare",
@@ -355,75 +361,54 @@
          */
     </script>
 
-    <div class="borderDiv marB" >
+
+    <div>
         <div class="smallTitle titlePadding" style="float:left;">
             <tag:img png="flag_white" title="events.alarms"/>
             <fmt:message key="events.pending"/>
         </div>
+
         <div id="ackAllDiv" class="titlePadding" style="float:right;">
-            <fmt:message key="events.acknowledgeAll"/>
-            <tag:img png="tick" id="acknowledgeAllPendingEventsImg" title="events.acknowledgeAll"/>&nbsp;
-            <fmt:message key="events.silenceAll"/>
-            <tag:img png="sound_mute" onclick="silenceAll()" title="events.silenceAll"/><br/>
+            <div data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'scadaBrDoActionIcon'"><fmt:message key="events.acknowledgeAll"/></div>
+            <div data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'scadaBrDoSilenceIcon'"><fmt:message key="events.silenceAll"/></div>
         </div>
         <div id="pendingAlarms" style="clear:both;"/>
     </div>
+</div>
 
-    <div class="borderDiv" style="clear:left;float:left;">
-        <div class="smallTitle titlePadding"><fmt:message key="events.search"/></div>
-        <div>
-            <table>
-                <tr>
-                    <td class="formLabel"><fmt:message key="events.id"/></td>
-                    <td class="formField"><input id="eventId" type="text"></td>
-                </tr>
-                <tr>
-                    <td class="formLabel"><fmt:message key="events.search.type"/></td>
-                    <td class="formField">
-                        <select id="eventSourceType">
-                            <option value="-1"><fmt:message key="common.all"/></option>
-                            <option value="<c:out value="<%= EventType.EventSources.DATA_POINT%>"/>"><fmt:message key="eventHandlers.pointEventDetector"/></option>
-                            <option value="<c:out value="<%= EventType.EventSources.SCHEDULED%>"/>"><fmt:message key="scheduledEvents.ses"/></option>
-                            <option value="<c:out value="<%= EventType.EventSources.COMPOUND%>"/>"><fmt:message key="compoundDetectors.compoundEventDetectors"/></option>
-                            <option value="<c:out value="<%= EventType.EventSources.DATA_SOURCE%>"/>"><fmt:message key="eventHandlers.dataSourceEvents"/></option>
-                            <option value="<c:out value="<%= EventType.EventSources.PUBLISHER%>"/>"><fmt:message key="eventHandlers.publisherEvents"/></option>
-                            <option value="<c:out value="<%= EventType.EventSources.MAINTENANCE%>"/>"><fmt:message key="eventHandlers.maintenanceEvents"/></option>
-                            <option value="<c:out value="<%= EventType.EventSources.SYSTEM%>"/>"><fmt:message key="eventHandlers.systemEvents"/></option>
-                            <option value="<c:out value="<%= EventType.EventSources.AUDIT%>"/>"><fmt:message key="eventHandlers.auditEvents"/></option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="formLabel"><fmt:message key="common.status"/></td>
-                    <td class="formField">
-                        <select id="eventStatus">
-                            <option value="<c:out value="<%= EventsDwr.STATUS_ALL%>"/>"><fmt:message key="common.all"/></option>
-                            <option value="<c:out value="<%= EventsDwr.STATUS_ACTIVE%>"/>"><fmt:message key="common.active"/></option>
-                            <option value="<c:out value="<%= EventsDwr.STATUS_RTN%>"/>"><fmt:message key="event.rtn.rtn"/></option>
-                            <option value="<c:out value="<%= EventsDwr.STATUS_NORTN%>"/>"><fmt:message key="common.nortn"/></option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="formLabel"><fmt:message key="common.alarmLevel"/></td>
-                    <td class="formField"><select id="alarmLevel"><tag:alarmLevelOptions allOption="true"/></select></td>
-                </tr>
-                <tr>
-                    <td class="formLabel"><fmt:message key="events.search.keywords"/></td>
-                    <td class="formField"><input id="keywords" type="text"/></td>
-                </tr>
-                <tr>
-                    <td colspan="2" align="center">
-                        <input id="searchBtn" type="button" value="<fmt:message key="events.search.search"/>" onclick="newSearch()"/>
-                        <span id="searchMessage" class="formError"></span>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div id="searchResults"></div>
+    <div class="smallTitle titlePadding"><fmt:message key="events.search"/></div>
+        
+            <div data-dojo-type="dijit/form/Form" id="myForm" data-dojo-id="myForm"
+         encType="multipart/form-data" >
+        <div data-dojo-type="dojox.layout.TableContainer" data-dojo-props="cols:1" id="tc1">
+                <div data-dojo-type="dijit.form.TextBox" name="eventId" title="<fmt:message key="events.id"/>:" ></div>
+
+                    <select id="eventSourceType" data-dojo-type="dijit/form/Select" title="<fmt:message key="events.search.type"/>">
+                        <option value="-1"><fmt:message key="common.all"/></option>
+                        <option value="<c:out value="<%= EventType.EventSources.DATA_POINT%>"/>"><fmt:message key="eventHandlers.pointEventDetector"/></option>
+                        <option value="<c:out value="<%= EventType.EventSources.SCHEDULED%>"/>"><fmt:message key="scheduledEvents.ses"/></option>
+                        <option value="<c:out value="<%= EventType.EventSources.COMPOUND%>"/>"><fmt:message key="compoundDetectors.compoundEventDetectors"/></option>
+                        <option value="<c:out value="<%= EventType.EventSources.DATA_SOURCE%>"/>"><fmt:message key="eventHandlers.dataSourceEvents"/></option>
+                        <option value="<c:out value="<%= EventType.EventSources.PUBLISHER%>"/>"><fmt:message key="eventHandlers.publisherEvents"/></option>
+                        <option value="<c:out value="<%= EventType.EventSources.MAINTENANCE%>"/>"><fmt:message key="eventHandlers.maintenanceEvents"/></option>
+                        <option value="<c:out value="<%= EventType.EventSources.SYSTEM%>"/>"><fmt:message key="eventHandlers.systemEvents"/></option>
+                        <option value="<c:out value="<%= EventType.EventSources.AUDIT%>"/>"><fmt:message key="eventHandlers.auditEvents"/></option>
+                    </select>
+                    <select id="eventStatus" data-dojo-type="dijit/form/Select" title="<fmt:message key="common.status"/>">
+                        <option value="<c:out value="<%= EventsDwr.STATUS_ALL%>"/>"><fmt:message key="common.all"/></option>
+                        <option value="<c:out value="<%= EventsDwr.STATUS_ACTIVE%>"/>"><fmt:message key="common.active"/></option>
+                        <option value="<c:out value="<%= EventsDwr.STATUS_RTN%>"/>"><fmt:message key="event.rtn.rtn"/></option>
+                        <option value="<c:out value="<%= EventsDwr.STATUS_NORTN%>"/>"><fmt:message key="common.nortn"/></option>
+                    </select>
+                <select id="alarmLevel" data-dojo-type="dijit/form/Select" title="<fmt:message key="common.alarmLevel"/>"><tag:alarmLevelOptions allOption="true"/></select>
+                <div id="keywords" data-dojo-type="dijit/form/TextBox" title="<fmt:message key="events.search.keywords"/>"></div>
+                    <div data-dojo-type="dijit/form/Button"><fmt:message key="events.search.search"/></div>
+                    <span id="searchMessage" class="formError"></span>
     </div>
-    <!--div id="datePickerDiv" style="position:absolute; top:0px; left:0px;" onmouseover="cancelDatePickerExpiry()" onmouseout="expireDatePicker()">
-        <div widgetId="datePicker" dojoType="datepicker" dayWidth="narrow" lang="${lang}"></div>
-    </div-->
+    <div id="searchResults"></div>
+</div>
+<!--div id="datePickerDiv" style="position:absolute; top:0px; left:0px;" onmouseover="cancelDatePickerExpiry()" onmouseout="expireDatePicker()">
+    <div widgetId="datePicker" dojoType="datepicker" dayWidth="narrow" lang="${lang}"></div>
+</div-->
 
 </tag:page>

@@ -37,9 +37,7 @@ import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ShareUser;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
