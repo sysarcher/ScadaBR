@@ -17,614 +17,255 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
-<%@page import="com.serotonin.mango.Common"%>
-<%@page import="com.serotonin.mango.view.ShareUser"%>
+<%@ taglib prefix="tag" tagdir="/WEB-INF/tags" %>
 <tag:page>
-    <jsp:attribute name="styles">
-        <style>
-            html > body .dojoTreeNodeLabelSelected {
-                background-color: inherit;
-                color: inherit;
-            }
-            .watchListAttr {
-                min-width:600px;
-            }
-            .rowIcons img {
-                padding-right: 3px;
-            }
-            html > body .dojoSplitContainerSizerH {
-                border: 1px solid #FFFFFF;
-                background-color: #39B54A;
-                margin-top:4px;
-                margin-bottom:4px;
-            }
-            .wlComponentMin {
-                top:0px;
-                left:0px;
-                position:relative;
-                margin:0px;
-                padding:0px;
-                width:16px;
-                height:16px;
-            }
-        </style>
-    </jsp:attribute>
 
     <jsp:body>
+        <style>
+
+        #watchListContainer {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
         <script type="text/javascript">
+            
+            require(["dojo/parser",
+                "dijit/layout/BorderContainer",
+                "dijit/layout/ContentPane"
+            ]);
+    
+    
             var selectedFolderNode;
             var tree;
             var myRestStore;
 
-                require([
-                    "dojo/store/JsonRest",
-                    "dijit/Tree",
-                    "dojo/domReady!"
-                ], function(JsonRest, Tree) {
+            require([
+                "dojo/dom",
+                "dojo/dom-construct",
+                "dojo/_base/declare",
+                "dojo/request",
+                "dojo/store/Memory",
+                "dojo/store/Observable",
+                "dojo/store/JsonRest",
+                "dijit/Tree",
+                "dgrid/Grid",
+                "dgrid/extensions/Pagination",
+                "dgrid/Keyboard",
+                "dgrid/Selection",
+                "dojo/rpc/JsonService",
+                "dojo/on",
+                "dojo/domReady!"
+            ], function(dom, domConstruct, declare, request, Memory, Observable, JsonRest, Tree, Grid, Pagination, Keyboard, Selection, JsonService, on) {
+                var grid;
+                var svc;
+                request("events/", {
+                    handleAs: "json"
+                }).then(function(response) {
+                    // Once the response is received, build an in-memory store
+                    // with the data
+                    var store = new Memory({data: response});
+                    // Create a Grid instance using Pagination,
+                    // referencing the store
+                    grid = new (declare([Grid, Pagination, Keyboard, Selection]))({
+                        store: store,
+                        columns: {
+                            id: {
+                                label: "<fmt:message key="events.id"/>"
+                            },
+                            alarmLevel: {
+                                label: "<fmt:message key="common.alarmLevel"/>",
+                                renderCell: function(event, alarmLevel, default_node, options) {
+                                    var node = domConstruct.create("img");
+                                    var imgName;
+                                    switch (alarmLevel) {
+                                        case 1:
+                                            imgName = 'flag_blue';
+                                            if (event.active) {
+                                                node.alt = '<fmt:message key="common.alarmLevel.info"/>';
+                                            } else {
+                                                node.alt = '<fmt:message key="common.alarmLevel.info.rtn"/>';
+                                            }
+                                            break;
+                                        case  2:
+                                            imgName = 'flag_yellow';
+                                            if (event.active) {
+                                                node.alt = '<fmt:message key="common.alarmLevel.urgent"/>';
+                                            } else {
+                                                node.alt = '<fmt:message key="common.alarmLevel.urgent.rtn"/>';
+                                            }
+                                            break;
+                                        case  3:
+                                            if (event.active) {
+                                                node.alt = '<fmt:message key="common.alarmLevel.critical"/>';
+                                            } else {
+                                                node.alt = '<fmt:message key="common.alarmLevel.critical.rtn"/>';
+                                            }
+                                            imgName = 'flag_orange';
+                                            break;
+                                        case  4:
+                                            if (event.active) {
+                                                node.alt = '<fmt:message key="common.alarmLevel.lifeSafety"/>';
+                                            } else {
+                                                node.alt = '<fmt:message key="common.alarmLevel.lifeSafety.rtn"/>';
+                                            }
+                                            imgName = 'flag_red';
+                                            break;
+                                        default :
+                                            node.alt = alarmLevel;
+                                            return  node;
+                                    }
+                                    node.src = 'images/' + imgName + (event.active ? '' : '_off') + '.png';
+                                    node.title = node.alt;
+                                    return node;
+                                }
+                            },
+                            activeTimestamp: {
+                                label: '<fmt:message key="common.time"/>',
+                                resizable: true
+                            },
+                            message: {
+                                label: "Message",
+                                resizable: true,
+                                formatter: function(msg) {
+                                    return msg;
+                                }
+                            },
+                            rtnTimestamp: {
+                                label: '<fmt:message key="common.inactiveTime"/>',
+                                renderCell: function(event, timestamp, default_node, options) {
+                                    var node = domConstruct.create("div");
 
-                    myRestStore = new JsonRest({
-                        target: "dstree/",
-                        getChildren: function(object, onComplete, onError) {
-                            this.query({parentId: object.id}).then(onComplete, onError);
+                                    if (event.active) {
+                                        node.innerHTML = '<fmt:message key="common.active"/>';
+                                        var img = domConstruct.create("img", null, node);
+                                        img.src = "images/flag_white.png";
+                                        img.title = '<fmt:message key="common.active"/>';
+                                        /*                                    
+                                         on(img, "click", function(evt){
+                                         console.log("CKLICKED: " + evt);
+                                         });
+                                         */
+                                    } else {
+                                        if (!event.rtnApplicable) {
+                                            node.innerHTML = '<fmt:message key="common.nortn"/>';
+                                        } else {
+                                            node.innerHTML = timestamp + ' - ' + event.rtnMessage;
+
+                                        }
+                                    }
+                                    return node;
+                                }
+                            },
+                            acknowledged: {
+                                label: '',
+                                renderCell: function(event, acknowledged, default_node, options) {
+                                    var img = domConstruct.create("img");
+
+                                    if (acknowledged) {
+                                        img.src = "images/tick_off.png";
+                                        img.alt = '<fmt:message key="events.acknowledged"/>';
+                                    } else {
+                                        img.src = "images/tick.png";
+                                        img.alt = '<fmt:message key="events.acknowledge"/>';
+                                    }
+                                    img.title = img.alt;
+
+                                    return img;
+                                }
+                            }
                         },
-                        mayHaveChildren: function(object) {
-                            return object.nodeType === "PF";
-                        },
-                        getRoot: function(onItem, onError) {
-                            this.get("root").then(onItem, onError);
-                        },
-                        getLabel: function(object) {
-                            return object.name;
+                        loadingMessage: "Loading data...",
+                        noDataMessage: "No results found.",
+                        selectionMode: "single", // for Selection; only select a single row at a time
+                        //cellNavigation: false, // for Keyboard; allow only row-level keyboard navigation
+                        pagingLinks: 1,
+                        pagingTextBox: true,
+                        firstLastArrows: true,
+                        pageSizeOptions: [10, 25, 50, 100]
+                    }, "watchListTable");
+
+                    //TODO move smd to server ...
+                    svc = new JsonService({
+                        serviceUrl: 'events/rpc', // Adress of the RPC service end point
+                        timeout: 1000,
+                        strictArgChecks: true,
+                        methods: [{
+                                name: 'acknowledgePendingEvent',
+                                parameters: [
+                                    {
+                                        name: 'id',
+                                        type: 'INTEGER'
+                                    }
+                                ]
+                            },
+                            {
+                                name: 'acknowledgeAllPendingEvents',
+                                parameters: []
+                            }
+                        ]
+                    });
+
+                    grid.on("dgrid-error", function(event) {
+                        console.log(event.error.message);
+                    });
+
+                    grid.on(".dgrid-cell:click", function(evt) {
+                        var cell = grid.cell(evt);
+                        var data = cell.row.data;
+                        if (cell.column.field === 'acknowledged') {
+                            if (!data.acknowledged) {
+                                svc.acknowledgePendingEvent(data.id).then(function(result) {
+                                    grid.setStore(new Memory({data: result}));
+                                });
+                            }
                         }
                     });
-                    // Create the Tree.
-                    tree = new Tree({
-                        model: myRestStore
-                    }, "treeDiv");
-                    tree.startup();
+
+                    on(dom.byId("acknowledgeAllPendingEventsImg"), "click", function() {
+                        svc.acknowledgeAllPendingEvents().then(function(result) {
+                            grid.setStore(new Memory({data: result}));
+                        });
+                    });
+
                 });
+
+                myRestStore = new JsonRest({
+                    target: "dstree/",
+                    getChildren: function(object, onComplete, onError) {
+                        this.query({parentId: object.id}).then(onComplete, onError);
+                    },
+                    mayHaveChildren: function(object) {
+                        return object.nodeType === "PF";
+                    },
+                    getRoot: function(onItem, onError) {
+                        this.get("root").then(onItem, onError);
+                    },
+                    getLabel: function(object) {
+                        return object.name;
+                    }
+                });
+                // Create the Tree.
+                tree = new Tree({
+                    model: myRestStore
+                }, "dataPointTree");
+                tree.startup();
+            });
 
         </script>
 
-
-        <!--script type="text/javascript">
-          dojo.require("dojo.widget.SplitContainer");
-          dojo.require("dojo.widget.ContentPane");
-          mango.view.initWatchlist();
-          mango.share.dwr = WatchListDwr;
-          var owner;
-          var pointNames = {};
-          var watchlistChangeId = 0;
-          
-          function init() {
-              WatchListDwr.init(function(data) {
-                  mango.share.users = data.shareUsers;
-                  
-                  // Create the point tree.
-                  var rootFolder = data.pointFolder;
-                  var tree = dojo.widget.manager.getWidgetById('tree');
-                  var i;
-                  
-                  for (i=0; i<rootFolder.subfolders.length; i++)
-                      addFolder(rootFolder.subfolders[i], tree);
-                  
-                  for (i=0; i<rootFolder.points.length; i++)
-                      addPoint(rootFolder.points[i], tree);
-                  
-                  hide("loadingImg");
-                  show("treeDiv");
-                  
-                  addPointNames(rootFolder);
-                  
-                  // Add default points.
-                  displayWatchList(data.selectedWatchList);
-                  maybeDisplayDeleteImg();
-              });
-              WatchListDwr.getDateRangeDefaults(<c:out value="<%= Common.TimePeriods.DAYS%>"/>, 1, function(data) { setDateRange(data); });
-              var handler = new TreeClickHandler();
-              dojo.event.topic.subscribe("tree/titleClick", handler, 'titleClick');
-              dojo.event.topic.subscribe("tree/expand", handler, 'expand');
-          }
-          
-          function addPointNames(folder) {
-              var i;
-              for (i=0; i<folder.points.length; i++)
-                  pointNames[folder.points[i].key] = folder.points[i].value;
-              for (i=0; i<folder.subfolders.length; i++)
-                  addPointNamesSub(folder.subfolders[i], "");
-          }
-          
-          function addPointNamesSub(folder, path) {
-              path = path + folder.name + ".";
-              var i;
-              for (i=0; i<folder.points.length; i++)
-                  pointNames[folder.points[i].key] = path + folder.points[i].value;
-              for (i=0; i<folder.subfolders.length; i++)
-                  addPointNamesSub(folder.subfolders[i], path);
-          }
-          
-          function addFolder(folder, parent) {
-              var folderNode = dojo.widget.createWidget("TreeNode", {
-                      title: "<img src='images/folder_brick.png'/> "+ folder.name,
-                      isFolder: "true",
-                      lazyLoadData: folder
-              });
-              parent.addChild(folderNode);
-          }
-          
-          function populateFolder(folderNode, lazyLoadData) {
-              // Turn this off so as not to confuse the tree node.
-              folderNode.isExpanded = false;
-              
-              var i;
-              for (i=0; i<lazyLoadData.subfolders.length; i++)
-                  addFolder(lazyLoadData.subfolders[i], folderNode);
-              
-              for (i=0; i<lazyLoadData.points.length; i++) {
-                  addPoint(lazyLoadData.points[i], folderNode);
-                  if ($("p"+ lazyLoadData.points[i].key))
-                      togglePointTreeIcon(lazyLoadData.points[i].key, false);
-              }
-              
-              folderNode.expand();
-          }
-          
-          function addPoint(point, parent) {
-              var pointNode = dojo.widget.createWidget("TreeNode", {
-                      title: "<img src='images/icon_comp.png'/> <span id='ph"+ point.key +"Name'>"+ point.value +"</span> "+
-                              "<img src='images/bullet_go.png' id='ph"+ point.key +"Image' title='<fmt:message key="watchlist.addToWatchlist"/>'/>",
-                      object: point
-              });
-              parent.addChild(pointNode);
-              $("ph"+ point.key +"Image").mangoName = "pointTreeIcon";
-          }
-          
-          var TreeClickHandler = function() {
-              this.titleClick = function(message) {
-                  var widget = message.source;
-                  if (!widget.isFolder)
-                      addToWatchList(widget.object.key);
-              },
-              
-              this.expand = function(message) {
-                  if (message.source.lazyLoadData) {
-                      var lazyLoadData = message.source.lazyLoadData;
-                      delete message.source.lazyLoadData;
-                      populateFolder(message.source, lazyLoadData);
-                  }
-              }
-          }
-          
-          function displayWatchList(data) {
-              if (!data.points)
-                  // Couldn't find the watchlist. Reload the page
-                  window.location.reload();
-              
-              var points = data.points;
-              owner = data.access == <c:out value="<%= ShareUser.ACCESS_OWNER%>"/>;
-              
-              // Add the new rows.
-              for (var i=0; i<points.length; i++) {
-                  if (!pointNames[points[i]]) {
-                      // The point id isn't in the list. Refresh the page to ensure we have current data.
-                      window.location.reload();
-                      return;
-                  }
-                  addToWatchListImpl(points[i]);
-              }
-              
-              fixRowFormatting();
-              mango.view.watchList.reset();
-              
-              var select = $("watchListSelect");
-              var txt = $("newWatchListName");
-              $set(txt, select.options[select.selectedIndex].text);
-              
-              // Display controls based on access
-              var iconSrc;
-              if (owner) {
-                  show("wlEditDiv", "inline");
-                  show("usersEditDiv", "inline");
-                  
-                  // Set the share users.
-                  mango.share.writeSharedUsers(data.users);
-                  iconSrc = "images/bullet_go.png";
-              }
-              else {
-                  hide("wlEditDiv");
-                  hide("usersEditDiv");
-                  iconSrc = "images/bullet_key.png";
-              }
-              
-              var icons = getElementsByMangoName($("treeDiv"), "pointTreeIcon");
-              for (var i=0; i<icons.length; i++)
-                  icons[i].src = iconSrc;
-          }
-          
-          function showWatchListEdit() {
-              openLayer("wlEdit");
-              $("newWatchListName").select();
-          }
-        
-          function saveWatchListName() {
-              var name = $get("newWatchListName");
-              var select = $("watchListSelect");
-              select.options[select.selectedIndex].text = name;
-              WatchListDwr.updateWatchListName(name);
-              hideLayer("wlEdit");
-          }
-          
-          function watchListChanged() {
-              // Clear the list.
-              var rows = getElementsByMangoName($("watchListTable"), "watchListRow");
-              for (var i=0; i<rows.length; i++)
-                  removeFromWatchListImpl(rows[i].id.substring(1));
-              
-              watchlistChangeId++;
-              var id = watchlistChangeId;
-              WatchListDwr.setSelectedWatchList($get("watchListSelect"), function(data) {
-                      if (id == watchlistChangeId)
-                      displayWatchList(data);
-              });
-          }
-          
-          function addWatchList(copy) {
-              var copyId = ${NEW_ID};
-              if (copy)
-                  copyId = $get("watchListSelect");
-              
-              WatchListDwr.addNewWatchList(copyId, function(watchListData) {
-                  var wlselect = $("watchListSelect");
-                  wlselect.options[wlselect.options.length] = new Option(watchListData.value, watchListData.key);
-                  $set(wlselect, watchListData.key);
-                  watchListChanged();
-                  maybeDisplayDeleteImg();
-              });
-          }
-          
-          function deleteWatchList() {
-              var wlselect = $("watchListSelect");
-              var deleteId = $get(wlselect);
-              wlselect.options[wlselect.selectedIndex] = null;
-              
-              watchListChanged();
-              WatchListDwr.deleteWatchList(deleteId);
-              maybeDisplayDeleteImg();
-          }
-          
-          function maybeDisplayDeleteImg() {
-              var wlselect = $("watchListSelect");
-              display("watchListDeleteImg", wlselect.options.length > 1);
-          }
-          
-          function showWatchListUsers() {
-              openLayer("usersEdit");
-          }
-          
-          function openLayer(nodeId) {
-              var nodeDiv = $(nodeId);
-              closeLayers(nodeId);
-              var divBounds = getNodeBounds(nodeDiv);
-              var ancBounds = getNodeBounds(findRelativeAncestor(nodeDiv));
-              nodeDiv.style.left = (ancBounds.w - divBounds.w - 30) +"px";
-              showLayer(nodeDiv, true);
-          }
-        
-          function closeLayers(exclude) {
-              if (exclude != "wlEdit")
-                  hideLayer("wlEdit");
-              if (exclude != "usersEdit")
-                  hideLayer("usersEdit");
-          }
-          
-          
-          //
-          // Watch list membership
-          //
-          function addToWatchList(pointId) {
-              // Check if this point is already in the watch list.
-              if ($("p"+ pointId) || !owner)
-                  return;
-              addToWatchListImpl(pointId);
-              WatchListDwr.addToWatchList(pointId, mango.view.watchList.setDataImpl);
-              fixRowFormatting();
-          }
-          
-          var watchListCount = 0;
-          function addToWatchListImpl(pointId) {
-              watchListCount++;
-          
-              // Add a row for the point by cloning the template row.
-              var pointContent = createFromTemplate("p_TEMPLATE_", pointId, "watchListTable");
-              pointContent.mangoName = "watchListRow";
-              
-              if (owner) {
-                  show("p"+ pointId +"MoveUp");
-                  show("p"+ pointId +"MoveDown");
-                  show("p"+ pointId +"Delete");
-              }
-              
-              $("p"+ pointId +"Name").innerHTML = pointNames[pointId];
-              
-              // Disable the element in the point list.
-              togglePointTreeIcon(pointId, false);
-          }
-          
-          function removeFromWatchList(pointId) {
-              removeFromWatchListImpl(pointId);
-              fixRowFormatting();
-              WatchListDwr.removeFromWatchList(pointId);
-          }
-          
-          function removeFromWatchListImpl(pointId) {
-              watchListCount--;
-              var pointContent = $("p"+ pointId);
-              var watchListTable = $("watchListTable");
-              watchListTable.removeChild(pointContent);
-              
-              // Enable the element in the point list.
-              togglePointTreeIcon(pointId, true);
-          }
-          
-          function togglePointTreeIcon(pointId, enable) {
-              var node = $("ph"+ pointId +"Image");
-              if (node) {
-                  if (enable)
-                      dojo.html.setOpacity(node, 1);
-                  else
-                      dojo.html.setOpacity(node, 0.2);
-              }
-          }
-          
-          //
-          // List state updating
-          //
-          function moveRowDown(pointId) {
-              var watchListTable = $("watchListTable");
-              var rows = getElementsByMangoName(watchListTable, "watchListRow");
-              var i=0;
-              for (; i<rows.length; i++) {
-                  if (rows[i].id == pointId)
-                      break;
-              }
-              if (i < rows.length - 1) {
-                  if (i == rows.length - 1)
-                      watchListTable.append(rows[i]);
-                  else
-                      watchListTable.insertBefore(rows[i], rows[i+2]);
-                  WatchListDwr.moveDown(pointId.substring(1));
-                  fixRowFormatting();
-              }
-          }
-          
-          function moveRowUp(pointId) {
-              var watchListTable = $("watchListTable");
-              var rows = getElementsByMangoName(watchListTable, "watchListRow");
-              var i=0;
-              for (; i<rows.length; i++) {
-                  if (rows[i].id == pointId)
-                      break;
-              }
-              if (i != 0) {
-                  watchListTable.insertBefore(rows[i], rows[i-1]);
-                  WatchListDwr.moveUp(pointId.substring(1));
-                  fixRowFormatting();
-              }
-          }
-          
-          function fixRowFormatting() {
-              var rows = getElementsByMangoName($("watchListTable"), "watchListRow");
-              if (rows.length == 0) {
-                  show("emptyListMessage");
-              }
-              else {
-                  hide("emptyListMessage");
-                  for (var i=0; i<rows.length; i++) {
-                      if (i == 0) {
-                          hide(rows[i].id +"BreakRow");
-                          hide(rows[i].id +"MoveUp");
-                      }
-                      else {
-                          show(rows[i].id +"BreakRow");
-                          if (owner)
-                              show(rows[i].id +"MoveUp");
-                      }
-                          
-                      if (i == rows.length - 1)
-                          hide(rows[i].id +"MoveDown");
-                      else if (owner)
-                          show(rows[i].id +"MoveDown");
-                  }
-              }
-          }
-          
-          function showChart(mangoId, event, source) {
-              if (isMouseLeaveOrEnter(event, source)) {
-                  // Take the data in the chart textarea and put it into the chart layer div
-                  $set('p'+ mangoId +'ChartLayer', $get('p'+ mangoId +'Chart'));
-                  showMenu('p'+ mangoId +'ChartLayer', 4, 12);
-              }
-          }
-          
-          function hideChart(mangoId, event, source) {
-              if (isMouseLeaveOrEnter(event, source))
-                      hideLayer('p'+ mangoId +'ChartLayer');
-          }
-          
-          //
-          // Image chart
-          //
-          function getImageChart() {
-              var width = dojo.html.getContentBox($("imageChartDiv")).width - 20;
-              startImageFader($("imageChartImg"));
-              WatchListDwr.getImageChartData(getChartPointList(), $get("fromYear"), $get("fromMonth"), $get("fromDay"), 
-                              $get("fromHour"), $get("fromMinute"), $get("fromSecond"), $get("fromNone"), $get("toYear"), 
-                              $get("toMonth"), $get("toDay"), $get("toHour"), $get("toMinute"), $get("toSecond"), $get("toNone"), 
-                              width, 350, function(data) {
-                  $("imageChartDiv").innerHTML = data;
-                  stopImageFader($("imageChartImg"));
-                  
-                  // Make sure the length of the chart doesn't mess up the watch list display. Do async to
-                  // make sure the rendering gets done.
-                  setTimeout('dojo.widget.manager.getWidgetById("splitContainer").onResized()', 2000);
-              });
-          }
-          
-          function getChartData() {
-              var pointIds = getChartPointList();
-              if (pointIds.length == 0)
-                      alert("<fmt:message key="watchlist.noExportables"/>");
-              else {
-                  startImageFader($("chartDataImg"));
-                  WatchListDwr.getChartData(getChartPointList(), $get("fromYear"), $get("fromMonth"), $get("fromDay"), 
-                          $get("fromHour"), $get("fromMinute"), $get("fromSecond"), $get("fromNone"), $get("toYear"), 
-                          $get("toMonth"), $get("toDay"), $get("toHour"), $get("toMinute"), $get("toSecond"), $get("toNone"), 
-                          function(data) {
-                      stopImageFader($("chartDataImg"));
-                      window.location = "chartExport/watchListData.csv";
-                  });
-              }
-          }
-          
-          function getChartPointList() {
-              var pointIds = $get("chartCB");
-              for (var i=pointIds.length-1; i>=0; i--) {
-                  if (pointIds[i] == "_TEMPLATE_") {
-                      pointIds.splice(i, 1);
-                  }
-              }
-              return pointIds;
-          }
-          
-          //
-          // Create report
-          function createReport() {
-              window.location = "reports.shtm?wlid="+ $get("watchListSelect");
-          }
-        </script-->
-
-        <table width="100%">
-            <tr><td>
-
-                    <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'sidebar', gutters:true, liveSplitters:true" id="borderContainer" style="width: 100%; height: 500px;" class="borderDiv">
-                        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region:'left'" style="width: 100px;">
-                            <span class="smallTitle"><fmt:message key="watchlist.points"/></span> <tag:help id="watchListPoints"/><br/>
-                            <div id="treeDiv" />
-                        </div>
-                        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region:'leading'">
-                            <table cellpadding="0" cellspacing="0" width="100%">
-                                <tr>
-                                    <td class="smallTitle"><fmt:message key="watchlist.watchlist"/> <tag:help id="watchList"/></td>
-                                    <td align="right">
-                                        <sbt:select id="watchListSelect" value="${selectedWatchList}" onchange="watchListChanged()"
-                                                    onmouseover="closeLayers();">
-                                            <c:forEach items="${watchLists}" var="wl">
-                                                <sbt:option value="${wl.key}">${sbt:escapeLessThan(wl.value)}</sbt:option>
-                                            </c:forEach>
-                                        </sbt:select>
-
-                                        <div id="wlEditDiv" style="display:inline;" onmouseover="showWatchListEdit()">
-                                            <tag:img id="wlEditImg" png="pencil" title="watchlist.editListName"/>
-                                            <div id="wlEdit" style="visibility:hidden;left:0px;top:15px;" class="labelDiv"
-                                                 onmouseout="hideLayer(this)">
-                                                <fmt:message key="watchlist.newListName"/><br/>
-                                                <input type="text" id="newWatchListName"
-                                                       onkeypress="if (event.keyCode == 13)
-                                                                   $('saveWatchListNameLink').onclick();"/>
-                                                <a class="ptr" id="saveWatchListNameLink" onclick="saveWatchListName()"><fmt:message key="common.save"/></a>
-                                            </div>
-                                        </div>
-
-                                        <div id="usersEditDiv" style="display:inline;" onmouseover="showWatchListUsers()">
-                                            <tag:img png="user" title="share.sharing" onmouseover="closeLayers();"/>
-                                            <div id="usersEdit" style="visibility:hidden;left:0px;top:15px;" class="labelDiv">
-                                                <tag:sharedUsers doxId="watchListSharing" noUsersKey="share.noWatchlistUsers"
-                                                                 closeFunction="hideLayer('usersEdit')"/>
-                                            </div>
-                                        </div>
-
-                                        <tag:img png="copy" onclick="addWatchList(true)" title="watchlist.copyList" onmouseover="closeLayers();"/>
-                                        <tag:img png="add" onclick="addWatchList(false)" title="watchlist.addNewList" onmouseover="closeLayers();"/>
-                                        <tag:img png="delete" id="watchListDeleteImg" onclick="deleteWatchList()" title="watchlist.deleteList"
-                                                 style="display:none;" onmouseover="closeLayers();"/>
-                                        <tag:img png="report_add" onclick="createReport()" title="watchlist.createReport" onmouseover="closeLayers();"/>
-                                    </td>
-                                </tr>
-                            </table>
-
-                        </div>
-                        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region:'center'">
-                            <div id="watchListDiv" class="watchListAttr">
-                                <table style="display:none;">
-                                    <tbody id="p_TEMPLATE_">
-                                        <tr id="p_TEMPLATE_BreakRow"><td class="horzSeparator" colspan="5"></td></tr>
-                                        <tr>
-                                            <td width="1">
-                                                <table cellpadding="0" cellspacing="0" class="rowIcons">
-                                                    <tr>
-                                                        <td onmouseover="mango.view.showChange('p' + getMangoId(this) + 'Change', 4, 12);"
-                                                            onmouseout="mango.view.hideChange('p' + getMangoId(this) + 'Change');"
-                                                            id="p_TEMPLATE_ChangeMin" style="display:none;"><img alt="" id="p_TEMPLATE_Changing" 
-                                                                                                             src="images/icon_edit.png"/><div id="p_TEMPLATE_Change" class="labelDiv" 
-                                                                                                             style="visibility:hidden;top:10px;left:1px;" onmouseout="hideLayer(this);">
-                                                                <tag:img png="hourglass" title="common.gettingData"/>
-                                                            </div></td>
-                                                        <td id="p_TEMPLATE_ChartMin" style="display:none;" onmouseover="showChart(getMangoId(this), event, this);"
-                                                            onmouseout="hideChart(getMangoId(this), event, this);"><img alt="" 
-                                                                                                                    src="images/icon_chart.png"/><div id="p_TEMPLATE_ChartLayer" class="labelDiv" 
-                                                                                                                    style="visibility:hidden;top:0;left:0;"></div><textarea
-                                                                                                                    style="display:none;" id="p_TEMPLATE_Chart"><tag:img png="hourglass"
-                                                                     title="common.gettingData"/></textarea></td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                            <td id="p_TEMPLATE_Name" style="font-weight:bold"></td>
-                                            <td id="p_TEMPLATE_Value" align="center"><img src="images/hourglass.png"/></td>
-                                            <td id="p_TEMPLATE_Time" align="center"></td>
-                                            <td style="width:1px; white-space:nowrap;">
-                                                <input type="checkbox" name="chartCB" id="p_TEMPLATE_ChartCB" value="_TEMPLATE_" checked="checked"
-                                                       title="<fmt:message key="watchlist.consolidatedChart"/>"/>
-                                                <tag:img png="icon_comp" title="watchlist.pointDetails"
-                                                         onclick="window.location='data_point_details.shtm?dpid='+ getMangoId(this)"/>
-                                                <tag:img png="arrow_up_thin" id="p_TEMPLATE_MoveUp" title="watchlist.moveUp" style="display:none;"
-                                                         onclick="moveRowUp('p'+ getMangoId(this));"/><tag:img png="arrow_down_thin"
-                                                         id="p_TEMPLATE_MoveDown" title="watchlist.moveDown" style="display:none;"
-                                                         onclick="moveRowDown('p'+ getMangoId(this));"/>
-                                                <tag:img id="p_TEMPLATE_Delete" png="bullet_delete" title="watchlist.delete" style="display:none;"
-                                                         onclick="removeFromWatchList(getMangoId(this))"/>
-                                            </td>
-                                        </tr>
-                                        <tr><td colspan="5" style="padding-left:16px;" id="p_TEMPLATE_Messages"></td></tr>
-                                    </tbody>
-                                </table>
-                                <table id="watchListTable" width="100%"></table>
-                                <div id="emptyListMessage" style="color:#888888;padding:10px;text-align:center;">
-                                    <fmt:message key="watchlist.emptyList"/>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </td></tr>
-
-            <tr><td>
-                    <div class="borderDiv" style="width: 100%;">
-                        <table width="100%">
-                            <tr>
-                                <td class="smallTitle"><fmt:message key="watchlist.chart"/> <tag:help id="watchListCharts"/></td>
-                                <td align="right"><tag:dateRange/></td>
-                                <td>
-                                    <tag:img id="imageChartImg" png="control_play_blue" title="watchlist.imageChartButton"
-                                             onclick="getImageChart()"/>
-                                    <%--               <tag:img id="chartDataImg" png="bullet_down" title="watchlist.chartDataButton" --%>
-                                    <!--                       onclick="getChartData()"/> -->
-                                </td>
-                            </tr>
-                            <tr><td colspan="3" id="imageChartDiv"></td></tr>
-                        </table>
-                    </div>
-                </td></tr>
-
-        </table>
-    </jsp:body>
+        <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design: 'sidebar', gutters:true, liveSplitters:true" id="watchListContainer" >
+            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region: 'left'"  style="width: 200px;">
+           <div id="dataPointTree"></div>
+            </div>
+            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region:'top'">
+            TOP
+            </div>
+            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'center'">
+           <div id="watchListTable"></div>
+           </div>
+        </div>
+    
+</jsp:body>
 </tag:page>

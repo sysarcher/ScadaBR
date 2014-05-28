@@ -18,87 +18,19 @@
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
 <tag:page >
-    <script type="text/javascript">
-        
-    var compatible = false;
-  
-    window.onload = function() {
-            require(["dojo/dom", "dojo/domReady"], function(dom){    
-                dom.byId("username").focus();
-            });
 
-            BrowserDetect.init();
+    <div data-dojo-type="dijit/form/Form" id="myForm" data-dojo-id="myForm"
+         encType="multipart/form-data" action="login.htm" method="post">
+        <div data-dojo-type="dojox.layout.TableContainer" data-dojo-props="cols:1" id="tc1">
+            <spring:bind path="login.username">
+                <div data-dojo-type="dijit.form.TextBox" name="username" title="<fmt:message key="login.userId"/>:" value="${status.value}"></div>
+            </spring:bind>
+            <spring:bind path="login.password">
+                <div data-dojo-type="dijit.form.TextBox" name="password" title="<fmt:message key="login.password"/>:" value="${status.value}"></div>
+            </spring:bind>
+        </div>
 
-            $set("browser", BrowserDetect.browser + " " + BrowserDetect.version + " <fmt:message key="login.browserOnPlatform"/> " + BrowserDetect.OS);
+        <button data-dojo-type="dijit/form/Button" type="submit" value="Submit"><fmt:message key="login.loginButton"/></button>
+    </div>
 
-            if (checkCombo(BrowserDetect.browser, BrowserDetect.version, BrowserDetect.OS)) {
-                $("browserImg").src = "images/accept.png";
-                show("okMsg");
-                compatible = true;
-            } else {
-                $("browserImg").src = "images/thumb_down.png";
-                show("warnMsg");
-            }
-        }
-    
-        function nag() {
-            if (!compatible)
-                alert('<fmt:message key="login.nag"/>');
-        }
-        
-    </script>
-    
-    <table cellspacing="0" cellpadding="0" border="0">
-        <tr>
-            <td>
-                <form action="login.htm" method="post" onclick="nag()">
-                    <table>
-                        <spring:bind path="login.username">
-                            <tr>
-                                <td class="formLabelRequired"><fmt:message key="login.userId"/></td>
-                                <td class="formField">
-                                    <input id="username" type="text" name="username" value="${status.value}" maxlength="40"/>
-                                </td>
-                                <td class="formError">${status.errorMessage}</td>
-                            </tr>
-                        </spring:bind>
-
-                        <spring:bind path="login.password">
-                            <tr>
-                                <td class="formLabelRequired"><fmt:message key="login.password"/></td>
-                                <td class="formField">
-                                    <input id="password" type="password" name="password" value="${status.value}" maxlength="20"/>
-                                </td>
-                                <td class="formError">${status.errorMessage}</td>
-                            </tr>
-                        </spring:bind>
-
-                        <tr>
-                            <td colspan="2" align="center">
-                                <input type="submit" value="<fmt:message key="login.loginButton"/>"/>
-                                <tag:help id="welcomeToMango"/>
-                            </td>
-                            <td></td>
-                        </tr>
-                    </table>
-                </form>
-                <br/>
-            </td>
-            <td valign="top">
-                <table>
-                    <tr>
-                        <td valign="top"><img id="browserImg" src="images/magnifier.png"/></td>
-                        <td><b><span id="browser"><fmt:message key="login.unknownBrowser"/></span></b></td>
-                    </tr>
-                    <tr>
-                        <td valign="top" colspan="2">
-                            <span id="okMsg" style="display:none"><fmt:message key="login.supportedBrowser"/></span>
-                            <span id="warnMsg" style="display:none"><fmt:message key="login.unsupportedBrowser"/></span>
-                        </td>
-                    </tr>
-                </table>
-                <br/><br/>
-            </td>
-        </tr>
-    </table>
 </tag:page>

@@ -32,6 +32,7 @@ import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.web.l10n.Localizer;
+import com.serotonin.mango.db.dao.UserDao;
 import javax.inject.Inject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -41,9 +42,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 @RequestMapping("/watch_list.shtm")
 public class WatchListController {
+    
 
     @Inject
     protected WatchListDao watchListDao;
+    @Inject
+    protected UserDao userDao;
     
     public static final String KEY_WATCHLISTS = "watchLists";
     public static final String KEY_SELECTED_WATCHLIST = "selectedWatchList";
@@ -109,4 +113,81 @@ public class WatchListController {
         modelMap.put(KEY_SELECTED_WATCHLIST, selected);
         modelMap.put("NEW_ID", Common.NEW_ID);
     }
+    
+    
+    public static class JsonWatchList {
+
+        private JsonWatchList(WatchList watchList) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+        
+    }
+    
+    
+        public JsonWatchList setSelectedWatchList(int watchListId) {
+        User user = Common.getUser();
+
+        WatchList watchList = watchListDao.getWatchList(watchListId);
+        Permissions.ensureWatchListPermission(user, watchList);
+        prepareWatchList(watchList, user);
+
+        watchListDao.saveSelectedWatchList(user.getId(), watchList.getId());
+        user.setSelectedWatchList(watchListId);
+
+        JsonWatchList data = getWatchListData(user, watchList);
+		// Set the watchlist in the user object after getting the data since it
+        // may take a while, and the long poll
+        // updates will all be missed in the meantime.
+        user.setWatchList(watchList);
+
+        return data;
+    }
+        
+    private JsonWatchList getWatchListData(User user, WatchList watchList) {
+        JsonWatchList data = new JsonWatchList(watchList);
+
+        List<DataPointVO> points = watchList.getPointList();
+        List<Integer> pointIds = new ArrayList<>(points.size());
+        for (DataPointVO point : points) {
+            if (Permissions.hasDataPointReadPermission(user, point)) {
+                pointIds.add(point.getId());
+            }
+        }
+
+//        data.put("points", pointIds);
+//        data.put("users", watchList.getWatchListUsers());
+//        data.put("access", watchList.getUserAccess(user));
+
+        return data;
+    }
+    private void prepareWatchList(WatchList watchList, User user) {
+        int access = watchList.getUserAccess(user);
+        User owner = userDao.getUser(watchList.getUserId());
+        for (DataPointVO point : watchList.getPointList()) {
+            updateSetPermission(point, access, owner);
+        }
+    }
+
+    private void updateSetPermission(DataPointVO point, int access, User owner) {
+        // Point isn't settable
+        if (!point.getPointLocator().isSettable()) {
+            return;
+        }
+
+        // Read-only access
+        if (access != ShareUser.ACCESS_OWNER && access != ShareUser.ACCESS_SET) {
+            return;
+        }
+
+        // Watch list owner doesn't have set permission
+        if (!Permissions.hasDataPointSetPermission(owner, point)) {
+            return;
+        }
+
+        // All good.
+        point.setSettable(true);
+    }
+
+	//
+
 }
