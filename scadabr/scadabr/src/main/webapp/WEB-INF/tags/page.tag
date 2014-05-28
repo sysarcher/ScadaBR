@@ -22,7 +22,7 @@
         </script>
     </head>
 
-    <body class="claro">
+    <body class="soria">
         <style>
             html, body {
                 width: 100%;
