@@ -29,10 +29,12 @@ import org.springframework.validation.BindException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.vo.User;
+import com.serotonin.mango.web.UserSessionContextBean;
 import com.serotonin.mango.web.integration.CrowdUtils;
 import com.serotonin.mango.web.mvc.form.LoginForm;
 import javax.inject.Inject;
 import javax.validation.Valid;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -42,11 +44,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/login.htm")
+@Scope("request")
 public class LoginController {
-
-    public LoginController() {
-        super();
-    }
     
     private static final Log logger = LogFactory.getLog(LoginController.class);
 
@@ -56,7 +55,14 @@ public class LoginController {
     @Inject
     private UserDao userDao;
 	
+   @Inject
+    private UserSessionContextBean userSessionContextBean;
 
+    public LoginController() {
+        super();
+    }
+    
+ 
     public void setSuccessUrl(String url) {
         successUrl = url;
     }
@@ -84,7 +90,7 @@ public class LoginController {
 //                        ValidationUtils.reject(errors, "login.validation.accountDisabled");
                     } else {
                         if (CrowdUtils.isAuthenticated(request, response)) {
-                            String result = performLogin(request, username);
+                            String result = performLogin(username);
                             CrowdUtils.setCrowdAuthenticated(Common.getUser(request));
                             return result;
                         }
@@ -149,16 +155,16 @@ public class LoginController {
             return "login";
         }
 */
-        String result = performLogin(request, loginForm.getUsername());
+        String result = performLogin(loginForm.getUsername());
         if (crowdAuthenticated) {
-            CrowdUtils.setCrowdAuthenticated(Common.getUser(request));
+            CrowdUtils.setCrowdAuthenticated(userSessionContextBean.getUser());
         }
         return result;
     }
 
-    private String performLogin(HttpServletRequest request, String username) {
+    private String performLogin(String username) {
         // Check if the user is already logged in.
-        User user = Common.getUser(request);
+        User user = userSessionContextBean.getUser();
         if (user != null && user.getUsername().equals(username)) {
             // The user is already logged in. Nothing to do.
             if (logger.isDebugEnabled()) {
@@ -175,7 +181,7 @@ public class LoginController {
 
             // Add the user object to the session. This indicates to the rest
             // of the application whether the user is logged in or not.
-            Common.setUser(request, user);
+            userSessionContextBean.setUser(user);
             if (logger.isDebugEnabled()) {
                 logger.debug("User object added to session");
             }

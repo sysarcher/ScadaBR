@@ -47,7 +47,7 @@ public class AlarmListComponent extends CustomComponent {
         WebContext webContext = WebContextFactory.get();
         HttpServletRequest request = webContext.getHttpServletRequest();
         List<EventInstance> events = EventDao.getInstance().getPendingEvents(Common
-                .getUser().getId());
+                .getUser());
 
         filter(events, minAlarmLevel);
 
