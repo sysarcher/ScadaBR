@@ -19,7 +19,9 @@
 package com.serotonin.mango.web.filter;
 
 import com.serotonin.mango.vo.User;
+import org.springframework.context.annotation.Scope;
 
+@Scope("request")
 public class NormalLoggedInFilter extends LoggedInFilter {
 
     @Override

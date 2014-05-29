@@ -108,7 +108,7 @@ public class MiscDwr extends BaseDwr {
     public DwrResponseI18n silenceAll() {
         List<Integer> silenced = new ArrayList<>();
         User user = Common.getUser();
-        for (EventInstance evt : eventDao.getPendingEvents(user.getId())) {
+        for (EventInstance evt : eventDao.getPendingEvents(user)) {
             if (!evt.isSilenced()) {
                 eventDao.toggleSilence(evt.getId(), user.getId());
                 silenced.add(evt.getId());
@@ -135,7 +135,7 @@ public class MiscDwr extends BaseDwr {
         User user = Common.getUser();
         if (user != null) {
             long now = System.currentTimeMillis();
-            for (EventInstance evt : eventDao.getPendingEvents(user.getId())) {
+            for (EventInstance evt : eventDao.getPendingEvents(user)) {
                 eventDao.ackEvent(evt.getId(), now, user.getId(), 0);
             }
             resetLastAlarmLevelChange();
@@ -430,7 +430,7 @@ public class MiscDwr extends BaseDwr {
             if (pollRequest.isPendingAlarms() && user != null) {
                 // Create the list of most current pending alarm content.
                 Map<String, Object> model = new HashMap<>();
-                model.put("events", eventDao.getPendingEvents(user.getId()));
+                model.put("events", eventDao.getPendingEvents(user));
                 model.put("pendingEvents", true);
                 model.put("noContentWhenEmpty", true);
                 String currentContent = generateContent(httpRequest, "eventList.jsp", model);

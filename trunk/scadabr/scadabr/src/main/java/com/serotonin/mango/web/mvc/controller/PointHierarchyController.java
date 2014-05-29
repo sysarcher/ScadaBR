@@ -10,6 +10,7 @@ import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.web.LazyTreeNode;
 import java.util.logging.Logger;
 import javax.inject.Inject;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author aploese
  */
 @Controller
+@Scope("request")
 public class PointHierarchyController {
 
     private static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);

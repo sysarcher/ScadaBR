@@ -69,8 +69,10 @@ import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
 import java.util.MissingResourceException;
 
+@Deprecated // Convert to singleton bean
 public class Common {
 
+    @Deprecated
     private static final String SESSION_USER = "sessionUser";
     private static final String ANON_VIEW_KEY = "anonymousViews";
     private static final String CUSTOM_VIEW_KEY = "customView";
@@ -80,6 +82,8 @@ public class Common {
 
     public static final int NEW_ID = -1;
     public static ContextWrapper ctx;
+    
+    //TODO inject this
     private static final ResourceBundle env = ResourceBundle.getBundle("env");
 
     // This is initialized
@@ -228,6 +232,7 @@ public class Common {
 
     //
     // Session user
+    @Deprecated
     public static User getUser() {
         WebContext webContext = WebContextFactory.get();
         if (webContext == null) {
@@ -242,7 +247,9 @@ public class Common {
         return getUser(webContext.getHttpServletRequest());
     }
 
+    @Deprecated
     public static User getUser(HttpServletRequest request) {
+        if (true) throw new RuntimeException("REMOVED >>USE @Inject UserSessionContextBean");
         // Check first to see if the user object is in the request.
         User user = (User) request.getAttribute(SESSION_USER);
         if (user != null) {
@@ -262,7 +269,9 @@ public class Common {
         return user;
     }
 
+    @Deprecated
     public static void setUser(HttpServletRequest request, User user) {
+        if (true) throw new RuntimeException("REMOVED USE: @Inject UserSessionContextBean");
         request.getSession().setAttribute(SESSION_USER, user);
     }
 

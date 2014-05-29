@@ -39,12 +39,15 @@ import com.serotonin.mango.vo.permission.Permissions;
 /**
  * @author Matthew Lohbihler
  */
+@Deprecated // Use UserSessionContextBean
 public class ControllerUtils {
 
+    @Deprecated // Use UserSessionContextBean
     public static ResourceBundle getResourceBundle(HttpServletRequest request) {
         return ResourceBundle.getBundle("messages", getLocale(request));
     }
 
+    @Deprecated // use UserSessionContextBean
     public static Locale getLocale(HttpServletRequest request) {
         WebApplicationContext webApplicationContext = WebApplicationContextUtils
                 .getRequiredWebApplicationContext(request.getSession().getServletContext());
@@ -52,6 +55,7 @@ public class ControllerUtils {
         return localeResolver.resolveLocale(request);
     }
 
+    @Deprecated // Use UserSessionContextBean
     public static void addPointListDataToModel(User user, int pointId, Map<String, Object> model) {
         List<DataPointVO> allPoints = DataPointDao.getInstance().getDataPoints(DataPointExtendedNameComparator.instance, false);
         List<DataPointVO> userPoints = new LinkedList<>();

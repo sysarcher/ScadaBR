@@ -24,14 +24,21 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.vo.User;
+import com.serotonin.mango.web.UserSessionContextBean;
 import com.serotonin.mango.web.integration.CrowdUtils;
+import javax.inject.Inject;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller()
 @RequestMapping("/logout.htm")
+@Scope("request")
 public class LogoutController  {
 
+    @Inject
+    private UserSessionContextBean userSessionContextBean;
+    
     private String redirectUrl;
 
     public void setRedirectUrl(String redirectUrl) {
@@ -41,7 +48,7 @@ public class LogoutController  {
     @RequestMapping()
     protected String handleRequestInternal(HttpServletRequest request, HttpServletResponse response) {
         // Check if the user is logged in.
-        User user = Common.getUser(request);
+        User user = userSessionContextBean.getUser();
         if (user != null) {
             // The user is in fact logged in. Invalidate the session.
             request.getSession().invalidate();
@@ -50,7 +57,7 @@ public class LogoutController  {
                 CrowdUtils.logout(request, response);
             }
         }
-
+        
         // Regardless of what happened above, forward to the configured view.
         return "redirect:login.htm";
     }

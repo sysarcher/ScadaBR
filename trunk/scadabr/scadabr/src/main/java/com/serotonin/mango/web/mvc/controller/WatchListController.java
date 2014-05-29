@@ -24,7 +24,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import br.org.scadabr.db.IntValuePair;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.view.ShareUser;
 import com.serotonin.mango.vo.DataPointVO;
@@ -32,8 +31,11 @@ import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.web.l10n.Localizer;
+import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.UserDao;
+import com.serotonin.mango.web.UserSessionContextBean;
 import javax.inject.Inject;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,25 +43,30 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/watch_list.shtm")
+@Scope("request")
 public class WatchListController {
     
 
     @Inject
-    protected WatchListDao watchListDao;
+    private UserSessionContextBean userSessionContextBean;
     @Inject
-    protected UserDao userDao;
+    private WatchListDao watchListDao;
+    @Inject
+    private UserDao userDao;
+    @Inject
+    private Localizer localizer;
     
     public static final String KEY_WATCHLISTS = "watchLists";
     public static final String KEY_SELECTED_WATCHLIST = "selectedWatchList";
 
     @RequestMapping(method = RequestMethod.GET)
-    public String initializeForm(ModelMap model, HttpServletRequest request) {
-        createModel(request, model);
+    public String initializeForm(ModelMap model) {
+        createModel(model);
         return "watchList";
     }
 
-    protected void createModel(HttpServletRequest request, ModelMap modelMap) {
-        User user = Common.getUser(request);
+    protected void createModel(ModelMap modelMap) {
+        User user = userSessionContextBean.getUser();
 
         // The user's permissions may have changed since the last session, so make sure the watch lists are correct.
         List<WatchList> watchLists = watchListDao.getWatchLists(user.getId());
@@ -67,7 +74,7 @@ public class WatchListController {
         if (watchLists.isEmpty()) {
             // Add a default watch list if none exist.
             WatchList watchList = new WatchList();
-            watchList.setName(Localizer.localizeI18nKey("common.newName", ControllerUtils.getResourceBundle(request)));
+            watchList.setName(localizer.localizeI18nKey("common.newName"));
             watchLists.add(watchListDao.createNewWatchList(watchList, user.getId()));
         }
 
@@ -125,7 +132,7 @@ public class WatchListController {
     
     
         public JsonWatchList setSelectedWatchList(int watchListId) {
-        User user = Common.getUser();
+        User user = userSessionContextBean.getUser();
 
         WatchList watchList = watchListDao.getWatchList(watchListId);
         Permissions.ensureWatchListPermission(user, watchList);

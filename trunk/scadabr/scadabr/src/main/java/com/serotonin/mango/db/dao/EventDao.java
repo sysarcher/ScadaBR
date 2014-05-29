@@ -61,6 +61,7 @@ import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.i18n.LocalizableMessageParseException;
 import br.org.scadabr.web.l10n.Localizer;
+import com.serotonin.mango.vo.User;
 import java.sql.Connection;
 import java.sql.Statement;
 import javax.inject.Named;
@@ -296,6 +297,11 @@ public class EventDao extends BaseDao {
         return results;
     }
 
+    public List<EventInstance> getPendingEvents(final User user) {
+        return getPendingEvents(user.getId());
+    }
+
+    @Deprecated
     public List<EventInstance> getPendingEvents(final int userId) {
         List<EventInstance> results = ejt.query(new PreparedStatementCreator() {
 

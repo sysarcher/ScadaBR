@@ -36,6 +36,7 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.integration.CrowdUtils;
 
+@Deprecated // Convert to spring security ...
 abstract public class LoggedInFilter implements Filter {
 
     private final Log LOGGER = LogFactory.getLog(LoggedInFilter.class);
@@ -50,6 +51,10 @@ abstract public class LoggedInFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
+        if (true) {
+            filterChain.doFilter(servletRequest, servletResponse);
+            return;
+        }
         // Assume an http request.
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
@@ -80,6 +85,7 @@ abstract public class LoggedInFilter implements Filter {
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
+    @Override
     public void destroy() {
         // no op
     }
