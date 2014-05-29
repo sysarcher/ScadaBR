@@ -66,6 +66,9 @@
             <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'center'">
                 <jsp:doBody />
             </div>
+            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'bottom'">
+                <span>&copy;2009-2014 Funda&ccedil;&atilde;o Certi, MCA Sistemas, Unis Sistemas, Conetec. <fmt:message key="footer.rightsReserved"/></span>
+            </div>
         </div>
 
     </body>
