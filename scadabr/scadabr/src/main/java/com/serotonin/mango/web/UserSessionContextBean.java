@@ -3,16 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.serotonin.mango.web;
 
+import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.rt.EventManager;
+import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.vo.User;
-import static com.serotonin.mango.web.mvc.controller.ControllerUtils.getLocale;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
 import javax.inject.Named;
 import org.springframework.context.annotation.Scope;
 
@@ -20,18 +23,21 @@ import org.springframework.context.annotation.Scope;
  *
  * @author aploese
  */
-
 @Named
 @Scope("session")
 public class UserSessionContextBean implements Serializable {
-    
+
+    @Inject
+    private EventManager eventManager;
+
     private User user;
     private Locale locale = Locale.getDefault();
     private TimeZone timeZone = TimeZone.getDefault();
     private transient DateFormat dateFormat;
     private transient DateFormat timeFormat;
     private transient DateFormat dateTimeFormat;
-    private transient ResourceBundle bundle;  
+    private transient ResourceBundle bundle;
+
     /**
      * @return the user
      */
@@ -42,10 +48,34 @@ public class UserSessionContextBean implements Serializable {
     /**
      * @param user the user to set
      */
-    public void setUser(User user) {
+    public void loginUser(User user) {
         this.user = user;
+        eventManager.raiseEvent(new SystemEventType(
+                SystemEventType.TYPE_USER_LOGIN, user.getId()), System
+                .currentTimeMillis(), true, new LocalizableMessageImpl(
+                        "event.login", user.getUsername()));
     }
 
+    /**
+     * @param user the user to set
+     */
+    public void logoutUser(User user) {
+        this.user = null;
+        eventManager.returnToNormal(new SystemEventType(
+                SystemEventType.TYPE_USER_LOGIN, user.getId()), System
+                .currentTimeMillis());
+        user.cancelTestingUtility();
+    }
+
+    
+    @PreDestroy
+    public void preDestroy() {
+        //forcibly ending
+        if (user != null) {
+            loginUser(user);
+        }
+    }
+    
     /**
      * @return the locale
      */
@@ -134,5 +164,5 @@ public class UserSessionContextBean implements Serializable {
         }
         return bundle;
     }
-    
+
 }

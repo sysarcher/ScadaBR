@@ -31,8 +31,11 @@
         .dgrid-column-alarmLevel {
             width: 5em;
         }
+        .dgrid-column-activeTimestamp {
+            width: 10em;
+        }
         .dgrid-column-acknowledged {
-            width: 20px;
+            width: 10em;
         }
         .dgrid-row-odd {
             background: #F2F5F9;
@@ -54,8 +57,10 @@
             "dgrid/Selection",
             "dojo/rpc/JsonService",
             "dojo/on",
+            "dijit/form/Button",
+            "dijit/registry",
             "dojo/domReady!"
-        ], function(dom, domConstruct, declare, request, Memory, Observable, Grid, Pagination, Keyboard, Selection, JsonService, on) {
+        ], function(dom, domConstruct, declare, request, Memory, Observable, Grid, Pagination, Keyboard, Selection, JsonService, on, Button, registry) {
             var grid;
             var svc;
             request("events/", {
@@ -159,18 +164,53 @@
                         acknowledged: {
                             label: '',
                             renderCell: function(event, acknowledged, default_node, options) {
-                                var img = domConstruct.create("img");
-
+                                var myIconClass;
+                                var myLabel;
                                 if (acknowledged) {
-                                    img.src = "images/tick_off.png";
-                                    img.alt = '<fmt:message key="events.acknowledged"/>';
+                                    myIconClass = 'scadaBrCantDoActionIcon';
+                                    myLabel = '<fmt:message key="events.acknowledged"/>';
                                 } else {
-                                    img.src = "images/tick.png";
-                                    img.alt = '<fmt:message key="events.acknowledge"/>';
+                                    myIconClass = 'scadaBrDoActionIcon';
+                                    myLabel = '<fmt:message key="events.acknowledge"/>';
                                 }
-                                img.title = img.alt;
 
-                                return img;
+                                var btnAck = new Button({
+                                    eventId: event.id,
+                                    showLabel: false,
+                                    iconClass: myIconClass,
+                                    label: myLabel,
+                                    onClick: function() {
+                                        svc.acknowledgePendingEvent(this.eventId).then(function(result) {
+                                            grid.setStore(new Memory({data: result}));
+                                        });
+                                    }
+                                }, default_node.appendChild(document.createElement("div")));
+                                btnAck._destroyOnRemove = true;
+
+                                var btnSilence = new Button({
+                                    eventId: event.id,
+                                    label: "Sil",
+                                    iconClass: 'scadaBrDoActionIcon',
+                                    showLabel: true
+                                }, default_node.appendChild(document.createElement("div")));
+                                btnSilence._destroyOnRemove = true;
+
+                                //  return node;
+                                /*
+                                 
+                                 var img = domConstruct.create("img");
+                                 
+                                 if (acknowledged) {
+                                 img.src = "images/tick_off.png";
+                                 img.alt = '<fmt:message key="events.acknowledged"/>';
+                                 } else {
+                                 img.src = "images/tick.png";
+                                 img.alt = '<fmt:message key="events.acknowledge"/>';
+                                 }
+                                 img.title = img.alt;
+                                 
+                                 return img;
+                                 */
                             }
                         }
                     },
@@ -206,26 +246,15 @@
                     ]
                 });
 
-                grid.on("dgrid-error", function(event) {
-                    console.log(event.error.message);
-                });
 
-                grid.on(".dgrid-cell:click", function(evt) {
-                    var cell = grid.cell(evt);
-                    var data = cell.row.data;
-                    if (cell.column.field === 'acknowledged') {
-                        if (!data.acknowledged) {
-                            svc.acknowledgePendingEvent(data.id).then(function(result) {
-                                grid.setStore(new Memory({data: result}));
-                            });
-                        }
-                    }
-                });
-
-                on(dom.byId("acknowledgeAllPendingEventsImg"), "click", function() {
+                on(registry.byId("btnAcknowledgeAll").domNode, "click", function() {
                     svc.acknowledgeAllPendingEvents().then(function(result) {
                         grid.setStore(new Memory({data: result}));
                     });
+                });
+
+                grid.on("dgrid-error", function(event) {
+                    console.log(event.error.message);
                 });
 
             });
@@ -373,8 +402,8 @@
         </div>
 
         <div id="ackAllDiv" class="titlePadding" style="float:right;">
-            <div data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'scadaBrDoActionIcon'"><fmt:message key="events.acknowledgeAll"/></div>
-            <div data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'scadaBrDoSilenceIcon'"><fmt:message key="events.silenceAll"/></div>
+            <button id="btnAcknowledgeAll" data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'scadaBrDoActionIcon'"><fmt:message key="events.acknowledgeAll"/></button>
+            <button data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'scadaBrDoSilenceIcon'"><fmt:message key="events.silenceAll"/></button>
         </div>
         <div id="pendingAlarms" style="clear:both;"/>
     </div>
@@ -384,7 +413,7 @@
 
 <div data-dojo-type="dijit/form/Form" id="myForm" data-dojo-id="myForm"
      encType="multipart/form-data" >
-    <div data-dojo-type="dojox.layout.TableContainer" data-dojo-props="cols:1" id="tc1">
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1" id="tc1">
         <input data-dojo-type="dijit.form.TextBox" name="eventId" title="<fmt:message key="events.id"/>:"/>
 
         <select id="eventSourceType" data-dojo-type="dijit/form/Select" title="<fmt:message key="events.search.type"/>">

@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-import com.serotonin.mango.Common;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.UserSessionContextBean;
 import com.serotonin.mango.web.integration.CrowdUtils;
@@ -52,7 +51,8 @@ public class LogoutController  {
         if (user != null) {
             // The user is in fact logged in. Invalidate the session.
             request.getSession().invalidate();
-
+            userSessionContextBean.logoutUser(user);
+            
             if (CrowdUtils.isCrowdEnabled()) {
                 CrowdUtils.logout(request, response);
             }

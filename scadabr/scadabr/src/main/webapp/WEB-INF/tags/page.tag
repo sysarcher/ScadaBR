@@ -5,20 +5,7 @@
         <link rel="stylesheet" href="resources/scadabr.css">
         <script src='resources/dojo/dojo.js' data-dojo-config="isDebug: true, async: true, parseOnLoad: true"></script>
         <script>
-            require(["dojo/parser",
-                "dijit/layout/LayoutContainer",
-                "dijit/layout/ContentPane",
-                "dijit/Toolbar",
-                "dijit/TooltipDialog",
-                "dijit/form/Button",
-                "dijit/form/ToggleButton",
-                "dijit/form/DropDownButton",
-                "dijit/form/CheckBox",
-                "dijit/form/NumberSpinner",
-                "dijit/form/TextBox",
-                "dijit/ToolbarSeparator",
-                "dijit/ColorPalette",
-                "dojox/layout/TableContainer"]);
+            require(["dojo/parser"]);
         </script>
     </head>
 

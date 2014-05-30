@@ -49,6 +49,14 @@ and open the template in the editor.
     text-align: center;
 }
 
+.scadaBrCantDoActionIcon {
+    background-image: url('tick_off.png');
+    background-repeat: no-repeat;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+}
+
 .scadaBrDoSilenceIcon {
     background-image: url('sound_mute.png');
     background-repeat: no-repeat;
