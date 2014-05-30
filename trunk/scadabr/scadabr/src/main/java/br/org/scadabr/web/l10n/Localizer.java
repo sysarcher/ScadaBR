@@ -2,6 +2,7 @@ package br.org.scadabr.web.l10n;
 
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import com.serotonin.mango.web.UserSessionContextBean;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Date;
@@ -22,7 +23,7 @@ import org.springframework.context.annotation.Scope;
  */
 @Named
 @Scope("session")
-public class Localizer {
+public class Localizer implements Serializable {
     
     @Inject
     private UserSessionContextBean userSessionContextBean;

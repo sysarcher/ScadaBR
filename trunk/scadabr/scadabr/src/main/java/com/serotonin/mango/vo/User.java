@@ -55,9 +55,10 @@ import com.serotonin.mango.web.dwr.beans.ImportTask;
 import com.serotonin.mango.web.dwr.beans.TestingUtility;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.io.Serializable;
 
 @JsonRemoteEntity
-public class User implements SetPointSource, HttpSessionBindingListener,
+public class User implements Serializable, SetPointSource, HttpSessionBindingListener,
         JsonSerializable {
 
     private int id = Common.NEW_ID;

@@ -125,7 +125,7 @@
     <url-pattern>*.shtm</url-pattern>
   </filter-mapping>
 
-  <filter-mapping>
+  <!--filter-mapping>
     <filter-name>CacheHeaders</filter-name>
     <url-pattern>/dwr/interfaces/*</url-pattern>
   </filter-mapping>
@@ -136,7 +136,7 @@
   <filter-mapping>
     <filter-name>CacheHeaders</filter-name>
     <url-pattern>/dwr/utils.js</url-pattern>
-  </filter-mapping>
+  </filter-mapping-->
   <filter-mapping>
     <filter-name>CacheHeaders</filter-name>
     <url-pattern>/audio/*</url-pattern>
@@ -164,7 +164,7 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
   
-  <servlet>
+  <!--servlet>
     <servlet-name>dwr-invoker</servlet-name>
     <servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
     <init-param>
@@ -180,7 +180,7 @@
       <param-value>false</param-value>
     </init-param>
     <load-on-startup>2</load-on-startup>
-  </servlet>
+  </servlet-->
   
   <servlet>
     <servlet-name>imageChart</servlet-name>
@@ -231,10 +231,10 @@
     <url-pattern>/</url-pattern>
   </servlet-mapping>
 
-  <servlet-mapping>
+  <!--servlet-mapping>
     <servlet-name>dwr-invoker</servlet-name>
     <url-pattern>/dwr/*</url-pattern>
-  </servlet-mapping>
+  </servlet-mapping-->
 
   <servlet-mapping>
     <servlet-name>imageChart</servlet-name>

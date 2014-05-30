@@ -8,6 +8,7 @@ package com.serotonin.mango.web;
 
 import com.serotonin.mango.vo.User;
 import static com.serotonin.mango.web.mvc.controller.ControllerUtils.getLocale;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -22,15 +23,15 @@ import org.springframework.context.annotation.Scope;
 
 @Named
 @Scope("session")
-public class UserSessionContextBean {
+public class UserSessionContextBean implements Serializable {
     
     private User user;
     private Locale locale = Locale.getDefault();
     private TimeZone timeZone = TimeZone.getDefault();
-    private DateFormat dateFormat;
-    private DateFormat timeFormat;
-    private DateFormat dateTimeFormat;
-    private ResourceBundle bundle;  
+    private transient DateFormat dateFormat;
+    private transient DateFormat timeFormat;
+    private transient DateFormat dateTimeFormat;
+    private transient ResourceBundle bundle;  
     /**
      * @return the user
      */

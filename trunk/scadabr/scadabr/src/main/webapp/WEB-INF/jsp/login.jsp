@@ -29,10 +29,10 @@
          encType="multipart/form-data" action="login.htm" method="post">
         <div data-dojo-type="dojox.layout.TableContainer" data-dojo-props="cols:1" id="tc1">
             <spring:bind path="login.username">
-                <input id="scadabr.username" tabindex="1" data-dojo-type="dijit.form.TextBox" name="username" title="<fmt:message key="login.userId"/>:" value="${status.value}"/>
+                <input id="scadabr.username" tabindex="2" data-dojo-type="dijit.form.TextBox" name="username" title="<fmt:message key="login.userId"/>:" value="${status.value}"/>
             </spring:bind>
             <spring:bind path="login.password">
-                <input id="scadabr.password" data-dojo-type="dijit.form.TextBox" name="password" type="password" title="<fmt:message key="login.password"/>:" value="${status.value}"/>
+                <input id="scadabr.password" tabindex="1" data-dojo-type="dijit.form.TextBox" name="password" type="password" title="<fmt:message key="login.password"/>:" value="${status.value}"/>
             </spring:bind>
         </div>
 

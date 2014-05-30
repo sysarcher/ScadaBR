@@ -186,7 +186,7 @@
 
                 //TODO move smd to server ...
                 svc = new JsonService({
-                    serviceUrl: 'events/rpc', // Adress of the RPC service end point
+                    serviceUrl: 'jsonrpc/events.json', // Adress of the RPC service end point
                     timeout: 1000,
                     strictArgChecks: true,
                     methods: [{
@@ -202,6 +202,7 @@
                             name: 'acknowledgeAllPendingEvents',
                             parameters: []
                         }
+
                     ]
                 });
 
