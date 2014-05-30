@@ -112,12 +112,14 @@ public class SystemEventType extends EventType {
         dao.setIntValue(SYSTEM_SETTINGS_PREFIX + type, alarmLevel);
     }
 
+    @Deprecated // Use Eventmanager
     public static void raiseEvent(SystemEventType type, long time, boolean rtn, LocalizableMessage message) {
         EventTypeVO vo = getEventType(type.getSystemEventTypeId());
         int alarmLevel = vo.getAlarmLevel();
         Common.ctx.getEventManager().raiseEvent(type, time, rtn, alarmLevel, message, null);
     }
 
+    @Deprecated // Use Eventmanager
     public static void returnToNormal(SystemEventType type, long time) {
         Common.ctx.getEventManager().returnToNormal(type, time);
     }

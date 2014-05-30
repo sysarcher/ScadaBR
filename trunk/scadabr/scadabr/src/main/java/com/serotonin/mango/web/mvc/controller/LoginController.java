@@ -181,7 +181,7 @@ public class LoginController {
 
             // Add the user object to the session. This indicates to the rest
             // of the application whether the user is logged in or not.
-            userSessionContextBean.setUser(user);
+            userSessionContextBean.loginUser(user);
             if (logger.isDebugEnabled()) {
                 logger.debug("User object added to session");
             }

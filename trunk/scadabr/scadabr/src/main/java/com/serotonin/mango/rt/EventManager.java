@@ -46,6 +46,8 @@ import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
+import static com.serotonin.mango.rt.event.type.SystemEventType.getEventType;
+import com.serotonin.mango.vo.event.EventTypeVO;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -384,4 +386,12 @@ public class EventManager implements ILifecycle {
 
         return false;
     }
+    
+    
+    public void raiseEvent(SystemEventType type, long time, boolean rtn, LocalizableMessage message) {
+        EventTypeVO vo = getEventType(type.getSystemEventTypeId());
+        int alarmLevel = vo.getAlarmLevel();
+        raiseEvent(type, time, rtn, alarmLevel, message, null);
+    }
+
 }

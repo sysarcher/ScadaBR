@@ -20,19 +20,24 @@
 <tag:page >
 
     <script>
-        //TODO this does not work
-        require(["dijit/focus", "dojo/dom", "dojo/domReady!"], function(focusUtil, dom) {
-            focusUtil.focus(dom.byId("scadabr.username"));
+        //A little bit clumsy but thats the only way to get this to work on firefox ....
+        // Wait for parser to finish???
+        require(["dojo/domReady!"], function() {
+            setTimeout(function() {
+                require(["dijit/focus", "dojo/dom"], function(focusUtil, dom) {
+                    focusUtil.focus(dom.byId("username"));
+                });
+            }, 1000);
         });
     </script>
     <div data-dojo-type="dijit/form/Form" id="myForm" data-dojo-id="myForm"
          encType="multipart/form-data" action="login.htm" method="post">
-        <div data-dojo-type="dojox.layout.TableContainer" data-dojo-props="cols:1" id="tc1">
+        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1" id="tc1">
             <spring:bind path="login.username">
-                <input id="scadabr.username" tabindex="2" data-dojo-type="dijit.form.TextBox" name="username" title="<fmt:message key="login.userId"/>:" value="${status.value}"/>
+                <input id="username" data-dojo-type="dijit/form/TextBox" name="username" title="<fmt:message key="login.userId"/>:" value="${status.value}"/>
             </spring:bind>
             <spring:bind path="login.password">
-                <input id="scadabr.password" tabindex="1" data-dojo-type="dijit.form.TextBox" name="password" type="password" title="<fmt:message key="login.password"/>:" value="${status.value}"/>
+                <input id="password" data-dojo-type="dijit/form/TextBox" name="password" type="password" title="<fmt:message key="login.password"/>:" value="${status.value}"/>
             </spring:bind>
         </div>
 

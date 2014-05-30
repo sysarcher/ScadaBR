@@ -23,9 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionBindingListener;
-
 import br.org.scadabr.vo.exporter.ZIPProjectManager;
 
 import br.org.scadabr.ShouldNeverHappenException;
@@ -58,8 +55,7 @@ import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.io.Serializable;
 
 @JsonRemoteEntity
-public class User implements Serializable, SetPointSource, HttpSessionBindingListener,
-        JsonSerializable {
+public class User implements Serializable, SetPointSource, JsonSerializable {
 
     private int id = Common.NEW_ID;
     @JsonRemoteProperty
@@ -93,6 +89,7 @@ public class User implements Serializable, SetPointSource, HttpSessionBindingLis
     private transient WatchList watchList;
     private transient DataPointVO editPoint;
     private transient DataSourceVO<?> editDataSource;
+    
     private transient TestingUtility testingUtility;
     private transient Map<String, byte[]> reportImageData;
     private transient PublisherVO<? extends PublishedPointVO> editPublisher;
@@ -100,10 +97,11 @@ public class User implements Serializable, SetPointSource, HttpSessionBindingLis
     private transient boolean muted = false;
     private transient DataExportDefinition dataExportDefinition;
     private transient EventExportDefinition eventExportDefinition;
-    private transient Map<String, Object> attributes = new HashMap<>();
+    private final transient Map<String, Object> attributes = new HashMap<>();
 
     /**
      * Used for various display purposes.
+     * @return 
      */
     public String getDescription() {
         return username + " (" + id + ")";
@@ -131,34 +129,6 @@ public class User implements Serializable, SetPointSource, HttpSessionBindingLis
     @Override
     public void raiseRecursionFailureEvent() {
         throw new ShouldNeverHappenException("");
-    }
-
-    //
-    // /
-    // / HttpSessionBindingListener implementation
-    // /
-    //
-    @Override
-    public void valueBound(HttpSessionBindingEvent evt) {
-        // User is bound to a session when logged in. Notify the event manager.
-        SystemEventType.raiseEvent(new SystemEventType(
-                SystemEventType.TYPE_USER_LOGIN, id), System
-                .currentTimeMillis(), true, new LocalizableMessageImpl(
-                        "event.login", username));
-    }
-
-    @Override
-    public void valueUnbound(HttpSessionBindingEvent evt) {
-        // User is unbound from a session when logged out or the session
-        // expires.
-        SystemEventType.returnToNormal(new SystemEventType(
-                SystemEventType.TYPE_USER_LOGIN, id), System
-                .currentTimeMillis());
-
-        // Terminate any testing utility
-        if (testingUtility != null) {
-            testingUtility.cancel();
-        }
     }
 
     // Convenience method for JSPs
