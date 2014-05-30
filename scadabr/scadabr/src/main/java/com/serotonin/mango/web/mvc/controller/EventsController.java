@@ -19,19 +19,10 @@
 package com.serotonin.mango.web.mvc.controller;
 
 import br.org.scadabr.logger.LogUtils;
-import br.org.scadabr.web.jsonrpc.JsonRpcResponse;
 import br.org.scadabr.web.l10n.Localizer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serotonin.mango.db.dao.EventDao;
-import com.serotonin.mango.rt.event.EventInstance;
-import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.UserSessionContextBean;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.ResourceBundle;
+import com.serotonin.mango.web.jsonrpc.JsonEventInstance;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -47,182 +38,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @Scope("request")
 public class EventsController {
-    
-    @Inject
-    private Localizer localizer;
-    @Inject 
-    private UserSessionContextBean userSessionContextBean;
-            
 
     private static final Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
 
-    private JsonEventInstance wrap(EventInstance eventInstance) {
-        final JsonEventInstance result = new JsonEventInstance();
-        result.setId(eventInstance.getId());
-        result.setActive(eventInstance.isActive());
-        result.setAlarmLevel(eventInstance.getAlarmLevel());
-        result.setActiveTimestamp(localizer.localizeTimeStamp(eventInstance.getActiveTimestamp(), true));
-        result.setRtnApplicable(eventInstance.isRtnApplicable());
-        if (eventInstance.getRtnMessage() != null) {
-            result.setRtnMessage(localizer.localizeMessage(eventInstance.getRtnMessage()));
-        }
-        if (eventInstance.getRtnTimestamp() > 0) {
-            result.setRtnTimestamp(localizer.localizeTimeStamp(eventInstance.getRtnTimestamp(), true));
-        }
-        result.setAcknowledged(eventInstance.isAcknowledged());
-        result.setMessage(localizer.localizeMessage(eventInstance.getMessage()));
-        return result;
-    }
-
-    private Collection<JsonEventInstance> wrap(Collection<EventInstance> eventInstances) {
-        List<JsonEventInstance> result = new ArrayList<>(eventInstances.size());
-        for (EventInstance ei : eventInstances) {
-            result.add(wrap(ei));
-        }
-        return result;
-    }
-
-    public static class JsonEventInstance {
-
-        private int id;
-        private int alarmLevel;
-        private boolean active;
-        private String activeTimestamp;
-        private String rtnTimestamp;
-        private String message;
-        private boolean rtnApplicable;
-        private String rtnMessage;
-        private boolean acknowledged;
-
-        /**
-         * @return the id
-         */
-        public int getId() {
-            return id;
-        }
-
-        /**
-         * @param id the id to set
-         */
-        public void setId(int id) {
-            this.id = id;
-        }
-
-        /**
-         * @return the alarmLevel
-         */
-        public int getAlarmLevel() {
-            return alarmLevel;
-        }
-
-        /**
-         * @param alarmLevel the alarmLevel to set
-         */
-        public void setAlarmLevel(int alarmLevel) {
-            this.alarmLevel = alarmLevel;
-        }
-
-        /**
-         * @return the activeTimestamp
-         */
-        public String getActiveTimestamp() {
-            return activeTimestamp;
-        }
-
-        /**
-         * @param activeTimestamp the activeTimestamp to set
-         */
-        public void setActiveTimestamp(String activeTimestamp) {
-            this.activeTimestamp = activeTimestamp;
-        }
-
-        /**
-         * @return the rtnTimestamp
-         */
-        public String getRtnTimestamp() {
-            return rtnTimestamp;
-        }
-
-        /**
-         * @param rtnTimestamp the rtnTimestamp to set
-         */
-        public void setRtnTimestamp(String rtnTimestamp) {
-            this.rtnTimestamp = rtnTimestamp;
-        }
-
-        /**
-         * @return the message
-         */
-        public String getMessage() {
-            return message;
-        }
-
-        /**
-         * @param message the message to set
-         */
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        /**
-         * @return the active
-         */
-        public boolean isActive() {
-            return active;
-        }
-
-        /**
-         * @param active the active to set
-         */
-        public void setActive(boolean active) {
-            this.active = active;
-        }
-
-        /**
-         * @return the rtnApplicable
-         */
-        public boolean isRtnApplicable() {
-            return rtnApplicable;
-        }
-
-        /**
-         * @param rtnApplicable the rtnApplicable to set
-         */
-        public void setRtnApplicable(boolean rtnApplicable) {
-            this.rtnApplicable = rtnApplicable;
-        }
-
-        /**
-         * @return the rtnMessage
-         */
-        public String getRtnMessage() {
-            return rtnMessage;
-        }
-
-        /**
-         * @param rtnMessage the rtnMessage to set
-         */
-        public void setRtnMessage(String rtnMessage) {
-            this.rtnMessage = rtnMessage;
-        }
-
-        /**
-         * @return the acknowledged
-         */
-        public boolean isAcknowledged() {
-            return acknowledged;
-        }
-
-        /**
-         * @param acknowledged the acknowledged to set
-         */
-        public void setAcknowledged(boolean acknowledged) {
-            this.acknowledged = acknowledged;
-        }
-    }
-
     @Inject
     private EventDao eventDao;
+
+    @Inject
+    private Localizer localizer;
+
+    @Inject
+    private UserSessionContextBean userSessionContextBean;
 
     @RequestMapping(value = "/events.shtm")
     public String showForm(Model model) {
@@ -233,73 +59,9 @@ public class EventsController {
     public @ResponseBody
     Object getNodeById(HttpServletRequest request, @RequestParam(value = "id", required = false) Integer id) {
         if (id != null) {
-            return wrap(eventDao.getEventInstance(id));
+            return JsonEventInstance.wrap(eventDao.getEventInstance(id), localizer);
         }
-        return wrap(eventDao.getPendingEvents(userSessionContextBean.getUser()));
-    }
-
-    @RequestMapping(value = "/events/rpc")
-    public @ResponseBody
-    JsonRpcResponse<?, ?> rpc(HttpServletRequest request) throws IOException {
-        JsonNode jsonNode = new ObjectMapper().readValue(request.getInputStream(), JsonNode.class);
-        //      JsonServiceUtil.handle(jsonService, request, response, EventsController.class);
-        try {
-            switch (jsonNode.get("method").textValue()) {
-                case "acknowledgePendingEvent":
-                    return acknowledgePendingEvent(jsonNode.get("id").intValue(), jsonNode.get("params").get(0).intValue());
-                case "acknowledgeAllPendingEvents":
-                    return acknowledgeAllPendingEvents(jsonNode.get("id").intValue());
-                default:
-                    throw new RuntimeException("Unknown method: " + jsonNode.get("method").textValue());
-            }
-        } catch (RuntimeException ex) {
-            return JsonRpcResponse.createErrorResponse(jsonNode.get("id").intValue(), ex);
-        }
-    }
-
-    public JsonRpcResponse<?, ?> acknowledgeAllPendingEvents(int sequenceid) {
-        final User user = userSessionContextBean.getUser();
-        if (user != null) {
-            long now = System.currentTimeMillis();
-            for (EventInstance evt : eventDao.getPendingEvents(user)) {
-                eventDao.ackEvent(evt.getId(), now, user.getId(), 0);
-            }
-//TODO impl            MiscDWR.resetLastAlarmLevelChange();
-        }
-        return JsonRpcResponse.createSuccessResponse(
-                sequenceid,
-                wrap(eventDao.getPendingEvents(user)));
-
-    }
-
-    public JsonRpcResponse<?, ?> acknowledgePendingEvent(int sequenceid, int eventId) {
-        final User user = userSessionContextBean.getUser();
-        if (user != null) {
-            long now = System.currentTimeMillis();
-            eventDao.ackEvent(eventId, now, user.getId(), 0);
-//TODO impl            MiscDWR.resetLastAlarmLevelChange();
-        }
-        return JsonRpcResponse.createSuccessResponse(
-                sequenceid,
-                wrap(eventDao.getPendingEvents(user)));
-
-    }
-
-    @RequestMapping(value = "/events.smd")
-    public @ResponseBody
-    String getSmd() {
-        return "{\n"
-                + "  serviceUrl: 'events/rpc/', // Adress of the RPC service end point\n"
-                + "  timeout: 1000, // Only used if an object is passed to the constructor (!)\n"
-                + "  // Only used if an object is passed to the constructor (!)\n"
-                + "  // if true, parameter count of each method will be checked against the\n"
-                + "  // length of its description's 'parameters' attribute\n"
-                + "  strictArgChecks: true,\n"
-                + "  // Methods descriptions\n"
-                + "  methods: [{\n"
-                + "     name: 'acknowledgeAllPendingEvents',\n"
-                + "  }]\n"
-                + "};";
+        return JsonEventInstance.wrap(eventDao.getPendingEvents(userSessionContextBean.getUser()), localizer);
     }
 
 }

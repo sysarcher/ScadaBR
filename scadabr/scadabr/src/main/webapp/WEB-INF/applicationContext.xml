@@ -50,9 +50,9 @@
     See http://forum.springsource.org/showthread.php?t=48372&highlight=UrlFilenameViewController -->
     <bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter" />
 
-
+ <bean class="com.googlecode.jsonrpc4j.spring.AutoJsonRpcServiceExporter"/>
    
-    <!-- DWR -->
+    <!-- DWR - ->
     <bean id="CompoundEventsDwr" class="com.serotonin.mango.web.dwr.CompoundEventsDwr">
         <property name="compoundEventDetectorDao" ref="compoundEventDetectorDao" />
         <property name="dataPointDao" ref="dataPointDao" />
@@ -219,8 +219,8 @@
         <property name="scriptDao" ref="scriptDao" />
         <property name="userDao" ref="userDao"/>
     </bean>
-  
-    <!-- i18n -->
+  -->
+    <!-- i18n TODO overhaul this to use userSessionContextBean ...  -->
     <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"/>
   
     <bean id="messageSource" class="br.org.scadabr.web.i18n.ResourceBundleMessageSource">
@@ -228,4 +228,5 @@
             <value>messages</value>
         </property>
     </bean>
+    
 </beans>

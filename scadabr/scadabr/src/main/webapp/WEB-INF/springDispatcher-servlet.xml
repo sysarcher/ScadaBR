@@ -38,8 +38,9 @@
     p:suffix=".jsp" />
   
   <!-- Default message code resolver -->
+  <!--
   <bean id="defaultMessageCodeResolver" class="br.org.scadabr.propertyEditor.DefaultMessageCodesResolver"/>
-  
+  -->
   <!-- 
       URL mappings to controllers
   -->
@@ -83,11 +84,12 @@
     </property>
   </bean-->
   
-  	<!-- Configures Handler Interceptors -->	
+  	<!-- Configures Handler Interceptors -->
+        <!--	
 	<mvc:interceptors>
               <bean id="commonData" class="com.serotonin.mango.web.mvc.interceptor.CommonDataInterceptor"/>
 	</mvc:interceptors>
-
+-->
   <!--
      Controllers
   -->
