@@ -402,8 +402,8 @@
         </div>
 
         <div id="ackAllDiv" class="titlePadding" style="float:right;">
-            <button id="btnAcknowledgeAll" data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'scadaBrDoActionIcon'"><fmt:message key="events.acknowledgeAll"/></button>
-            <button data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'scadaBrDoSilenceIcon'"><fmt:message key="events.silenceAll"/></button>
+            <dijit:button id="btnAcknowledgeAll" iconClass="scadaBrDoActionIcon" i18nLabel="events.acknowledgeAll"/>
+            <dijit:button iconClass="scadaBrDoSilenceIcon" i18nLabel="events.silenceAll"/>
         </div>
         <div id="pendingAlarms" style="clear:both;"/>
     </div>
@@ -413,8 +413,8 @@
 
 <div data-dojo-type="dijit/form/Form" id="myForm" data-dojo-id="myForm"
      encType="multipart/form-data" >
-    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1" id="tc1">
-        <input data-dojo-type="dijit.form.TextBox" name="eventId" title="<fmt:message key="events.id"/>:"/>
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1" >
+        <dijit:textBox name="eventId" i18nLabel="events.id"/>
 
         <select id="eventSourceType" data-dojo-type="dijit/form/Select" title="<fmt:message key="events.search.type"/>">
             <option value="-1"><fmt:message key="common.all"/></option>
@@ -434,8 +434,8 @@
             <option value="<c:out value="<%= EventsDwr.STATUS_NORTN%>"/>"><fmt:message key="common.nortn"/></option>
         </select>
         <select id="alarmLevel" data-dojo-type="dijit/form/Select" title="<fmt:message key="common.alarmLevel"/>"><tag:alarmLevelOptions allOption="true"/></select>
-        <input id="keywords" data-dojo-type="dijit/form/TextBox" title="<fmt:message key="events.search.keywords"/>"/>
-        <button data-dojo-type="dijit/form/Button"><fmt:message key="events.search.search"/></button>
+        <dijit:textBox id="keywords" i18nLabel="events.search.keywords"/>
+        <dijit:button i18nLabel="events.search.search"/>
         <span id="searchMessage" class="formError"></span>
     </div>
     <div id="searchResults"></div>

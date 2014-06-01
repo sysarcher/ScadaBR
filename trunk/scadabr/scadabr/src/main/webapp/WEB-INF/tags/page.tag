@@ -1,16 +1,28 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt_rt" %>
+<%@ taglib prefix="dijit" uri="/WEB-INF/tld/dijit.tld" %>
 <!DOCTYPE html>
 <html>
     <head>
         <link rel="stylesheet" href="resources/scadabr.css">
         <script src='resources/dojo/dojo.js' data-dojo-config="isDebug: true, async: true, parseOnLoad: true"></script>
         <script>
-            require(["dojo/parser"]);
+            require(["dojo/parser",
+                "dojo/domReady!"]);
         </script>
     </head>
 
     <body class="soria">
         <style>
+            #preloader,
+            body, html {
+                width:100%; height:100%; margin:0; padding:0;
+            }
+            
+            #preloader {
+                background-color:#fff;
+                position:absolute;
+            }
+
             html, body {
                 width: 100%;
                 height: 100%;
@@ -23,6 +35,8 @@
                 height: 100%;
             }
         </style>
+        <!-- Prevents flicker on page load of declarative dijits-->
+        <div id="preloader"></div>
 
         <div data-dojo-type="dijit/layout/LayoutContainer" data-dojo-props="design:'headline'" id="mainLayout">
             <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'top'">
@@ -32,20 +46,20 @@
                     </tr>
                 </table>
                 <div id="mainToolBar" data-dojo-type="dijit/Toolbar">
-                    <div data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'scadaBrWatchListIcon', showLabel:false"><fmt:message key="header.watchlist"/>
+                    <dijit:button iconClass="scadaBrWatchListIcon" i18nTitle="header.watchlist">
                         <script type="dojo/connect" data-dojo-event="onClick">window.location = "watch_list.shtm";</script>
-                    </div>
-                    <div data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'scadaBrEventsIcon', showLabel:false"><fmt:message key="header.alarms"/>
+                    </dijit:button>
+                    <dijit:button iconClass="scadaBrEventsIcon" i18nTitle="header.alarms">
                         <script type="dojo/connect" data-dojo-event="onClick">window.location = "events.shtm";</script>
-                    </div>
-                    <div data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'scadaBrPointHierarchyIcon', showLabel:false"><fmt:message key="header.pointHierarchy"/>
+                    </dijit:button>
+                    <dijit:button iconClass="scadaBrPointHierarchyIcon" i18nTitle="header.pointHierarchy" >
                         <script type="dojo/connect" data-dojo-event="onClick">window.location = "point_hierarchy.shtm";</script>
-                    </div>
+                    </dijit:button>
 
                     <span data-dojo-type="dijit/ToolbarSeparator"></span>
-                    <div data-dojo-type="dijit/form/Button" data-dojo-props="iconClass:'scadaBrLogoutIcon', showLabel:false"><fmt:message key="header.logout"/>
+                    <dijit:button iconClass="scadaBrLogoutIcon" i18nTitle="header.logout" >
                         <script type="dojo/connect" data-dojo-event="onClick">window.location = "logout.htm";</script>
-                    </div>
+                    </dijit:button>
                     <!-- USE style="float:right;" to right align button ...-->
 
                 </div>

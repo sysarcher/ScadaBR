@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Scope;
 public class UserSessionContextBean implements Serializable {
 
     @Inject
-    private EventManager eventManager;
+    private transient EventManager eventManager;
 
     private User user;
     private Locale locale = Locale.getDefault();
