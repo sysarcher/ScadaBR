@@ -48,14 +48,17 @@ import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.l10n.Localizer;
 import static com.serotonin.mango.rt.event.type.SystemEventType.getEventType;
 import com.serotonin.mango.vo.event.EventTypeVO;
+import java.io.Serializable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.springframework.context.annotation.Scope;
 
 /**
  * @author Matthew Lohbihler
  */
 @Named
-public class EventManager implements ILifecycle {
+@Scope("singleton")
+public class EventManager implements ILifecycle, Serializable {
 
     private final Log log = LogFactory.getLog(EventManager.class);
 

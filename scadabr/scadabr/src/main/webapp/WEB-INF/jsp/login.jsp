@@ -34,14 +34,14 @@
          encType="multipart/form-data" action="login.htm" method="post">
         <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1" id="tc1">
             <spring:bind path="login.username">
-                <input id="username" data-dojo-type="dijit/form/TextBox" name="username" title="<fmt:message key="login.userId"/>:" value="${status.value}"/>
+                <dijit:textBox id="username" name="username" i18nLabel="login.userId" value="${status.value}"/>
             </spring:bind>
             <spring:bind path="login.password">
-                <input id="password" data-dojo-type="dijit/form/TextBox" name="password" type="password" title="<fmt:message key="login.password"/>:" value="${status.value}"/>
+                <dijit:textBox name="password" type="password" i18nLabel="login.password" value="${status.value}"/>
             </spring:bind>
         </div>
 
-        <button data-dojo-type="dijit/form/Button" type="submit" value="Submit"><fmt:message key="login.loginButton"/></button>
+        <dijit:button type="submit" i18nLabel="login.loginButton" />
     </div>
 
 </tag:page>
