@@ -22,6 +22,10 @@
 
     <jsp:body>
         <style>
+            
+            #pointTreeContentPane{
+               width: 200px; 
+            }
 
             #watchListContainer {
                 width: 100%;
@@ -253,20 +257,20 @@
 
         </script>
 
-        <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design: 'sidebar', gutters:true, liveSplitters:true" id="watchListContainer" >
-            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region: 'left'"  style="width: 200px;">
+        <dijit:sidebarBorderContainer gutters="true" liveSplitters="true" >
+            <dijit:leftContentPane id="pointTreeContentPane" splitter="true" >
                 <div id="dataPointTree"></div>
-            </div>
-            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'center'">
-                <div data-dojo-type="dijit/layout/LayoutContainer" data-dojo-props="design:'headline'" id="wl">
-                    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'top'">
+            </dijit:leftContentPane>
+            <dijit:centerContentPane >
+                <dijit:headlineLayoutContainer >
+                    <dijit:topContentPane >
                         TOP
-                    </div>
-                    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'center'">
+                    </dijit:topContentPane>
+                    <dijit:centerContentPane >
                         <div id="watchListTable"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    </dijit:centerContentPane>
+                </dijit:headlineLayoutContainer>
+            </dijit:centerContentPane>
+        </dijit:sidebarBorderContainer>
     </jsp:body>
 </tag:page>

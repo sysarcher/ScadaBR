@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd" 
+        version="2.0">
+    <tlib-version>1.0</tlib-version>
+    <jsp-version>1.2</jsp-version>
+    <description>Custom tag library for the dojox widgets</description>
+    <short-name>dojox</short-name>
+  
+    <tag>
+        <name>tableContainer</name>
+        <tag-class>br.org.scadabr.web.taglib.dojox.TableContainerTag</tag-class>
+        <description>
+            Writes a div tag for dojox/layout/TableContainer.
+        </description>
+        <body-content>JSP</body-content>
+        <attribute>
+            <name>id</name>
+        </attribute>
+        <attribute>
+            <name>cols</name>
+            <required>true</required>
+        </attribute>
+    </tag>
+  
+</taglib>

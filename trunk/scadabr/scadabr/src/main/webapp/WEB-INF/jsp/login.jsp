@@ -30,18 +30,18 @@
             }, 1000);
         });
     </script>
-    <div data-dojo-type="dijit/form/Form" id="myForm" data-dojo-id="myForm"
-         encType="multipart/form-data" action="login.htm" method="post">
-        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1" id="tc1">
+    
+    <dijit:form action="login.htm" method="post">
+        <dojox:tableContainer cols="1">
             <spring:bind path="login.username">
                 <dijit:textBox id="username" name="username" i18nLabel="login.userId" value="${status.value}"/>
             </spring:bind>
             <spring:bind path="login.password">
                 <dijit:textBox name="password" type="password" i18nLabel="login.password" value="${status.value}"/>
             </spring:bind>
-        </div>
+        </dojox:tableContainer>
 
         <dijit:button type="submit" i18nLabel="login.loginButton" />
-    </div>
+    </dijit:form>
 
 </tag:page>
