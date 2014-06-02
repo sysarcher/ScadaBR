@@ -3,31 +3,29 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package br.org.scadabr.web.taglib.dijit;
 
-import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.l10n.Localizer;
 import static br.org.scadabr.web.taglib.Functions.printAttribute;
 import java.io.IOException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.tagext.TagSupport;
+import org.springframework.web.servlet.tags.RequestContextAwareTag;
 
 /**
  *
  * @author aploese
  */
-public class TextBoxTag extends TagSupport {
+public class TextBoxTag extends RequestContextAwareTag {
 
     private String name;
     private String value;
     private String i18nLabel;
     private String i18nTitle;
     private String type;
-    
-        @Override
+
+    @Override
     public void release() {
         super.release();
         id = null;
@@ -38,7 +36,8 @@ public class TextBoxTag extends TagSupport {
     }
 
     @Override
-    public int doStartTag() throws JspException {
+    public int doStartTagInternal() throws JspException {
+        Localizer localizer = getRequestContext().getWebApplicationContext().getBean(Localizer.class);
         try {
             JspWriter out = pageContext.getOut();
 
@@ -47,8 +46,8 @@ public class TextBoxTag extends TagSupport {
             printAttribute(out, "type", type);
             out.append(" data-dojo-type=\"dijit/form/TextBox\" ");
             printAttribute(out, "name", name);
-            printAttribute(out, "label", Localizer.localizeI18nKey(i18nLabel, I18NUtils.getBundle(pageContext)) + ":");
-            printAttribute(out, "title", Localizer.localizeI18nKey(i18nTitle != null ? i18nTitle : i18nLabel, I18NUtils.getBundle(pageContext)));
+            printAttribute(out, "label", localizer.localizeI18nKey(i18nLabel) + ":");
+            printAttribute(out, "title", localizer.localizeI18nKey(i18nTitle != null ? i18nTitle : i18nLabel));
             printAttribute(out, "value", value);
             out.println("/>");
         } catch (IOException ex) {

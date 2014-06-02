@@ -5,7 +5,6 @@
  */
 package br.org.scadabr.web.taglib.dijit;
 
-import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.l10n.Localizer;
 import static br.org.scadabr.web.taglib.Functions.printAttribute;
 import br.org.scadabr.web.taglib.dojo.DataDojoProps;
@@ -13,13 +12,13 @@ import java.io.IOException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.tagext.TagSupport;
+import org.springframework.web.servlet.tags.RequestContextAwareTag;
 
 /**
  *
  * @author aploese
  */
-public class ButtonTag extends TagSupport {
+public class ButtonTag extends RequestContextAwareTag {
 
     private String name;
     private String value;
@@ -40,7 +39,8 @@ public class ButtonTag extends TagSupport {
     }
 
     @Override
-    public int doStartTag() throws JspException {
+    public int doStartTagInternal() throws JspException {
+        Localizer localizer = getRequestContext().getWebApplicationContext().getBean(Localizer.class);
         try {
             JspWriter out = pageContext.getOut();
 
@@ -55,11 +55,11 @@ public class ButtonTag extends TagSupport {
             dataDojoProps.print(out);
             printAttribute(out, "name", name);
             if (i18nTitle != null) {
-                printAttribute(out, "title", Localizer.localizeI18nKey(i18nTitle, I18NUtils.getBundle(pageContext)));
+                printAttribute(out, "title", localizer.localizeI18nKey(i18nTitle));
             }
             out.print(">");
             if (i18nLabel != null) {
-                out.print(Localizer.localizeI18nKey(i18nLabel, I18NUtils.getBundle(pageContext)));
+                out.print(localizer.localizeI18nKey(i18nLabel));
             }
         } catch (IOException ex) {
             throw new JspTagException(ex.getMessage());
