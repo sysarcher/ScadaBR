@@ -405,15 +405,14 @@
             <dijit:button id="btnAcknowledgeAll" iconClass="scadaBrDoActionIcon" i18nLabel="events.acknowledgeAll"/>
             <dijit:button iconClass="scadaBrDoSilenceIcon" i18nLabel="events.silenceAll"/>
         </div>
-        <div id="pendingAlarms" style="clear:both;"/>
+        <div id="pendingAlarms" style="clear:both;"></div>
     </div>
 </div>
 
 <div class="smallTitle titlePadding"><fmt:message key="events.search"/></div>
 
-<div data-dojo-type="dijit/form/Form" id="myForm" data-dojo-id="myForm"
-     encType="multipart/form-data" >
-    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1" >
+<dijit:form >
+    <dojox:tableContainer cols="1" >
         <dijit:textBox name="eventId" i18nLabel="events.id"/>
 
         <select id="eventSourceType" data-dojo-type="dijit/form/Select" title="<fmt:message key="events.search.type"/>">
@@ -437,9 +436,9 @@
         <dijit:textBox id="keywords" i18nLabel="events.search.keywords"/>
         <dijit:button i18nLabel="events.search.search"/>
         <span id="searchMessage" class="formError"></span>
-    </div>
+    </dojox:tableContainer>
     <div id="searchResults"></div>
-</div>
+</dijit:form>
 <!--div id="datePickerDiv" style="position:absolute; top:0px; left:0px;" onmouseover="cancelDatePickerExpiry()" onmouseout="expireDatePicker()">
     <div widgetId="datePicker" dojoType="datepicker" dayWidth="narrow" lang="${lang}"></div>
 </div-->

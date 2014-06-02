@@ -24,4 +24,5 @@
 <%@ taglib prefix="mango" uri="/WEB-INF/tld/mango.tld" %>
 <%@ taglib prefix="sbt" uri="/WEB-INF/tld/scadabr.tld" %>
 <%@ taglib prefix="dijit" uri="/WEB-INF/tld/dijit.tld" %>
+<%@ taglib prefix="dojox" uri="/WEB-INF/tld/dojox.tld" %>
 <%@ taglib prefix="tag" tagdir="/WEB-INF/tags" %>

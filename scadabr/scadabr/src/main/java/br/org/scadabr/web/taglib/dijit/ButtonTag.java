@@ -8,9 +8,8 @@ package br.org.scadabr.web.taglib.dijit;
 import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.l10n.Localizer;
 import static br.org.scadabr.web.taglib.Functions.printAttribute;
+import br.org.scadabr.web.taglib.dojo.DataDojoProps;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.JspWriter;
@@ -27,7 +26,7 @@ public class ButtonTag extends TagSupport {
     private String i18nLabel;
     private String i18nTitle;
     private String type;
-    private Map<String, Object> dataDojoProps;
+    private DataDojoProps dataDojoProps = new DataDojoProps();
 
     @Override
     public void release() {
@@ -53,31 +52,7 @@ public class ButtonTag extends TagSupport {
             if (i18nLabel == null && !dataDojoProps.containsKey("showLabel") && dataDojoProps.containsKey("iconClass")) {
                 dataDojoProps.put("showLabel", false);
             }
-            if (dataDojoProps != null) {
-                boolean firstProp = true;
-                out.append(" data-dojo-props=\"");
-                for (String prop : dataDojoProps.keySet()) {
-                    if (firstProp) {
-                        firstProp = false;
-                    } else {
-                        out.append(", ");
-                    }
-                    out.append(prop);
-                    out.append(": ");
-                    final Object propValue = dataDojoProps.get(prop);
-                    if (propValue instanceof Boolean) {
-                        out.append(propValue.toString());
-                    } else if (propValue instanceof Number) {
-                        out.append(propValue.toString());
-                    } else {
-                        out.append('\'');
-                        out.append(propValue.toString());
-                        out.append('\'');
-                    }
-                }
-                out.append('\"');
-
-            }
+            dataDojoProps.print(out);
             printAttribute(out, "name", name);
             if (i18nTitle != null) {
                 printAttribute(out, "title", Localizer.localizeI18nKey(i18nTitle, I18NUtils.getBundle(pageContext)));
@@ -142,14 +117,7 @@ public class ButtonTag extends TagSupport {
      * @param iconClass the iconClass to set
      */
     public void setIconClass(String iconClass) {
-        addToDataDojoProps("iconClass", iconClass);
-    }
-
-    private void addToDataDojoProps(String propKey, String propValue) {
-        if (dataDojoProps == null) {
-            dataDojoProps = new HashMap<>();
-        }
-        dataDojoProps.put(propKey, propValue);
+        dataDojoProps.put("iconClass", iconClass);
     }
 
 }
