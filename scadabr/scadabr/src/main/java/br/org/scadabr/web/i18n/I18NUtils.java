@@ -18,6 +18,7 @@ import javax.servlet.jsp.jstl.fmt.LocalizationContext;
  */
 public class I18NUtils {
 
+    @Deprecated // USE RequestContextAwareTag
     public static ResourceBundle getBundle(ServletRequest request) {
         LocalizationContext lc = (LocalizationContext) Config.get(request, Config.FMT_LOCALIZATION_CONTEXT);
         if (lc != null) {
@@ -26,6 +27,7 @@ public class I18NUtils {
         return null;
     }
 
+    @Deprecated // USE RequestContextAwareTag
     public static ResourceBundle getBundle(PageContext pc) {
         LocalizationContext lc = (LocalizationContext) Config.find(pc, Config.FMT_LOCALIZATION_CONTEXT);
         if (lc != null) {
