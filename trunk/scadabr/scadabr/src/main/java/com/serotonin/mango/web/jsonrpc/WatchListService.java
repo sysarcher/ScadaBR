@@ -8,19 +8,12 @@ package com.serotonin.mango.web.jsonrpc;
 
 import com.googlecode.jsonrpc4j.JsonRpcParam;
 import com.googlecode.jsonrpc4j.JsonRpcService;
-import com.serotonin.mango.vo.User;
 
 /**
  *
  * @author aploese
  */
-@JsonRpcService("/rpc/watchlist.json")
-public class WatchListJsonRpcController {
-    
-    User getCurrentUser() {
-        return new User();
-    }
-    User createUser(@JsonRpcParam("username") String userName, @JsonRpcParam("thePassword") String password) {
-        return new User();
-    }
+@JsonRpcService("/rpc/watchlists.json")
+public interface WatchListService {
+    JsonWatchList getWatchList(@JsonRpcParam("watchlistId")int watchlistId);
 }

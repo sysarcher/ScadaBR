@@ -33,7 +33,7 @@ public class ToolbarSeparatorTag extends TagSupport {
             out.print("<span");
             printAttribute(out, "id", id);
             out.append(" data-dojo-type=\"dijit/ToolbarSeparator\" ");
-            out.println(">");
+            out.print(">");
         } catch (IOException ex) {
             throw new JspTagException(ex.getMessage());
         }

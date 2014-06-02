@@ -22,9 +22,9 @@
 
     <jsp:body>
         <style>
-            
+
             #pointTreeContentPane{
-               width: 200px; 
+                width: 200px; 
             }
 
             #watchListContainer {
@@ -40,6 +40,7 @@
         </style>
 
         <script type="text/javascript">
+            var grid;
 
             require(["dojo/parser",
                 "dijit/layout/BorderContainer",
@@ -66,20 +67,13 @@
                 "dgrid/Selection",
                 "dojo/rpc/JsonService",
                 "dojo/on",
-                "dojo/domReady!"
-            ], function(dom, domConstruct, declare, request, Memory, Observable, JsonRest, Tree, OnDemandGrid, Pagination, Keyboard, Selection, JsonService, on) {
-                var grid;
+                "dojo/ready"
+            ], function(dom, domConstruct, declare, request, Memory, Observable, JsonRest, Tree, OnDemandGrid, Pagination, Keyboard, Selection, JsonService, on, ready) {
                 var svc;
-                request("events/", {
-                    handleAs: "json"
-                }).then(function(response) {
-                    // Once the response is received, build an in-memory store
-                    // with the data
-                    var store = new Memory({data: response});
+                ready(function() {
                     // Create a Grid instance using Pagination,
                     // referencing the store
                     grid = new (declare([OnDemandGrid, Keyboard, Selection]))({
-                        store: store,
                         showHeader: false,
                         columns: {
                             id: {
@@ -192,9 +186,7 @@
                         selectionMode: "single" // for Selection; only select a single row at a time
                                 //cellNavigation: false, // for Keyboard; allow only row-level keyboard navigation
                     }, "watchListTable");
-                    grid.startup();
 
-                    //TODO move smd to server ...
                     svc = new JsonService({
                         serviceUrl: 'events/rpc', // Adress of the RPC service end point
                         timeout: 1000,
@@ -215,44 +207,54 @@
                         ]
                     });
 
-                    grid.on("dgrid-error", function(event) {
-                        console.log(event.error.message);
+
+                    request("events/", {
+                        handleAs: "json"
+                    }).then(function(response) {
+                        // Once the response is received, build an in-memory store
+                        // with the data
+                        grid.setStore(new Memory({data: response}));
+                        //TODO move smd to server ...
+
+                        grid.on("dgrid-error", function(event) {
+                            console.log(event.error.message);
+                        });
+
+                        grid.on(".dgrid-cell:click", function(evt) {
+                            var cell = grid.cell(evt);
+                            var data = cell.row.data;
+                            if (cell.column.field === 'acknowledged') {
+                                if (!data.acknowledged) {
+                                    svc.acknowledgePendingEvent(data.id).then(function(result) {
+                                        grid.setStore(new Memory({data: result}));
+                                    });
+                                }
+                            }
+                        });
+
                     });
 
-                    grid.on(".dgrid-cell:click", function(evt) {
-                        var cell = grid.cell(evt);
-                        var data = cell.row.data;
-                        if (cell.column.field === 'acknowledged') {
-                            if (!data.acknowledged) {
-                                svc.acknowledgePendingEvent(data.id).then(function(result) {
-                                    grid.setStore(new Memory({data: result}));
-                                });
-                            }
+                    myRestStore = new JsonRest({
+                        target: "dstree/",
+                        getChildren: function(object, onComplete, onError) {
+                            this.query({parentId: object.id}).then(onComplete, onError);
+                        },
+                        mayHaveChildren: function(object) {
+                            return object.nodeType === "PF";
+                        },
+                        getRoot: function(onItem, onError) {
+                            this.get("root").then(onItem, onError);
+                        },
+                        getLabel: function(object) {
+                            return object.name;
                         }
                     });
-
+                    // Create the Tree.
+                    tree = new Tree({
+                        model: myRestStore
+                    }, "dataPointTree");
+                    tree.startup();
                 });
-
-                myRestStore = new JsonRest({
-                    target: "dstree/",
-                    getChildren: function(object, onComplete, onError) {
-                        this.query({parentId: object.id}).then(onComplete, onError);
-                    },
-                    mayHaveChildren: function(object) {
-                        return object.nodeType === "PF";
-                    },
-                    getRoot: function(onItem, onError) {
-                        this.get("root").then(onItem, onError);
-                    },
-                    getLabel: function(object) {
-                        return object.name;
-                    }
-                });
-                // Create the Tree.
-                tree = new Tree({
-                    model: myRestStore
-                }, "dataPointTree");
-                tree.startup();
             });
 
         </script>
@@ -264,7 +266,7 @@
             <dijit:centerContentPane >
                 <dijit:headlineLayoutContainer >
                     <dijit:topContentPane >
-                        TOP
+                        <dijit:selectFromMap id="watchListSelect" value="${selectedWatchList}" map="${watchLists}" />
                     </dijit:topContentPane>
                     <dijit:centerContentPane >
                         <div id="watchListTable"></div>

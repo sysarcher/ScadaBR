@@ -34,6 +34,8 @@ import br.org.scadabr.web.l10n.Localizer;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.web.UserSessionContextBean;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.inject.Inject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -81,7 +83,7 @@ public class WatchListController {
         int selected = user.getSelectedWatchList();
         boolean found = false;
 
-        List<IntValuePair> watchListNames = new ArrayList<>(watchLists.size());
+        Map<String, String> watchListNames = new LinkedHashMap<>();
         for (WatchList watchList : watchLists) {
             if (watchList.getId() == selected) {
                 found = true;
@@ -105,7 +107,7 @@ public class WatchListController {
                 }
             }
 
-            watchListNames.add(new IntValuePair(watchList.getId(), watchList.getName()));
+            watchListNames.put(String.valueOf(watchList.getId()), watchList.getName());
         }
 
         if (!found) {

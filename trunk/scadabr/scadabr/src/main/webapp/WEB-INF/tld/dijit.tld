@@ -228,5 +228,29 @@
             <name>method</name>
         </attribute>
     </tag>
+    <tag>
+        <name>selectFromMap</name>
+        <tag-class>br.org.scadabr.web.taglib.dijit.SelectFromMapTag</tag-class>
+        <description>
+            Writes a select tag. the options are taken from the map key/value pairs.
+        </description>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>id</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>value</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>map</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
 
 </taglib>

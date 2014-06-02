@@ -44,12 +44,12 @@ public class TextBoxTag extends RequestContextAwareTag {
             out.print("<input");
             printAttribute(out, "id", id);
             printAttribute(out, "type", type);
-            out.append(" data-dojo-type=\"dijit/form/TextBox\" ");
+            out.print(" data-dojo-type=\"dijit/form/TextBox\" ");
             printAttribute(out, "name", name);
             printAttribute(out, "label", localizer.localizeI18nKey(i18nLabel) + ":");
             printAttribute(out, "title", localizer.localizeI18nKey(i18nTitle != null ? i18nTitle : i18nLabel));
             printAttribute(out, "value", value);
-            out.println("/>");
+            out.print("/>");
         } catch (IOException ex) {
             throw new JspTagException(ex.getMessage());
         }
