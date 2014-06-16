@@ -37,15 +37,9 @@ import com.serotonin.mango.vo.DataPointVO;
 @JsonRemoteEntity
 public class ImageFlipbookRenderer extends BaseChartRenderer {
 
-    private static ImplDefinition definition = new ImplDefinition("chartRendererImageFlipbook", "FLIPBOOK",
-            "chartRenderer.flipbook", new int[]{DataTypes.IMAGE});
-
-    public static ImplDefinition getDefinition() {
-        return definition;
-    }
-
-    public String getTypeName() {
-        return definition.getName();
+    @Override
+    public ChartType getType() {
+        return ChartType.IMAGE_FLIPBOOK;
     }
 
     @JsonRemoteProperty
@@ -67,15 +61,12 @@ public class ImageFlipbookRenderer extends BaseChartRenderer {
         this.limit = limit;
     }
 
+    @Override
     public void addDataToModel(Map<String, Object> model, DataPointVO point) {
         DataPointRT rt = Common.ctx.getRuntimeManager().getDataPoint(point.getId());
         if (rt != null) {
             model.put("chartData", rt.getLatestPointValues(limit));
         }
-    }
-
-    public ImplDefinition getDef() {
-        return definition;
     }
 
     //

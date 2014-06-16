@@ -36,25 +36,27 @@ public class PointHierarchyController {
         return "pointHierarchy";
     }
 
-    @RequestMapping(value = "/dstree", method = RequestMethod.GET)
-    public @ResponseBody Object getNodeById(@RequestParam(value = "id", required = false) Integer id, @RequestParam(value = "parentId", required = false) Integer parentId) {
-        if (id != null) {
+    @RequestMapping(value = "/dstree", params = "id", method = RequestMethod.GET)
+    public @ResponseBody Object getNodeById(@RequestParam(value = "id", required = true) Integer id) {
+        LOG.severe("CALLED: getNodeById" + id);
             return dataPointDao.getFolderById(id);
-        }
-        if (parentId != null) {
+    }
+
+    @RequestMapping(value = "/dstree", params = "parentId", method = RequestMethod.GET)
+    public @ResponseBody Object getChildNodesById(@RequestParam(value = "parentId", required = true) Integer parentId) {
+        LOG.severe("CALLED: getChildNodesById" + parentId);
             return dataPointDao.getFoldersAndDpByParentId(parentId);
-        }
-        return dataPointDao.getAllFoldersAndDp();
     }
 
     @RequestMapping("/dstree/root")
     public @ResponseBody LazyTreeNode getRootFolder() {
+        LOG.severe("CALLED: getRootFolder");
         return dataPointDao.getFolderById(0);
     }
 
     @RequestMapping("/dstree/{id}")
     public @ResponseBody LazyTreeNode getFolderNodeById(@PathVariable("id") int id) {
-        LOG.severe("CALLED: getNodeById" + id);
+        LOG.severe("CALLED: getFolderNodeById" + id);
         return dataPointDao.getFolderById(id);
     }
 

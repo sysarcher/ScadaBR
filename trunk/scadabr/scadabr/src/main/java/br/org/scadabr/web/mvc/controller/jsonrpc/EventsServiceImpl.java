@@ -1,4 +1,4 @@
-package com.serotonin.mango.web.jsonrpc;
+package br.org.scadabr.web.mvc.controller.jsonrpc;
 
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.web.l10n.Localizer;

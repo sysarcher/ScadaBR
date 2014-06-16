@@ -164,7 +164,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     private int purgePeriod = 1;
     @JsonRemoteProperty(typeFactory = BaseTextRenderer.Factory.class)
     private TextRenderer textRenderer;
-    @JsonRemoteProperty(typeFactory = BaseChartRenderer.Factory.class)
+//TODO    @JsonRemoteProperty(typeFactory = BaseChartRenderer.Factory.class)
     private ChartRenderer chartRenderer;
     private List<PointEventDetectorVO> eventDetectors;
     private List<UserComment> comments;
@@ -617,7 +617,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         }
 
         // Check chart renderer type
-        if (chartRenderer != null && !chartRenderer.getDef().supports(pointLocator.getDataTypeId())) {
+        if (chartRenderer != null && !chartRenderer.getType().supports(pointLocator.getDataTypeId())) {
             response.addGeneric("validate.chart.incompatible");
         }
     }

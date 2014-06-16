@@ -100,6 +100,19 @@ public class DataPointDao extends BaseDao {
         return isXidUnique(xid, excludeId, "dataPoints");
     }
 
+    public String getCanonicalPointName(final DataPointVO dp) {
+        int folderId = dp.getPointFolderId();
+        StringBuilder sb = new StringBuilder();
+        while (folderId != 0) {
+            LazyTreeNode pf = getFolderById(folderId);
+            sb.insert(0, '.');
+            sb.insert(0, pf.getName());
+            folderId = pf.getParentId();
+        }
+        sb.append(dp.getName());
+        return sb.toString();
+    }
+    @Deprecated
     public String getExtendedPointName(int dataPointId) {
         DataPointVO vo = getDataPoint(dataPointId);
         if (vo == null) {

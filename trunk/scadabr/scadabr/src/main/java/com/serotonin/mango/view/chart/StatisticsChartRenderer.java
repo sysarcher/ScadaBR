@@ -38,22 +38,9 @@ import com.serotonin.mango.vo.DataPointVO;
 @JsonRemoteEntity
 public class StatisticsChartRenderer extends TimePeriodChartRenderer {
 
-    private static ImplDefinition definition = new ImplDefinition("chartRendererStats", "STATS",
-            "chartRenderer.statistics", new int[]{DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE,
-                DataTypes.NUMERIC});
-
-    public static ImplDefinition getDefinition() {
-        return definition;
-    }
-
     @Override
-    public String getTypeName() {
-        return definition.getName();
-    }
-
-    @Override
-    public ImplDefinition getDef() {
-        return definition;
+    public ChartType getType() {
+        return ChartType.STATS;
     }
 
     @JsonRemoteProperty
