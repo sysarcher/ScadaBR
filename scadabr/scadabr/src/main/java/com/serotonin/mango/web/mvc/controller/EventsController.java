@@ -22,7 +22,7 @@ import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.web.l10n.Localizer;
 import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.web.UserSessionContextBean;
-import com.serotonin.mango.web.jsonrpc.JsonEventInstance;
+import br.org.scadabr.web.mvc.controller.jsonrpc.JsonEventInstance;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;

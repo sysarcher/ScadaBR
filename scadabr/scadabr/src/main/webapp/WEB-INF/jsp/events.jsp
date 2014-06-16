@@ -42,54 +42,20 @@
         }
     </style>
     <script type="text/javascript">
-    var events = {svc: null, grid: null};
-    
-        require([
-            "dojo/rpc/JsonService"], function(JsonService) { 
+        var events = {svc: undefined, grid: undefined, store: undefined};
 
-                //TODO move smd to server ...
-                events.svc = new JsonService({
-                    serviceUrl: 'jsonrpc/events.json', // Adress of the RPC service end point
-                    timeout: 1000,
-                    strictArgChecks: true,
-                    methods: [{
-                            name: 'acknowledgePendingEvent',
-                            parameters: [
-                                {
-                                    name: 'id',
-                                    type: 'INTEGER'
-                                }
-                            ]
-                        },
-                        {
-                            name: 'acknowledgeAllPendingEvents',
-                            parameters: []
-                        }
+        function createTable() {
+            require([
+                "dojo/dom-construct",
+                "dojo/_base/declare",
+                "dojo/store/Memory",
+                "dgrid/Grid",
+                "dgrid/extensions/Pagination",
+                "dgrid/Keyboard",
+                "dgrid/Selection",
+                "dijit/form/Button"
+            ], function(domConstruct, declare, Memory, Grid, Pagination, Keyboard, Selection, Button) {
 
-                    ]
-                });
-            });
-            
-        //Todo make pagination work with jsonrest
-        require([
-            "dojo/dom",
-            "dojo/dom-construct",
-            "dojo/_base/declare",
-            "dojo/request",
-            "dojo/store/Memory",
-            "dojo/store/Observable",
-            "dgrid/Grid",
-            "dgrid/extensions/Pagination",
-            "dgrid/Keyboard",
-            "dgrid/Selection",
-            "dojo/on",
-            "dijit/form/Button",
-            "dijit/registry",
-            "dojo/ready"
-        ], function(dom, domConstruct, declare, request, Memory, Observable, Grid, Pagination, Keyboard, Selection, on, Button, registry, ready) {
-            // Create a Grid instance using Pagination,
-            // referencing the store
-            ready(function() {
                 events.grid = new (declare([Grid, Pagination, Keyboard, Selection]))({
                     columns: {
                         id: {
@@ -241,29 +207,88 @@
                     firstLastArrows: true,
                     pageSizeOptions: [10, 25, 50, 100]
                 }, "pendingAlarms");
+                myStore = events.store;
+                if (myStore !== undefined) {
+                    events.grid.setStore(myStore);
+                    events.store = undefined;
+                }
+
+                wireEvents();
 
 
 
-                on(registry.byId("btnAcknowledgeAll").domNode, "click", function() {
-                    events.svc.acknowledgeAllPendingEvents().then(function(result) {
-                        events.grid.setStore(new Memory({data: result}));
+            });
+
+        }
+
+        function wireEvents() {
+            require([
+                "dojo/ready",
+                "dojo/store/Memory",
+                "dojo/on",
+                "dijit/registry"
+            ], function(ready, Memory, on, registry) {
+                ready(function() {
+
+                    on(registry.byId("btnAcknowledgeAll").domNode, "click", function() {
+                        events.svc.acknowledgeAllPendingEvents().then(function(result) {
+                            events.grid.setStore(new Memory({data: result}));
+                        });
                     });
-                });
 
-                events.grid.on("dgrid-error", function(event) {
-                    console.log(event.error.message);
-                });
+                    events.grid.on("dgrid-error", function(event) {
+                        console.log(event.error.message);
+                    });
+                }
+            });
+        }
 
-                request("events/", {
-                    handleAs: "json"
-                }).then(function(response) {
-                    // Once the response is received, build an in-memory store
-                    // with the data
-                    events.grid.setStore(new Memory({data: response}));
-                });
+        require(["dojo/rpc/JsonService"], function(JsonService) {
+
+            //TODO move smd to server ...
+            events.svc = new JsonService({
+                serviceUrl: 'jsonrpc/events.json', // Adress of the RPC service end point
+                timeout: 1000,
+                strictArgChecks: true,
+                methods: [{
+                        name: 'acknowledgePendingEvent',
+                        parameters: [
+                            {
+                                name: 'id',
+                                type: 'INTEGER'
+                            }
+                        ]
+                    },
+                    {
+                        name: 'acknowledgeAllPendingEvents',
+                        parameters: []
+                    }
+
+                ]
             });
         });
 
+
+        //Todo make pagination work with jsonrest
+        require(["dojo/domReady!"], function() {
+            createTable();
+        });
+
+        require(["dojo/request",
+            "dojo/store/Memory"], function(request, Memory) {
+
+            request("events/", {
+                handleAs: "json"
+            }).then(function(response) {
+                // Once the response is received, build an in-memory store
+                // with the data
+                events.store = new Memory({data: response});
+                if (events.grid !== undefined) {
+                    events.grid.setStore(new Memory({data: response}));
+                    events.store = undefined;
+                }
+            });
+        });
         /*
          require([
          "dojo/_base/declare",

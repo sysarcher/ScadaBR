@@ -24,23 +24,14 @@ import java.io.ObjectOutputStream;
 import java.util.Map;
 
 import br.org.scadabr.json.JsonRemoteEntity;
-import com.serotonin.mango.DataTypes;
-import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.vo.DataPointVO;
 
 @JsonRemoteEntity
 public class ImageChartRenderer extends TimePeriodChartRenderer {
 
-    private static ImplDefinition definition = new ImplDefinition("chartRendererImage", "IMAGE", "chartRenderer.image",
-            new int[]{DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC});
-
-    public static ImplDefinition getDefinition() {
-        return definition;
-    }
-
     @Override
-    public String getTypeName() {
-        return definition.getName();
+    public ChartType getType() {
+        return ChartType.IMAGE;
     }
 
     public ImageChartRenderer() {
@@ -54,11 +45,6 @@ public class ImageChartRenderer extends TimePeriodChartRenderer {
     @Override
     public void addDataToModel(Map<String, Object> model, DataPointVO point) {
         // Nothing to do.
-    }
-
-    @Override
-    public ImplDefinition getDef() {
-        return definition;
     }
 
     //

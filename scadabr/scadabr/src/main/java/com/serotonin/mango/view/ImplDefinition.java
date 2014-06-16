@@ -22,6 +22,7 @@ import java.util.List;
 
 import br.org.scadabr.util.ArrayUtils;
 
+@Deprecated //TODO convert to enum
 public class ImplDefinition {
 
     public static ImplDefinition findByName(List<ImplDefinition> list, String name) {

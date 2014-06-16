@@ -108,7 +108,7 @@ public class DataPointEditController {
         result.put("dataSource", Common.ctx.getRuntimeManager().getDataSource(point.getDataSourceId()));
 
         result.put("textRenderers", BaseTextRenderer.getImplementation(point.getPointLocator().getDataTypeId()));
-        result.put("chartRenderers", BaseChartRenderer.getImplementations(point.getPointLocator().getDataTypeId()));
+//TODO         result.put("chartRenderers", BaseChartRenderer.getImplementations(point.getPointLocator().getDataTypeId()));
         result.put("eventDetectors", PointEventDetectorVO.getImplementations(point.getPointLocator().getDataTypeId()));
 
         ControllerUtils.addPointListDataToModel(Common.getUser(request), point.getId(), result);

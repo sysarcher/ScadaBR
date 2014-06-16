@@ -37,44 +37,6 @@ import com.serotonin.mango.view.ImplDefinition;
 
 abstract public class BaseChartRenderer implements ChartRenderer, JsonSerializable {
 
-    private static ImplDefinition noneDefinition = new ImplDefinition("chartRendererNone", "NONE",
-            "chartRenderer.none", new int[]{DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE,
-                DataTypes.NUMERIC, DataTypes.IMAGE});
-
-    static List<ImplDefinition> definitions;
-
-    static void ensureDefinitions() {
-        if (definitions == null) {
-            List<ImplDefinition> d = new ArrayList<ImplDefinition>();
-            d.add(noneDefinition);
-            d.add(TableChartRenderer.getDefinition());
-            d.add(ImageChartRenderer.getDefinition());
-            d.add(StatisticsChartRenderer.getDefinition());
-            // d.add(ImageFlipbookRenderer.getDefinition());
-            definitions = d;
-        }
-    }
-
-    public static List<ImplDefinition> getImplementations(int dataType) {
-        ensureDefinitions();
-        List<ImplDefinition> impls = new ArrayList<ImplDefinition>();
-        for (ImplDefinition def : definitions) {
-            if (def.supports(dataType)) {
-                impls.add(def);
-            }
-        }
-        return impls;
-    }
-
-    public static List<String> getExportTypes() {
-        ensureDefinitions();
-        List<String> result = new ArrayList<String>(definitions.size());
-        for (ImplDefinition def : definitions) {
-            result.add(def.getExportName());
-        }
-        return result;
-    }
-
     //
     // /
     // / Serialization
@@ -100,48 +62,8 @@ abstract public class BaseChartRenderer implements ChartRenderer, JsonSerializab
     }
 
     @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("type", getDef().getExportName());
+    public void jsonSerialize(Map<String, Object> paramMap) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public static class Factory implements TypeFactory {
-
-        @Override
-        public Class<?> getType(JsonValue jsonValue) throws JsonException {
-            if (jsonValue.isNull()) {
-                return null;
-            }
-
-            JsonObject json = jsonValue.toJsonObject();
-
-            String type = json.getString("type");
-            if (type == null) {
-                throw new LocalizableJsonException("emport.error.chart.missing", "type", getExportTypes());
-            }
-
-            ImplDefinition def = null;
-            ensureDefinitions();
-            for (ImplDefinition id : definitions) {
-                if (id.getExportName().equalsIgnoreCase(type)) {
-                    def = id;
-                    break;
-                }
-            }
-
-            if (def == null) {
-                throw new LocalizableJsonException("emport.error.chart.invalid", "type", type, getExportTypes());
-            }
-
-            Class<? extends ChartRenderer> clazz = null;
-            if (def == TableChartRenderer.getDefinition()) {
-                clazz = TableChartRenderer.class;
-            } else if (def == ImageChartRenderer.getDefinition()) {
-                clazz = ImageChartRenderer.class;
-            } else if (def == StatisticsChartRenderer.getDefinition()) {
-                clazz = StatisticsChartRenderer.class;
-            }
-
-            return clazz;
-        }
-    }
 }

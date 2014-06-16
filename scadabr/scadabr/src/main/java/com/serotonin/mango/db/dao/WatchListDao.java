@@ -33,6 +33,7 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.WatchList;
 import java.sql.Connection;
 import java.sql.Statement;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -46,6 +47,9 @@ import org.springframework.jdbc.core.RowMapper;
 @Named
 public class WatchListDao extends BaseDao {
 
+    @Inject
+    private DataPointDao dataPointDao;
+    
     public WatchListDao() {
         super();
     }
@@ -109,12 +113,10 @@ public class WatchListDao extends BaseDao {
         List<Integer> pointIds = ejt.queryForList(
                 "select dataPointId from watchListPoints where watchListId=? order by sortOrder",
                 new Object[]{watchList.getId()}, Integer.class);
-        List<DataPointVO> points = watchList.getPointList();
-        DataPointDao dataPointDao = DataPointDao.getInstance();
+        final List<DataPointVO> points = watchList.getPointList();
         for (Integer pointId : pointIds) {
             points.add(dataPointDao.getDataPoint(pointId));
         }
-
         setWatchListUsers(watchList);
     }
 

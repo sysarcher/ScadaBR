@@ -26,23 +26,15 @@ import java.util.Map;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
-import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.vo.DataPointVO;
 
 @JsonRemoteEntity
 public class TableChartRenderer extends BaseChartRenderer {
 
-    private static ImplDefinition definition = new ImplDefinition("chartRendererTable", "TABLE", "chartRenderer.table",
-            new int[]{DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC});
-
-    public static ImplDefinition getDefinition() {
-        return definition;
-    }
-
-    public String getTypeName() {
-        return definition.getName();
+    @Override
+    public ChartType getType() {
+        return ChartType.TABLE;
     }
 
     @JsonRemoteProperty
@@ -64,15 +56,12 @@ public class TableChartRenderer extends BaseChartRenderer {
         this.limit = limit;
     }
 
+    @Override
     public void addDataToModel(Map<String, Object> model, DataPointVO point) {
         DataPointRT rt = Common.ctx.getRuntimeManager().getDataPoint(point.getId());
         if (rt != null) {
             model.put("chartData", rt.getLatestPointValues(limit));
         }
-    }
-
-    public ImplDefinition getDef() {
-        return definition;
     }
 
     //
@@ -96,4 +85,5 @@ public class TableChartRenderer extends BaseChartRenderer {
             limit = in.readInt();
         }
     }
+
 }

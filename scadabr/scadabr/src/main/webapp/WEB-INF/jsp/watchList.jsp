@@ -40,222 +40,107 @@
         </style>
 
         <script type="text/javascript">
-            var grid;
+            var watchlist = {
+                grid: undefined,
+                gridStore: undefined,
+                tree: undefined,
+                treeRestStore: undefined,
+                init: function(pointTreeNode, watchListNode, watchlistId) {
+                    watchlist.createTree(pointTreeNode);
+                    watchlist.createTable(watchListNode, watchlistId);
+                },
+                fetchSelectedWatchList: function(watchlistId) {
+                    require(["dojo/request", "dojo/store/Memory"], function(request, Memory) {
 
-            require(["dojo/parser",
-                "dijit/layout/BorderContainer",
-                "dijit/layout/ContentPane"
-            ]);
-
-
-            var selectedFolderNode;
-            var tree;
-            var myRestStore;
-
-            require([
-                "dojo/dom",
-                "dojo/dom-construct",
-                "dojo/_base/declare",
-                "dojo/request",
-                "dojo/store/Memory",
-                "dojo/store/Observable",
-                "dojo/store/JsonRest",
-                "dijit/Tree",
-                "dgrid/OnDemandGrid",
-                "dgrid/extensions/Pagination",
-                "dgrid/Keyboard",
-                "dgrid/Selection",
-                "dojo/rpc/JsonService",
-                "dojo/on",
-                "dojo/ready"
-            ], function(dom, domConstruct, declare, request, Memory, Observable, JsonRest, Tree, OnDemandGrid, Pagination, Keyboard, Selection, JsonService, on, ready) {
-                var svc;
-                ready(function() {
-                    // Create a Grid instance using Pagination,
-                    // referencing the store
-                    grid = new (declare([OnDemandGrid, Keyboard, Selection]))({
-                        showHeader: false,
-                        columns: {
-                            id: {
-                                label: "<fmt:message key="events.id"/>"
-                            },
-                            alarmLevel: {
-                                label: "<fmt:message key="common.alarmLevel"/>",
-                                renderCell: function(event, alarmLevel, default_node, options) {
-                                    var node = domConstruct.create("img");
-                                    var imgName;
-                                    switch (alarmLevel) {
-                                        case 1:
-                                            imgName = 'flag_blue';
-                                            if (event.active) {
-                                                node.alt = '<fmt:message key="common.alarmLevel.info"/>';
-                                            } else {
-                                                node.alt = '<fmt:message key="common.alarmLevel.info.rtn"/>';
-                                            }
-                                            break;
-                                        case  2:
-                                            imgName = 'flag_yellow';
-                                            if (event.active) {
-                                                node.alt = '<fmt:message key="common.alarmLevel.urgent"/>';
-                                            } else {
-                                                node.alt = '<fmt:message key="common.alarmLevel.urgent.rtn"/>';
-                                            }
-                                            break;
-                                        case  3:
-                                            if (event.active) {
-                                                node.alt = '<fmt:message key="common.alarmLevel.critical"/>';
-                                            } else {
-                                                node.alt = '<fmt:message key="common.alarmLevel.critical.rtn"/>';
-                                            }
-                                            imgName = 'flag_orange';
-                                            break;
-                                        case  4:
-                                            if (event.active) {
-                                                node.alt = '<fmt:message key="common.alarmLevel.lifeSafety"/>';
-                                            } else {
-                                                node.alt = '<fmt:message key="common.alarmLevel.lifeSafety.rtn"/>';
-                                            }
-                                            imgName = 'flag_red';
-                                            break;
-                                        default :
-                                            node.alt = alarmLevel;
-                                            return  node;
-                                    }
-                                    node.src = 'images/' + imgName + (event.active ? '' : '_off') + '.png';
-                                    node.title = node.alt;
-                                    return node;
-                                }
-                            },
-                            activeTimestamp: {
-                                label: '<fmt:message key="common.time"/>',
-                                resizable: true
-                            },
-                            message: {
-                                label: "Message",
-                                resizable: true,
-                                formatter: function(msg) {
-                                    return msg;
-                                }
-                            },
-                            rtnTimestamp: {
-                                label: '<fmt:message key="common.inactiveTime"/>',
-                                renderCell: function(event, timestamp, default_node, options) {
-                                    var node = domConstruct.create("div");
-
-                                    if (event.active) {
-                                        node.innerHTML = '<fmt:message key="common.active"/>';
-                                        var img = domConstruct.create("img", null, node);
-                                        img.src = "images/flag_white.png";
-                                        img.title = '<fmt:message key="common.active"/>';
-                                        /*                                    
-                                         on(img, "click", function(evt){
-                                         console.log("CKLICKED: " + evt);
-                                         });
-                                         */
-                                    } else {
-                                        if (!event.rtnApplicable) {
-                                            node.innerHTML = '<fmt:message key="common.nortn"/>';
-                                        } else {
-                                            node.innerHTML = timestamp + ' - ' + event.rtnMessage;
-
-                                        }
-                                    }
-                                    return node;
-                                }
-                            },
-                            acknowledged: {
-                                label: '',
-                                renderCell: function(event, acknowledged, default_node, options) {
-                                    var img = domConstruct.create("img");
-
-                                    if (acknowledged) {
-                                        img.src = "images/tick_off.png";
-                                        img.alt = '<fmt:message key="events.acknowledged"/>';
-                                    } else {
-                                        img.src = "images/tick.png";
-                                        img.alt = '<fmt:message key="events.acknowledge"/>';
-                                    }
-                                    img.title = img.alt;
-
-                                    return img;
-                                }
-                            }
-                        },
-                        loadingMessage: "Loading data...",
-                        noDataMessage: "No results found.",
-                        selectionMode: "single" // for Selection; only select a single row at a time
-                                //cellNavigation: false, // for Keyboard; allow only row-level keyboard navigation
-                    }, "watchListTable");
-
-                    svc = new JsonService({
-                        serviceUrl: 'events/rpc', // Adress of the RPC service end point
-                        timeout: 1000,
-                        strictArgChecks: true,
-                        methods: [{
-                                name: 'acknowledgePendingEvent',
-                                parameters: [
-                                    {
-                                        name: 'id',
-                                        type: 'INTEGER'
-                                    }
-                                ]
-                            },
-                            {
-                                name: 'acknowledgeAllPendingEvents',
-                                parameters: []
-                            }
-                        ]
-                    });
-
-
-                    request("events/", {
-                        handleAs: "json"
-                    }).then(function(response) {
-                        // Once the response is received, build an in-memory store
-                        // with the data
-                        grid.setStore(new Memory({data: response}));
-                        //TODO move smd to server ...
-
-                        grid.on("dgrid-error", function(event) {
-                            console.log(event.error.message);
+                        request("rest/watchlists/", {
+                            query: {id: watchlistId},
+                            handleAs: "json"
+                        }).then(function(data) {
+                            console.log("WL DATA: " + data);
+                            watchlist.gridStore = new Memory({data: data.points});
+                            watchlist.grid.setStore(watchlist.gridStore);
+                        }, function(err) {
+                            console.log("WL ERR: " + err);
+                        }, function(evt) {
+                            console.log("WL EVT: " + evt);
                         });
-
-                        grid.on(".dgrid-cell:click", function(evt) {
-                            var cell = grid.cell(evt);
-                            var data = cell.row.data;
-                            if (cell.column.field === 'acknowledged') {
-                                if (!data.acknowledged) {
-                                    svc.acknowledgePendingEvent(data.id).then(function(result) {
-                                        grid.setStore(new Memory({data: result}));
-                                    });
-                                }
+                    });
+                },
+                createTable: function(watchListNode, watchlistId) {
+                    require([
+                        "dojo/_base/declare",
+                        "dgrid/OnDemandGrid",
+                        "dgrid/Keyboard",
+                        "dgrid/Selection",
+                        "dojo/ready"
+                    ], function(declare, OnDemandGrid, Keyboard, Selection, ready) {
+                        ready(function() {
+                            // Create a Grid instance using Pagination,
+                            // referencing the store
+                            watchlist.grid = new (declare([OnDemandGrid, Keyboard, Selection]))({
+                                showHeader: false,
+                                columns: {
+                                    chartType: {
+                                        label: "ChartType"
+                                    },
+                                    id: {
+                                        label: "Id"
+                                    },
+                                    settable: {
+                                        label: "Settable"
+                                    },
+                                    canonicalName: {
+                                        label: "Name"
+                                    },
+                                    timestamp: {
+                                        lable: "Timestamp"
+                                    },
+                                    value: {
+                                        lable: "Value"
+                                    }
+                                },
+                                loadingMessage: "Loading data...",
+                                noDataMessage: "No results found.",
+                                selectionMode: "single" // for Selection; only select a single row at a time
+                                        //cellNavigation: false, // for Keyboard; allow only row-level keyboard navigation
+                            }, watchListNode);
+                            //init
+                            watchlist.fetchSelectedWatchList(watchlistId);
+                        });
+                    });
+                },
+                createTree: function(pointTreeNode) {
+                    require([
+                        "dojo/store/JsonRest",
+                        "dijit/Tree",
+                        "dojo/domReady!"
+                    ], function(JsonRest, Tree) {
+                        watchlist.treeRestStore = new JsonRest({
+                            target: "dstree/",
+                            getChildren: function(object, onComplete, onError) {
+                                this.query({parentId: object.id}).then(onComplete, onError);
+                            },
+                            mayHaveChildren: function(object) {
+                                return object.nodeType === "PF";
+                            },
+                            getRoot: function(onItem, onError) {
+                                this.get("root").then(onItem, onError);
+                            },
+                            getLabel: function(object) {
+                                return object.name;
                             }
                         });
-
+                        // Create the Tree.
+                        watchlist.tree = new Tree({
+                            model: watchlist.treeRestStore
+                        }, pointTreeNode);
+                        watchlist.tree.startup();
                     });
+                }
+            };
 
-                    myRestStore = new JsonRest({
-                        target: "dstree/",
-                        getChildren: function(object, onComplete, onError) {
-                            this.query({parentId: object.id}).then(onComplete, onError);
-                        },
-                        mayHaveChildren: function(object) {
-                            return object.nodeType === "PF";
-                        },
-                        getRoot: function(onItem, onError) {
-                            this.get("root").then(onItem, onError);
-                        },
-                        getLabel: function(object) {
-                            return object.name;
-                        }
-                    });
-                    // Create the Tree.
-                    tree = new Tree({
-                        model: myRestStore
-                    }, "dataPointTree");
-                    tree.startup();
-                });
-            });
+//INIT
+            watchlist.init("dataPointTree", "watchListTable", ${selectedWatchList});
 
         </script>
 

@@ -36,6 +36,8 @@ import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.db.dao.ViewDao;
 import com.serotonin.mango.view.View;
+import com.serotonin.mango.view.chart.ChartRenderer;
+import com.serotonin.mango.view.chart.ChartType;
 import com.serotonin.mango.view.chart.ImageChartRenderer;
 import com.serotonin.mango.view.chart.ImageFlipbookRenderer;
 import com.serotonin.mango.view.chart.TableChartRenderer;
@@ -144,7 +146,7 @@ public class DataPointDetailsController {
             modelMap.addAttribute("historyLimit", historyLimit);
 
             // Determine our image chart rendering capabilities.
-            if (ImageChartRenderer.getDefinition().supports(point.getPointLocator().getDataTypeId())) {
+            if (ChartType.IMAGE.supports(point.getPointLocator().getDataTypeId())) {
                 // This point can render an image chart. Carry on...
                 int periodType = Common.TimePeriods.DAYS;
                 int periodCount = 1;
@@ -158,7 +160,7 @@ public class DataPointDetailsController {
             }
 
             // Determine out flipbook rendering capabilities
-            if (ImageFlipbookRenderer.getDefinition().supports(point.getPointLocator().getDataTypeId())) {
+            if (ChartType.IMAGE_FLIPBOOK.supports(point.getPointLocator().getDataTypeId())) {
                 modelMap.addAttribute("flipbookLimit", 10);
             }
 

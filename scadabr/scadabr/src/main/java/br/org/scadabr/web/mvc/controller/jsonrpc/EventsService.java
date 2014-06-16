@@ -1,4 +1,4 @@
-package com.serotonin.mango.web.jsonrpc;
+package br.org.scadabr.web.mvc.controller.jsonrpc;
 
 import com.googlecode.jsonrpc4j.JsonRpcParam;
 import com.googlecode.jsonrpc4j.JsonRpcService;

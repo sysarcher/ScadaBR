@@ -413,7 +413,7 @@ public class RuntimeManager {
 
         // Chart renderer
         if (point.getChartRenderer() != null
-                && !point.getChartRenderer().getDef().supports(dataType)) // Return to a default renderer
+                && !point.getChartRenderer().getType().supports(dataType)) // Return to a default renderer
         {
             point.setChartRenderer(null);
         }
