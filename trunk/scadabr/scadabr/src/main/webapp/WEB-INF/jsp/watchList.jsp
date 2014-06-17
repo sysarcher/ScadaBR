@@ -40,107 +40,12 @@
         </style>
 
         <script type="text/javascript">
-            var watchlist = {
-                grid: undefined,
-                gridStore: undefined,
-                tree: undefined,
-                treeRestStore: undefined,
-                init: function(pointTreeNode, watchListNode, watchlistId) {
-                    watchlist.createTree(pointTreeNode);
-                    watchlist.createTable(watchListNode, watchlistId);
-                },
-                fetchSelectedWatchList: function(watchlistId) {
-                    require(["dojo/request", "dojo/store/Memory"], function(request, Memory) {
-
-                        request("rest/watchlists/", {
-                            query: {id: watchlistId},
-                            handleAs: "json"
-                        }).then(function(data) {
-                            console.log("WL DATA: " + data);
-                            watchlist.gridStore = new Memory({data: data.points});
-                            watchlist.grid.setStore(watchlist.gridStore);
-                        }, function(err) {
-                            console.log("WL ERR: " + err);
-                        }, function(evt) {
-                            console.log("WL EVT: " + evt);
-                        });
-                    });
-                },
-                createTable: function(watchListNode, watchlistId) {
-                    require([
-                        "dojo/_base/declare",
-                        "dgrid/OnDemandGrid",
-                        "dgrid/Keyboard",
-                        "dgrid/Selection",
-                        "dojo/ready"
-                    ], function(declare, OnDemandGrid, Keyboard, Selection, ready) {
-                        ready(function() {
-                            // Create a Grid instance using Pagination,
-                            // referencing the store
-                            watchlist.grid = new (declare([OnDemandGrid, Keyboard, Selection]))({
-                                showHeader: false,
-                                columns: {
-                                    chartType: {
-                                        label: "ChartType"
-                                    },
-                                    id: {
-                                        label: "Id"
-                                    },
-                                    settable: {
-                                        label: "Settable"
-                                    },
-                                    canonicalName: {
-                                        label: "Name"
-                                    },
-                                    timestamp: {
-                                        lable: "Timestamp"
-                                    },
-                                    value: {
-                                        lable: "Value"
-                                    }
-                                },
-                                loadingMessage: "Loading data...",
-                                noDataMessage: "No results found.",
-                                selectionMode: "single" // for Selection; only select a single row at a time
-                                        //cellNavigation: false, // for Keyboard; allow only row-level keyboard navigation
-                            }, watchListNode);
-                            //init
-                            watchlist.fetchSelectedWatchList(watchlistId);
-                        });
-                    });
-                },
-                createTree: function(pointTreeNode) {
-                    require([
-                        "dojo/store/JsonRest",
-                        "dijit/Tree",
-                        "dojo/domReady!"
-                    ], function(JsonRest, Tree) {
-                        watchlist.treeRestStore = new JsonRest({
-                            target: "dstree/",
-                            getChildren: function(object, onComplete, onError) {
-                                this.query({parentId: object.id}).then(onComplete, onError);
-                            },
-                            mayHaveChildren: function(object) {
-                                return object.nodeType === "PF";
-                            },
-                            getRoot: function(onItem, onError) {
-                                this.get("root").then(onItem, onError);
-                            },
-                            getLabel: function(object) {
-                                return object.name;
-                            }
-                        });
-                        // Create the Tree.
-                        watchlist.tree = new Tree({
-                            model: watchlist.treeRestStore
-                        }, pointTreeNode);
-                        watchlist.tree.startup();
-                    });
-                }
-            };
-
-//INIT
-            watchlist.init("dataPointTree", "watchListTable", ${selectedWatchList});
+            require([
+                "scadabr/jsp/WatchList",
+                "dojo/domReady!"
+            ], function(WatchList) {
+                var watchList = new WatchList("dataPointTree", "watchListTable", ${selectedWatchList});
+            });
 
         </script>
 
