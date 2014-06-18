@@ -65,7 +65,12 @@ function setSelectable(grid, selectable){
 	var node = grid.bodyNode,
 		value = selectable ? "text" : has("ff") < 21 ? "-moz-none" : "none";
 	
-	if(hasUserSelect){
+	// In IE10+, -ms-user-select: none will block selection from starting within the
+	// element, but will not block an existing selection from entering the element.
+	// When using a modifier key, IE will select text inside of the element as well
+	// as outside of the element, because it thinks the selection started outside.
+	// Therefore, fall back to other means of blocking selection for IE10+.
+	if(hasUserSelect && hasUserSelect !== "msUserSelect"){
 		node.style[hasUserSelect] = value;
 	}else if(has("dom-selectstart")){
 		// For browsers that don't support user-select but support selectstart (IE<10),
@@ -209,9 +214,9 @@ return declare(null, {
 	},
 	
 	_handleSelect: function(event, target){
-		// Don't run if selection mode doesn't have a handler (incl. "none"),
+		// Don't run if selection mode doesn't have a handler (incl. "none"), target can't be selected,
 		// or if coming from a dgrid-cellfocusin from a mousedown
-		if(!this[this._selectionHandlerName] ||
+		if(!this[this._selectionHandlerName] || !this.allowSelect(this.row(target)) ||
 				(event.type === "dgrid-cellfocusin" && event.parentType === "mousedown") ||
 				(event.type === upType && target != this._waitForMouseUp)){
 			return;
@@ -494,7 +499,7 @@ return declare(null, {
 		// rows shouldn't ever be selected anyway.
 		if(value === false || this.allowSelect(row)){
 			selection = this.selection;
-			previousValue = selection[row.id];
+			previousValue = !!selection[row.id];
 			if(value === null){
 				// indicates a toggle
 				value = !previousValue;
