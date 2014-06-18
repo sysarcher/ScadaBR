@@ -14,10 +14,10 @@ define(["dojo/_base/declare",
         pointsTree: null,
         watchlistGrid: null,
         constructor: function(pointsTreeNode, watchListNode, watchlistId) {
-            this.initPointsTree(pointsTreeNode);
-            this.initWatchListTable(watchListNode, watchlistId);
+            this._initPointsTree(pointsTreeNode);
+            this._initWatchListTable(watchListNode, watchlistId);
         },
-        initPointsTree: function(pointsTreeNode) {
+        _initPointsTree: function(pointsTreeNode) {
             this.pointsTreeStore = new JsonRest({
                 target: "dstree/",
                 getChildren: function(object, onComplete, onError) {
@@ -38,7 +38,7 @@ define(["dojo/_base/declare",
                 model: this.pointsTreeStore
             }, pointsTreeNode);
         },
-        initWatchListTable: function(watchListNode, watchlistId) {
+        _initWatchListTable: function(watchListNode, watchlistId) {
             this.watchlistGrid = new (declare([OnDemandGrid, Keyboard, Selection]))({
                 showHeader: false,
                 store: new Memory({data: null}),
