@@ -1,10 +1,11 @@
 {
     "directories": {},
     "dependencies": {
-        "dijit": "1.9.3",
-        "dojo": "1.9.3",
-        "dgrid": "0.3.14",
+        "dijit": "1.10",
+        "dojo": "1.10",
+        "dgrid": "0.3.15",
         "put-selector": "0.3.5",
-        "xstyle": "0.2.1"
+        "xstyle": "0.2.1",
+        "dojox": "1.10"
     }
 }
