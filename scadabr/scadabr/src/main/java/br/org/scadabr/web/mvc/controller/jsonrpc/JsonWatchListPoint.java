@@ -1,5 +1,10 @@
 package br.org.scadabr.web.mvc.controller.jsonrpc;
 
+import br.org.scadabr.web.l10n.Localizer;
+import com.serotonin.mango.db.dao.DataPointDao;
+import com.serotonin.mango.rt.dataImage.DataPointRT;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
+import com.serotonin.mango.view.chart.ChartRenderer;
 import com.serotonin.mango.view.chart.ChartType;
 import com.serotonin.mango.vo.DataPointVO;
 import java.io.Serializable;
@@ -9,7 +14,7 @@ import java.io.Serializable;
  * @author aploese
  */
 public class JsonWatchListPoint implements Serializable {
-    
+
     private String canonicalName;
     private int id;
     private boolean settable;
@@ -17,10 +22,22 @@ public class JsonWatchListPoint implements Serializable {
     private String value;
     private ChartType chartType;
 
-    JsonWatchListPoint(DataPointVO dp) {
-        canonicalName = dp.getName();
+    JsonWatchListPoint(DataPointVO dp, DataPointRT dpRt, DataPointDao dataPointDao, Localizer localizer) {
         id = dp.getId();
         settable = dp.isSettable();
+        canonicalName = dataPointDao.getCanonicalPointName(dp);
+        if (dpRt != null) {
+            PointValueTime pvt = dpRt.getPointValue();
+
+            timestamp = localizer.localizeTimeStamp(pvt.getTime(), true);
+            value = dp.getTextRenderer().getText(pvt, 0);//TODO hint????
+            final ChartRenderer renderer = dp.getChartRenderer();
+            if (renderer != null) {
+                chartType = renderer.getType();
+            } else {
+                chartType = ChartType.NONE;
+            }
+        }
     }
 
     /**
@@ -106,5 +123,5 @@ public class JsonWatchListPoint implements Serializable {
     public void setChartType(ChartType chartType) {
         this.chartType = chartType;
     }
-    
+
 }

@@ -22,7 +22,7 @@ define(["dojo/_base/declare",
         },
         _initSvc: function() {
             this.svc = new JsonService({
-                serviceUrl: 'jsonrpc/events.json', // Adress of the RPC service end point
+                serviceUrl: 'rpc/events.json', // Adress of the RPC service end point
                 timeout: 1000,
                 strictArgChecks: true,
                 methods: [{
@@ -147,7 +147,7 @@ define(["dojo/_base/declare",
                                 label: myLabel,
                                 onClick: function() {
                                     console.log("BTN ACK THIS: ", this);
-                                    this.myObj.svc.acknowledgePendingEvent(this.eventId).then(dojo.hitch(this.myObj, function(result) {
+                                    this.myObj.svc.acknowledgePendingEvent(this.eventId).then(lang.hitch(this.myObj, function(result) {
                                         console.log("BTN ACK CB: ", this);
                                         this.grid.store.setData(result);
                                         this.grid.refresh();

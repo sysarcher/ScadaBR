@@ -11,4 +11,5 @@ import com.googlecode.jsonrpc4j.JsonRpcService;
 public interface WatchListService {
     JsonWatchList getWatchList(@JsonRpcParam("watchlistId")int watchlistId);
     JsonWatchList getSelectedWatchlist();
+    JsonWatchList addPointToWatchlist(@JsonRpcParam("watchlistId")int watchlistId, @JsonRpcParam("index")int index, @JsonRpcParam("dataPointId")int dataPointId);
 }
