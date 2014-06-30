@@ -50,8 +50,12 @@
 		<script src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/extensions/DnD", "dgrid/Keyboard", "dojo/dnd/Source", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred",  "dgrid/test/data/base", "dojo/domReady!"],
-				function(Grid, Selection, DnD, Keyboard, DnDSource, declare, lang, arrayUtil, Deferred){
+			require([
+	"dojo/store/Memory",
+	"dojo/store/Observable",
+                            "dgrid/OnDemandGrid", 
+                            "dgrid/Selection", "dgrid/extensions/DnD", "dgrid/Keyboard", "dojo/dnd/Source", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred",  "dgrid/test/data/base", "dojo/domReady!"],
+				function(Memory, Observable, Grid, Selection, DnD, Keyboard, DnDSource, declare, lang, arrayUtil, Deferred){
 					var DnDGrid = declare([Grid, Selection, DnD, Keyboard]);
 					
 					// Create a custom data array based on testOrderedData, but looping
@@ -82,7 +86,7 @@
 						bufferRows: 5,
 						farOffRemoval: 400,
 						sort: "order",
-						store: store = createOrderedStore(orderedData, { idProperty: "id" }),
+						store: store = new Observable(new Memory({data:orderedData})), // createOrderedStore(orderedData, { idProperty: "id" }),
 						columns: [
 							{label:"Name", field:"name", sortable: false},
 							{label:"Description", field:"description", sortable: false}

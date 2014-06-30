@@ -36,7 +36,6 @@
                 border: none;
             }
 
-
         </style>
 
         <script type="text/javascript">
@@ -44,7 +43,7 @@
                 "scadabr/jsp/WatchList",
                 "dojo/domReady!"
             ], function(WatchList) {
-                var watchList = new WatchList("dataPointTree", "watchListTable", ${selectedWatchList});
+                _watchList = new WatchList("dataPointTree", "watchListTable", ${selectedWatchList});
             });
 
         </script>
