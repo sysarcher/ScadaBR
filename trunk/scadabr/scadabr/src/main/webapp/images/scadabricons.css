@@ -64,3 +64,11 @@ and open the template in the editor.
     height: 18px;
     text-align: center;
 }
+
+.scadaBrDeleteIcon {
+    background-image: url('delete.png');
+    background-repeat: no-repeat;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+}

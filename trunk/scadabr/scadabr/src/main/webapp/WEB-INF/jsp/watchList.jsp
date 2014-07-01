@@ -35,6 +35,15 @@
             .dgrid-cell {
                 border: none;
             }
+            .dgrid-column-id {
+                width: 10em;
+            }
+            .dgrid-column-chartType {
+                width: 5em;
+            }
+            .dgrid-column-settable {
+                width: 5em;
+            }
 
         </style>
 

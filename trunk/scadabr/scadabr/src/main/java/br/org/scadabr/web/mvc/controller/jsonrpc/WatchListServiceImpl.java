@@ -20,7 +20,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 
 //TODO Watchlist scope???
-
 @Named
 @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class WatchListServiceImpl implements WatchListService, Serializable {
@@ -47,7 +46,7 @@ public class WatchListServiceImpl implements WatchListService, Serializable {
 
     @Override
     public JsonWatchList getSelectedWatchlist() {
-        return new JsonWatchList(watchListDao.getWatchList(userSessionContextBean.getUser().getSelectedWatchList()), dataPointDao, runtimeManager, localizer );
+        return new JsonWatchList(watchListDao.getWatchList(userSessionContextBean.getUser().getSelectedWatchList()), dataPointDao, runtimeManager, localizer);
     }
 
     @Override
@@ -69,9 +68,9 @@ public class WatchListServiceImpl implements WatchListService, Serializable {
         watchListDao.saveWatchList(watchList);
         updateSetPermission(point, watchList.getUserAccess(user), userDao.getUser(watchList.getUserId()));
         LOG.warning("ENTER addPointToWatchlist " + watchListDao.getWatchList(watchlistId).getName());
-        return new JsonWatchList(watchListDao.getWatchList(watchlistId), dataPointDao, runtimeManager, localizer); 
+        return new JsonWatchList(watchListDao.getWatchList(watchlistId), dataPointDao, runtimeManager, localizer);
     }
-    
+
     private void updateSetPermission(DataPointVO point, int access, User owner) {
         // Point isn't settable
         if (!point.getPointLocator().isSettable()) {
@@ -90,6 +89,33 @@ public class WatchListServiceImpl implements WatchListService, Serializable {
 
         // All good.
         point.setSettable(true);
+    }
+
+    @Override
+    public JsonWatchList deletePointFromWatchlist(int watchlistId, int dataPointId) {
+        LOG.warning("ENTER deletePointFromWatchlist");
+        final User user = userSessionContextBean.getUser();
+        DataPointVO point = dataPointDao.getDataPoint(dataPointId);
+        if (point == null) {
+            return null;
+        }
+        WatchList watchList = watchListDao.getWatchList(watchlistId);
+
+        // Check permissions.
+        Permissions.ensureDataPointReadPermission(user, point);
+        Permissions.ensureWatchListEditPermission(user, watchList);
+
+        //remove
+        for (DataPointVO dp : watchList) {
+            if (dp.getId() == dataPointId) {
+                watchList.getPointList().remove(dp);
+                break;
+            }
+        }
+        watchListDao.saveWatchList(watchList);
+        updateSetPermission(point, watchList.getUserAccess(user), userDao.getUser(watchList.getUserId()));
+        LOG.warning("Exit deletePointFromWatchlist " + watchListDao.getWatchList(watchlistId).getName());
+        return new JsonWatchList(watchListDao.getWatchList(watchlistId), dataPointDao, runtimeManager, localizer);
     }
 
 }

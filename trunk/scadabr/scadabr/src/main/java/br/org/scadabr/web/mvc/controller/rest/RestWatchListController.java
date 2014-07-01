@@ -12,12 +12,6 @@ import br.org.scadabr.web.mvc.controller.jsonrpc.JsonWatchListPoint;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.rt.RuntimeManager;
-import com.serotonin.mango.rt.dataImage.DataPointRT;
-import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.view.chart.ChartRenderer;
-import com.serotonin.mango.view.chart.ChartType;
-import com.serotonin.mango.web.UserSessionContextBean;
-import java.util.Date;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.springframework.context.annotation.Scope;
@@ -50,6 +44,9 @@ public class RestWatchListController {
     public @ResponseBody JsonWatchList getWatchList(int id) {
         LOG.severe("CALLED: getWatchList " + id);
         final JsonWatchList result = new JsonWatchList(watchListDao.getWatchList(id), dataPointDao, runtimeManager, localizer);
+        for (JsonWatchListPoint jwp : result) {
+            LOG.severe("JWP: "+ jwp.getCanonicalName());
+        }
         return result;
     }
 
