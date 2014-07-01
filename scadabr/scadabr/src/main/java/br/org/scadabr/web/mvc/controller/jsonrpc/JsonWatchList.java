@@ -24,7 +24,6 @@ public class JsonWatchList implements Serializable, Iterable<JsonWatchListPoint>
         id = watchList.getId();
         name = watchList.getName();
         for (DataPointVO dp : watchList.getPointList()) {
-
             points.add(new JsonWatchListPoint(dp, runtimeManager.getDataPoint(dp.getId()), dataPointDao, localizer));
         }
     }

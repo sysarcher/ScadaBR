@@ -12,4 +12,5 @@ public interface WatchListService {
     JsonWatchList getWatchList(@JsonRpcParam("watchlistId")int watchlistId);
     JsonWatchList getSelectedWatchlist();
     JsonWatchList addPointToWatchlist(@JsonRpcParam("watchlistId")int watchlistId, @JsonRpcParam("index")int index, @JsonRpcParam("dataPointId")int dataPointId);
+    JsonWatchList deletePointFromWatchlist(@JsonRpcParam("watchlistId")int watchlistId, @JsonRpcParam("dataPointId")int dataPointId);
 }

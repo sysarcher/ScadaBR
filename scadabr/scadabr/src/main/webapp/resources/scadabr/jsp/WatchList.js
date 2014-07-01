@@ -1,6 +1,7 @@
 define(["dojo/_base/declare",
     "dojo/_base/lang",
     "dijit/Tree",
+    "dijit/form/Button",
     "dojo/store/JsonRest",
     "dojo/dnd/Source",
     "dgrid/OnDemandGrid",
@@ -12,7 +13,7 @@ define(["dojo/_base/declare",
     "dijit/tree/dndSource",
     "dgrid/extensions/DnD",
     "dojo/rpc/JsonService"
-], function(declare, lang, Tree, JsonRest, DnDSource, OnDemandGrid, Keyboard, Selection, request, Memory, Observable, dndSource, DnD, JsonService) {
+], function(declare, lang, Tree, Button, JsonRest, DnDSource, OnDemandGrid, Keyboard, Selection, request, Memory, Observable, dndSource, DnD, JsonService) {
 
     return declare(null, {
         pointsTreeStore: null,
@@ -39,6 +40,19 @@ define(["dojo/_base/declare",
                             },
                             {
                                 name: 'index',
+                                type: 'INTEGER'
+                            },
+                            {
+                                name: 'dataPointId',
+                                type: 'INTEGER'
+                            }
+                        ]
+                    },
+                    {
+                        name: 'deletePointFromWatchlist',
+                        parameters: [
+                            {
+                                name: 'watchListId',
                                 type: 'INTEGER'
                             },
                             {
@@ -82,20 +96,39 @@ define(["dojo/_base/declare",
                     chartType: {
                         label: "ChartType"
                     },
-                    id: {
-                        label: "Id"
-                    },
                     settable: {
                         label: "Settable"
                     },
                     canonicalName: {
                         label: "Name"
                     },
+                    value: {
+                        lable: "Value"
+                    },
                     timestamp: {
                         lable: "Timestamp"
                     },
-                    value: {
-                        lable: "Value"
+                    id: {
+                        label: '',
+                        renderCell: lang.hitch(this, function(point, pointId, default_node, options) {
+                            var myIconClass;
+                            var myLabel;
+                                myIconClass = 'scadaBrDeleteIcon';
+                                myLabel = "Delete";
+
+                            var btnAck = new Button({
+                                myObj: this,
+                                pointId: pointId,
+                                showLabel: false,
+                                iconClass: myIconClass,
+                                label: myLabel,
+                                onClick: function() {
+                                    console.log("BTN Delete THIS: ", this);
+                                    this.myObj.deletePointFromWatchlist(this.myObj.watchlistId, this.pointId);
+                                }
+                            }, default_node.appendChild(document.createElement("div")));
+                            btnAck._destroyOnRemove = true;
+                        })
                     }
                 },
                 dndParams: {
@@ -110,14 +143,28 @@ define(["dojo/_base/declare",
                     },
                     onDropExternal: function(source, nodes, copy, target) {
                         var grid = this.grid;
-                        var store = this.grid.store;
                         nodes.forEach(function(node) {
                             var i = source.getItem(node.id);
                             var d = i.data;
                             var a = i.type.indexOf("treeNode");
+
                             if (i.type.indexOf("treeNode") >= 0) {
-                                this.self.addPointToWatchlist(this.self.watchlistId, 1, d.item.id);
-                                console.log("Dropped TreeNode" + d.item.name);
+                                var idx = 0;
+                                if (target === undefined) {
+                                    //dropped after last row    
+                                    this.self.addPointToWatchlist(this.self.watchlistId, grid.store.data.length, d.item.id);
+                                } else if (target === null) {
+                                    //dropped not onto a row, so add it at the end
+                                    this.self.addPointToWatchlist(this.self.watchlistId, grid.store.data.length, d.item.id);
+                                } else {
+                                    grid.store.data.forEach(function() {
+                                        if (grid.store.data[idx].id === target.id) {
+                                            this.self.addPointToWatchlist(this.self.watchlistId, idx, d.item.id);
+                                            console.log("Dropped TreeNode" + d.item.name);
+                                        }
+                                        idx++;
+                                    }, this);
+                                }
                             } else if (i.type.indexOf("dgrid-row") >= 0) {
                                 console.log("Dropped dgrid col" + d.canonicalName);
 
@@ -152,6 +199,15 @@ define(["dojo/_base/declare",
             var grid = this.watchlistGrid;
             this.svc.addPointToWatchlist(watchlistId, index, dataPointId).then(function(result) {
                 console.log("DataPoint Added CB: ", result);
+                grid.store.setData(result.points);
+                grid.refresh();
+            });
+
+        },
+        deletePointFromWatchlist: function(watchlistId, dataPointId) {
+            var grid = this.watchlistGrid;
+            this.svc.deletePointFromWatchlist(watchlistId, dataPointId).then(function(result) {
+                console.log("DataPoint deleted CB: ", result);
                 grid.store.setData(result.points);
                 grid.refresh();
             });

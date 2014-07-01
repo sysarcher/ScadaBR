@@ -38,12 +38,13 @@ import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ShareUser;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
+import java.util.Iterator;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
-public class WatchList implements JsonSerializable {
+public class WatchList implements JsonSerializable, Iterable<DataPointVO> {
 
     public static final String XID_PREFIX = "WL_";
 
@@ -192,5 +193,10 @@ public class WatchList implements JsonSerializable {
                 }
             }
         }
+    }
+
+    @Override
+    public Iterator<DataPointVO> iterator() {
+        return pointList.iterator();
     }
 }
