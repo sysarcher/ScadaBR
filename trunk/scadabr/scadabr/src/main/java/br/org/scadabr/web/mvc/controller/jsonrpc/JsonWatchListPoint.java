@@ -21,6 +21,8 @@ public class JsonWatchListPoint implements Serializable {
     private String timestamp;
     private String value;
     private ChartType chartType;
+    private boolean changed;
+    private long timestampMs;
 
     JsonWatchListPoint(DataPointVO dp, DataPointRT dpRt, DataPointDao dataPointDao, Localizer localizer) {
         id = dp.getId();
@@ -29,6 +31,8 @@ public class JsonWatchListPoint implements Serializable {
         if (dpRt != null) {
             PointValueTime pvt = dpRt.getPointValue();
 
+            timestampMs = pvt.getTime();
+            changed = timestampMs + 30000 > System.currentTimeMillis();
             timestamp = localizer.localizeTimeStamp(pvt.getTime(), true);
             value = dp.getTextRenderer().getText(pvt, 0);//TODO hint????
             final ChartRenderer renderer = dp.getChartRenderer();
@@ -122,6 +126,34 @@ public class JsonWatchListPoint implements Serializable {
      */
     public void setChartType(ChartType chartType) {
         this.chartType = chartType;
+    }
+
+    /**
+     * @return the changed
+     */
+    public boolean isChanged() {
+        return changed;
+    }
+
+    /**
+     * @param changed the changed to set
+     */
+    public void setChanged(boolean changed) {
+        this.changed = changed;
+    }
+
+    /**
+     * @return the timestampMs
+     */
+    public long getTimestampMs() {
+        return timestampMs;
+    }
+
+    /**
+     * @param timestampMs the timestampMs to set
+     */
+    public void setTimestampMs(long timestampMs) {
+        this.timestampMs = timestampMs;
     }
 
 }
