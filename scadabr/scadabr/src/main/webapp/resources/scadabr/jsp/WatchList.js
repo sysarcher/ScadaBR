@@ -12,8 +12,10 @@ define(["dojo/_base/declare",
     "dojo/store/Observable",
     "dijit/tree/dndSource",
     "dgrid/extensions/DnD",
-    "dojo/rpc/JsonService"
-], function(declare, lang, Tree, Button, JsonRest, DnDSource, OnDemandGrid, Keyboard, Selection, request, Memory, Observable, dndSource, DnD, JsonService) {
+    "dojo/rpc/JsonService",
+    "dojo/_base/fx",
+    "dojox/timing"
+], function(declare, lang, Tree, Button, JsonRest, DnDSource, OnDemandGrid, Keyboard, Selection, request, Memory, Observable, dndSource, DnD, JsonService, fx, timing) {
 
     return declare(null, {
         pointsTreeStore: null,
@@ -25,6 +27,14 @@ define(["dojo/_base/declare",
             this._initSvc();
             this._initPointsTree(pointsTreeNode);
             this._initWatchListTable(watchListNode, watchlistId);
+            //,    "dojox/timing/Timer"
+     //       dojo.require('dojox.timing');
+            t = new timing.Timer(1000);
+
+            t.onTick = lang.hitch(this, function() {
+                this.fetchWatchList(this.watchlistId);
+            })
+            t.start();
         },
         _initSvc: function() {
             this.svc = new JsonService({
@@ -103,18 +113,44 @@ define(["dojo/_base/declare",
                         label: "Name"
                     },
                     value: {
-                        lable: "Value"
+                        anim: null,
+                        lable: "Value",
+                        renderCell: lang.hitch(this, function(point, value, default_node, options) {
+                            this.anim = fx.animateProperty({
+                                node: default_node, duration: 5000,
+                                properties: {
+                                    backgroundColor: {start: "gray", end: "white"}
+                                }
+                            });
+                            default_node.innerHTML = value;
+                            if (point.changed) {
+                                this.anim.play();
+                            }
+                        })
                     },
                     timestamp: {
-                        lable: "Timestamp"
+                        anim: null,
+                        lable: "Timestamp",
+                        renderCell: lang.hitch(this, function(point, value, default_node, options) {
+                            this.anim = fx.animateProperty({
+                                node: default_node, duration: 5000,
+                                properties: {
+                                    backgroundColor: {start: "gray", end: "white"}
+                                }
+                            });
+                            default_node.innerHTML = point.timestamp;
+                            if (point.changed) {
+                                this.anim.play();
+                            }
+                        })
                     },
                     id: {
                         label: '',
                         renderCell: lang.hitch(this, function(point, pointId, default_node, options) {
                             var myIconClass;
                             var myLabel;
-                                myIconClass = 'scadaBrDeleteIcon';
-                                myLabel = "Delete";
+                            myIconClass = 'scadaBrDeleteIcon';
+                            myLabel = "Delete";
 
                             var btnAck = new Button({
                                 myObj: this,
@@ -128,6 +164,7 @@ define(["dojo/_base/declare",
                                 }
                             }, default_node.appendChild(document.createElement("div")));
                             btnAck._destroyOnRemove = true;
+
                         })
                     }
                 },
@@ -213,6 +250,5 @@ define(["dojo/_base/declare",
             });
 
         }
-
     });
 });
