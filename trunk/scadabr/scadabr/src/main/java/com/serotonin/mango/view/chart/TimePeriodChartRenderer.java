@@ -39,10 +39,17 @@ abstract public class TimePeriodChartRenderer extends BaseChartRenderer {
     /**
      * Convenience method for getting the start time of the chart period.
      */
-    public long getStartTime() {
-        return System.currentTimeMillis() - getDuration();
+    public long getStartTime(long timestamp) {
+        return timestamp - getDuration();
     }
 
+    /**
+     * Convenience method for getting the start time of the chart period.
+     */
+    public long getEndTime(long timestamp) {
+        return timestamp;
+    }
+    
     /**
      * Convenience method for getting the duration of the chart period.
      */

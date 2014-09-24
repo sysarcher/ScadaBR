@@ -43,6 +43,7 @@ import com.serotonin.mango.vo.report.PointTimeSeriesCollection;
 import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.util.StringUtils;
 
+@Deprecated //CHarts are rendered on the client with with dojox.charting
 public class ImageChartServlet extends BaseInfoServlet {
 
     private static final long serialVersionUID = -1;
