@@ -3,16 +3,20 @@ package br.org.scadabr.web.mvc.controller.jsonrpc;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.web.l10n.Localizer;
 import com.serotonin.mango.db.dao.DataPointDao;
+import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.rt.RuntimeManager;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ShareUser;
+import com.serotonin.mango.view.chart.TimePeriodChartRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.io.Serializable;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,6 +30,8 @@ public class WatchListServiceImpl implements WatchListService, Serializable {
 
     private static final Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
 
+    @Inject
+    private transient PointValueDao pointValueDao;
     @Inject
     private transient DataPointDao dataPointDao;
     @Inject
@@ -118,4 +124,19 @@ public class WatchListServiceImpl implements WatchListService, Serializable {
         return new JsonWatchList(watchListDao.getWatchList(watchlistId), dataPointDao, runtimeManager, localizer);
     }
 
+    @Override
+    public JsonChartDataSet getChartDataSet(int dataPointId) {
+        DataPointVO dp = dataPointDao.getDataPoint(dataPointId);
+        if (dp.getChartRenderer() instanceof TimePeriodChartRenderer) {
+            final TimePeriodChartRenderer tpcr = (TimePeriodChartRenderer)dp.getChartRenderer();
+            final long timeStamp = System.currentTimeMillis();
+            final long from = tpcr.getStartTime(timeStamp);
+            final long to = tpcr.getEndTime(timeStamp);
+            List<PointValueTime> pvt = pointValueDao.getPointValuesBetween(dataPointId, from, to);
+            return new JsonChartDataSet(from, to, dp, pvt);
+        }
+        return new JsonChartDataSet();
+    }
+
+    
 }

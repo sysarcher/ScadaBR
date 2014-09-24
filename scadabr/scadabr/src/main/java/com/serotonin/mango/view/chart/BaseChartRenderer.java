@@ -21,19 +21,12 @@ package com.serotonin.mango.view.chart;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonSerializable;
-import br.org.scadabr.json.JsonValue;
-import br.org.scadabr.json.TypeFactory;
-import com.serotonin.mango.DataTypes;
-import com.serotonin.mango.util.LocalizableJsonException;
-import com.serotonin.mango.view.ImplDefinition;
 
 abstract public class BaseChartRenderer implements ChartRenderer, JsonSerializable {
 

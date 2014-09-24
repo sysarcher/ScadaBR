@@ -14,8 +14,10 @@ define(["dojo/_base/declare",
     "dgrid/extensions/DnD",
     "dojo/rpc/JsonService",
     "dojo/_base/fx",
-    "dojox/timing"
-], function(declare, lang, Tree, Button, JsonRest, DnDSource, OnDemandGrid, Keyboard, Selection, request, Memory, Observable, dndSource, DnD, JsonService, fx, timing) {
+    "dojox/timing",
+    "scadabr/DataPointChart",
+    "dijit/Dialog"
+], function(declare, lang, Tree, Button, JsonRest, DnDSource, OnDemandGrid, Keyboard, Selection, request, Memory, Observable, dndSource, DnD, JsonService, fx, timing, DataPointChart, Dialog) {
 
     return declare(null, {
         pointsTreeStore: null,
@@ -28,7 +30,7 @@ define(["dojo/_base/declare",
             this._initPointsTree(pointsTreeNode);
             this._initWatchListTable(watchListNode, watchlistId);
             //,    "dojox/timing/Timer"
-     //       dojo.require('dojox.timing');
+            //       dojo.require('dojox.timing');
             t = new timing.Timer(1000);
 
             t.onTick = lang.hitch(this, function() {
@@ -70,6 +72,15 @@ define(["dojo/_base/declare",
                                 type: 'INTEGER'
                             }
                         ]
+                    },
+                    {
+                        name: 'getChartDataSet',
+                        parameters: [
+                            {
+                                name: 'dataPointId',
+                                type: 'INTEGER'
+                            }
+                        ]
                     }
 
                 ]
@@ -104,7 +115,32 @@ define(["dojo/_base/declare",
                 store: new Observable(new Memory({data: null})),
                 columns: {
                     chartType: {
-                        label: "ChartType"
+                        label: "ChartType",
+                        renderCell: lang.hitch(this, function(point, chartType, default_node, options) {
+                            var myIconClass;
+                            var myLabel;
+                            myIconClass = 'scadaBrDeleteIcon';
+                            myLabel = "Show Chart";
+
+                            var btnAck = new Button({
+                                myObj: this,
+                                pointId: point.id,
+                                showLabel: false,
+                                iconClass: myIconClass,
+                                label: myLabel,
+                                onClick: function() {
+                                    this.myObj.svc.getChartDataSet(this.pointId).then(function(result) {
+                                        var d = new Dialog();
+                                        var div = document.createElement("div");
+                                        var c = new DataPointChart(result, div)
+                                        d.setContent(div);
+                                        d.show();
+                                    });
+                                }
+                            }, default_node.appendChild(document.createElement("div")));
+                            btnAck._destroyOnRemove = true;
+
+                        })
                     },
                     settable: {
                         label: "Settable"

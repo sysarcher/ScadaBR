@@ -65,7 +65,7 @@ public class StatisticsChartRenderer extends TimePeriodChartRenderer {
 
     @Override
     public void addDataToModel(Map<String, Object> model, DataPointVO point) {
-        long startTime = getStartTime();
+        long startTime = getStartTime(System.currentTimeMillis());
         PointValueFacade pointValueFacade = new PointValueFacade(point.getId());
         List<PointValueTime> values = pointValueFacade.getPointValues(startTime);
 
