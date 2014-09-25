@@ -71,10 +71,25 @@ var Keyboard = declare(null, {
 					grid._focusedHeaderNode.tabIndex = -1;
 				}
 				if(grid.showHeader){
+					if(cellNavigation){
+						// Get the focused element. Ensure that the focused element
+						// is actually a grid cell, not a column-set-cell or some
+						// other cell that should not be focused
+						for(var i = 0, element, elements = grid.headerNode.getElementsByTagName("th"); (element = elements[i]); ++i){
+							if(isFocusableClass.test(element.className)){
+								grid._focusedHeaderNode = initialNode = element;
+								break;
+							}
+						}
+					}
+					else{
+						grid._focusedHeaderNode = initialNode = grid.headerNode;
+					}
+
 					// Set the tab index only if the header is visible.
-					grid._focusedHeaderNode = initialNode =
-						cellNavigation ? grid.headerNode.getElementsByTagName("th")[0] : grid.headerNode;
-					if(initialNode){ initialNode.tabIndex = grid.tabIndex; }
+					if(initialNode){
+						initialNode.tabIndex = grid.tabIndex;
+					}
 				}
 			}
 			
@@ -280,7 +295,7 @@ var Keyboard = declare(null, {
 			inputs = element.getElementsByTagName("input");
 			for(i = 0, numInputs = inputs.length; i < numInputs; i++){
 				input = inputs[i];
-				if((input.tabIndex != -1 || "lastValue" in input) && !input.disabled){
+				if((input.tabIndex != -1 || "_dgridLastValue" in input) && !input.disabled){
 					// Employ workaround for focus rectangle in IE < 8
 					if(has("ie") < 8){ input.style.position = "relative"; }
 					input.focus();
@@ -316,8 +331,10 @@ var Keyboard = declare(null, {
 			
 			// Expose object representing focused cell or row losing focus, via
 			// event.cell or event.row; which is set depends on cellNavigation.
-			event[cellOrRowType] = this[cellOrRowType](focusedNode);
-			on.emit(focusedNode, "dgrid-cellfocusout", event);
+			if(event){
+				event[cellOrRowType] = this[cellOrRowType](focusedNode);
+				on.emit(focusedNode, "dgrid-cellfocusout", event);
+			}
 		}
 		focusedNode = this[focusedNodeProperty] = element;
 		
@@ -352,7 +369,12 @@ var Keyboard = declare(null, {
 	},
 	
 	focus: function(element){
-		this._focusOnNode(element || this._focusedNode, false);
+		var node = element || this._focusedNode;
+		if(node){
+			this._focusOnNode(node, false);
+		}else{
+			this.contentNode.focus();
+		}
 	}
 });
 
