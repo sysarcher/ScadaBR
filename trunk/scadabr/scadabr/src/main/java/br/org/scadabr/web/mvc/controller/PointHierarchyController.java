@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.serotonin.mango.web.mvc.controller;
+package br.org.scadabr.web.mvc.controller;
 
 import br.org.scadabr.logger.LogUtils;
 import com.serotonin.mango.db.dao.DataPointDao;

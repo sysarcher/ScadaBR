@@ -72,7 +72,7 @@ public class MBusDataSourceRT extends PollingDataSource<MBusDataSourceVO> {
         boolean pointError = false;
         boolean dsError = false;
 
-        ValueRequest<DataPointRT> request = new ValueRequest<>();
+        final ValueRequest<DataPointRT> request = new ValueRequest<>();
         for (DataPointRT point : enabledDataPoints.values()) {
             final MBusPointLocatorRT locator = point.getPointLocator();
             request.add(locator.createValueRequestPointLocator(point));

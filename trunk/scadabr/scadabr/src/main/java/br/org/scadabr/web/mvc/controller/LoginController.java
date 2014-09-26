@@ -16,9 +16,10 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.web.mvc.controller;
+package br.org.scadabr.web.mvc.controller;
 
 
+import br.org.scadabr.web.mvc.form.LoginForm;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,7 +32,6 @@ import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.UserSessionContextBean;
 import com.serotonin.mango.web.integration.CrowdUtils;
-import com.serotonin.mango.web.mvc.form.LoginForm;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import org.springframework.context.annotation.Scope;
@@ -45,13 +45,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 @RequestMapping("/login.htm")
 @Scope("request")
-public class LoginController {
+class LoginController {
     
     private static final Log logger = LogFactory.getLog(LoginController.class);
 
     private String successUrl ="redirect:watch_list.shtm";
     private String newUserUrl = "redirect:help.shtm";
-    private String loginView = "login";
+    private final static String LOGIN_VIEW = "login";
     @Inject
     private UserDao userDao;
 	
@@ -78,7 +78,7 @@ public class LoginController {
             String username = CrowdUtils.getCrowdUsername(request);
 
             if (username != null) {
-                model.addAttribute("login", new LoginForm(username));
+                model.addAttribute(LOGIN_VIEW, new LoginForm(username));
 
                 // The user is logged into Crowd. Make sure the username is valid in this instance.
                 User user = userDao.getUser(username);
@@ -98,9 +98,9 @@ public class LoginController {
                 }
             }
         } else {
-            model.addAttribute("login", new LoginForm());
+            model.addAttribute(LOGIN_VIEW, new LoginForm());
         }
-        return loginView;
+        return LOGIN_VIEW;
     }
 
     /*

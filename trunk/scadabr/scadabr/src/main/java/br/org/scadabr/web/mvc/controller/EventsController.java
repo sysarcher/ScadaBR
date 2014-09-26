@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.web.mvc.controller;
+package br.org.scadabr.web.mvc.controller;
 
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.web.l10n.Localizer;
