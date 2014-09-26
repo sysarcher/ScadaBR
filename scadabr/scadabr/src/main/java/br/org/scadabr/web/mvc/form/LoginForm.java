@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.web.mvc.form;
+package br.org.scadabr.web.mvc.form;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;

@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.web.mvc.controller;
+package br.org.scadabr.web.mvc.controller;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,17 +38,23 @@ import com.serotonin.mango.web.comparators.BaseComparator;
 import br.org.scadabr.web.l10n.Localizer;
 import br.org.scadabr.web.util.PagingDataForm;
 import com.serotonin.mango.rt.RuntimeManager;
+import com.serotonin.mango.web.UserSessionContextBean;
+import com.serotonin.mango.web.mvc.controller.ControllerUtils;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
+@Scope("request")
 @RequestMapping("/data_sources.shtm")
 public class DataSourceListController {
 
+    @Inject
+    private UserSessionContextBean userSessionContextBean;
     @Inject
     private RuntimeManager runtimeManager;
     @Inject
@@ -66,7 +72,7 @@ public class DataSourceListController {
    
     
     private void fillDataForm(HttpServletRequest request, PagingDataForm paging) {
-        User user = Common.getUser(request);
+        final User user = userSessionContextBean.getUser();
         
         List<DataSourceVO<?>> data = runtimeManager.getDataSources();
         List<ListParent<DataSourceVO<?>, DataPointVO>> dataSources = new ArrayList<>();

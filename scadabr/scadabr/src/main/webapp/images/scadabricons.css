@@ -16,6 +16,14 @@ and open the template in the editor.
     text-align: center;
 }
 
+.scadaBrDataSourcesIcon{
+    background-image: url('icon_ds.png');
+    background-repeat: no-repeat;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+}
+
 .scadaBrPointHierarchyIcon {
     background-image: url('folder_brick.png');
     background-repeat: no-repeat;

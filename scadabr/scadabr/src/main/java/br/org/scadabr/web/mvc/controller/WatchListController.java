@@ -16,14 +16,11 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.web.mvc.controller;
+package br.org.scadabr.web.mvc.controller;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
-import br.org.scadabr.db.IntValuePair;
 import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.view.ShareUser;
 import com.serotonin.mango.vo.DataPointVO;
@@ -68,7 +65,7 @@ public class WatchListController {
     }
 
     protected void createModel(ModelMap modelMap) {
-        User user = userSessionContextBean.getUser();
+        final User user = userSessionContextBean.getUser();
 
         // The user's permissions may have changed since the last session, so make sure the watch lists are correct.
         List<WatchList> watchLists = watchListDao.getWatchLists(user.getId());
