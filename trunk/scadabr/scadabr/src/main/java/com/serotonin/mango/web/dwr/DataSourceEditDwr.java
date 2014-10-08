@@ -233,6 +233,7 @@ import net.sf.fhz4j.fht.FhtProperty;
 /**
  * @author Matthew Lohbihler
  */
+@Deprecated // anything of dwr is deprecated
 public class DataSourceEditDwr extends DataSourceListDwr {
 
     private static final Log LOG = LogFactory.getLog(DataSourceEditDwr.class);

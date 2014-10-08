@@ -41,14 +41,15 @@
             background: #F2F5F9;
         }
     </style>
-    
+
     <script type="text/javascript">
+        var events;
         require(["scadabr/jsp/Events",
             "dojo/domReady!"
-        ], function(Events) {
-            var events = new Events("pendingAlarms");
-            require(["dojo/ready"], function(ready) {
-                ready(function() {
+        ], function (Events) {
+            events = new Events("pendingAlarms");
+            require(["dojo/ready"], function (ready) {
+                ready(function () {
                     events.wireEvents("btnAcknowledgeAll");
                 });
             });

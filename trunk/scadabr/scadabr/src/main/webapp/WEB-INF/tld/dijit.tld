@@ -24,6 +24,36 @@
         </attribute>
         <attribute>
             <name>name</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>value</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>i18nLabel</name>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>i18nTitle</name>
+        </attribute>
+    </tag>
+    <tag>
+        <name>validationTextBox</name>
+        <tag-class>br.org.scadabr.web.taglib.dijit.ValidationTextBoxTag</tag-class>
+        <description>
+            Writes a input tag for dijit/form/ValidatingTextBox.
+        </description>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>id</name>
+        </attribute>
+        <attribute>
+            <name>type</name>
+        </attribute>
+        <attribute>
+            <name>name</name>
+            <rtexprvalue>true</rtexprvalue>
         </attribute>
         <attribute>
             <name>value</name>

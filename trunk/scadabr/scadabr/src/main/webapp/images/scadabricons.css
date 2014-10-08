@@ -32,6 +32,13 @@ and open the template in the editor.
     text-align: center;
 }
 
+.scadaBrAddDataSourceIcon {
+    background-image: url('icon_ds_add.png');
+    background-repeat: no-repeat;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+}
 
 .scadaBrEventsIcon {
     background-image: url('flag_white.png');

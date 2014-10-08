@@ -8,8 +8,10 @@ package br.org.scadabr.web.content;
 import br.org.scadabr.ImplementMeException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.Locale;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,6 +20,31 @@ import javax.servlet.http.HttpServletResponse;
  * @author aploese
  */
 public class MockServletResponse implements HttpServletResponse {
+
+    @Override
+    public int getStatus() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getHeader(String string) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Collection<String> getHeaders(String string) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Collection<String> getHeaderNames() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setContentLengthLong(long l) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
     public static class MockServletOutputStream extends ServletOutputStream {
 
@@ -91,6 +118,16 @@ public class MockServletResponse implements HttpServletResponse {
         public void write(int b) {
             // We should never reach this ...
             throw new ImplementMeException();
+        }
+
+        @Override
+        public boolean isReady() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void setWriteListener(WriteListener wl) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
         
     }

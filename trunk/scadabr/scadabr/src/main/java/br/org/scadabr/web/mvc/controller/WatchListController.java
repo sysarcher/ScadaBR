@@ -68,11 +68,11 @@ public class WatchListController {
         final User user = userSessionContextBean.getUser();
 
         // The user's permissions may have changed since the last session, so make sure the watch lists are correct.
-        List<WatchList> watchLists = watchListDao.getWatchLists(user.getId());
+        final List<WatchList> watchLists = watchListDao.getWatchLists(user.getId());
 
         if (watchLists.isEmpty()) {
             // Add a default watch list if none exist.
-            WatchList watchList = new WatchList();
+            final WatchList watchList = new WatchList();
             watchList.setName(localizer.localizeI18nKey("common.newName"));
             watchLists.add(watchListDao.createNewWatchList(watchList, user.getId()));
         }

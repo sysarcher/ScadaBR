@@ -22,22 +22,22 @@
     <script>
         //A little bit clumsy but thats the only way to get this to work on firefox ....
         // Wait for parser to finish???
-        require(["dojo/domReady!"], function() {
-            setTimeout(function() {
-                require(["dijit/focus", "dojo/dom"], function(focusUtil, dom) {
+        require(["dojo/domReady!"], function () {
+            setTimeout(function () {
+                require(["dijit/focus", "dojo/dom"], function (focusUtil, dom) {
                     focusUtil.focus(dom.byId("username"));
                 });
             }, 1000);
         });
     </script>
-    
+
     <dijit:form action="login.htm" method="post">
         <dojox:tableContainer cols="1">
             <spring:bind path="login.username">
-                <dijit:textBox id="username" name="username" i18nLabel="login.userId" value="${status.value}"/>
+                    <dijit:validationTextBox i18nLabel="login.userId" />
             </spring:bind>
             <spring:bind path="login.password">
-                <dijit:textBox name="password" type="password" i18nLabel="login.password" value="${status.value}"/>
+                <dijit:validationTextBox type="password" i18nLabel="login.password" />
             </spring:bind>
         </dojox:tableContainer>
 

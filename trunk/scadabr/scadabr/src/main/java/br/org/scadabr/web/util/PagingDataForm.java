@@ -5,9 +5,6 @@
  */
 package br.org.scadabr.web.util;
 
-import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.ListParent;
-import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -16,6 +13,7 @@ import java.util.List;
  *
  * @author aploese
  */
+@Deprecated
 public class PagingDataForm<P, T extends PaginatedData<P>> {
 
     private List<T> data;
