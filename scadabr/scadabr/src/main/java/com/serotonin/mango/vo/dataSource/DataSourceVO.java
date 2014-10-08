@@ -310,6 +310,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         private final String key;
         private final boolean display;
 
+        @Deprecated
         public int getId() {
             return id;
         }
@@ -491,6 +492,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
     }
 
     @Override
+    //TODO is tis everytime an audit event ???
     public String getTypeKey() {
         return "event.audit.dataSource";
     }

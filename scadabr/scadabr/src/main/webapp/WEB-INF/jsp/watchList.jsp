@@ -48,10 +48,11 @@
         </style>
 
         <script type="text/javascript">
+            var _watchList;
             require([
                 "scadabr/jsp/WatchList",
                 "dojo/domReady!"
-            ], function(WatchList) {
+            ], function (WatchList) {
                 _watchList = new WatchList("dataPointTree", "watchListTable", ${selectedWatchList});
             });
 

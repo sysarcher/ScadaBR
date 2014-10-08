@@ -11,6 +11,8 @@ import java.io.IOException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.JspWriter;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.servlet.tags.BindTag;
 import org.springframework.web.servlet.tags.RequestContextAwareTag;
 
@@ -18,7 +20,7 @@ import org.springframework.web.servlet.tags.RequestContextAwareTag;
  *
  * @author aploese
  */
-public class TextBoxTag extends RequestContextAwareTag {
+public class ValidationTextBoxTag extends RequestContextAwareTag {
 
     private String name;
     private String value;
@@ -45,11 +47,25 @@ public class TextBoxTag extends RequestContextAwareTag {
             out.print("<input");
             printAttribute(out, "id", id);
             printAttribute(out, "type", type);
-            out.print(" data-dojo-type=\"dijit/form/TextBox\" ");
+            out.print(" data-dojo-type=\"dijit/form/ValidationTextBox\" ");
+            
             printAttribute(out, "label", localizer.localizeI18nKey(i18nLabel) + ":");
             printAttribute(out, "title", localizer.localizeI18nKey(i18nTitle != null ? i18nTitle : i18nLabel));
-            if (getParent() instanceof BindTag) {
-                BindTag bindTag = (BindTag) getParent();
+            BindTag bindTag = (BindTag) this.getParent();
+            if (bindTag != null) {
+                if (bindTag.getErrors().hasFieldErrors(bindTag.getProperty())) {
+                    out.print(" data-dojo-props=\"");
+                    out.print("_isEmpty: function(value) {return false;},\n"); //TODO Workaround to show error message see ValidationTextBox.validate
+                    out.print("validator : function(value, constraints){return ");
+                    out.print(bindTag.getErrors().hasErrors() ? (value == null ? "''" : "'" + value + "'") + " != value" : "true");
+                    out.print(";},\n invalidMessage:'");
+                    for (FieldError fe : bindTag.getErrors().getFieldErrors(bindTag.getProperty())) {
+                        out.print(getRequestContext().getMessage(fe, true));
+                    }
+                    out.print("'\"");
+                } else {
+                    out.print(" data-dojo-props=\"validator : function(value, constraints){return true;}\""); // no client validation...
+                }
                 printAttribute(out, "name", bindTag.getProperty());
                 printAttribute(out, "value", bindTag.getEditor().getAsText());
             } else {
