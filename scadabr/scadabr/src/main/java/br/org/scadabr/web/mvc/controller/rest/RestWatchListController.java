@@ -19,12 +19,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  *
  * @author aploese
  */
-@Controller
+@RestController
 @Scope("request")
 public class RestWatchListController {
 
@@ -41,7 +42,7 @@ public class RestWatchListController {
 
 
     @RequestMapping(value = "/rest/watchlists", params = "id", method = RequestMethod.GET)
-    public @ResponseBody JsonWatchList getWatchList(int id) {
+    public JsonWatchList getWatchList(int id) {
         LOG.severe("CALLED: getWatchList " + id);
         final JsonWatchList result = new JsonWatchList(watchListDao.getWatchList(id), dataPointDao, runtimeManager, localizer);
         for (JsonWatchListPoint jwp : result) {

@@ -22,19 +22,13 @@
 
     <jsp:body>
 
-        <dijit:sidebarBorderContainer gutters="true" liveSplitters="true" >
-            <dijit:leftContentPane id="pointTreeContentPane" splitter="true" >
-                <div id="dataPointTree"></div>
-            </dijit:leftContentPane>
-            <dijit:centerContentPane >
-                <dijit:headlineLayoutContainer >
-                    <dijit:topContentPane >
-                    </dijit:topContentPane>
-                    <dijit:centerContentPane >
-                        <div id="watchListTable"></div>
-                    </dijit:centerContentPane>
-                </dijit:headlineLayoutContainer>
-            </dijit:centerContentPane>
-        </dijit:sidebarBorderContainer>
+        <dijit:form action="editDataSource.shtml.htm" method="post">
+        <dojox:tableContainer cols="1">
+                    <dijit:validationTextBox i18nLabel="dsEdit.head.name" path="dataSource.name"/>
+        </dojox:tableContainer>
+
+        <dijit:button type="submit" i18nLabel="common.save" />
+    </dijit:form>
+
     </jsp:body>
 </tag:page>

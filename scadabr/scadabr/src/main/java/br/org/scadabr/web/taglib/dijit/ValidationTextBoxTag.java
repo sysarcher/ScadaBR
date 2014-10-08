@@ -6,24 +6,17 @@
 package br.org.scadabr.web.taglib.dijit;
 
 import br.org.scadabr.web.l10n.Localizer;
-import static br.org.scadabr.web.taglib.Functions.printAttribute;
-import java.io.IOException;
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspTagException;
-import javax.servlet.jsp.JspWriter;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.servlet.tags.BindTag;
-import org.springframework.web.servlet.tags.RequestContextAwareTag;
+import org.springframework.web.servlet.tags.form.AbstractHtmlInputElementTag;
+import org.springframework.web.servlet.tags.form.TagWriter;
 
 /**
  *
  * @author aploese
  */
-public class ValidationTextBoxTag extends RequestContextAwareTag {
+public class ValidationTextBoxTag extends AbstractHtmlInputElementTag {
 
-    private String name;
-    private String value;
     private String i18nLabel;
     private String i18nTitle;
     private String type;
@@ -31,66 +24,53 @@ public class ValidationTextBoxTag extends RequestContextAwareTag {
     @Override
     public void release() {
         super.release();
-        id = null;
-        value = null;
         i18nLabel = null;
         i18nTitle = null;
         type = null;
     }
 
     @Override
-    public int doStartTagInternal() throws JspException {
-        Localizer localizer = getRequestContext().getWebApplicationContext().getBean(Localizer.class);
-        try {
-            JspWriter out = pageContext.getOut();
+    protected int writeTagContent(TagWriter tagWriter) throws JspException {
+        final Localizer localizer = getRequestContext().getWebApplicationContext().getBean(Localizer.class);
+        tagWriter.startTag("input");
 
-            out.print("<input");
-            printAttribute(out, "id", id);
-            printAttribute(out, "type", type);
-            out.print(" data-dojo-type=\"dijit/form/ValidationTextBox\" ");
-            
-            printAttribute(out, "label", localizer.localizeI18nKey(i18nLabel) + ":");
-            printAttribute(out, "title", localizer.localizeI18nKey(i18nTitle != null ? i18nTitle : i18nLabel));
-            BindTag bindTag = (BindTag) this.getParent();
-            if (bindTag != null) {
-                if (bindTag.getErrors().hasFieldErrors(bindTag.getProperty())) {
-                    out.print(" data-dojo-props=\"");
-                    out.print("_isEmpty: function(value) {return false;},\n"); //TODO Workaround to show error message see ValidationTextBox.validate
-                    out.print("validator : function(value, constraints){return ");
-                    out.print(bindTag.getErrors().hasErrors() ? (value == null ? "''" : "'" + value + "'") + " != value" : "true");
-                    out.print(";},\n invalidMessage:'");
-                    for (FieldError fe : bindTag.getErrors().getFieldErrors(bindTag.getProperty())) {
-                        out.print(getRequestContext().getMessage(fe, true));
-                    }
-                    out.print("'\"");
-                } else {
-                    out.print(" data-dojo-props=\"validator : function(value, constraints){return true;}\""); // no client validation...
-                }
-                printAttribute(out, "name", bindTag.getProperty());
-                printAttribute(out, "value", bindTag.getEditor().getAsText());
-            } else {
-                printAttribute(out, "name", name);
-                printAttribute(out, "value", value);
+        writeDefaultAttributes(tagWriter);
+        tagWriter.writeOptionalAttributeValue("type", type);
+
+        final String value = getValue();
+        tagWriter.writeAttribute("value", value);
+
+        // custom optional attributes
+        tagWriter.writeAttribute("label", localizer.localizeI18nKey(i18nLabel) + ":");
+        tagWriter.writeAttribute("title", localizer.localizeI18nKey(i18nTitle != null ? i18nTitle : i18nLabel));
+        tagWriter.writeAttribute("data-dojo-type", "dijit/form/ValidationTextBox");
+        StringBuilder sb = new StringBuilder();
+        if (getBindStatus().getErrors().hasFieldErrors(getBindStatus().getExpression())) {
+            sb.append("_isEmpty: function(value) {return false;},\n"); //TODO Workaround to show error message see ValidationTextBox.validate
+            sb.append("validator : function(value, constraints){return ");
+            sb.append(getBindStatus().getErrors().hasErrors() ? (value == null ? "''" : "'" + value + "'") + " != value" : "true");
+            sb.append(";},\n invalidMessage:'");
+            for (FieldError fe : getBindStatus().getErrors().getFieldErrors(getBindStatus().getExpression())) {
+                sb.append(getRequestContext().getMessage(fe, true));
             }
-            out.print("/>");
-        } catch (IOException ex) {
-            throw new JspTagException(ex.getMessage());
+            sb.append("'");
+        } else {
+            sb.append("validator : function(value, constraints){return true;}"); // no client validation...
         }
-        return EVAL_BODY_INCLUDE;
+        tagWriter.writeAttribute("data-dojo-props", sb.toString());
+
+        tagWriter.endTag();
+        return SKIP_BODY;
     }
 
     /**
-     * @param name the name to set
+     * Writes the '{@code value}' attribute to the supplied {@link TagWriter}.
+     * Subclasses may choose to override this implementation to control exactly
+     * when the value is written.
      */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * @param value the value to set
-     */
-    public void setValue(String value) {
-        this.value = value;
+    protected String getValue() throws JspException {
+        String value = getDisplayString(getBoundValue(), getPropertyEditor());
+        return processFieldValue(getName(), value, "text");
     }
 
     /**
