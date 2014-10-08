@@ -67,9 +67,7 @@ define(["dojo/_base/declare",
                                 label: myLabel,
                                 onClick: function() {
                                     console.log("BTN Edit THIS: ", this);
-                                    window.location = "editDataSources/editFhz.shtml?id=1";
-                                    
-                                    //this.myObj.editDataSource(this.dataSourceId);
+                                    window.location = "editDataSource.shtml?id=" + dataSourceId;
                                 }
                             }, default_node.appendChild(document.createElement("div")));
                             btnAck._destroyOnRemove = true;

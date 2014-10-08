@@ -25,12 +25,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  *
  * @author aploese
  */
-@Controller
+@RestController
 @Scope("request")
 public class RestDataSourcesController {
 
@@ -48,7 +49,7 @@ public class RestDataSourcesController {
 
 
     @RequestMapping(value = "/rest/dataSources", method = RequestMethod.GET)
-    public @ResponseBody List<JsonDataSource> getDataSources() {
+    public List<JsonDataSource> getDataSources() {
         LOG.severe("CALLED: getDataSources");
         
         final User user = userSessionContextBean.getUser();

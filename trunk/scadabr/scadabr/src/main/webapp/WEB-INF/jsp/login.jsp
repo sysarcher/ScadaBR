@@ -33,12 +33,8 @@
 
     <dijit:form action="login.htm" method="post">
         <dojox:tableContainer cols="1">
-            <spring:bind path="login.username">
-                    <dijit:validationTextBox i18nLabel="login.userId" />
-            </spring:bind>
-            <spring:bind path="login.password">
-                <dijit:validationTextBox type="password" i18nLabel="login.password" />
-            </spring:bind>
+            <dijit:validationTextBox i18nLabel="login.userId" path="login.username"/>
+            <dijit:validationTextBox type="password" i18nLabel="login.password" path="login.password"/>
         </dojox:tableContainer>
 
         <dijit:button type="submit" i18nLabel="login.loginButton" />

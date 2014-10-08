@@ -40,24 +40,25 @@
     </tag>
     <tag>
         <name>validationTextBox</name>
-        <tag-class>br.org.scadabr.web.taglib.dijit.ValidationTextBoxTag</tag-class>
         <description>
             Writes a input tag for dijit/form/ValidatingTextBox.
         </description>
+        <tag-class>br.org.scadabr.web.taglib.dijit.ValidationTextBoxTag</tag-class>
         <body-content>empty</body-content>
         <attribute>
+            <description>Path to property for data binding</description>
+            <name>path</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>HTML Standard Attribute</description>
             <name>id</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
         </attribute>
         <attribute>
             <name>type</name>
-        </attribute>
-        <attribute>
-            <name>name</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>value</name>
-            <rtexprvalue>true</rtexprvalue>
         </attribute>
         <attribute>
             <name>i18nLabel</name>
@@ -66,6 +67,8 @@
         <attribute>
             <name>i18nTitle</name>
         </attribute>
+        <body-content>empty</body-content>
+        <dynamic-attributes>true</dynamic-attributes>
     </tag>
     <tag>
         <name>button</name>
@@ -241,7 +244,7 @@
             <name>splitter</name>
         </attribute>
     </tag>
-      <tag>
+    <tag>
         <name>form</name>
         <tag-class>br.org.scadabr.web.taglib.dijit.FormTag</tag-class>
         <description>
