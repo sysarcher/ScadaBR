@@ -19,15 +19,10 @@
 package br.org.scadabr.web.mvc.controller;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.vo.datasource.fhz4j.Fhz4JDataSourceVO;
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
-import com.serotonin.mango.vo.DataPointVO;
 import javax.servlet.http.HttpServletRequest;
 
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import java.util.HashMap;
-import java.util.Map;
 import javax.inject.Inject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -38,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @Scope("request")
-@RequestMapping("/editDataSource.shtml")
+@RequestMapping("/editDataSource")
 public class EditDataSourceController {
 
     @Inject

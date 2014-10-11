@@ -31,7 +31,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller()
-@RequestMapping("/logout.htm")
+@RequestMapping("/logout")
 @Scope("request")
 public class LogoutController  {
 
@@ -59,6 +59,6 @@ public class LogoutController  {
         }
         
         // Regardless of what happened above, forward to the configured view.
-        return "redirect:login.htm";
+        return "redirect:login";
     }
 }

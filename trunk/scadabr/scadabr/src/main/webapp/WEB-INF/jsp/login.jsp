@@ -31,7 +31,7 @@
         });
     </script>
 
-    <dijit:form action="login.htm" method="post">
+    <dijit:form action="login" method="post">
         <dojox:tableContainer cols="1">
             <dijit:validationTextBox i18nLabel="login.userId" path="login.username"/>
             <dijit:validationTextBox type="password" i18nLabel="login.password" path="login.password"/>

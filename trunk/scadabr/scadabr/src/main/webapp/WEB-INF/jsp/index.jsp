@@ -29,8 +29,8 @@
   <link rel="shortcut icon" href="images/favicon.ico"/>
 </head>
 <body>
-<script language="JavaScript">window.location="login.htm";</script>
+<script language="JavaScript">window.location="login";</script>
 <%--<a style="font-size: 13px; color: #804000; font-family: Verdana, Arial, Helvetica, sans-serif;" href="login.htm">ScadaBR (powered by Mango)</a>--%>
-<a style="font-size: 13px; color: #414042; font-family: Verdana, Arial, Helvetica, sans-serif;" href="login.htm">ScadaBR (powered by Mango)</a>
+<a style="font-size: 13px; color: #414042; font-family: Verdana, Arial, Helvetica, sans-serif;" href="login">ScadaBR (powered by Mango)</a>
 </body>
 </html>

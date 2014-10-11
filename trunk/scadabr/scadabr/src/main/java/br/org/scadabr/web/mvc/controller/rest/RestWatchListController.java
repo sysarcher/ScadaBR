@@ -41,7 +41,7 @@ public class RestWatchListController {
     private Localizer localizer;
 
 
-    @RequestMapping(value = "/rest/watchlists", params = "id", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/watchLists", params = "id", method = RequestMethod.GET)
     public JsonWatchList getWatchList(int id) {
         LOG.severe("CALLED: getWatchList " + id);
         final JsonWatchList result = new JsonWatchList(watchListDao.getWatchList(id), dataPointDao, runtimeManager, localizer);
