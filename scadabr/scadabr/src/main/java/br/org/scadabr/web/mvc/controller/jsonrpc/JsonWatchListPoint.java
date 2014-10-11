@@ -24,7 +24,7 @@ public class JsonWatchListPoint implements Serializable {
     private boolean changed;
     private long timestampMs;
 
-    JsonWatchListPoint(DataPointVO dp, DataPointRT dpRt, DataPointDao dataPointDao, Localizer localizer) {
+    JsonWatchListPoint(final DataPointVO dp, final DataPointRT dpRt, final DataPointDao dataPointDao, final Localizer localizer) {
         id = dp.getId();
         settable = dp.isSettable();
         canonicalName = dataPointDao.getCanonicalPointName(dp);

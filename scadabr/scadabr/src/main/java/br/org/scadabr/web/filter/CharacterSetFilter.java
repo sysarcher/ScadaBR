@@ -18,6 +18,7 @@ import javax.servlet.ServletResponse;
  *
  * @author aploese
  */
+@Deprecated // apl -> really needed???
 public class CharacterSetFilter implements Filter {
   private String charset;
   

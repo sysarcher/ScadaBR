@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @Scope("request")
-@RequestMapping("/data_sources.shtm")
+@RequestMapping("/dataSources")
 public class DataSourceListController {
 
     @RequestMapping(method = RequestMethod.GET)

@@ -17,60 +17,25 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
-<%@page import="com.serotonin.mango.Common"%>
 <tag:page >
+
     <script type="text/javascript">
         require([
             "scadabr/jsp/PointHierarchy",
             "dojo/domReady!"
         ], function(PointHierarchy) {
-            var pointHierarchy = new PointHierarchy("treeDiv");
+            var _pointHierarchy = new PointHierarchy("dataPointTree", "dataPointEdit");
         });
 
     </script>
 
-    <table>
-        <tr>
-            <td valign="top">
-                <div class="borderDivPadded">
-                    <table width="100%">
-                        <tr>
-                            <td>
-                                <span class="smallTitle"><fmt:message key="pointHierarchy.hierarchy"/></span>
-                                <tag:help id="pointHierarchy"/>
-                            </td>
-                            <td align="right">
-                                <tag:img png="folder_add" title="common.add" onclick="showRoot()"/>
-                                <tag:img png="save" title="common.save" onclick="save()"/>
-                            </td>
-                        </tr>
-                        <tr><td class="formError" id="errorMessage"></td></tr>
-                    </table>
-                    <div id="treeDiv"></div>
-                    <!--TODO make this work ... div data-dojo-type="dijit/Tree" id="myTree" data-dojo-props="model: myRestStore"></div-->
-                </div>
-            </td>
-
-            <td valign="top">
-                <div id="folderEditDiv" class="borderDivPadded" style="display:none;">
-                    <table width="100%">
-                        <tr>
-                            <td class="smallTitle"><fmt:message key="pointHierarchy.details"/></td>
-                            <td align="right">
-                                <tag:img id="deleteImg" png="delete" title="common.delete" onclick="deleteFolder();"/>
-                                <tag:img id="saveImg" png="save" title="common.save" onclick="saveFolder();"/>
-                            </td>
-                        </tr>
-                    </table>
-
-                    <table>
-                        <tr>
-                            <td class="formLabelRequired"><fmt:message key="pointHierarchy.name"/></td>
-                            <td class="formField"><input id="folderName" type="text"/></td>
-                        </tr>
-                    </table>
-                </div>
-            </td>
-        </tr>
-    </table>
+        <dijit:sidebarBorderContainer gutters="true" liveSplitters="true" >
+            <dijit:leftContentPane id="pointTreeContentPane" splitter="true" >
+                <div id="dataPointTree"></div>
+            </dijit:leftContentPane>
+            <dijit:centerContentPane >
+                        <div id="dataPointEdit"></div>
+            </dijit:centerContentPane>
+        </dijit:sidebarBorderContainer>
+    
 </tag:page>

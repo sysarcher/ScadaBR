@@ -3,7 +3,12 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta name="Copyright" content="&copy;©2009-2011 Fundação Certi, MCA Sistemas, Unis Sistemas, Conetec, Todos os direitos reservados."/>
+        <meta name="DESCRIPTION" content="ScadaBR Software"/>
+        <meta name="KEYWORDS" content="ScadaBR Software"/>
         <link rel="stylesheet" href="resources/scadabr.css">
+        <link rel="icon" href="images/favicon.ico"/>
+        <link rel="shortcut icon" href="images/favicon.ico"/>
         <script src='resources/dojo/dojo.js' data-dojo-config="isDebug: true, async: true, parseOnLoad: true"></script>
         <script>
             require(["dojo/parser",
@@ -47,20 +52,20 @@
                     <dijit:bottomContentPane>
                         <dijit:toolbar>
                             <dijit:button iconClass="scadaBrWatchListIcon" i18nTitle="header.watchlist">
-                                <script type="dojo/connect" data-dojo-event="onClick">window.location = "watch_list.shtm";</script>
+                                <script type="dojo/connect" data-dojo-event="onClick">window.location = "watchList";</script>
                             </dijit:button>
                             <dijit:button iconClass="scadaBrEventsIcon" i18nTitle="header.alarms">
-                                <script type="dojo/connect" data-dojo-event="onClick">window.location = "events.shtm";</script>
+                                <script type="dojo/connect" data-dojo-event="onClick">window.location = "events";</script>
                             </dijit:button>
                             <dijit:button iconClass="scadaBrDataSourcesIcon" i18nTitle="header.dataSources">
-                                <script type="dojo/connect" data-dojo-event="onClick">window.location = "data_sources.shtm";</script>
+                                <script type="dojo/connect" data-dojo-event="onClick">window.location = "dataSources";</script>
                             </dijit:button>
                             <dijit:button iconClass="scadaBrPointHierarchyIcon" i18nTitle="header.pointHierarchy" >
-                                <script type="dojo/connect" data-dojo-event="onClick">window.location = "point_hierarchy.shtm";</script>
+                                <script type="dojo/connect" data-dojo-event="onClick">window.location = "pointHierarchy";</script>
                             </dijit:button>
                             <dijit:toolbarSeparator/>
                             <dijit:button iconClass="scadaBrLogoutIcon" i18nTitle="header.logout" >
-                                <script type="dojo/connect" data-dojo-event="onClick">window.location = "logout.htm";</script>
+                                <script type="dojo/connect" data-dojo-event="onClick">window.location = "logout";</script>
                             </dijit:button>
                             <!-- USE style="float:right;" to right align button ...-->
 

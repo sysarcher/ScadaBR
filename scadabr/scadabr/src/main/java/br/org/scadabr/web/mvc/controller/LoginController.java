@@ -43,14 +43,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-@RequestMapping("/login.htm")
+@RequestMapping("/login")
 @Scope("request")
 class LoginController {
     
     private static final Log logger = LogFactory.getLog(LoginController.class);
 
-    private String successUrl ="redirect:watch_list.shtm";
-    private String newUserUrl = "redirect:help.shtm";
+    private String successUrl ="redirect:watchList";
+    private String newUserUrl = "redirect:help";
     private final static String LOGIN_VIEW = "login";
     @Inject
     private UserDao userDao;
@@ -174,7 +174,7 @@ class LoginController {
             // Get the user data from the app server.
             user = userDao.getUser(username);
             if (user == null) {
-                return "redirect:login.htm";
+                return "redirect:login";
             }
             // Update the last login time.
             userDao.recordLogin(user.getId());

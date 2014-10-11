@@ -36,13 +36,12 @@
     See Spring Reference 15.12 Configuring Spring MVC
     @ http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/mvc.html#mvc-annotation-driven-->
     <mvc:annotation-driven /> 
-	<mvc:resources mapping="/resources/**" location="/resources/*" />
-	<mvc:resources mapping="/images/**" location="/images/*" />
-        <mvc:resources mapping="/soundmanager2.swf" location="/soundmanager2.swf" />
-        <mvc:resources mapping="/favicon_small.ico" location="/favicon_small.ico" />
-        <mvc:resources mapping="/audio/**" location="/audio/*" />
-        
-    
+    <mvc:resources mapping="/resources/**" location="/resources/*" />
+    <mvc:resources mapping="/images/**" location="/images/*" />
+    <mvc:resources mapping="/soundmanager2.swf" location="/soundmanager2.swf" />
+    <mvc:resources mapping="/favicon_small.ico" location="/favicon_small.ico" />
+    <mvc:resources mapping="/audio/**" location="/audio/*" />
+
     <!-- Without the following adapter, we'll get a "Does your handler implement a supported interface like Controller?"
     This is because mvc:annotation-driven element doesn't declare a SimpleControllerHandlerAdapter
     For more info 
@@ -50,176 +49,8 @@
     See http://forum.springsource.org/showthread.php?t=48372&highlight=UrlFilenameViewController -->
     <bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter" />
 
- <bean class="com.googlecode.jsonrpc4j.spring.AutoJsonRpcServiceExporter"/>
+    <bean class="com.googlecode.jsonrpc4j.spring.AutoJsonRpcServiceExporter"/>
    
-    <!-- DWR - ->
-    <bean id="CompoundEventsDwr" class="com.serotonin.mango.web.dwr.CompoundEventsDwr">
-        <property name="compoundEventDetectorDao" ref="compoundEventDetectorDao" />
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="scheduledEventDao" ref="scheduledEventDao"/>
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="CustomViewDwr" class="com.serotonin.mango.web.dwr.CustomViewDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="DataPointDetailsDwr" class="com.serotonin.mango.web.dwr.DataPointDetailsDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="DataPointEditDwr" class="com.serotonin.mango.web.dwr.DataPointEditDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="DataSourceEditDwr" class="com.serotonin.mango.web.dwr.DataSourceEditDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="DataSourceListDwr" class="com.serotonin.mango.web.dwr.DataSourceListDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="dataSourceDao" ref="dataSourceDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="EmportDwr" class="com.serotonin.mango.web.dwr.EmportDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="dataSourceDao" ref="dataSourceDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="EventHandlersDwr" class="com.serotonin.mango.web.dwr.EventHandlersDwr">
-        <property name="compoundEventDetectorDao" ref="compoundEventDetectorDao" />
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="dataSourceDao" ref="dataSourceDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="mailingListDao" ref="mailingListDao" />
-        <property name="maintenanceEventDao" ref="maintenanceEventDao" />
-        <property name="publisherDao" ref="publisherDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="scheduledEventDao" ref="scheduledEventDao" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="EventsDwr" class="com.serotonin.mango.web.dwr.EventsDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="MailingListsDwr" class="com.serotonin.mango.web.dwr.MailingListsDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="mailingListDao" ref="mailingListDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="MaintenanceEventsDwr" class="com.serotonin.mango.web.dwr.MaintenanceEventsDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="dataSourceDao" ref="dataSourceDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="maintenanceEventDao" ref="maintenanceEventDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="MiscDwr" class="com.serotonin.mango.web.dwr.MiscDwr">
-        <property name="customViewDwr" ref="customViewDwr" />
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="dataPointDetailsDwr" ref="dataPointDetailsDwr" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="eventManager" ref="eventManager" />
-        <property name="mailingListDao" ref="mailingListDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-        <property name="viewDwr" ref="viewDwr"/>
-    </bean>
-    <bean id="PointHierarchyDwr" class="com.serotonin.mango.web.dwr.PointHierarchyDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-    </bean>
-    <bean id="PointLinksDwr" class="com.serotonin.mango.web.dwr.PointLinksDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="pointLinkDao" ref="pointLinkDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="PublisherEditDwr" class="com.serotonin.mango.web.dwr.PublisherEditDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="PublisherListDwr" class="com.serotonin.mango.web.dwr.PublisherListDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="publisherDao" ref="publisherDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="ReportsDwr" class="com.serotonin.mango.web.dwr.ReportsDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="mailingListDao" ref="mailingListDao" />
-        <property name="reportDao" ref="reportDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-        <property name="watchListDao" ref="watchListDao" />
-    </bean>
-    <bean id="ScheduledEventsDwr" class="com.serotonin.mango.web.dwr.ScheduledEventsDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="scheduledEventDao" ref="scheduledEventDao" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="SystemSettingsDwr" class="com.serotonin.mango.web.dwr.SystemSettingsDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="systemSettingsDao" ref="systemSettingsDao" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="UsersDwr" class="com.serotonin.mango.web.dwr.UsersDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="dataSourceDao" ref="dataSourceDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-    <bean id="ViewDwr" class="com.serotonin.mango.web.dwr.ViewDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="flexProjectDao" ref="flexProjectDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="scriptDao" ref="scriptDao" />
-        <property name="userDao" ref="userDao"/>
-        <property name="viewDao" ref="viewDao" />
-    </bean>
-    <bean id="WatchListDwr" class="com.serotonin.mango.web.dwr.WatchListDwr">
-        <property name="dataPointDao" ref="dataPointDao"/>
-        <property name="eventDao" ref="eventDao"/>
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="userDao" ref="userDao"/>
-        <property name="watchListDao" ref="watchListDao"/>
-    </bean>
-    <bean id="ScriptsDwr" class="br.org.scadabr.web.dwr.ScriptsDwr">
-        <property name="dataPointDao" ref="dataPointDao" />
-        <property name="eventDao" ref="eventDao" />
-        <property name="runtimeManager" ref="runtimeManager" />
-        <property name="scriptDao" ref="scriptDao" />
-        <property name="userDao" ref="userDao"/>
-    </bean>
-  -->
     <!-- i18n TODO overhaul this to use userSessionContextBean ...  -->
     <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"/>
   

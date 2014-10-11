@@ -18,50 +18,21 @@
  */
 package br.org.scadabr.web.mvc.controller;
 
-import br.org.scadabr.logger.LogUtils;
-import br.org.scadabr.web.l10n.Localizer;
-import com.serotonin.mango.db.dao.EventDao;
-import com.serotonin.mango.web.UserSessionContextBean;
-import br.org.scadabr.web.mvc.controller.jsonrpc.JsonEventInstance;
-import java.util.logging.Logger;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Scope;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @Scope("request")
+@RequestMapping(value = "/events")
 public class EventsController {
 
-    private static final Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
-
-    @Inject
-    private EventDao eventDao;
-
-    @Inject
-    private Localizer localizer;
-
-    @Inject
-    private UserSessionContextBean userSessionContextBean;
-
-    @RequestMapping(value = "/events.shtm")
+    @RequestMapping(method = RequestMethod.GET)
     public String showForm(Model model) {
         return "events";
-    }
-
-    @RequestMapping(value = "/events", method = RequestMethod.GET)
-    public @ResponseBody
-    Object getNodeById(HttpServletRequest request, @RequestParam(value = "id", required = false) Integer id) {
-        if (id != null) {
-            return JsonEventInstance.wrap(eventDao.getEventInstance(id), localizer);
-        }
-        return JsonEventInstance.wrap(eventDao.getPendingEvents(userSessionContextBean.getUser()), localizer);
     }
 
 }

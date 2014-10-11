@@ -88,7 +88,7 @@ define(["dojo/_base/declare",
         },
         _initPointsTree: function(pointsTreeNode) {
             this.pointsTreeStore = new JsonRest({
-                target: "dstree/",
+                target: "rest/pointHierarchy/",
                 getChildren: function(object, onComplete, onError) {
                     this.query({parentId: object.id}).then(onComplete, onError);
                 },
@@ -255,7 +255,7 @@ define(["dojo/_base/declare",
             this.fetchWatchList(watchlistId);
         },
         fetchWatchList: function(watchlistId) {
-            request("rest/watchlists/", {
+            request("rest/watchLists/", {
                 query: {id: watchlistId},
                 handleAs: "json"
             }).then(lang.hitch(this, function(data) {

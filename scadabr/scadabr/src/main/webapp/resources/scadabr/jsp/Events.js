@@ -174,7 +174,7 @@ define(["dojo/_base/declare",
                 firstLastArrows: true,
                 pageSizeOptions: [10, 25, 50, 100]
             }, pendingAlarmsTableNode);
-            request("events/", {
+            request("rest/events/", {
                 handleAs: "json"
             }).then(lang.hitch(this, function(response) {
                 this.grid.store.setData(response);
