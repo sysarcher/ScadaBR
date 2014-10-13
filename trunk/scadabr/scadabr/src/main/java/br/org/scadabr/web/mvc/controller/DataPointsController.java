@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller
 @Scope("request")
-@RequestMapping(value = "/pointHierarchy")
-public class PointHierarchyController {
+@RequestMapping(value = "/dataPoints")
+public class DataPointsController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String showForm() {
-        return "pointHierarchy";
+        return "dataPoints";
     }
 
 }
