@@ -50,8 +50,9 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@Controller
-@RequestMapping("/data_point_details.shtm")
+@Deprecated
+//@Controller
+//@RequestMapping("/data_point_details.shtm")
 public class DataPointDetailsController {
     
     @Inject

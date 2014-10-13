@@ -23,7 +23,7 @@
                         evt.preventDefault();
 
                         // Post the data to the server
-                        request.post("pointEdit/common", {
+                        request.post("dataPointDetails/editCommonProperties", {
                             query: {
                                 id: ${dataPoint.id},
                             },
@@ -55,12 +55,12 @@
         );
         console.log("script end");
     </script>
-    <dijit:form id="dpEditCommon" action="pointEdit/common" method="post">
+    <dijit:form id="dpEditCommon" action="dataPointDetails/editCommonProperties" method="post">
         <dojox:tableContainer cols="1">
             <dijit:validationTextBox i18nLabel="pointEdit.props.name"  path="dataPoint.name"/>
             <dijit:validationTextBox i18nLabel="pointEdit.props.name"  path="dataPoint."/>
         </dojox:tableContainer>    
-        <dijit:button type="submit" i18nLabel="login.loginButton" />
+        <dijit:button type="submit" i18nLabel="common.save" />
 
     </dijit:form>
 </div>

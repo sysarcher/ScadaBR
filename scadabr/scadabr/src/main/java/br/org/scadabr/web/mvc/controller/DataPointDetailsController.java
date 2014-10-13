@@ -20,7 +20,6 @@ package br.org.scadabr.web.mvc.controller;
 
 
 import br.org.scadabr.logger.LogUtils;
-import br.org.scadabr.web.mvc.form.LoginForm;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.DataPointVO;
@@ -29,12 +28,9 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.validation.BindException;
 
 import javax.validation.Valid;
-import net.sf.openv4j.DataPoint;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,9 +41,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("/pointEdit/common")
+@RequestMapping("/dataPointDetails")
 @Scope("request")
-class PointEditController {
+class DataPointDetailsController {
 
     private static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
     
@@ -58,25 +54,24 @@ class PointEditController {
     private RuntimeManager runtimeManager;
     
 
-    public PointEditController() {
+    public DataPointDetailsController() {
         super();
     }
     
- 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value="/editCommonProperties", method = RequestMethod.GET)
     protected String showForm(@RequestParam int id, Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
         LOG.severe("showForm called "+ id);
-        return "pointEdit/common";
+        return "dataPointDetails/editCommonProperties";
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value="/editCommonProperties", method = RequestMethod.POST)
     protected String onSubmit(@RequestParam int id, @ModelAttribute("dataPoint") @Valid DataPointVO dataPoint, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response) throws BindException {
         LOG.severe("onSubmit called "+ id);
         if (bindingResult.hasErrors()) {
-            return "pointEdit/common";
+            return "dataPointDetails/editCommonProperties";
         }
         runtimeManager.saveDataPoint(dataPoint);
-        return "pointEdit/common";
+        return "dataPointDetails/editCommonProperties";
     }
     
     @ModelAttribute

@@ -38,7 +38,7 @@ define(["dojo/_base/declare",
                     }
                     var cleanNode = this.cleanNode; // Todo or use hitch ???
                     // Request the html fragment
-                    request.get("pointEdit/common", {
+                    request.get("dataPointDetails/editCommonProperties", {
                         query: {
                             id: node.id,
                         }
