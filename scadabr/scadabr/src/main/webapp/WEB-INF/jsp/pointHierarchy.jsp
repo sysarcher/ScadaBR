@@ -18,24 +18,31 @@
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
 <tag:page >
+    <jsp:body>
+        <style>
 
-    <script type="text/javascript">
-        require([
-            "scadabr/jsp/PointHierarchy",
-            "dojo/domReady!"
-        ], function(PointHierarchy) {
-            var _pointHierarchy = new PointHierarchy("dataPointTree", "dataPointEdit");
-        });
+            #pointTreeContentPane{
+                width: 250px; 
+            }
 
-    </script>
+        </style>
+        <script type="text/javascript">
+            require([
+                "scadabr/jsp/PointHierarchy",
+                "dojo/domReady!"
+            ], function (PointHierarchy) {
+                var _pointHierarchy = new PointHierarchy("dataPointTree", "dataPointEdit");
+            });
+
+        </script>
 
         <dijit:sidebarBorderContainer gutters="true" liveSplitters="true" >
             <dijit:leftContentPane id="pointTreeContentPane" splitter="true" >
                 <div id="dataPointTree"></div>
             </dijit:leftContentPane>
             <dijit:centerContentPane >
-                        <div id="dataPointEdit"></div>
+                <div id="dataPointEdit"></div>
             </dijit:centerContentPane>
         </dijit:sidebarBorderContainer>
-    
+    </jsp:body>
 </tag:page>
