@@ -19,9 +19,12 @@
 package br.org.scadabr.web.mvc.controller;
 
 
+import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.web.mvc.form.LoginForm;
 import com.serotonin.mango.db.dao.DataPointDao;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.DataPointVO;
+import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,11 +48,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/pointEdit/common")
 @Scope("request")
 class PointEditController {
+
+    private static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
     
     @Inject
     private DataPointDao dataPointDao;
     
-    private static final Log logger = LogFactory.getLog(PointEditController.class);
+    @Inject
+    private RuntimeManager runtimeManager;
+    
 
     public PointEditController() {
         super();
@@ -58,18 +65,25 @@ class PointEditController {
  
     @RequestMapping(method = RequestMethod.GET)
     protected String showForm(@RequestParam int id, Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        final DataPointVO dataPointVO = dataPointDao.getDataPoint(id);
-        model.addAttribute("dataPoint", dataPointVO);
+        LOG.severe("showForm called "+ id);
         return "pointEdit/common";
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String onSubmit(@ModelAttribute("login") @Valid LoginForm loginForm, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response) throws BindException {
+    protected String onSubmit(@RequestParam int id, @ModelAttribute("dataPoint") @Valid DataPointVO dataPoint, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response) throws BindException {
+        LOG.severe("onSubmit called "+ id);
         if (bindingResult.hasErrors()) {
             return "pointEdit/common";
         }
-        // store changes
+        runtimeManager.saveDataPoint(dataPoint);
         return "pointEdit/common";
+    }
+    
+    @ModelAttribute
+    protected void getModel(@RequestParam int id, Model model) {
+        LOG.severe("getModel called "+ id);
+        final DataPointVO dataPointVO = dataPointDao.getDataPoint(id);
+        model.addAttribute("dataPoint", dataPointVO);
     }
 
 }
