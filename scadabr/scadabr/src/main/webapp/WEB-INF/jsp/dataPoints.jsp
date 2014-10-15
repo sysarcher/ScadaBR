@@ -31,7 +31,7 @@
                 "scadabr/jsp/DataPoints",
                 "dojo/domReady!"
             ], function (DataPoints) {
-                var _dataPoints = new DataPoints("dataPointTree", "dataPointEdit");
+                var _dataPoints = new DataPoints("dataPointTree", "detailViewTabContainer");
             });
 
         </script>
@@ -41,30 +41,24 @@
                 <div id="dataPointTree"></div>
             </dijit:leftContentPane>
             <dijit:centerContentPane >
-                <div data-dojo-type="dijit/layout/TabContainer" >
-                    <div data-dojo-type="dijit/layout/ContentPane" title="Show data (chart)" data-dojo-props="selected:true">
-                        <div id="dataPointDetailsChart"></div>
+                <div id="detailViewTabContainer" data-dojo-type="dijit/layout/TabContainer" >
+                    <div id="dataPointDetailsChartTab" data-dojo-type="dijit/layout/ContentPane" title="Show data (chart)" data-dojo-props="selected:true, contentId: 'dataPointDetailsChart', contentUrl: 'dataPointDetails/renderChart'">
+                        <div id="dataPointDetailsChart" ></div>
                     </div>
-                    <div data-dojo-type="dijit/layout/ContentPane" title="Show data (table)" data-dojo-props="selected:true">
-                        <div id="dataPointDetailsTable"></div>
+                    <div id="dataPointDetailsTableTab" data-dojo-type="dijit/layout/ContentPane" title="Show data (table)" data-dojo-props="contentId: 'dataPointDetailsTable', contentUrl: 'dataPointDetails/editCommonProperties'">
+                        <div id="dataPointDetailsTable" ></div>
                     </div>
-                    <div data-dojo-type="dijit/layout/ContentPane" id="second" title="Edit Point">
-                        <dijit:sidebarBorderContainer gutters="false">
-                            <dijit:centerContentPane >
-                                <div id="dataPointEdit"></div>
-                            </dijit:centerContentPane>
-                            <dijit:bottomContentPane >
-                                <div style="float:right;">
-                                    <dijit:button type="submit" i18nLabel="common.revert" />
-                                    <dijit:button type="submit" i18nLabel="common.save" />
-                                </div>
-                            </dijit:bottomContentPane>
-                        </dijit:sidebarBorderContainer>
+                    <div id="dataPointEditTab" data-dojo-type="dijit/layout/ContentPane" id="second" title="Edit" data-dojo-props="contentId: 'dataPointEditForm', contentUrl: 'dataPointDetails/editCommonProperties'">
+                        <dijit:form id="dataPointEditForm"/>
+                        <div style="position: absolute;bottom: 0;right: 0;}">
+                            <dijit:button id="btnDataPointEditGet" i18nLabel="common.revert" />
+                            <dijit:button id="btnDataPointEditPost" i18nLabel="common.save" />
+                        </div>
                     </div>
-                    <div data-dojo-type="dijit/layout/ContentPane" title="point Events and Notes" data-dojo-props="selected:true">
-                        <div id="dataPointDetailsEventsAndNotes"></div>
+                    <div id="dataPointDetailsEventsAndNotesTab" data-dojo-type="dijit/layout/ContentPane" title="point Events and Notes" data-dojo-props="contentId: 'dataPointDetailsEventsAndNotes', contentUrl: 'dataPointDetails/editCommonProperties'">
+                        <div id="dataPointDetailsEventsAndNotes" ></div>
                     </div>
-                    <div data-dojo-type="dijit/layout/ContentPane" title="point usage" data-dojo-props="selected:true">
+                    <div id="dataPointUsagesTab" data-dojo-type="dijit/layout/ContentPane" title="point usage" data-dojo-props="contentId: 'dataPointUsages', contentUrl: 'dataPointDetails/editCommonProperties'">
                         <div id="dataPointUsages"></div>
                     </div>
 

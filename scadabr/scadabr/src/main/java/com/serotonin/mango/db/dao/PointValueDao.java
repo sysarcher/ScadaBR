@@ -91,17 +91,17 @@ public class PointValueDao extends BaseDao {
     public PointValueDao() {
         super();
     }
-    
-   @Deprecated
+
+    @Deprecated
     private PointValueDao(DataSource dataSource) {
         super(dataSource);
     }
 
-   @Deprecated
-     public static PointValueDao getInstance() {
+    @Deprecated
+    public static PointValueDao getInstance() {
         return new PointValueDao(Common.ctx.getDatabaseAccess().getDataSource());
     }
-    
+
     /**
      * Only the PointValueCache should call this method during runtime. Do not
      * use.
@@ -662,13 +662,17 @@ public class PointValueDao extends BaseDao {
         return ejt
                 .queryForLong(
                         "select count(*) from pointValues where dataPointId=? and ts>=? and ts<=?",
-                        new Object[]{dataPointId, from, to});
+                        dataPointId, from, to);
     }
 
     public long getInceptionDate(int dataPointId) {
-        return ejt.queryForLong(
-                "select min(ts) from pointValues where dataPointId=?",
-                new Object[]{dataPointId}, -1);
+        try {
+            return ejt.queryForObject("select min(ts) from pointValues where dataPointId=?",
+                    Long.class,
+                    dataPointId);
+        } catch (NullPointerException e) {
+            return -1;
+        }
     }
 
     public long getStartTime(List<Integer> dataPointIds) {
@@ -853,7 +857,7 @@ public class PointValueDao extends BaseDao {
                             break;
                         }
 
-                        inserts = new BatchWriteBehindEntry[ENTRIES.size() < MAX_ROWS ? ENTRIES .size() : MAX_ROWS];
+                        inserts = new BatchWriteBehindEntry[ENTRIES.size() < MAX_ROWS ? ENTRIES.size() : MAX_ROWS];
                         for (int i = 0; i < inserts.length; i++) {
                             inserts[i] = ENTRIES.remove();
                         }

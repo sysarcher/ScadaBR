@@ -61,7 +61,7 @@
                                 <script type="dojo/connect" data-dojo-event="onClick">window.location = "dataSources";</script>
                             </dijit:button>
                             <dijit:button iconClass="scadaBrPointHierarchyIcon" i18nTitle="header.pointHierarchy" >
-                                <script type="dojo/connect" data-dojo-event="onClick">window.location = "pointHierarchy";</script>
+                                <script type="dojo/connect" data-dojo-event="onClick">window.location = "dataPoints";</script>
                             </dijit:button>
                             <dijit:toolbarSeparator/>
                             <dijit:button iconClass="scadaBrLogoutIcon" i18nTitle="header.logout" >

@@ -59,13 +59,13 @@ class DataPointDetailsController {
     }
     
     @RequestMapping(value="/editCommonProperties", method = RequestMethod.GET)
-    protected String showForm(@RequestParam int id, Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    protected String getEditCommonProperties(@RequestParam int id, Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
         LOG.severe("showForm called "+ id);
         return "dataPointDetails/editCommonProperties";
     }
 
     @RequestMapping(value="/editCommonProperties", method = RequestMethod.POST)
-    protected String onSubmit(@RequestParam int id, @ModelAttribute("dataPoint") @Valid DataPointVO dataPoint, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response) throws BindException {
+    protected String postEditCommonProperties(@RequestParam int id, @ModelAttribute("dataPoint") @Valid DataPointVO dataPoint, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response) throws BindException {
         LOG.severe("onSubmit called "+ id);
         if (bindingResult.hasErrors()) {
             return "dataPointDetails/editCommonProperties";
@@ -81,4 +81,12 @@ class DataPointDetailsController {
         model.addAttribute("dataPoint", dataPointVO);
     }
 
+    @RequestMapping(value="/renderChart", method = RequestMethod.GET)
+    protected String getRrenderChart(@RequestParam int id, Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        LOG.severe("showForm called "+ id);
+        return "dataPointDetails/renderChart";
+    }
+
+    
+    
 }
