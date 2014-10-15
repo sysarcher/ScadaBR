@@ -10,8 +10,12 @@ import br.org.scadabr.web.l10n.Localizer;
 import br.org.scadabr.web.mvc.controller.jsonrpc.JsonWatchList;
 import br.org.scadabr.web.mvc.controller.jsonrpc.JsonWatchListPoint;
 import com.serotonin.mango.db.dao.DataPointDao;
+import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.rt.RuntimeManager;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.springframework.context.annotation.Scope;
@@ -25,28 +29,22 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Scope("request")
-public class RestWatchListController {
+public class RestPointValuesController {
 
     private static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
 
     @Inject
-    private transient DataPointDao dataPointDao;
-    @Inject
-    private transient WatchListDao watchListDao;
-    @Inject
-    private transient RuntimeManager runtimeManager;
-    @Inject 
-    private Localizer localizer;
+    private transient PointValueDao pointValueDao;
 
+    @RequestMapping(value = "/rest/pointValues", params = "id", method = RequestMethod.GET)
+    public JsonPointValueSeries getPointValues(int id) {
 
-    @RequestMapping(value = "/rest/watchLists", params = "id", method = RequestMethod.GET)
-    public JsonWatchList getWatchList(int id) {
-        LOG.severe("CALLED: getWatchList " + id);
-        final JsonWatchList result = new JsonWatchList(watchListDao.getWatchList(id), dataPointDao, runtimeManager, localizer);
-        for (JsonWatchListPoint jwp : result) {
-            LOG.severe("JWP: "+ jwp.getCanonicalName());
+        List<PointValueTime> pvt = pointValueDao.getPointValues(id, pointValueDao.getInceptionDate(id));
+        List<JsonPointValue> result = new ArrayList<>(pvt.size());
+        for (PointValueTime p: pvt) {
+            result.add(new JsonPointValue(p.getTime(), p.getDoubleValue()));
         }
-        return result;
+        return new JsonPointValueSeries(id, result);
     }
 
 

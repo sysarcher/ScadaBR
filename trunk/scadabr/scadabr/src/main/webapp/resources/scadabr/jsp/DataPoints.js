@@ -2,13 +2,15 @@ define(["dojo/_base/declare",
     "dijit/Tree",
     "dojo/request",
     "dojo/dom",
-    "dojo/store/JsonRest"
-], function (declare, Tree, request, dom, JsonRest) {
+    "dojo/store/JsonRest",
+    "dijit/registry",
+    "dojo/parser"
+], function (declare, Tree, request, dom, JsonRest, registry, parser) {
 
     return declare(null, {
         tree: null,
         store: null,
-        constructor: function (parentNode, dataPointEditNode) {
+        constructor: function (parentNodeId, tabWidgetId) {
             this.store = new JsonRest({
                 target: "rest/pointHierarchy/",
                 getChildren: function (object, onComplete, onError) {
@@ -27,51 +29,90 @@ define(["dojo/_base/declare",
             // Create the Tree.
             this.tree = new Tree({
                 model: this.store,
+                detailController: this,
                 onClick: function (node) {
-                    //TODO Use a ContentPane ???
-                    var resultDiv = dom.byId(dataPointEditNode);
-                    // DataPoint node??
-                    if (node.nodeType !== "DP") {
-                        this.cleanNode(resultDiv);
-                        resultDiv.innerHTML = null;
-                        return;
+                    if (node.nodeType === "DP") {
+                        this.detailController.setPointId(node.id)
+                    } else if (node.nodeType === "PF") {
+                        this.detailController.setFolderId(node.id)
+                    } else {
+                        this.detailController.clearDetailViewId();
                     }
-                    var cleanNode = this.cleanNode; // Todo or use hitch ???
-                    // Request the html fragment
-                    request.get("dataPointDetails/editCommonProperties", {
-                        query: {
-                            id: node.id,
-                        }
-                    }).then(
-                            function (response) {
-                                cleanNode(resultDiv);
-                                resultDiv.innerHTML = response;
-                                require(["dojo/parser"], function (parser) {
-                                    parser.parse(resultDiv).then(function () {
-                                        var scripts = resultDiv.getElementsByTagName("script");
-                                        for (var i = 0; i < scripts.length; i++) {
-                                            eval(scripts[i].innerHTML);
-                                        }
-                                    });
-                                });
-                            },
-                            function (error) {
-                                cleanNode(resultDiv);
-                                // Display the error returned
-                                resultDiv.innerHTML = "<div class=\"error\">" + error + "<div>";
-                            }
-                    );
-                },
-                cleanNode: function (node) {
-                    //Destroy the dijit widgets
-                    require(["dijit/registry"], function (registry) {
-                        var formWidgets = registry.findWidgets(node);
-                        formWidgets.forEach(function (widget) {
-                            widget.destroyRecursive();
-                        });
+                }
+            }, parentNodeId);
+
+            this.selectedTab = null;
+            this.tabViewWidget = null;
+            this.dpId = -1;
+            this.pfId = 0;
+            this.cleanUpBeforeChanage = function () {
+                if (this.selectedTab !== null) {
+                    var contentNode = dom.byId(this.selectedTab.contentId);
+                    var formWidgets = registry.findWidgets(contentNode);
+                    formWidgets.forEach(function (widget) {
+                        widget.destroyRecursive();
                     });
                 }
-            }, parentNode);
+            };
+            this.setUpAfterChange = function () {
+                if (((this.dpId === -1) && (this.pfId <= 0)) || (this.selectedTab === null)) {
+                    return;
+                }
+
+                var contentNode = dom.byId(this.selectedTab.contentId);
+
+                request.get(this.selectedTab.contentUrl, {
+                    query: {
+                        id: this.dpId !== -1 ? this.dpId : this.pfId
+                    }
+                }).then(
+                        function (response) {
+                            contentNode.innerHTML = response;
+                            var scripts = contentNode.getElementsByTagName("script");
+                            for (var i = 0; i < scripts.length; i++) {
+                                eval(scripts[i].innerHTML);
+                            }
+                        },
+                        function (error) {
+                            contentNode.innerHTML = "<div class=\"error\">" + error + "<div>";
+                        }
+                );
+            };
+            this.setSelectedTab = function (tab) {
+                this.cleanUpBeforeChanage();
+                this.selectedTab = tab;
+                this.setUpAfterChange();
+            };
+            this.setPointId = function (id) {
+                this.cleanUpBeforeChanage();
+                this.dpId = id;
+                this.pfId = -1;
+                this.setUpAfterChange();
+            };
+            this.setFolderId = function (id) {
+                this.cleanUpBeforeChanage();
+                this.pfId = id;
+                this.dpId = -1;
+                this.setUpAfterChange();
+            };
+            this.clearDetailViewId = function () {
+                this.cleanUpBeforeChanage();
+                this.dpId = -1;
+                this.pfId = -1;
+                this.setUpAfterChange();
+            }
+
+            var detailController = this;
+            require(["dojo/ready"],
+                    function (ready) {
+                        ready(function () {
+                            detailController.tabViewWidget = registry.byId(tabWidgetId);
+                            detailController.setSelectedTab(detailController.tabViewWidget.selectedChildWidget);
+                            detailController.tabViewWidget.watch("selectedChildWidget", function (name, oval, nval) {
+                                detailController.setSelectedTab(nval);
+                            });
+                        });
+                    });
         }
     });
 });
