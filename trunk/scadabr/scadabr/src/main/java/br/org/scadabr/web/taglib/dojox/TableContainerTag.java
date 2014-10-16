@@ -20,13 +20,14 @@ import javax.servlet.jsp.tagext.TagSupport;
 public class TableContainerTag extends TagSupport {
 
     private DataDojoProps dataDojoProps = new DataDojoProps();
-    
+    private String style; 
     
     @Override
     public void release() {
         super.release();
         id = null;
         dataDojoProps = null;
+        style = null;
     }
 
     @Override
@@ -38,6 +39,7 @@ public class TableContainerTag extends TagSupport {
             printAttribute(out, "id", id);
             out.append(" data-dojo-type=\"dojox/layout/TableContainer\" ");
             dataDojoProps.print(out);
+            printAttribute(out, "style", style);
             out.print(">");
         } catch (IOException ex) {
             throw new JspTagException(ex.getMessage());
@@ -59,5 +61,12 @@ public class TableContainerTag extends TagSupport {
     
     public void setCols(int cols) {
         dataDojoProps.put("cols", cols);
+    }
+
+    /**
+     * @param style the style to set
+     */
+    public void setStyle(String style) {
+        this.style = style;
     }
 }
