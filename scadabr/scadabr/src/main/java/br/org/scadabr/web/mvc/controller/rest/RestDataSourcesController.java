@@ -6,11 +6,10 @@
 package br.org.scadabr.web.mvc.controller.rest;
 
 import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.web.LazyTreeNode;
 import br.org.scadabr.web.l10n.Localizer;
-import br.org.scadabr.web.mvc.controller.jsonrpc.JsonWatchList;
-import br.org.scadabr.web.mvc.controller.jsonrpc.JsonWatchListPoint;
 import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.db.dao.WatchListDao;
+import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
@@ -21,10 +20,8 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -33,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Scope("request")
+@RequestMapping(value = "/rest/dataSources")
 public class RestDataSourcesController {
 
     private static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
@@ -43,12 +41,14 @@ public class RestDataSourcesController {
     private RuntimeManager runtimeManager;
     @Inject
     private DataPointDao dataPointDao;
+    @Inject
+    private DataSourceDao dataSourceDao;
     
     @Inject 
     private Localizer localizer;
 
 
-    @RequestMapping(value = "/rest/dataSources", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public List<JsonDataSource> getDataSources() {
         LOG.severe("CALLED: getDataSources");
         
@@ -60,6 +60,12 @@ public class RestDataSourcesController {
             }
         }
         return result;
+    }
+
+    @RequestMapping(value = "/tree/root", method = RequestMethod.GET)
+    public LazyTreeNode getDataSourcesTreeRoot() {
+        LOG.severe("CALLED: getDataSources");
+        return new LazyTreeNode("root");
     }
 
 
