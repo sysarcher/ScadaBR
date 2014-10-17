@@ -59,7 +59,7 @@ class DataPointDetailsController {
     }
     
     @RequestMapping(value="/editCommonProperties", method = RequestMethod.GET)
-    protected String getEditCommonProperties(@RequestParam int id, Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    protected String getEditCommonProperties(@RequestParam int id) throws Exception {
         LOG.severe("showForm called "+ id);
         return "dataPointDetails/editCommonProperties";
     }
@@ -82,7 +82,7 @@ class DataPointDetailsController {
     }
 
     @RequestMapping(value="/renderChart", method = RequestMethod.GET)
-    protected String getRrenderChart(@RequestParam int id, Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    protected String getRrenderChart(@RequestParam int id) throws Exception {
         LOG.severe("showForm called "+ id);
         return "dataPointDetails/renderChart";
     }

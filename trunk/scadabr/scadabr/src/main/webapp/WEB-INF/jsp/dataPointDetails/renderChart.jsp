@@ -1,16 +1,24 @@
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
 <script src='../resources/dojo/dojo.js' data-dojo-config="isDebug: true, async: true, parseOnLoad: true"></script>
 <div id="chartContentId">
-    <div id="chartId" ></div>
-    <dojox:tableContainer cols="2" style="float:left;">
-        <input id="fromDate" label="von Datum:" title="Datum" data-dojo-type="dijit/form/DateTextBox" value="2014-09-21"/>
-        <input id="toDate" label="bis Datum:" title="Datum" data-dojo-type="dijit/form/DateTextBox"/>
-        <input id="fromTime" label="von Zeit:" title="Zeit" data-dojo-type="dojox/form/TimeSpinner"/>
-        <input id="toTime" label="bis Zeit:" title="Zeit" data-dojo-type="dojox/form/TimeSpinner"/>
-        <input id="checkInception" label="vom Anfang:" data-dojo-type="dijit/form/CheckBox" />
-        <input id="mycheLatest" label="Bis Ende:" data-dojo-type="dijit/form/CheckBox"/>
-    </dojox:tableContainer>
-    <dijit:button type="submit" i18nLabel="login.loginButton" />
+    <dijit:headlineLayoutContainer>
+        <dijit:topContentPane>
+            <dojox:tableContainer cols="2" style="float:left;">
+                <input id="fromDate" label="von Datum:" title="Datum" data-dojo-type="dijit/form/DateTextBox" value="2014-09-21"/>
+                <input id="toDate" label="bis Datum:" title="Datum" data-dojo-type="dijit/form/DateTextBox"/>
+                <input id="fromTime" label="von Zeit:" title="Zeit" data-dojo-type="dojox/form/TimeSpinner"/>
+                <input id="toTime" label="bis Zeit:" title="Zeit" data-dojo-type="dojox/form/TimeSpinner"/>
+                <input id="checkInception" label="vom Anfang:" data-dojo-type="dijit/form/CheckBox" />
+                <input id="mycheLatest" label="Bis Ende:" data-dojo-type="dijit/form/CheckBox"/>
+            </dojox:tableContainer>
+            <dijit:button type="submit" i18nLabel="login.loginButton" />
+
+        </dijit:topContentPane>
+        <dijit:centerContentPane>
+            <div id="chartId"></div>
+        </dijit:centerContentPane>
+    </dijit:headlineLayoutContainer>
+
 </div>
 
 <script type="text/javascript">
@@ -30,6 +38,15 @@
     var store;
     var chart;
 
+//TODO calc some meaningful values
+    function calcMajorTickStep() {
+        return 1000 * 3600 * 24; // 7 Days
+    }
+
+    function calcMinorTickStep() {
+        return 1000 * 3600 * 3;
+    }
+
     function setupChart() {
         require(["dojo/store/JsonRest",
             "dojox/charting/Chart",
@@ -45,17 +62,11 @@
             });
 
             chart = new Chart("chartId");
-            chart.addPlot("front_grid", {
-                type: "Grid", hMajorLines: true, vMajorLines: false, hMinorLines: false, vMinorLines: false
+            chart.addPlot("grid", {
+                type: "Grid", hMajorLines: true, vMajorLines: true, hMinorLines: true, vMinorLines: false
             });
+
             chart.addPlot("default", {type: "Lines", markers: true});
-            chart.addPlot("back_grid", {
-                type: "Grid", hMajorLines: false, vMajorLines: true, hMinorLines: false, vMinorLines: true
-            });
-
-            var d = new Date(2014, 9, 10);
-            var startTime = d.getTime() + d.getTimezoneOffset() * 60 * 1000;
-
 
             chart.addAxis("x", {
                 title: "Timestamp",
@@ -64,10 +75,9 @@
                 titleOrientation: "away",
                 majorLabels: true, majorTicks: true, majorTick: {length: 10},
                 minorLabels: true, minorTicks: true, minorTick: {length: 6},
-                microTicks: true, microTick: {length: 3},
-                majorTickStep: 1000 * 3600 * 24 * 7, // 7 Days
-                minorTickStep: 1000 * 3600 * 24,
-                microTickStep: 1000 * 3600 * 12,
+                microTicks: false,
+                majorTickStep: calcMajorTickStep(),
+                minorTickStep: calcMinorTickStep(),
                 natural: false,
                 fixed: true,
                 labelFunc: function (text, value, precision) {
@@ -81,8 +91,7 @@
                 vertical: true,
                 fixUpper: "major",
                 includeZero: true,
-                title: "${dataPoint.name}",
-                stroke: "green"
+                title: "${dataPoint.name}"
             });
 
             chart.addSeries("Series A", new StoreSeries(store, {query: {from: new Date().getTime() - 3600 * 1000, to: new Date().getTime()}}, {x: "x", y: "y"}), {stroke: {color: "red"}});
