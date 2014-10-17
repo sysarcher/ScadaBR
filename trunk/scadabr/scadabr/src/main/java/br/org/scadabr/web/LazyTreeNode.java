@@ -1,10 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-package com.serotonin.mango.web;
+package br.org.scadabr.web;
 
 /**
  *
@@ -14,8 +8,15 @@ public class LazyTreeNode {
     
     private Integer id;
     private Integer parentId;
-    private String Name;
+    private String name;
     private String nodeType;
+
+    public LazyTreeNode() {
+    }
+
+    public LazyTreeNode(String name) {
+        this.name = name;
+    }
 
     /**
      * @return the id
@@ -49,14 +50,14 @@ public class LazyTreeNode {
      * @return the Name
      */
     public String getName() {
-        return Name;
+        return name;
     }
 
     /**
      * @param Name the Name to set
      */
-    public void setName(String Name) {
-        this.Name = Name;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**

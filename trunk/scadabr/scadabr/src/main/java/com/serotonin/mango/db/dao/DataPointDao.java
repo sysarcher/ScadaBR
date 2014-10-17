@@ -25,7 +25,6 @@ import java.sql.Types;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -55,8 +54,8 @@ import com.serotonin.mango.vo.hierarchy.PointHierarchyEventDispatcher;
 import com.serotonin.mango.vo.link.PointLinkVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.Tuple;
+import br.org.scadabr.web.LazyTreeNode;
 import com.serotonin.mango.rt.RuntimeManager;
-import com.serotonin.mango.web.LazyTreeNode;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Collection;
@@ -250,6 +249,10 @@ public class DataPointDao extends BaseDao {
             }
         }
         return result;
+    }
+
+    public LazyTreeNode getRootFolder() {
+        return getFolderById(0);
     }
 
     class DataPointRowMapper implements RowMapper<DataPointVO> {

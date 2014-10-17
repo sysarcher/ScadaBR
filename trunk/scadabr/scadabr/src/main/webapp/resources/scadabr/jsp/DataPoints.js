@@ -17,7 +17,7 @@ define(["dojo/_base/declare",
         treeMenu: null,
         constructor: function (treeNodeId, tabWidgetId) {
             this.store = new JsonRest({
-                target: "rest/pointHierarchy/",
+                target: "rest/pointHierarchy",
                 getChildren: function (object, onComplete, onError) {
                     this.query({parentId: object.id}).then(onComplete, onError);
                 },
