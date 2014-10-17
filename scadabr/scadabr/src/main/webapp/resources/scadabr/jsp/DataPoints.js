@@ -4,13 +4,18 @@ define(["dojo/_base/declare",
     "dojo/dom",
     "dojo/store/JsonRest",
     "dijit/registry",
-    "dojo/parser"
-], function (declare, Tree, request, dom, JsonRest, registry, parser) {
+    "dijit/Menu",
+    "dijit/MenuItem",
+    "dijit/CheckedMenuItem",
+    "dijit/MenuSeparator",
+    "dijit/PopupMenuItem"
+], function (declare, Tree, request, dom, JsonRest, registry, Menu, MenuItem, CheckedMenuItem, MenuSeparator, PopupMenuItem) {
 
     return declare(null, {
         tree: null,
         store: null,
-        constructor: function (parentNodeId, tabWidgetId) {
+        treeMenu: null,
+        constructor: function (treeNodeId, tabWidgetId) {
             this.store = new JsonRest({
                 target: "rest/pointHierarchy/",
                 getChildren: function (object, onComplete, onError) {
@@ -39,7 +44,7 @@ define(["dojo/_base/declare",
                         this.detailController.clearDetailViewId();
                     }
                 }
-            }, parentNodeId);
+            }, treeNodeId);
 
             this.selectedTab = null;
             this.tabViewWidget = null;
@@ -113,6 +118,29 @@ define(["dojo/_base/declare",
                             });
                         });
                     });
+                    
+            this.treeMenu = new Menu({
+                targetNodeIds: [treeNodeId]
+            });
+            this.treeMenu.addChild(new MenuItem({
+                iconClass: "dijitEditorIcon dijitEditorIconCut",
+                label: "Add Folder"
+            }));
+            this.treeMenu.addChild(new MenuItem({
+                iconClass: "dijitEditorIcon dijitEditorIconCut",
+                label: "Delete Folder",
+                disabled: true
+            }));
+            this.treeMenu.addChild(new MenuItem({
+                label: "Rename Folder",
+                disabled: true
+            }));
+            this.treeMenu.addChild(new MenuItem({
+                label: "Rename DataPoint",
+                disabled: true
+            }));
+            this.treeMenu.startup();
         }
+
     });
 });

@@ -27,33 +27,31 @@ import java.util.HashMap;
 import java.util.Map;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @Scope("request")
 @RequestMapping("/dataSources")
-public class DataSourceListController {
+public class DataSourcesController {
 
     @RequestMapping(method = RequestMethod.GET)
-    public String initializeForm(ModelMap modelMap, HttpServletRequest request) {
-        createModel(modelMap);
-        return "dataSourceList";
+    public String initializeForm() {
+        return "dataSources";
     }
 
-    /**
-     * Add all DataSourcesTypes
-     * @param modelMap 
-     */
-    protected void createModel(ModelMap modelMap) {
+    @ModelAttribute
+    protected void getModel(Model model) {
         Map<String, String> typeMap = new HashMap<>();
         for (DataSourceVO.Type type : DataSourceVO.Type.values()) {
             typeMap.put(type.name(), type.getKey());
         }
         
-        modelMap.addAttribute("dataSourceTypes", typeMap);
-        modelMap.addAttribute("defaultDataSourceType", DataSourceVO.Type.M_BUS.name());
+        model.addAttribute("dataSourceTypes", typeMap);
+        model.addAttribute("defaultDataSourceType", DataSourceVO.Type.M_BUS.name());
                 
         
     }
