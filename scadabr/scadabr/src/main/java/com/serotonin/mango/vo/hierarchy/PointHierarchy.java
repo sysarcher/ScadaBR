@@ -29,6 +29,7 @@ import br.org.scadabr.db.IntValuePair;
  * @author Matthew Lohbihler
  *
  */
+@Deprecated //there should be no need for this... 
 public class PointHierarchy {
 
     private final PointFolder root;

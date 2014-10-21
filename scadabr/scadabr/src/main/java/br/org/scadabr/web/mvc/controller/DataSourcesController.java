@@ -19,7 +19,6 @@
 package br.org.scadabr.web.mvc.controller;
 
 
-import javax.servlet.http.HttpServletRequest;
 
 
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
@@ -28,7 +27,6 @@ import java.util.Map;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -47,7 +45,9 @@ public class DataSourcesController {
     protected void getModel(Model model) {
         Map<String, String> typeMap = new HashMap<>();
         for (DataSourceVO.Type type : DataSourceVO.Type.values()) {
-            typeMap.put(type.name(), type.getKey());
+            if (type.isDisplay()) {
+                typeMap.put(type.name(), type.getKey());
+            }
         }
         
         model.addAttribute("dataSourceTypes", typeMap);

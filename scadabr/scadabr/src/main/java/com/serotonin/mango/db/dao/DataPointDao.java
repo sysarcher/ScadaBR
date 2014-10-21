@@ -68,6 +68,8 @@ import org.springframework.jdbc.core.RowMapper;
 
 @Named
 public class DataPointDao extends BaseDao {
+    
+    public final static int ROOT_ID = 0;
 
     @Inject
     private RuntimeManager runtimeManager;
@@ -199,7 +201,7 @@ public class DataPointDao extends BaseDao {
         final LazyTreeNode result = new LazyTreeNode();
         result.setId(id);
 
-        if (id == 0) {
+        if (id == ROOT_ID) {
             result.setName("ROOT");
             result.setNodeType("PF");
             return result;
@@ -252,7 +254,7 @@ public class DataPointDao extends BaseDao {
     }
 
     public LazyTreeNode getRootFolder() {
-        return getFolderById(0);
+        return getFolderById(ROOT_ID);
     }
 
     class DataPointRowMapper implements RowMapper<DataPointVO> {
@@ -391,7 +393,7 @@ public class DataPointDao extends BaseDao {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 List<Integer> pointIds = ejt.queryForList("select id from dataPoints where dataSourceId=?", Integer.class, dataSourceId);
-                if (pointIds.size() > 0) {
+                if (!pointIds.isEmpty()) {
                     deleteDataPointImpl(createDelimitedList(pointIds, ","));
                 }
             }
@@ -680,7 +682,7 @@ public class DataPointDao extends BaseDao {
 
             // Create the folder hierarchy.
             PointHierarchy ph = new PointHierarchy();
-            addFoldersToHeirarchy(ph, 0, folders);
+            addFoldersToHeirarchy(ph, ROOT_ID, folders);
 
             // Add data points.
             List<DataPointVO> points = getDataPoints(DataPointExtendedNameComparator.instance, false);
@@ -715,7 +717,7 @@ public class DataPointDao extends BaseDao {
                 ejt2.update("delete from pointHierarchy");
 
                 // Save the point folders.
-                savePointFolder(root, 0);
+                savePointFolder(root, ROOT_ID);
             }
         });
 
@@ -727,7 +729,35 @@ public class DataPointDao extends BaseDao {
         PointHierarchyEventDispatcher.firePointHierarchySaved(root);
     }
 
-    void savePointFolder(final PointFolder folder, final int parentId) {
+  
+    /**
+     * Saves parentId and name thus moving or renaming the folder
+     * @param folder
+     * @param parentId 
+     */
+    public void savePointFolder(final LazyTreeNode folder) {
+        // Save the folder.
+        if (folder.getId() == null || folder.getId() == Common.NEW_ID) {
+            final int id = doInsert(new PreparedStatementCreator() {
+
+                final static String SQL_INSERT = "insert into pointHierarchy (parentId, name) values (?,?)";
+
+                @Override
+                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                    PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                    ps.setInt(1, folder.getParentId());
+                    ps.setString(2, folder.getName());
+                    //TODO set index...
+                    return ps;
+                }
+            });
+            folder.setId(id);
+        } else if (folder.getId() != ROOT_ID) {
+            ejt.update("update pointHierarchy set parentId=?, name=? where id=?", folder.getParentId(), folder.getName(), folder.getId());
+        }
+    }
+
+    public void savePointFolder(final PointFolder folder, final int parentId) {
         // Save the folder.
         if (folder.getId() == Common.NEW_ID) {
             final int id = doInsert(new PreparedStatementCreator() {
@@ -743,14 +773,15 @@ public class DataPointDao extends BaseDao {
                 }
             });
             folder.setId(id);
-        } else if (folder.getId() != 0) {
-            ejt.update("insert into pointHierarchy (id, parentId, name) values (?,?,?)", new Object[]{folder.getId(),
-                parentId, folder.getName()});
+        } else if (folder.getId() != ROOT_ID) {
+            ejt.update("update pointHierarchy set parentId=?, name=? where id=?", parentId, folder.getName(), folder.getId());
         }
         // Save the subfolders
         for (PointFolder sf : folder.getSubfolders()) {
             savePointFolder(sf, folder.getId());
         }
+        savePointFolder(folder, folder.getId());
+            //DODO save points... to new 
     }
 
     void savePointsInFolder(PointFolder folder) {

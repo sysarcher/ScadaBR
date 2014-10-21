@@ -8,6 +8,7 @@ public class LazyTreeNode {
     
     private Integer id;
     private Integer parentId;
+    private Integer index;
     private String name;
     private String nodeType;
 
@@ -72,6 +73,20 @@ public class LazyTreeNode {
      */
     public void setNodeType(String nodeType) {
         this.nodeType = nodeType;
+    }
+
+    /**
+     * @return the index
+     */
+    public Integer getIndex() {
+        return index;
+    }
+
+    /**
+     * @param index the index to set
+     */
+    public void setIndex(Integer index) {
+        this.index = index;
     }
     
 }

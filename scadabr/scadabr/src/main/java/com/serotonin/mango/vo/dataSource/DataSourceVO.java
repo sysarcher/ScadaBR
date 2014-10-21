@@ -101,55 +101,55 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                         return new ViconicsDataSourceVO();
                     }
                 },
-        BACNET(10, "dsEdit.bacnetIp", true) {
+        BACNET(10, "dsEdit.bacnetIp", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new BACnetIPDataSourceVO();
                     }
                 },
-        DNP3_IP(21, "dsEdit.dnp3Ip", true) {
+        DNP3_IP(21, "dsEdit.dnp3Ip", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new Dnp3IpDataSourceVO();
                     }
                 },
-        DNP3_SERIAL(22, "dsEdit.dnp3Serial", true) {
+        DNP3_SERIAL(22, "dsEdit.dnp3Serial", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new Dnp3SerialDataSourceVO();
                     }
                 },
-        GALIL(14, "dsEdit.galil", true) {
+        GALIL(14, "dsEdit.galil", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new GalilDataSourceVO();
                     }
                 },
-        HTTP_RECEIVER(7, "dsEdit.httpReceiver", true) {
+        HTTP_RECEIVER(7, "dsEdit.httpReceiver", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new HttpReceiverDataSourceVO();
                     }
                 },
-        HTTP_RETRIEVER(11, "dsEdit.httpRetriever", true) {
+        HTTP_RETRIEVER(11, "dsEdit.httpRetriever", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new HttpRetrieverDataSourceVO();
                     }
                 },
-        HTTP_IMAGE(15, "dsEdit.httpImage", true) {
+        HTTP_IMAGE(15, "dsEdit.httpImage", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new HttpImageDataSourceVO();
                     }
                 },
-        INTERNAL(27, "dsEdit.internal", true) {
+        INTERNAL(27, "dsEdit.internal", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new InternalDataSourceVO();
                     }
                 },
-        JMX(26, "dsEdit.jmx", true) {
+        JMX(26, "dsEdit.jmx", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new JmxDataSourceVO();
@@ -167,19 +167,19 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                         return new MetaDataSourceVO();
                     }
                 },
-        MODBUS_IP(3, "dsEdit.modbusIp", true) {
+        MODBUS_IP(3, "dsEdit.modbusIp", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new ModbusIpDataSourceVO();
                     }
                 },
-        MODBUS_SERIAL(2, "dsEdit.modbusSerial", true) {
+        MODBUS_SERIAL(2, "dsEdit.modbusSerial", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new ModbusSerialDataSourceVO();
                     }
                 },
-        NMEA(13, "dsEdit.nmea", true) {
+        NMEA(13, "dsEdit.nmea", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new NmeaDataSourceVO();
@@ -203,37 +203,37 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                         return new Fhz4JDataSourceVO();
                     }
                 },
-        PACHUBE(23, "dsEdit.pachube", true) {
+        PACHUBE(23, "dsEdit.pachube", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new PachubeDataSourceVO();
                     }
                 },
-        PERSISTENT(24, "dsEdit.persistent", true) {
+        PERSISTENT(24, "dsEdit.persistent", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new PersistentDataSourceVO();
                     }
                 },
-        POP3(12, "dsEdit.pop3", true) {
+        POP3(12, "dsEdit.pop3", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new Pop3DataSourceVO();
                     }
                 },
-        SNMP(5, "dsEdit.snmp", true) {
+        SNMP(5, "dsEdit.snmp", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new SnmpDataSourceVO();
                     }
                 },
-        SPINWAVE(4, "dsEdit.spinwave", true) {
+        SPINWAVE(4, "dsEdit.spinwave", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new SpinwaveDataSourceVO();
                     }
                 },
-        SQL(6, "dsEdit.sql", true) {
+        SQL(6, "dsEdit.sql", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new SqlDataSourceVO();
@@ -251,31 +251,31 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                         return new VMStatDataSourceVO();
                     }
                 },
-        OPC(32, "dsEdit.opc", true) {
+        OPC(32, "dsEdit.opc", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new OPCDataSourceVO();
                     }
                 },
-        ASCII_FILE(33, "dsEdit.asciiFile", true) {
+        ASCII_FILE(33, "dsEdit.asciiFile", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new ASCIIFileDataSourceVO();
                     }
                 },
-        ASCII_SERIAL(34, "dsEdit.asciiSerial", true) {
+        ASCII_SERIAL(34, "dsEdit.asciiSerial", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new ASCIISerialDataSourceVO();
                     }
                 },
-        IEC101_SERIAL(35, "dsEdit.iec101Serial", true) {
+        IEC101_SERIAL(35, "dsEdit.iec101Serial", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new IEC101SerialDataSourceVO();
                     }
                 },
-        IEC101_ETHERNET(36, "dsEdit.iec101Ethernet", true) {
+        IEC101_ETHERNET(36, "dsEdit.iec101Ethernet", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new IEC101EthernetDataSourceVO();
@@ -287,13 +287,13 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                         return new NodaveS7DataSourceVO();
                     }
                 },
-        DR_STORAGE_HT5B(38, "dsEdit.drStorageHt5b", true) {
+        DR_STORAGE_HT5B(38, "dsEdit.drStorageHt5b", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new DrStorageHt5bDataSourceVO();
                     }
                 },
-        ALPHA_2(39, "dsEdit.alpha2", true) {
+        ALPHA_2(39, "dsEdit.alpha2", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new Alpha2DataSourceVO();
