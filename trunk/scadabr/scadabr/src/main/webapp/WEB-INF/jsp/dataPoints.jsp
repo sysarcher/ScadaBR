@@ -31,7 +31,10 @@
                 "scadabr/jsp/DataPoints",
                 "dojo/domReady!"
             ], function (DataPoints) {
-                var _dataPoints = new DataPoints("dataPointTree", "detailViewTabContainer");
+                var _dataPoints = new DataPoints("dataPointTree", "detailViewTabContainer", {
+                    'common.edit.add': "Add...",
+                    'common.edit.reanme': "Rename..."
+                });
             });
 
         </script>
