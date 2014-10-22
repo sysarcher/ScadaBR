@@ -43,9 +43,9 @@ public class ValidationTextBoxTag extends AbstractHtmlInputElementTag {
         // custom optional attributes
         tagWriter.writeAttribute("label", localizer.localizeI18nKey(i18nLabel) + ":");
         tagWriter.writeAttribute("title", localizer.localizeI18nKey(i18nTitle != null ? i18nTitle : i18nLabel));
-        tagWriter.writeAttribute("data-dojo-type", "dijit/form/ValidationTextBox");
-        StringBuilder sb = new StringBuilder();
         if (getBindStatus().getErrors().hasFieldErrors(getBindStatus().getExpression())) {
+            tagWriter.writeAttribute("data-dojo-type", "dijit/form/ValidationTextBox");
+            StringBuilder sb = new StringBuilder();
             sb.append("_isEmpty: function(value) {return false;},\n"); //TODO Workaround to show error message see ValidationTextBox.validate
             sb.append("validator : function(value, constraints){return ");
             sb.append(getBindStatus().getErrors().hasErrors() ? (value == null ? "''" : "'" + value + "'") + " != value" : "true");
@@ -54,10 +54,10 @@ public class ValidationTextBoxTag extends AbstractHtmlInputElementTag {
                 sb.append(getRequestContext().getMessage(fe, true));
             }
             sb.append("'");
+            tagWriter.writeAttribute("data-dojo-props", sb.toString());
         } else {
-            sb.append("validator : function(value, constraints){return true;}"); // no client validation...
+            tagWriter.writeAttribute("data-dojo-type", "dijit/form/TextBox");
         }
-        tagWriter.writeAttribute("data-dojo-props", sb.toString());
 
         tagWriter.endTag();
         return SKIP_BODY;
