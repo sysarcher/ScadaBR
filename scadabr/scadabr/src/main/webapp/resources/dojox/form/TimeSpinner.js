@@ -25,19 +25,19 @@ return declare("dojox.form.TimeSpinner", Spinner,
 	//FIXME should we allow for constraints in this widget?
 	isValid: function(){return true;},
 
-	smallDelta: 5,
+	smallDelta: 1,
 
-	largeDelta: 30,
+	largeDelta: 10,
 
 	timeoutChangeRate: 0.50,
 
 	parse: function(time, locale){
-		return dateLocale.parse(time, {selector:"time", formatLength:"short"});
+		return dateLocale.parse(time, {selector:"time", formatLength:"medium"});
 	},
 
 	format: function(time, locale){
 		if(lang.isString(time)){ return time; }
-		return dateLocale.format(time, {selector:"time", formatLength:"short"});
+		return dateLocale.format(time, {selector:"time", formatLength:"medium"});
 	},
 
 	serialize: dateStamp.toISOString,

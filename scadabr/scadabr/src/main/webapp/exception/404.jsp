@@ -22,6 +22,6 @@
 <span class="bigTitle">Page Not Found!</span><br/>
 <br/>
 The page that you requested was not found. Please check your URL
-and try your request again, or start again from the <a href="${pageContext.request.contextPath}/login.jsp">login page</a>.<br/>
+and try your request again, or start again from the <a href="${pageContext.request.contextPath}/login">login page</a>.<br/>
 <br/>
 <br/>

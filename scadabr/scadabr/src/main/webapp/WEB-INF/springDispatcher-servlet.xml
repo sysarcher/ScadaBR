@@ -32,8 +32,9 @@
   -->
   
 	<!-- Forwards requests to the "/" resource to the "welcome" view -->
-	<mvc:view-controller path="/" view-name="index"/>
-
+<!-- TODO this crashes jsonrpc	
+    <mvc:view-controller path="/" view-name="index"/>
+-->
         <!-- View resolver -->
 <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"
     p:prefix="/WEB-INF/jsp/"

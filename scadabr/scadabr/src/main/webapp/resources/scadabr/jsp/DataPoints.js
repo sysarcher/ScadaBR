@@ -38,31 +38,10 @@ define(["dojo/_base/declare",
                 },
                 //inserted manually to catch the aspect of Tree to get this working -- Observable looks wired to me ... at least JSONRest does not woirk out of the box ...
                 onChange: function (/*dojo/data/Item*/ /*===== item =====*/) {
-                    // summary:
-                    //		Callback whenever an item has changed, so that Tree
-                    //		can update the label, icon, etc.   Note that changes
-                    //		to an item's children or parent(s) will trigger an
-                    //		onChildrenChange() so you can ignore those changes here.
-                    // tags:
-                    //		callback
                 },
                 onChildrenChange: function (/*===== parent, newChildrenList =====*/) {
-                    // summary:
-                    //		Callback to do notifications about new, updated, or deleted items.
-                    // parent: dojo/data/Item
-                    // newChildrenList: Object[]
-                    //		Items from the store
-                    // tags:
-                    //		callback
                 },
                 onDelete: function (/*dojo/data/Item*/ /*===== item =====*/) {
-                    // summary:
-                    //		Callback when an item has been deleted.
-                    //		Actually we have no way of knowing this with the new dojo.store API,
-                    //		so this method is never called (but it's left here since Tree connects
-                    //		to it).
-                    // tags:
-                    //		callback
                 }
 
             }));
@@ -86,42 +65,20 @@ define(["dojo/_base/declare",
             this.dpId = -1;
             this.pfId = 0;
             this.cleanUpBeforeChanage = function () {
-                if (this.selectedTab !== null) {
-                    var contentNode = dom.byId(this.selectedTab.contentId);
-                    var formWidgets = registry.findWidgets(contentNode);
-                    formWidgets.forEach(function (widget) {
-                        widget.destroyRecursive();
-                    });
-                }
             };
             this.setUpAfterChange = function () {
                 if (((this.dpId === -1) && (this.pfId <= 0)) || (this.selectedTab === null)) {
                     return;
                 }
-
-                var contentNode = dom.byId(this.selectedTab.contentId);
-
-                request.get(this.selectedTab.contentUrl, {
-                    query: {
-                        id: this.dpId !== -1 ? this.dpId : this.pfId
-                    }
-                }).then(
-                        function (response) {
-                            contentNode.innerHTML = response;
-                            var scripts = contentNode.getElementsByTagName("script");
-                            for (var i = 0; i < scripts.length; i++) {
-                                eval(scripts[i].innerHTML);
-                            }
-                        },
-                        function (error) {
-                            contentNode.innerHTML = "<div class=\"error\">" + error + "<div>";
-                        }
-                );
+                this.selectedTab.set("href", this.selectedTab.contentUrl + "?id=" + (this.dpId !== -1 ? this.dpId : this.pfId));
             };
             this.setSelectedTab = function (tab) {
                 this.cleanUpBeforeChanage();
                 this.selectedTab = tab;
-                this.setUpAfterChange();
+                if (this.pfId === -1) {
+                    //curently filter out folders
+                    this.setUpAfterChange();
+                }
             };
             this.setPointId = function (id) {
                 this.cleanUpBeforeChanage();
@@ -133,7 +90,8 @@ define(["dojo/_base/declare",
                 this.cleanUpBeforeChanage();
                 this.pfId = id;
                 this.dpId = -1;
-                this.setUpAfterChange();
+                //curently filter out folders
+                //  this.setUpAfterChange();
             };
             this.clearDetailViewId = function () {
                 this.cleanUpBeforeChanage();
@@ -160,7 +118,6 @@ define(["dojo/_base/declare",
 
 
             this.nodeNameDialog = new TooltipDialog({
-//                style: "width: 300px;",
                 content: new TextBox({
                     treeNode: null,
                     setTreeNode: function (treeNode) {
@@ -215,10 +172,10 @@ define(["dojo/_base/declare",
                 label: localizedKeys['common.edit.add'],
                 onClick: function () {
                     _store.put({parentId: _tree.lastFocused.item.id, nodeType: "PF", name: "New Folder"}).then(function (object) {
-                        _store.getChildren(_tree.lastFocused.item, function(children) {
-                           _store.onChildrenChange(_tree.lastFocused.item, children);
-                        }, function(error) {
-                        alert(error);
+                        _store.getChildren(_tree.lastFocused.item, function (children) {
+                            _store.onChildrenChange(_tree.lastFocused.item, children);
+                        }, function (error) {
+                            alert(error);
                         });
                     }, function (error) {
                         alert(error);

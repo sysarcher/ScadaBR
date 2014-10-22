@@ -1,44 +1,85 @@
+<%--TODO 
+
+setting cbo Latest disable to* clicking inception fetching inception and setting and disabling from*
+
+calculate major|minior chart ticks...
+--%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
-<script src='../resources/dojo/dojo.js' data-dojo-config="isDebug: true, async: true, parseOnLoad: true"></script>
-<div id="chartContentId">
-    <dijit:headlineLayoutContainer>
-        <dijit:topContentPane>
+<dijit:headlineLayoutContainer id="renderChartContent">
+    <dijit:topContentPane>
+        <form id="timeFilterId">
             <dojox:tableContainer cols="2" style="float:left;">
-                <input id="fromDate" label="von Datum:" title="Datum" data-dojo-type="dijit/form/DateTextBox" value="2014-09-21"/>
-                <input id="toDate" label="bis Datum:" title="Datum" data-dojo-type="dijit/form/DateTextBox"/>
-                <input id="fromTime" label="von Zeit:" title="Zeit" data-dojo-type="dojox/form/TimeSpinner"/>
-                <input id="toTime" label="bis Zeit:" title="Zeit" data-dojo-type="dojox/form/TimeSpinner"/>
-                <input id="checkInception" label="vom Anfang:" data-dojo-type="dijit/form/CheckBox" />
-                <input id="mycheLatest" label="Bis Ende:" data-dojo-type="dijit/form/CheckBox"/>
+                <input id="fromDateId" label="von Datum:" title="Datum" data-dojo-type="dijit/form/DateTextBox" />
+                <input id="toDateId" label="bis Datum:" title="Datum" data-dojo-type="dijit/form/DateTextBox" />
+                <input id="fromTimeId" label="von Zeit:" title="Zeit" data-dojo-type="dojox/form/TimeSpinner" />
+                <input id="toTimeId" label="bis Zeit:" title="Zeit" data-dojo-type="dojox/form/TimeSpinner" />
+                <input id="checkInceptionId" label="vom Anfang:" data-dojo-type="dijit/form/CheckBox" />
+                <input id="checkLatestId" label="Bis Ende:" data-dojo-type="dijit/form/CheckBox" checked="true"/>
             </dojox:tableContainer>
             <dijit:button type="submit" i18nLabel="login.loginButton" />
-
-        </dijit:topContentPane>
-        <dijit:centerContentPane>
-            <div id="chartId"></div>
-        </dijit:centerContentPane>
-    </dijit:headlineLayoutContainer>
-
-</div>
+        </form>
+    </dijit:topContentPane>
+    <dijit:centerContentPane>
+        <div id="chartId"></div >
+    </dijit:centerContentPane>
+</dijit:headlineLayoutContainer>
 
 <script type="text/javascript">
-    var md;
-    var timeSpinner;
+        var fromDate;
+        var fromTime;
+        var toDate;
+        var toTime;
+        function getFromTimestamp() {
+            return fromDate.get("value").getTime() + fromTime.get("value").getTime();
+        }
+
+        function getToTimestamp() {
+            return toDate.get("value").getTime() + toTime.get("value").getTime();
+        }
+
     require([
         "dojo/dom",
-        "dojo/parser"
-    ], function (dom, parser) {
-        var chartContent = dom.byId("chartContentId");
-        parser.parse(chartContent).then(function () {
-            setupChart();
-            //setup    
-        });
-    });
+        "dojo/on",
+        "dijit/registry",
+        "dojo/ready",
+        "dojo/parser",
+        "dojox/charting/StoreSeries"
+    ], function (dom, on, registry, ready, parser, StoreSeries) {
 
+        parser.parse(dom.byId("renderChartContent").parentNode).then(function () {
+            var form = dom.byId('timeFilterId');
+            fromDate = registry.byId("fromDateId");
+            fromTime = registry.byId("fromTimeId");
+            toDate = registry.byId("toDateId");
+            toTime = registry.byId("toTimeId");
+
+            var date = new Date();
+            date.setTime(${fromTimestamp});
+            fromDate.set("value", date);
+            fromTime.set("value", fromTime.format(date));
+            date.setTime(${toTimestamp});
+            toDate.set("value", date);
+            toTime.set("value", toTime.format(date));
+
+            // Attach the onsubmit event handler of the form
+            on(form, "submit", function (evt) {
+                // prevent the page from navigating after submit
+                evt.stopPropagation();
+                evt.preventDefault();
+                var query = {
+                    from: getFromTimestamp(),
+                    to: getToTimestamp()
+                };
+                chart.updateSeries("Series A", new StoreSeries(store, {query: query}, {x: "x", y: "y"}));
+            });
+            setupChart();
+        }, function (error) {
+            alert(error);
+        });
+    })
     var store;
     var chart;
-
-//TODO calc some meaningful values
+    //TODO calc some meaningful values
     function calcMajorTickStep() {
         return 1000 * 3600 * 24; // 7 Days
     }
@@ -53,21 +94,17 @@
             "dojox/charting/StoreSeries",
             "dojox/charting/plot2d/Lines",
             "dojox/charting/plot2d/Grid",
-            "dojox/charting/axis2d/Default",
-            "dojo/domReady!"
+            "dojox/charting/axis2d/Default"
         ], function (JsonRest, Chart, StoreSeries) {
             store = new JsonRest({
                 target: "rest/pointValues/${dataPoint.id}",
                 idProperty: "x"
             });
-
             chart = new Chart("chartId");
             chart.addPlot("grid", {
                 type: "Grid", hMajorLines: true, vMajorLines: true, hMinorLines: true, vMinorLines: false
             });
-
             chart.addPlot("default", {type: "Lines", markers: true});
-
             chart.addAxis("x", {
                 title: "Timestamp",
 //                from: startTime,
@@ -93,13 +130,9 @@
                 includeZero: true,
                 title: "${dataPoint.name}"
             });
-
-            chart.addSeries("Series A", new StoreSeries(store, {query: {from: new Date().getTime() - 3600 * 1000, to: new Date().getTime()}}, {x: "x", y: "y"}), {stroke: {color: "red"}});
-
+            chart.addSeries("Series A", new StoreSeries(store, {query: {from: getFromTimestamp(), to: getToTimestamp()}}, {x: "x", y: "y"}), {stroke: {color: "red"}});
             chart.render();
-
-            chart.updateSeries("Series A", new StoreSeries(store, {query: {from: new Date().getTime() - 3600 * 1000 * 24 * 4, to: new Date().getTime()}}, {x: "x", y: "y"}));
-
         });
     }
+
 </script>
