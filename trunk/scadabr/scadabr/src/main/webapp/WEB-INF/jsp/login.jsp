@@ -25,6 +25,8 @@
         require(["dojo/domReady!"], function () {
             setTimeout(function () {
                 require(["dijit/focus", "dojo/dom"], function (focusUtil, dom) {
+                    dom.byId("scadabrUsername").autocomplete = "on";
+                    dom.byId("scadabrPassword").autocomplete = "on";
                     focusUtil.focus(dom.byId("scadabrUsername"));
                 });
             }, 1000);
@@ -33,6 +35,7 @@
 
     <dijit:form action="login" method="post">
         <dojox:tableContainer cols="1">
+            <%-- TODO validationtextbox prevents autocomplete from browser ... but we only need the change in the color revert to textbox ???--%>
             <dijit:validationTextBox id="scadabrUsername" i18nLabel="login.userId" path="login.username"/>
             <dijit:validationTextBox id="scadabrPassword" type="password" i18nLabel="login.password" path="login.password"/>
         </dojox:tableContainer>

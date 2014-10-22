@@ -18,13 +18,22 @@
  */
 package br.org.scadabr.web.mvc.controller;
 
-
 import br.org.scadabr.logger.LogUtils;
+import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.RuntimeManager;
+import com.serotonin.mango.view.chart.ChartType;
+import com.serotonin.mango.view.chart.ImageChartRenderer;
 import com.serotonin.mango.vo.DataPointVO;
+import java.text.DateFormat;
+import java.text.MessageFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
+import javax.management.RuntimeErrorException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,52 +50,90 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("/dataPointDetails")
+@RequestMapping("/dataPointDetails/")
 @Scope("request")
 class DataPointDetailsController {
 
     private static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
-    
+
     @Inject
     private DataPointDao dataPointDao;
-    
+
     @Inject
     private RuntimeManager runtimeManager;
-    
 
     public DataPointDetailsController() {
         super();
     }
-    
-    @RequestMapping(value="/editCommonProperties", method = RequestMethod.GET)
+
+    @RequestMapping(value = "editCommonProperties", method = RequestMethod.GET)
     protected String getEditCommonProperties(@RequestParam int id) throws Exception {
-        LOG.severe("showForm called "+ id);
+        LOG.severe(MessageFormat.format("getEditCommonProperties called {0}", id));
         return "dataPointDetails/editCommonProperties";
     }
 
-    @RequestMapping(value="/editCommonProperties", method = RequestMethod.POST)
+    @RequestMapping(value = "editCommonProperties", method = RequestMethod.POST)
     protected String postEditCommonProperties(@RequestParam int id, @ModelAttribute("dataPoint") @Valid DataPointVO dataPoint, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response) throws BindException {
-        LOG.severe("onSubmit called "+ id);
+        LOG.log(Level.SEVERE, "postEditCommonProperties called {0}", id);
         if (bindingResult.hasErrors()) {
             return "dataPointDetails/editCommonProperties";
         }
         runtimeManager.saveDataPoint(dataPoint);
         return "dataPointDetails/editCommonProperties";
     }
-    
+
     @ModelAttribute
     protected void getModel(@RequestParam int id, Model model) {
-        LOG.severe("getModel called "+ id);
+        LOG.log(Level.SEVERE, "getModel called {0}", id);
         final DataPointVO dataPointVO = dataPointDao.getDataPoint(id);
         model.addAttribute("dataPoint", dataPointVO);
     }
 
-    @RequestMapping(value="/renderChart", method = RequestMethod.GET)
-    protected String getRrenderChart(@RequestParam int id) throws Exception {
-        LOG.severe("showForm called "+ id);
+    @RequestMapping(value = "renderChart", method = RequestMethod.GET)
+    protected String getRenderChart(@RequestParam int id, Model model) throws Exception {
+        LOG.log(Level.SEVERE, "getRenderChart called {0}", id);
+        DataPointVO dp = (DataPointVO) model.asMap().get("dataPoint");
+        // Determine our image chart rendering capabilities.
+        Calendar c = Calendar.getInstance();
+        model.addAttribute("toTimestamp", c.getTimeInMillis());
+        if (ChartType.IMAGE.supports(dp.getPointLocator().getDataTypeId())) {
+            // This point can render an image chart. Carry on...
+            if (dp.getChartRenderer() instanceof ImageChartRenderer) {
+                ImageChartRenderer r = (ImageChartRenderer) dp.getChartRenderer();
+                switch (r.getTimePeriod()) {
+                    case Common.TimePeriods.YEARS:
+                        c.add(Calendar.YEAR, -r.getNumberOfPeriods());
+                        break;
+                    case Common.TimePeriods.MONTHS:
+                        c.add(Calendar.MONTH, -r.getNumberOfPeriods());
+                        break;
+                    case Common.TimePeriods.WEEKS:
+                        c.add(Calendar.DATE, -r.getNumberOfPeriods() * 7);
+                        break;
+                    case Common.TimePeriods.DAYS:
+                        c.add(Calendar.DATE, -r.getNumberOfPeriods());
+                        break;
+                    case Common.TimePeriods.HOURS:
+                        c.add(Calendar.HOUR_OF_DAY, -r.getNumberOfPeriods());
+                        break;
+                    case Common.TimePeriods.MINUTES:
+                        c.add(Calendar.MINUTE, -r.getNumberOfPeriods());
+                        break;
+                    case Common.TimePeriods.SECONDS:
+                        c.add(Calendar.SECOND, -r.getNumberOfPeriods());
+                        break;
+                    case Common.TimePeriods.MILLISECONDS:
+                        c.add(Calendar.MILLISECOND, -r.getNumberOfPeriods());
+                        break;
+                    default:
+                        throw new RuntimeException("Not implemented Yet!");
+                }
+            } else {
+                c.add(Calendar.DATE, -1);
+            }
+        model.addAttribute("fromTimestamp", c.getTimeInMillis());
+        }
         return "dataPointDetails/renderChart";
     }
 
-    
-    
 }
