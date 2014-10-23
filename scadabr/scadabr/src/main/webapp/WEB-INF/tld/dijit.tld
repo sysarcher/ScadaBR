@@ -95,6 +95,10 @@
         <attribute>
             <name>i18nTitle</name>
         </attribute>
+        <attribute>
+            <name>disabled</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
     </tag>
     <tag>
         <name>toolbar</name>
