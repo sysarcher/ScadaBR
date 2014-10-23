@@ -26,6 +26,7 @@ public class ButtonTag extends RequestContextAwareTag {
     private String i18nTitle;
     private String type;
     private DataDojoProps dataDojoProps = new DataDojoProps();
+    private boolean disabled;
 
     @Override
     public void release() {
@@ -36,6 +37,7 @@ public class ButtonTag extends RequestContextAwareTag {
         i18nTitle = null;
         type = null;
         dataDojoProps = null;
+        disabled = false;
     }
 
     @Override
@@ -56,6 +58,9 @@ public class ButtonTag extends RequestContextAwareTag {
             printAttribute(out, "name", name);
             if (i18nTitle != null) {
                 printAttribute(out, "title", localizer.localizeI18nKey(i18nTitle));
+            }
+            if (disabled) {
+                printAttribute(out, "disabled", "true");
             }
             out.print(">");
             if (i18nLabel != null) {
@@ -118,6 +123,13 @@ public class ButtonTag extends RequestContextAwareTag {
      */
     public void setIconClass(String iconClass) {
         dataDojoProps.put("iconClass", iconClass);
+    }
+
+    /**
+     * @param disabled the disabled to set
+     */
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 
 }

@@ -76,6 +76,18 @@ public class UserSessionContextBean implements Serializable {
         }
     }
     
+    public String getUsername() {
+        return user != null ? user.getUsername() : "anonymous";
+    }
+    
+    public String getUserHomeUrl() {
+        return user != null ? user.getHomeUrl(): "";
+    }
+    
+    public boolean isLoggedIn() {
+        return user != null;
+    }
+    
     /**
      * @return the locale
      */

@@ -11,8 +11,25 @@
         <link rel="shortcut icon" href="images/favicon.ico"/>
         <script src='resources/dojo/dojo.js' data-dojo-config="isDebug: true, async: true, parseOnLoad: true"></script>
         <script>
+            var homeUrl = "${userSessionContextBean.userHomeUrl}";
+            var _mainPage;
+            function setHomeUrl() {
+                _MainPage.setHomeUrl(window.location.href).then(function (newHomeUrl) {
+                    homeUrl = newHomeUrl;
+                    alert("HomeURL set to: " + homeUrl);
+                }, function (error) {
+                    alert("SetHomeUrl Error: " + error);
+                });
+            }
             require(["dojo/parser",
-                "dojo/domReady!"]);
+                "scadabr/jsp/MainPage",
+                "dojo/ready"], function (parser, MainPage, ready) {
+                ready(function () {
+                    _MainPage = new MainPage()
+                });
+            });
+
+
         </script>
     </head>
 
@@ -49,6 +66,9 @@
                     <dijit:leftContentPane>
                         <img src="images/mangoLogoMed.jpg" alt="Logo"/>
                     </dijit:leftContentPane>
+                    <dijit:rightContentPane>
+                        <b>ScadaBR @</b>${pageContext.request.localAddr}:${pageContext.request.localPort}${pageContext.request.contextPath}
+                    </dijit:rightContentPane>
                     <dijit:bottomContentPane>
                         <dijit:toolbar>
                             <dijit:button iconClass="scadaBrWatchListIcon" i18nTitle="header.watchlist">
@@ -67,8 +87,16 @@
                             <dijit:button iconClass="scadaBrLogoutIcon" i18nTitle="header.logout" >
                                 <script type="dojo/connect" data-dojo-event="onClick">window.location = "logout";</script>
                             </dijit:button>
-                            <!-- USE style="float:right;" to right align button ...-->
-
+                            <div style="float:right;"><%-- move content to the right side --%>
+                                <dijit:toolbarSeparator/>
+                                <label><fmt:message key="common.user" />:&nbsp;<b>${userSessionContextBean.username}</b></label>
+                                <dijit:button iconClass="scadaBrGotoHomeUrlIcon" i18nTitle="header.goHomeUrl" disabled="${!userSessionContextBean.loggedIn}">
+                                    <script type="dojo/connect" data-dojo-event="onClick">window.location = homeUrl;</script>
+                                </dijit:button>
+                                <dijit:button iconClass="scadaBrSetHomeUrlIcon" i18nTitle="header.setHomeUrl" disabled="${!userSessionContextBean.loggedIn}">
+                                    <script type="dojo/connect" data-dojo-event="onClick">setHomeUrl();</script>
+                                </dijit:button>
+                            </div>
                         </dijit:toolbar>
                     </dijit:bottomContentPane>
                 </dijit:headlineLayoutContainer>

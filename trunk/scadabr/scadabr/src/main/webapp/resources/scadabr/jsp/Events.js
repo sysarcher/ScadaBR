@@ -22,7 +22,7 @@ define(["dojo/_base/declare",
         },
         _initSvc: function() {
             this.svc = new JsonService({
-                serviceUrl: 'rpc/events.json', // Adress of the RPC service end point
+                serviceUrl: 'rpc/events', // Adress of the RPC service end point
                 timeout: 1000,
                 strictArgChecks: true,
                 methods: [{

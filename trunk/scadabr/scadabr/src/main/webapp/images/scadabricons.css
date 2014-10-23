@@ -7,6 +7,14 @@ and open the template in the editor.
     Created on : 28.05.2014, 08:55:21
     Author     : aploese
 */
+/*
+TODO put all images in one file like scadabr/src/main/webapp/resources/dijit/icons/commonIcons.css
+{
+	background-image: url('scadaBrEnabled.png'); // Contains both object and action icons in a sprite image for the enabled state.  
+	width: 16px;
+	height: 16px;
+}
+*/
 
 .scadaBrWatchListIcon {
     background-image: url('eye.png');
@@ -82,6 +90,22 @@ and open the template in the editor.
 
 .scadaBrDeleteIcon {
     background-image: url('delete.png');
+    background-repeat: no-repeat;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+}
+
+.scadaBrGotoHomeUrlIcon {
+    background-image: url('house.png');
+    background-repeat: no-repeat;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+}
+
+.scadaBrSetHomeUrlIcon {
+    background-image: url('house_link.png');
     background-repeat: no-repeat;
     width: 18px;
     height: 18px;
