@@ -25,15 +25,11 @@ import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.view.chart.ChartType;
 import com.serotonin.mango.view.chart.ImageChartRenderer;
 import com.serotonin.mango.vo.DataPointVO;
-import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
-import javax.management.RuntimeErrorException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 

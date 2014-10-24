@@ -151,6 +151,7 @@ public class MiscDwr extends BaseDwr {
         return false;
     }
 
+    @Deprecated //APL use static content???
     public Map<String, Object> getDocumentationItem(String documentId) {
         Map<String, Object> result = new HashMap<>();
 
@@ -189,11 +190,13 @@ public class MiscDwr extends BaseDwr {
         return result;
     }
 
+    @Deprecated //APL old dox help stuff
     private void addDocumentationItem(Map<String, Object> map, DocumentationItem di) {
         map.put("id", di.getId());
         map.put("title", getMessage("dox." + di.getId()));
     }
 
+    
     public void jsError(String desc, String page, String line, String browserName, String browserVersion,
             String osName, String location) {
         LOG.warn("Javascript error\r\n" + "   Description: " + desc + "\r\n" + "   Page: " + page + "\r\n"
@@ -238,6 +241,7 @@ public class MiscDwr extends BaseDwr {
                 (Locale) localeEditor.getValue());
     }
 
+    @Deprecated
     @MethodFilter
     public void setHomeUrl(String url) {
         // Remove the scheme, domain, and context if there.
@@ -266,6 +270,7 @@ public class MiscDwr extends BaseDwr {
         userDao.saveHomeUrl(Common.getUser().getId(), url);
     }
 
+    @Deprecated
     @MethodFilter
     public String getHomeUrl() {
         String url = Common.getUser().getHomeUrl();

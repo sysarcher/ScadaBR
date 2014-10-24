@@ -17,7 +17,7 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
-<tag:page >
+<tag:page helpId="dataPoints">
     <jsp:body>
         <style>
 

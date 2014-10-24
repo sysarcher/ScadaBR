@@ -1,5 +1,5 @@
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
-<tag:page >
+<tag:page helpId="dataSources">
     <jsp:body>
         <script type="text/javascript">
             var _dataSources;

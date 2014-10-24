@@ -21,7 +21,7 @@
 <%@page import="com.serotonin.mango.vo.UserComment"%>
 <%@page import="com.serotonin.mango.rt.event.type.EventType"%>
 <%@page import="com.serotonin.mango.web.dwr.EventsDwr"%>
-<tag:page>
+<tag:page helpId="events">
     <!--%@ include file="/WEB-INF/jsp/include/userComment.jsp" %-->
     <style>
         .incrementControl { width: 2em; }

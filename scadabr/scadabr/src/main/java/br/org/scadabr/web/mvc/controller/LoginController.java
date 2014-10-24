@@ -73,7 +73,7 @@ class LoginController {
 
     @RequestMapping(method = RequestMethod.GET)
     protected String showForm(Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
-            // Check if Crowd is enabled
+        // Check if Crowd is enabled
         if (CrowdUtils.isCrowdEnabled()) {
             String username = CrowdUtils.getCrowdUsername(request);
 

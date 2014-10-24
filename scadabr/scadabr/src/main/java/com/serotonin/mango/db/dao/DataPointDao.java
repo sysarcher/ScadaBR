@@ -169,40 +169,13 @@ public class DataPointDao extends BaseDao {
     }
 
     //TODO Quick and dirty
-    public Collection<LazyTreeNode> getAllFoldersAndDp() {
-
-        final Collection<LazyTreeNode> result = new LinkedList<>();
-        LazyTreeNode root = new LazyTreeNode();
-        root.setId(0);
-        root.setName("ROOT");
-        root.setNodeType("PF");
-        result.add(root);
-
-        // Get the folder list.
-        ejt.query("select id, parentId, name from pointHierarchy", new RowCallbackHandler() {
-
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                LazyTreeNode n = new LazyTreeNode();
-                n.setId(rs.getInt(1));
-                n.setParentId(rs.getInt(2));
-                n.setName(rs.getString(3));
-                n.setNodeType("PF");
-                result.add(n);
-            }
-        });
-        //TODO add dp?
-        return result;
-    }
-
-    //TODO Quick and dirty
     public LazyTreeNode getFolderById(int id) {
 
         final LazyTreeNode result = new LazyTreeNode();
         result.setId(id);
 
         if (id == ROOT_ID) {
-            result.setName("ROOT");
+            result.setName("ROOT"); //TODO localize ??
             result.setNodeType("PF");
             return result;
         }

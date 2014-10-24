@@ -6,7 +6,9 @@
         version="2.0">
     <tlib-version>1.0</tlib-version>
     <jsp-version>1.2</jsp-version>
-    <description>Custom tag library for dijit widgets</description>
+    <description>
+        Custom tag library for dijit widgets
+    </description>
     <short-name>dijit</short-name>
   
     <tag>

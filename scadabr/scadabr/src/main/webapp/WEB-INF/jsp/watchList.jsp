@@ -18,7 +18,7 @@
 --%>
 <%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
 <%@ taglib prefix="tag" tagdir="/WEB-INF/tags" %>
-<tag:page>
+<tag:page helpId="watchList">
 
     <jsp:body>
         <style>

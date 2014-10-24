@@ -33,6 +33,7 @@ import org.w3c.dom.NodeList;
 /**
  * @author Matthew Lohbihler
  */
+@Deprecated //APL hanle this in the html files directly ...
 public class DocumentationManifest {
 
     public List<Element> getElementsByTagName(Element parent, String name) {

@@ -18,60 +18,28 @@
  */
 package br.org.scadabr.web.mvc.controller;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.servlet.ModelAndView;
+import br.org.scadabr.logger.LogUtils;
+import java.text.MessageFormat;
+import java.util.logging.Logger;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.ParameterizableViewController;
 
+@Controller
+@RequestMapping("/help")
+@Scope("request")
 public class HelpController extends ParameterizableViewController {
 
-    @Override
-    protected ModelAndView handleRequestInternal(HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-        Map<String, Object> model = new HashMap<String, Object>();
+    private static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
 
-        model.put("versionNumber", retrieveVersionNumber());
-        model.put("buildNumber", retrieveBuildNumber());
-
-        return new ModelAndView(getViewName(), model);
+    @RequestMapping(params = "id", method = RequestMethod.GET)
+    protected String getHelpById(@RequestParam String id) throws Exception {
+        LOG.severe(MessageFormat.format("getHelpById called {0}", id));
+    //TODO hardcoded Language to en...
+        return "help/en/" + id;
     }
 
-    private String retrieveVersionNumber() {
-        String versionNumber = "";
-
-        try {
-            ServletContext sCon = getServletContext();
-            Properties prop = new Properties();
-            prop.load(sCon.getResourceAsStream("/META-INF/MANIFEST.MF"));
-
-            versionNumber = prop.getProperty("Version-Number");
-
-        } catch (IOException ex) {
-            versionNumber = "No version number available.";
-        }
-        return versionNumber;
-    }
-
-    private String retrieveBuildNumber() {
-        String buildNumber = "";
-
-        try {
-            ServletContext sCon = getServletContext();
-            Properties prop = new Properties();
-            prop.load(sCon.getResourceAsStream("/META-INF/MANIFEST.MF"));
-
-            buildNumber = prop.getProperty("Build-Number");
-
-        } catch (IOException ex) {
-            buildNumber = "No build number available.";
-        }
-        return buildNumber;
-    }
 }
