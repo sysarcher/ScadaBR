@@ -15,6 +15,13 @@ TODO put all images in one file like scadabr/src/main/webapp/resources/dijit/ico
 	height: 16px;
 }
 */
+.scadaBrHelpIcon {
+    background-image: url('help.png');
+    background-repeat: no-repeat;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+}
 
 .scadaBrWatchListIcon {
     background-image: url('eye.png');

@@ -24,6 +24,7 @@ import java.util.List;
 /**
  * @author Matthew Lohbihler
  */
+@Deprecated //APL handle this in the html files directly
 public class DocumentationItem {
 
     private final String id;

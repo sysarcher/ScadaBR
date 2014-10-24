@@ -1,5 +1,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt_rt" %>
 <%@ taglib prefix="dijit" uri="/WEB-INF/tld/dijit.tld" %>
+<%@attribute name="helpId" required="true" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -64,10 +65,12 @@
             <dijit:topContentPane >
                 <dijit:headlineLayoutContainer>
                     <dijit:leftContentPane>
-                        <img src="images/mangoLogoMed.jpg" alt="Logo"/>
+                        <i><%-- TODO version number not shown ??? Why??? --%>
+                            ScadaBR ${scadaBrVersionBean.versionNumber}@${pageContext.request.localAddr}:${pageContext.request.localPort}${pageContext.request.contextPath}
+                        </i>
                     </dijit:leftContentPane>
                     <dijit:rightContentPane>
-                        <b>ScadaBR @</b>${pageContext.request.localAddr}:${pageContext.request.localPort}${pageContext.request.contextPath}
+                        <img src="images/mangoLogoMed.jpg" alt="Logo"/>
                     </dijit:rightContentPane>
                     <dijit:bottomContentPane>
                         <dijit:toolbar>
@@ -86,6 +89,9 @@
                             <dijit:toolbarSeparator/>
                             <dijit:button iconClass="scadaBrLogoutIcon" i18nTitle="header.logout" >
                                 <script type="dojo/connect" data-dojo-event="onClick">window.location = "logout";</script>
+                            </dijit:button>
+                            <dijit:button iconClass="scadaBrHelpIcon" i18nTitle="header.help" >
+                                <script type="dojo/connect" data-dojo-event="onClick">_MainPage.showHelp("${pageScope.helpId}");</script>
                             </dijit:button>
                             <div style="float:right;"><%-- move content to the right side --%>
                                 <dijit:toolbarSeparator/>
