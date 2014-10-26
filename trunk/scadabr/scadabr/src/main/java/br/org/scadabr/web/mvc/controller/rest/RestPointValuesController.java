@@ -6,16 +6,9 @@
 package br.org.scadabr.web.mvc.controller.rest;
 
 import br.org.scadabr.logger.LogUtils;
-import br.org.scadabr.web.l10n.Localizer;
-import br.org.scadabr.web.mvc.controller.jsonrpc.JsonWatchList;
-import br.org.scadabr.web.mvc.controller.jsonrpc.JsonWatchListPoint;
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.PointValueDao;
-import com.serotonin.mango.db.dao.WatchListDao;
-import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -32,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Scope("request")
+@RequestMapping(value = "/rest/pointValues/")
 public class RestPointValuesController {
 
     private static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
@@ -39,7 +33,7 @@ public class RestPointValuesController {
     @Inject
     private transient PointValueDao pointValueDao;
 
-    @RequestMapping(value = "/rest/pointValues/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public List<JsonPointValue> getPointValues(@PathVariable int id, @RequestParam(value = "from", required = false) Long from, @RequestParam(value = "to",required = false) Long to) {
         if (from == null) {
             from = pointValueDao.getInceptionDate(id);

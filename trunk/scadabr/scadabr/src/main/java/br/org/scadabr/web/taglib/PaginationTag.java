@@ -5,8 +5,9 @@
  */
 package br.org.scadabr.web.taglib;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,7 @@ public class PaginationTag extends PaginationUrlTag {
 
                 printAttribute(out, "class", styleClass);
                 out.write(">");
-                out.write(Localizer.localizeI18nKey(previousLabelKey, I18NUtils.getBundle(pageContext)));
+                out.write(AbstractLocalizer.localizeI18nKey(previousLabelKey, I18NUtils.getBundle(pageContext)));
                 out.write("</a>");
             }
             if ((indices) && (paging.getNumberOfItems() > 0)) {
@@ -109,7 +110,7 @@ public class PaginationTag extends PaginationUrlTag {
 
                 printAttribute(out, "class", styleClass);
                 out.write(">");
-                out.write(Localizer.localizeI18nKey(nextLabelKey, I18NUtils.getBundle(pageContext)));
+                out.write(AbstractLocalizer.localizeI18nKey(nextLabelKey, I18NUtils.getBundle(pageContext)));
                 out.write("</a>");
             }
             out.flush();

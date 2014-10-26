@@ -1,6 +1,8 @@
 package br.org.scadabr.web.mvc.controller.jsonrpc;
 import br.org.scadabr.logger.LogUtils;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.web.i18n.LocaleResolver;
+import br.org.scadabr.web.i18n.MessageSource;
+import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.googlecode.jsonrpc4j.JsonRpcService;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.PointValueDao;
@@ -21,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 
@@ -41,21 +44,21 @@ public class WatchListService implements Serializable {
     @Inject
     private transient RuntimeManager runtimeManager;
     @Inject
-    private transient Localizer localizer;
-    @Inject
     private transient UserDao userDao;
     @Inject
     private transient UserSessionContextBean userSessionContextBean;
+    @Inject
+    private transient RequestContextAwareLocalizer localizer;
 
-    public JsonWatchList getWatchList(int watchlistId) {
+    public JsonWatchList getWatchList(int watchlistId, HttpServletRequest request) {
         return new JsonWatchList(watchListDao.getWatchList(watchlistId), dataPointDao, runtimeManager, localizer);
     }
 
-    public JsonWatchList getSelectedWatchlist() {
+    public JsonWatchList getSelectedWatchlist(HttpServletRequest request) {
         return new JsonWatchList(watchListDao.getWatchList(userSessionContextBean.getUser().getSelectedWatchList()), dataPointDao, runtimeManager, localizer);
     }
 
-    public JsonWatchList addPointToWatchlist(int watchlistId, int index, int dataPointId) {
+    public JsonWatchList addPointToWatchlist(int watchlistId, int index, int dataPointId, HttpServletRequest request) {
         LOG.warning("ENTER addPointToWatchlist");
         final User user = userSessionContextBean.getUser();
         DataPointVO point = dataPointDao.getDataPoint(dataPointId);
@@ -96,7 +99,7 @@ public class WatchListService implements Serializable {
         point.setSettable(true);
     }
 
-    public JsonWatchList deletePointFromWatchlist(int watchlistId, int dataPointId) {
+    public JsonWatchList deletePointFromWatchlist(int watchlistId, int dataPointId, HttpServletRequest request) {
         LOG.warning("ENTER deletePointFromWatchlist");
         final User user = userSessionContextBean.getUser();
         DataPointVO point = dataPointDao.getDataPoint(dataPointId);

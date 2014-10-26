@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -42,7 +43,7 @@ import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.email.MangoEmailContent;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import freemarker.template.TemplateException;
 import java.io.IOException;
 import javax.inject.Inject;
@@ -201,7 +202,7 @@ public class UsersDwr extends BaseDwr {
             ResourceBundle bundle = Common.getBundle();
             Map<String, Object> model = new HashMap<>();
             model.put("message", new LocalizableMessageImpl("ftl.userTestEmail", username));
-            MangoEmailContent cnt = new MangoEmailContent("testEmail", model, bundle, Localizer.localizeI18nKey("ftl.testEmail", bundle), Common.UTF8);
+            MangoEmailContent cnt = new MangoEmailContent("testEmail", model, bundle, AbstractLocalizer.localizeI18nKey("ftl.testEmail", bundle), Common.UTF8);
             EmailWorkItem.queueEmail(email, cnt);
             result.put("message", new LocalizableMessageImpl("common.testEmailSent", email));
         } catch (TemplateException | IOException | AddressException e) {

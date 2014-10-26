@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr.beans;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.io.IOException;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -30,7 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import net.sf.mbus4j.Connection;
 import br.org.scadabr.vo.datasource.mbus.MBusSearchByAddressing;
 import br.org.scadabr.vo.datasource.mbus.PrimaryAddressingSearch;
@@ -99,7 +100,7 @@ public class MBusDiscovery implements MasterEventListener, TestingUtility {
 
             @Override
             void shutOff() {
-                message = Localizer.localizeI18nKey("dsEdit.mbus.tester.autoShutOff", MBusDiscovery.this.bundle);
+                message = AbstractLocalizer.localizeI18nKey("dsEdit.mbus.tester.autoShutOff", MBusDiscovery.this.bundle);
                 MBusDiscovery.this.cleanup();
             }
         };
@@ -108,7 +109,7 @@ public class MBusDiscovery implements MasterEventListener, TestingUtility {
         master = new MBusMaster();
         master.setConnection(connection);
         this.searchByAddressing = searchByAddressing;
-        message = Localizer.localizeI18nKey("dsEdit.mbus.tester.searchingDevices", bundle);
+        message = AbstractLocalizer.localizeI18nKey("dsEdit.mbus.tester.searchingDevices", bundle);
         searchThread = new SearchThread();
     }
 
@@ -130,7 +131,7 @@ public class MBusDiscovery implements MasterEventListener, TestingUtility {
     @Override
     public void cancel() {
         LOG.info("cancel()");
-        message = Localizer.localizeI18nKey("dsEdit.mbus.tester.cancelled", bundle);
+        message = AbstractLocalizer.localizeI18nKey("dsEdit.mbus.tester.cancelled", bundle);
         cleanup();
     }
 

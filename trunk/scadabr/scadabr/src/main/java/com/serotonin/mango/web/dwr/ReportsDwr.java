@@ -21,6 +21,7 @@ package com.serotonin.mango.web.dwr;
 import java.util.List;
 
 import br.org.scadabr.InvalidArgumentException;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.Common;
@@ -39,7 +40,7 @@ import com.serotonin.mango.vo.report.ReportVO;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,7 +83,7 @@ public class ReportsDwr extends BaseDwr {
 
             if (copy) {
                 report.setId(Common.NEW_ID);
-                report.setName(Localizer.localizeI18nKey("common.copyPrefix", getResourceBundle(), report.getName()));
+                report.setName(AbstractLocalizer.localizeI18nKey("common.copyPrefix", getResourceBundle(), report.getName()));
             }
 
             Permissions.ensureReportPermission(Common.getUser(), report);
@@ -296,10 +297,10 @@ public class ReportsDwr extends BaseDwr {
             final Map<String, Object> entry = new HashMap<>();
             entry.put("id", ri.getId());
             entry.put("name", ri.getName());
-            entry.put("reportStartTime", Localizer.localizeTimeStamp(ri.getReportStartTime(), true, locale));
-            entry.put("reportEndTime", Localizer.localizeTimeStamp(ri.getReportEndTime(), true, locale));
-            entry.put("runStartTime", Localizer.localizeTimeStamp(ri.getRunStartTime(), true, locale));
-            entry.put("runEndTime", Localizer.localizeTimeStamp(ri.getRunEndTime(), true, locale));
+            entry.put("reportStartTime", AbstractLocalizer.localizeTimeStamp(ri.getReportStartTime(), true, locale));
+            entry.put("reportEndTime", AbstractLocalizer.localizeTimeStamp(ri.getReportEndTime(), true, locale));
+            entry.put("runStartTime", AbstractLocalizer.localizeTimeStamp(ri.getRunStartTime(), true, locale));
+            entry.put("runEndTime", AbstractLocalizer.localizeTimeStamp(ri.getRunEndTime(), true, locale));
             entry.put("state", ri.getState());
             entry.put("runDuration", String.format("%d s %d ms", ri.getRunDuration() / 1000, ri.getRunDuration() % 1000));
             entry.put("recordCount", ri.getRecordCount());
@@ -321,7 +322,7 @@ public class ReportsDwr extends BaseDwr {
         }
 
         ReportVO report = new ReportVO();
-        report.setName(Localizer.localizeI18nKey("common.copyPrefix", getResourceBundle(), watchList.getName()));
+        report.setName(AbstractLocalizer.localizeI18nKey("common.copyPrefix", getResourceBundle(), watchList.getName()));
         for (DataPointVO dp : watchList.getPointList()) {
             ReportPointVO rp = new ReportPointVO();
             rp.setPointId(dp.getId());

@@ -36,6 +36,7 @@ import org.joda.time.DateTime;
 import org.joda.time.IllegalFieldValueException;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
@@ -59,7 +60,7 @@ import com.serotonin.mango.web.taglib.Functions;
 import br.org.scadabr.web.content.ContentGenerator;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import com.serotonin.mango.rt.RuntimeManager;
 import java.util.Locale;
 import java.util.Objects;
@@ -141,7 +142,7 @@ abstract public class BaseDwr {
         if (!Objects.equals(pointVO.lastValue(), pointValue)) {
             state.setValue(prettyText);
             if (pointValue != null) {
-                state.setTime(Localizer.localizeTimeStamp(pointValue.getTime(), true, getLocale()));
+                state.setTime(AbstractLocalizer.localizeTimeStamp(pointValue.getTime(), true, getLocale()));
             }
             pointVO.updateLastValue(pointValue);
         }
@@ -254,7 +255,7 @@ abstract public class BaseDwr {
             throw new ShouldNeverHappenException("Invalid comment type: " + typeId);
         }
         Map<String, String> result = new HashMap<>();
-        result.put("timeAndUsername", String.format("%s %s %s", Localizer.localizeTimeStamp(c.getTs(), true, getLocale()), Localizer.localizeI18nKey("notes.by", getResourceBundle()), user.getUsername()));
+        result.put("timeAndUsername", String.format("%s %s %s", AbstractLocalizer.localizeTimeStamp(c.getTs(), true, getLocale()), AbstractLocalizer.localizeI18nKey("notes.by", getResourceBundle()), user.getUsername()));
         result.put("comment", c.getComment());
         return result;
     }
@@ -305,11 +306,11 @@ abstract public class BaseDwr {
     }
 
     protected String getMessage(String i18nKey, Object... args) {
-        return Localizer.localizeI18nKey(i18nKey, getResourceBundle(), args);
+        return AbstractLocalizer.localizeI18nKey(i18nKey, getResourceBundle(), args);
     }
 
     protected String getMessage(LocalizableMessage message) {
-        return Localizer.localizeMessage(message, getResourceBundle());
+        return AbstractLocalizer.localizeMessage(message, getResourceBundle());
     }
 
     protected Locale getLocale() {

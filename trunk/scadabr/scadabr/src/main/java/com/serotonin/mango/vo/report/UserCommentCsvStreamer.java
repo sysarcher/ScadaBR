@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.report;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -25,7 +26,7 @@ import java.util.ResourceBundle;
 import com.serotonin.mango.view.export.CsvWriter;
 import com.serotonin.mango.vo.UserComment;
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -37,30 +38,30 @@ public class UserCommentCsvStreamer {
         String[] data = new String[5];
 
         // Write the headers.
-        data[0] = Localizer.localizeI18nKey("users.username", bundle);
-        data[1] = Localizer.localizeI18nKey("reports.commentList.type", bundle);
-        data[2] = Localizer.localizeI18nKey("reports.commentList.typeKey", bundle);
-        data[3] = Localizer.localizeI18nKey("reports.commentList.time", bundle);
-        data[4] = Localizer.localizeI18nKey("notes.note", bundle);
+        data[0] = AbstractLocalizer.localizeI18nKey("users.username", bundle);
+        data[1] = AbstractLocalizer.localizeI18nKey("reports.commentList.type", bundle);
+        data[2] = AbstractLocalizer.localizeI18nKey("reports.commentList.typeKey", bundle);
+        data[3] = AbstractLocalizer.localizeI18nKey("reports.commentList.time", bundle);
+        data[4] = AbstractLocalizer.localizeI18nKey("notes.note", bundle);
         out.write(csvWriter.encodeRow(data));
 
         for (ReportUserComment comment : comments) {
             data[0] = comment.getUsername();
             if (data[0] == null) {
-                data[0] = Localizer.localizeI18nKey("common.deleted", bundle);
+                data[0] = AbstractLocalizer.localizeI18nKey("common.deleted", bundle);
             }
             if (comment.getCommentType() == UserComment.TYPE_EVENT) {
-                data[1] = Localizer.localizeI18nKey("reports.commentList.type.event", bundle);
+                data[1] = AbstractLocalizer.localizeI18nKey("reports.commentList.type.event", bundle);
                 data[2] = Integer.toString(comment.getTypeKey());
             } else if (comment.getCommentType() == UserComment.TYPE_POINT) {
-                data[1] = Localizer.localizeI18nKey("reports.commentList.type.point", bundle);
+                data[1] = AbstractLocalizer.localizeI18nKey("reports.commentList.type.point", bundle);
                 data[2] = comment.getPointName();
             } else {
-                data[1] = Localizer.localizeI18nKey("common.unknown", bundle);
+                data[1] = AbstractLocalizer.localizeI18nKey("common.unknown", bundle);
                 data[2] = "";
             }
 
-            data[3] = Localizer.localizeTime(bundle.getLocale(), comment.getTs());
+            data[3] = AbstractLocalizer.localizeTime(bundle.getLocale(), comment.getTs());
             data[4] = comment.getComment();
 
             out.write(csvWriter.encodeRow(data));

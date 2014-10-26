@@ -5,9 +5,10 @@
  */
 package br.org.scadabr.web.taglib;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import java.io.IOException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
@@ -46,9 +47,9 @@ public class LocalizableMessageTag extends TagSupport {
     public int doEndTag() throws JspException {
         String s = null;
         if (message != null) {
-            s = Localizer.localizeMessage(message, I18NUtils.getBundle(pageContext));
+            s = AbstractLocalizer.localizeMessage(message, I18NUtils.getBundle(pageContext));
         } else if (key != null) {
-            s = Localizer.localizeI18nKey(key, I18NUtils.getBundle(pageContext));
+            s = AbstractLocalizer.localizeI18nKey(key, I18NUtils.getBundle(pageContext));
         }
         if (s != null) {
             if (escapeQuotes && escapeDQuotes) {

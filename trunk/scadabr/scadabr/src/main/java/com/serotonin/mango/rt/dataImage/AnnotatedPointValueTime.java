@@ -18,12 +18,13 @@
  */
 package com.serotonin.mango.rt.dataImage;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * This class provides a way of arbitrarily annotating a PointValue. Point value
@@ -103,9 +104,9 @@ public class AnnotatedPointValueTime extends PointValueTime {
     }
 
     public String getAnnotation(ResourceBundle bundle) {
-        String pattern = Localizer.localizeI18nKey(getSourceDescriptionKey(), bundle);
+        String pattern = AbstractLocalizer.localizeI18nKey(getSourceDescriptionKey(), bundle);
         if (sourceDescriptionArgument == null) {
-            return MessageFormat.format(pattern, Localizer.localizeI18nKey("common.deleted", bundle));
+            return MessageFormat.format(pattern, AbstractLocalizer.localizeI18nKey("common.deleted", bundle));
         }
         return MessageFormat.format(pattern, sourceDescriptionArgument);
     }

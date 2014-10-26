@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -36,7 +37,7 @@ import com.serotonin.mango.vo.event.EventHandlerVO;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource {
 
@@ -155,7 +156,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
                 // The set point attempt failed for an event that is a set point handler failure in the first place.
                 // Do not propagate the event, but rather just write a log message.
                 LOG.warn("A set point event due to a set point handler failure itself failed. The failure event "
-                        + "has been discarded: " + Localizer.localizeMessage(message, Common.getBundle()));
+                        + "has been discarded: " + AbstractLocalizer.localizeMessage(message, Common.getBundle()));
                 return;
             }
         }

@@ -27,6 +27,7 @@ import java.util.ResourceBundle;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.DatabaseAccess;
@@ -51,7 +52,7 @@ import com.serotonin.mango.vo.report.ReportUserComment;
 import com.serotonin.mango.vo.report.ReportVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -282,10 +283,10 @@ public class ReportDao extends BaseDao {
     public int runReport(final ReportInstance instance, List<PointInfo> points, ResourceBundle bundle) {
         PointValueDao pointValueDao = PointValueDao.getInstance();
         int count = 0;
-        String userLabel = Localizer.localizeI18nKey("common.user", bundle);
-        String setPointLabel = Localizer.localizeI18nKey("annotation.eventHandler", bundle);
-        String anonymousLabel = Localizer.localizeI18nKey("annotation.anonymous", bundle);
-        String deletedLabel = Localizer.localizeI18nKey("common.deleted", bundle);
+        String userLabel = AbstractLocalizer.localizeI18nKey("common.user", bundle);
+        String setPointLabel = AbstractLocalizer.localizeI18nKey("annotation.eventHandler", bundle);
+        String anonymousLabel = AbstractLocalizer.localizeI18nKey("annotation.anonymous", bundle);
+        String deletedLabel = AbstractLocalizer.localizeI18nKey("common.deleted", bundle);
 
         // The timestamp selection code is used multiple times for different tables
         String timestampSql;

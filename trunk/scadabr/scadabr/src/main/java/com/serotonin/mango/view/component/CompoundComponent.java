@@ -32,6 +32,7 @@ import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonValue;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
@@ -39,7 +40,7 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -215,7 +216,7 @@ abstract public class CompoundComponent extends ViewComponent {
         htmlData.append(height);
 
         htmlData.append(".png");
-        htmlData.append("\" alt=\"").append(Localizer.localizeI18nKey("common.imageChart", bundle)).append("\"/>");
+        htmlData.append("\" alt=\"").append(AbstractLocalizer.localizeI18nKey("common.imageChart", bundle)).append("\"/>");
 
         return htmlData.toString();
     }

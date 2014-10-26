@@ -1,5 +1,6 @@
 package com.serotonin.mango.web.email;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.ResourceBundle;
 
 import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 import freemarker.core.Environment;
 import freemarker.ext.beans.BeanModel;
@@ -47,7 +48,7 @@ public class SubjectDirective implements TemplateDirectiveModel {
                 if (message == null) {
                     subject = "";
                 } else {
-                    subject = Localizer.localizeMessage(message, bundle);
+                    subject = AbstractLocalizer.localizeMessage(message, bundle);
                 }
             }
         } else if (params.containsKey("key")) {
@@ -59,7 +60,7 @@ public class SubjectDirective implements TemplateDirectiveModel {
                 if (key instanceof TemplateScalarModel) {
                     String keyString = ((TemplateScalarModel) key).getAsString();
                     final Object[] keyParams = findParameters(params);
-                    subject = Localizer.localizeI18nKey(keyString, bundle, keyParams);
+                    subject = AbstractLocalizer.localizeI18nKey(keyString, bundle, keyParams);
                 } else {
                     throw new TemplateModelException("key must be a string");
                 }

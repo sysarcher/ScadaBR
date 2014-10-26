@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr.beans;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -30,7 +31,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -145,9 +146,9 @@ public class SqlStatementTester extends Thread implements TestingUtility {
 
         // Add the headers.
         List<String> row = new ArrayList<>();
-        row.add(Localizer.localizeI18nKey("dsEdit.sql.tester.columnName", bundle));
-        row.add(Localizer.localizeI18nKey("dsEdit.sql.tester.columnType", bundle));
-        row.add(Localizer.localizeI18nKey("dsEdit.sql.tester.value", bundle));
+        row.add(AbstractLocalizer.localizeI18nKey("dsEdit.sql.tester.columnName", bundle));
+        row.add(AbstractLocalizer.localizeI18nKey("dsEdit.sql.tester.columnType", bundle));
+        row.add(AbstractLocalizer.localizeI18nKey("dsEdit.sql.tester.value", bundle));
         resultTable.add(row);
 
         for (int i = 1; i <= columns; i++) {
@@ -159,7 +160,7 @@ public class SqlStatementTester extends Thread implements TestingUtility {
             if (data) {
                 value = rs.getString(i);
             } else {
-                value = Localizer.localizeI18nKey("common.noData", bundle);
+                value = AbstractLocalizer.localizeI18nKey("common.noData", bundle);
             }
 
             row.add(value);

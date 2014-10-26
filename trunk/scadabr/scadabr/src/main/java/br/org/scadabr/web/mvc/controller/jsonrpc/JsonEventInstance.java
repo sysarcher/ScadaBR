@@ -1,6 +1,6 @@
 package br.org.scadabr.web.mvc.controller.jsonrpc;
 
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import com.serotonin.mango.rt.event.EventInstance;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -156,13 +156,13 @@ public class JsonEventInstance {
         result.setActiveTimestamp(localizer.localizeTimeStamp(eventInstance.getActiveTimestamp(), true));
         result.setRtnApplicable(eventInstance.isRtnApplicable());
         if (eventInstance.getRtnMessage() != null) {
-            result.setRtnMessage(localizer.localizeMessage(eventInstance.getRtnMessage()));
+            result.setRtnMessage(localizer.getMessage(eventInstance.getRtnMessage()));
         }
         if (eventInstance.getRtnTimestamp() > 0) {
             result.setRtnTimestamp(localizer.localizeTimeStamp(eventInstance.getRtnTimestamp(), true));
         }
         result.setAcknowledged(eventInstance.isAcknowledged());
-        result.setMessage(localizer.localizeMessage(eventInstance.getMessage()));
+        result.setMessage(localizer.getMessage(eventInstance.getMessage()));
         return result;
     }
 

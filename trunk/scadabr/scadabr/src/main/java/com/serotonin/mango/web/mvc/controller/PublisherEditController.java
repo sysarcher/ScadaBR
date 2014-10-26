@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.web.mvc.controller;
 
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +32,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.ParameterizableViewController;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.db.dao.PublisherDao;
@@ -86,7 +87,7 @@ public class PublisherEditController extends ParameterizableViewController {
             if (events != null) {
                 ResourceBundle bundle = ControllerUtils.getResourceBundle(request);
                 for (EventInstance event : events) {
-                    beans.add(new EventInstanceBean(event.isActive(), event.getAlarmLevel(), event.getActiveTimestamp(), Localizer.localizeMessage(event.getMessage(), bundle)));
+                    beans.add(new EventInstanceBean(event.isActive(), event.getAlarmLevel(), event.getActiveTimestamp(), AbstractLocalizer.localizeMessage(event.getMessage(), bundle)));
                 }
             }
             model.put("publisherEvents", beans);

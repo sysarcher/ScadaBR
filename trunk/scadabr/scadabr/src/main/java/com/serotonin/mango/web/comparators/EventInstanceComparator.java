@@ -18,7 +18,8 @@
  */
 package com.serotonin.mango.web.comparators;
 
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.AbstractLocalizer;
+import br.org.scadabr.l10n.Localizer;
 import java.util.ResourceBundle;
 
 import com.serotonin.mango.rt.event.EventInstance;
@@ -69,8 +70,8 @@ public class EventInstanceComparator extends BaseComparator<EventInstance> {
                 result = 1;
             }
         } else if (sortType == SORT_MESSAGE) {
-            String s1 = Localizer.localizeMessage(e1.getMessage(), bundle);
-            String s2 = Localizer.localizeMessage(e2.getMessage(), bundle);
+            String s1 = AbstractLocalizer.localizeMessage(e1.getMessage(), bundle);
+            String s2 = AbstractLocalizer.localizeMessage(e2.getMessage(), bundle);
             result = s1.compareTo(s2);
         } else if (sortType == SORT_ID) {
             result = e1.getId() - e2.getId();

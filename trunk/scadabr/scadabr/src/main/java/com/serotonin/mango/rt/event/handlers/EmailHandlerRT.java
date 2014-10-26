@@ -18,11 +18,12 @@
  */
 package com.serotonin.mango.rt.event.handlers;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.web.email.EmailInline;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.MailingListDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
@@ -189,7 +190,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
             }
         }
 
-        String subject = Localizer.localizeMessage(subjectMsg, bundle);
+        String subject = AbstractLocalizer.localizeMessage(subjectMsg, bundle);
 
         try {
             String[] toAddrs = addresses.toArray(new String[0]);

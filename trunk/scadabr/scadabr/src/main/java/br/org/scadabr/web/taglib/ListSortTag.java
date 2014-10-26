@@ -5,8 +5,9 @@
  */
 package br.org.scadabr.web.taglib;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +128,7 @@ public class ListSortTag extends PaginationUrlTag {
             if (labelKey.isEmpty()) {
                 out.write(label);
             } else {
-                out.write(Localizer.localizeI18nKey(labelKey, I18NUtils.getBundle(pageContext)));
+                out.write(AbstractLocalizer.localizeI18nKey(labelKey, I18NUtils.getBundle(pageContext)));
             }
             out.write("</a>&nbsp;");
             if ((field != null) && (field.equals(paging.getSortField()))) {
@@ -137,7 +138,7 @@ public class ListSortTag extends PaginationUrlTag {
                     printAttribute(out, "width", downImageWidth);
                     printAttribute(out, "height", downImageHeight);
                     if (downImageAltKey != null) {
-                        printAttribute(out, "alt", Localizer.localizeI18nKey(downImageAltKey, I18NUtils.getBundle(pageContext)));
+                        printAttribute(out, "alt", AbstractLocalizer.localizeI18nKey(downImageAltKey, I18NUtils.getBundle(pageContext)));
                     } else {
                         printAttribute(out, "alt", downImageAlt);
                     }
@@ -146,7 +147,7 @@ public class ListSortTag extends PaginationUrlTag {
                     printAttribute(out, "width", upImageWidth);
                     printAttribute(out, "height", upImageHeight);
                     if (upImageAltKey != null) {
-                        printAttribute(out, "alt", Localizer.localizeI18nKey(upImageAltKey, I18NUtils.getBundle(pageContext)));
+                        printAttribute(out, "alt", AbstractLocalizer.localizeI18nKey(upImageAltKey, I18NUtils.getBundle(pageContext)));
                     } else {
                         printAttribute(out, "alt", upImageAlt);
                     }

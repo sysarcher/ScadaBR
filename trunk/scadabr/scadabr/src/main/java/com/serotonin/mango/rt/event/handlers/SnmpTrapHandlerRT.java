@@ -126,7 +126,7 @@ public class SnmpTrapHandlerRT /* extends EventHandlerRT */ {
     //        
     // ResourceBundle bundle = Common.getBundle();
     //        
-    // String subject = Localizer.localizeI18nKey(bundle, subjectKey);
+    // String subject = AbstractLocalizer.localizeI18nKey(bundle, subjectKey);
     // if (evt.getId() != Common.NEW_ID)
     // subject += new LocalizableMessage("ftl.subject.eventId", evt.getId()).getLocalizedMessage(bundle);
     //        

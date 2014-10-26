@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr.beans;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
@@ -29,7 +30,7 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
 
 import com.serotonin.mango.rt.dataSource.snmp.Version;
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -72,7 +73,7 @@ public class SnmpOidGet extends Thread implements TestingUtility {
 
             PDU response = snmp.send(pdu, version.getTarget(host, port, retries, timeout)).getResponse();
             if (response == null) {
-                result = Localizer.localizeI18nKey("dsEdit.snmp.tester.noResponse", bundle);
+                result = AbstractLocalizer.localizeI18nKey("dsEdit.snmp.tester.noResponse", bundle);
             } else {
                 result = response.get(0).getVariable().toString();
             }

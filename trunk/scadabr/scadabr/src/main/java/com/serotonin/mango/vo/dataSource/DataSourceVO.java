@@ -80,7 +80,7 @@ import br.org.scadabr.vo.datasource.vmstat.VMStatDataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import br.org.scadabr.vo.datasource.fhz4j.Fhz4JDataSourceVO;
 import br.org.scadabr.vo.datasource.mbus.MBusDataSourceVO;
 
@@ -475,12 +475,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         if (name.length() > 40) {
             response.addContextual("dataSourceName", "validate.nameTooLong");
         }
-    }
-
-    @Deprecated
-    protected String getMessage(ResourceBundle bundle, String key,
-            Object... args) {
-        return Localizer.localizeI18nKey(key, bundle, args);
     }
 
     public DataSourceVO<?> copy() {

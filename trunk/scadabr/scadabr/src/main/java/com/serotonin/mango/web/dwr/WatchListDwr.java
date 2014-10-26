@@ -29,6 +29,7 @@ import org.directwebremoting.WebContextFactory;
 import org.joda.time.DateTime;
 
 import br.org.scadabr.db.IntValuePair;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.logger.LogUtils;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
@@ -51,7 +52,7 @@ import com.serotonin.mango.web.dwr.beans.WatchListState;
 import br.org.scadabr.util.ArrayUtils;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -320,7 +321,7 @@ public class WatchListDwr extends BaseDwr {
             state.setValue(generateContent(request, "imageValueThumbnail.jsp",
                     model));
             if (pointValue != null) {
-                state.setTime(Localizer.localizeTimeStamp(pointValue.getTime(), true, request.getLocale()));
+                state.setTime(AbstractLocalizer.localizeTimeStamp(pointValue.getTime(), true, request.getLocale()));
             }
             pointVO.updateLastValue(pointValue);
         }

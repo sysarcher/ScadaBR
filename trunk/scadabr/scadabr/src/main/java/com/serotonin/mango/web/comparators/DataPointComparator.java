@@ -18,7 +18,8 @@
  */
 package com.serotonin.mango.web.comparators;
 
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.AbstractLocalizer;
+import br.org.scadabr.l10n.Localizer;
 import java.util.ResourceBundle;
 
 import com.serotonin.mango.vo.DataPointVO;
@@ -68,12 +69,12 @@ public class DataPointComparator extends BaseComparator<DataPointVO> {
         } else if (sortType == SORT_ENABLED) {
             result = Boolean.compare(dp1.isEnabled(), dp2.isEnabled());
         } else if (sortType == SORT_DATA_TYPE) {
-            String s1 = Localizer.localizeMessage(dp1.getDataTypeMessage(), bundle);
-            String s2 = Localizer.localizeMessage(dp2.getDataTypeMessage(), bundle);
+            String s1 = AbstractLocalizer.localizeMessage(dp1.getDataTypeMessage(), bundle);
+            String s2 = AbstractLocalizer.localizeMessage(dp2.getDataTypeMessage(), bundle);
             result = s1.compareTo(s2);
         } else if (sortType == SORT_CONFIG) {
-            String s1 = Localizer.localizeMessage(dp1.getConfigurationDescription(), bundle);
-            String s2 = Localizer.localizeMessage(dp2.getConfigurationDescription(), bundle);
+            String s1 = AbstractLocalizer.localizeMessage(dp1.getConfigurationDescription(), bundle);
+            String s2 = AbstractLocalizer.localizeMessage(dp2.getConfigurationDescription(), bundle);
             result = s1.compareTo(s2);
         }
 

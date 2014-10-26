@@ -37,6 +37,7 @@ import org.joda.time.DateTime;
 
 import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.io.StreamUtils;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.MailingListDao;
@@ -55,7 +56,7 @@ import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.web.email.EmailAttachment;
 import br.org.scadabr.web.email.EmailContent;
 import br.org.scadabr.web.email.EmailInline;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -206,7 +207,7 @@ public class ReportWorkItem implements WorkItem {
             }
 
             try {
-                EmailWorkItem.queueEmail(toAddrs, Localizer.localizeI18nKey("ftl.scheduledReport", bundle, reportConfig.getName()), emailContent, postEmail);
+                EmailWorkItem.queueEmail(toAddrs, AbstractLocalizer.localizeI18nKey("ftl.scheduledReport", bundle, reportConfig.getName()), emailContent, postEmail);
             } catch (AddressException e) {
                 LOG.error(e);
             }

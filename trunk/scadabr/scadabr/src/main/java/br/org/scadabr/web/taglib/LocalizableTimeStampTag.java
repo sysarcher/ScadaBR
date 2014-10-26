@@ -5,7 +5,8 @@
  */
 package br.org.scadabr.web.taglib;
 
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.AbstractLocalizer;
+import br.org.scadabr.l10n.Localizer;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
@@ -29,7 +30,7 @@ public class LocalizableTimeStampTag extends TagSupport {
     public int doEndTag() throws JspException {
         Locale l = ((LocalizationContext) Config.find(pageContext, Config.FMT_LOCALIZATION_CONTEXT)).getLocale();
         try {
-            pageContext.getOut().write(Localizer.localizeTimeStamp(timestamp, hideDateOfToday, l));
+            pageContext.getOut().write(AbstractLocalizer.localizeTimeStamp(timestamp, hideDateOfToday, l));
         } catch (IOException e) {
             throw new JspException(e);
         }
