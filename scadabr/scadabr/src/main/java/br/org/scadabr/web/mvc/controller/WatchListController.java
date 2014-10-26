@@ -27,7 +27,9 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.permission.Permissions;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.web.i18n.MessageSource;
+import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.web.UserSessionContextBean;
@@ -37,8 +39,10 @@ import javax.inject.Inject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.support.RequestContext;
 
 @Controller
 @RequestMapping("/watchList")
@@ -53,18 +57,18 @@ public class WatchListController {
     @Inject
     private UserDao userDao;
     @Inject
-    private Localizer localizer;
+    private MessageSource messageSource;
     
     public static final String KEY_WATCHLISTS = "watchLists";
     public static final String KEY_SELECTED_WATCHLIST = "selectedWatchList";
 
     @RequestMapping(method = RequestMethod.GET)
     public String initializeForm(ModelMap model) {
-        createModel(model);
         return "watchList";
     }
 
-    protected void createModel(ModelMap modelMap) {
+    @ModelAttribute
+    protected void createModel(ModelMap modelMap, RequestContext requestContext) {
         final User user = userSessionContextBean.getUser();
 
         // The user's permissions may have changed since the last session, so make sure the watch lists are correct.
@@ -73,7 +77,7 @@ public class WatchListController {
         if (watchLists.isEmpty()) {
             // Add a default watch list if none exist.
             final WatchList watchList = new WatchList();
-            watchList.setName(localizer.localizeI18nKey("common.newName"));
+            watchList.setName(messageSource.getMessage("common.newName", requestContext.getLocale()));
             watchLists.add(watchListDao.createNewWatchList(watchList, user.getId()));
         }
 

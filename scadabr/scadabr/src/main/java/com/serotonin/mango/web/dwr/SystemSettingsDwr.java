@@ -28,6 +28,7 @@ import java.util.ResourceBundle;
 import br.org.scadabr.db.configuration.ConfigurationDB;
 
 import br.org.scadabr.InvalidArgumentException;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
@@ -49,7 +50,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import com.serotonin.mango.db.dao.UserDao;
 import javax.inject.Inject;
 
@@ -236,7 +237,7 @@ public class SystemSettingsDwr extends BaseDwr {
             model.put("message", new LocalizableMessageImpl(
                     "systemSettings.testEmail"));
             MangoEmailContent cnt = new MangoEmailContent("testEmail", model,
-                    bundle, Localizer.localizeI18nKey("ftl.testEmail", bundle),
+                    bundle, AbstractLocalizer.localizeI18nKey("ftl.testEmail", bundle),
                     Common.UTF8);
             EmailWorkItem.queueEmail(user.getEmail(), cnt);
             result.put("message", new LocalizableMessageImpl(

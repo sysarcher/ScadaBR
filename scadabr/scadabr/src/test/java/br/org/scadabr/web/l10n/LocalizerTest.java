@@ -6,6 +6,8 @@
 
 package br.org.scadabr.web.l10n;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
+import br.org.scadabr.l10n.Localizer;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -54,7 +56,7 @@ public class LocalizerTest {
         ResourceBundle bundle = null;
         Object[] args = null;
         String expResult = "";
-        String result = Localizer.localizeI18nKey(i18nKey, bundle, args);
+        String result = AbstractLocalizer.localizeI18nKey(i18nKey, bundle, args);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -70,7 +72,7 @@ public class LocalizerTest {
         LocalizableMessage i18nMessage = null;
         ResourceBundle bundle = null;
         String expResult = "";
-        String result = Localizer.localizeMessage(i18nMessage, bundle);
+        String result = AbstractLocalizer.localizeMessage(i18nMessage, bundle);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -86,7 +88,7 @@ public class LocalizerTest {
         long ts = System.currentTimeMillis();
         Locale locale = Locale.CANADA;
         String expResult = "";
-        String result = Localizer.localizeTimeStamp(ts, true, locale);
+        String result = AbstractLocalizer.localizeTimeStamp(ts, true, locale);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -102,7 +104,7 @@ public class LocalizerTest {
         Locale locale = null;
         long ts = 0L;
         String expResult = "";
-        String result = Localizer.localizeDate(locale, ts);
+        String result = AbstractLocalizer.localizeDate(locale, ts);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -118,7 +120,7 @@ public class LocalizerTest {
         Locale locale = null;
         long ts = 0L;
         String expResult = "";
-        String result = Localizer.localizeTime(locale, ts);
+        String result = AbstractLocalizer.localizeTime(locale, ts);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

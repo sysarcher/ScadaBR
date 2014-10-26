@@ -5,7 +5,6 @@
  */
 package br.org.scadabr.web.taglib.dijit;
 
-import br.org.scadabr.web.l10n.Localizer;
 import static br.org.scadabr.web.taglib.Functions.printAttribute;
 import br.org.scadabr.web.taglib.dojo.DataDojoProps;
 import java.io.IOException;
@@ -42,7 +41,6 @@ public class ButtonTag extends RequestContextAwareTag {
 
     @Override
     public int doStartTagInternal() throws JspException {
-        Localizer localizer = getRequestContext().getWebApplicationContext().getBean(Localizer.class);
         try {
             JspWriter out = pageContext.getOut();
 
@@ -57,14 +55,14 @@ public class ButtonTag extends RequestContextAwareTag {
             dataDojoProps.print(out);
             printAttribute(out, "name", name);
             if (i18nTitle != null) {
-                printAttribute(out, "title", localizer.localizeI18nKey(i18nTitle));
+                printAttribute(out, "title", getRequestContext().getMessage(i18nTitle));
             }
             if (disabled) {
                 printAttribute(out, "disabled", "true");
             }
             out.print(">");
             if (i18nLabel != null) {
-                out.print(localizer.localizeI18nKey(i18nLabel));
+                out.print(getRequestContext().getMessage(i18nLabel));
             }
         } catch (IOException ex) {
             throw new JspTagException(ex.getMessage());

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr.beans;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -28,7 +29,7 @@ import com.serotonin.mango.rt.dataSource.nmea.NmeaMessageListener;
 import com.serotonin.mango.rt.dataSource.nmea.NmeaReceiver;
 import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -45,7 +46,7 @@ public class NmeaUtilListener implements NmeaMessageListener, TestingUtility {
 
     public NmeaUtilListener(ResourceBundle bundle, String commPortId, int baudRate) {
         this.bundle = bundle;
-        message = Localizer.localizeI18nKey("dsEdit.nmea.tester.listening", bundle);
+        message = AbstractLocalizer.localizeI18nKey("dsEdit.nmea.tester.listening", bundle);
 
         SerialParameters params = new SerialParameters();
         params.setCommPortId(commPortId);
@@ -111,6 +112,6 @@ public class NmeaUtilListener implements NmeaMessageListener, TestingUtility {
     }
 
     private String getMessage(String key, String param) {
-        return Localizer.localizeI18nKey(key, bundle, param);
+        return AbstractLocalizer.localizeI18nKey(key, bundle, param);
     }
 }

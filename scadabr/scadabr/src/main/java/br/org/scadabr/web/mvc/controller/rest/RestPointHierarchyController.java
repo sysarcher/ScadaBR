@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author aploese
  */
 @RestController
-@RequestMapping("/rest/pointHierarchy")
+@RequestMapping("/rest/pointHierarchy/")
 public class RestPointHierarchyController {
 
     @Inject
@@ -39,34 +39,11 @@ public class RestPointHierarchyController {
             return dataPointDao.getFoldersAndDpByParentId(parentId);
     }
 
-    @RequestMapping(params = "id", method = RequestMethod.GET)
-    public LazyTreeNode getFolderById(@RequestParam(value = "id", required = true) int id) {
-            return dataPointDao.getFolderById(id);
-    }
-
-    @RequestMapping(method = RequestMethod.POST)
-    public LazyTreeNode addFolder(@RequestBody LazyTreeNode folder) {
-        dataPointDao.savePointFolder(folder);
-        return folder;
-    }
-
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public LazyTreeNode putFolder(@PathVariable("id") int id, @RequestBody LazyTreeNode folder) {
-        dataPointDao.savePointFolder(folder);
-        return folder;
-    }
-
-   /*RequestMapping(method = RequestMethod.POST)
-    public LazyTreeNode postNewFolder(@RequestBody LazyTreeNode folder) {
-        dataPointDao.savePointFolder(folder, 0);
-        return folder;
-    }
-*/
     /**
      * get the root of the pointHierarchy tree
      * @return the rood node
      */
-    @RequestMapping(value = "/root", method = RequestMethod.GET)
+    @RequestMapping(value = "root", method = RequestMethod.GET)
     public LazyTreeNode getRootFolder() {
         return dataPointDao.getRootFolder();
     }
@@ -76,9 +53,21 @@ public class RestPointHierarchyController {
      * @param id of the node
      * @return the folder
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public LazyTreeNode getFolderNodeById(@PathVariable("id") int id) {
+    @RequestMapping(value = "{id}", method = RequestMethod.GET)
+    public LazyTreeNode getFolder(@PathVariable("id") int id) {
         return dataPointDao.getFolderById(id);
+    }
+
+    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
+    public LazyTreeNode putFolder(@PathVariable("id") int id, @RequestBody LazyTreeNode folder) {
+        dataPointDao.savePointFolder(folder);
+        return folder;
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public LazyTreeNode postFolder(@RequestBody LazyTreeNode folder) {
+        dataPointDao.savePointFolder(folder);
+        return folder;
     }
 
 }

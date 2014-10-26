@@ -43,6 +43,7 @@ import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import br.org.scadabr.io.StreamUtils;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.MailingListDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
@@ -65,7 +66,7 @@ import com.serotonin.mango.web.email.MangoEmailContent;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import java.util.Objects;
 import javax.inject.Inject;
 
@@ -217,7 +218,7 @@ public class MiscDwr extends BaseDwr {
                 Map<String, Object> model = new HashMap<>();
                 model.put("user", Common.getUser());
                 model.put("message", new LocalizableMessageImpl("common.default", message));
-                MangoEmailContent cnt = new MangoEmailContent("testEmail", model, bundle, Localizer.localizeI18nKey("ftl.testEmail", bundle), Common.UTF8);
+                MangoEmailContent cnt = new MangoEmailContent("testEmail", model, bundle, AbstractLocalizer.localizeI18nKey("ftl.testEmail", bundle), Common.UTF8);
                 EmailWorkItem.queueEmail(toAddrs, cnt);
             } catch (Exception e) {
                 response.addGeneric("common.default", e);

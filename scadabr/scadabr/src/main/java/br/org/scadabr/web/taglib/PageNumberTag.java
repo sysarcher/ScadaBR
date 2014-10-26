@@ -5,8 +5,9 @@
  */
 package br.org.scadabr.web.taglib;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import br.org.scadabr.web.util.PagingDataForm;
 import java.io.IOException;
 import javax.servlet.jsp.JspException;
@@ -55,11 +56,11 @@ public class PageNumberTag extends TagSupport {
         try {
             final JspWriter out = pageContext.getOut();
             if (paging.getNumberOfItems() > 0) {
-                out.write(Localizer.localizeI18nKey(pageLabelKey, I18NUtils.getBundle(pageContext)));
+                out.write(AbstractLocalizer.localizeI18nKey(pageLabelKey, I18NUtils.getBundle(pageContext)));
                 out.write(" ");
                 out.write(Integer.toString(paging.getPage() + 1));
                 out.write(" ");
-                out.write(Localizer.localizeI18nKey(ofLabelKey, I18NUtils.getBundle(pageContext)));
+                out.write(AbstractLocalizer.localizeI18nKey(ofLabelKey, I18NUtils.getBundle(pageContext)));
                 out.write(" ");
                 out.write(Integer.toString(paging.getNumberOfPages()));
                 if (rows) {
@@ -72,16 +73,16 @@ public class PageNumberTag extends TagSupport {
                         out.write(Integer.toString(paging.getOffset() + paging.getItemsPerPage()));
                     }
                     out.write(" ");
-                    out.write(Localizer.localizeI18nKey(ofLabelKey, I18NUtils.getBundle(pageContext)));
+                    out.write(AbstractLocalizer.localizeI18nKey(ofLabelKey, I18NUtils.getBundle(pageContext)));
                     out.write(" ");
                     out.write(Integer.toString(paging.getNumberOfItems()));
                     out.write(" ");
-                    out.write(Localizer.localizeI18nKey(rowsLabelKey, I18NUtils.getBundle(pageContext)));
+                    out.write(AbstractLocalizer.localizeI18nKey(rowsLabelKey, I18NUtils.getBundle(pageContext)));
                     out.write(")");
                 }
                 out.flush();
             } else if (rows) {
-                out.write(Localizer.localizeI18nKey(noRowsLabelKey, I18NUtils.getBundle(pageContext)));
+                out.write(AbstractLocalizer.localizeI18nKey(noRowsLabelKey, I18NUtils.getBundle(pageContext)));
             }
         } catch (IOException e) {
             throw new JspException("Error writing page info", e);

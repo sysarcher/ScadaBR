@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr.beans;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
@@ -41,7 +42,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author aploese
@@ -102,7 +103,7 @@ public class OpenV4JDiscovery implements TestingUtility {
 
             @Override
             void shutOff() {
-                message = Localizer.localizeI18nKey("dsEdit.mbus.tester.auto", OpenV4JDiscovery.this.bundle);
+                message = AbstractLocalizer.localizeI18nKey("dsEdit.mbus.tester.auto", OpenV4JDiscovery.this.bundle);
                 OpenV4JDiscovery.this.cleanup();
             }
         };
@@ -117,7 +118,7 @@ public class OpenV4JDiscovery implements TestingUtility {
             result.addToDataContainer(dp);
         }
         result.start(commPortId);
-        result.setMessage(Localizer.localizeI18nKey("dsEdit.openv4j.tester.searchingDataPoints", bundle));
+        result.setMessage(AbstractLocalizer.localizeI18nKey("dsEdit.openv4j.tester.searchingDataPoints", bundle));
         return result;
     }
 
@@ -125,7 +126,7 @@ public class OpenV4JDiscovery implements TestingUtility {
         OpenV4JDiscovery result = new OpenV4JDiscovery(bundle);
         result.addToDataContainer(DataPoint.COMMON_CONFIG_DEVICE_TYPE_ID);
         result.start(commPortId);
-        result.setMessage(Localizer.localizeI18nKey("dsEdit.openv4j.tester.detectingDevice", bundle));
+        result.setMessage(AbstractLocalizer.localizeI18nKey("dsEdit.openv4j.tester.detectingDevice", bundle));
         return result;
     }
 
@@ -180,7 +181,7 @@ public class OpenV4JDiscovery implements TestingUtility {
     @Override
     public void cancel() {
         LOG.info("cancel()");
-        message = Localizer.localizeI18nKey("dsEdit.openv4j.tester.cancelled", bundle);
+        message = AbstractLocalizer.localizeI18nKey("dsEdit.openv4j.tester.cancelled", bundle);
         cleanup();
     }
 

@@ -18,12 +18,13 @@
  */
 package com.serotonin.mango.web.email;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.io.IOException;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 import freemarker.core.Environment;
 import freemarker.ext.beans.BeanModel;
@@ -54,7 +55,7 @@ public class MessageFormatDirective implements TemplateDirectiveModel {
         if (params.containsKey("key")) {
             try {
                 final TemplateScalarModel key = (TemplateScalarModel) params.get("key");
-                env.getOut().write(Localizer.localizeI18nKey(((TemplateScalarModel) key).getAsString(), bundle));
+                env.getOut().write(AbstractLocalizer.localizeI18nKey(((TemplateScalarModel) key).getAsString(), bundle));
                 return;
             } catch (ClassCastException e) {
                 throw new TemplateModelException("key must be a string");
@@ -71,7 +72,7 @@ public class MessageFormatDirective implements TemplateDirectiveModel {
             if (message == null) {
                 return;
             } else {
-                env.getOut().write(Localizer.localizeMessage(message, bundle));
+                env.getOut().write(AbstractLocalizer.localizeMessage(message, bundle));
                 return;
             }
         }
@@ -83,7 +84,7 @@ public class MessageFormatDirective implements TemplateDirectiveModel {
                     // The parameter is there, but the value is null.
                     return;
                 }
-                env.getOut().write(Localizer.localizeTimeStamp(timestamp.getAsNumber().longValue(), false, bundle.getLocale()));
+                env.getOut().write(AbstractLocalizer.localizeTimeStamp(timestamp.getAsNumber().longValue(), false, bundle.getLocale()));
                 return;
             } catch (ClassCastException e) {
                 throw new TemplateModelException("timestamp must be a long");

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.report;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -26,7 +27,7 @@ import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.view.export.CsvWriter;
 import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -38,38 +39,38 @@ public class EventCsvStreamer {
         String[] data = new String[7];
 
         // Write the headers.
-        data[0] = Localizer.localizeI18nKey("reports.eventList.id", bundle);
-        data[1] = Localizer.localizeI18nKey("common.alarmLevel", bundle);
-        data[2] = Localizer.localizeI18nKey("common.activeTime", bundle);
-        data[3] = Localizer.localizeI18nKey("reports.eventList.message", bundle);
-        data[4] = Localizer.localizeI18nKey("reports.eventList.status", bundle);
-        data[5] = Localizer.localizeI18nKey("reports.eventList.ackTime", bundle);
-        data[6] = Localizer.localizeI18nKey("reports.eventList.ackUser", bundle);
+        data[0] = AbstractLocalizer.localizeI18nKey("reports.eventList.id", bundle);
+        data[1] = AbstractLocalizer.localizeI18nKey("common.alarmLevel", bundle);
+        data[2] = AbstractLocalizer.localizeI18nKey("common.activeTime", bundle);
+        data[3] = AbstractLocalizer.localizeI18nKey("reports.eventList.message", bundle);
+        data[4] = AbstractLocalizer.localizeI18nKey("reports.eventList.status", bundle);
+        data[5] = AbstractLocalizer.localizeI18nKey("reports.eventList.ackTime", bundle);
+        data[6] = AbstractLocalizer.localizeI18nKey("reports.eventList.ackUser", bundle);
 
         out.write(csvWriter.encodeRow(data));
 
         for (EventInstance event : events) {
             data[0] = Integer.toString(event.getId());
-            data[1] = Localizer.localizeMessage(AlarmLevels.getAlarmLevelMessage(event.getAlarmLevel()), bundle);
-            data[2] = Localizer.localizeTimeStamp(event.getActiveTimestamp(), false, bundle.getLocale());
-            data[3] = Localizer.localizeMessage(event.getMessage(), bundle);
+            data[1] = AbstractLocalizer.localizeMessage(AlarmLevels.getAlarmLevelMessage(event.getAlarmLevel()), bundle);
+            data[2] = AbstractLocalizer.localizeTimeStamp(event.getActiveTimestamp(), false, bundle.getLocale());
+            data[3] = AbstractLocalizer.localizeMessage(event.getMessage(), bundle);
 
             if (event.isActive()) {
-                data[4] = Localizer.localizeI18nKey("common.active", bundle);
+                data[4] = AbstractLocalizer.localizeI18nKey("common.active", bundle);
             } else if (!event.isRtnApplicable()) {
                 data[4] = "";
             } else {
-                data[4] = String.format("%s - %s", Localizer.localizeTimeStamp(event.getRtnTimestamp(), false, bundle.getLocale()), Localizer.localizeMessage(event.getRtnMessage(), bundle));
+                data[4] = String.format("%s - %s", AbstractLocalizer.localizeTimeStamp(event.getRtnTimestamp(), false, bundle.getLocale()), AbstractLocalizer.localizeMessage(event.getRtnMessage(), bundle));
             }
 
             if (event.isAcknowledged()) {
-                data[5] = Localizer.localizeTimeStamp(event.getAcknowledgedTimestamp(), false, bundle.getLocale());
+                data[5] = AbstractLocalizer.localizeTimeStamp(event.getAcknowledgedTimestamp(), false, bundle.getLocale());
 
                 LocalizableMessage ack = event.getExportAckMessage();
                 if (ack == null) {
                     data[6] = "";
                 } else {
-                    data[6] = Localizer.localizeMessage(ack, bundle);
+                    data[6] = AbstractLocalizer.localizeMessage(ack, bundle);
                 }
             } else {
                 data[5] = "";

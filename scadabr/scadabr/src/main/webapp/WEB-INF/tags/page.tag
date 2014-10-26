@@ -10,7 +10,9 @@
         <link rel="stylesheet" href="resources/scadabr.css">
         <link rel="icon" href="images/favicon.ico"/>
         <link rel="shortcut icon" href="images/favicon.ico"/>
-        <script src='resources/dojo/dojo.js' data-dojo-config="isDebug: true, async: true, parseOnLoad: true"></script>
+        <%-- set dojos locale to that of the session --%>
+        <%-- TODO USe this for timezone support ??? https://github.com/mde/timezone-js ??? --%>
+        <script src='resources/dojo/dojo.js' data-dojo-config="isDebug: true, async: true, parseOnLoad: true, locale: '${pageContext.response.locale}'"></script>
         <script>
             var homeUrl = "${userSessionContextBean.userHomeUrl}";
             var _mainPage;

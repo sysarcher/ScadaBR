@@ -5,9 +5,10 @@
  */
 package br.org.scadabr.web.dwr;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;
 import org.directwebremoting.convert.StringConverter;
@@ -25,7 +26,7 @@ public class LocalizableMessageConverter extends StringConverter {
     public OutboundVariable convertOutbound(Object data, OutboundContext outctx) throws MarshallException {
         WebContext webctx = WebContextFactory.get();
         LocalizableMessage lm = (LocalizableMessage) data;
-        String s = Localizer.localizeMessage(lm, I18NUtils.getBundle(webctx.getHttpServletRequest()));
+        String s = AbstractLocalizer.localizeMessage(lm, I18NUtils.getBundle(webctx.getHttpServletRequest()));
         return super.convertOutbound(s, outctx);
     }
 

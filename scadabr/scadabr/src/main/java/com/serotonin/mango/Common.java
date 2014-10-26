@@ -46,6 +46,7 @@ import org.joda.time.Period;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.KeyValuePair;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.util.BackgroundContext;
 import com.serotonin.mango.util.CommPortConfigException;
@@ -66,7 +67,7 @@ import br.org.scadabr.timer.cron.SystemRunnable;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import java.util.MissingResourceException;
 
 @Deprecated // Convert to singleton bean
@@ -502,14 +503,18 @@ public class Common {
     // i18n
     //
     private final static Object i18nLock = new Object();
+    @Deprecated // Use per user settings ...
     private static String systemLanguage;
+    @Deprecated // Use per user settings ...
     private static ResourceBundle systemBundle;
 
     public static String getMessage(String key) {
         ensureI18n();
-        return Localizer.localizeI18nKey(key, systemBundle);
+        return AbstractLocalizer.localizeI18nKey(key, systemBundle);
     }
 
+    
+    @Deprecated // Use per user settings ...
     public static ResourceBundle getBundle() {
         ensureI18n();
         return systemBundle;

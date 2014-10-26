@@ -18,13 +18,14 @@
  */
 package com.serotonin.mango.util.freemarker;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.io.IOException;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 import freemarker.core.Environment;
 import freemarker.ext.beans.BeanModel;
@@ -68,12 +69,12 @@ public class MessageFormatDirective implements TemplateDirectiveModel {
                 if (message == null) {
                     out = "";
                 } else {
-                    out = Localizer.localizeMessage(message, bundle);
+                    out = AbstractLocalizer.localizeMessage(message, bundle);
                 }
             }
         } else {
             if (key instanceof TemplateScalarModel) {
-                out = Localizer.localizeI18nKey(((TemplateScalarModel) key).getAsString(), bundle);
+                out = AbstractLocalizer.localizeI18nKey(((TemplateScalarModel) key).getAsString(), bundle);
             } else {
                 throw new TemplateModelException("key must be a string");
             }

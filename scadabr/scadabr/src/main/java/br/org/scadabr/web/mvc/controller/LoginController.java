@@ -19,6 +19,8 @@
 package br.org.scadabr.web.mvc.controller;
 
 
+import br.org.scadabr.web.i18n.LocaleResolver;
+import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import br.org.scadabr.web.mvc.form.LoginForm;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,15 +34,22 @@ import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.UserSessionContextBean;
 import com.serotonin.mango.web.integration.CrowdUtils;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.TimeZone;
 import javax.inject.Inject;
 import javax.validation.Valid;
+import org.junit.runner.Request;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.i18n.SimpleTimeZoneAwareLocaleContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.LocaleContextResolver;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 @Controller
 @RequestMapping("/login")
@@ -54,7 +63,10 @@ class LoginController {
     private final static String LOGIN_VIEW = "login";
     @Inject
     private UserDao userDao;
-	
+
+    @Inject 
+    LocaleResolver localeResolver;
+    
    @Inject
     private UserSessionContextBean userSessionContextBean;
 
@@ -73,7 +85,7 @@ class LoginController {
 
     @RequestMapping(method = RequestMethod.GET)
     protected String showForm(Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        // Check if Crowd is enabled
+// Check if Crowd is enabled
         if (CrowdUtils.isCrowdEnabled()) {
             String username = CrowdUtils.getCrowdUsername(request);
 
@@ -159,8 +171,17 @@ class LoginController {
         if (crowdAuthenticated) {
             CrowdUtils.setCrowdAuthenticated(userSessionContextBean.getUser());
         }
+        fixTimeZone(request, response);
         return result;
     }
+
+    	public void fixTimeZone(HttpServletRequest request, HttpServletResponse response) {
+		final Locale locale = localeResolver.resolveLocale(request);
+                final TimeZone timeZone = Calendar.getInstance(locale).getTimeZone();
+                localeResolver.setLocaleContext(request, response, new SimpleTimeZoneAwareLocaleContext(locale, timeZone));
+                userSessionContextBean.setLocale(locale);
+		userSessionContextBean.setTimeZone(timeZone);
+	}
 
     private String performLogin(String username) {
         // Check if the user is already logged in.

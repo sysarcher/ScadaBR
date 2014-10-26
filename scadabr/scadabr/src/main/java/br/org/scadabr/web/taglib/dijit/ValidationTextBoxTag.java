@@ -5,7 +5,6 @@
  */
 package br.org.scadabr.web.taglib.dijit;
 
-import br.org.scadabr.web.l10n.Localizer;
 import javax.servlet.jsp.JspException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.tags.form.AbstractHtmlInputElementTag;
@@ -31,7 +30,6 @@ public class ValidationTextBoxTag extends AbstractHtmlInputElementTag {
 
     @Override
     protected int writeTagContent(TagWriter tagWriter) throws JspException {
-        final Localizer localizer = getRequestContext().getWebApplicationContext().getBean(Localizer.class);
         tagWriter.startTag("input");
 
         writeDefaultAttributes(tagWriter);
@@ -41,8 +39,8 @@ public class ValidationTextBoxTag extends AbstractHtmlInputElementTag {
         tagWriter.writeAttribute("value", value);
 
         // custom optional attributes
-        tagWriter.writeAttribute("label", localizer.localizeI18nKey(i18nLabel) + ":");
-        tagWriter.writeAttribute("title", localizer.localizeI18nKey(i18nTitle != null ? i18nTitle : i18nLabel));
+        tagWriter.writeAttribute("label", getRequestContext().getMessage(i18nLabel) + ":");
+        tagWriter.writeAttribute("title", getRequestContext().getMessage(i18nTitle != null ? i18nTitle : i18nLabel));
         if (getBindStatus().getErrors().hasFieldErrors(getBindStatus().getExpression())) {
             tagWriter.writeAttribute("data-dojo-type", "dijit/form/ValidationTextBox");
             StringBuilder sb = new StringBuilder();
@@ -67,6 +65,8 @@ public class ValidationTextBoxTag extends AbstractHtmlInputElementTag {
      * Writes the '{@code value}' attribute to the supplied {@link TagWriter}.
      * Subclasses may choose to override this implementation to control exactly
      * when the value is written.
+     * @return 
+     * @throws javax.servlet.jsp.JspException
      */
     protected String getValue() throws JspException {
         String value = getDisplayString(getBoundValue(), getPropertyEditor());

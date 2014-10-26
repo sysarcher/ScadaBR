@@ -47,9 +47,10 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.PropertyReferences;
 import com.serotonin.bacnet4j.util.PropertyValues;
 import br.org.scadabr.db.IntValuePair;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.util.queue.ByteQueue;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -77,7 +78,7 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
         autoShutOff = new AutoShutOff() {
             @Override
             void shutOff() {
-                message = Localizer.localizeI18nKey("dsEdit.bacnetIp.tester.auto", BACnetDiscovery.this.bundle);
+                message = AbstractLocalizer.localizeI18nKey("dsEdit.bacnetIp.tester.auto", BACnetDiscovery.this.bundle);
                 BACnetDiscovery.this.cleanup();
             }
         };
@@ -117,7 +118,7 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
             return;
         }
 
-        message = Localizer.localizeI18nKey("dsEdit.bacnetIp.tester.listening", bundle);
+        message = AbstractLocalizer.localizeI18nKey("dsEdit.bacnetIp.tester.listening", bundle);
     }
 
     public void addUpdateInfo(Map<String, Object> result) {
@@ -153,7 +154,7 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
 
     @Override
     public void cancel() {
-        message = Localizer.localizeI18nKey("dsEdit.bacnetIp.tester.cancelled", bundle);
+        message = AbstractLocalizer.localizeI18nKey("dsEdit.bacnetIp.tester.cancelled", bundle);
         cleanup();
     }
 
@@ -223,7 +224,7 @@ public class BACnetDiscovery extends DefaultDeviceEventListener implements Testi
     private List<BACnetObjectBean> getDetails(int index) throws Exception {
         RemoteDevice d = localDevice.getRemoteDeviceByUserData(index);
         if (d == null) {
-            throw new Exception(Localizer.localizeI18nKey("dsEdit.bacnetIp.tester.indexNotFound", bundle));
+            throw new Exception(AbstractLocalizer.localizeI18nKey("dsEdit.bacnetIp.tester.indexNotFound", bundle));
         }
 
         deviceDetailsIndex = index;

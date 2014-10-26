@@ -5,7 +5,6 @@
  */
 package br.org.scadabr.web.taglib.dijit;
 
-import br.org.scadabr.web.l10n.Localizer;
 import static br.org.scadabr.web.taglib.Functions.printAttribute;
 import java.io.IOException;
 import javax.servlet.jsp.JspException;
@@ -38,7 +37,6 @@ public class TextBoxTag extends RequestContextAwareTag {
 
     @Override
     public int doStartTagInternal() throws JspException {
-        Localizer localizer = getRequestContext().getWebApplicationContext().getBean(Localizer.class);
         try {
             JspWriter out = pageContext.getOut();
 
@@ -46,8 +44,8 @@ public class TextBoxTag extends RequestContextAwareTag {
             printAttribute(out, "id", id);
             printAttribute(out, "type", type);
             out.print(" data-dojo-type=\"dijit/form/TextBox\" ");
-            printAttribute(out, "label", localizer.localizeI18nKey(i18nLabel) + ":");
-            printAttribute(out, "title", localizer.localizeI18nKey(i18nTitle != null ? i18nTitle : i18nLabel));
+            printAttribute(out, "label", getRequestContext().getMessage(i18nLabel) + ":");
+            printAttribute(out, "title", getRequestContext().getMessage(i18nTitle != null ? i18nTitle : i18nLabel));
             if (getParent() instanceof BindTag) {
                 BindTag bindTag = (BindTag) getParent();
                 printAttribute(out, "name", bindTag.getProperty());

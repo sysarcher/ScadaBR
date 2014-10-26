@@ -52,9 +52,9 @@
     <bean class="com.googlecode.jsonrpc4j.spring.AutoJsonRpcServiceExporter"/>
    
     <!-- i18n TODO overhaul this to use userSessionContextBean ...  -->
-    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"/>
+    <bean id="localeResolver" class="br.org.scadabr.web.i18n.LocaleResolver"/>
   
-    <bean id="messageSource" class="br.org.scadabr.web.i18n.ResourceBundleMessageSource">
+    <bean id="messageSource" class="br.org.scadabr.web.i18n.MessageSource">
         <property name="basename">
             <value>messages</value>
         </property>

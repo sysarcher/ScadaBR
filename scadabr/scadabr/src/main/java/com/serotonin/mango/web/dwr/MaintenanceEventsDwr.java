@@ -27,6 +27,7 @@ import java.util.ResourceBundle;
 import org.joda.time.DateTime;
 
 import br.org.scadabr.db.IntValuePair;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.MaintenanceEventDao;
 import com.serotonin.mango.rt.event.maintenance.MaintenanceEventRT;
@@ -34,7 +35,7 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import javax.inject.Inject;
 
@@ -58,8 +59,8 @@ public class MaintenanceEventsDwr extends BaseDwr {
         Collections.sort(events, new Comparator<MaintenanceEventVO>() {
             @Override
             public int compare(MaintenanceEventVO m1, MaintenanceEventVO m2) {
-                return Localizer.localizeMessage(m1.getDescription(), bundle)
-                        .compareTo(Localizer.localizeMessage(m2.getDescription(), bundle));
+                return AbstractLocalizer.localizeMessage(m1.getDescription(), bundle)
+                        .compareTo(AbstractLocalizer.localizeMessage(m2.getDescription(), bundle));
             }
         });
         response.addData("events", events);

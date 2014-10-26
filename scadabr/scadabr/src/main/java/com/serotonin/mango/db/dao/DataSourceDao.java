@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.db.dao;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.io.Serializable;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
@@ -40,7 +41,7 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import java.sql.Connection;
 import java.sql.Statement;
 import javax.inject.Named;
@@ -225,7 +226,7 @@ public class DataSourceDao extends BaseDao {
                 dataSourceCopy.setXid(generateUniqueXid());
                 dataSourceCopy.setEnabled(false);
                 dataSourceCopy.setName(StringUtils.truncate(
-                        Localizer.localizeI18nKey("common.copyPrefix", bundle, dataSource.getName()), 40));
+                        AbstractLocalizer.localizeI18nKey("common.copyPrefix", bundle, dataSource.getName()), 40));
                 saveDataSource(dataSourceCopy);
 
                 // Copy permissions.

@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.vo.report;
 
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileWriter;
@@ -39,6 +39,7 @@ import org.jfree.data.time.TimeSeries;
 
 import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.ReportDao;
@@ -375,7 +376,7 @@ public class ReportChartCreator {
         }
 
         public String getAnalogMinTime() {
-            return Localizer.localizeTimeStamp(((AnalogStatistics) stats).getMinTime(), false, bundle.getLocale());
+            return AbstractLocalizer.localizeTimeStamp(((AnalogStatistics) stats).getMinTime(), false, bundle.getLocale());
         }
 
         public String getAnalogMaximum() {
@@ -383,7 +384,7 @@ public class ReportChartCreator {
         }
 
         public String getAnalogMaxTime() {
-            return Localizer.localizeTimeStamp(((AnalogStatistics) stats).getMaxTime(), false, bundle.getLocale());
+            return AbstractLocalizer.localizeTimeStamp(((AnalogStatistics) stats).getMaxTime(), false, bundle.getLocale());
         }
 
         public String getAnalogAverage() {
@@ -500,7 +501,7 @@ public class ReportChartCreator {
             point = new PointStatistics(pointInfo.getReportPointId());
             point.setName(pointInfo.getExtendedName());
             point.setDataType(pointInfo.getDataType());
-            point.setDataTypeDescription(Localizer.localizeMessage(DataTypes.getDataTypeMessage(pointInfo.getDataType()), bundle));
+            point.setDataTypeDescription(AbstractLocalizer.localizeMessage(DataTypes.getDataTypeMessage(pointInfo.getDataType()), bundle));
             point.setTextRenderer(pointInfo.getTextRenderer());
             if (pointInfo.getStartValue() != null) {
                 point.setStartValue(pointInfo.getTextRenderer().getText(pointInfo.getStartValue(),

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.report;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.io.PrintWriter;
 import java.util.ResourceBundle;
 
@@ -28,7 +29,7 @@ import org.joda.time.format.DateTimeFormatter;
 import com.serotonin.mango.view.export.CsvWriter;
 import com.serotonin.mango.view.text.TextRenderer;
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -47,11 +48,11 @@ public class ReportCsvStreamer implements ReportDataStreamHandler {
         this.out = out;
 
         // Write the headers.
-        data[0] = Localizer.localizeI18nKey("reports.pointName", bundle);
-        data[1] = Localizer.localizeI18nKey("common.time", bundle);
-        data[2] = Localizer.localizeI18nKey("common.value", bundle);
-        data[3] = Localizer.localizeI18nKey("reports.rendered", bundle);
-        data[4] = Localizer.localizeI18nKey("common.annotation", bundle);
+        data[0] = AbstractLocalizer.localizeI18nKey("reports.pointName", bundle);
+        data[1] = AbstractLocalizer.localizeI18nKey("common.time", bundle);
+        data[2] = AbstractLocalizer.localizeI18nKey("common.value", bundle);
+        data[3] = AbstractLocalizer.localizeI18nKey("reports.rendered", bundle);
+        data[4] = AbstractLocalizer.localizeI18nKey("common.annotation", bundle);
         out.write(csvWriter.encodeRow(data));
     }
 

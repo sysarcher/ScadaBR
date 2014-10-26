@@ -22,24 +22,18 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.l10n.Localizer;
 
 abstract public class AbstractPointLocatorVO implements PointLocatorVO {
 
     @Override
     public LocalizableMessage getDataTypeMessage() {
         return DataTypes.getDataTypeMessage(getDataTypeId());
-    }
-
-    protected String getMessage(ResourceBundle bundle, String key, Object... args) {
-        return Localizer.localizeI18nKey(key, bundle, args);
     }
 
     //

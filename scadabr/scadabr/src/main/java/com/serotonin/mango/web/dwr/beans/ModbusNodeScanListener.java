@@ -19,6 +19,7 @@
 package com.serotonin.mango.web.dwr.beans;
 
 import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -27,7 +28,7 @@ import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.NodeScanListener;
 import com.serotonin.modbus4j.exception.ModbusInitException;
 import br.org.scadabr.util.ProgressiveTask;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -50,9 +51,9 @@ public class ModbusNodeScanListener implements NodeScanListener, TestingUtility 
             modbusMaster.init();
         } catch (ModbusInitException e) {
             if (serial) {
-                message = Localizer.localizeI18nKey("dsEdit.modbus.scannerSerial.startError", bundle, e.getMessage());
+                message = AbstractLocalizer.localizeI18nKey("dsEdit.modbus.scannerSerial.startError", bundle, e.getMessage());
             } else {
-                message = Localizer.localizeI18nKey("dsEdit.modbus.scannerIp.startError", bundle, e.getMessage());
+                message = AbstractLocalizer.localizeI18nKey("dsEdit.modbus.scannerIp.startError", bundle, e.getMessage());
             }
             return;
         }
@@ -99,19 +100,19 @@ public class ModbusNodeScanListener implements NodeScanListener, TestingUtility 
     //
     @Override
     public void progressUpdate(float progress) {
-        message = Localizer.localizeI18nKey("dsEdit.modbus.scanner.progress", bundle, Integer.toString((int) (progress * 100)));
+        message = AbstractLocalizer.localizeI18nKey("dsEdit.modbus.scanner.progress", bundle, Integer.toString((int) (progress * 100)));
     }
 
     @Override
     public synchronized void taskCancelled() {
         cleanup();
-        message = Localizer.localizeI18nKey("dsEdit.modbus.scanner.cancelled", bundle);
+        message = AbstractLocalizer.localizeI18nKey("dsEdit.modbus.scanner.cancelled", bundle);
     }
 
     @Override
     public synchronized void taskCompleted() {
         cleanup();
-        message = Localizer.localizeI18nKey("dsEdit.modbus.scanner.complete", bundle);
+        message = AbstractLocalizer.localizeI18nKey("dsEdit.modbus.scanner.complete", bundle);
     }
 
     @Override

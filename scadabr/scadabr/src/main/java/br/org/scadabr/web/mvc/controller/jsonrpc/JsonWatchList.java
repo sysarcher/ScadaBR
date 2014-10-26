@@ -1,6 +1,7 @@
 package br.org.scadabr.web.mvc.controller.jsonrpc;
 
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.web.i18n.MessageSource;
+import br.org.scadabr.l10n.Localizer;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.DataPointVO;
@@ -9,6 +10,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  *
@@ -20,7 +23,7 @@ public class JsonWatchList implements Serializable, Iterable<JsonWatchListPoint>
     private int id;
     private List<JsonWatchListPoint> points = new ArrayList<>();
 
-    public JsonWatchList(WatchList watchList, DataPointDao dataPointDao, RuntimeManager runtimeManager, Localizer localizer) {
+    public JsonWatchList(WatchList watchList, DataPointDao dataPointDao, RuntimeManager runtimeManager, final Localizer localizer) {
         id = watchList.getId();
         name = watchList.getName();
         for (DataPointVO dp : watchList.getPointList()) {

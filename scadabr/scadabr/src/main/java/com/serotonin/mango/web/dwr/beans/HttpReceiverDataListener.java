@@ -18,13 +18,14 @@
  */
 package com.serotonin.mango.web.dwr.beans;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.util.ResourceBundle;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.http.HttpMulticastListener;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverData;
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -42,7 +43,7 @@ public class HttpReceiverDataListener implements HttpMulticastListener, TestingU
 
     public HttpReceiverDataListener(ResourceBundle bundle, String[] ipWhiteList, String[] deviceIdWhiteList) {
         this.bundle = bundle;
-        message = Localizer.localizeI18nKey("dsEdit.httpReceiver.tester.listening", bundle);
+        message = AbstractLocalizer.localizeI18nKey("dsEdit.httpReceiver.tester.listening", bundle);
 
         this.ipWhiteList = ipWhiteList;
         this.deviceIdWhiteList = deviceIdWhiteList;
@@ -51,7 +52,7 @@ public class HttpReceiverDataListener implements HttpMulticastListener, TestingU
         autoShutOff = new AutoShutOff() {
             @Override
             void shutOff() {
-                message = Localizer.localizeI18nKey("dsEdit.httpReceiver.tester.auto", HttpReceiverDataListener.this.bundle);
+                message = AbstractLocalizer.localizeI18nKey("dsEdit.httpReceiver.tester.auto", HttpReceiverDataListener.this.bundle);
                 HttpReceiverDataListener.this.cancel();
             }
         };
@@ -90,12 +91,12 @@ public class HttpReceiverDataListener implements HttpMulticastListener, TestingU
 
     @Override
     public void ipWhiteListError(String message) {
-        this.message = Localizer.localizeI18nKey("dsEdit.httpReceiver.tester.whiteList", bundle, message);
+        this.message = AbstractLocalizer.localizeI18nKey("dsEdit.httpReceiver.tester.whiteList", bundle, message);
     }
 
     @Override
     public void data(HttpReceiverData data) {
-        message = Localizer.localizeI18nKey("dsEdit.httpReceiver.tester.data", bundle);
+        message = AbstractLocalizer.localizeI18nKey("dsEdit.httpReceiver.tester.data", bundle);
         this.data = data;
     }
 }

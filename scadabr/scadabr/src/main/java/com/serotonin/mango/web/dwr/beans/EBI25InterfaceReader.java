@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr.beans;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -46,7 +47,7 @@ import com.serotonin.modbus4j.locator.NumericLocator;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -69,7 +70,7 @@ public class EBI25InterfaceReader {
     public EBI25InterfaceReader(ResourceBundle bundle, EBI25DataSourceVO dataSource, String host, int port,
             boolean keepAlive, int timeout, int retries) {
         if (host.isEmpty()) {
-            errorMessage = Localizer.localizeI18nKey("dsEdit.ebi25.read.host", bundle);
+            errorMessage = AbstractLocalizer.localizeI18nKey("dsEdit.ebi25.read.host", bundle);
             return;
         }
 
@@ -135,18 +136,18 @@ public class EBI25InterfaceReader {
                 rtm.saveDataPoint(dp);
             }
         } catch (ModbusInitException e) {
-            errorMessage = Localizer.localizeI18nKey("dsEdit.ebi25.read.init", bundle, e.getMessage());
+            errorMessage = AbstractLocalizer.localizeI18nKey("dsEdit.ebi25.read.init", bundle, e.getMessage());
             LOG.warn("Modbus initialization", e);
         } catch (ModbusTransportException e) {
-            errorMessage = Localizer.localizeI18nKey("dsEdit.ebi25.read.transport", bundle, e.getMessage());
+            errorMessage = AbstractLocalizer.localizeI18nKey("dsEdit.ebi25.read.transport", bundle, e.getMessage());
             LOG.warn("Modbus transport", e);
         } catch (ErrorResponseException e) {
             //TODO was getExceptionMessage ???
-            errorMessage = Localizer.localizeI18nKey("dsEdit.ebi25.read.response", bundle, e.getErrorResponse());
+            errorMessage = AbstractLocalizer.localizeI18nKey("dsEdit.ebi25.read.response", bundle, e.getErrorResponse());
             LOG.warn("Modbus error response: " + e.getErrorResponse().getExceptionMessage());
         } catch (ExceptionResultException e) {
             //TODO was getExceptionMessage ???
-            errorMessage = Localizer.localizeI18nKey("dsEdit.ebi25.read.response", bundle, e.getExceptionResult());
+            errorMessage = AbstractLocalizer.localizeI18nKey("dsEdit.ebi25.read.response", bundle, e.getExceptionResult());
             LOG.warn("Modbus error response in '" + e.getKey() + "': " + e.getExceptionResult().getExceptionMessage());
         } finally {
             EBI25Constants.destroyModbusMaster(modbusMaster);

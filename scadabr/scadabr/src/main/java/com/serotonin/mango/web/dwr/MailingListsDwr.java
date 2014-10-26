@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +40,7 @@ import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import com.serotonin.mango.web.email.MangoEmailContent;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import javax.inject.Inject;
 
 public class MailingListsDwr extends BaseDwr {
@@ -110,7 +111,7 @@ public class MailingListsDwr extends BaseDwr {
             ResourceBundle bundle = Common.getBundle();
             Map<String, Object> model = new HashMap<>();
             model.put("message", new LocalizableMessageImpl("ftl.userTestEmail", ml.getName()));
-            MangoEmailContent cnt = new MangoEmailContent("ftl.testEmail", model, bundle, Localizer.localizeI18nKey("ftl.testEmail", bundle), Common.UTF8);
+            MangoEmailContent cnt = new MangoEmailContent("ftl.testEmail", model, bundle, AbstractLocalizer.localizeI18nKey("ftl.testEmail", bundle), Common.UTF8);
             EmailWorkItem.queueEmail(toAddrs, cnt);
         } catch (Exception e) {
             response.addGeneric("mailingLists.testerror", e);

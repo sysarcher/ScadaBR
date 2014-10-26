@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +46,7 @@ import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import static com.serotonin.mango.rt.event.type.SystemEventType.getEventType;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import java.io.Serializable;
@@ -164,7 +165,7 @@ public class EventManager implements ILifecycle, Serializable {
             handleRaiseEvent(evt, emailUsers);
 
             if (log.isDebugEnabled()) {
-                log.debug("Event raised: type=" + type + ", message=" + Localizer.localizeMessage(message, Common.getBundle()));
+                log.debug("Event raised: type=" + type + ", message=" + AbstractLocalizer.localizeMessage(message, Common.getBundle()));
             }
         }
     }

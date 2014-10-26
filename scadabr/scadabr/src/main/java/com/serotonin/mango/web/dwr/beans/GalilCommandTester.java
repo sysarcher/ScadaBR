@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr.beans;
 
+import br.org.scadabr.l10n.AbstractLocalizer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -28,7 +29,7 @@ import com.serotonin.mango.rt.dataSource.galil.GalilMessageParser;
 import com.serotonin.mango.rt.dataSource.galil.GalilResponse;
 import com.serotonin.util.queue.ByteQueue;
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -77,9 +78,9 @@ public class GalilCommandTester extends Thread {
             }
 
             if (response == null) {
-                result = Localizer.localizeI18nKey("dsEdit.galil.tester.timeout", bundle);
+                result = AbstractLocalizer.localizeI18nKey("dsEdit.galil.tester.timeout", bundle);
             } else if (response.isErrorResponse()) {
-                result = Localizer.localizeI18nKey("dsEdit.galil.tester.noResponse", bundle);
+                result = AbstractLocalizer.localizeI18nKey("dsEdit.galil.tester.noResponse", bundle);
             } else {
                 result = response.getResponseData();
             }

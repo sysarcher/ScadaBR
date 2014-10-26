@@ -38,6 +38,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.timer.cron.EventRunnable;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.EventInstance;
@@ -60,7 +61,7 @@ import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.i18n.LocalizableMessageParseException;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 import com.serotonin.mango.vo.User;
 import java.sql.Connection;
 import java.sql.Statement;
@@ -552,7 +553,7 @@ public class EventDao extends BaseDao {
                         // Do the text search. If the instance has a match, put
                         // it in the result. Otherwise ignore.
                         StringBuilder text = new StringBuilder();
-                        text.append(Localizer.localizeMessage(e.getMessage(), bundle));
+                        text.append(AbstractLocalizer.localizeMessage(e.getMessage(), bundle));
                         for (UserComment comment : e.getEventComments()) {
                             text.append(' ').append(comment.getComment());
                         }

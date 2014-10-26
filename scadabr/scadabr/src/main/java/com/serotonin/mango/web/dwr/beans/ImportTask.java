@@ -33,6 +33,7 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonValue;
+import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.timer.cron.SystemRunnable;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
@@ -74,7 +75,7 @@ import br.org.scadabr.util.ProgressiveTask;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrMessageI18n;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -289,7 +290,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
             String msg = e.getMessage();
             Throwable t = e;
             while ((t = t.getCause()) != null) {
-                msg += ", " + Localizer.localizeI18nKey("emport.causedBy", bundle)
+                msg += ", " + AbstractLocalizer.localizeI18nKey("emport.causedBy", bundle)
                         + " '" + t.getMessage() + "'";
             }
             response.addGeneric("common.default", msg);
@@ -537,7 +538,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
             // Save the new values.
             dataPointDao.savePointHierarchy(root);
             response.addGeneric("emport.pointHierarchy.prefix",
-                    Localizer.localizeI18nKey("emport.saved", bundle));
+                    AbstractLocalizer.localizeI18nKey("emport.saved", bundle));
         } catch (LocalizableJsonException e) {
             response.addGeneric("emport.pointHierarchy.prefix", e);
         } catch (JsonException e) {
@@ -950,16 +951,16 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
     private void copyValidationMessages(DwrResponseI18n voResponse, String key,
             String desc) {
         for (DwrMessageI18n msg : voResponse.getMessages()) {
-            response.addGeneric(key, desc, Localizer.localizeMessage(msg, bundle));
+            response.addGeneric(key, desc, AbstractLocalizer.localizeMessage(msg, bundle));
         }
     }
 
     private void addSuccessMessage(boolean isnew, String key, String desc) {
-        //TODO Localizer.localizeI18nKey should be done later wrap this in an LocalizableMsg????
+        //TODO AbstractLocalizer.localizeI18nKey should be done later wrap this in an LocalizableMsg????
         if (isnew) {
-            response.addGeneric(key, desc, Localizer.localizeI18nKey("emport.added", bundle));
+            response.addGeneric(key, desc, AbstractLocalizer.localizeI18nKey("emport.added", bundle));
         } else {
-            response.addGeneric(key, desc, Localizer.localizeI18nKey("emport.saved", bundle));
+            response.addGeneric(key, desc, AbstractLocalizer.localizeI18nKey("emport.saved", bundle));
         }
     }
 
@@ -969,11 +970,11 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
         while ((t = t.getCause()) != null) {
             if (t instanceof LocalizableJsonException) {
                 msg += ", "
-                        + Localizer.localizeI18nKey("emport.causedBy", bundle)
+                        + AbstractLocalizer.localizeI18nKey("emport.causedBy", bundle)
                         + " '"
-                        + Localizer.localizeMessage((LocalizableJsonException) t, bundle) + "'";
+                        + AbstractLocalizer.localizeMessage((LocalizableJsonException) t, bundle) + "'";
             } else {
-                msg += ", " + Localizer.localizeI18nKey("emport.causedBy", bundle)
+                msg += ", " + AbstractLocalizer.localizeI18nKey("emport.causedBy", bundle)
                         + " '" + t.getMessage() + "'";
             }
         }

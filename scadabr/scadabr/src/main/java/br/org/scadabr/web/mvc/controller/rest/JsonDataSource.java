@@ -5,7 +5,8 @@
  */
 package br.org.scadabr.web.mvc.controller.rest;
 
-import br.org.scadabr.web.l10n.Localizer;
+import br.org.scadabr.l10n.AbstractLocalizer;
+import br.org.scadabr.l10n.Localizer;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.io.Serializable;
 
@@ -22,7 +23,7 @@ public class JsonDataSource implements Serializable {
     public JsonDataSource(DataSourceVO<?> dsVo, Localizer localizer) {
         this.name = dsVo.getName();
         this.id = dsVo.getId();
-        this.typeKey = localizer.localizeI18nKey(dsVo.getType().getKey());
+        this.typeKey = localizer.getMessage(dsVo.getType().getKey());
     }
 
     /**
