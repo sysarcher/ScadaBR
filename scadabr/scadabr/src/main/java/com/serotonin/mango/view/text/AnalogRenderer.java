@@ -30,10 +30,12 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.view.FormatPatternHolder;
+import java.text.MessageFormat;
 
 @JsonRemoteEntity
 public class AnalogRenderer extends BaseTextRenderer {
-
+    
     private static ImplDefinition definition = new ImplDefinition("textRendererAnalog", "ANALOG",
             "textRenderer.analog", new int[]{DataTypes.NUMERIC});
 
@@ -41,27 +43,29 @@ public class AnalogRenderer extends BaseTextRenderer {
         return definition;
     }
 
+    
+    @Override
     public String getTypeName() {
         return definition.getName();
     }
 
+    @Override
     public ImplDefinition getDef() {
         return definition;
     }
 
     @JsonRemoteProperty
-    private String format;
+    private String decimalPattern;
+    private String fullPattern;
     @JsonRemoteProperty
     private String suffix;
 
-    private DecimalFormat formatInstance;
-
     public AnalogRenderer() {
-        // no op
+        super();
     }
 
     public AnalogRenderer(String format, String suffix) {
-        setFormat(format);
+        this.decimalPattern  = format;
         this.suffix = suffix;
     }
 
@@ -81,9 +85,9 @@ public class AnalogRenderer extends BaseTextRenderer {
     @Override
     public String getText(double value, int hint) {
         if (hint == HINT_RAW || suffix == null) {
-            return formatInstance.format(value);
+            return new DecimalFormat(decimalPattern).format(value);
         }
-        return formatInstance.format(value) + suffix;
+        return new MessageFormat(getMessagePattern()).format(value);
     }
 
     @Override
@@ -91,21 +95,23 @@ public class AnalogRenderer extends BaseTextRenderer {
         return null;
     }
 
-    public String getFormat() {
-        return format;
+    public String getFormatPattern() {
+        return decimalPattern;
     }
 
-    public void setFormat(String format) {
-        this.format = format;
-        formatInstance = new DecimalFormat(format);
+    public void setFormatPattern(String pattern) {
+        this.decimalPattern = pattern;
+        fullPattern = null;
     }
 
+    @Override
     public String getSuffix() {
         return suffix;
     }
 
     public void setSuffix(String suffix) {
         this.suffix = suffix;
+        fullPattern = null;
     }
 
     //
@@ -118,7 +124,7 @@ public class AnalogRenderer extends BaseTextRenderer {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        SerializationHelper.writeSafeUTF(out, format);
+        SerializationHelper.writeSafeUTF(out, decimalPattern);
         SerializationHelper.writeSafeUTF(out, suffix);
     }
 
@@ -127,8 +133,22 @@ public class AnalogRenderer extends BaseTextRenderer {
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            setFormat(SerializationHelper.readSafeUTF(in));
+            decimalPattern = SerializationHelper.readSafeUTF(in);
             suffix = SerializationHelper.readSafeUTF(in);
         }
     }
+
+    @Override
+    public String getValueMessagePattern() {
+        return decimalPattern;
+    }
+
+    @Override
+    public String getMessagePattern() {
+        if (fullPattern == null) {
+          fullPattern = String.format("{0,number,%s} %s", decimalPattern, suffix);
+        }
+        return fullPattern;
+    }
+
 }

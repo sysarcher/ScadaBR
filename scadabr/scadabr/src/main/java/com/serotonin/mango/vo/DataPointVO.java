@@ -422,6 +422,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         this.tolerance = tolerance;
     }
 
+    //TODO use MessageFormat pattern for this ???
     public TextRenderer getTextRenderer() {
         return textRenderer;
     }

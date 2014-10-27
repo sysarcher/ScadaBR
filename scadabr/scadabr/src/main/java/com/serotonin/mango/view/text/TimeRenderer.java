@@ -31,6 +31,7 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
+import java.util.Locale;
 
 @JsonRemoteEntity
 public class TimeRenderer extends BaseTextRenderer {
@@ -136,4 +137,20 @@ public class TimeRenderer extends BaseTextRenderer {
             conversionExponent = in.readInt();
         }
     }
+
+    @Override
+    public String getValueMessagePattern() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getMessagePattern() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getSuffix() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

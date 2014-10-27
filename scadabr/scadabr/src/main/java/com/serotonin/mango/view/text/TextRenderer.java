@@ -18,13 +18,14 @@
  */
 package com.serotonin.mango.view.text;
 
+import br.org.scadabr.view.FormatPatternHolder;
 import java.io.Serializable;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.ImplDefinition;
 
-public interface TextRenderer extends Serializable {
+public interface TextRenderer extends Serializable, FormatPatternHolder {
 
     public static final int TYPE_ANALOG = 1;
     public static final int TYPE_BINARY = 2;
@@ -50,37 +51,44 @@ public interface TextRenderer extends Serializable {
 
     public static final String UNKNOWN_VALUE = "(n/a)";
 
-    public String getText(int hint);
+    @Deprecated //TODO localized value is passed 
+    String getText(int hint);
 
-    public String getText(PointValueTime valueTime, int hint);
+    @Deprecated //TODO localized value is passed 
+    String getText(PointValueTime valueTime, int hint);
 
-    public String getText(MangoValue value, int hint);
+    @Deprecated //TODO localized value is passed 
+    String getText(MangoValue value, int hint);
 
-    public String getText(double value, int hint);
+    @Deprecated //TODO localized value is passed 
+    String getText(double value, int hint);
 
-    public String getText(int value, int hint);
+    @Deprecated //TODO localized value is passed 
+    String getText(int value, int hint);
 
-    public String getText(boolean value, int hint);
+    @Deprecated //TODO localized value is passed 
+    String getText(boolean value, int hint);
 
-    public String getText(String value, int hint);
+    @Deprecated //TODO localized value is passed 
+    String getText(String value, int hint);
 
-    public String getMetaText();
+    String getMetaText();
 
-    public String getColour();
+    String getColour();
 
-    public String getColour(PointValueTime valueTime);
+    String getColour(PointValueTime valueTime);
 
-    public String getColour(MangoValue value);
+    String getColour(MangoValue value);
 
-    public String getColour(double value);
+    String getColour(double value);
 
-    public String getColour(int value);
+    String getColour(int value);
 
-    public String getColour(boolean value);
+    String getColour(boolean value);
 
-    public String getColour(String value);
+    String getColour(String value);
 
-    public String getTypeName();
+    String getTypeName();
 
-    public ImplDefinition getDef();
+    ImplDefinition getDef();
 }

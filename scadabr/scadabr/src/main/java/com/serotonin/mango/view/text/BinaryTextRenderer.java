@@ -170,4 +170,20 @@ public class BinaryTextRenderer extends BaseTextRenderer {
             oneColour = SerializationHelper.readSafeUTF(in);
         }
     }
+
+    @Override
+    public String getValueMessagePattern() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getMessagePattern() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getSuffix() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

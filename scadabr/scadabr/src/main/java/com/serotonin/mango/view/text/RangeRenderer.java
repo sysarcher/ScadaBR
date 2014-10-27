@@ -43,10 +43,12 @@ public class RangeRenderer extends BaseTextRenderer {
         return definition;
     }
 
+    @Override
     public String getTypeName() {
         return definition.getName();
     }
 
+    @Override
     public ImplDefinition getDef() {
         return definition;
     }
@@ -54,7 +56,7 @@ public class RangeRenderer extends BaseTextRenderer {
     @JsonRemoteProperty
     private String format;
     @JsonRemoteProperty(innerType = RangeValue.class)
-    private List<RangeValue> rangeValues = new ArrayList<RangeValue>();
+    private List<RangeValue> rangeValues = new ArrayList<>();
 
     private DecimalFormat formatInstance;
 
@@ -158,4 +160,20 @@ public class RangeRenderer extends BaseTextRenderer {
             rangeValues = (List<RangeValue>) in.readObject();
         }
     }
+
+    @Override
+    public String getValueMessagePattern() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getMessagePattern() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getSuffix() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }
