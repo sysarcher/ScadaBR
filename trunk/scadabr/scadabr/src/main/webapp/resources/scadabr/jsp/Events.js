@@ -11,18 +11,18 @@ define(["dojo/_base/declare",
     "dgrid/Selection",
     "dijit/form/Button",
     "dojo/rpc/JsonService",
-    "dojo/i18n!scadabr/nls/events",
-    "dojo/i18n!scadabr/nls/common"
-], function(declare, lang, on, registry, domConstruct, request, Memory, Grid, Pagination, Keyboard, Selection, Button, JsonService, events, common) {
+    "dojo/date",
+    "dojo/date/locale"
+], function (declare, lang, on, registry, domConstruct, request, Memory, Grid, Pagination, Keyboard, Selection, Button, JsonService, date, dateLocale) {
 
     return declare(null, {
-        constructor: function(pendingAlarmsTableNode) {
+        constructor: function (pendingAlarmsTableNode, localizedMap) {
             this._initSvc();
-            this._initPendingAlarmsTable(pendingAlarmsTableNode);
+            this._initPendingAlarmsTable(pendingAlarmsTableNode, localizedMap);
         },
-        _initSvc: function() {
+        _initSvc: function () {
             this.svc = new JsonService({
-                serviceUrl: 'rpc/events', // Adress of the RPC service end point
+                serviceUrl: 'rpc/events/', // Adress of the RPC service end point
                 timeout: 1000,
                 strictArgChecks: true,
                 methods: [{
@@ -42,48 +42,59 @@ define(["dojo/_base/declare",
                 ]
             });
         },
-        _initPendingAlarmsTable: function(pendingAlarmsTableNode) {
+        _initPendingAlarmsTable: function (pendingAlarmsTableNode, localizedMap) {
+            var _formatTimeStamp = function (timestamp) {
+                var now = new Date();
+                var ts = new Date();
+                ts.setTime(timestamp);
+                if (date.compare(now, ts, "date") === 0) {
+                    return dateLocale.format(ts, {selector: "time", formatLength: "medium"});
+                } else {
+                    return dateLocale.format(ts, {selector: "datetime", formatLength: "medium"});
+                }
+
+            };
             this.grid = new (declare([Grid, Pagination, Keyboard, Selection]))({
                 store: new Memory(),
                 columns: {
                     id: {
-                        label: events.id
+                        label: localizedMap["events.id"]
                     },
                     alarmLevel: {
-                        label: common.alarmLevel,
-                        renderCell: function(event, alarmLevel, default_node, options) {
+                        label: localizedMap["common.alarmLevel"],
+                        renderCell: function (event, alarmLevel, default_node, options) {
                             var node = domConstruct.create("img");
                             var imgName;
                             switch (alarmLevel) {
                                 case 1:
                                     imgName = 'flag_blue';
                                     if (event.active) {
-                                        node.alt = common.alarmLevel_info;
+                                        node.alt = localizedMap["common.alarmLevel.info"];
                                     } else {
-                                        node.alt = common.alarmLevel_info_rtn;
+                                        node.alt = localizedMap["common.alarmLevel.info.rtn"];
                                     }
                                     break;
                                 case  2:
                                     imgName = 'flag_yellow';
                                     if (event.active) {
-                                        node.alt = common.alarmLevel_urgent;
+                                        node.alt = localizedMap["common.alarmLevel.urgent"];
                                     } else {
-                                        node.alt = common.alarmLevel_urgent_rtn;
+                                        node.alt = localizedMap["common.alarmLevel.urgent_rtn"];
                                     }
                                     break;
                                 case  3:
                                     if (event.active) {
-                                        node.alt = common.alarmLevel.critical;
+                                        node.alt = localizedMap["common.alarmLevel.critical"];
                                     } else {
-                                        node.alt = common.alarmLevel_critical_rtn;
+                                        node.alt = localizedMap["common.alarmLevel.critical.rtn"];
                                     }
                                     imgName = 'flag_orange';
                                     break;
                                 case  4:
                                     if (event.active) {
-                                        node.alt = common.alarmLevel_lifeSafety;
+                                        node.alt = localizedMap["common.alarmLevel.lifeSafety"];
                                     } else {
-                                        node.alt = common.alarmLevel_lifeSafety_rtn;
+                                        node.alt = localizedMap["common.alarmLevel.lifeSafety.rtn"];
                                     }
                                     imgName = 'flag_red';
                                     break;
@@ -97,30 +108,33 @@ define(["dojo/_base/declare",
                         }
                     },
                     activeTimestamp: {
-                        label: common.time,
-                        resizable: true
+                        label: localizedMap["common.time"],
+                        resizable: true,
+                        formatter: function (timestamp) {
+                            return _formatTimeStamp(timestamp);
+                        }
                     },
                     message: {
                         label: "Message",
                         resizable: true,
-                        formatter: function(msg) {
+                        formatter: function (msg) {
                             return msg;
                         }
                     },
                     rtnTimestamp: {
-                        label: common.inactiveTime,
-                        renderCell: function(event, timestamp, default_node, options) {
+                        label: localizedMap["common.inactiveTime"],
+                        renderCell: function (event, timestamp, default_node, options) {
                             var node = domConstruct.create("div");
                             if (event.active) {
-                                node.innerHTML = common.active;
+                                node.innerHTML = localizedMap["common.active"];
                                 var img = domConstruct.create("img", null, node);
                                 img.src = "images/flag_white.png";
-                                img.title = common.active;
+                                img.title = localizedMap["common.active"];
                             } else {
                                 if (!event.rtnApplicable) {
-                                    node.innerHTML = common.nortn;
+                                    node.innerHTML = localizedMap["common.nortn"];
                                 } else {
-                                    node.innerHTML = timestamp + ' - ' + event.rtnMessage;
+                                    node.innerHTML = _formatTimeStamp(timestamp) + ' - ' + event.rtnMessage;
                                 }
                             }
                             return node;
@@ -128,15 +142,15 @@ define(["dojo/_base/declare",
                     },
                     acknowledged: {
                         label: '',
-                        renderCell: lang.hitch(this, function(event, acknowledged, default_node, options) {
+                        renderCell: lang.hitch(this, function (event, acknowledged, default_node, options) {
                             var myIconClass;
                             var myLabel;
                             if (acknowledged) {
                                 myIconClass = 'scadaBrCantDoActionIcon';
-                                myLabel = events.acknowledged;
+                                myLabel = localizedMap["events.acknowledged"];
                             } else {
                                 myIconClass = 'scadaBrDoActionIcon';
-                                myLabel = events.acknowledge;
+                                myLabel = localizedMap["events.acknowledge"];
                             }
 
                             var btnAck = new Button({
@@ -145,9 +159,9 @@ define(["dojo/_base/declare",
                                 showLabel: false,
                                 iconClass: myIconClass,
                                 label: myLabel,
-                                onClick: function() {
+                                onClick: function () {
                                     console.log("BTN ACK THIS: ", this);
-                                    this.myObj.svc.acknowledgePendingEvent(this.eventId).then(lang.hitch(this.myObj, function(result) {
+                                    this.myObj.svc.acknowledgePendingEvent(this.eventId).then(lang.hitch(this.myObj, function (result) {
                                         console.log("BTN ACK CB: ", this);
                                         this.grid.store.setData(result);
                                         this.grid.refresh();
@@ -176,19 +190,19 @@ define(["dojo/_base/declare",
             }, pendingAlarmsTableNode);
             request("rest/events/", {
                 handleAs: "json"
-            }).then(lang.hitch(this, function(response) {
+            }).then(lang.hitch(this, function (response) {
                 this.grid.store.setData(response);
                 this.grid.refresh();
             }));
         },
-        wireEvents: function(btnAckAll) {
-            on(registry.byId(btnAckAll).domNode, "click", lang.hitch(this, function() {
-                this.svc.acknowledgeAllPendingEvents().then(lang.hitch(this, function(result) {
+        wireEvents: function (btnAckAll) {
+            on(registry.byId(btnAckAll).domNode, "click", lang.hitch(this, function () {
+                this.svc.acknowledgeAllPendingEvents().then(lang.hitch(this, function (result) {
                     this.grid.store.setData(result);
                     this.grid.refresh();
                 }));
             }));
-            this.grid.on("dgrid-error", function(event) {
+            this.grid.on("dgrid-error", function (event) {
                 console.log(event.error.message);
             });
         }

@@ -36,7 +36,7 @@ public class LayoutContainerTag extends TagSupport {
     @Override
     public int doStartTag() throws JspException {
         try {
-            JspWriter out = pageContext.getOut();
+            final JspWriter out = pageContext.getOut();
 
             out.print("<div");
             printAttribute(out, "id", id);
@@ -52,7 +52,7 @@ public class LayoutContainerTag extends TagSupport {
     @Override
     public int doEndTag() throws JspException {
         try {
-            JspWriter out = pageContext.getOut();
+            final JspWriter out = pageContext.getOut();
             out.print("</div>");
         } catch (IOException ex) {
             throw new JspTagException(ex.getMessage());

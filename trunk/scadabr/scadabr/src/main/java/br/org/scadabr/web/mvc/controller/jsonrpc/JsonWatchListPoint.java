@@ -8,8 +8,6 @@ import com.serotonin.mango.view.chart.ChartRenderer;
 import com.serotonin.mango.view.chart.ChartType;
 import com.serotonin.mango.vo.DataPointVO;
 import java.io.Serializable;
-import java.util.Locale;
-import java.text.MessageFormat;
 
 /**
  *
@@ -20,11 +18,10 @@ public class JsonWatchListPoint implements Serializable {
     private String canonicalName;
     private int id;
     private boolean settable;
-    private String timestamp;
+    private long timestamp;
     private String value;
     private ChartType chartType;
     private boolean changed;
-    private long timestampMs;
 
     //TODO remove changed to more sophisticated Websocket, transfer raw value (formatting should be done on the client side) transfer only timestamp as long 
     JsonWatchListPoint(final DataPointVO dp, final DataPointRT dpRt, final DataPointDao dataPointDao, final Localizer localizer) {
@@ -34,9 +31,8 @@ public class JsonWatchListPoint implements Serializable {
         if (dpRt != null) {
             PointValueTime pvt = dpRt.getPointValue();
 
-            timestampMs = pvt.getTime();
-            changed = timestampMs + 30000 > System.currentTimeMillis();
-            timestamp = localizer.localizeTimeStamp(pvt.getTime(), true);
+            timestamp = pvt.getTime();
+            changed = timestamp + 30000 > System.currentTimeMillis();
             value = localizer.format(dp, pvt.getValue());
             final ChartRenderer renderer = dp.getChartRenderer();
             if (renderer != null) {
@@ -92,14 +88,14 @@ public class JsonWatchListPoint implements Serializable {
     /**
      * @return the timestamp
      */
-    public String getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
     /**
      * @param timestamp the timestamp to set
      */
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -143,20 +139,6 @@ public class JsonWatchListPoint implements Serializable {
      */
     public void setChanged(boolean changed) {
         this.changed = changed;
-    }
-
-    /**
-     * @return the timestampMs
-     */
-    public long getTimestampMs() {
-        return timestampMs;
-    }
-
-    /**
-     * @param timestampMs the timestampMs to set
-     */
-    public void setTimestampMs(long timestampMs) {
-        this.timestampMs = timestampMs;
     }
 
 }

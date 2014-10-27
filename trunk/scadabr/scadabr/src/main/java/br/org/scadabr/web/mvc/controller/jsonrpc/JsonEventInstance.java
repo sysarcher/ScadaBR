@@ -15,8 +15,8 @@ public class JsonEventInstance {
     private int id;
     private int alarmLevel;
     private boolean active;
-    private String activeTimestamp;
-    private String rtnTimestamp;
+    private long activeTimestamp;
+    private Long rtnTimestamp;
     private String message;
     private boolean rtnApplicable;
     private String rtnMessage;
@@ -53,28 +53,28 @@ public class JsonEventInstance {
     /**
      * @return the activeTimestamp
      */
-    public String getActiveTimestamp() {
+    public long getActiveTimestamp() {
         return activeTimestamp;
     }
 
     /**
      * @param activeTimestamp the activeTimestamp to set
      */
-    public void setActiveTimestamp(String activeTimestamp) {
+    public void setActiveTimestamp(long activeTimestamp) {
         this.activeTimestamp = activeTimestamp;
     }
 
     /**
      * @return the rtnTimestamp
      */
-    public String getRtnTimestamp() {
+    public Long getRtnTimestamp() {
         return rtnTimestamp;
     }
 
     /**
      * @param rtnTimestamp the rtnTimestamp to set
      */
-    public void setRtnTimestamp(String rtnTimestamp) {
+    public void setRtnTimestamp(Long rtnTimestamp) {
         this.rtnTimestamp = rtnTimestamp;
     }
 
@@ -153,13 +153,13 @@ public class JsonEventInstance {
         result.setId(eventInstance.getId());
         result.setActive(eventInstance.isActive());
         result.setAlarmLevel(eventInstance.getAlarmLevel());
-        result.setActiveTimestamp(localizer.localizeTimeStamp(eventInstance.getActiveTimestamp(), true));
+        result.setActiveTimestamp(eventInstance.getActiveTimestamp());
         result.setRtnApplicable(eventInstance.isRtnApplicable());
         if (eventInstance.getRtnMessage() != null) {
             result.setRtnMessage(localizer.getMessage(eventInstance.getRtnMessage()));
         }
         if (eventInstance.getRtnTimestamp() > 0) {
-            result.setRtnTimestamp(localizer.localizeTimeStamp(eventInstance.getRtnTimestamp(), true));
+            result.setRtnTimestamp(eventInstance.getRtnTimestamp());
         }
         result.setAcknowledged(eventInstance.isAcknowledged());
         result.setMessage(localizer.getMessage(eventInstance.getMessage()));

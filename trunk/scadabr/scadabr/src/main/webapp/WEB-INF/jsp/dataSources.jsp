@@ -7,34 +7,19 @@
                 "scadabr/jsp/DataSources",
                 "dojo/domReady!"
             ], function (DataSources) {
-                _dataSources = new DataSources("dataSourcesList", "dataSourceTypesSelect", "addDataSource");
+                _dataSources = new DataSources("dataSourcesTree", "dataSourcesContent");
             });
 
         </script>
 
-        <dijit:headlineLayoutContainer >
-            <dijit:topContentPane>
-                <div class="smallTitle titlePadding" style="float:left;">
-                    <tag:img png="icon_ds" title="dsList.dataSources"/>
-                    <fmt:message key="dsList.dataSources"/>
-                    <tag:help id="dataSourceList"/>
-                </div>
-                <div class="titlePadding" style="float:right;">
-                    <dijit:selectFromMap id="dataSourceTypesSelect" map="${dataSourceTypes}" value="${defaultDataSourceType}"></dijit:selectFromMap>
-                    <dijit:button id="addDataSource" iconClass="scadaBrAddDataSourceIcon" i18nLabel="common.add"/>
-                </div>
-            </dijit:topContentPane>
-            <dijit:centerContentPane>
-                <dijit:sidebarBorderContainer gutters="true" liveSplitters="true">
-                    <dijit:leftContentPane>
-                        <div id="dataSourcesTree"></div>
-                    </dijit:leftContentPane>
-                    <dijit:centerContentPane id="dataSourcesList">
+        <dijit:sidebarBorderContainer gutters="true" liveSplitters="true">
+            <dijit:leftContentPane>
+                <div id="dataSourcesTree"></div>
+            </dijit:leftContentPane>
+            <dijit:centerContentPane id="dataSourcesContent">
 
-                    </dijit:centerContentPane>
-
-                </dijit:sidebarBorderContainer>
             </dijit:centerContentPane>
-        </dijit:headlineLayoutContainer>
+
+        </dijit:sidebarBorderContainer>
     </jsp:body>
 </tag:page>
