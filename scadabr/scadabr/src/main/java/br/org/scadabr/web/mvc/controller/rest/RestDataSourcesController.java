@@ -35,7 +35,7 @@ import org.springframework.web.servlet.support.RequestContext;
  */
 @RestController
 @Scope("request")
-@RequestMapping(value = "/rest/dataSources")
+@RequestMapping(value = "/rest/dataSources/")
 public class RestDataSourcesController {
 
     private static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
@@ -53,8 +53,8 @@ public class RestDataSourcesController {
     private RequestContextAwareLocalizer localizer;
 
 
-    @RequestMapping(method = RequestMethod.GET)
-    public List<JsonDataSource> getDataSources(HttpServletRequest request) {
+    @RequestMapping(value = "lazyTree/", method = RequestMethod.GET)
+    public List<JsonDataSource> getDataSources() {
         LOG.severe("CALLED: getDataSources");
         
         final User user = userSessionContextBean.getUser();
@@ -66,12 +66,5 @@ public class RestDataSourcesController {
         }
         return result;
     }
-
-    @RequestMapping(value = "/tree/root", method = RequestMethod.GET)
-    public LazyTreeNode getDataSourcesTreeRoot() {
-        LOG.severe("CALLED: getDataSources");
-        return new LazyTreeNode("root");
-    }
-
 
 }

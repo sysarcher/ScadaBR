@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 
 @Named
-@JsonRpcService("/rpc/events")
+@JsonRpcService("/rpc/events/")
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class EventsService {
 
@@ -35,7 +35,6 @@ public class EventsService {
             for (EventInstance evt : eventDao.getPendingEvents(user)) {
                 eventDao.ackEvent(evt.getId(), now, user.getId(), 0);
             }
-//TODO impl            MiscDWR.resetLastAlarmLevelChange();
         }
         return JsonEventInstance.wrap(eventDao.getPendingEvents(user), localizer);
 

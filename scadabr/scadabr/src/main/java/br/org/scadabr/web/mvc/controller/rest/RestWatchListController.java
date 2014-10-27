@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Scope("request")
+@RequestMapping(value = "/rest/watchLists/")
 public class RestWatchListController {
 
     private static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
@@ -40,7 +41,7 @@ public class RestWatchListController {
     @Inject
     private RequestContextAwareLocalizer localizer;
 
-    @RequestMapping(value = "/rest/watchLists", params = "id", method = RequestMethod.GET)
+    @RequestMapping(params = "id", method = RequestMethod.GET)
     public JsonWatchList getWatchList(int id, HttpServletRequest request) {
         LOG.log(Level.SEVERE, "CALLED: getWatchList {0}", id);
         //TODO use JDK 8 clojure???
