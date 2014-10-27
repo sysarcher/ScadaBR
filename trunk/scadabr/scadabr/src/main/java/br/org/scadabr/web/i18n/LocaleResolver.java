@@ -22,7 +22,7 @@ public class LocaleResolver extends SessionLocaleResolver {
         return Calendar.getInstance(resolveLocale(request)).getTimeZone();
     }
 
-    public TimeZone resolverTimeZone(HttpServletRequest request) {
+    public TimeZone resolveTimeZone(HttpServletRequest request) {
         TimeZone timeZone = (TimeZone) WebUtils.getSessionAttribute(request, TIME_ZONE_SESSION_ATTRIBUTE_NAME);
         if (timeZone == null) {
             timeZone = determineDefaultTimeZone(request);

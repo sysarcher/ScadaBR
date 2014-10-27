@@ -18,7 +18,6 @@
  */
 package br.org.scadabr.web.mvc.controller;
 
-
 import br.org.scadabr.web.i18n.LocaleResolver;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import br.org.scadabr.web.mvc.form.LoginForm;
@@ -55,26 +54,25 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 @RequestMapping("/login")
 @Scope("request")
 class LoginController {
-    
+
     private static final Log logger = LogFactory.getLog(LoginController.class);
 
-    private String successUrl ="redirect:watchList";
+    private String successUrl = "redirect:watchList";
     private String newUserUrl = "redirect:help";
     private final static String LOGIN_VIEW = "login";
     @Inject
     private UserDao userDao;
 
-    @Inject 
-    LocaleResolver localeResolver;
-    
-   @Inject
+    @Inject
+    private LocaleResolver localeResolver;
+
+    @Inject
     private UserSessionContextBean userSessionContextBean;
 
     public LoginController() {
         super();
     }
-    
- 
+
     public void setSuccessUrl(String url) {
         successUrl = url;
     }
@@ -116,28 +114,27 @@ class LoginController {
     }
 
     /*
-    protected void onBindAndValidate(HttpServletRequest request, Object command, BindException errors) {
-        LoginForm login = (LoginForm) command;
+     protected void onBindAndValidate(HttpServletRequest request, Object command, BindException errors) {
+     LoginForm login = (LoginForm) command;
 
-        // Make sure there is a username
-        if (login.getUsername().isEmpty()) {
-            ValidationUtils.rejectValue(errors, "username", "login.validation.noUsername");
-        }
+     // Make sure there is a username
+     if (login.getUsername().isEmpty()) {
+     ValidationUtils.rejectValue(errors, "username", "login.validation.noUsername");
+     }
 
-        // Make sure there is a password
-        if (login.getPassword().isEmpty()) {
-            ValidationUtils.rejectValue(errors, "password", "login.validation.noPassword");
-        }
-    }
-*/
+     // Make sure there is a password
+     if (login.getPassword().isEmpty()) {
+     ValidationUtils.rejectValue(errors, "password", "login.validation.noPassword");
+     }
+     }
+     */
     //TODO @Valid does not work with <spring:bind ????
-    
     @RequestMapping(method = RequestMethod.POST)
     public String onSubmit(@ModelAttribute("login") @Valid LoginForm loginForm, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response) throws BindException {
         if (bindingResult.hasErrors()) {
             return "login";
         }
-        
+
         boolean crowdAuthenticated = false;
 
         // Check if the user exists
@@ -162,11 +159,11 @@ class LoginController {
                 }
             }
         }
-/*
-        if (errors.hasErrors()) {
-            return "login";
-        }
-*/
+        /*
+         if (errors.hasErrors()) {
+         return "login";
+         }
+         */
         String result = performLogin(loginForm.getUsername());
         if (crowdAuthenticated) {
             CrowdUtils.setCrowdAuthenticated(userSessionContextBean.getUser());
@@ -175,13 +172,17 @@ class LoginController {
         return result;
     }
 
-    	public void fixTimeZone(HttpServletRequest request, HttpServletResponse response) {
-		final Locale locale = localeResolver.resolveLocale(request);
-                final TimeZone timeZone = Calendar.getInstance(locale).getTimeZone();
-                localeResolver.setLocaleContext(request, response, new SimpleTimeZoneAwareLocaleContext(locale, timeZone));
-                userSessionContextBean.setLocale(locale);
-		userSessionContextBean.setTimeZone(timeZone);
-	}
+    public void fixTimeZone(HttpServletRequest request, HttpServletResponse response) {
+        //TODO set client to different timezone of locale I.e. (bash: export TZ=Asia/Calcutta && firefox) ->> how to get this timezone to the server (us)? 
+        final Locale locale = Locale.ENGLISH; //localeResolver.resolveLocale(request);
+        TimeZone timeZone = localeResolver.resolveTimeZone(request);
+        if (timeZone == null) {
+            timeZone = Calendar.getInstance(locale).getTimeZone();
+            localeResolver.setLocaleContext(request, response, new SimpleTimeZoneAwareLocaleContext(locale, timeZone));
+        }
+        userSessionContextBean.setLocale(locale);
+        userSessionContextBean.setTimeZone(timeZone);
+    }
 
     private String performLogin(String username) {
         // Check if the user is already logged in.
@@ -208,12 +209,12 @@ class LoginController {
             }
         }
 
-            if (user.isFirstLogin()) {
-                return newUserUrl;
-            }
-            if (!user.getHomeUrl().isEmpty()) {
-                return "redirect:" + user.getHomeUrl();
-            }
+        if (user.isFirstLogin()) {
+            return newUserUrl;
+        }
+        if (!user.getHomeUrl().isEmpty()) {
+            return "redirect:" + user.getHomeUrl();
+        }
 
         return successUrl;
     }

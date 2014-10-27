@@ -9,8 +9,7 @@ import com.serotonin.mango.view.chart.ChartType;
 import com.serotonin.mango.vo.DataPointVO;
 import java.io.Serializable;
 import java.util.Locale;
-import java.util.TimeZone;
-import br.org.scadabr.web.i18n.MessageSource;
+import java.text.MessageFormat;
 
 /**
  *
@@ -27,6 +26,7 @@ public class JsonWatchListPoint implements Serializable {
     private boolean changed;
     private long timestampMs;
 
+    //TODO remove changed to more sophisticated Websocket, transfer raw value (formatting should be done on the client side) transfer only timestamp as long 
     JsonWatchListPoint(final DataPointVO dp, final DataPointRT dpRt, final DataPointDao dataPointDao, final Localizer localizer) {
         id = dp.getId();
         settable = dp.isSettable();
@@ -37,7 +37,7 @@ public class JsonWatchListPoint implements Serializable {
             timestampMs = pvt.getTime();
             changed = timestampMs + 30000 > System.currentTimeMillis();
             timestamp = localizer.localizeTimeStamp(pvt.getTime(), true);
-            value = dp.getTextRenderer().getText(pvt, 0);//TODO hint????
+            value = localizer.format(dp, pvt.getValue());
             final ChartRenderer renderer = dp.getChartRenderer();
             if (renderer != null) {
                 chartType = renderer.getType();

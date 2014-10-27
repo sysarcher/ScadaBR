@@ -40,10 +40,12 @@ public class PlainRenderer extends BaseTextRenderer {
         return definition;
     }
 
+    @Override
     public String getTypeName() {
         return definition.getName();
     }
 
+    @Override
     public ImplDefinition getDef() {
         return definition;
     }
@@ -116,4 +118,15 @@ public class PlainRenderer extends BaseTextRenderer {
             suffix = SerializationHelper.readSafeUTF(in);
         }
     }
+
+    @Override
+    public String getValueMessagePattern() {
+        return "{0}";
+    }
+
+    @Override
+    public String getMessagePattern() {
+        return "{0} " + suffix;
+    }
+
 }

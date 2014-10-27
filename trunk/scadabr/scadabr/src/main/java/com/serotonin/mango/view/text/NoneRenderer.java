@@ -26,21 +26,24 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.Locale;
 
 @JsonRemoteEntity
 public class NoneRenderer extends BaseTextRenderer {
 
-    private static ImplDefinition definition = new ImplDefinition("textRendererNone", "NONE", "textRenderer.none",
+    private static final ImplDefinition definition = new ImplDefinition("textRendererNone", "NONE", "textRenderer.none",
             new int[]{DataTypes.IMAGE});
 
     public static ImplDefinition getDefinition() {
         return definition;
     }
 
+    @Override
     public String getTypeName() {
         return definition.getName();
     }
 
+    @Override
     public ImplDefinition getDef() {
         return definition;
     }
@@ -79,4 +82,20 @@ public class NoneRenderer extends BaseTextRenderer {
             // no op
         }
     }
+
+    @Override
+    public String getValueMessagePattern() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getMessagePattern() {
+        return "";
+    }
+
+    @Override
+    public String getSuffix() {
+        return "";
+    }
+
 }

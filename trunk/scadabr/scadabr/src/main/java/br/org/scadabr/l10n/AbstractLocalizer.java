@@ -5,10 +5,11 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
-import java.util.MissingResourceException;
+import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
+import java.util.WeakHashMap;
 import java.util.logging.Logger;
 import net.sf.mbus4j.log.LogUtils;
 
@@ -17,67 +18,33 @@ import net.sf.mbus4j.log.LogUtils;
  * or an given one.
  *
  */
-public abstract class AbstractLocalizer implements Serializable {
-    
+public abstract class AbstractLocalizer implements Serializable, Localizer {
+
     /**
      * the logger to use.
      */
     private final static Logger LOG = LogUtils.getCoreLogger();
 
-    
-    abstract public ResourceBundle getBundle();
-    
-    abstract public Locale getLocale();
-    
-    /**
-     * Localize the message.
-     *
-     * @param i18nKey the I18N key
-     * @param args the parameter to pass.
-     * @return the localizes I18n message.
-     */
-    public String localizeI18nKey(String i18nKey, Object... args) {
-        Object[] localizedArgs = new Object[args.length];
-        for (int i = 0; i < args.length; i++) {
-            if (args[i] instanceof LocalizableMessage) {
-                final LocalizableMessage localizableMessage = (LocalizableMessage) args[i];
-                localizedArgs[i] = localizeMessage(localizableMessage);
-            } else {
-                localizedArgs[i] = args[i];
+    //TODO APL move this map out to a Singleton bean?
+    private final Map<Locale, Map<String, MessageFormat>> pvtMessageFormatMap = new HashMap<>();
+
+    protected MessageFormat getMessageRender(String messagePattern, final Locale locale) {
+        synchronized (pvtMessageFormatMap) {
+            Map<String, MessageFormat> localizedMap = pvtMessageFormatMap.get(locale);
+            if (localizedMap == null) {
+                localizedMap = new WeakHashMap<>();
+                pvtMessageFormatMap.put(getLocale(), localizedMap);
             }
-        }
-        try {
-            return new MessageFormat(getBundle().getString(i18nKey)).format(localizedArgs);
-        } catch (MissingResourceException e) {
-            return logAndGetMessage(i18nKey, getLocale());
+            MessageFormat result = localizedMap.get(messagePattern);
+            if (result == null) {
+                result = new MessageFormat(messagePattern, locale);
+                localizedMap.put(messagePattern, result);
+            }
+            return result;
         }
     }
 
     /**
-     * Localize the message.
-     *
-     * @param i18nMessage the I18N message.
-     * @return the localized I18N message.
-     */
-    public String localizeMessage(LocalizableMessage i18nMessage) {
-        return localizeI18nKey(i18nMessage.getI18nKey(), ((LocalizableMessage) i18nMessage).getArgs());
-    }
-
-    /**
-     * Log a comment and generate a pseudo translated message instead of
-     * throwing an exception. THis happens if the key is not found in the given
-     * locale and no default message can be found.
-     *
-     * @param i18nKey the missing I18N key.
-     * @param locale the locale
-     * @return the pseudo translated key.
-     */
-    protected static String logAndGetMessage(String i18nKey, Locale locale) {
-        LOG.log(Level.SEVERE, "Localizer found unknown I18N key {0} for locale: {1}.", new Object[]{i18nKey, locale});
-        return String.format("!>>>%s:%s<<<!", locale, i18nKey);
-    }
-
-        /**
      * Localize the message.
      *
      * @param i18nKey the I18N key
@@ -96,11 +63,7 @@ public abstract class AbstractLocalizer implements Serializable {
                 localizedArgs[i] = args[i];
             }
         }
-        try {
-            return new MessageFormat(bundle.getString(i18nKey), bundle.getLocale()).format(localizedArgs);
-        } catch (MissingResourceException e) {
-            return logAndGetMessage(i18nKey, bundle.getLocale());
-        }
+        return new MessageFormat(bundle.getString(i18nKey), bundle.getLocale()).format(localizedArgs);
     }
 
     /**

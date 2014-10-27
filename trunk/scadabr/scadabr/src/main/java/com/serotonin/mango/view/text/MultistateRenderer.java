@@ -34,23 +34,25 @@ import java.awt.Color;
 @JsonRemoteEntity
 public class MultistateRenderer extends BaseTextRenderer {
 
-    private static ImplDefinition definition = new ImplDefinition("textRendererMultistate", "MULTISTATE",
+    private static final ImplDefinition definition = new ImplDefinition("textRendererMultistate", "MULTISTATE",
             "textRenderer.multistate", new int[]{DataTypes.MULTISTATE});
 
     public static ImplDefinition getDefinition() {
         return definition;
     }
 
+    @Override
     public String getTypeName() {
         return definition.getName();
     }
 
+    @Override
     public ImplDefinition getDef() {
         return definition;
     }
 
     @JsonRemoteProperty(innerType = MultistateValue.class)
-    private List<MultistateValue> multistateValues = new ArrayList<MultistateValue>();
+    private List<MultistateValue> multistateValues = new ArrayList<>();
 
     public void addMultistateValue(int key, String text, String colour) {
         multistateValues.add(new MultistateValue(key, text, colour));
@@ -137,4 +139,20 @@ public class MultistateRenderer extends BaseTextRenderer {
             multistateValues = (List<MultistateValue>) in.readObject();
         }
     }
+
+    @Override
+    public String getValueMessagePattern() {
+        return "{0,number,intetger}";
+    }
+
+    @Override
+    public String getMessagePattern() {
+        return getValueMessagePattern();
+    }
+
+    @Override
+    public String getSuffix() {
+        return "";
+    }
+
 }
