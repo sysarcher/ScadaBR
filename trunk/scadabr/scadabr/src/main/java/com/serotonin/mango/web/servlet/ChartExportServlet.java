@@ -21,6 +21,7 @@ import com.serotonin.mango.vo.report.ReportDataValue;
 import com.serotonin.mango.vo.report.ReportPointInfo;
 import com.serotonin.mango.web.dwr.beans.DataExportDefinition;
 
+@Deprecated //TODO APL Use rest to fetch image
 public class ChartExportServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
