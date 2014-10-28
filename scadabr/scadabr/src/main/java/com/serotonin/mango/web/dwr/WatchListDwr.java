@@ -33,10 +33,7 @@ import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.logger.LogUtils;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
-import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.db.dao.WatchListDao;
-import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
@@ -52,12 +49,9 @@ import com.serotonin.mango.web.dwr.beans.WatchListState;
 import br.org.scadabr.util.ArrayUtils;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.l10n.Localizer;
 import java.util.Objects;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 public class WatchListDwr extends BaseDwr {
 
