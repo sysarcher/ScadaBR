@@ -1,5 +1,6 @@
 package br.org.scadabr.rt.dataSource.nodaves7;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.ImplementMeException;
 import br.org.scadabr.timer.cron.CronExpression;
 import java.io.File;
@@ -102,7 +103,7 @@ public class NodaveS7DataSource extends PollingDataSource<NodaveS7DataSourceVO> 
         while (matcher.find()) {
             found = true;
             strValue = matcher.group();
-            value = MangoValue.stringToValue(strValue, point.getDataTypeId());
+            value = MangoValue.stringToValue(strValue, point.getDataType());
         }
         if (!found) {
             throw new Exception("Value string not found (regex: " + valueRegex
@@ -175,10 +176,9 @@ public class NodaveS7DataSource extends PollingDataSource<NodaveS7DataSourceVO> 
 		// datatype 1 => binario
         // datatype 2 => multistate
         // (...)
-		// logica exclusiva para aplicacao com um
+        // logica exclusiva para aplicacao com um
         // unico bit ativo na word especificada ex.: resets
-        if (((NodaveS7PointLocatorVO) dataPoint.getVo().getPointLocator())
-                .getDataType() == 1) {
+        if (dataPoint.getDataType() == DataType.BINARY) {
             int converted = 0;
             int bit = ((NodaveS7PointLocatorVO) dataPoint.getVo()
                     .getPointLocator()).getS7writeBitOffset();

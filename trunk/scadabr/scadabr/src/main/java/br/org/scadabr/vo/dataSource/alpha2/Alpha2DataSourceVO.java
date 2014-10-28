@@ -19,9 +19,9 @@ import com.serotonin.mango.rt.dataSource.modbus.ModbusDataSource;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -118,7 +118,7 @@ public class Alpha2DataSourceVO extends DataSourceVO<Alpha2DataSourceVO> {
             response.addContextual("station", "validate.invalidValue");
         }
         if (timeout <= 0) {
-            response .addContextual("timeout", "validate.greaterThanZero");
+            response.addContextual("timeout", "validate.greaterThanZero");
         }
         if (retries < 0) {
             response.addContextual("retries", "validate.cannotBeNegative");

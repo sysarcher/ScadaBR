@@ -21,10 +21,8 @@ public class DPCommandsScriptContextObject extends ScriptContextObject {
         if (dataPoint != null) {
             Permissions.ensureDataPointSetPermission(user, dataPoint);
             RuntimeManager runtimeManager = Common.ctx.getRuntimeManager();
-            MangoValue value = MangoValue.stringToValue(stringValue, dataPoint
-                    .getPointLocator().getDataTypeId());
-            runtimeManager.setDataPointValue(dataPoint.getId(), value,
-                    this.user);
+            MangoValue value = MangoValue.stringToValue(stringValue, dataPoint.getDataType());
+            runtimeManager.setDataPointValue(dataPoint.getId(), value, this.user);
         }
     }
 

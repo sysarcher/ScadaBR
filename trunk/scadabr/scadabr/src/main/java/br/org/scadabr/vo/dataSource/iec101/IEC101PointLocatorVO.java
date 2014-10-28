@@ -15,7 +15,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
@@ -51,15 +50,15 @@ public class IEC101PointLocatorVO extends AbstractPointLocatorVO implements
     }
 
     @Override
-    public int getDataTypeId() {
+    public br.org.scadabr.DataType getDataType() {
         if (iec101DataType == IEC101Master.SINGLE_POINT_INFORMATION) {
-            return DataTypes.BINARY;
+            return br.org.scadabr.DataType.BINARY;
         } else if (iec101DataType == IEC101Master.DOUBLE_POINT_INFORMATION) {
-            return DataTypes.ALPHANUMERIC;
+            return br.org.scadabr.DataType.ALPHANUMERIC;
         } else if (iec101DataType == IEC101Master.NORMALIZED_MEASURE) {
-            return DataTypes.NUMERIC;
+            return br.org.scadabr.DataType.NUMERIC;
         }
-        return DataTypes.ALPHANUMERIC;
+        return br.org.scadabr.DataType.ALPHANUMERIC;
     }
 
     @Override
@@ -149,7 +148,7 @@ public class IEC101PointLocatorVO extends AbstractPointLocatorVO implements
 
     }
 
-	//
+    //
     // /
     // / Serialization
     // /
@@ -171,7 +170,7 @@ public class IEC101PointLocatorVO extends AbstractPointLocatorVO implements
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int ver = in.readInt();
-		// Switch on the version of the class so that version changes can be
+        // Switch on the version of the class so that version changes can be
         // elegantly handled.
         if (ver == 1) {
             iec101DataType = in.readInt();

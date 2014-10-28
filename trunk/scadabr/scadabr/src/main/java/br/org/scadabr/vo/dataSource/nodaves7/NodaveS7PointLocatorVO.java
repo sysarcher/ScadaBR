@@ -1,5 +1,6 @@
 package br.org.scadabr.vo.dataSource.nodaves7;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -15,7 +16,6 @@ import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
@@ -34,7 +34,7 @@ public class NodaveS7PointLocatorVO extends AbstractPointLocatorVO implements
     @JsonRemoteProperty
     private String timestampRegex = "";
     @JsonRemoteProperty
-    private int dataType = DataTypes.BINARY;
+    private DataType dataType = DataType.BINARY;
     @JsonRemoteProperty
     private boolean settable;
     @JsonRemoteProperty
@@ -119,16 +119,12 @@ public class NodaveS7PointLocatorVO extends AbstractPointLocatorVO implements
         this.timestampRegex = timestampRegex;
     }
 
-    public int getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(int dataType) {
+    public void setDataType(DataType dataType) {
         this.dataType = dataType;
     }
 
     @Override
-    public int getDataTypeId() {
+    public DataType getDataType() {
         return dataType;
     }
 
@@ -159,7 +155,7 @@ public class NodaveS7PointLocatorVO extends AbstractPointLocatorVO implements
         SerializationHelper.writeSafeUTF(out, valueRegex);
         SerializationHelper.writeSafeUTF(out, timestampFormat);
         SerializationHelper.writeSafeUTF(out, timestampRegex);
-        out.writeInt(dataType);
+        out.writeInt(dataType.ordinal());
         out.writeBoolean(settable);
         out.writeBoolean(customTimestamp);
         SerializationHelper.writeSafeUTF(out, s7writeMemoryArea);
@@ -177,7 +173,7 @@ public class NodaveS7PointLocatorVO extends AbstractPointLocatorVO implements
         valueRegex = SerializationHelper.readSafeUTF(in);
         timestampFormat = SerializationHelper.readSafeUTF(in);
         timestampRegex = SerializationHelper.readSafeUTF(in);
-        dataType = in.readInt();
+        dataType = DataType.valueOf(in.readInt());
         settable = in.readBoolean();
         customTimestamp = in.readBoolean();
 

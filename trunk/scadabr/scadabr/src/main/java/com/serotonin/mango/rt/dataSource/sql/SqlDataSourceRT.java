@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.sql;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.ImplementMeException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,7 +38,6 @@ import org.apache.commons.logging.LogFactory;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.io.StreamUtils;
 import br.org.scadabr.timer.cron.CronExpression;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -85,21 +85,27 @@ public class SqlDataSourceRT extends PollingDataSource<SqlDataSourceVO> {
         try {
             stmt = conn.prepareStatement(locatorVO.getUpdateStatement());
 
-            if (locatorVO.getDataTypeId() == DataTypes.ALPHANUMERIC) {
-                stmt.setString(1, valueTime.getStringValue());
-            } else if (locatorVO.getDataTypeId() == DataTypes.BINARY) {
-                stmt.setBoolean(1, valueTime.getBooleanValue());
-            } else if (locatorVO.getDataTypeId() == DataTypes.MULTISTATE) {
-                stmt.setInt(1, valueTime.getIntegerValue());
-            } else if (locatorVO.getDataTypeId() == DataTypes.NUMERIC) {
-                stmt.setDouble(1, valueTime.getDoubleValue());
-            } else if (locatorVO.getDataTypeId() == DataTypes.IMAGE) {
-                byte[] data = ((ImageValue) valueTime.getValue())
-                        .getImageData();
-                stmt.setBlob(1, new ByteArrayInputStream(data), data.length);
-            } else {
-                throw new ShouldNeverHappenException("What's this?: "
-                        + locatorVO.getDataTypeId());
+            switch (locatorVO.getDataType()) {
+                case ALPHANUMERIC:
+                    stmt.setString(1, valueTime.getStringValue());
+                    break;
+                case BINARY:
+                    stmt.setBoolean(1, valueTime.getBooleanValue());
+                    break;
+                case MULTISTATE:
+                    stmt.setInt(1, valueTime.getIntegerValue());
+                    break;
+                case NUMERIC:
+                    stmt.setDouble(1, valueTime.getDoubleValue());
+                    break;
+                case IMAGE:
+                    byte[] data = ((ImageValue) valueTime.getValue())
+                            .getImageData();
+                    stmt.setBlob(1, new ByteArrayInputStream(data), data.length);
+                    break;
+                default:
+                    throw new ShouldNeverHappenException("What's this?: "
+                            + locatorVO.getDataType());
             }
 
             int rows = stmt.executeUpdate();
@@ -136,7 +142,7 @@ public class SqlDataSourceRT extends PollingDataSource<SqlDataSourceVO> {
             return;
         }
 
-		// If there is no select statement, don't bother. It's true that we
+        // If there is no select statement, don't bother. It's true that we
         // wouldn't need to bother polling at all,
         // but for now this will do.
         if (vo.getSelectStatement().isEmpty()) {
@@ -178,145 +184,143 @@ public class SqlDataSourceRT extends PollingDataSource<SqlDataSourceVO> {
 
     private void doColumnPollImpl(long time, PreparedStatement stmt)
             throws SQLException {
-        ResultSet rs = stmt.executeQuery();
-        ResultSetMetaData meta = rs.getMetaData();
+        try (ResultSet rs = stmt.executeQuery()) {
+            ResultSetMetaData meta = rs.getMetaData();
 
-        if (rs.next()) {
+            if (rs.next()) {
 
-            for (DataPointRT dp : enabledDataPoints.values()) {
-                SqlPointLocatorRT locatorRT = dp.getPointLocator();
-                SqlPointLocatorVO locatorVO = locatorRT.getVo();
+                for (DataPointRT dp : enabledDataPoints.values()) {
+                    SqlPointLocatorRT locatorRT = dp.getPointLocator();
+                    SqlPointLocatorVO locatorVO = locatorRT.getVo();
 
-                String fieldName = locatorVO.getFieldName();
-                if (!fieldName.isEmpty()) {
-                    // Point value.
-                    MangoValue value;
-                    try {
-                        value = getValue(locatorVO, rs, fieldName, time);
-                    } catch (IOException e) {
-                        continue;
-                    } catch (SQLException e) {
-                        continue;
-                    }
+                    String fieldName = locatorVO.getFieldName();
+                    if (!fieldName.isEmpty()) {
+                        // Point value.
+                        MangoValue value;
+                        try {
+                            value = getValue(locatorVO, rs, fieldName, time);
+                        } catch (IOException e) {
+                            continue;
+                        } catch (SQLException e) {
+                            continue;
+                        }
 
-                    // Point time override.
-                    long pointTime = time;
-                    String timeOverride = locatorVO.getTimeOverrideName();
-                    if (!timeOverride.isEmpty()) {
-                        // Find the meta data for the column.
-                        int column = -1;
-                        for (int i = 1; i <= meta.getColumnCount(); i++) {
-                            if (timeOverride.equalsIgnoreCase(meta
-                                    .getColumnLabel(i))) {
-                                column = i;
-                                break;
+                        // Point time override.
+                        long pointTime = time;
+                        String timeOverride = locatorVO.getTimeOverrideName();
+                        if (!timeOverride.isEmpty()) {
+                            // Find the meta data for the column.
+                            int column = -1;
+                            for (int i = 1; i <= meta.getColumnCount(); i++) {
+                                if (timeOverride.equalsIgnoreCase(meta
+                                        .getColumnLabel(i))) {
+                                    column = i;
+                                    break;
+                                }
+                            }
+
+                            if (column == -1) {
+                                // Couldn't find the column.
+                                raiseEvent(STATEMENT_EXCEPTION_EVENT, time, true,
+                                        new LocalizableMessageImpl(
+                                                "event.sql.timeNotFound",
+                                                timeOverride));
+                                continue;
+                            }
+
+                            pointTime = getTimeOverride(meta, column, rs, time);
+                            if (pointTime == -1) {
+                                continue;
                             }
                         }
 
-                        if (column == -1) {
-                            // Couldn't find the column.
-                            raiseEvent(STATEMENT_EXCEPTION_EVENT, time, true,
-                                    new LocalizableMessageImpl(
-                                            "event.sql.timeNotFound",
-                                            timeOverride));
-                            continue;
-                        }
-
-                        pointTime = getTimeOverride(meta, column, rs, time);
-                        if (pointTime == -1) {
-                            continue;
-                        }
+                        dp.updatePointValue(new PointValueTime(value, pointTime));
                     }
-
-                    dp.updatePointValue(new PointValueTime(value, pointTime));
                 }
+            } else {
+                raiseEvent(STATEMENT_EXCEPTION_EVENT, time, true,
+                        new LocalizableMessageImpl("event.sql.noData"));
             }
-        } else {
-            raiseEvent(STATEMENT_EXCEPTION_EVENT, time, true,
-                    new LocalizableMessageImpl("event.sql.noData"));
         }
-
-        rs.close();
     }
 
     private void doRowPollImpl(long time, PreparedStatement stmt)
             throws SQLException {
-        ResultSet rs = stmt.executeQuery();
-        ResultSetMetaData meta = rs.getMetaData();
+        try (ResultSet rs = stmt.executeQuery()) {
+            ResultSetMetaData meta = rs.getMetaData();
 
-        while (rs.next()) {
-			// In each row:
-            // - the first column is the row identifier which is matched with
-            // the field name in the vo
-            // - the second column is the value
-            // - the third column (if it exists) is the time override
+            while (rs.next()) {
+                // In each row:
+                // - the first column is the row identifier which is matched with
+                // the field name in the vo
+                // - the second column is the value
+                // - the third column (if it exists) is the time override
 
-            String rowId = rs.getString(1);
+                String rowId = rs.getString(1);
 
-            // Find the vo in question.
-            boolean found = false;
-            for (DataPointRT dp : enabledDataPoints.values()) {
-                SqlPointLocatorRT locatorRT = dp.getPointLocator();
-                SqlPointLocatorVO locatorVO = locatorRT.getVo();
-                String fieldName = locatorVO.getFieldName();
+                // Find the vo in question.
+                boolean found = false;
+                for (DataPointRT dp : enabledDataPoints.values()) {
+                    SqlPointLocatorRT locatorRT = dp.getPointLocator();
+                    SqlPointLocatorVO locatorVO = locatorRT.getVo();
+                    String fieldName = locatorVO.getFieldName();
 
-                if (!fieldName.isEmpty()
-                        && fieldName.equalsIgnoreCase(rowId)) {
-                    found = true;
+                    if (!fieldName.isEmpty()
+                            && fieldName.equalsIgnoreCase(rowId)) {
+                        found = true;
 
-                    // Point value.
-                    MangoValue value;
-                    try {
-                        value = getValue(locatorVO, rs, meta.getColumnLabel(2),
-                                time);
-                    } catch (IOException e) {
-                        continue;
-                    } catch (SQLException e) {
-                        continue;
-                    }
-
-                    // Point time override.
-                    long pointTime = time;
-                    if (meta.getColumnCount() > 2) {
-                        pointTime = getTimeOverride(meta, 3, rs, time);
-                        if (pointTime == -1) {
+                        // Point value.
+                        MangoValue value;
+                        try {
+                            value = getValue(locatorVO, rs, meta.getColumnLabel(2),
+                                    time);
+                        } catch (IOException e) {
+                            continue;
+                        } catch (SQLException e) {
                             continue;
                         }
-                    }
 
-                    dp.updatePointValue(new PointValueTime(value, pointTime));
+                        // Point time override.
+                        long pointTime = time;
+                        if (meta.getColumnCount() > 2) {
+                            pointTime = getTimeOverride(meta, 3, rs, time);
+                            if (pointTime == -1) {
+                                continue;
+                            }
+                        }
+
+                        dp.updatePointValue(new PointValueTime(value, pointTime));
+                    }
+                }
+
+                if (!found) {
+                    raiseEvent(STATEMENT_EXCEPTION_EVENT, time, true,
+                            new LocalizableMessageImpl("event.sql.noDataPoint", rowId));
                 }
             }
-
-            if (!found) {
-                raiseEvent(STATEMENT_EXCEPTION_EVENT, time, true,
-                        new LocalizableMessageImpl("event.sql.noDataPoint", rowId));
-            }
         }
-
-        rs.close();
     }
 
     private MangoValue getValue(SqlPointLocatorVO locatorVO, ResultSet rs,
             String fieldName, long time) throws SQLException, IOException {
         try {
-            int dataType = locatorVO.getDataTypeId();
-            if (dataType == DataTypes.ALPHANUMERIC) {
-                return new AlphanumericValue(rs.getString(fieldName));
-            } else if (dataType == DataTypes.BINARY) {
-                return new BinaryValue(rs.getBoolean(fieldName));
-            } else if (dataType == DataTypes.MULTISTATE) {
-                return new MultistateValue(rs.getInt(fieldName));
-            } else if (dataType == DataTypes.NUMERIC) {
-                return new NumericValue(rs.getDouble(fieldName));
-            } else if (dataType == DataTypes.IMAGE) {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                StreamUtils.transfer(rs.getBlob(fieldName).getBinaryStream(),
-                        out);
-                return new ImageValue(out.toByteArray(), ImageValue.TYPE_JPG);
-            } else {
-                throw new ShouldNeverHappenException("What's this?: "
-                        + locatorVO.getDataTypeId());
+            switch (locatorVO.getDataType()) {
+                case ALPHANUMERIC:
+                    return new AlphanumericValue(rs.getString(fieldName));
+                case BINARY:
+                    return new BinaryValue(rs.getBoolean(fieldName));
+                case MULTISTATE:
+                    return new MultistateValue(rs.getInt(fieldName));
+                case NUMERIC:
+                    return new NumericValue(rs.getDouble(fieldName));
+                case IMAGE:
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    StreamUtils.transfer(rs.getBlob(fieldName).getBinaryStream(),
+                            out);
+                    return new ImageValue(out.toByteArray(), ImageValue.TYPE_JPG);
+                default:
+                    throw new ShouldNeverHappenException("What's this?: "
+                            + locatorVO.getDataType());
             }
         } catch (SQLException e) {
             // Field level error. Assume a bad field name.
@@ -349,14 +353,14 @@ public class SqlDataSourceRT extends PollingDataSource<SqlDataSourceVO> {
         return -1;
     }
 
-	//
+    //
     // /
     // / Lifecycle
     // /
     //
     @Override
     public void initialize() {
-		// Get a connection to the database. No need to pool, because we don't
+        // Get a connection to the database. No need to pool, because we don't
         // intend to close it until we shut down.
         try {
             DriverManager.registerDriver((Driver) Class.forName(
@@ -392,6 +396,7 @@ public class SqlDataSourceRT extends PollingDataSource<SqlDataSourceVO> {
             throw new ShouldNeverHappenException(e);
         }
     }
+
     @Override
     protected CronExpression getCronExpression() throws ParseException {
         throw new ImplementMeException();

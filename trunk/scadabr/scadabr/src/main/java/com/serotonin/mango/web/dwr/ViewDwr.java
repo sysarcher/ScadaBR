@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr;
 
+import br.org.scadabr.DataType;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -48,9 +49,7 @@ import br.org.scadabr.vo.scripting.ScriptVO;
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.db.KeyValuePair;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.ViewDao;
-import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.DynamicImage;
@@ -1043,9 +1042,9 @@ public class ViewDwr extends BaseDwr {
 
             // Add the list of points that are numeric.
             for (DataPointVO dp : dataPoints) {
-                if (dp.getPointLocator().getDataTypeId() == DataTypes.NUMERIC
-                        || dp.getPointLocator().getDataTypeId() == DataTypes.BINARY
-                        || dp.getPointLocator().getDataTypeId() == DataTypes.MULTISTATE) {
+                if (dp.getPointLocator().getDataType() == DataType.NUMERIC
+                        || dp.getPointLocator().getDataType() == DataType.BINARY
+                        || dp.getPointLocator().getDataType() == DataType.MULTISTATE) {
                     htmlData.append('_');
                     htmlData.append(dp.getId());
                 }

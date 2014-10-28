@@ -18,9 +18,9 @@
  */
 package com.serotonin.mango.view;
 
+import br.org.scadabr.DataType;
 import com.serotonin.mango.view.graphic.GraphicRenderer;
 import com.serotonin.mango.vo.DataPointVO;
-import br.org.scadabr.util.StringUtils;
 
 @Deprecated
 // use ViewComponent instead
@@ -54,8 +54,8 @@ public class PointView {
         return settableOverride;
     }
 
-    public int getDataType() {
-        return dataPoint.getPointLocator().getDataTypeId();
+    public DataType getDataType() {
+        return dataPoint.getDataType();
     }
 
     public int getId() {

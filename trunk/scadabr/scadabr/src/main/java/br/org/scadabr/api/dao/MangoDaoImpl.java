@@ -256,7 +256,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
             checkValidWriteCommand(dp, itemValue);
             checkValidWritableDataPoint(dp);
             MangoValue value = MangoValue.stringToValue(itemValue.getValue()
-                    .toString(), dp.getPointLocator().getDataTypeId());
+                    .toString(), dp.getDataType());
             Common.ctx.getRuntimeManager().setDataPointValue(dp.getId(), value,
                     null);
             flag = true;
@@ -276,8 +276,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
                     checkValidWritableDataPoint(dataPointVO);
 
                     MangoValue value = MangoValue.stringToValue(itemValue
-                            .getValue().toString(), dataPointVO
-                            .getPointLocator().getDataTypeId());
+                            .getValue().toString(), dataPointVO.getDataType());
                     Common.ctx.getRuntimeManager().setDataPointValue(
                             dataPointVO.getId(), value, null);
 
@@ -389,7 +388,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
             checkValidWritableDataPoint(dp);
 
             MangoValue value = MangoValue.stringToValue(itemValue.getValue(),
-                    dp.getPointLocator().getDataTypeId());
+                    dp.getDataType());
             Common.ctx.getRuntimeManager().setDataPointValue(dp.getId(), value,
                     null);
 
@@ -411,8 +410,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
                     checkValidWritableDataPoint(dp);
 
                     MangoValue value = MangoValue.stringToValue(itemValue
-                            .getValue(), dataPointVO.getPointLocator()
-                            .getDataTypeId());
+                            .getValue(), dataPointVO.getDataType());
                     Common.ctx.getRuntimeManager().setDataPointValue(
                             dataPointVO.getId(), value, null);
 
@@ -468,9 +466,8 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
                             }
                         }
 
-                        itemInfo.setDataType(APIUtils.toDataType(dataPointVO
-                                .getPointLocator().getDataTypeId()));
-                        dataPointVO.getPointLocator().getDataTypeId();
+                        itemInfo.setDataType(APIUtils.toDataType(dataPointVO.getDataType()));
+                        dataPointVO.getDataType();
                         itemInfoList.add(itemInfo);
                     }
                 }

@@ -68,7 +68,7 @@ import javax.inject.Inject;
 public class EventHandlersDwr extends BaseDwr {
 
     private static final Log LOG = LogFactory.getLog(EventHandlersDwr.class);
-    
+
     @Inject
     private ScheduledEventDao scheduledEventDao;
     @Inject
@@ -81,7 +81,7 @@ public class EventHandlersDwr extends BaseDwr {
     private MaintenanceEventDao maintenanceEventDao;
     @Inject
     private MailingListDao mailingListDao;
-            
+
     private final ResourceBundle setPointSnippetMap = ResourceBundle
             .getBundle("setPointSnippetMap");
 
@@ -225,8 +225,7 @@ public class EventHandlersDwr extends BaseDwr {
         Permissions.ensureDataSourcePermission(Common.getUser(),
                 pointVO.getDataSourceId());
 
-        MangoValue value = MangoValue.stringToValue(valueStr, pointVO
-                .getPointLocator().getDataTypeId());
+        MangoValue value = MangoValue.stringToValue(valueStr, pointVO.getDataType());
 
         Map<String, Object> model = new HashMap<>();
         model.put("point", pointVO);

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.bacnet;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -36,7 +37,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.bacnet.BACnetIPPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -48,6 +48,7 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -85,15 +86,15 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
     private boolean settable;
     @JsonRemoteProperty
     private int writePriority = 16;
-    private int dataTypeId;
+    private DataType dataType;
 
     @Override
-    public int getDataTypeId() {
-        return dataTypeId;
+    public DataType getDataType() {
+        return dataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
     }
 
     public String getRemoteDeviceIp() {
@@ -235,10 +236,6 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
             response.addContextual("objectInstanceNumber", "validate.illegalValue");
         }
 
-        if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextual("dataTypeId", "validate.invalidValue");
-        }
-
         if (writePriority < 1 || writePriority > 16) {
             response.addContextual("writePriority", "validate.illegalValue");
         }
@@ -256,7 +253,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
         AuditEventType.addPropertyMessage(list, "dsEdit.bacnetIp.objectInstanceNumber", objectInstanceNumber);
         AuditEventType.addPropertyMessage(list, "dsEdit.bacnetIp.useCov", useCovSubscription);
         AuditEventType.addPropertyMessage(list, "dsEdit.settable", settable);
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.bacnetIp.writePriority", writePriority);
     }
 
@@ -282,7 +279,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.bacnetIp.useCov", from.useCovSubscription,
                 useCovSubscription);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.settable", from.settable, settable);
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.bacnetIp.writePriority", from.writePriority,
                 writePriority);
     }
@@ -307,7 +304,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
         out.writeInt(propertyIdentifierId);
         out.writeBoolean(useCovSubscription);
         out.writeBoolean(settable);
-        out.writeInt(dataTypeId);
+        out.writeInt(dataType.ordinal());
         out.writeInt(writePriority);
     }
 
@@ -326,7 +323,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
             propertyIdentifierId = in.readInt();
             useCovSubscription = in.readBoolean();
             settable = in.readBoolean();
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
             writePriority = 16;
         } else if (ver == 2) {
             remoteDeviceIp = SerializationHelper.readSafeUTF(in);
@@ -339,7 +336,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
             propertyIdentifierId = in.readInt();
             useCovSubscription = in.readBoolean();
             settable = in.readBoolean();
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
             writePriority = in.readInt();
         } else if (ver == 3) {
             remoteDeviceIp = SerializationHelper.readSafeUTF(in);
@@ -352,7 +349,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
             propertyIdentifierId = in.readInt();
             useCovSubscription = in.readBoolean();
             settable = in.readBoolean();
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
             writePriority = in.readInt();
         } else if (ver == 4) {
             remoteDeviceIp = SerializationHelper.readSafeUTF(in);
@@ -365,16 +362,16 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
             propertyIdentifierId = in.readInt();
             useCovSubscription = in.readBoolean();
             settable = in.readBoolean();
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
             writePriority = in.readInt();
         }
     }
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        Integer value = deserializeDataType(json, DataTypes.IMAGE);
+        DataType value = deserializeDataType(json, EnumSet.of(DataType.IMAGE));
         if (value != null) {
-            dataTypeId = value;
+            dataType = value;
         }
 
         String text = json.getString("objectType");

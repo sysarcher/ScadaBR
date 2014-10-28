@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.mvc.controller;
 
+import br.org.scadabr.DataType;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,10 +34,8 @@ import org.springframework.web.util.WebUtils;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.RuntimeManager;
-import com.serotonin.mango.view.chart.BaseChartRenderer;
 import com.serotonin.mango.view.text.BaseTextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
@@ -63,7 +62,7 @@ public class DataPointEditController {
 
     @Inject
     private DataPointDao dataPointDao;
-    
+
     @RequestMapping(method = RequestMethod.GET)
     protected Object formBackingObject(HttpServletRequest request) {
         DataPointVO dataPoint;
@@ -107,9 +106,9 @@ public class DataPointEditController {
 
         result.put("dataSource", Common.ctx.getRuntimeManager().getDataSource(point.getDataSourceId()));
 
-        result.put("textRenderers", BaseTextRenderer.getImplementation(point.getPointLocator().getDataTypeId()));
+        result.put("textRenderers", BaseTextRenderer.getImplementation(point.getDataType()));
 //TODO         result.put("chartRenderers", BaseChartRenderer.getImplementations(point.getPointLocator().getDataTypeId()));
-        result.put("eventDetectors", PointEventDetectorVO.getImplementations(point.getPointLocator().getDataTypeId()));
+        result.put("eventDetectors", PointEventDetectorVO.getImplementations(point.getDataType()));
 
         ControllerUtils.addPointListDataToModel(Common.getUser(request), point.getId(), result);
 
@@ -150,7 +149,7 @@ public class DataPointEditController {
         }
 
         if (point.getLoggingType() == DataPointVO.LoggingTypes.ON_CHANGE
-                && point.getPointLocator().getDataTypeId() == DataTypes.NUMERIC) {
+                && point.getDataType() == DataType.NUMERIC) {
             if (point.getTolerance() < 0) {
                 ValidationUtils.rejectValue(errors, "tolerance", "validate.cannotBeNegative");
             }

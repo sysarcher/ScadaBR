@@ -264,7 +264,7 @@ public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> imple
             ScriptExecutor executor = new ScriptExecutor();
             try {
                 PointValueTime pvt = executor.execute(vo.getScript(), context, timer.currentTimeMillis(),
-                        vo.getDataTypeId(), runtime);
+                        vo.getDataType(), runtime);
                 if (pvt.getValue() == null) {
                     handleError(runtime, new LocalizableMessageImpl("event.meta.nullResult"));
                 } else {

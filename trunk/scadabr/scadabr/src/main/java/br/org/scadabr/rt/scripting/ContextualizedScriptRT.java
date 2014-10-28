@@ -13,7 +13,6 @@ import br.org.scadabr.vo.scripting.ContextualizedScriptVO;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.IntValuePair;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataSource.meta.AlphanumericPointWrapper;
@@ -83,22 +82,26 @@ public class ContextualizedScriptRT extends ScriptRT {
         // Put the context variables into the engine with engine scope.
         for (String varName : context.keySet()) {
             IDataPoint point = context.get(varName);
-            int dt = point.getDataTypeId();
-            if (dt == DataTypes.BINARY) {
-                engine.put(varName, new BinaryPointWrapper(point,
-                        wrapperContext));
-            } else if (dt == DataTypes.MULTISTATE) {
-                engine.put(varName, new MultistatePointWrapper(point,
-                        wrapperContext));
-            } else if (dt == DataTypes.NUMERIC) {
-                engine.put(varName, new NumericPointWrapper(point,
-                        wrapperContext));
-            } else if (dt == DataTypes.ALPHANUMERIC) {
-                engine.put(varName, new AlphanumericPointWrapper(point,
-                        wrapperContext));
-            } else {
-                throw new ShouldNeverHappenException("Unknown data type id: "
-                        + point.getDataTypeId());
+            switch (point.getDataType()) {
+                case BINARY:
+                    engine.put(varName, new BinaryPointWrapper(point,
+                            wrapperContext));
+                    break;
+                case MULTISTATE:
+                    engine.put(varName, new MultistatePointWrapper(point,
+                            wrapperContext));
+                    break;
+                case NUMERIC:
+                    engine.put(varName, new NumericPointWrapper(point,
+                            wrapperContext));
+                    break;
+                case ALPHANUMERIC:
+                    engine.put(varName, new AlphanumericPointWrapper(point,
+                            wrapperContext));
+                    break;
+                default:
+                    throw new ShouldNeverHappenException("Unknown data type id: "
+                            + point.getDataType());
             }
         }
 

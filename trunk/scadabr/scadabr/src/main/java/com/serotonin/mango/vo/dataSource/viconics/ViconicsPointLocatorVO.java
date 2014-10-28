@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.viconics;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -52,7 +53,7 @@ public class ViconicsPointLocatorVO extends AbstractPointLocatorVO {
     private byte[] deviceIeee;
     private int deviceCommAddress;
     private int pointAddress;
-    private int dataTypeId;
+    private DataType dataType;
     private boolean settable;
 
     public byte[] getDeviceIeee() {
@@ -79,14 +80,16 @@ public class ViconicsPointLocatorVO extends AbstractPointLocatorVO {
         this.pointAddress = pointAddress;
     }
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    @Override
+    public DataType getDataType() {
+        return dataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
     }
 
+    @Override
     public boolean isSettable() {
         return settable;
     }
@@ -95,6 +98,7 @@ public class ViconicsPointLocatorVO extends AbstractPointLocatorVO {
         this.settable = settable;
     }
 
+    @Override
     public void validate(DwrResponseI18n response) {
         // Nothing to change; nothing to validate
     }
@@ -122,7 +126,7 @@ public class ViconicsPointLocatorVO extends AbstractPointLocatorVO {
         out.writeObject(deviceIeee);
         out.writeInt(deviceCommAddress);
         out.writeInt(pointAddress);
-        out.writeInt(dataTypeId);
+        out.writeInt(dataType.ordinal());
         out.writeBoolean(settable);
     }
 
@@ -134,7 +138,7 @@ public class ViconicsPointLocatorVO extends AbstractPointLocatorVO {
             deviceIeee = (byte[]) in.readObject();
             deviceCommAddress = in.readInt();
             pointAddress = in.readInt();
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
             settable = in.readBoolean();
         }
     }

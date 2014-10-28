@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.viconics;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.ImplementMeException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,7 +34,6 @@ import org.apache.commons.logging.LogFactory;
 import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.db.dao.WatchListDao;
@@ -135,26 +135,27 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
          super.initialize();
          */
     }
-/*
-    @Override
-    public void addDataPoint(DataPointRT dataPoint) {
-        super.addDataPoint(dataPoint);
+    /*
+     @Override
+     public void addDataPoint(DataPointRT dataPoint) {
+     super.addDataPoint(dataPoint);
 
-        // Mark the point as unreliable.
-        dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
+     // Mark the point as unreliable.
+     dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
 
-        // Add the point to the lookup map.
-        pointLookup.put(new PointKey(dataPoint), dataPoint);
-    }
+     // Add the point to the lookup map.
+     pointLookup.put(new PointKey(dataPoint), dataPoint);
+     }
 
-    @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
-        super.removeDataPoint(dataPoint);
+     @Override
+     public void removeDataPoint(DataPointRT dataPoint) {
+     super.removeDataPoint(dataPoint);
 
-        // Remove the point from the lookup map.
-        pointLookup.remove(new PointKey(dataPoint));
-    }
-*/
+     // Remove the point from the lookup map.
+     pointLookup.remove(new PointKey(dataPoint));
+     }
+     */
+
     @Override
     public void terminate() {
         if (network != null) {
@@ -284,7 +285,7 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
                         format = "#." + StringUtils.pad("", '#', precision);
                     }
 
-                    locator.setDataTypeId(DataTypes.NUMERIC);
+                    locator.setDataType(DataType.NUMERIC);
 
                     if (numericConfig.isFahrenheit()) {
                         dp.setEngineeringUnits(EngineeringUnits.degreesFahrenheit.intValue());
@@ -302,7 +303,7 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
                     dp.setTextRenderer(new BinaryTextRenderer(binaryConfig.getFalseText(), "#222222", binaryConfig
                             .getTrueText(), "#000000"));
 
-                    locator.setDataTypeId(DataTypes.BINARY);
+                    locator.setDataType(DataType.BINARY);
                 } else if (pointConfig instanceof MultistatePoint) {
                     MultistatePoint multistateConfig = (MultistatePoint) pointConfig;
 
@@ -313,7 +314,7 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
                     }
                     dp.setTextRenderer(r);
 
-                    locator.setDataTypeId(DataTypes.MULTISTATE);
+                    locator.setDataType(DataType.MULTISTATE);
                 } else {
                     throw new ShouldNeverHappenException("Unknown point type: " + pointConfig.getClass());
                 }
@@ -424,11 +425,11 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
         }
 
         MangoValue mangoValue;
-        int dataTypeId = rt.getVo().getPointLocator().getDataTypeId();
+        DataType dataType = rt.getDataType();
         if (point instanceof NumericPoint) {
             NumericPoint numericConfig = (NumericPoint) point;
-            if (dataTypeId != DataTypes.NUMERIC) {
-                throw new ShouldNeverHappenException("Data type mismatch: " + point.getClass() + ", type=" + dataTypeId);
+            if (dataType != DataType.NUMERIC) {
+                throw new ShouldNeverHappenException("Data type mismatch: " + point.getClass() + ", type=" + dataType);
             }
 
             double d = numericConfig.fromDeviceFormat(deviceValue);
@@ -438,15 +439,15 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
             mangoValue = new NumericValue(d);
         } else if (point instanceof BinaryPoint) {
             BinaryPoint binaryConfig = (BinaryPoint) point;
-            if (dataTypeId != DataTypes.BINARY) {
-                throw new ShouldNeverHappenException("Data type mismatch: " + point.getClass() + ", type=" + dataTypeId);
+            if (dataType != DataType.BINARY) {
+                throw new ShouldNeverHappenException("Data type mismatch: " + point.getClass() + ", type=" + dataType);
             }
 
             mangoValue = new BinaryValue(binaryConfig.fromDeviceFormat(deviceValue));
         } else if (point instanceof MultistatePoint) {
             MultistatePoint multistateConfig = (MultistatePoint) point;
-            if (dataTypeId != DataTypes.MULTISTATE) {
-                throw new ShouldNeverHappenException("Data type mismatch: " + point.getClass() + ", type=" + dataTypeId);
+            if (dataType != DataType.MULTISTATE) {
+                throw new ShouldNeverHappenException("Data type mismatch: " + point.getClass() + ", type=" + dataType);
             }
 
             mangoValue = new MultistateValue(multistateConfig.fromDeviceFormat(deviceValue));

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.snmp;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -32,7 +33,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.snmp.SnmpPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
@@ -40,6 +40,7 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -79,7 +80,7 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     @JsonRemoteProperty
     private String oid;
-    private int dataTypeId;
+    private DataType dataType;
     @JsonRemoteProperty
     private String binary0Value = "0";
     @JsonRemoteProperty
@@ -95,12 +96,13 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         this.oid = oid;
     }
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    @Override
+    public DataType getDataType() {
+        return dataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setDataTypeId(DataType dataType) {
+        this.dataType = dataType;
     }
 
     public String getBinary0Value() {
@@ -139,16 +141,12 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
                 response.addContextual("oid", "validate.parseError", e.getMessage());
             }
         }
-
-        if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextual("dataTypeId", "validate.invalidValue");
-        }
     }
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.snmp.oid", oid);
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.snmp.binary0Value", binary0Value);
         AuditEventType.addPropertyMessage(list, "dsEdit.snmp.setType", setType);
         AuditEventType.addPropertyMessage(list, "dsEdit.snmp.polling", trapOnly);
@@ -158,7 +156,7 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         SnmpPointLocatorVO from = (SnmpPointLocatorVO) o;
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.snmp.oid", from.oid, oid);
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.snmp.binary0Value", from.binary0Value, binary0Value);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.snmp.setType", from.setType, setType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.snmp.polling", from.trapOnly, trapOnly);
@@ -175,7 +173,7 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, oid);
-        out.writeInt(dataTypeId);
+        out.writeInt(dataType.ordinal());
         SerializationHelper.writeSafeUTF(out, binary0Value);
         out.writeInt(setType);
         out.writeBoolean(trapOnly);
@@ -187,19 +185,19 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
             oid = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
             binary0Value = "0";
             setType = in.readInt();
             trapOnly = false;
         } else if (ver == 2) {
             oid = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
             binary0Value = "0";
             setType = in.readInt();
             trapOnly = in.readBoolean();
         } else if (ver == 3) {
             oid = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
             binary0Value = SerializationHelper.readSafeUTF(in);
             setType = in.readInt();
             trapOnly = in.readBoolean();
@@ -208,9 +206,9 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        Integer value = deserializeDataType(json, DataTypes.IMAGE);
+        DataType value = deserializeDataType(json, EnumSet.of(DataType.IMAGE));
         if (value != null) {
-            dataTypeId = value;
+            dataType = value;
         }
     }
 

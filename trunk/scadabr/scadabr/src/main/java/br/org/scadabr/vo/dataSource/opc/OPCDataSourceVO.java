@@ -18,9 +18,9 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -178,7 +178,7 @@ public class OPCDataSourceVO extends DataSourceVO<OPCDataSourceVO> {
         if (host.isEmpty()) {
             response.addContextual("host", "validate.required");
         }
-		// if (StringUtils.isEmpty(domain))
+        // if (StringUtils.isEmpty(domain))
         // response.addContextualMessage("domain", "validate.required");
         if (user.isEmpty()) {
             response.addContextual("user", "validate.required");
@@ -232,7 +232,7 @@ public class OPCDataSourceVO extends DataSourceVO<OPCDataSourceVO> {
                 "dsEdit.opc.creationMode", fromVO.creationMode, creationMode);
     }
 
-	//
+    //
     // /
     // / Serialization
     // /

@@ -18,11 +18,12 @@
  */
 package com.serotonin.mango.view.component;
 
+import br.org.scadabr.DataType;
 import java.util.ResourceBundle;
 
 import br.org.scadabr.json.JsonRemoteEntity;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -79,10 +80,10 @@ public class WirelessTempHumSensor extends CompoundComponent {
         humidity.setDisplayControls(true);
 
         addChild(TEXT, "graphic.wirelessTempHumSensor.staticText", text);
-        addChild(BATTERY, "graphic.wirelessTempHumSensor.battery", battery, new int[]{DataTypes.NUMERIC});
-        addChild(SIGNAL, "graphic.wirelessTempHumSensor.signal", signal, new int[]{DataTypes.NUMERIC});
-        addChild(TEMPERATURE, "graphic.wirelessTempHumSensor.temperature", temperature, new int[]{DataTypes.NUMERIC});
-        addChild(HUMIDITY, "graphic.wirelessTempHumSensor.humidity", humidity, new int[]{DataTypes.NUMERIC});
+        addChild(BATTERY, "graphic.wirelessTempHumSensor.battery", battery, EnumSet.of(DataType.NUMERIC));
+        addChild(SIGNAL, "graphic.wirelessTempHumSensor.signal", signal, EnumSet.of(DataType.NUMERIC));
+        addChild(TEMPERATURE, "graphic.wirelessTempHumSensor.temperature", temperature, EnumSet.of(DataType.NUMERIC));
+        addChild(HUMIDITY, "graphic.wirelessTempHumSensor.humidity", humidity, EnumSet.of(DataType.NUMERIC));
     }
 
     @Override

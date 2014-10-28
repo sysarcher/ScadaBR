@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.ebro;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,7 +31,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.ebro.EBI25Constants;
 import com.serotonin.mango.rt.dataSource.ebro.EBI25PointLocatorRT;
@@ -67,8 +67,8 @@ public class EBI25PointLocatorVO extends AbstractPointLocatorVO implements JsonS
     }
 
     @Override
-    public int getDataTypeId() {
-        return DataTypes.NUMERIC;
+    public DataType getDataType() {
+        return DataType.NUMERIC;
     }
 
     @Override

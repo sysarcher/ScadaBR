@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view.component;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,13 +31,13 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonValue;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.DynamicImage;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -45,7 +46,7 @@ import br.org.scadabr.util.SerializationHelper;
 public class DynamicGraphicComponent extends PointComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("dynamicGraphic", "DYNAMIC_GRAPHIC",
-            "graphic.dynamicGraphic", new int[]{DataTypes.NUMERIC});
+            "graphic.dynamicGraphic", EnumSet.of(DataType.NUMERIC));
 
     private DynamicImage dynamicImage;
     @JsonRemoteProperty

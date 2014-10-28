@@ -346,7 +346,7 @@ abstract public class ViewComponent implements Serializable, JsonSerializable {
                             "emport.error.missingPoint", xid);
                 }
                 if (!comp.definition().supports(
-                        dataPoint.getPointLocator().getDataTypeId())) {
+                        dataPoint.getDataType())) {
                     throw new LocalizableJsonException(
                             "emport.error.component.incompatibleDataType", xid,
                             definition().getExportName());

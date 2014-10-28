@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr.beans;
 
+import br.org.scadabr.DataType;
 import com.serotonin.mango.vo.DataPointVO;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 
@@ -26,16 +27,14 @@ public class DataPointBean {
     private int id;
     private String name;
     private boolean settable;
-    private int dataType;
-    private final LocalizableMessage dataTypeMessage;
+    private DataType dataType;
     private final String chartColour;
 
     public DataPointBean(DataPointVO vo) {
         id = vo.getId();
         name = vo.getExtendedName();
         settable = vo.getPointLocator().isSettable();
-        dataType = vo.getPointLocator().getDataTypeId();
-        dataTypeMessage = vo.getDataTypeMessage();
+        dataType = vo.getDataType();
         chartColour = vo.getChartColour();
     }
 
@@ -63,16 +62,12 @@ public class DataPointBean {
         this.settable = settable;
     }
 
-    public int getDataType() {
+    public DataType getDataType() {
         return dataType;
     }
 
-    public void setDataType(int dataType) {
+    public void setDataType(DataType dataType) {
         this.dataType = dataType;
-    }
-
-    public LocalizableMessage getDataTypeMessage() {
-        return dataTypeMessage;
     }
 
     public String getChartColour() {

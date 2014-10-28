@@ -18,13 +18,13 @@
  */
 package com.serotonin.mango.vo.dataSource.galil;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
 import br.org.scadabr.json.JsonRemoteEntity;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.galil.CommandPointTypeRT;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
@@ -48,8 +48,8 @@ public class CommandPointTypeVO extends PointTypeVO {
     }
 
     @Override
-    public int getDataTypeId() {
-        return DataTypes.ALPHANUMERIC;
+    public DataType getDataType() {
+        return DataType.ALPHANUMERIC;
     }
 
     @Override

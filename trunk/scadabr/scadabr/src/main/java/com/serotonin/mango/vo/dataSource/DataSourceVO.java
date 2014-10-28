@@ -80,6 +80,7 @@ import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.vo.datasource.fhz4j.Fhz4JDataSourceVO;
 import br.org.scadabr.vo.datasource.mbus.MBusDataSourceVO;
 import br.org.scadabr.vo.event.AlarmLevel;

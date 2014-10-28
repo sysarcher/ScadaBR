@@ -92,7 +92,7 @@ class DataPointDetailsController {
         // Determine our image chart rendering capabilities.
         Calendar c = Calendar.getInstance();
         model.addAttribute("toTimestamp", c.getTimeInMillis());
-        if (ChartType.IMAGE.supports(dp.getPointLocator().getDataTypeId())) {
+        if (ChartType.IMAGE.supports(dp.getDataType())) {
             // This point can render an image chart. Carry on...
             if (dp.getChartRenderer() instanceof ImageChartRenderer) {
                 ImageChartRenderer r = (ImageChartRenderer) dp.getChartRenderer();

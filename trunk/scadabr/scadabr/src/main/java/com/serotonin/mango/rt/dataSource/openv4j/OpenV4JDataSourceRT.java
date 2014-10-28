@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.openv4j;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.ImplementMeException;
 import gnu.io.SerialPort;
 
@@ -35,7 +36,6 @@ import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.timer.cron.CronExpression;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -142,7 +142,7 @@ public class OpenV4JDataSourceRT extends PollingDataSource<OpenV4JDataSourceVO> 
         final OpenV4JPointLocatorRT locator = dataPoint.getPointLocator();
 
         dc.addToDataContainer(locator.getDataPoint());
-        if (locator.getVo().getDataTypeId() == DataTypes.NUMERIC) {
+        if (locator.getDataType() == DataType.NUMERIC) {
             locator.getDataPoint().encode(dc, valueTime.getValue().getDoubleValue());
             dataPoint.setPointValue(valueTime, source);
         } else {
@@ -197,6 +197,7 @@ public class OpenV4JDataSourceRT extends PollingDataSource<OpenV4JDataSourceVO> 
             sPort = null;
         }
     }
+
     @Override
     protected CronExpression getCronExpression() throws ParseException {
         throw new ImplementMeException();

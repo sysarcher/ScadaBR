@@ -351,7 +351,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
                 case 1:
                     VirtualPointLocatorVO pl1 = new VirtualPointLocatorVO();
                     dp.setPointLocator(pl1);
-                    pl1.setDataTypeId(rs.getInt(i + 1));
+                    pl1.setDataType(br.org.scadabr.DataType.valueOf(rs.getInt(i + 1)));
                     pl1.setChangeTypeId(rs.getInt(i + 2));
                     pl1.setSettable(charToBool(rs.getString(i + 3)));
 
@@ -408,7 +408,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
                     ModbusPointLocatorVO pl2 = new ModbusPointLocatorVO();
                     dp.setPointLocator(pl2);
 
-                // pl2.setRange(RegisterRange.valueOf(rs.getString(i+18)));
+                    // pl2.setRange(RegisterRange.valueOf(rs.getString(i+18)));
                     // pl2.setModbusDataType(DataType.valueOf(rs.getString(i+19)));
                     pl2.setRange(RegisterRange.COIL_STATUS);
                     pl2.setModbusDataType(DataType.BINARY);
@@ -455,6 +455,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
             // Extract the values from the database.
             ejt.query("select multistateKey, multistateValue, multistateColour from dataPointMultistateValues "
                     + "where dataPointId=? order by valueOrder", new Object[]{dp.getId()}, new RowCallbackHandler() {
+                        @Override
                         public void processRow(ResultSet rs) throws SQLException {
                             dr.addMultistateValue(rs.getInt(1), rs.getString(2), rs.getString(3));
                         }
@@ -464,6 +465,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
             // Extract the values from the database.
             ejt.query("select rangeFrom, rangeTo, rangeValue, rangeColour from dataPointRangeValues "
                     + "where dataPointId=? order by valueOrder", new Object[]{dp.getId()}, new RowCallbackHandler() {
+                        @Override
                         public void processRow(ResultSet rs) throws SQLException {
                             rr.addRangeValues(rs.getDouble(1), rs.getDouble(2), rs.getString(3), rs.getString(4));
                         }
@@ -473,6 +475,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
 
     private void insertDataPoint(final DataPointVO vo) {
         ejt.update("insert into dataPoints (id, dataSourceId, data) values (?,?,?)", new PreparedStatementSetter() {
+            @Override
             public void setValues(PreparedStatement ps) throws SQLException {
                 ps.setInt(1, vo.getId());
                 ps.setInt(2, vo.getDataSourceId());

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.onewire;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,7 +31,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.onewire.OneWirePointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -91,14 +91,14 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
         return "Unknown";
     }
 
-    public static int getAttributeDataType(int attributeId) {
+    public static DataType getAttributeDataType(int attributeId) {
         if (attributeId == AttributeTypes.LATCH_STATE) {
-            return DataTypes.BINARY;
+            return DataType.BINARY;
         }
         if (attributeId == AttributeTypes.WIPER_POSITION) {
-            return DataTypes.MULTISTATE;
+            return DataType.MULTISTATE;
         }
-        return DataTypes.NUMERIC;
+        return DataType.NUMERIC;
     }
 
     /**
@@ -123,7 +123,7 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
     }
 
     @Override
-    public int getDataTypeId() {
+    public DataType getDataType() {
         return getAttributeDataType(attributeId);
     }
 

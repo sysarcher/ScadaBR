@@ -65,7 +65,7 @@ public class Alpha2DataSource extends PollingDataSource<Alpha2DataSourceVO> {
                 DataPointRT rt = map.get(deviceValue.getLocator());
                 if (rt != null) {
                     MangoValue value = MangoValue.stringToValue(deviceValue
-                            .getValue(), rt.getDataTypeId());
+                            .getValue(), rt.getDataType());
                     rt.updatePointValue(new PointValueTime(value, time));
                 }
             }
@@ -194,7 +194,7 @@ public class Alpha2DataSource extends PollingDataSource<Alpha2DataSourceVO> {
         }
     }
 
-	// public static void main(String[] args) {
+    // public static void main(String[] args) {
     // List<String> lista = new ArrayList<String>();
     //
     // for (int i = 0; i < 250; i++) {

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view.text;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -37,7 +38,6 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImplDefinition;
-import java.util.Locale;
 
 abstract public class BaseTextRenderer implements TextRenderer, JsonSerializable, FormatPatternHolder {
 
@@ -57,7 +57,7 @@ abstract public class BaseTextRenderer implements TextRenderer, JsonSerializable
         }
     }
 
-    public static List<ImplDefinition> getImplementation(int dataType) {
+    public static List<ImplDefinition> getImplementation(DataType dataType) {
         ensureDefinitions();
         List<ImplDefinition> impls = new ArrayList<>(definitions.size());
         for (ImplDefinition def : definitions) {

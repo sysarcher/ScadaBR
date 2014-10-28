@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.bacnet;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.ImplementMeException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,13 +28,11 @@ import java.util.Map;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.logger.LogUtils;
 import com.serotonin.bacnet4j.LocalDevice;
-import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.RemoteObject;
 import com.serotonin.bacnet4j.event.DeviceEventListener;
 import com.serotonin.bacnet4j.event.ExceptionListener;
 import com.serotonin.bacnet4j.exception.BACnetException;
-import com.serotonin.bacnet4j.exception.PropertyValueException;
 import com.serotonin.bacnet4j.obj.BACnetObject;
 import com.serotonin.bacnet4j.obj.ObjectProperties;
 import com.serotonin.bacnet4j.service.acknowledgement.ReadPropertyAck;
@@ -43,7 +42,6 @@ import com.serotonin.bacnet4j.service.confirmed.SubscribeCOVRequest;
 import com.serotonin.bacnet4j.service.confirmed.WritePropertyRequest;
 import com.serotonin.bacnet4j.service.unconfirmed.WhoIsRequest;
 import com.serotonin.bacnet4j.type.Encodable;
-import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.BACnetError;
 import com.serotonin.bacnet4j.type.constructed.Choice;
 import com.serotonin.bacnet4j.type.constructed.DateTime;
@@ -67,7 +65,6 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.PropertyReferences;
 import com.serotonin.bacnet4j.util.PropertyValues;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -201,90 +198,90 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
     }
 
     /*
-    @Override
-    public void addDataPoint(DataPointRT dataPoint) {
-        if (!initialized) {
-            return;
-        }
+     @Override
+     public void addDataPoint(DataPointRT dataPoint) {
+     if (!initialized) {
+     return;
+     }
 
-        BACnetIPPointLocatorRT locator = dataPoint.getPointLocator();
-        Address address = locator.getAddress(vo.getPort());
-        Network network = locator.getNetwork();
+     BACnetIPPointLocatorRT locator = dataPoint.getPointLocator();
+     Address address = locator.getAddress(vo.getPort());
+     Network network = locator.getNetwork();
 
-        // Check if the remote device is in the local list yet.
-        RemoteDevice d = localDevice.getRemoteDevice(address, network);
-        if (d == null) {
-            // Send a whois to get remote device data.
-            try {
-                localDevice.sendUnconfirmed(address, null, new WhoIsRequest());
-            } catch (BACnetException e) {
-                fireMessageExceptionEvent("event.bacnet.whoisPoint", dataPoint.getVoName(), e.getMessage());
-                disablePoint(dataPoint);
-                return;
-            }
+     // Check if the remote device is in the local list yet.
+     RemoteDevice d = localDevice.getRemoteDevice(address, network);
+     if (d == null) {
+     // Send a whois to get remote device data.
+     try {
+     localDevice.sendUnconfirmed(address, null, new WhoIsRequest());
+     } catch (BACnetException e) {
+     fireMessageExceptionEvent("event.bacnet.whoisPoint", dataPoint.getVoName(), e.getMessage());
+     disablePoint(dataPoint);
+     return;
+     }
 
-            int sleep = vo.getTimeout() / 4;
-            for (int i = 0; i < 4; i++) {
-                // Wait a bit for the response.
-                try {
-                    if (sleep > 0) {
-                        Thread.sleep(sleep);
-                    }
-                } catch (InterruptedException e) {
-                    // no op
-                }
+     int sleep = vo.getTimeout() / 4;
+     for (int i = 0; i < 4; i++) {
+     // Wait a bit for the response.
+     try {
+     if (sleep > 0) {
+     Thread.sleep(sleep);
+     }
+     } catch (InterruptedException e) {
+     // no op
+     }
 
-                // Check again for the device
-                d = localDevice.getRemoteDevice(address, network);
-                if (d != null) {
-                    break;
-                }
-            }
-        }
+     // Check again for the device
+     d = localDevice.getRemoteDevice(address, network);
+     if (d != null) {
+     break;
+     }
+     }
+     }
 
-        if (d == null) {
-            // If we still don't have the device, try to get it manually.
-            try {
-                d = localDevice.findRemoteDevice(address, network, locator.getRemoteDeviceInstanceNumber());
-            } catch (BACnetException e) {
-                // Ignore.
-            } catch (PropertyValueException e) {
-                // Shouldn't happen, so just log.
-                log.log(Level.SEVERE, "Couldn't manually get segmentation and vendor id from device", e);
-            }
-        }
+     if (d == null) {
+     // If we still don't have the device, try to get it manually.
+     try {
+     d = localDevice.findRemoteDevice(address, network, locator.getRemoteDeviceInstanceNumber());
+     } catch (BACnetException e) {
+     // Ignore.
+     } catch (PropertyValueException e) {
+     // Shouldn't happen, so just log.
+     log.log(Level.SEVERE, "Couldn't manually get segmentation and vendor id from device", e);
+     }
+     }
 
-        if (d == null) {
-            // If we still don't have the device, call it in.
-            fireDeviceExceptionEvent("event.bacnet.deviceError", address.toIpString());
-            disablePoint(dataPoint);
-        } else {
-            locator.setRemoteDevice(d);
+     if (d == null) {
+     // If we still don't have the device, call it in.
+     fireDeviceExceptionEvent("event.bacnet.deviceError", address.toIpString());
+     disablePoint(dataPoint);
+     } else {
+     locator.setRemoteDevice(d);
 
-            if (locator.isUseCovSubscription()) {
-                if (!sendCovSubscription(dataPoint, false)) {
-                    return;
-                }
-            }
+     if (locator.isUseCovSubscription()) {
+     if (!sendCovSubscription(dataPoint, false)) {
+     return;
+     }
+     }
 
-            super.addDataPoint(dataPoint);
-        }
-    }
+     super.addDataPoint(dataPoint);
+     }
+     }
 
-    @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
-        super.removeDataPoint(dataPoint);
+     @Override
+     public void removeDataPoint(DataPointRT dataPoint) {
+     super.removeDataPoint(dataPoint);
 
-        if (!initialized) {
-            return;
-        }
+     if (!initialized) {
+     return;
+     }
 
-        BACnetIPPointLocatorRT locator = dataPoint.getPointLocator();
-        if (locator.isInitialized() && locator.isUseCovSubscription()) {
-            sendCovSubscription(dataPoint, true);
-        }
-    }
-*/
+     BACnetIPPointLocatorRT locator = dataPoint.getPointLocator();
+     if (locator.isInitialized() && locator.isUseCovSubscription()) {
+     sendCovSubscription(dataPoint, true);
+     }
+     }
+     */
     //
     // /
     // / PollingDataSource
@@ -296,27 +293,27 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
         Map<RemoteDevice, List<DataPointRT>> devicePoints = new HashMap<>();
         throw new ImplementMeException();
         /*
-        synchronized (pointListChangeLock) {
-            for (DataPointRT dp : dataPoints) {
-                BACnetIPPointLocatorRT locator = dp.getPointLocator();
-                if (locator.isUseCovSubscription() && dp.getPointValue() != null) {
-                    continue;
-                }
+         synchronized (pointListChangeLock) {
+         for (DataPointRT dp : dataPoints) {
+         BACnetIPPointLocatorRT locator = dp.getPointLocator();
+         if (locator.isUseCovSubscription() && dp.getPointValue() != null) {
+         continue;
+         }
 
-                List<DataPointRT> points = devicePoints.get(locator.getRemoteDevice());
-                if (points == null) {
-                    points = new ArrayList<>();
-                    devicePoints.put(locator.getRemoteDevice(), points);
-                }
+         List<DataPointRT> points = devicePoints.get(locator.getRemoteDevice());
+         if (points == null) {
+         points = new ArrayList<>();
+         devicePoints.put(locator.getRemoteDevice(), points);
+         }
 
-                points.add(dp);
-            }
-        }
+         points.add(dp);
+         }
+         }
 
-        for (RemoteDevice d : devicePoints.keySet()) {
-            Common.ctx.getBackgroundProcessing().addWorkItem(new DevicePoller(d, devicePoints.get(d), time));
-        }
-        */
+         for (RemoteDevice d : devicePoints.keySet()) {
+         Common.ctx.getBackgroundProcessing().addWorkItem(new DevicePoller(d, devicePoints.get(d), time));
+         }
+         */
     }
 
     @Override
@@ -407,7 +404,7 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
             fireDeviceExceptionEvent("event.bacnet.readError", dp.getVo().getName(),
                     ((BACnetError) encodable).getErrorCode());
         } else {
-            MangoValue value = encodableToValue(encodable, dp.getDataTypeId());
+            MangoValue value = encodableToValue(encodable, dp.getDataType());
             dp.updatePointValue(new PointValueTime(value, time));
         }
     }
@@ -467,15 +464,15 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
         public void run(long executionTime) {
             throw new ImplementMeException();
             /*
-            synchronized (pointListChangeLock) {
-                for (DataPointRT dp : getDataPoints()) {
-                    BACnetIPPointLocatorRT locator = dp.getPointLocator();
-                    if (locator.isUseCovSubscription()) {
-                        sendCovSubscription(dp, false);
-                    }
-                }
-            }
-            */
+             synchronized (pointListChangeLock) {
+             for (DataPointRT dp : getDataPoints()) {
+             BACnetIPPointLocatorRT locator = dp.getPointLocator();
+             if (locator.isUseCovSubscription()) {
+             sendCovSubscription(dp, false);
+             }
+             }
+             }
+             */
         }
 
         @Override
@@ -525,38 +522,38 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
             SequenceOf<PropertyValue> listOfValues) {
         throw new ImplementMeException();
         /*
-        int covId = subscriberProcessIdentifier.intValue();
+         int covId = subscriberProcessIdentifier.intValue();
 
-        List<PropertyValue> values = listOfValues.getValues();
-        for (PropertyValue pv : values) {
-            // Find the point that cares.
-            DataPointRT dataPoint = null;
-            BACnetIPPointLocatorRT locator = null;
-            synchronized (pointListChangeLock) {
-                for (DataPointRT dp : dataPoints) {
-                    locator = dp.getPointLocator();
-                    if (locator.getCovId() == covId) {
-                        dataPoint = dp;
-                        break;
-                    }
-                }
-            }
+         List<PropertyValue> values = listOfValues.getValues();
+         for (PropertyValue pv : values) {
+         // Find the point that cares.
+         DataPointRT dataPoint = null;
+         BACnetIPPointLocatorRT locator = null;
+         synchronized (pointListChangeLock) {
+         for (DataPointRT dp : dataPoints) {
+         locator = dp.getPointLocator();
+         if (locator.getCovId() == covId) {
+         dataPoint = dp;
+         break;
+         }
+         }
+         }
 
-            if (dataPoint != null) {
-                if (pv.getPropertyIdentifier().equals(locator.getPid())) {
-                    MangoValue value = encodableToValue(pv.getValue(), dataPoint.getDataTypeId());
-                    dataPoint.updatePointValue(new PointValueTime(value, System.currentTimeMillis()));
-                }
-            } else {
-                // We got a cov notice for a point we don't have? Unsubscribe.
-                try {
-                    sendCovSubscriptionImpl(initiatingDevice, monitoredObjectIdentifier, covId, true);
-                } catch (BACnetException e) { // Ignore exceptions 
+         if (dataPoint != null) {
+         if (pv.getPropertyIdentifier().equals(locator.getPid())) {
+         MangoValue value = encodableToValue(pv.getValue(), dataPoint.getDataTypeId());
+         dataPoint.updatePointValue(new PointValueTime(value, System.currentTimeMillis()));
+         }
+         } else {
+         // We got a cov notice for a point we don't have? Unsubscribe.
+         try {
+         sendCovSubscriptionImpl(initiatingDevice, monitoredObjectIdentifier, covId, true);
+         } catch (BACnetException e) { // Ignore exceptions 
 
-                }
-            }
-        }
-                */
+         }
+         }
+         }
+         */
     }
 
     @Override
@@ -669,42 +666,43 @@ public class BACnetIPDataSourceRT extends PollingDataSource<BACnetIPDataSourceVO
         Common.ctx.getRuntimeManager().saveDataPoint(dataPointVO);
     }
 
-    private MangoValue encodableToValue(Encodable encodable, int dataTypeId) {
-        if (dataTypeId == DataTypes.BINARY) {
-            if (encodable instanceof Enumerated) {
-                return new BinaryValue(((Enumerated) encodable).intValue() != 0);
-            }
-            if (encodable instanceof Real) {
-                return new BinaryValue(((Real) encodable).floatValue() != 0);
-            }
-            log.log(Level.WARNING, "Unexpected Encodable type for data type Binary: {0}", encodable.getClass().getName());
-            return BinaryValue.ZERO;
-        } else if (dataTypeId == DataTypes.MULTISTATE) {
-            if (encodable instanceof UnsignedInteger) {
-                return new MultistateValue(((UnsignedInteger) encodable).intValue());
-            }
-            if (encodable instanceof Enumerated) {
-                return new MultistateValue(((Enumerated) encodable).intValue());
-            }
-            if (encodable instanceof Real) {
-                return new MultistateValue((int) ((Real) encodable).floatValue());
-            }
-            log.log(Level.WARNING, "Unexpected Encodable type for data type Multistate: {0}", encodable.getClass().getName());
-            return new MultistateValue(1);
-        } else if (dataTypeId == DataTypes.NUMERIC) {
-            if (encodable instanceof Enumerated) {
-                return new NumericValue(((Enumerated) encodable).intValue());
-            }
-            if (encodable instanceof Real) {
-                return new NumericValue(((Real) encodable).floatValue());
-            }
-            log.log(Level.WARNING, "Unexpected Encodable type for data type Numeric: {0}", encodable.getClass().getName());
-            return new NumericValue(0);
-        } else if (dataTypeId == DataTypes.ALPHANUMERIC) {
-            return new AlphanumericValue(encodable.toString());
+    private MangoValue encodableToValue(Encodable encodable, DataType dataType) {
+        switch (dataType) {
+            case BINARY:
+                if (encodable instanceof Enumerated) {
+                    return new BinaryValue(((Enumerated) encodable).intValue() != 0);
+                }
+                if (encodable instanceof Real) {
+                    return new BinaryValue(((Real) encodable).floatValue() != 0);
+                }
+                log.log(Level.WARNING, "Unexpected Encodable type for data type Binary: {0}", encodable.getClass().getName());
+                return BinaryValue.ZERO;
+            case MULTISTATE:
+                if (encodable instanceof UnsignedInteger) {
+                    return new MultistateValue(((UnsignedInteger) encodable).intValue());
+                }
+                if (encodable instanceof Enumerated) {
+                    return new MultistateValue(((Enumerated) encodable).intValue());
+                }
+                if (encodable instanceof Real) {
+                    return new MultistateValue((int) ((Real) encodable).floatValue());
+                }
+                log.log(Level.WARNING, "Unexpected Encodable type for data type Multistate: {0}", encodable.getClass().getName());
+                return new MultistateValue(1);
+            case NUMERIC:
+                if (encodable instanceof Enumerated) {
+                    return new NumericValue(((Enumerated) encodable).intValue());
+                }
+                if (encodable instanceof Real) {
+                    return new NumericValue(((Real) encodable).floatValue());
+                }
+                log.log(Level.WARNING, "Unexpected Encodable type for data type Numeric: {0}", encodable.getClass().getName());
+                return new NumericValue(0);
+            case ALPHANUMERIC:
+                return new AlphanumericValue(encodable.toString());
+            default:
+                throw new ShouldNeverHappenException("Unknown data type: " + dataType);
         }
-
-        throw new ShouldNeverHappenException("Unknown data type id: " + dataTypeId);
     }
 
     private Encodable valueToEncodable(MangoValue value, ObjectType objectType, PropertyIdentifier pid) {

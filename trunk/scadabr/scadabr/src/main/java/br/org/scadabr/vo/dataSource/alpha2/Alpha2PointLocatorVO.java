@@ -1,5 +1,6 @@
 package br.org.scadabr.vo.dataSource.alpha2;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -10,7 +11,6 @@ import br.org.scadabr.rt.dataSource.alpha2.Alpha2PointLocatorRT;
 import com.i2msolucoes.alpha24j.DeviceLocator.DeviceCodes;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
@@ -32,13 +32,13 @@ public class Alpha2PointLocatorVO extends AbstractPointLocatorVO {
     @JsonRemoteProperty
     private int accessMode = READ_ONLY; // 1: readOnly, 2: writeOnly, 3: read
 
-	// and write
+    // and write
     @Override
-    public int getDataTypeId() {
+    public DataType getDataType() {
         if ((deviceCodeId == RUN_STOP_CODE)
                 || (deviceCodeId == DeviceCodes.SYSTEM_BIT.getId())
                 || (deviceCodeId == DeviceCodes.COMM_BIT_DEVICE.getId())) {
-            return DataTypes.BINARY;
+            return DataType.BINARY;
         }
 
         if ((deviceCodeId == DeviceCodes.ANALOG_IN.getId())
@@ -49,10 +49,10 @@ public class Alpha2PointLocatorVO extends AbstractPointLocatorVO {
                 || (deviceCodeId == DeviceCodes.EXTERNAL_INPUT.getId())
                 || (deviceCodeId == DeviceCodes.LINK_OUTPUT.getId())
                 || (deviceCodeId == DeviceCodes.LINK_INPUT.getId())) {
-            return DataTypes.NUMERIC;
+            return DataType.NUMERIC;
         }
 
-        return DataTypes.ALPHANUMERIC;
+        return DataType.ALPHANUMERIC;
     }
 
     @Override

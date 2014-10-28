@@ -18,32 +18,25 @@
  */
 package com.serotonin.mango.rt.dataSource.modbus;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.ImplementMeException;
 import br.org.scadabr.web.i18n.LocalizableException;
 import java.net.ConnectException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
-import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.DataPointVO.LoggingTypes;
 import com.serotonin.mango.vo.dataSource.modbus.ModbusDataSourceVO;
 import com.serotonin.mango.vo.dataSource.modbus.ModbusPointLocatorVO;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import com.serotonin.messaging.MessagingExceptionHandler;
 import com.serotonin.messaging.TimeoutException;
 import com.serotonin.modbus4j.BatchRead;
@@ -323,9 +316,9 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
     }
 
     private void updatePointValue(DataPointRT dataPoint, ModbusPointLocatorRT pl, Object value, long time) {
-        if (pl.getVo().getDataTypeId() == DataTypes.BINARY) {
+        if (pl.getDataType() == DataType.BINARY) {
             dataPoint.updatePointValue(new PointValueTime((Boolean) value, time));
-        } else if (pl.getVo().getDataTypeId() == DataTypes.ALPHANUMERIC) {
+        } else if (pl.getDataType() == DataType.ALPHANUMERIC) {
             dataPoint.updatePointValue(new PointValueTime((String) value, time));
         } else {
             // Apply arithmetic conversions.
@@ -353,12 +346,12 @@ abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends 
 
         try {
             // See if this is a numeric value that needs to be converted.
-            if (dataPoint.getDataTypeId() == DataTypes.NUMERIC) {
+            if (dataPoint.getDataType() == DataType.NUMERIC) {
                 double convertedValue = valueTime.getDoubleValue();
                 convertedValue -= pl.getVo().getAdditive();
                 convertedValue /= pl.getVo().getMultiplier();
                 modbusMaster.setValue(ml, convertedValue);
-            } else if (dataPoint.getDataTypeId() == DataTypes.ALPHANUMERIC) {
+            } else if (dataPoint.getDataType() == DataType.ALPHANUMERIC) {
                 modbusMaster.setValue(ml, valueTime.getStringValue());
             } else {
                 modbusMaster.setValue(ml, valueTime.getBooleanValue());

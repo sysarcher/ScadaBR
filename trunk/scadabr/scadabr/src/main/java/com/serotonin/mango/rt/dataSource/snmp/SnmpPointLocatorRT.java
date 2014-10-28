@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.snmp;
 
+import br.org.scadabr.DataType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.snmp4j.smi.Counter32;
@@ -32,7 +33,6 @@ import org.snmp4j.smi.TimeTicks;
 import org.snmp4j.smi.Variable;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -62,14 +62,14 @@ public class SnmpPointLocatorRT extends PointLocatorRT<SnmpPointLocatorVO> {
     }
 
     public MangoValue variableToValue(Variable variable) {
-        switch (vo.getDataTypeId()) {
-            case DataTypes.BINARY:
+        switch (getDataType()) {
+            case BINARY:
                 return new BinaryValue(Objects.equals(variable.toString(), vo.getBinary0Value()));
 
-            case DataTypes.MULTISTATE:
+            case MULTISTATE:
                 return new MultistateValue(variable.toInt());
 
-            case DataTypes.NUMERIC:
+            case NUMERIC:
                 if (variable instanceof OctetString) {
                     try {
                         return NumericValue.parseNumeric(variable.toString());
@@ -79,12 +79,11 @@ public class SnmpPointLocatorRT extends PointLocatorRT<SnmpPointLocatorVO> {
                 }
                 return new NumericValue(variable.toInt());
 
-            case DataTypes.ALPHANUMERIC:
+            case ALPHANUMERIC:
                 return new AlphanumericValue(variable.toString());
-
+            default:
+                throw new ShouldNeverHappenException("Unknown data type: " + vo.getDataType());
         }
-
-        throw new ShouldNeverHappenException("Unknown data type id: " + vo.getDataTypeId());
     }
 
     public Variable valueToVariable(MangoValue value) {
@@ -105,13 +104,13 @@ public class SnmpPointLocatorRT extends PointLocatorRT<SnmpPointLocatorVO> {
                 return new Integer32(0);
 
             case SnmpPointLocatorVO.SetTypes.OCTET_STRING:
-                return new OctetString(DataTypes.valueToString(value));
+                return new OctetString(Objects.toString(value));
 
             case SnmpPointLocatorVO.SetTypes.OID:
-                return new OID(DataTypes.valueToString(value));
+                return new OID(Objects.toString(value));
 
             case SnmpPointLocatorVO.SetTypes.IP_ADDRESS:
-                return new IpAddress(DataTypes.valueToString(value));
+                return new IpAddress(Objects.toString(value));
 
             case SnmpPointLocatorVO.SetTypes.COUNTER_32:
                 return new Counter32((long) value.getDoubleValue());
@@ -123,7 +122,7 @@ public class SnmpPointLocatorRT extends PointLocatorRT<SnmpPointLocatorVO> {
                 return new TimeTicks((long) value.getDoubleValue());
 
             case SnmpPointLocatorVO.SetTypes.OPAQUE:
-                return new Opaque(DataTypes.valueToString(value).getBytes());
+                return new Opaque(Objects.toString(value).getBytes());
 
             case SnmpPointLocatorVO.SetTypes.COUNTER_64:
                 return new Counter64((long) value.getDoubleValue());

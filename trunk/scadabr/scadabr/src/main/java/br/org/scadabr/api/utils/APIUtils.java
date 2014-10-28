@@ -31,7 +31,6 @@ import br.org.scadabr.api.vo.ModbusIPConfig;
 import br.org.scadabr.api.vo.ModbusPointConfig;
 import br.org.scadabr.api.vo.ModbusSerialConfig;
 
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.ScheduledEventDao;
@@ -117,15 +116,15 @@ public final class APIUtils {
         try {
             if (DataType.BOOLEAN == dataType) {
                 System.out.println("Checando " + value + " para binario!");
-                MangoValue.stringToValue(value, DataTypes.BINARY);
+                MangoValue.stringToValue(value, br.org.scadabr.DataType.BINARY);
             } else if (DataType.INTEGER == dataType) {
-                MangoValue.stringToValue(value, DataTypes.NUMERIC);
+                MangoValue.stringToValue(value, br.org.scadabr.DataType.NUMERIC);
             } else if (DataType.DOUBLE == dataType) {
-                MangoValue.stringToValue(value, DataTypes.NUMERIC);
+                MangoValue.stringToValue(value, br.org.scadabr.DataType.NUMERIC);
             } else if (DataType.STRING == dataType) {
-                MangoValue.stringToValue(value, DataTypes.ALPHANUMERIC);
+                MangoValue.stringToValue(value, br.org.scadabr.DataType.ALPHANUMERIC);
             } else if (DataType.DOUBLE == dataType) {
-                MangoValue.stringToValue(value, DataTypes.NUMERIC);
+                MangoValue.stringToValue(value, br.org.scadabr.DataType.NUMERIC);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -837,17 +836,19 @@ public final class APIUtils {
         return null;
     }
 
-    public static DataType toDataType(int mangoDataType) {
-        if (mangoDataType == DataTypes.ALPHANUMERIC) {
-            return DataType.STRING;
-        } else if (mangoDataType == DataTypes.BINARY) {
-            return DataType.BOOLEAN;
-        } else if (mangoDataType == DataTypes.NUMERIC) {
-            return DataType.DOUBLE;
-        } else if (mangoDataType == DataTypes.MULTISTATE) {
-            return DataType.INTEGER;
+    public static DataType toDataType(br.org.scadabr.DataType mangoDataType) {
+        switch (mangoDataType) {
+            case ALPHANUMERIC:
+                return DataType.STRING;
+            case BINARY:
+                return DataType.BOOLEAN;
+            case NUMERIC:
+                return DataType.DOUBLE;
+            case MULTISTATE:
+                return DataType.INTEGER;
+            default:
+                return null;
         }
-        return null;
     }
 
     public static UserComment toUserComment(EventMessage message) {

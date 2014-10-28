@@ -18,17 +18,18 @@
  */
 package com.serotonin.mango.view.text;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
+import java.util.EnumSet;
 
 /**
  * This class is called "binary" so that we can refer to values as 0 and 1,
@@ -42,16 +43,18 @@ import br.org.scadabr.util.SerializationHelper;
 public class BinaryTextRenderer extends BaseTextRenderer {
 
     private static ImplDefinition definition = new ImplDefinition("textRendererBinary", "BINARY",
-            "textRenderer.binary", new int[]{DataTypes.BINARY});
+            "textRenderer.binary", EnumSet.of(DataType.BINARY));
 
     public static ImplDefinition getDefinition() {
         return definition;
     }
 
+    @Override
     public String getTypeName() {
         return definition.getName();
     }
 
+    @Override
     public ImplDefinition getDef() {
         return definition;
     }

@@ -18,13 +18,13 @@
  */
 package com.serotonin.mango.rt.link;
 
+import br.org.scadabr.DataType;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.script.ScriptException;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.DataPointListener;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
@@ -36,7 +36,6 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.work.SetPointWorkItem;
 import com.serotonin.mango.vo.link.PointLinkVO;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
@@ -105,7 +104,7 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
             return;
         }
 
-        int targetDataType = targetPoint.getVo().getPointLocator().getDataTypeId();
+        DataType targetDataType = targetPoint.getDataType();
 
         if (!vo.getScript().isEmpty()) {
             ScriptExecutor scriptExecutor = new ScriptExecutor();
@@ -130,7 +129,7 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
             }
         }
 
-        if (DataTypes.getDataType(newValue.getValue()) != targetDataType) {
+        if (newValue.getDataType() != targetDataType) {
             raiseFailureEvent(newValue.getTime(), new LocalizableMessageImpl("event.pointLink.convertError"));
             return;
         }

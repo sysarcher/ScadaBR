@@ -1,5 +1,6 @@
 package com.serotonin.mango.rt.dataImage;
 
+import br.org.scadabr.DataType;
 import java.util.List;
 
 import br.org.scadabr.NotImplementedException;
@@ -9,13 +10,13 @@ import br.org.scadabr.timer.SimulationTimer;
 public class HistoricalDataPoint implements IDataPoint {
 
     private final int id;
-    private final int dataTypeId;
+    private final DataType dataType;
     private final PointValueDao pointValueDao;
     private final SimulationTimer timer;
 
-    public HistoricalDataPoint(int id, int dataTypeId, SimulationTimer timer, PointValueDao pointValueDao) {
+    public HistoricalDataPoint(int id, DataType dataType, SimulationTimer timer, PointValueDao pointValueDao) {
         this.id = id;
-        this.dataTypeId = dataTypeId;
+        this.dataType = dataType;
         this.pointValueDao = pointValueDao;
         this.timer = timer;
     }
@@ -65,7 +66,7 @@ public class HistoricalDataPoint implements IDataPoint {
     }
 
     @Override
-    public int getDataTypeId() {
-        return dataTypeId;
+    public DataType getDataType() {
+        return dataType;
     }
 }

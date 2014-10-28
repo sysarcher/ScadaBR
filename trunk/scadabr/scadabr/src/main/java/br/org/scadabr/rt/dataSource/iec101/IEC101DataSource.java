@@ -58,7 +58,7 @@ public class IEC101DataSource<T extends IEC101DataSourceVO<T>> extends PollingDa
 
             for (DataElement dataElement : elements) {
                 MangoValue value = MangoValue.stringToValue(dataElement
-                        .getValue(), pointLocator.getDataTypeId());
+                        .getValue(), pointLocator.getDataType());
                 Calendar ts = Calendar.getInstance();
                 ts.setTimeInMillis(dataElement.getTimestamp());
                 dataPoint.updatePointValue(new PointValueTime(value, ts

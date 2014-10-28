@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view.chart;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -26,10 +27,8 @@ import java.util.Map;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.PointValueFacade;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.stats.AnalogStatistics;
 import com.serotonin.mango.view.stats.StartsAndRuntimeList;
 import com.serotonin.mango.view.stats.ValueChangeCounter;
@@ -70,7 +69,7 @@ public class StatisticsChartRenderer extends TimePeriodChartRenderer {
         List<PointValueTime> values = pointValueFacade.getPointValues(startTime);
 
         // Generate statistics on the values.
-        int dataTypeId = point.getPointLocator().getDataTypeId();
+        final DataType dataType = point.getDataType();
 
         // The start value is the value of the point at the start of the period for this renderer.
         PointValueTime startValue = null;
@@ -83,14 +82,14 @@ public class StatisticsChartRenderer extends TimePeriodChartRenderer {
         }
 
         if (startValue != null || values.size() > 0) {
-            if (dataTypeId == DataTypes.BINARY || dataTypeId == DataTypes.MULTISTATE) {
+            if (dataType == DataType.BINARY || dataType == DataType.MULTISTATE) {
                 // Runtime stats
                 StartsAndRuntimeList stats = new StartsAndRuntimeList(startValue, values, startTime, startTime
                         + getDuration());
                 model.put("start", stats.getRealStart());
                 model.put("end", stats.getEnd());
                 model.put("startsAndRuntimes", stats.getData());
-            } else if (dataTypeId == DataTypes.NUMERIC) {
+            } else if (dataType == DataType.NUMERIC) {
                 AnalogStatistics stats = new AnalogStatistics(startValue, values, startTime, startTime + getDuration());
                 model.put("start", stats.getRealStart());
                 model.put("end", stats.getEnd());
@@ -104,7 +103,7 @@ public class StatisticsChartRenderer extends TimePeriodChartRenderer {
                 }
                 model.put("count", stats.getCount());
                 model.put("noData", stats.isNoData());
-            } else if (dataTypeId == DataTypes.ALPHANUMERIC) {
+            } else if (dataType == DataType.ALPHANUMERIC) {
                 ValueChangeCounter stats = new ValueChangeCounter(startValue, values);
                 model.put("changeCount", stats.getChangeCount());
             }

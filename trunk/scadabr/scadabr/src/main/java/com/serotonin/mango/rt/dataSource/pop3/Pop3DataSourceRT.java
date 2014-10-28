@@ -59,12 +59,13 @@ public class Pop3DataSourceRT extends PollingDataSource<Pop3DataSourceVO> {
         super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
-/*
-    @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
-        returnToNormal(PARSE_EXCEPTION_EVENT, System.currentTimeMillis());
-    }
-*/
+    /*
+     @Override
+     public void removeDataPoint(DataPointRT dataPoint) {
+     returnToNormal(PARSE_EXCEPTION_EVENT, System.currentTimeMillis());
+     }
+     */
+
     @Override
     public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source) {
         // no op
@@ -206,7 +207,7 @@ public class Pop3DataSourceRT extends PollingDataSource<Pop3DataSourceVO> {
 
             MangoValue value;
             try {
-                value = DataSourceUtils.getValue(locator.getValuePattern(), content, locator.getDataTypeId(), locator
+                value = DataSourceUtils.getValue(locator.getValuePattern(), content, locator.getDataType(), locator
                         .getBinary0Value(), dp.getVo().getTextRenderer(), locator.getValueFormat(), dp.getVoName());
             } catch (NoMatchException e) {
                 if (locator.isIgnoreIfMissing()) {
@@ -233,6 +234,7 @@ public class Pop3DataSourceRT extends PollingDataSource<Pop3DataSourceVO> {
             dp.updatePointValue(new PointValueTime(value, valueTime));
         }
     }
+
     @Override
     protected CronExpression getCronExpression() throws ParseException {
         throw new ImplementMeException();

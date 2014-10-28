@@ -18,16 +18,17 @@
  */
 package com.serotonin.mango.view.component;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
 import br.org.scadabr.json.JsonRemoteEntity;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -36,7 +37,7 @@ import com.serotonin.mango.view.ImplDefinition;
 public class SimpleImageComponent extends PointComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("simpleImage", "SIMPLE_IMAGE", "graphic.simpleImage",
-            new int[]{DataTypes.IMAGE});
+            EnumSet.of(DataType.IMAGE));
 
     @Override
     public String snippetName() {

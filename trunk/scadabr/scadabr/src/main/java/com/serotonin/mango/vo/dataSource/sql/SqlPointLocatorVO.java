@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.sql;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,7 +31,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.sql.SqlPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -40,6 +40,7 @@ import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -66,7 +67,7 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
     private String fieldName;
     @JsonRemoteProperty
     private String timeOverrideName;
-    private int dataTypeId;
+    private DataType dataType;
     @JsonRemoteProperty
     private String updateStatement;
 
@@ -95,19 +96,16 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
     }
 
     @Override
-    public int getDataTypeId() {
-        return dataTypeId;
+    public DataType getDataType() {
+        return dataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setDataTypeId(DataType dataType) {
+        this.dataType = dataType;
     }
 
     @Override
     public void validate(DwrResponseI18n response) {
-        if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextual("dataTypeId", "validate.invalidValue");
-        }
         if (fieldName.isEmpty() && updateStatement.isEmpty()) {
             response.addContextual("fieldName", "validate.fieldName");
         }
@@ -115,7 +113,7 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.sql.rowId", fieldName);
         AuditEventType.addPropertyMessage(list, "dsEdit.sql.timeColumn", timeOverrideName);
         AuditEventType.addPropertyMessage(list, "dsEdit.sql.update", updateStatement);
@@ -124,7 +122,7 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         SqlPointLocatorVO from = (SqlPointLocatorVO) o;
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.rowId", from.fieldName, fieldName);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.timeColumn", from.timeOverrideName,
                 timeOverrideName);
@@ -144,7 +142,7 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
         SerializationHelper.writeSafeUTF(out, fieldName);
         SerializationHelper.writeSafeUTF(out, timeOverrideName);
         SerializationHelper.writeSafeUTF(out, updateStatement);
-        out.writeInt(dataTypeId);
+        out.writeInt(dataType.ordinal());
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
@@ -155,20 +153,20 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
             fieldName = SerializationHelper.readSafeUTF(in);
             timeOverrideName = "";
             updateStatement = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
         } else if (ver == 2) {
             fieldName = SerializationHelper.readSafeUTF(in);
             timeOverrideName = SerializationHelper.readSafeUTF(in);
             updateStatement = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
         }
     }
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        Integer value = deserializeDataType(json, DataTypes.IMAGE);
+        DataType value = deserializeDataType(json, EnumSet.of(DataType.IMAGE));
         if (value != null) {
-            dataTypeId = value;
+            dataType = value;
         }
     }
 

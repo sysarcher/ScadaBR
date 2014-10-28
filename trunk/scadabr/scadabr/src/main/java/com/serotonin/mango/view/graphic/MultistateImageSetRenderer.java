@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view.graphic;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -27,10 +28,10 @@ import java.util.List;
 import java.util.Map;
 
 import br.org.scadabr.db.IntValuePair;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImageSet;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -39,17 +40,19 @@ import com.serotonin.mango.view.ImplDefinition;
 // Use ViewComponent instead
 public class MultistateImageSetRenderer extends ImageSetRenderer {
 
-    private static ImplDefinition definition = new ImplDefinition("graphicRendererMultistateImage", "MULTISTATE_IMAGE",
-            "graphic.multistateImage", new int[]{DataTypes.MULTISTATE});
+    private static final ImplDefinition definition = new ImplDefinition("graphicRendererMultistateImage", "MULTISTATE_IMAGE",
+            "graphic.multistateImage", EnumSet.of(DataType.MULTISTATE));
 
     public static ImplDefinition getDefinition() {
         return definition;
     }
 
+    @Override
     public String getTypeName() {
         return definition.getName();
     }
 
+    @Override
     public ImplDefinition getDef() {
         return definition;
     }
@@ -61,7 +64,7 @@ public class MultistateImageSetRenderer extends ImageSetRenderer {
             boolean displayText) {
         super(imageSet, displayText);
 
-        stateImageMap = new HashMap<Integer, Integer>();
+        stateImageMap = new HashMap<>();
         for (IntValuePair ivp : imageStateList) {
             String[] states = ivp.getValue().split(",");
             for (String stateStr : states) {
@@ -87,9 +90,7 @@ public class MultistateImageSetRenderer extends ImageSetRenderer {
 
         if (imageId == null) {
             imageId = defaultImage;
-        }
-
-        if (imageId != null) {
+        } else {
             int id = imageId;
 
             if (id >= 0 && id < imageSet.getImageCount()) {
@@ -101,7 +102,7 @@ public class MultistateImageSetRenderer extends ImageSetRenderer {
     }
 
     public List<IntValuePair> getImageStateList() {
-        List<IntValuePair> result = new ArrayList<IntValuePair>();
+        List<IntValuePair> result = new ArrayList<>();
         for (Integer state : stateImageMap.keySet()) {
             Integer imageId = stateImageMap.get(state);
 

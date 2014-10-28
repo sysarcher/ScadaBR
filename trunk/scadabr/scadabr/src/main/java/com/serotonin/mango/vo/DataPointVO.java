@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -37,7 +38,6 @@ import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.json.JsonValue;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -45,16 +45,15 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
-import com.serotonin.mango.view.chart.BaseChartRenderer;
 import com.serotonin.mango.view.chart.ChartRenderer;
 import com.serotonin.mango.view.text.BaseTextRenderer;
 import com.serotonin.mango.view.text.NoneRenderer;
 import com.serotonin.mango.view.text.PlainRenderer;
 import com.serotonin.mango.view.text.TextRenderer;
-import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import java.util.Objects;
@@ -65,10 +64,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     private static final long serialVersionUID = -1;
     public static final String XID_PREFIX = "DP_";
 
-    public int getDataTypeId() {
-        return pointLocator.getDataTypeId();
+    public DataType getDataType() {
+        return pointLocator.getDataType();
     }
 
+    //TODO Enum
     public interface LoggingTypes {
 
         int ON_CHANGE = 1;
@@ -124,10 +124,6 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         for (int i = 0; i < 190; i++) {
             ENGINEERING_UNITS_CODES.addElement(i, new EngineeringUnits(i).toString().toUpperCase().replace(' ', '_'), "engUnit." + i);
         }
-    }
-
-    public LocalizableMessage getDataTypeMessage() {
-        return pointLocator.getDataTypeMessage();
     }
 
     public LocalizableMessage getConfigurationDescription() {
@@ -228,8 +224,8 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         if (pointLocator == null) {
             textRenderer = new PlainRenderer("");
         } else {
-            switch (pointLocator.getDataTypeId()) {
-                case DataTypes.IMAGE:
+            switch (pointLocator.getDataType()) {
+                case IMAGE:
                     textRenderer = new NoneRenderer();
                     break;
                 default:
@@ -567,7 +563,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         if (!LOGGING_TYPE_CODES.isValidId(loggingType)) {
             response.addContextual("loggingType", "validate.invalidValue");
         }
-        if (loggingType == DataPointVO.LoggingTypes.ON_CHANGE && pointLocator.getDataTypeId() == DataTypes.NUMERIC) {
+        if (loggingType == DataPointVO.LoggingTypes.ON_CHANGE && getDataType() == DataType.NUMERIC) {
             if (tolerance < 0) {
                 response.addContextual("tolerance", "validate.cannotBeNegative");
             }
@@ -613,12 +609,12 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         pointLocator.validate(response);
 
         // Check text renderer type
-        if (textRenderer != null && !textRenderer.getDef().supports(pointLocator.getDataTypeId())) {
+        if (textRenderer != null && !textRenderer.getDef().supports(pointLocator.getDataType())) {
             response.addGeneric("validate.text.incompatible");
         }
 
         // Check chart renderer type
-        if (chartRenderer != null && !chartRenderer.getType().supports(pointLocator.getDataTypeId())) {
+        if (chartRenderer != null && !chartRenderer.getType().supports(pointLocator.getDataType())) {
             response.addGeneric("validate.chart.incompatible");
         }
     }

@@ -62,7 +62,7 @@ public class Dnp3DataSource<T extends Dnp3DataSourceVO<T>> extends PollingDataSo
             if (pointValues.size() > 0) {
                 for (DataElement dataElement : pointValues) {
                     MangoValue value = MangoValue.stringToValue(dataElement
-                            .getValue(), pointLocator.getDataTypeId());
+                            .getValue(), pointLocator.getDataType());
                     Calendar ts = Calendar.getInstance();
                     ts.setTimeInMillis(dataElement.getTimestamp());
 

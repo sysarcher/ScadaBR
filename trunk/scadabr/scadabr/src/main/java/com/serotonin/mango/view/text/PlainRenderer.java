@@ -18,23 +18,24 @@
  */
 package com.serotonin.mango.view.text;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class PlainRenderer extends BaseTextRenderer {
 
     private static ImplDefinition definition = new ImplDefinition("textRendererPlain", "PLAIN", "textRenderer.plain",
-            new int[]{DataTypes.BINARY, DataTypes.ALPHANUMERIC, DataTypes.MULTISTATE, DataTypes.NUMERIC});
+            EnumSet.of(DataType.BINARY, DataType.ALPHANUMERIC, DataType.MULTISTATE, DataType.NUMERIC));
 
     public static ImplDefinition getDefinition() {
         return definition;
@@ -84,6 +85,7 @@ public class PlainRenderer extends BaseTextRenderer {
         return value.toString();
     }
 
+    @Override
     public String getSuffix() {
         return suffix;
     }

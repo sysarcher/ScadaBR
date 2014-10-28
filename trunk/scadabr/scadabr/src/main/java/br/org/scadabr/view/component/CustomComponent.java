@@ -1,9 +1,11 @@
 package br.org.scadabr.view.component;
 
+import br.org.scadabr.DataType;
 import com.serotonin.mango.view.component.ViewComponent;
 import com.serotonin.mango.vo.User;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.Set;
 
 abstract public class CustomComponent extends ViewComponent {
 
@@ -16,7 +18,7 @@ abstract public class CustomComponent extends ViewComponent {
         return true;
     }
 
-    public int[] getSupportedDataTypes() {
+    public Set<DataType> getSupportedDataTypes() {
         return definition().getSupportedDataTypes();
     }
 

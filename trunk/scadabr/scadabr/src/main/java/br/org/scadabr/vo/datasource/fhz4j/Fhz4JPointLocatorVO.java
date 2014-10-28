@@ -18,6 +18,7 @@
  */
 package br.org.scadabr.vo.datasource.fhz4j;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.ImplementMeException;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
@@ -28,7 +29,6 @@ import br.org.scadabr.rt.datasource.fhz4j.Fhz4JPointLocatorRT;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import java.io.IOException;
@@ -60,31 +60,31 @@ public class Fhz4JPointLocatorVO<T extends ScadaProperty> extends AbstractPointL
     }
 
     @Override
-    public int getDataTypeId() {
+    public DataType getDataType() {
         if (getProperty() == null) {
-            return DataTypes.UNKNOWN;
+            return DataType.UNKNOWN;
         }
         switch (getProperty().getDataType()) {
             case BOOLEAN:
-                return DataTypes.BINARY;
+                return DataType.BINARY;
             case BYTE:
-                return DataTypes.MULTISTATE;
+                return DataType.MULTISTATE;
             case CHAR:
-                return DataTypes.ALPHANUMERIC;
+                return DataType.ALPHANUMERIC;
             case DOUBLE:
-                return DataTypes.NUMERIC;
+                return DataType.NUMERIC;
             case FLOAT:
-                return DataTypes.NUMERIC;
+                return DataType.NUMERIC;
             case LONG:
-                return DataTypes.MULTISTATE;
+                return DataType.MULTISTATE;
             case INT:
-                return DataTypes.MULTISTATE;
+                return DataType.MULTISTATE;
             case SHORT:
-                return DataTypes.MULTISTATE;
+                return DataType.MULTISTATE;
             case STRING:
-                return DataTypes.ALPHANUMERIC;
+                return DataType.ALPHANUMERIC;
             case TIME:
-                return DataTypes.ALPHANUMERIC;
+                return DataType.ALPHANUMERIC;
             default:
                 throw new RuntimeException("Cant find datatype of " + getProperty());
         }
@@ -166,11 +166,11 @@ public class Fhz4JPointLocatorVO<T extends ScadaProperty> extends AbstractPointL
 
     @Override
     public void jsonSerialize(Map<String, Object> paramMap) {
-        throw new ImplementMeException(); 
+        throw new ImplementMeException();
     }
 
     @Override
     public void jsonDeserialize(JsonReader paramJsonReader, JsonObject paramJsonObject) throws JsonException {
-        throw new ImplementMeException(); 
+        throw new ImplementMeException();
     }
 }

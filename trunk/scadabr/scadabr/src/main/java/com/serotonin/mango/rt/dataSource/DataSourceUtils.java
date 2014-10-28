@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource;
 
+import br.org.scadabr.DataType;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -34,15 +34,13 @@ import com.serotonin.mango.view.text.MultistateRenderer;
 import com.serotonin.mango.view.text.MultistateValue;
 import com.serotonin.mango.view.text.TextRenderer;
 import br.org.scadabr.web.i18n.LocalizableException;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
  */
 public class DataSourceUtils {
 
-    public static MangoValue getValue(Pattern valuePattern, String data, int dataTypeId, String binary0Value,
+    public static MangoValue getValue(Pattern valuePattern, String data, DataType dataType, String binary0Value,
             TextRenderer textRenderer, DecimalFormat valueFormat, String pointName) throws LocalizableException {
         if (data == null) {
             throw new LocalizableException("event.valueParse.noData", pointName);
@@ -55,7 +53,7 @@ public class DataSourceUtils {
                 valueStr = "";
             }
 
-            return getValue(valueStr, dataTypeId, binary0Value, textRenderer, valueFormat, pointName);
+            return getValue(valueStr, dataType, binary0Value, textRenderer, valueFormat, pointName);
         }
 
         throw new NoMatchException("event.valueParse.noValue", pointName);
@@ -89,55 +87,51 @@ public class DataSourceUtils {
         return valueTime;
     }
 
-    public static MangoValue getValue(String valueStr, int dataTypeId, String binary0Value, TextRenderer textRenderer,
+    public static MangoValue getValue(String valueStr, DataType dataType, String binary0Value, TextRenderer textRenderer,
             DecimalFormat valueFormat, String pointName) throws LocalizableException {
-        if (dataTypeId == DataTypes.ALPHANUMERIC) {
-            return new AlphanumericValue(valueStr);
-        }
 
-        if (dataTypeId == DataTypes.BINARY) {
-            return new BinaryValue(!valueStr.equals(binary0Value));
-        }
-
-        if (dataTypeId == DataTypes.MULTISTATE) {
-            if (textRenderer instanceof MultistateRenderer) {
-                List<MultistateValue> multistateValues = ((MultistateRenderer) textRenderer).getMultistateValues();
-                for (MultistateValue multistateValue : multistateValues) {
-                    if (multistateValue.getText().equalsIgnoreCase(valueStr)) {
-                        return new com.serotonin.mango.rt.dataImage.types.MultistateValue(multistateValue.getKey());
+        switch (dataType) {
+            case ALPHANUMERIC:
+                return new AlphanumericValue(valueStr);
+            case BINARY:
+                return new BinaryValue(!valueStr.equals(binary0Value));
+            case MULTISTATE:
+                if (textRenderer instanceof MultistateRenderer) {
+                    List<MultistateValue> multistateValues = ((MultistateRenderer) textRenderer).getMultistateValues();
+                    for (MultistateValue multistateValue : multistateValues) {
+                        if (multistateValue.getText().equalsIgnoreCase(valueStr)) {
+                            return new com.serotonin.mango.rt.dataImage.types.MultistateValue(multistateValue.getKey());
+                        }
                     }
                 }
-            }
 
-            try {
-                return com.serotonin.mango.rt.dataImage.types.MultistateValue.parseMultistate(valueStr);
-            } catch (NumberFormatException e) {
-                if (pointName == null) {
-                    throw new LocalizableException("event.valueParse.textParse", valueStr);
+                try {
+                    return com.serotonin.mango.rt.dataImage.types.MultistateValue.parseMultistate(valueStr);
+                } catch (NumberFormatException e) {
+                    if (pointName == null) {
+                        throw new LocalizableException("event.valueParse.textParse", valueStr);
+                    }
+                    throw new LocalizableException("event.valueParse.textParsePoint", valueStr, pointName);
                 }
-                throw new LocalizableException("event.valueParse.textParsePoint", valueStr, pointName);
-            }
+            case NUMERIC:
+                try {
+                    if (valueFormat != null) {
+                        return new NumericValue(valueFormat.parse(valueStr).doubleValue());
+                    }
+                    return NumericValue.parseNumeric(valueStr);
+                } catch (NumberFormatException e) {
+                    if (pointName == null) {
+                        throw new LocalizableException("event.valueParse.numericParse", valueStr);
+                    }
+                    throw new LocalizableException("event.valueParse.numericParsePoint", valueStr, pointName);
+                } catch (ParseException e) {
+                    if (pointName == null) {
+                        throw new LocalizableException("event.valueParse.generalParse", e.getMessage(), valueStr);
+                    }
+                    throw new LocalizableException("event.valueParse.generalParsePoint", e.getMessage(), valueStr, pointName);
+                }
+            default:
+                return null;
         }
-
-        if (dataTypeId == DataTypes.NUMERIC) {
-            try {
-                if (valueFormat != null) {
-                    return new NumericValue(valueFormat.parse(valueStr).doubleValue());
-                }
-                return NumericValue.parseNumeric(valueStr);
-            } catch (NumberFormatException e) {
-                if (pointName == null) {
-                    throw new LocalizableException("event.valueParse.numericParse", valueStr);
-                }
-                throw new LocalizableException("event.valueParse.numericParsePoint", valueStr, pointName);
-            } catch (ParseException e) {
-                if (pointName == null) {
-                    throw new LocalizableException("event.valueParse.generalParse", e.getMessage(), valueStr);
-                }
-                throw new LocalizableException("event.valueParse.generalParsePoint", e.getMessage(), valueStr, pointName);
-            }
-        }
-
-        return null;
     }
 }

@@ -142,19 +142,20 @@ public class PersistentDataSourceRT extends EventDataSource<PersistentDataSource
             new Thread(this, "Persistent TCP data source").start();
         }
     }
-/*
-    @Override
-    public void addDataPoint(DataPointRT dataPoint) {
-        super.addDataPoint(dataPoint);
-        pointXids.put(dataPoint.getVo().getXid(), dataPoint);
-    }
+    /*
+     @Override
+     public void addDataPoint(DataPointRT dataPoint) {
+     super.addDataPoint(dataPoint);
+     pointXids.put(dataPoint.getVo().getXid(), dataPoint);
+     }
 
-    @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
-        super.removeDataPoint(dataPoint);
-        pointXids.remove(dataPoint.getVo().getXid());
-    }
-*/
+     @Override
+     public void removeDataPoint(DataPointRT dataPoint) {
+     super.removeDataPoint(dataPoint);
+     pointXids.remove(dataPoint.getVo().getXid());
+     }
+     */
+
     @Override
     public void run() {
         try {
@@ -164,7 +165,7 @@ public class PersistentDataSourceRT extends EventDataSource<PersistentDataSource
                     log.info("Received socket from " + socket.getRemoteSocketAddress());
                     ConnectionHandler ch = new ConnectionHandler(socket);
                     connectionHandlers.add(ch);
-                    throw  new ImplementMeException(); //Was: Common.timer.execute(ch);
+                    throw new ImplementMeException(); //Was: Common.timer.execute(ch);
                 } catch (SocketTimeoutException e) {
                     // no op
                 }
@@ -365,7 +366,7 @@ public class PersistentDataSourceRT extends EventDataSource<PersistentDataSource
                     }
 
                     if (packet.getType() == PacketType.RANGE_COUNT) {
-                        throw  new ImplementMeException(); //WAS: Common.timer.execute(new RangeCountHandler(packet, out)); continue;
+                        throw new ImplementMeException(); //WAS: Common.timer.execute(new RangeCountHandler(packet, out)); continue;
                     }
 
                     if (packet.getType() == PacketType.POINT_UPDATE) {
@@ -456,9 +457,9 @@ public class PersistentDataSourceRT extends EventDataSource<PersistentDataSource
 
             if (dprt != null) {
                 // Already exists. Check that the data types match.
-                if (dprt.getVo().getPointLocator().getDataTypeId() != newDpvo.getPointLocator().getDataTypeId()) {
+                if (dprt.getVo().getDataType() != newDpvo.getDataType()) {
                     // Data type mismatch. Abort
-                    throw new DoAbortException("event.persistent.dataTypeMismatch", xid, newDpvo.getDataTypeMessage(), dprt.getVo().getDataTypeMessage());
+                    throw new DoAbortException("event.persistent.dataTypeMismatch", xid, newDpvo.getDataType(), dprt.getDataType());
                 }
 
                 // We're good.
@@ -492,7 +493,7 @@ public class PersistentDataSourceRT extends EventDataSource<PersistentDataSource
                 newDpvo.setEventDetectors(new ArrayList<PointEventDetectorVO>());
                 newDpvo.setLoggingType(DataPointVO.LoggingTypes.ALL);
                 PersistentPointLocatorVO locator = new PersistentPointLocatorVO();
-                locator.setDataTypeId(newDpvo.getPointLocator().getDataTypeId());
+                locator.setDataType(newDpvo.getDataType());
                 newDpvo.setPointLocator(locator);
                 Common.ctx.getRuntimeManager().saveDataPoint(newDpvo);
             }

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.http;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -34,7 +35,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.http.HttpRetrieverPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -44,6 +44,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.taglib.Functions;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -72,7 +73,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
     private boolean ignoreIfMissing;
     @JsonRemoteProperty
     private String valueFormat;
-    private int dataTypeId;
+    private DataType dataType;
     @JsonRemoteProperty
     private String timeRegex;
     @JsonRemoteProperty
@@ -103,12 +104,12 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
     }
 
     @Override
-    public int getDataTypeId() {
-        return dataTypeId;
+    public DataType getDataType() {
+        return dataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
     }
 
     public String getTimeRegex() {
@@ -142,16 +143,13 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
             }
         }
 
-        if (dataTypeId == DataTypes.NUMERIC && !valueFormat.isEmpty()) {
+        if (dataType == DataType.NUMERIC && !valueFormat.isEmpty()) {
             try {
+                //TODO Localization with server locale !!!
                 new DecimalFormat(valueFormat);
             } catch (IllegalArgumentException e) {
                 response.addContextual("valueFormat", "common.default", e);
             }
-        }
-
-        if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextual("dataTypeId", "validate.invalidValue");
         }
 
         if (!timeRegex.isEmpty()) {
@@ -178,7 +176,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpRetriever.valueRegex", valueRegex);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpRetriever.ignoreIfMissing", ignoreIfMissing);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpRetriever.numberFormat", valueFormat);
@@ -189,7 +187,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         HttpRetrieverPointLocatorVO from = (HttpRetrieverPointLocatorVO) o;
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpRetriever.valueRegex", from.valueRegex,
                 valueRegex);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpRetriever.ignoreIfMissing",
@@ -213,7 +211,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, valueRegex);
         out.writeBoolean(ignoreIfMissing);
-        out.writeInt(dataTypeId);
+        out.writeInt(dataType.ordinal());
         SerializationHelper.writeSafeUTF(out, valueFormat);
         SerializationHelper.writeSafeUTF(out, timeRegex);
         SerializationHelper.writeSafeUTF(out, timeFormat);
@@ -226,7 +224,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
         if (ver == 1) {
             valueRegex = SerializationHelper.readSafeUTF(in);
             ignoreIfMissing = in.readBoolean();
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
             valueFormat = SerializationHelper.readSafeUTF(in);
             timeRegex = SerializationHelper.readSafeUTF(in);
             timeFormat = SerializationHelper.readSafeUTF(in);
@@ -235,9 +233,9 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        Integer value = deserializeDataType(json, DataTypes.IMAGE);
+        DataType value = deserializeDataType(json, EnumSet.of(DataType.IMAGE));
         if (value != null) {
-            dataTypeId = value;
+            dataType = value;
         }
     }
 

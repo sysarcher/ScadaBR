@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataImage.types;
 
-import com.serotonin.mango.DataTypes;
+import br.org.scadabr.DataType;
 
 /**
  * @author Matthew Lohbihler
@@ -72,14 +72,15 @@ public class MultistateValue extends MangoValue implements Comparable<Multistate
     public Object getObjectValue() {
         return value;
     }
+
     @Override
     public byte getByteValue() {
-        return (byte)value;
+        return (byte) value;
     }
 
     @Override
     public short getShortValue() {
-        return (short)value;
+        return (short) value;
     }
 
     @Override
@@ -98,8 +99,8 @@ public class MultistateValue extends MangoValue implements Comparable<Multistate
     }
 
     @Override
-    public int getDataType() {
-        return DataTypes.MULTISTATE;
+    public DataType getDataType() {
+        return DataType.MULTISTATE;
     }
 
     @Override

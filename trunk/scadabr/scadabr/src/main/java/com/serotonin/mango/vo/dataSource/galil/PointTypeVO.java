@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.galil;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -64,7 +65,7 @@ abstract public class PointTypeVO implements Serializable, JsonSerializable, Cha
 
     abstract public PointTypeRT createRuntime();
 
-    abstract public int getDataTypeId();
+    abstract public DataType getDataType();
 
     abstract public boolean isSettable();
 

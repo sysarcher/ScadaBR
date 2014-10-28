@@ -1,16 +1,16 @@
 package com.serotonin.mango.vo.dataSource.persistent;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
 import br.org.scadabr.json.JsonRemoteEntity;
-import com.serotonin.mango.DataTypes;
+import br.org.scadabr.web.dwr.DwrResponseI18n;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.persistent.PersistentPointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
@@ -27,27 +27,20 @@ public class PersistentPointLocatorVO extends AbstractPointLocatorVO {
         return new LocalizableMessageImpl("common.noMessage");
     }
 
-    private int dataTypeId;
+    private DataType dataType;
 
     @Override
-    public int getDataTypeId() {
-        return dataTypeId;
+    public DataType getDataType() {
+        return dataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
     }
 
     @Override
     public boolean isSettable() {
         return false;
-    }
-
-    @Override
-    public void validate(DwrResponseI18n response) {
-        if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextual("dataTypeId", "validate.invalidValue");
-        }
     }
 
     @Override
@@ -70,7 +63,7 @@ public class PersistentPointLocatorVO extends AbstractPointLocatorVO {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(dataTypeId);
+        out.writeInt(dataType.ordinal());
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
@@ -78,7 +71,11 @@ public class PersistentPointLocatorVO extends AbstractPointLocatorVO {
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
         }
+    }
+
+    @Override
+    public void validate(DwrResponseI18n response) {
     }
 }

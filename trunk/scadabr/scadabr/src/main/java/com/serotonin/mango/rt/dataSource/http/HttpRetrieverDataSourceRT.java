@@ -56,13 +56,12 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
     }
 
     /*
-    @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
-        returnToNormal(PARSE_EXCEPTION_EVENT, System.currentTimeMillis());
-        super.removeDataPoint(dataPoint);
-    }
-*/
-
+     @Override
+     public void removeDataPoint(DataPointRT dataPoint) {
+     returnToNormal(PARSE_EXCEPTION_EVENT, System.currentTimeMillis());
+     super.removeDataPoint(dataPoint);
+     }
+     */
     @Override
     public void doPoll(long time) {
         updateChangedPoints();
@@ -90,7 +89,7 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
 
             try {
                 // Get the value
-                MangoValue value = DataSourceUtils.getValue(locator.getValuePattern(), data, locator.getDataTypeId(),
+                MangoValue value = DataSourceUtils.getValue(locator.getValuePattern(), data, locator.getDataType(),
                         locator.getBinary0Value(), dp.getVo().getTextRenderer(), locator.getValueFormat(), dp.getVoName());
 
                 // Get the time.
@@ -158,6 +157,7 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
 
         return data;
     }
+
     @Override
     protected CronExpression getCronExpression() throws ParseException {
         throw new ImplementMeException();

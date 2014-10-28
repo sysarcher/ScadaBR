@@ -81,11 +81,10 @@ import javax.inject.Inject;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import com.serotonin.mango.db.DatabaseAccessFactory;
 
-
 public class MangoContextListener implements ServletContextListener {
 
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_CORE);
-    
+
     @Inject
     private SystemSettingsDao systemSettingsDao;
     @Inject
@@ -94,22 +93,19 @@ public class MangoContextListener implements ServletContextListener {
     private RuntimeManager runtimeManager;
     @Inject
     private EventManager eventManager;
-    
-    
+
     @Override
     public void contextInitialized(ServletContextEvent evt) {
         LOG.info("Mango context starting");
-        
+
         // Get a handle on the context.
         ServletContext ctx = evt.getServletContext();
 
         // Create the common reference to the context
         Common.ctx = new ContextWrapper(ctx);
 
-        
         SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
 
-        
         // Once the threadpool was shut down no its dead, so create them new here....
         Common.dataSourcePool = new CronTimerPool(2, 5, 30, TimeUnit.SECONDS);
         Common.systemCronPool = new CronTimerPool(2, 5, 30, TimeUnit.SECONDS);
@@ -129,7 +125,7 @@ public class MangoContextListener implements ServletContextListener {
                 LOG.log(Level.SEVERE, "Mango''s known servlet context path has changed from {0} to {1}. Are there two instances of Mango running?", new Object[]{knownContextPath, contextPath});
             }
         }
-        
+
         systemSettingsDao.setValue(SystemSettingsDao.SERVLET_CONTEXT_PATH, ctx.getContextPath());
 
         utilitiesInitialize(ctx);
@@ -249,14 +245,9 @@ public class MangoContextListener implements ServletContextListener {
     //
     // Constants
     //
+    @Deprecated // for old pages and dwr needed ...
     private void constantsInitialize(ServletContext ctx) {
         ctx.setAttribute("constants.Common.NEW_ID", Common.NEW_ID);
-
-        ctx.setAttribute("constants.DataTypes.BINARY", DataTypes.BINARY);
-        ctx.setAttribute("constants.DataTypes.MULTISTATE", DataTypes.MULTISTATE);
-        ctx.setAttribute("constants.DataTypes.NUMERIC", DataTypes.NUMERIC);
-        ctx.setAttribute("constants.DataTypes.ALPHANUMERIC", DataTypes.ALPHANUMERIC);
-        ctx.setAttribute("constants.DataTypes.IMAGE", DataTypes.IMAGE);
 
         ctx.setAttribute("constants.DataSourceVO.Types.VIRTUAL", DataSourceVO.Type.VIRTUAL.getId());
         ctx.setAttribute("constants.DataSourceVO.Types.MODBUS_SERIAL", DataSourceVO.Type.MODBUS_SERIAL.getId());
@@ -308,7 +299,7 @@ public class MangoContextListener implements ServletContextListener {
         ctx.setAttribute("constants.EventType.EventSources.PUBLISHER", EventType.EventSources.PUBLISHER);
         ctx.setAttribute("constants.EventType.EventSources.AUDIT", EventType.EventSources.AUDIT);
         ctx.setAttribute("constants.EventType.EventSources.MAINTENANCE", EventType.EventSources.MAINTENANCE);
-        
+
         ctx.setAttribute("constants.SystemEventType.TYPE_SYSTEM_STARTUP", SystemEventType.TYPE_SYSTEM_STARTUP);
         ctx.setAttribute("constants.SystemEventType.TYPE_SYSTEM_SHUTDOWN", SystemEventType.TYPE_SYSTEM_SHUTDOWN);
         ctx.setAttribute("constants.SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED", SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED);
@@ -331,7 +322,7 @@ public class MangoContextListener implements ServletContextListener {
         ctx.setAttribute("constants.PublisherVO.Types.HTTP_SENDER", PublisherVO.Type.HTTP_SENDER.getId());
         ctx.setAttribute("constants.PublisherVO.Types.PACHUBE", PublisherVO.Type.PACHUBE.getId());
         ctx.setAttribute("constants.PublisherVO.Types.PERSISTENT", PublisherVO.Type.PERSISTENT.getId());
-        
+
         ctx.setAttribute("constants.UserComment.TYPE_EVENT", UserComment.TYPE_EVENT);
         ctx.setAttribute("constants.UserComment.TYPE_POINT", UserComment.TYPE_POINT);
 

@@ -16,52 +16,61 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.vo.dataSource;
+package br.org.scadabr.vo.dataSource;
 
+import br.org.scadabr.DataType;
 import java.io.Serializable;
 
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.util.ChangeComparableObject;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
+import com.serotonin.mango.vo.dataSource.DataPointSaveHandler;
 
-public interface PointLocatorVO  extends Serializable, ChangeComparableObject {
-
-    /**
-     * One of the com.serotonin.mango.DataTypes
-     */
-    public int getDataTypeId();
+public interface PointLocatorVO extends Serializable, ChangeComparableObject {
 
     /**
-     * The text representation of the data type
+     * One of the com.serotonin.mango.DataType
+     *
+     * @return
      */
-    public LocalizableMessage getDataTypeMessage();
+    DataType getDataType();
 
     /**
      * An arbitrary description of the point location configuration for human
      * consumption.
+     *
+     * @return
      */
-    public LocalizableMessage getConfigurationDescription();
+    LocalizableMessage getConfigurationDescription();
 
     /**
      * Can the value be set in the data source?
+     *
+     * @return
      */
-    public boolean isSettable();
+    boolean isSettable();
 
     /**
      * Supplemental to being settable, can the set value be relinquished?
+     *
+     * @return
      */
-    public boolean isRelinquishable();
+    boolean isRelinquishable();
 
     /**
      * Create a runtime version of the locator
+     *
+     * @return
      */
-    public PointLocatorRT createRuntime();
+    PointLocatorRT createRuntime();
 
     /**
      * Validate. What else?
+     *
+     * @param response
      */
-    public void validate(DwrResponseI18n response);
+    void validate(DwrResponseI18n response);
 
-    public DataPointSaveHandler getDataPointSaveHandler();
+    DataPointSaveHandler getDataPointSaveHandler();
 }

@@ -10,8 +10,7 @@ package br.org.scadabr.web.i18n;
  * @author aploese
  */
 public interface LocalizableMessage {
-    public final static Object[] EMPTY_ARGS = new Object[0];
-    
+
     String getI18nKey();
 
     Object[] getArgs();

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.galil;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -95,8 +96,8 @@ public class GalilPointLocatorVO extends AbstractPointLocatorVO implements JsonS
     }
 
     @Override
-    public int getDataTypeId() {
-        return getPointType().getDataTypeId();
+    public DataType getDataType() {
+        return getPointType().getDataType();
     }
 
     @Override

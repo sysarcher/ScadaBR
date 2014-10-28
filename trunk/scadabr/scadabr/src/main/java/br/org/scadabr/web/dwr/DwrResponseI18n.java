@@ -12,18 +12,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * @TODO rename this properly
  * @author aploese
  */
 public class DwrResponseI18n {
 
-   private List<DwrMessageI18n> messages = new ArrayList<>();
-  private Map<String, Object> data = new HashMap<>();
-  
- public void add(DwrMessageI18n message)
-  {
-    messages.add(message);
-  }
+    private List<DwrMessageI18n> messages = new ArrayList<>();
+    private Map<String, Object> data = new HashMap<>();
+
+    public void add(DwrMessageI18n message) {
+        messages.add(message);
+    }
 
     public void addContextual(String contexKey, String i18nKey, Object... args) {
         add(new DwrMessageI18n(contexKey, i18nKey, args));

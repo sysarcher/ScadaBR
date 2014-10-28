@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.report;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.l10n.Localizer;
 import java.awt.Color;
 import java.io.File;
@@ -41,7 +42,6 @@ import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.ReportDao;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -132,11 +132,11 @@ public class ReportChartCreator {
         model.put("points", pointStatistics);
         model.put("inline", inlinePrefix == null ? "" : "cid:");
 
-        model.put("ALPHANUMERIC", DataTypes.ALPHANUMERIC);
-        model.put("BINARY", DataTypes.BINARY);
-        model.put("MULTISTATE", DataTypes.MULTISTATE);
-        model.put("NUMERIC", DataTypes.NUMERIC);
-        model.put("IMAGE", DataTypes.IMAGE);
+        model.put("ALPHANUMERIC", DataType.ALPHANUMERIC.ordinal());
+        model.put("BINARY", DataType.BINARY.ordinal());
+        model.put("MULTISTATE", DataType.MULTISTATE.ordinal());
+        model.put("NUMERIC", DataType.NUMERIC.ordinal());
+        model.put("IMAGE", DataType.IMAGE.ordinal());
 
         // Create the individual point charts
         for (PointStatistics pointStat : pointStatistics) {
@@ -277,7 +277,7 @@ public class ReportChartCreator {
 
         private final int reportPointId;
         private String name;
-        private int dataType;
+        private DataType dataType;
         private String dataTypeDescription;
         private String startValue;
         private TextRenderer textRenderer;
@@ -299,11 +299,11 @@ public class ReportChartCreator {
             this.name = name;
         }
 
-        public int getDataType() {
+        public DataType getDataType() {
             return dataType;
         }
 
-        public void setDataType(int dataType) {
+        public void setDataType(DataType dataType) {
             this.dataType = dataType;
         }
 
@@ -430,7 +430,7 @@ public class ReportChartCreator {
 
     public static class StartsAndRuntimeWrapper {
 
-        private static DecimalFormat percFormat = new DecimalFormat("0.#%");
+        private static final DecimalFormat percFormat = new DecimalFormat("0.#%");
         private final StartsAndRuntime sar;
         private final TextRenderer textRenderer;
 
@@ -501,7 +501,7 @@ public class ReportChartCreator {
             point = new PointStatistics(pointInfo.getReportPointId());
             point.setName(pointInfo.getExtendedName());
             point.setDataType(pointInfo.getDataType());
-            point.setDataTypeDescription(AbstractLocalizer.localizeMessage(DataTypes.getDataTypeMessage(pointInfo.getDataType()), bundle));
+            point.setDataTypeDescription(AbstractLocalizer.localizeMessage(pointInfo.getDataType(), bundle));
             point.setTextRenderer(pointInfo.getTextRenderer());
             if (pointInfo.getStartValue() != null) {
                 point.setStartValue(pointInfo.getTextRenderer().getText(pointInfo.getStartValue(),
@@ -518,53 +518,58 @@ public class ReportChartCreator {
                 // Should never happen, but leave the color null in case it does.
             }
 
-            if (pointInfo.getDataType() == DataTypes.NUMERIC) {
-                point.setStats(new AnalogStatistics(pointInfo.getStartValue() == null ? null : pointInfo
-                        .getStartValue().getDoubleValue(), start, end));
-                quantizer = new NumericDataQuantizer(start, end, imageWidth, this);
+            switch (pointInfo.getDataType()) {
+                case NUMERIC:
+                    point.setStats(new AnalogStatistics(pointInfo.getStartValue() == null ? null : pointInfo
+                            .getStartValue().getDoubleValue(), start, end));
+                    quantizer = new NumericDataQuantizer(start, end, imageWidth, this);
 
-                discreteTimeSeries = null;
-                numericTimeSeries = new TimeSeries(pointInfo.getExtendedName(), null, null, Second.class);
-                numericTimeSeries.setRangeDescription(point.getTextRenderer().getMetaText());
-                point.setNumericTimeSeries(numericTimeSeries);
-                point.setNumericTimeSeriesColor(colour);
-                if (pointInfo.isConsolidatedChart()) {
-                    pointTimeSeriesCollection.addNumericTimeSeries(numericTimeSeries, colour);
-                }
-            } else if (pointInfo.getDataType() == DataTypes.MULTISTATE) {
-                point.setStats(new StartsAndRuntimeList(pointInfo.getStartValue(), start, end));
-                quantizer = new MultistateDataQuantizer(start, end, imageWidth, this);
+                    discreteTimeSeries = null;
+                    numericTimeSeries = new TimeSeries(pointInfo.getExtendedName(), null, null, Second.class);
+                    numericTimeSeries.setRangeDescription(point.getTextRenderer().getMetaText());
+                    point.setNumericTimeSeries(numericTimeSeries);
+                    point.setNumericTimeSeriesColor(colour);
+                    if (pointInfo.isConsolidatedChart()) {
+                        pointTimeSeriesCollection.addNumericTimeSeries(numericTimeSeries, colour);
+                    }
+                    break;
+                case MULTISTATE:
+                    point.setStats(new StartsAndRuntimeList(pointInfo.getStartValue(), start, end));
+                    quantizer = new MultistateDataQuantizer(start, end, imageWidth, this);
 
-                discreteTimeSeries = new DiscreteTimeSeries(pointInfo.getExtendedName(), pointInfo.getTextRenderer(),
-                        colour);
-                point.setDiscreteTimeSeries(discreteTimeSeries);
-                if (pointInfo.isConsolidatedChart()) {
-                    pointTimeSeriesCollection.addDiscreteTimeSeries(discreteTimeSeries);
-                }
-                numericTimeSeries = null;
-            } else if (pointInfo.getDataType() == DataTypes.BINARY) {
-                point.setStats(new StartsAndRuntimeList(pointInfo.getStartValue(), start, end));
-                quantizer = new BinaryDataQuantizer(start, end, imageWidth, this);
+                    discreteTimeSeries = new DiscreteTimeSeries(pointInfo.getExtendedName(), pointInfo.getTextRenderer(),
+                            colour);
+                    point.setDiscreteTimeSeries(discreteTimeSeries);
+                    if (pointInfo.isConsolidatedChart()) {
+                        pointTimeSeriesCollection.addDiscreteTimeSeries(discreteTimeSeries);
+                    }
+                    numericTimeSeries = null;
+                    break;
+                case BINARY:
+                    point.setStats(new StartsAndRuntimeList(pointInfo.getStartValue(), start, end));
+                    quantizer = new BinaryDataQuantizer(start, end, imageWidth, this);
 
-                discreteTimeSeries = new DiscreteTimeSeries(pointInfo.getExtendedName(), pointInfo.getTextRenderer(),
-                        colour);
-                point.setDiscreteTimeSeries(discreteTimeSeries);
-                if (pointInfo.isConsolidatedChart()) {
-                    pointTimeSeriesCollection.addDiscreteTimeSeries(discreteTimeSeries);
-                }
-                numericTimeSeries = null;
-            } else if (pointInfo.getDataType() == DataTypes.ALPHANUMERIC) {
-                point.setStats(new ValueChangeCounter(pointInfo.getStartValue()));
-                quantizer = null;
+                    discreteTimeSeries = new DiscreteTimeSeries(pointInfo.getExtendedName(), pointInfo.getTextRenderer(),
+                            colour);
+                    point.setDiscreteTimeSeries(discreteTimeSeries);
+                    if (pointInfo.isConsolidatedChart()) {
+                        pointTimeSeriesCollection.addDiscreteTimeSeries(discreteTimeSeries);
+                    }
+                    numericTimeSeries = null;
+                    break;
+                case ALPHANUMERIC:
+                    point.setStats(new ValueChangeCounter(pointInfo.getStartValue()));
+                    quantizer = null;
 
-                discreteTimeSeries = null;
-                numericTimeSeries = null;
-            } else if (pointInfo.getDataType() == DataTypes.IMAGE) {
-                point.setStats(new ValueChangeCounter(pointInfo.getStartValue()));
-                quantizer = null;
+                    discreteTimeSeries = null;
+                    numericTimeSeries = null;
+                    break;
+                case IMAGE:
+                    point.setStats(new ValueChangeCounter(pointInfo.getStartValue()));
+                    quantizer = null;
 
-                discreteTimeSeries = null;
-                numericTimeSeries = null;
+                    discreteTimeSeries = null;
+                    numericTimeSeries = null;
             }
 
             if (reportCsvStreamer != null) {

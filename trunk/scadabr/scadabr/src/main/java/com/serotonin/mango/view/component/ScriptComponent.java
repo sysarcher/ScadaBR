@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view.component;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -29,7 +30,6 @@ import javax.script.ScriptException;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataSource.meta.ScriptExecutor;
 import com.serotonin.mango.view.ImplDefinition;
@@ -37,6 +37,7 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.web.dwr.BaseDwr;
 import com.serotonin.mango.web.taglib.Functions;
 import br.org.scadabr.util.SerializationHelper;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -44,8 +45,8 @@ import br.org.scadabr.util.SerializationHelper;
 @JsonRemoteEntity
 public class ScriptComponent extends PointComponent {
 
-    public static ImplDefinition DEFINITION = new ImplDefinition("script", "SCRIPT", "graphic.script", new int[]{
-        DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC, DataTypes.ALPHANUMERIC});
+    public static ImplDefinition DEFINITION = new ImplDefinition("script", "SCRIPT", "graphic.script",
+            EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC, DataType.ALPHANUMERIC));
 
     private static final String SCRIPT_PREFIX = "function __scriptRenderer__() {";
     private static final String SCRIPT_SUFFIX = "\r\n}\r\n__scriptRenderer__();";

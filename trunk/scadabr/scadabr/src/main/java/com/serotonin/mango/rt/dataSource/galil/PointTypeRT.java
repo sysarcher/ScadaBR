@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.galil;
 
+import br.org.scadabr.DataType;
 import java.text.DecimalFormat;
 
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -66,8 +67,8 @@ abstract public class PointTypeRT {
 
     abstract public MangoValue parseSetResponse(String data) throws LocalizableException;
 
-    protected MangoValue parseValue(String data, int dataTypeId, String pointName) throws LocalizableException {
-        return DataSourceUtils.getValue(data, dataTypeId, "0.0000", null, numericFormat, pointName);
+    protected MangoValue parseValue(String data, DataType dataType, String pointName) throws LocalizableException {
+        return DataSourceUtils.getValue(data, dataType, "0.0000", null, numericFormat, pointName);
     }
 
     protected double rawToEngineeringUnits(double raw, double rawLow, double rawHigh, double engLow, double engHigh) {

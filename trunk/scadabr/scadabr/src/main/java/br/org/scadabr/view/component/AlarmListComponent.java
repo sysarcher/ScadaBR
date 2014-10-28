@@ -1,5 +1,6 @@
 package br.org.scadabr.view.component;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,12 +22,13 @@ import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.web.dwr.BaseDwr;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class AlarmListComponent extends CustomComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("alarmlist",
-            "ALARMLIST", "graphic.alarmlist", new int[]{});
+            "ALARMLIST", "graphic.alarmlist", EnumSet.noneOf(DataType.class));
 
     @JsonRemoteProperty
     private AlarmLevel minAlarmLevel = AlarmLevel.INFORMATION;

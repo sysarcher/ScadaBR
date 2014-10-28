@@ -48,7 +48,6 @@ import org.springframework.web.servlet.support.RequestContext;
 @RequestMapping("/watchList")
 @Scope("request")
 public class WatchListController {
-    
 
     @Inject
     private UserSessionContextBean userSessionContextBean;
@@ -58,7 +57,7 @@ public class WatchListController {
     private UserDao userDao;
     @Inject
     private MessageSource messageSource;
-    
+
     public static final String KEY_WATCHLISTS = "watchLists";
     public static final String KEY_SELECTED_WATCHLIST = "selectedWatchList";
 
@@ -123,18 +122,16 @@ public class WatchListController {
         modelMap.put(KEY_SELECTED_WATCHLIST, selected);
         modelMap.put("NEW_ID", Common.NEW_ID);
     }
-    
-    
+
     public static class JsonWatchList {
 
         private JsonWatchList(WatchList watchList) {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
-        
+
     }
-    
-    
-        public JsonWatchList setSelectedWatchList(int watchListId) {
+
+    public JsonWatchList setSelectedWatchList(int watchListId) {
         User user = userSessionContextBean.getUser();
 
         WatchList watchList = watchListDao.getWatchList(watchListId);
@@ -145,14 +142,14 @@ public class WatchListController {
         user.setSelectedWatchList(watchListId);
 
         JsonWatchList data = getWatchListData(user, watchList);
-		// Set the watchlist in the user object after getting the data since it
+        // Set the watchlist in the user object after getting the data since it
         // may take a while, and the long poll
         // updates will all be missed in the meantime.
         user.setWatchList(watchList);
 
         return data;
     }
-        
+
     private JsonWatchList getWatchListData(User user, WatchList watchList) {
         JsonWatchList data = new JsonWatchList(watchList);
 
@@ -167,9 +164,9 @@ public class WatchListController {
 //        data.put("points", pointIds);
 //        data.put("users", watchList.getWatchListUsers());
 //        data.put("access", watchList.getUserAccess(user));
-
         return data;
     }
+
     private void prepareWatchList(WatchList watchList, User user) {
         int access = watchList.getUserAccess(user);
         User owner = userDao.getUser(watchList.getUserId());
@@ -199,5 +196,4 @@ public class WatchListController {
     }
 
 	//
-
 }

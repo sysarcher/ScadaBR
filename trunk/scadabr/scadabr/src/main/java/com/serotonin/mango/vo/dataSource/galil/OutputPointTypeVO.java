@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.galil;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -25,7 +26,6 @@ import java.util.List;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.galil.OutputPointTypeRT;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -53,8 +53,8 @@ public class OutputPointTypeVO extends PointTypeVO {
     }
 
     @Override
-    public int getDataTypeId() {
-        return DataTypes.BINARY;
+    public DataType getDataType() {
+        return DataType.BINARY;
     }
 
     @Override

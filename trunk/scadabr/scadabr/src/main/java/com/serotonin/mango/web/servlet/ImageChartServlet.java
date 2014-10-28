@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.servlet;
 
+import br.org.scadabr.DataType;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,7 +33,6 @@ import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 
 import br.org.scadabr.InvalidArgumentException;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataImage.PointValueFacade;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -157,7 +157,7 @@ public class ImageChartServlet extends BaseInfoServlet {
 
                     DataPointVO dp = DataPointDao.getInstance().getDataPoint(dataPointId);
                     if (dp == null || dp.getName() == null) {
-                    } else if (dp.getPointLocator().getDataTypeId() == DataTypes.NUMERIC) {
+                    } else if (dp.getDataType() == DataType.NUMERIC) {
                         TimeSeries ts = new TimeSeries(dp.getName(), null, null, Second.class);
                         for (PointValueTime pv : data) {
                             ImageChartUtils.addSecond(ts, pv.getTime(), pv.getValue().numberValue());

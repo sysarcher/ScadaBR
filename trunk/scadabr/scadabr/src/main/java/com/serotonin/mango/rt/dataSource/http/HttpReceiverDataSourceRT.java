@@ -23,14 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
-import com.serotonin.mango.rt.dataImage.DataPointRT;
-import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.types.BinaryValue;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.EventDataSource;
 import com.serotonin.mango.vo.dataSource.http.HttpReceiverDataSourceVO;
-import com.serotonin.mango.vo.dataSource.http.HttpReceiverPointLocatorVO;
 
 /**
  * @author Matthew Lohbihler

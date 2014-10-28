@@ -69,8 +69,8 @@ public class DataPointComparator extends BaseComparator<DataPointVO> {
         } else if (sortType == SORT_ENABLED) {
             result = Boolean.compare(dp1.isEnabled(), dp2.isEnabled());
         } else if (sortType == SORT_DATA_TYPE) {
-            String s1 = AbstractLocalizer.localizeMessage(dp1.getDataTypeMessage(), bundle);
-            String s2 = AbstractLocalizer.localizeMessage(dp2.getDataTypeMessage(), bundle);
+            String s1 = AbstractLocalizer.localizeMessage(dp1.getDataType(), bundle);
+            String s2 = AbstractLocalizer.localizeMessage(dp2.getDataType(), bundle);
             result = s1.compareTo(s2);
         } else if (sortType == SORT_CONFIG) {
             String s1 = AbstractLocalizer.localizeMessage(dp1.getConfigurationDescription(), bundle);

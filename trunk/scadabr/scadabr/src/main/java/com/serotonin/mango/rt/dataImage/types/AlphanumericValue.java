@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataImage.types;
 
-import com.serotonin.mango.DataTypes;
+import br.org.scadabr.DataType;
 import br.org.scadabr.util.StringUtils;
 
 /**
@@ -83,10 +83,10 @@ public class AlphanumericValue extends MangoValue implements Comparable<Alphanum
     public long getLongValue() {
         throw new RuntimeException("AlphanumericValue has no long value.");
     }
-    
+
     @Override
-    public int getDataType() {
-        return DataTypes.ALPHANUMERIC;
+    public DataType getDataType() {
+        return DataType.ALPHANUMERIC;
     }
 
     @Override

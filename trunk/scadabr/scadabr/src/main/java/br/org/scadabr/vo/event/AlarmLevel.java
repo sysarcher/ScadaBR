@@ -58,7 +58,7 @@ public enum AlarmLevel implements LocalizableMessage {
 
     @Override
     public Object[] getArgs() {
-        return LocalizableMessage.EMPTY_ARGS;
+        return null;
     }
 
     public boolean otherIsHigher(AlarmLevel o) {

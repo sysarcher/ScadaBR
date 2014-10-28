@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.pachube;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,16 +31,15 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.pachube.PachubePointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class PachubePointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
@@ -58,7 +58,7 @@ public class PachubePointLocatorVO extends AbstractPointLocatorVO implements Jso
     private int feedId;
     @JsonRemoteProperty
     private String dataStreamId;
-    private int dataTypeId;
+    private DataType dataType;
     @JsonRemoteProperty
     private String binary0Value;
     @JsonRemoteProperty
@@ -80,12 +80,12 @@ public class PachubePointLocatorVO extends AbstractPointLocatorVO implements Jso
         this.dataStreamId = dataStreamId;
     }
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    public DataType getDataType() {
+        return dataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setDataTypeId(DataType dataType) {
+        this.dataType = dataType;
     }
 
     public String getBinary0Value() {
@@ -115,16 +115,13 @@ public class PachubePointLocatorVO extends AbstractPointLocatorVO implements Jso
             response.addContextual("dataStreamId", "validate.required");
         }
 
-        if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextual("dataTypeId", "validate.invalidValue");
-        }
     }
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.pachube.feedId", feedId);
         AuditEventType.addPropertyMessage(list, "dsEdit.pachube.dataStreamId", dataStreamId);
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.pachube.binaryZeroValue", binary0Value);
         AuditEventType.addPropertyMessage(list, "dsEdit.settable", settable);
     }
@@ -132,7 +129,7 @@ public class PachubePointLocatorVO extends AbstractPointLocatorVO implements Jso
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         PachubePointLocatorVO from = (PachubePointLocatorVO) o;
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pachube.feedId", from.feedId, feedId);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pachube.dataStreamId", from.dataStreamId,
                 dataStreamId);
@@ -153,7 +150,7 @@ public class PachubePointLocatorVO extends AbstractPointLocatorVO implements Jso
         out.writeInt(version);
         out.writeInt(feedId);
         SerializationHelper.writeSafeUTF(out, dataStreamId);
-        out.writeInt(dataTypeId);
+        out.writeInt(dataType.ordinal());
         SerializationHelper.writeSafeUTF(out, binary0Value);
         out.writeBoolean(settable);
     }
@@ -165,7 +162,7 @@ public class PachubePointLocatorVO extends AbstractPointLocatorVO implements Jso
         if (ver == 1) {
             feedId = in.readInt();
             dataStreamId = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
             binary0Value = SerializationHelper.readSafeUTF(in);
             settable = in.readBoolean();
         }
@@ -173,9 +170,9 @@ public class PachubePointLocatorVO extends AbstractPointLocatorVO implements Jso
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        Integer value = deserializeDataType(json, DataTypes.IMAGE);
+        DataType value = deserializeDataType(json, EnumSet.of(DataType.IMAGE));
         if (value != null) {
-            dataTypeId = value;
+            dataType = value;
         }
     }
 

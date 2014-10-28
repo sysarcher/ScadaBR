@@ -113,33 +113,33 @@ public class NmeaDataSourceRT extends EventDataSource<NmeaDataSourceVO> implemen
     public void receivedMessage(NmeaMessage message) {
         throw new ImplementMeException();
         /*
-        long time = System.currentTimeMillis();
+         long time = System.currentTimeMillis();
 
-        unscheduleTimeout();
-        scheduleTimeout();
+         unscheduleTimeout();
+         scheduleTimeout();
 
-        LocalizableMessage parseError = null;
+         LocalizableMessage parseError = null;
 
-        synchronized (pointListChangeLock) {
-            for (DataPointRT dp : dataPoints) {
-                try {
-                    receivedMessageImpl(dp, message, time);
-                } catch (LocalizableException e) {
-                    if (parseError == null) {
-                        parseError = e;
-                    }
-                } catch (Exception e) {
-                    if (parseError == null) {
-                        parseError = new LocalizableMessageImpl("event.exception2", dp.getVoName(), e.getMessage());
-                    }
-                }
-            }
-        }
+         synchronized (pointListChangeLock) {
+         for (DataPointRT dp : dataPoints) {
+         try {
+         receivedMessageImpl(dp, message, time);
+         } catch (LocalizableException e) {
+         if (parseError == null) {
+         parseError = e;
+         }
+         } catch (Exception e) {
+         if (parseError == null) {
+         parseError = new LocalizableMessageImpl("event.exception2", dp.getVoName(), e.getMessage());
+         }
+         }
+         }
+         }
 
-        if (parseError != null) {
-            raiseEvent(PARSE_EXCEPTION_EVENT, time, false, parseError);
-        }
-                */
+         if (parseError != null) {
+         raiseEvent(PARSE_EXCEPTION_EVENT, time, false, parseError);
+         }
+         */
     }
 
     private void receivedMessageImpl(DataPointRT dp, NmeaMessage message, long time) throws Exception {
@@ -157,7 +157,7 @@ public class NmeaDataSourceRT extends EventDataSource<NmeaDataSourceVO> implemen
                 String valueStr = message.getField(locator.getFieldIndex());
 
                 // Convert the value
-                MangoValue value = DataSourceUtils.getValue(valueStr, locator.getDataTypeId(),
+                MangoValue value = DataSourceUtils.getValue(valueStr, locator.getDataType(),
                         locator.getBinary0Value(), dp.getVo().getTextRenderer(), null, dp.getVoName());
 
                 // Save the new value
@@ -184,7 +184,7 @@ public class NmeaDataSourceRT extends EventDataSource<NmeaDataSourceVO> implemen
     }
 
     private void scheduleTimeout() {
-        throw  new ImplementMeException(); //resetTask = new TimeoutTask(vo.getResetTimeout() * 1000, this);
+        throw new ImplementMeException(); //resetTask = new TimeoutTask(vo.getResetTimeout() * 1000, this);
     }
 
     private void unscheduleTimeout() {

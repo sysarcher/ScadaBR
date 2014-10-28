@@ -32,7 +32,6 @@ import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.KeyValuePair;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.PublisherEventType;
@@ -46,6 +45,7 @@ import com.serotonin.mango.web.servlet.HttpDataSourceServlet;
 import br.org.scadabr.web.http.HttpUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.Objects;
 
 /**
  * @author Matthew Lohbihler
@@ -196,7 +196,7 @@ public class HttpSenderRT extends PublisherRT<HttpPointVO> {
     }
 
     NameValuePair[] createNVPs(List<KeyValuePair> staticParameters, List<PublishQueueEntry<HttpPointVO>> list) {
-        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        List<NameValuePair> nvps = new ArrayList<>();
 
         for (KeyValuePair kvp : staticParameters) {
             nvps.add(new NameValuePair(kvp.getKey(), kvp.getValue()));
@@ -206,7 +206,7 @@ public class HttpSenderRT extends PublisherRT<HttpPointVO> {
             HttpPointVO pvo = e.getVo();
             PointValueTime pvt = e.getPvt();
 
-            String value = DataTypes.valueToString(pvt.getValue());
+            String value = Objects.toString(pvt.getValue());
 
             if (pvo.isIncludeTimestamp()) {
                 value += "@";

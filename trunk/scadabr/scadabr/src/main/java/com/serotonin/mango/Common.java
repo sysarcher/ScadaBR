@@ -83,7 +83,7 @@ public class Common {
 
     public static final int NEW_ID = -1;
     public static ContextWrapper ctx;
-    
+
     //TODO inject this
     private static final ResourceBundle env = ResourceBundle.getBundle("env");
 
@@ -91,7 +91,6 @@ public class Common {
     public static CronTimerPool<DataSourceCronTask, DataSourceRunnable> dataSourcePool;
     public static CronTimerPool<SystemCronTask, SystemRunnable> systemCronPool;
     public static CronTimerPool<EventCronTask, EventRunnable> eventCronPool;
-    
 
     public static final MonitoredValues MONITORED_VALUES = new MonitoredValues();
 
@@ -250,7 +249,9 @@ public class Common {
 
     @Deprecated
     public static User getUser(HttpServletRequest request) {
-        if (true) throw new RuntimeException("REMOVED >>USE @Inject UserSessionContextBean");
+        if (true) {
+            throw new RuntimeException("REMOVED >>USE @Inject UserSessionContextBean");
+        }
         // Check first to see if the user object is in the request.
         User user = (User) request.getAttribute(SESSION_USER);
         if (user != null) {
@@ -272,7 +273,9 @@ public class Common {
 
     @Deprecated
     public static void setUser(HttpServletRequest request, User user) {
-        if (true) throw new RuntimeException("REMOVED USE: @Inject UserSessionContextBean");
+        if (true) {
+            throw new RuntimeException("REMOVED USE: @Inject UserSessionContextBean");
+        }
         request.getSession().setAttribute(SESSION_USER, user);
     }
 
@@ -513,7 +516,6 @@ public class Common {
         return AbstractLocalizer.localizeI18nKey(key, systemBundle);
     }
 
-    
     @Deprecated // Use per user settings ...
     public static ResourceBundle getBundle() {
         ensureI18n();

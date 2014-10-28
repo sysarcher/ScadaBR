@@ -60,7 +60,6 @@ import com.serotonin.mango.web.taglib.Functions;
 import br.org.scadabr.web.content.ContentGenerator;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.l10n.Localizer;
 import com.serotonin.mango.rt.RuntimeManager;
 import java.util.Locale;
 import java.util.Objects;
@@ -79,9 +78,10 @@ abstract public class BaseDwr {
     @Inject
     protected DataPointDao dataPointDao;
     @Inject
-    protected RuntimeManager runtimeManager; 
+    protected RuntimeManager runtimeManager;
 
-    public BaseDwr() {}
+    public BaseDwr() {
+    }
 
     protected ResourceBundle changeSnippetMap = ResourceBundle.getBundle("changeSnippetMap");
     protected ResourceBundle chartSnippetMap = ResourceBundle.getBundle("chartSnippetMap");
@@ -212,7 +212,7 @@ abstract public class BaseDwr {
             runtimeManager.relinquish(point.getId());
         } else {
             // Convert the string value into an object.
-            MangoValue value = MangoValue.stringToValue(valueStr, point.getPointLocator().getDataTypeId());
+            MangoValue value = MangoValue.stringToValue(valueStr, point.getDataType());
             runtimeManager.setDataPointValue(point.getId(), value, source);
         }
     }
@@ -415,5 +415,5 @@ abstract public class BaseDwr {
     public void setRuntimeManager(RuntimeManager runtimeManager) {
         this.runtimeManager = runtimeManager;
     }
-    
+
 }

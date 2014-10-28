@@ -18,9 +18,11 @@
  */
 package com.serotonin.mango.view;
 
+import br.org.scadabr.DataType;
 import java.util.List;
 
-import br.org.scadabr.util.ArrayUtils;
+import java.util.EnumSet;
+import java.util.Set;
 
 @Deprecated //TODO convert to enum
 public class ImplDefinition {
@@ -47,20 +49,20 @@ public class ImplDefinition {
     private String name;
     private String exportName;
     private final String nameKey;
-    private final int[] supportedDataTypes;
+    private final Set<DataType> supportedDataTypes = EnumSet.noneOf(DataType.class);
 
-    public ImplDefinition(int id, String exportName, String nameKey, int[] supportedDataTypes) {
+    public ImplDefinition(int id, String exportName, String nameKey, Set<DataType> supportedDataTypes) {
         this.id = id;
         this.nameKey = nameKey;
         this.exportName = exportName;
-        this.supportedDataTypes = supportedDataTypes;
+        this.supportedDataTypes.addAll(supportedDataTypes);
     }
 
-    public ImplDefinition(String name, String exportName, String nameKey, int[] supportedDataTypes) {
+    public ImplDefinition(String name, String exportName, String nameKey, Set<DataType> supportedDataTypes) {
         this.name = name;
         this.nameKey = nameKey;
         this.exportName = exportName;
-        this.supportedDataTypes = supportedDataTypes;
+        this.supportedDataTypes.addAll(supportedDataTypes);
     }
 
     public int getId() {
@@ -83,11 +85,11 @@ public class ImplDefinition {
         this.exportName = exportName;
     }
 
-    public int[] getSupportedDataTypes() {
+    public Set<DataType> getSupportedDataTypes() {
         return supportedDataTypes;
     }
 
-    public boolean supports(int dataType) {
-        return ArrayUtils.contains(supportedDataTypes, dataType);
+    public boolean supports(DataType dataType) {
+        return supportedDataTypes.contains(dataType);
     }
 }

@@ -14,7 +14,6 @@ import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.vo.dataSource.opc.OPCDataSourceVO;
 import br.org.scadabr.vo.dataSource.opc.OPCPointLocatorVO;
 
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -83,10 +82,8 @@ public class OPCDataSource extends PollingDataSource<OPCDataSourceVO> {
             try {
                 value = opcMaster.getValue(dataPointVO.getTag());
 
-                mangoValue = MangoValue.stringToValue(value,
-                        dataPointVO.getDataTypeId());
-                dataPoint
-                        .updatePointValue(new PointValueTime(mangoValue, time));
+                mangoValue = MangoValue.stringToValue(value, dataPointVO.getDataType());
+                dataPoint.updatePointValue(new PointValueTime(mangoValue, time));
             } catch (Exception e) {
                 raiseEvent(POINT_READ_EXCEPTION_EVENT, time, true,
                         new LocalizableMessageImpl("event.exception2",
@@ -101,14 +98,18 @@ public class OPCDataSource extends PollingDataSource<OPCDataSourceVO> {
         String tag = ((OPCPointLocatorVO) dataPoint.getVo().getPointLocator())
                 .getTag();
         Object value = null;
-        if (dataPoint.getDataTypeId() == DataTypes.NUMERIC) {
-            value = valueTime.getDoubleValue();
-        } else if (dataPoint.getDataTypeId() == DataTypes.BINARY) {
-            value = valueTime.getBooleanValue();
-        } else if (dataPoint.getDataTypeId() == DataTypes.MULTISTATE) {
-            value = valueTime.getIntegerValue();
-        } else {
-            value = valueTime.getStringValue();
+        switch (dataPoint.getDataType()) {
+            case NUMERIC:
+                value = valueTime.getDoubleValue();
+                break;
+            case BINARY:
+                value = valueTime.getBooleanValue();
+                break;
+            case MULTISTATE:
+                value = valueTime.getIntegerValue();
+                break;
+            default:
+                value = valueTime.getStringValue();
         }
 
         try {

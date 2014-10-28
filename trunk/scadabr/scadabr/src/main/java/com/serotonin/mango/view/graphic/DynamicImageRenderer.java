@@ -18,16 +18,17 @@
  */
 package com.serotonin.mango.view.graphic;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.DynamicImage;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -37,7 +38,7 @@ import br.org.scadabr.util.SerializationHelper;
 public class DynamicImageRenderer extends BaseGraphicRenderer {
 
     private static ImplDefinition definition = new ImplDefinition("graphicRendererDynamicImage", "DYNAMIC_IMAGE",
-            "graphic.dynamicImage", new int[]{DataTypes.NUMERIC});
+            "graphic.dynamicImage", EnumSet.of(DataType.NUMERIC));
 
     public static ImplDefinition getDefinition() {
         return definition;

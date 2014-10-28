@@ -8,11 +8,12 @@ package br.org.scadabr.web.dwr;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 
 /**
+ * @TODO rename this properly
  *
  * @author aploese
  */
 public class DwrMessageI18n implements LocalizableMessage {
-    
+
     private final String contextKey;
     private final String i18nKey;
     private final Object[] args;
@@ -26,7 +27,7 @@ public class DwrMessageI18n implements LocalizableMessage {
     public boolean isInContext() {
         return contextKey != null;
     }
-    
+
     public String getContextKey() {
         return contextKey;
     }

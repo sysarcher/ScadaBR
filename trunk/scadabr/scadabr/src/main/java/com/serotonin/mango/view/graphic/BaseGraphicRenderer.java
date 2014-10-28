@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view.graphic;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -32,9 +33,9 @@ abstract public class BaseGraphicRenderer implements GraphicRenderer {
 
     private static List<ImplDefinition> definitions;
 
-    public static List<ImplDefinition> getImplementations(int dataType) {
+    public static List<ImplDefinition> getImplementations(DataType dataType) {
         if (definitions == null) {
-            List<ImplDefinition> d = new ArrayList<ImplDefinition>();
+            List<ImplDefinition> d = new ArrayList<>();
             d.add(AnalogImageSetRenderer.getDefinition());
             d.add(BasicRenderer.getDefinition());
             d.add(BinaryImageSetRenderer.getDefinition());
@@ -46,7 +47,7 @@ abstract public class BaseGraphicRenderer implements GraphicRenderer {
             definitions = d;
         }
 
-        List<ImplDefinition> impls = new ArrayList<ImplDefinition>();
+        List<ImplDefinition> impls = new ArrayList<>();
         for (ImplDefinition def : definitions) {
             if (def.supports(dataType)) {
                 impls.add(def);

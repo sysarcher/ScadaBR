@@ -1,5 +1,6 @@
 package br.org.scadabr.vo.dataSource.drStorageHt5b;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,7 +17,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
@@ -31,8 +31,6 @@ public class DrStorageHt5bPointLocatorVO extends AbstractPointLocatorVO
     private String pointType;
     @JsonRemoteProperty
     private boolean settable;
-
-    private final int dataType = DataTypes.ALPHANUMERIC;
 
     @Override
     public void validate(DwrResponseI18n response) {
@@ -109,9 +107,8 @@ public class DrStorageHt5bPointLocatorVO extends AbstractPointLocatorVO
     }
 
     @Override
-    public int getDataTypeId() {
-        // TODO Auto-generated method stub
-        return 4;
+    public DataType getDataType() {
+        return DataType.ALPHANUMERIC;
     }
 
 }

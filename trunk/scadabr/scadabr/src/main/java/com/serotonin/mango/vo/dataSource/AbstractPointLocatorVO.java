@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -25,16 +26,12 @@ import java.util.Map;
 
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
-import com.serotonin.mango.DataTypes;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.util.LocalizableJsonException;
 import br.org.scadabr.web.i18n.LocalizableMessage;
+import java.util.Set;
 
 abstract public class AbstractPointLocatorVO implements PointLocatorVO {
-
-    @Override
-    public LocalizableMessage getDataTypeMessage() {
-        return DataTypes.getDataTypeMessage(getDataTypeId());
-    }
 
     //
     // /
@@ -53,22 +50,22 @@ abstract public class AbstractPointLocatorVO implements PointLocatorVO {
     }
 
     protected void serializeDataType(Map<String, Object> map) {
-        map.put("dataType", DataTypes.CODES.getCode(getDataTypeId()));
+        map.put("dataType", getDataType().getName());
     }
 
-    protected Integer deserializeDataType(JsonObject json, int... excludeIds) throws JsonException {
+    protected DataType deserializeDataType(JsonObject json, Set<DataType> excludeTypes) throws JsonException {
         String text = json.getString("dataType");
         if (text == null) {
             return null;
         }
 
-        int dataType = DataTypes.CODES.getId(text);
-        if (!DataTypes.CODES.isValidId(dataType, excludeIds)) {
-            throw new LocalizableJsonException("emport.error.invalid", "dataType", text,
-                    DataTypes.CODES.getCodeList(excludeIds));
-        }
+        try {
 
-        return dataType;
+            return DataType.valueOf(text);
+        } catch (Exception e) {
+            throw new LocalizableJsonException("emport.error.invalid", "dataType", text,
+                    DataType.nameValues());
+        }
     }
 
     /**
