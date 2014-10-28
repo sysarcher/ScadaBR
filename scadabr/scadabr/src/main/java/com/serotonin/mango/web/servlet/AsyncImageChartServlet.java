@@ -38,6 +38,7 @@ import br.org.scadabr.sync.Synchronizer;
 import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.util.StringUtils;
 
+@Deprecated //TODO APL Use rest to fetch image
 public class AsyncImageChartServlet extends BaseInfoServlet {
 
     private static final long serialVersionUID = -1;

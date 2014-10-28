@@ -38,14 +38,17 @@ import com.serotonin.mango.view.ImageSet;
 
 import freemarker.template.Configuration;
 
+@Deprecated // use Bean
 public class ContextWrapper {
 
     private final ServletContext ctx;
 
+    @Deprecated // use Bean
     public ContextWrapper(ServletContext ctx) {
         this.ctx = ctx;
     }
 
+    @Deprecated // use Bean
     public ContextWrapper(HttpServletRequest request) {
         ctx = request.getSession().getServletContext();
     }
@@ -56,11 +59,13 @@ public class ContextWrapper {
                 .getAttribute(Common.ContextKeys.DATABASE_ACCESS);
     }
 
+    @Deprecated // use Bean
     @SuppressWarnings("unchecked")
     public List<ImageSet> getImageSets() {
         return (List<ImageSet>) ctx.getAttribute(Common.ContextKeys.IMAGE_SETS);
     }
 
+    @Deprecated // use Bean
     public List<String> getImageSetIds() {
         List<String> result = new ArrayList<>();
         for (ImageSet s : getImageSets()) {
@@ -69,12 +74,14 @@ public class ContextWrapper {
         return result;
     }
 
+    @Deprecated // use Bean
     @SuppressWarnings("unchecked")
     public List<DynamicImage> getDynamicImages() {
         return (List<DynamicImage>) ctx
                 .getAttribute(Common.ContextKeys.DYNAMIC_IMAGES);
     }
 
+    @Deprecated // use Bean
     public List<String> getDynamicImageIds() {
         List<String> result = new ArrayList<>();
         for (DynamicImage d : getDynamicImages()) {
@@ -83,6 +90,7 @@ public class ContextWrapper {
         return result;
     }
 
+    @Deprecated // use Bean
     public ImageSet getImageSet(String id) {
         List<ImageSet> imageSets = getImageSets();
         for (ImageSet imageSet : imageSets) {
@@ -93,6 +101,7 @@ public class ContextWrapper {
         return null;
     }
 
+    @Deprecated // use Bean
     public DynamicImage getDynamicImage(String id) {
         List<DynamicImage> dynamicImages = getDynamicImages();
         for (DynamicImage dynamicImage : dynamicImages) {
@@ -103,31 +112,37 @@ public class ContextWrapper {
         return null;
     }
 
+    @Deprecated // use Bean
     public RuntimeManager getRuntimeManager() {
         return (RuntimeManager) ctx
                 .getAttribute(Common.ContextKeys.RUNTIME_MANAGER);
     }
 
+    @Deprecated // use Bean
     public EventManager getEventManager() {
         return (EventManager) ctx
                 .getAttribute(Common.ContextKeys.EVENT_MANAGER);
     }
 
+    @Deprecated // use Bean
     public Configuration getFreemarkerConfig() {
         return (Configuration) ctx
                 .getAttribute(Common.ContextKeys.FREEMARKER_CONFIG);
     }
 
+    @Deprecated // use Bean
     public BackgroundProcessing getBackgroundProcessing() {
         return (BackgroundProcessing) ctx
                 .getAttribute(Common.ContextKeys.BACKGROUND_PROCESSING);
     }
 
+    @Deprecated // use Bean
     public HttpReceiverMulticaster getHttpReceiverMulticaster() {
         return (HttpReceiverMulticaster) ctx
                 .getAttribute(Common.ContextKeys.HTTP_RECEIVER_MULTICASTER);
     }
 
+    @Deprecated // use Bean
     public Integer getDataPointByName(String dataPointQualifiedName) {
         Map<String, Integer> mapping = (Map<String, Integer>) ctx
                 .getAttribute(Common.ContextKeys.DATA_POINTS_NAME_ID_MAPPING);
@@ -139,10 +154,12 @@ public class ContextWrapper {
         }
     }
 
+    @Deprecated // use Bean
     public ServletContext getServletContext() {
         return ctx;
     }
 
+    @Deprecated // use Bean
     public DocumentationManifest getDocumentationManifest() {
         DocumentationManifest dm = (DocumentationManifest) ctx
                 .getAttribute(Common.ContextKeys.DOCUMENTATION_MANIFEST);

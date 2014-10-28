@@ -20,132 +20,6 @@
 
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
   <!-- 
-    Context parameters.
-   -->
-  <context-param>
-    <param-name>br.org.scadabr.web.taglib.ListSortTag.styleClass</param-name>
-    <param-value>rowHeaderLink</param-value>
-  </context-param>
-  <context-param>
-    <param-name>br.org.scadabr.web.taglib.ListSortTag.imageAlign</param-name>
-    <param-value>top</param-value>
-  </context-param>
-  
-  <context-param>
-    <param-name>br.org.scadabr.web.taglib.ListSortTag.upImage.src</param-name>
-    <param-value>images/icon_arrow_up.png</param-value>
-  </context-param>
-  <context-param>
-    <param-name>br.org.scadabr.web.taglib.ListSortTag.upImage.width</param-name>
-    <param-value>16</param-value>
-  </context-param>
-  <context-param>
-    <param-name>br.org.scadabr.web.taglib.ListSortTag.upImage.height</param-name>
-    <param-value>16</param-value>
-  </context-param>
-  <context-param>
-    <param-name>br.org.scadabr.web.taglib.ListSortTag.upImage.altKey</param-name>
-    <param-value>pagination.ascending</param-value>
-  </context-param>
-  
-  <context-param>
-    <param-name>br.org.scadabr.web.taglib.ListSortTag.downImage.src</param-name>
-    <param-value>images/icon_arrow_down.png</param-value>
-  </context-param>
-  <context-param>
-    <param-name>br.org.scadabr.web.taglib.ListSortTag.downImage.width</param-name>
-    <param-value>16</param-value>
-  </context-param>
-  <context-param>
-    <param-name>br.org.scadabr.web.taglib.ListSortTag.downImage.height</param-name>
-    <param-value>16</param-value>
-  </context-param>
-  <context-param>
-    <param-name>br.org.scadabr.web.taglib.ListSortTag.downImage.altKey</param-name>
-    <param-value>pagination.descending</param-value>
-  </context-param>
-  
-  
-  <!-- 
-    Filter definitions.
-   -->
-  <filter>
-    <filter-name>CharacterSet</filter-name>
-    <filter-class>br.org.scadabr.web.filter.CharacterSetFilter</filter-class>
-    <init-param>
-      <param-name>charset</param-name>
-      <param-value>UTF-8</param-value>
-    </init-param>
-  </filter>
-  
-  <filter>
-    <filter-name>IsLoggedIn</filter-name>
-    <filter-class>com.serotonin.mango.web.filter.NormalLoggedInFilter</filter-class>
-    <init-param>
-      <param-name>forwardUrl</param-name>
-      <param-value>/login</param-value>
-    </init-param>
-  </filter>
-  
-  <filter>
-    <filter-name>CacheHeaders</filter-name>
-    <filter-class>com.serotonin.mango.web.filter.HttpResponseHeaderFilter</filter-class>
-    <init-param>
-      <param-name>Cache-Control</param-name>
-      <param-value>max-age=5184000</param-value>
-    </init-param>
-  </filter>
-  
-  
-  <!-- 
-    Filter mappings.
-   -->
-  <filter-mapping>
-    <filter-name>CharacterSet</filter-name>
-    <url-pattern>*.htm</url-pattern>
-  </filter-mapping>
-
-  <filter-mapping>
-    <filter-name>CharacterSet</filter-name>
-    <url-pattern>*.shtm</url-pattern>
-  </filter-mapping>
-
-  <filter-mapping>
-    <filter-name>IsLoggedIn</filter-name>
-    <url-pattern>*.shtm</url-pattern>
-  </filter-mapping>
-
-  <!--filter-mapping>
-    <filter-name>CacheHeaders</filter-name>
-    <url-pattern>/dwr/interfaces/*</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>CacheHeaders</filter-name>
-    <url-pattern>/dwr/engine.js</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>CacheHeaders</filter-name>
-    <url-pattern>/dwr/utils.js</url-pattern>
-  </filter-mapping-->
-  <filter-mapping>
-    <filter-name>CacheHeaders</filter-name>
-    <url-pattern>/audio/*</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>CacheHeaders</filter-name>
-    <url-pattern>/images/*</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>CacheHeaders</filter-name>
-    <url-pattern>/graphics/*</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>CacheHeaders</filter-name>
-    <url-pattern>/resources/*</url-pattern>
-  </filter-mapping>
-
-  
-  <!-- 
     Servlet definitions.
    -->
   <servlet>
@@ -153,25 +27,8 @@
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
-  
-  <!--servlet>
-    <servlet-name>dwr-invoker</servlet-name>
-    <servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
-    <init-param>
-      <param-name>debug</param-name>
-      <param-value>true</param-value>
-    </init-param>
-    <init-param>
-      <param-name>publishContainerAs</param-name>
-      <param-value>DwrContainer</param-value>
-    </init-param>
-    <init-param>
-      <param-name>crossDomainSessionSecurity</param-name>
-      <param-value>false</param-value>
-    </init-param>
-    <load-on-startup>2</load-on-startup>
-  </servlet-->
-  
+
+  <!--  
   <servlet>
     <servlet-name>imageChart</servlet-name>
     <servlet-class>com.serotonin.mango.web.servlet.ImageChartServlet</servlet-class>
@@ -211,7 +68,7 @@
     <servlet-name>imageValue</servlet-name>
     <servlet-class>com.serotonin.mango.web.servlet.ImageValueServlet</servlet-class>
   </servlet>
-  
+  -->
 
   <!-- 
     Servlet mappings.
@@ -222,11 +79,6 @@
   </servlet-mapping>
 
   <!--servlet-mapping>
-    <servlet-name>dwr-invoker</servlet-name>
-    <url-pattern>/dwr/*</url-pattern>
-  </servlet-mapping-->
-
-  <servlet-mapping>
     <servlet-name>imageChart</servlet-name>
     <url-pattern>/chart/*</url-pattern>
   </servlet-mapping>
@@ -266,6 +118,7 @@
     <url-pattern>/imageValue/*</url-pattern>
   </servlet-mapping>
  
+-->
   
   <!-- 
     Context listeners.
@@ -284,7 +137,7 @@
     <welcome-file>home.jsp</welcome-file>
     <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>
-<servlet>
+<!--servlet>
     <display-name>Apache-Axis Servlet</display-name>
     <servlet-name>AxisServlet</servlet-name>
     <servlet-class>org.apache.axis.transport.http.AxisServlet</servlet-class>
@@ -310,7 +163,7 @@
   <servlet-mapping>
     <servlet-name>AdminServlet</servlet-name>
     <url-pattern>/servlet/AdminServlet</url-pattern>
-  </servlet-mapping>
+  </servlet-mapping-->
   <error-page>
     <exception-type>com.serotonin.mango.vo.permission.PermissionException</exception-type>
     <location>/exception/accessDenied.jsp</location>
