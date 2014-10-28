@@ -18,6 +18,8 @@
  */
 package com.serotonin.mango.rt.event;
 
+import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.EventStatus;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +29,7 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.UserComment;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import com.serotonin.bacnet4j.type.enumerated.EventState;
 
 public class EventInstance {
 
@@ -80,7 +83,7 @@ public class EventInstance {
      *
      * @see AlarmLevels
      */
-    private final int alarmLevel;
+    private final AlarmLevel alarmLevel;
 
     /**
      * Configuration field. The message associated with the event.
@@ -111,7 +114,7 @@ public class EventInstance {
     // Contextual data from the source that raised the event.
     private final Map<String, Object> context;
 
-    public EventInstance(EventType eventType, long activeTimestamp, boolean rtnApplicable, int alarmLevel,
+    public EventInstance(EventType eventType, long activeTimestamp, boolean rtnApplicable, AlarmLevel alarmLevel,
             LocalizableMessage message, Map<String, Object> context) {
         this.eventType = eventType;
         this.activeTimestamp = activeTimestamp;
@@ -184,7 +187,7 @@ public class EventInstance {
     }
 
     public boolean isAlarm() {
-        return alarmLevel != AlarmLevels.NONE;
+        return alarmLevel != AlarmLevel.NONE;
     }
 
     /**
@@ -197,6 +200,16 @@ public class EventInstance {
         this.id = id;
     }
 
+    public EventStatus getEventState() {
+        if (isActive()) {
+            return EventStatus.ACTIVE; 
+        } else if (isRtnApplicable()) {
+            return EventStatus.RTN;
+        } else {
+            return EventStatus.NORTN;
+        }
+    }
+    
     public boolean isActive() {
         return rtnApplicable && rtnTimestamp == 0;
     }
@@ -216,7 +229,7 @@ public class EventInstance {
         return activeTimestamp;
     }
 
-    public int getAlarmLevel() {
+    public AlarmLevel getAlarmLevel() {
         return alarmLevel;
     }
 

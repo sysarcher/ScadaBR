@@ -33,7 +33,6 @@ import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.schedule.ScheduledEventRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -41,6 +40,7 @@ import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -89,7 +89,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     private String xid;
     @JsonRemoteProperty
     private String alias;
-    private int alarmLevel = AlarmLevels.NONE;
+    private AlarmLevel alarmLevel = AlarmLevel.NONE;
     private int scheduleType = TYPE_DAILY;
     @JsonRemoteProperty
     private boolean returnToNormal = true;
@@ -342,7 +342,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "scheduledEvents.alias", alias);
-        AuditEventType.addPropertyMessage(list, "common.alarmLevel", AlarmLevels.getAlarmLevelMessage(alarmLevel));
+        AuditEventType.addPropertyMessage(list, "common.alarmLevel", alarmLevel.getI18nKey());
         AuditEventType.addPropertyMessage(list, "scheduledEvents.type", getTypeMessage());
         AuditEventType.addPropertyMessage(list, "common.rtn", returnToNormal);
         AuditEventType.addPropertyMessage(list, "common.disabled", disabled);
@@ -445,11 +445,11 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         this.activeYear = activeYear;
     }
 
-    public int getAlarmLevel() {
+    public AlarmLevel getAlarmLevel() {
         return alarmLevel;
     }
 
-    public void setAlarmLevel(int alarmLevel) {
+    public void setAlarmLevel(AlarmLevel alarmLevel) {
         this.alarmLevel = alarmLevel;
     }
 
@@ -549,7 +549,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
-        map.put("alarmLevel", AlarmLevels.CODES.getCode(alarmLevel));
+        map.put("alarmLevel", alarmLevel.getName());
         map.put("scheduleType", TYPE_CODES.getCode(scheduleType));
     }
 
@@ -557,10 +557,11 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("alarmLevel");
         if (text != null) {
-            alarmLevel = AlarmLevels.CODES.getId(text);
-            if (!AlarmLevels.CODES.isValidId(alarmLevel)) {
+            try {
+                alarmLevel = AlarmLevel.valueOf(text);
+            } catch (Exception e) {
                 throw new LocalizableJsonException("emport.error.scheduledEvent.invalid", "alarmLevel", text,
-                        AlarmLevels.CODES.getCodeList());
+                        AlarmLevel.nameValues());
             }
         }
 

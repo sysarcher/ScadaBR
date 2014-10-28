@@ -29,9 +29,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.pachube.PachubeDataSourceRT;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.PublisherEventType;
 import com.serotonin.mango.rt.publish.PublishQueue;
@@ -154,7 +154,7 @@ public class PachubeSenderRT extends PublisherRT<PachubePointVO> {
 
                 if (failureCount == MAX_FAILURES + 1) {
                     Common.ctx.getEventManager().raiseEvent(sendExceptionEventType, System.currentTimeMillis(), true,
-                            AlarmLevels.URGENT, failureMessage, createEventContext());
+                            AlarmLevel.URGENT, failureMessage, createEventContext());
                 }
 
                 return permanentFailure;

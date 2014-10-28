@@ -19,6 +19,7 @@
 package com.serotonin.mango.web.dwr.beans;
 
 import br.org.scadabr.l10n.AbstractLocalizer;
+import br.org.scadabr.vo.event.AlarmLevel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -31,7 +32,6 @@ import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataSource.ebro.EBI25Constants;
 import com.serotonin.mango.rt.dataSource.ebro.ExceptionResultException;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.view.text.AnalogRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.ebro.EBI25DataSourceVO;
@@ -44,10 +44,6 @@ import com.serotonin.modbus4j.exception.ErrorResponseException;
 import com.serotonin.modbus4j.exception.ModbusInitException;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.locator.NumericLocator;
-import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -214,7 +210,7 @@ public class EBI25InterfaceReader {
         ped.setXid(xid);
         ped.setAlias("");
         ped.setDetectorType(type);
-        ped.setAlarmLevel(AlarmLevels.URGENT);
+        ped.setAlarmLevel(AlarmLevel.URGENT);
 
         dp.getEventDetectors().add(ped);
         ped.njbSetDataPoint(dp);

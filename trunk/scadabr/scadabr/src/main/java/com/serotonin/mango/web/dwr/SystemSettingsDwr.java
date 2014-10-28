@@ -51,6 +51,7 @@ import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.UserDao;
 import javax.inject.Inject;
 
@@ -253,7 +254,7 @@ public class SystemSettingsDwr extends BaseDwr {
         Permissions.ensureAdmin();
         for (IntegerPair eventAlarmLevel : eventAlarmLevels) {
             SystemEventType.setEventTypeAlarmLevel(eventAlarmLevel.getI1(),
-                    eventAlarmLevel.getI2());
+                    AlarmLevel.valueOf(eventAlarmLevel.getI2()));
         }
     }
 
@@ -262,7 +263,7 @@ public class SystemSettingsDwr extends BaseDwr {
         Permissions.ensureAdmin();
         for (IntegerPair eventAlarmLevel : eventAlarmLevels) {
             AuditEventType.setEventTypeAlarmLevel(eventAlarmLevel.getI1(),
-                    eventAlarmLevel.getI2());
+                    AlarmLevel.valueOf(eventAlarmLevel.getI2()));
         }
     }
 

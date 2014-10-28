@@ -34,11 +34,11 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.json.JsonValue;
+import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
-import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.View;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
@@ -47,11 +47,9 @@ import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import com.serotonin.mango.web.dwr.beans.DataExportDefinition;
-import com.serotonin.mango.web.dwr.beans.EventExportDefinition;
 import com.serotonin.mango.web.dwr.beans.ImportTask;
 import com.serotonin.mango.web.dwr.beans.TestingUtility;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import java.io.Serializable;
 
 @JsonRemoteEntity
@@ -76,7 +74,7 @@ public class User implements Serializable, SetPointSource, JsonSerializable {
     @JsonRemoteProperty
     private String homeUrl;
     private long lastLogin;
-    private int receiveAlarmEmails;
+    private AlarmLevel receiveAlarmEmails;
     @JsonRemoteProperty
     private boolean receiveOwnAuditEvents;
 
@@ -89,19 +87,19 @@ public class User implements Serializable, SetPointSource, JsonSerializable {
     private transient WatchList watchList;
     private transient DataPointVO editPoint;
     private transient DataSourceVO<?> editDataSource;
-    
+
     private transient TestingUtility testingUtility;
     private transient Map<String, byte[]> reportImageData;
     private transient PublisherVO<? extends PublishedPointVO> editPublisher;
     private transient ImportTask importTask;
     private transient boolean muted = false;
     private transient DataExportDefinition dataExportDefinition;
-    private transient EventExportDefinition eventExportDefinition;
     private final transient Map<String, Object> attributes = new HashMap<>();
 
     /**
      * Used for various display purposes.
-     * @return 
+     *
+     * @return
      */
     public String getDescription() {
         return username + " (" + id + ")";
@@ -327,11 +325,11 @@ public class User implements Serializable, SetPointSource, JsonSerializable {
         this.muted = muted;
     }
 
-    public int getReceiveAlarmEmails() {
+    public AlarmLevel getReceiveAlarmEmails() {
         return receiveAlarmEmails;
     }
 
-    public void setReceiveAlarmEmails(int receiveAlarmEmails) {
+    public void setReceiveAlarmEmails(AlarmLevel receiveAlarmEmails) {
         this.receiveAlarmEmails = receiveAlarmEmails;
     }
 
@@ -350,15 +348,6 @@ public class User implements Serializable, SetPointSource, JsonSerializable {
     public void setDataExportDefinition(
             DataExportDefinition dataExportDefinition) {
         this.dataExportDefinition = dataExportDefinition;
-    }
-
-    public EventExportDefinition getEventExportDefinition() {
-        return eventExportDefinition;
-    }
-
-    public void setEventExportDefinition(
-            EventExportDefinition eventExportDefinition) {
-        this.eventExportDefinition = eventExportDefinition;
     }
 
     public void setAttribute(String key, Object value) {
@@ -382,17 +371,17 @@ public class User implements Serializable, SetPointSource, JsonSerializable {
             response.addContextual("email", "validate.required");
         }
         if (id == Common.NEW_ID && password.isEmpty()) {
-            response.addContextual("password",  "validate.required");
+            response.addContextual("password", "validate.required");
         }
 
         // Check field lengths
-        if (username.length()> 40) {
+        if (username.length() > 40) {
             response.addContextual("username", "validate.notLongerThan", 40);
         }
         if (email.length() > 255) {
             response.addContextual("email", "validate.notLongerThan", 255);
         }
-        if (phone.length() >  40) {
+        if (phone.length() > 40) {
             response.addContextual("phone", "validate.notLongerThan", 40);
         }
     }
@@ -508,5 +497,9 @@ public class User implements Serializable, SetPointSource, JsonSerializable {
     }
 
     private ZIPProjectManager uploadedProject;
+
+    public boolean isReceiveAlarmEmails() {
+        return receiveAlarmEmails != null;
+    }
 
 }

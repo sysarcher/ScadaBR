@@ -15,9 +15,9 @@ import org.directwebremoting.WebContextFactory;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.EventDao;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.web.dwr.BaseDwr;
@@ -29,7 +29,7 @@ public class AlarmListComponent extends CustomComponent {
             "ALARMLIST", "graphic.alarmlist", new int[]{});
 
     @JsonRemoteProperty
-    private int minAlarmLevel = 1;
+    private AlarmLevel minAlarmLevel = AlarmLevel.INFORMATION;
     @JsonRemoteProperty
     private int maxListSize = 5;
     @JsonRemoteProperty
@@ -67,23 +67,23 @@ public class AlarmListComponent extends CustomComponent {
         return content;
     }
 
-    private void filter(List<EventInstance> list, int alarmLevel) {
+    private void filter(List<EventInstance> list, AlarmLevel alarmLevel) {
 
-        if (AlarmLevels.URGENT == alarmLevel) {
-            removeAlarmLevel(list, AlarmLevels.INFORMATION);
+        if (alarmLevel.URGENT == alarmLevel) {
+            removeAlarmLevel(list, AlarmLevel.INFORMATION);
         }
-        if (AlarmLevels.CRITICAL == alarmLevel) {
-            removeAlarmLevel(list, AlarmLevels.INFORMATION);
-            removeAlarmLevel(list, AlarmLevels.URGENT);
+        if (AlarmLevel.CRITICAL == alarmLevel) {
+            removeAlarmLevel(list, AlarmLevel.INFORMATION);
+            removeAlarmLevel(list, AlarmLevel.URGENT);
         }
-        if (AlarmLevels.LIFE_SAFETY == alarmLevel) {
-            removeAlarmLevel(list, AlarmLevels.INFORMATION);
-            removeAlarmLevel(list, AlarmLevels.URGENT);
-            removeAlarmLevel(list, AlarmLevels.CRITICAL);
+        if (AlarmLevel.LIFE_SAFETY == alarmLevel) {
+            removeAlarmLevel(list, AlarmLevel.INFORMATION);
+            removeAlarmLevel(list, AlarmLevel.URGENT);
+            removeAlarmLevel(list, AlarmLevel.CRITICAL);
         }
     }
 
-    private void removeAlarmLevel(List<EventInstance> source, int alarmLevel) {
+    private void removeAlarmLevel(List<EventInstance> source, AlarmLevel alarmLevel) {
         List<EventInstance> copy = new ArrayList<>();
 
         for (EventInstance eventInstance : source) {
@@ -164,7 +164,7 @@ public class AlarmListComponent extends CustomComponent {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(minAlarmLevel);
+        out.writeInt(minAlarmLevel.ordinal());
         out.writeInt(maxListSize);
         out.writeInt(width);
         out.writeBoolean(hideIdColumn);
@@ -177,10 +177,10 @@ public class AlarmListComponent extends CustomComponent {
 
     private void readObject(ObjectInputStream in) throws IOException {
         int ver = in.readInt();
-		// Switch on the version of the class so that version changes can be
+        // Switch on the version of the class so that version changes can be
         // elegantly handled.
         if (ver == 1) {
-            minAlarmLevel = in.readInt();
+            minAlarmLevel = AlarmLevel.valueOf(in.readInt());
             maxListSize = in.readInt();
             width = in.readInt();
             hideIdColumn = in.readBoolean();
@@ -200,11 +200,11 @@ public class AlarmListComponent extends CustomComponent {
         return hideAckColumn;
     }
 
-    public void setMinAlarmLevel(int minAlarmLevel) {
+    public void setMinAlarmLevel(AlarmLevel minAlarmLevel) {
         this.minAlarmLevel = minAlarmLevel;
     }
 
-    public int getMinAlarmLevel() {
+    public AlarmLevel getMinAlarmLevel() {
         return minAlarmLevel;
     }
 

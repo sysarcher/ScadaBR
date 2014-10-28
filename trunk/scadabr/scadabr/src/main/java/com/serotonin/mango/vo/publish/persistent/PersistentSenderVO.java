@@ -29,7 +29,6 @@ import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.publish.PublisherRT;
 import com.serotonin.mango.rt.publish.persistent.PersistentSenderRT;
@@ -38,6 +37,7 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -49,19 +49,19 @@ public class PersistentSenderVO extends PublisherVO<PersistentPointVO> {
     protected void getEventTypesImpl(List<EventTypeVO> eventTypes) {
         eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(),
                 PersistentSenderRT.CONNECTION_FAILED_EVENT, new LocalizableMessageImpl(
-                        "event.pb.persistent.connectionFailed"), AlarmLevels.URGENT));
+                        "event.pb.persistent.connectionFailed"), AlarmLevel.URGENT));
         eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(),
                 PersistentSenderRT.PROTOCOL_FAILURE_EVENT,
-                new LocalizableMessageImpl("event.pb.persistent.protocolFailure"), AlarmLevels.URGENT));
+                new LocalizableMessageImpl("event.pb.persistent.protocolFailure"), AlarmLevel.URGENT));
         eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(),
                 PersistentSenderRT.CONNECTION_ABORTED_EVENT, new LocalizableMessageImpl(
-                        "event.pb.persistent.connectionAborted"), AlarmLevels.URGENT));
+                        "event.pb.persistent.connectionAborted"), AlarmLevel.URGENT));
         eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(),
                 PersistentSenderRT.CONNECTION_LOST_EVENT, new LocalizableMessageImpl("event.pb.persistent.connectionLost"),
-                AlarmLevels.URGENT));
+                AlarmLevel.URGENT));
         eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(),
                 PersistentSenderRT.SYNC_COMPLETION_EVENT, new LocalizableMessageImpl("event.pb.persistent.syncCompleted"),
-                AlarmLevels.NONE));
+                AlarmLevel.NONE));
     }
 
     private static final ExportCodes EVENT_CODES = new ExportCodes();

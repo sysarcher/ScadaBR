@@ -20,7 +20,7 @@
 <%@include file="/WEB-INF/jsp/include/tech.jsp" %>
 <%@page import="com.serotonin.mango.vo.UserComment"%>
 <%@page import="com.serotonin.mango.rt.event.type.EventType"%>
-<%@page import="com.serotonin.mango.web.dwr.EventsDwr"%>
+<%@page import="br.org.scadabr.vo.event.EventStatus"%>
 <tag:page helpId="events">
     <!--%@ include file="/WEB-INF/jsp/include/userComment.jsp" %-->
     <style>
@@ -109,11 +109,12 @@
                         <option value="<c:out value="<%= EventType.EventSources.SYSTEM%>"/>"><fmt:message key="eventHandlers.systemEvents"/></option>
                         <option value="<c:out value="<%= EventType.EventSources.AUDIT%>"/>"><fmt:message key="eventHandlers.auditEvents"/></option>
                     </select>
+                    <!-- TODO use checkboxes for this ???-->
                     <select id="eventStatus" data-dojo-type="dijit/form/Select" title="<fmt:message key="common.status"/>">
-                        <option value="<c:out value="<%= EventsDwr.STATUS_ALL%>"/>"><fmt:message key="common.all"/></option>
-                        <option value="<c:out value="<%= EventsDwr.STATUS_ACTIVE%>"/>"><fmt:message key="common.active"/></option>
-                        <option value="<c:out value="<%= EventsDwr.STATUS_RTN%>"/>"><fmt:message key="event.rtn.rtn"/></option>
-                        <option value="<c:out value="<%= EventsDwr.STATUS_NORTN%>"/>"><fmt:message key="common.nortn"/></option>
+                        <option value="<c:out value="<%= EventStatus.ANY%>"/>"><fmt:message key="common.all"/></option>
+                        <option value="<c:out value="<%= EventStatus.ACTIVE.getName()%>"/>"><fmt:message key="common.active"/></option>
+                        <option value="<c:out value="<%= EventStatus.RTN.getName()%>"/>"><fmt:message key="event.rtn.rtn"/></option>
+                        <option value="<c:out value="<%= EventStatus.NORTN.getName()%>"/>"><fmt:message key="common.nortn"/></option>
                     </select>
                     <select id="alarmLevel" data-dojo-type="dijit/form/Select" title="<fmt:message key="common.alarmLevel"/>"><tag:alarmLevelOptions allOption="true"/></select>
                     <dijit:textBox id="keywords" i18nLabel="events.search.keywords"/>

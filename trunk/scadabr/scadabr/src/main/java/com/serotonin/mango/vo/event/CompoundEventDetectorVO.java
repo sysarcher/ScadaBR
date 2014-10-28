@@ -29,7 +29,6 @@ import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.compound.CompoundEventDetectorRT;
 import com.serotonin.mango.rt.event.compound.ConditionParseException;
 import com.serotonin.mango.rt.event.compound.LogicalOperator;
@@ -41,6 +40,7 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -57,7 +57,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
     private String xid;
     @JsonRemoteProperty
     private String name;
-    private int alarmLevel = AlarmLevels.NONE;
+    private AlarmLevel alarmLevel = AlarmLevel.NONE;
     @JsonRemoteProperty
     private boolean returnToNormal = true;
     @JsonRemoteProperty
@@ -139,7 +139,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "compoundDetectors.name", name);
-        AuditEventType.addPropertyMessage(list, "common.alarmLevel", AlarmLevels.getAlarmLevelMessage(alarmLevel));
+        AuditEventType.addPropertyMessage(list, "common.alarmLevel", alarmLevel.getI18nKey());
         AuditEventType.addPropertyMessage(list, "common.rtn", returnToNormal);
         AuditEventType.addPropertyMessage(list, "common.disabled", disabled);
         AuditEventType.addPropertyMessage(list, "compoundDetectors.condition", condition);
@@ -176,11 +176,11 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
         this.xid = xid;
     }
 
-    public int getAlarmLevel() {
+    public AlarmLevel getAlarmLevel() {
         return alarmLevel;
     }
 
-    public void setAlarmLevel(int alarmLevel) {
+    public void setAlarmLevel(AlarmLevel alarmLevel) {
         this.alarmLevel = alarmLevel;
     }
 
@@ -224,17 +224,18 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
-        map.put("alarmLevel", AlarmLevels.CODES.getCode(alarmLevel));
+        map.put("alarmLevel", alarmLevel.getName());
     }
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("alarmLevel");
         if (text != null) {
-            alarmLevel = AlarmLevels.CODES.getId(text);
-            if (!AlarmLevels.CODES.isValidId(alarmLevel)) {
+            try {
+                alarmLevel = AlarmLevel.valueOf(text);
+            } catch (Exception e) {
                 throw new LocalizableJsonException("emport.error.scheduledEvent.invalid", "alarmLevel", text,
-                        AlarmLevels.CODES.getCodeList());
+                        AlarmLevel.nameValues());
             }
         }
     }

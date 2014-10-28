@@ -25,7 +25,6 @@ import java.util.List;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.publish.PublisherRT;
 import com.serotonin.mango.rt.publish.httpSender.HttpSenderRT;
@@ -34,7 +33,7 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -45,7 +44,7 @@ public class PachubeSenderVO extends PublisherVO<PachubePointVO> {
     @Override
     protected void getEventTypesImpl(List<EventTypeVO> eventTypes) {
         eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(), HttpSenderRT.SEND_EXCEPTION_EVENT,
-                new LocalizableMessageImpl("event.pb.httpSend"), AlarmLevels.URGENT));
+                new LocalizableMessageImpl("event.pb.httpSend"), AlarmLevel.URGENT));
     }
 
     private static final ExportCodes EVENT_CODES = new ExportCodes();

@@ -19,6 +19,7 @@
 package com.serotonin.mango.db.dao;
 
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.vo.event.AlarmLevel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -51,17 +52,17 @@ public class UserDao extends BaseDao {
     public UserDao() {
         super();
     }
-    
-   @Deprecated
+
+    @Deprecated
     public UserDao(DataSource dataSource) {
         super(dataSource);
     }
 
-   @Deprecated
-     public static UserDao getInstance() {
+    @Deprecated
+    public static UserDao getInstance() {
         return new UserDao(Common.ctx.getDatabaseAccess().getDataSource());
     }
-    
+
     public User getUser(int id) {
         try {
             User user = ejt.queryForObject(USER_SELECT + "where id=?", new UserRowMapper(), id);
@@ -98,7 +99,8 @@ public class UserDao extends BaseDao {
             user.setSelectedWatchList(rs.getInt(++i));
             user.setHomeUrl(rs.getString(++i));
             user.setLastLogin(rs.getLong(++i));
-            user.setReceiveAlarmEmails(rs.getInt(++i));
+            AlarmLevel l = AlarmLevel.valueOf(rs.getInt(++i));
+            user.setReceiveAlarmEmails(l == AlarmLevel.NONE ? null : l);
             user.setReceiveOwnAuditEvents(charToBool(rs.getString(++i)));
             return user;
         }
@@ -172,7 +174,7 @@ public class UserDao extends BaseDao {
                 ps.setString(5, boolToChar(user.isAdmin()));
                 ps.setString(6, boolToChar(user.isDisabled()));
                 ps.setString(7, user.getHomeUrl());
-                ps.setInt(8, user.getReceiveAlarmEmails());
+                ps.setInt(8, user.getReceiveAlarmEmails().ordinal());
                 ps.setString(9, boolToChar(user.isReceiveOwnAuditEvents()));
                 return ps;
             }

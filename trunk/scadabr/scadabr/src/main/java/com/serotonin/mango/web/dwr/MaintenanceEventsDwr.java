@@ -36,6 +36,7 @@ import com.serotonin.mango.vo.event.MaintenanceEventVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import javax.inject.Inject;
 
@@ -104,7 +105,7 @@ public class MaintenanceEventsDwr extends BaseDwr {
         return response;
     }
 
-    public DwrResponseI18n saveMaintenanceEvent(int id, String xid, int dataSourceId, String alias, int alarmLevel,
+    public DwrResponseI18n saveMaintenanceEvent(int id, String xid, int dataSourceId, String alias, AlarmLevel alarmLevel,
             int scheduleType, boolean disabled, int activeYear, int activeMonth, int activeDay, int activeHour,
             int activeMinute, int activeSecond, String activeCron, int inactiveYear, int inactiveMonth,
             int inactiveDay, int inactiveHour, int inactiveMinute, int inactiveSecond, String inactiveCron) {

@@ -35,7 +35,6 @@ import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.json.JsonValue;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.PublisherDao;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.publish.PublisherRT;
 import com.serotonin.mango.util.ExportCodes;
@@ -45,13 +44,14 @@ import com.serotonin.mango.vo.publish.httpSender.HttpSenderVO;
 import com.serotonin.mango.vo.publish.pachube.PachubeSenderVO;
 import com.serotonin.mango.vo.publish.persistent.PersistentSenderVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
+ * @param <T>
  */
 abstract public class PublisherVO<T extends PublishedPointVO> implements Serializable, JsonSerializable {
 
@@ -138,11 +138,11 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
     }
 
     public List<EventTypeVO> getEventTypes() {
-        List<EventTypeVO> eventTypes = new ArrayList<EventTypeVO>();
+        List<EventTypeVO> eventTypes = new ArrayList<>();
         eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(), PublisherRT.POINT_DISABLED_EVENT,
-                new LocalizableMessageImpl("event.pb.pointMissing"), AlarmLevels.URGENT));
+                new LocalizableMessageImpl("event.pb.pointMissing"), AlarmLevel.URGENT));
         eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(), PublisherRT.QUEUE_SIZE_WARNING_EVENT,
-                new LocalizableMessageImpl("event.pb.queueSize"), AlarmLevels.URGENT));
+                new LocalizableMessageImpl("event.pb.queueSize"), AlarmLevel.URGENT));
 
         getEventTypesImpl(eventTypes);
 

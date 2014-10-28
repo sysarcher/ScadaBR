@@ -209,6 +209,7 @@ import com.serotonin.modbus4j.msg.ReadResponse;
 import br.org.scadabr.util.IpAddressUtils;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.vo.datasource.fhz4j.FhtPointLocator;
+import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.viconics.RequestFailureException;
 import com.serotonin.viconics.ViconicsDevice;
 import com.serotonin.viconics.ViconicsNetwork;
@@ -408,7 +409,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     }
 
     @MethodFilter
-    public void updateEventAlarmLevel(int eventId, int alarmLevel) {
+    public void updateEventAlarmLevel(int eventId, AlarmLevel alarmLevel) {
         DataSourceVO<?> ds = Common.getUser().getEditDataSource();
         ds.setAlarmLevel(eventId, alarmLevel);
     }

@@ -26,10 +26,10 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.User;
@@ -91,7 +91,7 @@ public class AuditEventType extends EventType {
 
     private static void addEventTypeVO(int type, String key) {
         auditEventTypes.add(new EventTypeVO(EventType.EventSources.AUDIT, type, 0, new LocalizableMessageImpl(key),
-                SystemSettingsDao.getIntValue(AUDIT_SETTINGS_PREFIX + type, AlarmLevels.INFORMATION)));
+                SystemSettingsDao.getAlarmLevel(AUDIT_SETTINGS_PREFIX + type, AlarmLevel.INFORMATION)));
     }
 
     public static EventTypeVO getEventType(int type) {
@@ -103,12 +103,12 @@ public class AuditEventType extends EventType {
         return null;
     }
 
-    public static void setEventTypeAlarmLevel(int type, int alarmLevel) {
+    public static void setEventTypeAlarmLevel(int type, AlarmLevel alarmLevel) {
         EventTypeVO et = getEventType(type);
         et.setAlarmLevel(alarmLevel);
 
         SystemSettingsDao dao = SystemSettingsDao.getInstance();
-        dao.setIntValue(AUDIT_SETTINGS_PREFIX + type, alarmLevel);
+        dao.setAlarmLevel(AUDIT_SETTINGS_PREFIX + type, alarmLevel);
     }
 
     public static void raiseAddedEvent(int auditEventTypeId, ChangeComparable<?> o) {
@@ -233,10 +233,9 @@ public class AuditEventType extends EventType {
     }
 
     public static void maybeAddAlarmLevelChangeMessage(List<LocalizableMessage> list, String propertyNameKey,
-            int fromAlarmLevel, int toAlarmLevel) {
+            AlarmLevel fromAlarmLevel, AlarmLevel toAlarmLevel) {
         if (fromAlarmLevel != toAlarmLevel) {
-            addPropertyChangeMessage(list, propertyNameKey, AlarmLevels.getAlarmLevelMessage(fromAlarmLevel),
-                    AlarmLevels.getAlarmLevelMessage(toAlarmLevel));
+            addPropertyChangeMessage(list, propertyNameKey, fromAlarmLevel.getI18nKey(), toAlarmLevel.getI18nKey());
         }
     }
 

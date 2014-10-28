@@ -1,5 +1,6 @@
 package com.serotonin.mango.db.dao;
 
+import br.org.scadabr.vo.event.AlarmLevel;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -35,17 +36,17 @@ public class MaintenanceEventDao extends BaseDao {
     public MaintenanceEventDao() {
         super();
     }
-    
-   @Deprecated
+
+    @Deprecated
     private MaintenanceEventDao(DataSource dataSource) {
         super(dataSource);
     }
 
-   @Deprecated
-     public static MaintenanceEventDao getInstance() {
+    @Deprecated
+    public static MaintenanceEventDao getInstance() {
         return new MaintenanceEventDao(Common.ctx.getDatabaseAccess().getDataSource());
     }
-    
+
     public String generateUniqueXid() {
         return generateUniqueXid(MaintenanceEventVO.XID_PREFIX, "maintenanceEvents");
     }
@@ -81,7 +82,7 @@ public class MaintenanceEventDao extends BaseDao {
             me.setXid(rs.getString(++i));
             me.setDataSourceId(rs.getInt(++i));
             me.setAlias(rs.getString(++i));
-            me.setAlarmLevel(rs.getInt(++i));
+            me.setAlarmLevel(AlarmLevel.valueOf(rs.getInt(++i)));
             me.setScheduleType(rs.getInt(++i));
             me.setDisabled(charToBool(rs.getString(++i)));
             me.setActiveYear(rs.getInt(++i));
@@ -128,7 +129,7 @@ public class MaintenanceEventDao extends BaseDao {
                 ps.setString(1, me.getXid());
                 ps.setInt(2, me.getDataSourceId());
                 ps.setString(3, me.getAlias());
-                ps.setInt(4, me.getAlarmLevel());
+                ps.setInt(4, me.getAlarmLevel().ordinal());
                 ps.setInt(5, me.getScheduleType());
                 ps.setString(6, boolToChar(me.isDisabled()));
                 ps.setInt(7, me.getActiveYear());

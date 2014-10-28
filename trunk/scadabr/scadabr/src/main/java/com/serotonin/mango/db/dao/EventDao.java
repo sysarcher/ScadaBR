@@ -54,14 +54,14 @@ import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.vo.event.EventHandlerVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
-import com.serotonin.mango.web.dwr.EventsDwr;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.web.i18n.I18NUtils;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.EventStatus;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.i18n.LocalizableMessageParseException;
-import br.org.scadabr.l10n.Localizer;
 import com.serotonin.mango.vo.User;
 import java.sql.Connection;
 import java.sql.Statement;
@@ -81,17 +81,17 @@ public class EventDao extends BaseDao {
     public EventDao() {
         super();
     }
-    
-   @Deprecated
+
+    @Deprecated
     private EventDao(DataSource dataSource) {
         super(dataSource);
     }
 
-   @Deprecated
-     public static EventDao getInstance() {
+    @Deprecated
+    public static EventDao getInstance() {
         return new EventDao(Common.ctx.getDatabaseAccess().getDataSource());
     }
-    
+
     public void saveEvent(EventInstance event) {
         if (event.getId() == Common.NEW_ID) {
             insertEvent(event);
@@ -126,7 +126,7 @@ public class EventDao extends BaseDao {
                     ps.setNull(6, Types.BIGINT);
                     ps.setNull(7, Types.INTEGER);
                 }
-                ps.setInt(8, event.getAlarmLevel());
+                ps.setInt(8, event.getAlarmLevel().ordinal());
                 ps.setString(9, I18NUtils.serialize(event.getMessage()));
                 if (!event.isAlarm()) {
                     event.setAcknowledgedTimestamp(event.getActiveTimestamp());
@@ -341,7 +341,7 @@ public class EventDao extends BaseDao {
             }
 
             EventInstance event = new EventInstance(type, rs.getLong(5),
-                    charToBool(rs.getString(6)), rs.getInt(9), message, null);
+                    charToBool(rs.getString(6)), AlarmLevel.valueOf(rs.getInt(9)), message, null);
             event.setId(rs.getInt(1));
             long rtnTs = rs.getLong(7);
             if (!rs.wasNull()) {
@@ -463,7 +463,7 @@ public class EventDao extends BaseDao {
     }
 
     public List<EventInstance> search(int eventId, int eventSourceType,
-            String status, int alarmLevel, final String[] keywords, int userId,
+            EventStatus status, int alarmLevel, final String[] keywords, int userId,
             final ResourceBundle bundle, final int from, final int to,
             final Date date) {
         return search(eventId, eventSourceType, status, alarmLevel, keywords,
@@ -471,7 +471,7 @@ public class EventDao extends BaseDao {
     }
 
     public List<EventInstance> search(int eventId, int eventSourceType,
-            String status, int alarmLevel, final String[] keywords,
+            EventStatus status, int alarmLevel, final String[] keywords,
             long dateFrom, long dateTo, int userId,
             final ResourceBundle bundle, final int from, final int to,
             final Date date) {
@@ -493,19 +493,21 @@ public class EventDao extends BaseDao {
             params.add(eventSourceType);
         }
 
-        if (null != status) switch (status) {
-            case EventsDwr.STATUS_ACTIVE:
-                where.add("e.rtnApplicable=? and e.rtnTs is null");
-                params.add(boolToChar(true));
-                break;
-            case EventsDwr.STATUS_RTN:
-                where.add("e.rtnApplicable=? and e.rtnTs is not null");
-                params.add(boolToChar(true));
-                break;
-            case EventsDwr.STATUS_NORTN:
-                where.add("e.rtnApplicable=?");
-                params.add(boolToChar(false));
-                break;
+        if (null != status) {
+            switch (status) {
+                case ACTIVE:
+                    where.add("e.rtnApplicable=? and e.rtnTs is null");
+                    params.add(boolToChar(true));
+                    break;
+                case RTN:
+                    where.add("e.rtnApplicable=? and e.rtnTs is not null");
+                    params.add(boolToChar(true));
+                    break;
+                case NORTN:
+                    where.add("e.rtnApplicable=?");
+                    params.add(boolToChar(false));
+                    break;
+            }
         }
 
         if (alarmLevel != -1) {

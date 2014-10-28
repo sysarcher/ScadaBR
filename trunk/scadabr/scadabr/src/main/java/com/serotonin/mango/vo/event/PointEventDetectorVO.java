@@ -29,9 +29,9 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
+import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.detectors.AlphanumericStateDetectorRT;
 import com.serotonin.mango.rt.event.detectors.AnalogHighLimitDetectorRT;
 import com.serotonin.mango.rt.event.detectors.AnalogLowLimitDetectorRT;
@@ -52,7 +52,6 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
@@ -120,7 +119,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
     private String alias;
     private DataPointVO dataPoint;
     private int detectorType;
-    private int alarmLevel;
+    private AlarmLevel alarmLevel;
     private double limit;
     private int duration;
     private int durationType = Common.TimePeriods.SECONDS;
@@ -292,7 +291,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "pointEdit.detectors.alias", alias);
         AuditEventType.addPropertyMessage(list, "pointEdit.detectors.type", getDef().getNameKey());
-        AuditEventType.addPropertyMessage(list, "common.alarmLevel", AlarmLevels.getAlarmLevelMessage(alarmLevel));
+        AuditEventType.addPropertyMessage(list, "common.alarmLevel", alarmLevel.getI18nKey());
         AuditEventType.addPropertyMessage(list, "common.configuration", getConfigurationDescription());
         AuditEventType.addPropertyMessage(list, "pointEdit.detectors.weight", weight);
     }
@@ -323,11 +322,11 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
         this.dataPoint = dataPoint;
     }
 
-    public int getAlarmLevel() {
+    public AlarmLevel getAlarmLevel() {
         return alarmLevel;
     }
 
-    public void setAlarmLevel(int alarmLevel) {
+    public void setAlarmLevel(AlarmLevel alarmLevel) {
         this.alarmLevel = alarmLevel;
     }
 
@@ -457,10 +456,10 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
 
         text = json.getString("alarmLevel");
         if (text != null) {
-            alarmLevel = AlarmLevels.CODES.getId(text);
-            if (!AlarmLevels.CODES.isValidId(alarmLevel)) {
-                throw new LocalizableJsonException("emport.error.ped.invalid", "alarmLevel", text, AlarmLevels.CODES
-                        .getCodeList());
+            try {
+                alarmLevel = AlarmLevel.valueOf(text);
+            } catch (Exception e) {
+                throw new LocalizableJsonException("emport.error.ped.invalid", "alarmLevel", text, AlarmLevel.nameValues());
             }
         }
 
@@ -514,7 +513,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
         map.put("type", TYPE_CODES.getCode(detectorType));
-        map.put("alarmLevel", AlarmLevels.CODES.getCode(alarmLevel));
+        map.put("alarmLevel", alarmLevel.getName());
 
         switch (detectorType) {
             case TYPE_ANALOG_HIGH_LIMIT:

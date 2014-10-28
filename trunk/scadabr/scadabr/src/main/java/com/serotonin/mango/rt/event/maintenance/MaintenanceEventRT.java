@@ -12,7 +12,6 @@ import com.serotonin.mango.util.timeout.SystemRunWithArgTask;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
-import br.org.scadabr.timer.cron.SystemCronTask;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 

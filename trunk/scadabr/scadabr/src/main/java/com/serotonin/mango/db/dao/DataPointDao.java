@@ -54,6 +54,7 @@ import com.serotonin.mango.vo.hierarchy.PointHierarchyEventDispatcher;
 import com.serotonin.mango.vo.link.PointLinkVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.Tuple;
+import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.LazyTreeNode;
 import com.serotonin.mango.rt.RuntimeManager;
 import java.sql.Connection;
@@ -68,7 +69,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 @Named
 public class DataPointDao extends BaseDao {
-    
+
     public final static int ROOT_ID = 0;
 
     @Inject
@@ -113,6 +114,7 @@ public class DataPointDao extends BaseDao {
         sb.append(dp.getName());
         return sb.toString();
     }
+
     @Deprecated
     public String getExtendedPointName(int dataPointId) {
         DataPointVO vo = getDataPoint(dataPointId);
@@ -502,7 +504,7 @@ public class DataPointDao extends BaseDao {
             detector.setXid(rs.getString(++i));
             detector.setAlias(rs.getString(++i));
             detector.setDetectorType(rs.getInt(++i));
-            detector.setAlarmLevel(rs.getInt(++i));
+            detector.setAlarmLevel(AlarmLevel.valueOf(rs.getInt(++i)));
             detector.setLimit(rs.getDouble(++i));
             detector.setDuration(rs.getInt(++i));
             detector.setDurationType(rs.getInt(++i));
@@ -538,7 +540,7 @@ public class DataPointDao extends BaseDao {
                         ps.setString(2, ped.getAlias());
                         ps.setInt(3, dp.getId());
                         ps.setInt(4, ped.getDetectorType());
-                        ps.setInt(5, ped.getAlarmLevel());
+                        ps.setInt(5, ped.getAlarmLevel().ordinal());
                         ps.setDouble(6, ped.getLimit());
                         ps.setInt(7, ped.getDuration());
                         ps.setInt(8, ped.getDurationType());
@@ -702,11 +704,11 @@ public class DataPointDao extends BaseDao {
         PointHierarchyEventDispatcher.firePointHierarchySaved(root);
     }
 
-  
     /**
      * Saves parentId and name thus moving or renaming the folder
+     *
      * @param folder
-     * @param parentId 
+     * @param parentId
      */
     public void savePointFolder(final LazyTreeNode folder) {
         // Save the folder.
@@ -754,7 +756,7 @@ public class DataPointDao extends BaseDao {
             savePointFolder(sf, folder.getId());
         }
         savePointFolder(folder, folder.getId());
-            //DODO save points... to new 
+        //DODO save points... to new 
     }
 
     void savePointsInFolder(PointFolder folder) {

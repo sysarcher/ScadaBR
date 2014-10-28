@@ -8,7 +8,6 @@ import org.apache.commons.logging.LogFactory;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.PublisherEventType;
 import com.serotonin.mango.rt.publish.PublishQueue;
@@ -19,6 +18,7 @@ import com.serotonin.mango.vo.publish.persistent.PersistentPointVO;
 import com.serotonin.mango.vo.publish.persistent.PersistentSenderVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.queue.ByteQueue;
+import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
@@ -147,12 +147,12 @@ public class PersistentSenderRT extends PublisherRT<PersistentPointVO> {
     }
 
     void raiseConnectionEvent(EventType type, LocalizableMessage lm) {
-        Common.ctx.getEventManager().raiseEvent(type, System.currentTimeMillis(), true, AlarmLevels.URGENT, lm,
+        Common.ctx.getEventManager().raiseEvent(type, System.currentTimeMillis(), true, AlarmLevel.URGENT, lm,
                 createEventContext());
     }
 
     void raiseSyncCompletionEvent(LocalizableMessage lm) {
         Common.ctx.getEventManager().raiseEvent(syncCompletionEventType, System.currentTimeMillis(), false,
-                AlarmLevels.NONE, lm, createEventContext());
+                AlarmLevel.NONE, lm, createEventContext());
     }
 }

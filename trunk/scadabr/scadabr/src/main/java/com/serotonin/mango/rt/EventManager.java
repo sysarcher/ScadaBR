@@ -32,7 +32,6 @@ import org.apache.commons.logging.LogFactory;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.db.dao.UserDao;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.handlers.EmailHandlerRT;
 import com.serotonin.mango.rt.event.handlers.EventHandlerRT;
@@ -47,6 +46,7 @@ import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.vo.event.AlarmLevel;
 import static com.serotonin.mango.rt.event.type.SystemEventType.getEventType;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import java.io.Serializable;
@@ -69,13 +69,13 @@ public class EventManager implements ILifecycle, Serializable {
     @Inject
     private UserDao userDao;
     private long lastAlarmTimestamp = 0;
-    private int highestActiveAlarmLevel = 0;
+    private AlarmLevel highestActiveAlarmLevel = AlarmLevel.NONE;
 
     //
     //
     // Basic event management.
     //
-    public void raiseEvent(EventType type, long time, boolean rtnApplicable, int alarmLevel,
+    public void raiseEvent(EventType type, long time, boolean rtnApplicable, AlarmLevel alarmLevel,
             LocalizableMessage message, Map<String, Object> context) {
         // Check if there is an event for this type already active.
         EventInstance dup = get(type);
@@ -132,7 +132,7 @@ public class EventManager implements ILifecycle, Serializable {
 
             if (Permissions.hasEventTypePermission(user, type)) {
                 eventUserIds.add(user.getId());
-                if (evt.isAlarm() && user.getReceiveAlarmEmails() > 0 && alarmLevel >= user.getReceiveAlarmEmails()) {
+                if (evt.isAlarm() && user.isReceiveAlarmEmails() && alarmLevel.otherIsLower(user.getReceiveAlarmEmails())) {
                     emailUsers.add(user.getEmail());
                 }
             }
@@ -153,8 +153,8 @@ public class EventManager implements ILifecycle, Serializable {
             eventDao.ackEvent(evt.getId(), time, 0, EventInstance.AlternateAcknowledgementSources.MAINTENANCE_MODE);
         } else {
             if (evt.isRtnApplicable()) {
-                if (alarmLevel > highestActiveAlarmLevel) {
-                    int oldValue = highestActiveAlarmLevel;
+                if (alarmLevel.meIsHigher(highestActiveAlarmLevel)) {
+                    AlarmLevel oldValue = highestActiveAlarmLevel;
                     highestActiveAlarmLevel = alarmLevel;
                     SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED), time,
                             false, getAlarmLevelChangeMessage("event.alarmMaxIncreased", oldValue));
@@ -239,21 +239,21 @@ public class EventManager implements ILifecycle, Serializable {
     }
 
     private void resetHighestAlarmLevel(long time, boolean init) {
-        int max = 0;
+        AlarmLevel max = AlarmLevel.NONE;
         for (EventInstance e : activeEvents) {
-            if (e.getAlarmLevel() > max) {
+            if (e.getAlarmLevel().otherIsHigher(max)) {
                 max = e.getAlarmLevel();
             }
         }
 
         if (!init) {
-            if (max > highestActiveAlarmLevel) {
-                int oldValue = highestActiveAlarmLevel;
+            if (max.meIsHigher(highestActiveAlarmLevel)) {
+                AlarmLevel oldValue = highestActiveAlarmLevel;
                 highestActiveAlarmLevel = max;
                 SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED), time,
                         false, getAlarmLevelChangeMessage("event.alarmMaxIncreased", oldValue));
-            } else if (max < highestActiveAlarmLevel) {
-                int oldValue = highestActiveAlarmLevel;
+            } else if (max.meIsLower(highestActiveAlarmLevel)) {
+                AlarmLevel oldValue = highestActiveAlarmLevel;
                 highestActiveAlarmLevel = max;
                 SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED), time,
                         false, getAlarmLevelChangeMessage("event.alarmMaxDecreased", oldValue));
@@ -261,9 +261,8 @@ public class EventManager implements ILifecycle, Serializable {
         }
     }
 
-    private LocalizableMessage getAlarmLevelChangeMessage(String key, int oldValue) {
-        return new LocalizableMessageImpl(key, AlarmLevels.getAlarmLevelMessage(oldValue),
-                AlarmLevels.getAlarmLevelMessage(highestActiveAlarmLevel));
+    private LocalizableMessage getAlarmLevelChangeMessage(String key, AlarmLevel oldValue) {
+        return new LocalizableMessageImpl(key, oldValue.getI18nKey(), highestActiveAlarmLevel.getI18nKey());
     }
 
     //
@@ -390,11 +389,10 @@ public class EventManager implements ILifecycle, Serializable {
 
         return false;
     }
-    
-    
+
     public void raiseEvent(SystemEventType type, long time, boolean rtn, LocalizableMessage message) {
         EventTypeVO vo = getEventType(type.getSystemEventTypeId());
-        int alarmLevel = vo.getAlarmLevel();
+        AlarmLevel alarmLevel = vo.getAlarmLevel();
         raiseEvent(type, time, rtn, alarmLevel, message, null);
     }
 

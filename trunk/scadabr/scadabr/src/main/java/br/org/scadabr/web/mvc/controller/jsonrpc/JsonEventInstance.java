@@ -1,6 +1,8 @@
 package br.org.scadabr.web.mvc.controller.jsonrpc;
 
 import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.EventStatus;
 import com.serotonin.mango.rt.event.EventInstance;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,7 +15,8 @@ import java.util.List;
 public class JsonEventInstance {
 
     private int id;
-    private int alarmLevel;
+    private EventStatus eventStatus;
+    private AlarmLevel alarmLevel;
     private boolean active;
     private long activeTimestamp;
     private Long rtnTimestamp;
@@ -39,14 +42,14 @@ public class JsonEventInstance {
     /**
      * @return the alarmLevel
      */
-    public int getAlarmLevel() {
+    public AlarmLevel getAlarmLevel() {
         return alarmLevel;
     }
 
     /**
      * @param alarmLevel the alarmLevel to set
      */
-    public void setAlarmLevel(int alarmLevel) {
+    public void setAlarmLevel(AlarmLevel alarmLevel) {
         this.alarmLevel = alarmLevel;
     }
 
@@ -153,6 +156,7 @@ public class JsonEventInstance {
         result.setId(eventInstance.getId());
         result.setActive(eventInstance.isActive());
         result.setAlarmLevel(eventInstance.getAlarmLevel());
+        result.setEventStatus(eventInstance.getEventState());
         result.setActiveTimestamp(eventInstance.getActiveTimestamp());
         result.setRtnApplicable(eventInstance.isRtnApplicable());
         if (eventInstance.getRtnMessage() != null) {
@@ -172,6 +176,20 @@ public class JsonEventInstance {
             result.add(JsonEventInstance.wrap(ei, localizer));
         }
         return result;
+    }
+
+    /**
+     * @return the eventStatus
+     */
+    public EventStatus getEventStatus() {
+        return eventStatus;
+    }
+
+    /**
+     * @param eventStatus the eventStatus to set
+     */
+    public void setEventStatus(EventStatus eventStatus) {
+        this.eventStatus = eventStatus;
     }
 
 }
