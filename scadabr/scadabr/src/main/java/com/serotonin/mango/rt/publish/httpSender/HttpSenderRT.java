@@ -30,10 +30,10 @@ import org.apache.commons.httpclient.methods.PostMethod;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.KeyValuePair;
+import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.PublisherEventType;
 import com.serotonin.mango.rt.publish.PublishQueue;
@@ -43,7 +43,6 @@ import com.serotonin.mango.rt.publish.SendThread;
 import com.serotonin.mango.vo.publish.httpSender.HttpPointVO;
 import com.serotonin.mango.vo.publish.httpSender.HttpSenderVO;
 import com.serotonin.mango.web.servlet.HttpDataSourceServlet;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.http.HttpUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -156,7 +155,7 @@ public class HttpSenderRT extends PublisherRT<HttpPointVO> {
                         String result = HttpUtils.readResponseBody(method, 1024);
                         if (!result.isEmpty()) {
                             Common.ctx.getEventManager().raiseEvent(resultWarningsEventType,
-                                    System.currentTimeMillis(), false, AlarmLevels.INFORMATION,
+                                    System.currentTimeMillis(), false, AlarmLevel.INFORMATION,
                                     new LocalizableMessageImpl("common.default", result), createEventContext());
                         }
                     }
@@ -178,7 +177,7 @@ public class HttpSenderRT extends PublisherRT<HttpPointVO> {
 
                 if (failureCount == MAX_FAILURES + 1) {
                     Common.ctx.getEventManager().raiseEvent(sendExceptionEventType, System.currentTimeMillis(), true,
-                            AlarmLevels.URGENT, failureMessage, createEventContext());
+                            AlarmLevel.URGENT, failureMessage, createEventContext());
                 }
 
                 return false;

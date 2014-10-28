@@ -44,6 +44,7 @@ import com.serotonin.mango.web.email.MangoEmailContent;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.vo.event.AlarmLevel;
 import freemarker.template.TemplateException;
 import java.io.IOException;
 import javax.inject.Inject;
@@ -103,7 +104,7 @@ public class UsersDwr extends BaseDwr {
     }
 
     public DwrResponseI18n saveUserAdmin(int id, String username, String password, String email, String phone,
-            boolean admin, boolean disabled, int receiveAlarmEmails, boolean receiveOwnAuditEvents,
+            boolean admin, boolean disabled, AlarmLevel receiveAlarmEmails, boolean receiveOwnAuditEvents,
             List<Integer> dataSourcePermissions, List<DataPointAccess> dataPointPermissions) {
         Permissions.ensureAdmin();
 
@@ -165,7 +166,7 @@ public class UsersDwr extends BaseDwr {
         return response;
     }
 
-    public DwrResponseI18n saveUser(int id, String password, String email, String phone, int receiveAlarmEmails,
+    public DwrResponseI18n saveUser(int id, String password, String email, String phone, AlarmLevel receiveAlarmEmails,
             boolean receiveOwnAuditEvents) {
         HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
         User user = Common.getUser(request);

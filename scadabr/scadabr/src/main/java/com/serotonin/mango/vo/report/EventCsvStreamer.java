@@ -23,11 +23,9 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.view.export.CsvWriter;
 import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.l10n.Localizer;
 
 /**
  * @author Matthew Lohbihler
@@ -51,7 +49,7 @@ public class EventCsvStreamer {
 
         for (EventInstance event : events) {
             data[0] = Integer.toString(event.getId());
-            data[1] = AbstractLocalizer.localizeMessage(AlarmLevels.getAlarmLevelMessage(event.getAlarmLevel()), bundle);
+            data[1] = AbstractLocalizer.localizeI18nKey(event.getAlarmLevel().getI18nKey(), bundle);
             data[2] = AbstractLocalizer.localizeTimeStamp(event.getActiveTimestamp(), false, bundle.getLocale());
             data[3] = AbstractLocalizer.localizeMessage(event.getMessage(), bundle);
 

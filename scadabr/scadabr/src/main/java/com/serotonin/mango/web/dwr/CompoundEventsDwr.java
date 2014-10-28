@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr;
 
+import br.org.scadabr.vo.event.AlarmLevel;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -108,7 +109,7 @@ public class CompoundEventsDwr extends BaseDwr {
         return compoundEventDetectorDao.getCompoundEventDetector(id);
     }
 
-    public DwrResponseI18n saveCompoundEvent(int id, String xid, String name, int alarmLevel, boolean returnToNormal,
+    public DwrResponseI18n saveCompoundEvent(int id, String xid, String name, AlarmLevel alarmLevel, boolean returnToNormal,
             String condition, boolean disabled) {
         Permissions.ensureDataSourcePermission(Common.getUser());
 

@@ -26,9 +26,9 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.web.i18n.LocalizableMessage;
@@ -76,23 +76,23 @@ public class SystemEventType extends EventType {
         if (systemEventTypes == null) {
             systemEventTypes = new ArrayList<EventTypeVO>();
 
-            addEventTypeVO(TYPE_SYSTEM_STARTUP, "event.system.startup", AlarmLevels.INFORMATION);
-            addEventTypeVO(TYPE_SYSTEM_SHUTDOWN, "event.system.shutdown", AlarmLevels.INFORMATION);
-            addEventTypeVO(TYPE_MAX_ALARM_LEVEL_CHANGED, "event.system.maxAlarmChanged", AlarmLevels.NONE);
-            addEventTypeVO(TYPE_USER_LOGIN, "event.system.userLogin", AlarmLevels.INFORMATION);
-            addEventTypeVO(TYPE_VERSION_CHECK, "event.system.versionCheck", AlarmLevels.INFORMATION);
-            addEventTypeVO(TYPE_COMPOUND_DETECTOR_FAILURE, "event.system.compound", AlarmLevels.URGENT);
-            addEventTypeVO(TYPE_SET_POINT_HANDLER_FAILURE, "event.system.setPoint", AlarmLevels.URGENT);
-            addEventTypeVO(TYPE_EMAIL_SEND_FAILURE, "event.system.email", AlarmLevels.INFORMATION);
-            addEventTypeVO(TYPE_POINT_LINK_FAILURE, "event.system.pointLink", AlarmLevels.URGENT);
-            addEventTypeVO(TYPE_PROCESS_FAILURE, "event.system.process", AlarmLevels.URGENT);
+            addEventTypeVO(TYPE_SYSTEM_STARTUP, "event.system.startup", AlarmLevel.INFORMATION);
+            addEventTypeVO(TYPE_SYSTEM_SHUTDOWN, "event.system.shutdown", AlarmLevel.INFORMATION);
+            addEventTypeVO(TYPE_MAX_ALARM_LEVEL_CHANGED, "event.system.maxAlarmChanged", AlarmLevel.NONE);
+            addEventTypeVO(TYPE_USER_LOGIN, "event.system.userLogin", AlarmLevel.INFORMATION);
+            addEventTypeVO(TYPE_VERSION_CHECK, "event.system.versionCheck", AlarmLevel.INFORMATION);
+            addEventTypeVO(TYPE_COMPOUND_DETECTOR_FAILURE, "event.system.compound", AlarmLevel.URGENT);
+            addEventTypeVO(TYPE_SET_POINT_HANDLER_FAILURE, "event.system.setPoint", AlarmLevel.URGENT);
+            addEventTypeVO(TYPE_EMAIL_SEND_FAILURE, "event.system.email", AlarmLevel.INFORMATION);
+            addEventTypeVO(TYPE_POINT_LINK_FAILURE, "event.system.pointLink", AlarmLevel.URGENT);
+            addEventTypeVO(TYPE_PROCESS_FAILURE, "event.system.process", AlarmLevel.URGENT);
         }
         return systemEventTypes;
     }
 
-    private static void addEventTypeVO(int type, String key, int defaultAlarmLevel) {
+    private static void addEventTypeVO(int type, String key, AlarmLevel defaultAlarmLevel) {
         systemEventTypes.add(new EventTypeVO(EventType.EventSources.SYSTEM, type, 0, new LocalizableMessageImpl(key),
-                SystemSettingsDao.getIntValue(SYSTEM_SETTINGS_PREFIX + type, defaultAlarmLevel)));
+                SystemSettingsDao.getAlarmLevel(SYSTEM_SETTINGS_PREFIX + type, defaultAlarmLevel)));
     }
 
     public static EventTypeVO getEventType(int type) {
@@ -104,18 +104,18 @@ public class SystemEventType extends EventType {
         return null;
     }
 
-    public static void setEventTypeAlarmLevel(int type, int alarmLevel) {
+    public static void setEventTypeAlarmLevel(int type, AlarmLevel alarmLevel) {
         EventTypeVO et = getEventType(type);
         et.setAlarmLevel(alarmLevel);
 
         SystemSettingsDao dao = SystemSettingsDao.getInstance();
-        dao.setIntValue(SYSTEM_SETTINGS_PREFIX + type, alarmLevel);
+        dao.setAlarmLevel(SYSTEM_SETTINGS_PREFIX + type, alarmLevel);
     }
 
     @Deprecated // Use Eventmanager
     public static void raiseEvent(SystemEventType type, long time, boolean rtn, LocalizableMessage message) {
         EventTypeVO vo = getEventType(type.getSystemEventTypeId());
-        int alarmLevel = vo.getAlarmLevel();
+        AlarmLevel alarmLevel = vo.getAlarmLevel();
         Common.ctx.getEventManager().raiseEvent(type, time, rtn, alarmLevel, message, null);
     }
 

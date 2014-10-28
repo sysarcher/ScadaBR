@@ -48,7 +48,6 @@ import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.util.ChangeComparable;
@@ -83,6 +82,7 @@ import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.l10n.Localizer;
 import br.org.scadabr.vo.datasource.fhz4j.Fhz4JDataSourceVO;
 import br.org.scadabr.vo.datasource.mbus.MBusDataSourceVO;
+import br.org.scadabr.vo.event.AlarmLevel;
 
 abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         Serializable, Cloneable, JsonSerializable, ChangeComparable<T> {
@@ -390,7 +390,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
     private String name;
     @JsonRemoteProperty
     private boolean enabled;
-    private Map<Integer, Integer> alarmLevels = new HashMap<>();
+    private Map<Integer, AlarmLevel> alarmLevels = new HashMap<>();
 
     public boolean isEnabled() {
         return enabled;
@@ -425,12 +425,12 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         this.name = name;
     }
 
-    public void setAlarmLevel(int eventId, int level) {
+    public void setAlarmLevel(int eventId, AlarmLevel level) {
         alarmLevels.put(eventId, level);
     }
 
-    public int getAlarmLevel(int eventId, int defaultLevel) {
-        Integer level = alarmLevels.get(eventId);
+    public AlarmLevel getAlarmLevel(int eventId, AlarmLevel defaultLevel) {
+        AlarmLevel level = alarmLevels.get(eventId);
         if (level == null) {
             return defaultLevel;
         }
@@ -449,12 +449,12 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
     protected EventTypeVO createEventType(int eventId,
             LocalizableMessage message) {
         return createEventType(eventId, message,
-                EventType.DuplicateHandling.IGNORE, AlarmLevels.URGENT);
+                EventType.DuplicateHandling.IGNORE, AlarmLevel.URGENT);
     }
 
     protected EventTypeVO createEventType(int eventId,
             LocalizableMessage message, int duplicateHandling,
-            int defaultAlarmLevel) {
+            AlarmLevel defaultAlarmLevel) {
         return new EventTypeVO(EventType.EventSources.DATA_SOURCE, getId(),
                 eventId, message, getAlarmLevel(eventId, defaultAlarmLevel),
                 duplicateHandling);
@@ -518,7 +518,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
     abstract protected void addPropertyChangesImpl(
             List<LocalizableMessage> list, T from);
 
-	//
+    //
     // /
     // / Serialization
     // /
@@ -529,6 +529,10 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
         out.writeBoolean(enabled);
+        final Map<Integer, Integer> _alarmLevels = new HashMap<>();
+        for (Map.Entry<Integer, AlarmLevel> e : alarmLevels.entrySet()) {
+            _alarmLevels.put(e.getKey(), e.getValue().ordinal());
+        }
         out.writeObject(alarmLevels);
     }
 
@@ -537,14 +541,19 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
             ClassNotFoundException {
         int ver = in.readInt();
 
-		// Switch on the version of the class so that version changes can be
+        // Switch on the version of the class so that version changes can be
         // elegantly handled.
         if (ver == 1) {
             enabled = in.readBoolean();
             alarmLevels = new HashMap<>();
         } else if (ver == 2) {
             enabled = in.readBoolean();
-            alarmLevels = (HashMap<Integer, Integer>) in.readObject();
+            final Map<Integer, Integer> _alarmLevels = (HashMap<Integer, Integer>) in.readObject();
+            alarmLevels = new HashMap<>();
+            for (Map.Entry<Integer, Integer> e : _alarmLevels.entrySet()) {
+                alarmLevels.put(e.getKey(), AlarmLevel.valueOf(e.getValue()));
+            }
+
         }
     }
 
@@ -559,9 +568,8 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
 
             for (int i = 0; i < eventCodes.size(); i++) {
                 int eventId = eventCodes.getId(i);
-                int level = getAlarmLevel(eventId, AlarmLevels.URGENT);
-                alarmCodeLevels.put(eventCodes.getCode(eventId),
-                        AlarmLevels.CODES.getCode(level));
+                AlarmLevel level = getAlarmLevel(eventId, AlarmLevel.URGENT);
+                alarmCodeLevels.put(eventCodes.getCode(eventId), level.getName());
             }
 
             map.put("alarmLevels", alarmCodeLevels);
@@ -586,14 +594,15 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                     }
 
                     String text = alarmCodeLevels.getString(code);
-                    int level = AlarmLevels.CODES.getId(text);
-                    if (!AlarmLevels.CODES.isValidId(level)) {
+                    try {
+                        AlarmLevel level = AlarmLevel.valueOf(text);
+                        setAlarmLevel(eventId, level);
+                    } catch (Exception e) {
                         throw new LocalizableJsonException(
                                 "emport.error.alarmLevel", text, code,
-                                AlarmLevels.CODES.getCodeList());
+                                AlarmLevel.nameValues());
                     }
 
-                    setAlarmLevel(eventId, level);
                 }
             }
         }

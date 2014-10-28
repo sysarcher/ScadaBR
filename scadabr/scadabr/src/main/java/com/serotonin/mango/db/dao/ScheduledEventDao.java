@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.db.dao;
 
+import br.org.scadabr.vo.event.AlarmLevel;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -55,17 +56,17 @@ public class ScheduledEventDao extends BaseDao {
     public ScheduledEventDao() {
         super();
     }
-    
-   @Deprecated
+
+    @Deprecated
     private ScheduledEventDao(DataSource dataSource) {
         super(dataSource);
     }
 
-   @Deprecated
-     public static ScheduledEventDao getInstance() {
+    @Deprecated
+    public static ScheduledEventDao getInstance() {
         return new ScheduledEventDao(Common.ctx.getDatabaseAccess().getDataSource());
     }
-    
+
     public String generateUniqueXid() {
         return generateUniqueXid(ScheduledEventVO.XID_PREFIX, "scheduledEvents");
     }
@@ -99,7 +100,7 @@ public class ScheduledEventDao extends BaseDao {
             se.setId(rs.getInt(++i));
             se.setXid(rs.getString(++i));
             se.setAlias(rs.getString(++i));
-            se.setAlarmLevel(rs.getInt(++i));
+            se.setAlarmLevel(AlarmLevel.valueOf(rs.getInt(++i)));
             se.setScheduleType(rs.getInt(++i));
             se.setReturnToNormal(charToBool(rs.getString(++i)));
             se.setDisabled(charToBool(rs.getString(++i)));
@@ -142,7 +143,7 @@ public class ScheduledEventDao extends BaseDao {
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, se.getXid());
-                ps.setInt(2, se.getAlarmLevel());
+                ps.setInt(2, se.getAlarmLevel().ordinal());
                 ps.setString(3, se.getAlias());
                 ps.setInt(4, se.getScheduleType());
                 ps.setString(5, boolToChar(se.isReturnToNormal()));

@@ -82,6 +82,7 @@ import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.dwr.beans.DataPointBean;
 import com.serotonin.mango.web.dwr.beans.ViewComponentState;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.dwr.MethodFilter;
 import javax.inject.Inject;
@@ -897,7 +898,7 @@ public class ViewDwr extends BaseDwr {
 
     @MethodFilter
     public DwrResponseI18n saveAlarmListComponent(String viewComponentId,
-            int minAlarmLevel, int maxListSize, int width,
+            AlarmLevel minAlarmLevel, int maxListSize, int width,
             boolean hideIdColumn, boolean hideAlarmLevelColumn,
             boolean hideTimestampColumn, boolean hideInactivityColumn,
             boolean hideAckColumn) {

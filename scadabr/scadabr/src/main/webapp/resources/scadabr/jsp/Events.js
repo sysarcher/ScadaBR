@@ -66,7 +66,7 @@ define(["dojo/_base/declare",
                             var node = domConstruct.create("img");
                             var imgName;
                             switch (alarmLevel) {
-                                case 1:
+                                case "INFORMATION":
                                     imgName = 'flag_blue';
                                     if (event.active) {
                                         node.alt = localizedMap["common.alarmLevel.info"];
@@ -74,7 +74,7 @@ define(["dojo/_base/declare",
                                         node.alt = localizedMap["common.alarmLevel.info.rtn"];
                                     }
                                     break;
-                                case  2:
+                                case  "URGENT":
                                     imgName = 'flag_yellow';
                                     if (event.active) {
                                         node.alt = localizedMap["common.alarmLevel.urgent"];
@@ -82,7 +82,7 @@ define(["dojo/_base/declare",
                                         node.alt = localizedMap["common.alarmLevel.urgent_rtn"];
                                     }
                                     break;
-                                case  3:
+                                case  "CRITICAL":
                                     if (event.active) {
                                         node.alt = localizedMap["common.alarmLevel.critical"];
                                     } else {
@@ -90,7 +90,7 @@ define(["dojo/_base/declare",
                                     }
                                     imgName = 'flag_orange';
                                     break;
-                                case  4:
+                                case  "LIVE_SAVETY":
                                     if (event.active) {
                                         node.alt = localizedMap["common.alarmLevel.lifeSafety"];
                                     } else {

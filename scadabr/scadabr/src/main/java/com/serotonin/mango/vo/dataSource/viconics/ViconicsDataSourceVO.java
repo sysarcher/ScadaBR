@@ -27,13 +27,13 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.viconics.ViconicsDataSourceRT;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -55,9 +55,9 @@ public class ViconicsDataSourceVO extends DataSourceVO<ViconicsDataSourceVO> {
                 "event.ds.initialization")));
         ets
                 .add(createEventType(ViconicsDataSourceRT.MESSAGE_EXCEPTION_EVENT, new LocalizableMessageImpl(
-                                        "event.ds.message"), EventType.DuplicateHandling.IGNORE, AlarmLevels.INFORMATION));
+                                        "event.ds.message"), EventType.DuplicateHandling.IGNORE, AlarmLevel.INFORMATION));
         ets.add(createEventType(ViconicsDataSourceRT.DEVICE_OFFLINE_EVENT, new LocalizableMessageImpl("event.ds.device"),
-                EventType.DuplicateHandling.IGNORE, AlarmLevels.INFORMATION));
+                EventType.DuplicateHandling.IGNORE, AlarmLevel.INFORMATION));
         ets
                 .add(createEventType(ViconicsDataSourceRT.NETWORK_OFFLINE_EVENT, new LocalizableMessageImpl(
                                         "event.ds.network")));

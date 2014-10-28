@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr;
 
+import br.org.scadabr.vo.event.AlarmLevel;
 import java.util.List;
 
 import org.joda.time.DateTime;
@@ -64,7 +65,7 @@ public class ScheduledEventsDwr extends BaseDwr {
         return scheduledEventDao.getScheduledEvent(id);
     }
 
-    public DwrResponseI18n saveScheduledEvent(int id, String xid, String alias, int alarmLevel, int scheduleType,
+    public DwrResponseI18n saveScheduledEvent(int id, String xid, String alias, AlarmLevel alarmLevel, int scheduleType,
             boolean returnToNormal, boolean disabled, int activeYear, int activeMonth, int activeDay, int activeHour,
             int activeMinute, int activeSecond, String activeCron, int inactiveYear, int inactiveMonth,
             int inactiveDay, int inactiveHour, int inactiveMinute, int inactiveSecond, String inactiveCron) {

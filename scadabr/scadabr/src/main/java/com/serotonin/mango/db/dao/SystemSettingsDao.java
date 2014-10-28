@@ -29,8 +29,10 @@ import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import br.org.scadabr.util.ColorUtils;
+import br.org.scadabr.vo.event.AlarmLevel;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
 import javax.inject.Named;
 import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -98,6 +100,19 @@ public class SystemSettingsDao extends BaseDao {
 
     // Value cache
     private static final Map<String, String> cache = new HashMap<>();
+
+    public static AlarmLevel getAlarmLevel(String key, AlarmLevel defaultAlarmLevel) {
+        String value = getValue(key, null);
+        if (value == null) {
+            return defaultAlarmLevel;
+        }
+        try {
+            return AlarmLevel.values()[Integer.parseInt(value)];
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "Can''t get Default Alarmlevel of {0}", key);
+            return defaultAlarmLevel;
+        }
+    }
 
     public SystemSettingsDao() {
         super();
@@ -331,5 +346,9 @@ public class SystemSettingsDao extends BaseDao {
                             }
                 });
 
+    }
+
+    public void setAlarmLevel(String key, AlarmLevel alarmLevel) {
+        setValue(key, Integer.toString(alarmLevel.ordinal()));
     }
 }

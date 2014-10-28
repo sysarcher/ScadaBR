@@ -18,17 +18,19 @@
  */
 package com.serotonin.mango.web.dwr.beans;
 
+import br.org.scadabr.vo.event.AlarmLevel;
+
 /**
  * @author Matthew Lohbihler
  */
 public class EventInstanceBean {
 
     private final boolean active;
-    private final int alarmLevel;
+    private final AlarmLevel alarmLevel;
     private final long activeTimestamp;
     private final String message;
 
-    public EventInstanceBean(boolean active, int alarmLevel, long activeTimestamp, String message) {
+    public EventInstanceBean(boolean active, AlarmLevel alarmLevel, long activeTimestamp, String message) {
         this.active = active;
         this.alarmLevel = alarmLevel;
         this.activeTimestamp = activeTimestamp;
@@ -39,7 +41,7 @@ public class EventInstanceBean {
         return active;
     }
 
-    public int getAlarmLevel() {
+    public AlarmLevel getAlarmLevel() {
         return alarmLevel;
     }
 

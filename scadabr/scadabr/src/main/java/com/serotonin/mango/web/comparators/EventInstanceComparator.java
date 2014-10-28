@@ -20,6 +20,7 @@ package com.serotonin.mango.web.comparators;
 
 import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.vo.event.AlarmLevel;
 import java.util.ResourceBundle;
 
 import com.serotonin.mango.rt.event.EventInstance;
@@ -37,22 +38,24 @@ public class EventInstanceComparator extends BaseComparator<EventInstance> {
     public EventInstanceComparator(ResourceBundle bundle, String sortField, boolean descending) {
         this.bundle = bundle;
 
-        if (null != sortField) switch (sortField) {
-            case "alarmLevel":
-                sortType = SORT_ALARM_LEVEL;
-                break;
-            case "time":
-                sortType = SORT_ACTIVE_TIME;
-                break;
-            case "msg":
-                sortType = SORT_MESSAGE;
-                break;
-            case "id":
-                sortType = SORT_ID;
-                break;
-            case "rtntime":
-                sortType = SORT_RTN_TIME;
-                break;
+        if (null != sortField) {
+            switch (sortField) {
+                case "alarmLevel":
+                    sortType = SORT_ALARM_LEVEL;
+                    break;
+                case "time":
+                    sortType = SORT_ACTIVE_TIME;
+                    break;
+                case "msg":
+                    sortType = SORT_MESSAGE;
+                    break;
+                case "id":
+                    sortType = SORT_ID;
+                    break;
+                case "rtntime":
+                    sortType = SORT_RTN_TIME;
+                    break;
+            }
         }
         this.descending = descending;
     }
@@ -61,7 +64,7 @@ public class EventInstanceComparator extends BaseComparator<EventInstance> {
     public int compare(EventInstance e1, EventInstance e2) {
         int result = 0;
         if (sortType == SORT_ALARM_LEVEL) {
-            result = e1.getAlarmLevel() - e2.getAlarmLevel();
+            result = e1.getAlarmLevel().compareTo(e2.getAlarmLevel());
         } else if (sortType == SORT_ACTIVE_TIME) {
             long diff = e1.getActiveTimestamp() - e2.getActiveTimestamp();
             if (diff < 0) {

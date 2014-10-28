@@ -24,8 +24,8 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.DataSourceDao;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 
 @JsonRemoteEntity
@@ -33,7 +33,7 @@ public class DataSourceEventType extends EventType {
 
     private int dataSourceId;
     private int dataSourceEventTypeId;
-    private int alarmLevel;
+    private AlarmLevel alarmLevel;
     private int duplicateHandling;
 
     public DataSourceEventType() {
@@ -41,10 +41,10 @@ public class DataSourceEventType extends EventType {
     }
 
     public DataSourceEventType(int dataSourceId, int dataSourceEventTypeId) {
-        this(dataSourceId, dataSourceEventTypeId, AlarmLevels.URGENT, EventType.DuplicateHandling.IGNORE);
+        this(dataSourceId, dataSourceEventTypeId, AlarmLevel.URGENT, EventType.DuplicateHandling.IGNORE);
     }
 
-    public DataSourceEventType(int dataSourceId, int dataSourceEventTypeId, int alarmLevel, int duplicateHandling) {
+    public DataSourceEventType(int dataSourceId, int dataSourceEventTypeId, AlarmLevel alarmLevel, int duplicateHandling) {
         this.dataSourceId = dataSourceId;
         this.dataSourceEventTypeId = dataSourceEventTypeId;
         this.alarmLevel = alarmLevel;
@@ -60,7 +60,7 @@ public class DataSourceEventType extends EventType {
         return dataSourceEventTypeId;
     }
 
-    public int getAlarmLevel() {
+    public AlarmLevel getAlarmLevel() {
         return alarmLevel;
     }
 
@@ -113,10 +113,7 @@ public class DataSourceEventType extends EventType {
         if (dataSourceEventTypeId != other.dataSourceEventTypeId) {
             return false;
         }
-        if (dataSourceId != other.dataSourceId) {
-            return false;
-        }
-        return true;
+        return dataSourceId == other.dataSourceId;
     }
 
     //

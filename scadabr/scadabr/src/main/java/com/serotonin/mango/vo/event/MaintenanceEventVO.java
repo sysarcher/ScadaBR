@@ -16,7 +16,6 @@ import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataSourceDao;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.maintenance.MaintenanceEventRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -25,10 +24,10 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 
 @JsonRemoteEntity
 public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>, JsonSerializable {
@@ -62,7 +61,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     private int dataSourceId;
     @JsonRemoteProperty
     private String alias;
-    private int alarmLevel = AlarmLevels.NONE;
+    private AlarmLevel alarmLevel = AlarmLevel.NONE;
     private int scheduleType = TYPE_MANUAL;
     @JsonRemoteProperty
     private boolean disabled = false;
@@ -140,11 +139,11 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
         this.alias = alias;
     }
 
-    public int getAlarmLevel() {
+    public AlarmLevel getAlarmLevel() {
         return alarmLevel;
     }
 
-    public void setAlarmLevel(int alarmLevel) {
+    public void setAlarmLevel(AlarmLevel alarmLevel) {
         this.alarmLevel = alarmLevel;
     }
 
@@ -479,7 +478,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "maintenanceEvents.dataSource", dataSourceId);
         AuditEventType.addPropertyMessage(list, "maintenanceEvents.alias", alias);
-        AuditEventType.addPropertyMessage(list, "common.alarmLevel", AlarmLevels.getAlarmLevelMessage(alarmLevel));
+        AuditEventType.addPropertyMessage(list, "common.alarmLevel", alarmLevel.getI18nKey());
         AuditEventType.addPropertyMessage(list, "maintenanceEvents.type", getTypeMessage());
         AuditEventType.addPropertyMessage(list, "common.disabled", disabled);
         AuditEventType.addPropertyMessage(list, "common.configuration", getDescription());
@@ -517,7 +516,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
         map.put("dataSourceXid", dataSourceXid);
-        map.put("alarmLevel", AlarmLevels.CODES.getCode(alarmLevel));
+        map.put("alarmLevel", alarmLevel.getName());
         map.put("scheduleType", TYPE_CODES.getCode(scheduleType));
     }
 
@@ -534,10 +533,11 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
 
         text = json.getString("alarmLevel");
         if (text != null) {
-            alarmLevel = AlarmLevels.CODES.getId(text);
-            if (!AlarmLevels.CODES.isValidId(alarmLevel)) {
+            try {
+                alarmLevel = AlarmLevel.valueOf(text);
+            } catch (Exception e) {
                 throw new LocalizableJsonException("emport.error.maintenanceEvent.invalid", "alarmLevel", text,
-                        AlarmLevels.CODES.getCodeList());
+                        AlarmLevel.nameValues());
             }
         }
 

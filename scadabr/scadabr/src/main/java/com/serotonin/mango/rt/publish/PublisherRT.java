@@ -30,13 +30,13 @@ import com.serotonin.mango.db.dao.PublisherDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.event.AlarmLevels;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.PublisherEventType;
 import com.serotonin.mango.util.timeout.RunClient;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.timer.TimerTask;
+import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
@@ -157,7 +157,7 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
             if (pointDisabledEventActive) // A published point has been terminated, was never enabled, or no longer exists.
             {
                 Common.ctx.getEventManager().raiseEvent(pointDisabledEventType, System.currentTimeMillis(), true,
-                        AlarmLevels.URGENT, new LocalizableMessageImpl("event.publish.pointMissing"), createEventContext());
+                        AlarmLevel.URGENT, new LocalizableMessageImpl("event.publish.pointMissing"), createEventContext());
             } else // Everything is good
             {
                 Common.ctx.getEventManager().returnToNormal(pointDisabledEventType, System.currentTimeMillis());
@@ -167,7 +167,7 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
 
     void fireQueueSizeWarningEvent() {
         Common.ctx.getEventManager().raiseEvent(queueSizeWarningEventType, System.currentTimeMillis(), true,
-                AlarmLevels.URGENT, new LocalizableMessageImpl("event.publish.queueSize", vo.getCacheWarningSize()),
+                AlarmLevel.URGENT, new LocalizableMessageImpl("event.publish.queueSize", vo.getCacheWarningSize()),
                 createEventContext());
     }
 

@@ -174,7 +174,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
 
     }
 
-	// @Override
+    // @Override
     // public List<ItemValue> getItemValueList(String itemQName)
     // throws ScadaBRAPIException {
     // checkUser();
@@ -614,7 +614,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
     }
 
     private List<EventInstance> getAcknowledgedEvents() {
-		// Adicionados parametros novos (?)
+        // Adicionados parametros novos (?)
         // return new EventDao().search(0, -1, null, -1, null, 20000, 1, null);
         return EventDao.getInstance().search(0, -1, null, -1, null, 1, null, 0, 5000, null);
     }
