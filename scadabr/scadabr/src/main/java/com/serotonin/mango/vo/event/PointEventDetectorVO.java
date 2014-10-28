@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.event;
 
+import br.org.scadabr.DataType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,6 @@ import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.event.detectors.AlphanumericStateDetectorRT;
 import com.serotonin.mango.rt.event.detectors.AnalogHighLimitDetectorRT;
 import com.serotonin.mango.rt.event.detectors.AnalogLowLimitDetectorRT;
@@ -54,6 +54,7 @@ import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class PointEventDetectorVO extends SimpleEventDetectorVO implements Cloneable, JsonSerializable,
@@ -75,32 +76,31 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
 
     private static List<ImplDefinition> definitions;
 
-    public static List<ImplDefinition> getImplementations(int dataType) {
+    public static List<ImplDefinition> getImplementations(DataType dataType) {
         if (definitions == null) {
             List<ImplDefinition> d = new ArrayList<ImplDefinition>();
             d.add(new ImplDefinition(TYPE_ANALOG_HIGH_LIMIT, null, "pointEdit.detectors.highLimit",
-                    new int[]{DataTypes.NUMERIC}));
+                    EnumSet.of(DataType.NUMERIC)));
             d.add(new ImplDefinition(TYPE_ANALOG_LOW_LIMIT, null, "pointEdit.detectors.lowLimit",
-                    new int[]{DataTypes.NUMERIC}));
-            d.add(new ImplDefinition(TYPE_POINT_CHANGE, null, "pointEdit.detectors.change", new int[]{
-                DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC, DataTypes.ALPHANUMERIC}));
+                    EnumSet.of(DataType.NUMERIC)));
+            d.add(new ImplDefinition(TYPE_POINT_CHANGE, null, "pointEdit.detectors.change",
+                    EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC, DataType.ALPHANUMERIC)));
             d.add(new ImplDefinition(TYPE_BINARY_STATE, null, "pointEdit.detectors.state",
-                    new int[]{DataTypes.BINARY}));
+                    EnumSet.of(DataType.BINARY)));
             d.add(new ImplDefinition(TYPE_MULTISTATE_STATE, null, "pointEdit.detectors.state",
-                    new int[]{DataTypes.MULTISTATE}));
+                    EnumSet.of(DataType.MULTISTATE)));
             d.add(new ImplDefinition(TYPE_ALPHANUMERIC_STATE, null, "pointEdit.detectors.state",
-                    new int[]{DataTypes.ALPHANUMERIC}));
-            d.add(new ImplDefinition(TYPE_STATE_CHANGE_COUNT, null, "pointEdit.detectors.changeCount", new int[]{
-                DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.ALPHANUMERIC}));
-            d.add(new ImplDefinition(TYPE_NO_CHANGE, null, "pointEdit.detectors.noChange", new int[]{
-                DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC, DataTypes.ALPHANUMERIC}));
+                    EnumSet.of(DataType.ALPHANUMERIC)));
+            d.add(new ImplDefinition(TYPE_STATE_CHANGE_COUNT, null, "pointEdit.detectors.changeCount",
+                    EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.ALPHANUMERIC)));
+            d.add(new ImplDefinition(TYPE_NO_CHANGE, null, "pointEdit.detectors.noChange",
+                    EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC, DataType.ALPHANUMERIC)));
             d.add(new ImplDefinition(TYPE_NO_UPDATE, null, "pointEdit.detectors.noUpdate",
-                    new int[]{DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC, DataTypes.ALPHANUMERIC,
-                        DataTypes.IMAGE}));
+                    EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC, DataType.ALPHANUMERIC, DataType.IMAGE)));
             d.add(new ImplDefinition(TYPE_POSITIVE_CUSUM, null, "pointEdit.detectors.posCusum",
-                    new int[]{DataTypes.NUMERIC}));
+                    EnumSet.of(DataType.NUMERIC)));
             d.add(new ImplDefinition(TYPE_NEGATIVE_CUSUM, null, "pointEdit.detectors.negCusum",
-                    new int[]{DataTypes.NUMERIC}));
+                    EnumSet.of(DataType.NUMERIC)));
             definitions = d;
         }
 
@@ -137,7 +137,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
     public ImplDefinition getDef() {
         // Ensure that definitions is not null.
         if (definitions == null) {
-            getImplementations(0);
+            getImplementations(DataType.UNKNOWN);
         }
 
         for (ImplDefinition def : definitions) {

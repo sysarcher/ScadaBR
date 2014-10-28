@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataImage;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.ImplementMeException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,7 +31,6 @@ import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.RuntimeManager;
@@ -183,16 +183,16 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
         }
 
         // Check the data type of the value against that of the locator, just for fun.
-        int valueDataType = DataTypes.getDataType(newValue.getValue());
-        if (valueDataType != DataTypes.UNKNOWN && valueDataType != vo.getPointLocator().getDataTypeId()) // This should never happen, but if it does it can have serious downstream consequences. Also, we need
+        DataType valueDataType = newValue.getValue().getDataType();
+        if (valueDataType != DataType.UNKNOWN && valueDataType != vo.getDataType()) // This should never happen, but if it does it can have serious downstream consequences. Also, we need
         // to know how it happened, and the stack trace here provides the best information.
         {
             throw new ShouldNeverHappenException("Data type mismatch between new value and point locator: newValue="
-                    + DataTypes.getDataType(newValue.getValue()) + ", locator=" + vo.getPointLocator().getDataTypeId());
+                    + newValue.getDataType() + ", locator=" + vo.getDataType());
         }
 
         // Check if this value qualifies for discardation.
-        if (vo.isDiscardExtremeValues() && DataTypes.getDataType(newValue.getValue()) == DataTypes.NUMERIC) {
+        if (vo.isDiscardExtremeValues() && newValue.getDataType() == DataType.NUMERIC) {
             double newd = newValue.getDoubleValue();
             if (newd < vo.getDiscardLowLimit() || newd > vo.getDiscardHighLimit()) // Discard the value
             {
@@ -203,7 +203,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
         if (newValue.getTime() > System.currentTimeMillis() + SystemSettingsDao.getFutureDateLimit()) {
             // Too far future dated. Toss it. But log a message first.
             LOG.warn("Future dated value detected: pointId=" + vo.getId() + ", value=" + newValue.getStringValue()
-                    + ", type=" + vo.getPointLocator().getDataTypeId() + ", ts=" + newValue.getTime(), new Exception());
+                    + ", type=" + vo.getDataType() + ", ts=" + newValue.getTime(), new Exception());
             return;
         }
 
@@ -290,8 +290,9 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
                 return;
             }
 
-            if (true) throw new ImplementMeException(); //WAS: intervalLoggingTask = new TimeoutTask(this, vo.getIntervalLoggingPeriodType(), vo.getIntervalLoggingPeriod());
-
+            if (true) {
+                throw new ImplementMeException(); //WAS: intervalLoggingTask = new TimeoutTask(this, vo.getIntervalLoggingPeriodType(), vo.getIntervalLoggingPeriod());
+            }
             intervalValue = pointValue;
             if (vo.getIntervalLoggingType() == DataPointVO.IntervalLoggingTypes.AVERAGE) {
                 intervalStartTime = System.currentTimeMillis();
@@ -336,7 +337,8 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
 
     /**
      * Collect the data and store them
-     * @param fireTime 
+     *
+     * @param fireTime
      */
     @Override
     public void run(long fireTime) {
@@ -406,10 +408,10 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     public String getVoName() {
         return vo.getName();
     }
-    
+
     @Override
-    public int getDataTypeId() {
-        return vo.getPointLocator().getDataTypeId();
+    public DataType getDataType() {
+        return vo.getDataType();
     }
 
     public Map<String, Object> getAttributes() {

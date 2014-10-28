@@ -1,5 +1,6 @@
 package br.org.scadabr.vo.dataSource.dnp3;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,7 +15,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
@@ -48,13 +48,13 @@ public class Dnp3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     @Override
-    public int getDataTypeId() {
+    public DataType getDataType() {
         if (dnp3DataType == BINARY_INPUT) {
-            return DataTypes.BINARY;
+            return DataType.BINARY;
         } else if (dnp3DataType == BINARY_OUTPUT) {
-            return DataTypes.ALPHANUMERIC;
+            return DataType.ALPHANUMERIC;
         }
-        return DataTypes.NUMERIC;
+        return DataType.NUMERIC;
     }
 
     @JsonRemoteProperty
@@ -184,7 +184,7 @@ public class Dnp3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int ver = in.readInt();
-		// Switch on the version of the class so that version changes can be
+        // Switch on the version of the class so that version changes can be
         // elegantly handled.
         if (ver == 2) {
             dnp3DataType = in.readInt();
@@ -202,7 +202,7 @@ public class Dnp3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json)
             throws JsonException {
-		// Range
+        // Range
         // String text = json.getString("range");
         // if (text == null)
         // throw new LocalizableJsonException("emport.error.missing", "range",
@@ -227,7 +227,7 @@ public class Dnp3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-		// map.put("range", RANGE_CODES.getCode(range));
+        // map.put("range", RANGE_CODES.getCode(range));
         // map.put("modbusDataType",
         // MODBUS_DATA_TYPE_CODES.getCode(modbusDataType));
     }

@@ -18,6 +18,7 @@
  */
 package br.org.scadabr.vo.datasource.vmstat;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,7 +31,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import br.org.scadabr.rt.datasource.vmstat.VMStatPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -64,8 +64,8 @@ public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements Json
     }
 
     @Override
-    public int getDataTypeId() {
-        return DataTypes.NUMERIC;
+    public DataType getDataType() {
+        return DataType.NUMERIC;
     }
 
     public Attribute getAttribute() {
@@ -112,8 +112,8 @@ public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements Json
         switch (ver) {
             case 1:
                 final int attributeId = in.readInt();
-                attribute = Attribute.values()[attributeId -1];
-               break;
+                attribute = Attribute.values()[attributeId - 1];
+                break;
             case 2:
                 attribute = Attribute.valueOf(in.readUTF());
                 break;
@@ -124,18 +124,18 @@ public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements Json
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-     /*TODO
-        String text = json.getString("attributeId");
-        if (text == null) {
-            throw new LocalizableJsonException("emport.error.missing", "attributeId", ATTRIBUTE_CODES.getCodeList());
-        }
+        /*TODO
+         String text = json.getString("attributeId");
+         if (text == null) {
+         throw new LocalizableJsonException("emport.error.missing", "attributeId", ATTRIBUTE_CODES.getCodeList());
+         }
      
-        attributeId = ATTRIBUTE_CODES.getId(text);
-        if (!ATTRIBUTE_CODES.isValidId(attributeId)) {
-            throw new LocalizableJsonException("emport.error.invalid", "attributeId", text, ATTRIBUTE_CODES
-                    .getCodeList());
-        }
-             */
+         attributeId = ATTRIBUTE_CODES.getId(text);
+         if (!ATTRIBUTE_CODES.isValidId(attributeId)) {
+         throw new LocalizableJsonException("emport.error.invalid", "attributeId", text, ATTRIBUTE_CODES
+         .getCodeList());
+         }
+         */
     }
 
     @Override

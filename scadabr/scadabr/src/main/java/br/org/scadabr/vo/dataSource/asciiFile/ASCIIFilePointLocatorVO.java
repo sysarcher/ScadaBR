@@ -1,5 +1,6 @@
 package br.org.scadabr.vo.dataSource.asciiFile;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,7 +17,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
@@ -36,7 +36,7 @@ public class ASCIIFilePointLocatorVO extends AbstractPointLocatorVO implements
     @JsonRemoteProperty
     private String timestampRegex = "";
     @JsonRemoteProperty
-    private int dataType = DataTypes.BINARY;
+    private DataType dataType = DataType.BINARY;
     @JsonRemoteProperty
     private boolean settable;
 
@@ -71,11 +71,12 @@ public class ASCIIFilePointLocatorVO extends AbstractPointLocatorVO implements
         this.timestampRegex = timestampRegex;
     }
 
-    public int getDataType() {
+    @Override
+    public DataType getDataType() {
         return dataType;
     }
 
-    public void setDataType(int dataType) {
+    public void setDataType(DataType dataType) {
         this.dataType = dataType;
     }
 
@@ -101,7 +102,7 @@ public class ASCIIFilePointLocatorVO extends AbstractPointLocatorVO implements
         SerializationHelper.writeSafeUTF(out, valueRegex);
         SerializationHelper.writeSafeUTF(out, timestampFormat);
         SerializationHelper.writeSafeUTF(out, timestampRegex);
-        out.writeInt(dataType);
+        out.writeInt(dataType.ordinal());
         out.writeBoolean(settable);
         out.writeBoolean(customTimestamp);
 
@@ -114,7 +115,7 @@ public class ASCIIFilePointLocatorVO extends AbstractPointLocatorVO implements
             valueRegex = SerializationHelper.readSafeUTF(in);
             timestampFormat = SerializationHelper.readSafeUTF(in);
             timestampRegex = SerializationHelper.readSafeUTF(in);
-            dataType = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
             settable = in.readBoolean();
             customTimestamp = in.readBoolean();
         }
@@ -129,11 +130,6 @@ public class ASCIIFilePointLocatorVO extends AbstractPointLocatorVO implements
     @Override
     public void jsonSerialize(Map<String, Object> arg0) {
 
-    }
-
-    @Override
-    public int getDataTypeId() {
-        return dataType;
     }
 
     @Override

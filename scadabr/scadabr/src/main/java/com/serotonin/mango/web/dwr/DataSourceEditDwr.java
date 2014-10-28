@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr;
 
+import br.org.scadabr.DataType;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -92,10 +93,6 @@ import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import br.org.scadabr.db.IntValuePair;
 import com.serotonin.io.serial.SerialParameters;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
-import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.db.dao.EventDao;
-import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -121,7 +118,6 @@ import com.serotonin.mango.vo.DataPointNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.dataSource.bacnet.BACnetIPDataSourceVO;
 import com.serotonin.mango.vo.dataSource.bacnet.BACnetIPPointLocatorVO;
 import com.serotonin.mango.vo.dataSource.ebro.EBI25DataSourceVO;
@@ -208,6 +204,7 @@ import com.serotonin.modbus4j.msg.ModbusRequest;
 import com.serotonin.modbus4j.msg.ReadResponse;
 import br.org.scadabr.util.IpAddressUtils;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.vo.datasource.fhz4j.FhtPointLocator;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.viconics.RequestFailureException;
@@ -433,8 +430,8 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     }
 
     @MethodFilter
-    public IntMessagePair[] getChangeTypes(int dataTypeId) {
-        return ChangeTypeVO.getChangeTypes(dataTypeId);
+    public IntMessagePair[] getChangeTypes(DataType dataType) {
+        return ChangeTypeVO.getChangeTypes(dataType);
     }
 
     @MethodFilter
@@ -1136,14 +1133,14 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     }
 
     @MethodFilter
-    public DwrResponseI18n validateScript(String script, List<IntValuePair> context, int dataTypeId) {
+    public DwrResponseI18n validateScript(String script, List<IntValuePair> context, DataType dataType) {
         DwrResponseI18n response = new DwrResponseI18n();
 
         ScriptExecutor executor = new ScriptExecutor();
         try {
             Map<String, IDataPoint> convertedContext = executor.convertContext(context);
             PointValueTime pvt = executor.execute(script, convertedContext,
-                    System.currentTimeMillis(), dataTypeId, -1);
+                    System.currentTimeMillis(), dataType, -1);
             if (pvt.getTime() == -1) {
                 response.addContextual("script", "dsEdit.meta.test.success", pvt.getValue());
             } else {
@@ -1317,7 +1314,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         locator.setObjectInstanceNumber(bean.getInstanceNumber());
         locator.setPropertyIdentifierId(PropertyIdentifier.presentValue
                 .intValue());
-        locator.setDataTypeId(bean.getDataTypeId());
+        locator.setDataType(bean.getDataType());
         locator.setUseCovSubscription(bean.isCov());
 
         // We would like to default text renderer values too, but it's rather
@@ -1355,19 +1352,19 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
     @MethodFilter
     public String testHttpRetrieverValueParams(String url, int timeoutSeconds,
-            int retries, String valueRegex, int dataTypeId, String valueFormat) {
+            int retries, String valueRegex, DataType dataType, String valueFormat) {
         try {
             String data = HttpRetrieverDataSourceRT.getData(url,
                     timeoutSeconds, retries);
 
             Pattern valuePattern = Pattern.compile(valueRegex);
             DecimalFormat decimalFormat = null;
-            if (dataTypeId == DataTypes.NUMERIC
+            if (dataType == DataType.NUMERIC
                     && !valueFormat.isEmpty()) {
                 decimalFormat = new DecimalFormat(valueFormat);
             }
             MangoValue value = DataSourceUtils.getValue(valuePattern, data,
-                    dataTypeId, valueFormat, null, decimalFormat, null);
+                    dataType, valueFormat, null, decimalFormat, null);
             return getMessage("common.result") + ": " + value.toString();
         } catch (LocalizableException e) {
             return getMessage(e);
@@ -1449,16 +1446,16 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
     @MethodFilter
     public String testPop3ValueParams(String testData, String valueRegex,
-            int dataTypeId, String valueFormat) {
+            DataType dataType, String valueFormat) {
         try {
             Pattern valuePattern = Pattern.compile(valueRegex);
             DecimalFormat decimalFormat = null;
-            if (dataTypeId == DataTypes.NUMERIC
+            if (dataType == DataType.NUMERIC
                     && !valueFormat.isEmpty()) {
                 decimalFormat = new DecimalFormat(valueFormat);
             }
             MangoValue value = DataSourceUtils.getValue(valuePattern, testData,
-                    dataTypeId, valueFormat, null, decimalFormat, null);
+                    dataType, valueFormat, null, decimalFormat, null);
             return getMessage("common.result") + ": " + value.toString();
         } catch (LocalizableException e) {
             return getMessage(e);
@@ -2037,7 +2034,6 @@ public class DataSourceEditDwr extends DataSourceListDwr {
         locator.setPropertyLabel(propertyLabel);
 
         //  result.setName(locator.defaultName());
-
         return result;
     }
 
@@ -2289,7 +2285,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     // }
     // }
     public DwrResponseI18n saveMultipleOPCPointLocator(String[] tags,
-            int[] dataTypes, boolean[] settables, OPCPointLocatorVO[] locators,
+            DataType[] dataTypes, boolean[] settables, OPCPointLocatorVO[] locators,
             String context) {
 
         return validateMultipleOPCPoints(tags, dataTypes, settables, locators,
@@ -2297,7 +2293,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     }
 
     private DwrResponseI18n validateMultipleOPCPoints(String[] tags,
-            int[] dataTypes, boolean[] settables, OPCPointLocatorVO[] locators,
+            DataType[] dataTypes, boolean[] settables, OPCPointLocatorVO[] locators,
             String context, DataPointDefaulter defaulter) {
         DwrResponseI18n response = new DwrResponseI18n();
         OPCDataSourceVO ds = (OPCDataSourceVO) Common.getUser().getEditDataSource();
@@ -2309,7 +2305,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             DataPointVO dp = getPoint(Common.NEW_ID, defaulter);
             dp.setName(tags[i]);
             locators[i].setTag(tags[i]);
-            locators[i].setDataTypeId(dataTypes[i]);
+            locators[i].setDataType(dataTypes[i]);
             locators[i].setSettable(settables[i]);
             dp.setPointLocator(locators[i]);
 
@@ -2551,7 +2547,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
     @MethodFilter
     public String testPachubeValueParams(String apiKey, int timeoutSeconds,
-            int retries, int feedId, String dataStreamId, int dataTypeId,
+            int retries, int feedId, String dataStreamId, DataType dataType,
             String binary0Value) {
         try {
             Map<String, PachubeValue> data = PachubeDataSourceRT.getData(
@@ -2564,7 +2560,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             }
 
             MangoValue value = DataSourceUtils.getValue(
-                    pachubeValue.getValue(), dataTypeId, binary0Value, null,
+                    pachubeValue.getValue(), dataType, binary0Value, null,
                     null, null);
             return getMessage("common.result") + ": " + value.toString();
         } catch (LocalizableException e) {

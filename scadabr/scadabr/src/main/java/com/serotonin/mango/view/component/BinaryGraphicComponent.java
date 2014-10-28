@@ -18,17 +18,18 @@
  */
 package com.serotonin.mango.view.component;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -37,7 +38,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 public class BinaryGraphicComponent extends ImageSetComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("binaryGraphic", "BINARY_GRAPHIC",
-            "graphic.binaryGraphic", new int[]{DataTypes.BINARY});
+            "graphic.binaryGraphic", EnumSet.of(DataType.BINARY));
 
     @JsonRemoteProperty(alias = "zeroImageIndex")
     private int zeroImage;

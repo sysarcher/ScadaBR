@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr;
 
+import br.org.scadabr.DataType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +53,7 @@ import javax.inject.Inject;
  * @author Matthew Lohbihler
  */
 public class PointLinksDwr extends BaseDwr {
-    
+
     @Inject
     private PointLinkDao pointLinkDao;
 
@@ -157,7 +158,7 @@ public class PointLinksDwr extends BaseDwr {
         } else {
             Map<String, IDataPoint> context = new HashMap<>();
             context.put(PointLinkRT.CONTEXT_VAR_NAME, point);
-            int targetDataType = dataPointDao.getDataPoint(targetPointId).getPointLocator().getDataTypeId();
+            final DataType targetDataType = dataPointDao.getDataPoint(targetPointId).getDataType();
 
             try {
                 PointValueTime pvt = scriptExecutor.execute(script, context, System.currentTimeMillis(),

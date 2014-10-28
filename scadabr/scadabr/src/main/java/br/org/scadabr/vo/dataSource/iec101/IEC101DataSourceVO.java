@@ -12,10 +12,10 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
@@ -112,7 +112,7 @@ abstract public class IEC101DataSourceVO<T extends IEC101DataSourceVO<T>> extend
         }
 
         if (timeout <= 0) {
-            response .addContextual("timeout", "validate.greaterThanZero");
+            response.addContextual("timeout", "validate.greaterThanZero");
         }
         if (retries < 0) {
             response.addContextual("retries", "validate.cannotBeNegative");
@@ -131,7 +131,7 @@ abstract public class IEC101DataSourceVO<T extends IEC101DataSourceVO<T>> extend
 
     }
 
-	//
+    //
     // /
     // / Serialization
     // /
@@ -160,7 +160,7 @@ abstract public class IEC101DataSourceVO<T extends IEC101DataSourceVO<T>> extend
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int ver = in.readInt();
-		// Switch on the version of the class so that version changes can be
+        // Switch on the version of the class so that version changes can be
         // elegantly handled.
         if (ver == 1) {
             transmissionProcedure = in.readInt();

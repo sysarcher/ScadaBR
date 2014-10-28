@@ -14,7 +14,6 @@ import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -226,21 +225,21 @@ class PersistentSendThread extends SendThread {
         // Data
         writeBuffer.pushU2B(entry.getVo().getIndex());
         MangoValue value = entry.getPvt().getValue();
-        writeBuffer.push(value.getDataType());
+        writeBuffer.push(value.getDataType().ordinal());
         switch (entry.getPvt().getValue().getDataType()) {
-            case DataTypes.BINARY:
+            case BINARY:
                 writeBuffer.push(value.getBooleanValue() ? 1 : 0);
                 break;
-            case DataTypes.MULTISTATE:
+            case MULTISTATE:
                 writeBuffer.pushS4B(value.getIntegerValue());
                 break;
-            case DataTypes.NUMERIC:
+            case NUMERIC:
                 Packet.pushDouble(writeBuffer, value.getDoubleValue());
                 break;
-            case DataTypes.ALPHANUMERIC:
+            case ALPHANUMERIC:
                 Packet.pushString(writeBuffer, value.getStringValue());
                 break;
-            case DataTypes.IMAGE:
+            case IMAGE:
                 byte[] data;
                 try {
                     data = ((ImageValue) value).getImageData();

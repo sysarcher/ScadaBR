@@ -1,5 +1,6 @@
 package br.org.scadabr.view.component;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,17 +8,17 @@ import java.util.Map;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.component.ScriptComponent;
 import br.org.scadabr.util.SerializationHelper;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class ButtonComponent extends ScriptComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("button",
-            "BUTTON", "graphic.button", new int[]{DataTypes.BINARY});
+            "BUTTON", "graphic.button", EnumSet.of(DataType.BINARY));
     @JsonRemoteProperty
     private String whenOffLabel = "ON";
 
@@ -121,7 +122,7 @@ public class ButtonComponent extends ScriptComponent {
     private void readObject(ObjectInputStream in) throws IOException {
         int ver = in.readInt();
 
-		// Switch on the version of the class so that version changes can be
+        // Switch on the version of the class so that version changes can be
         // elegantly handled.
         if (ver == 1) {
             setScript(SerializationHelper.readSafeUTF(in));

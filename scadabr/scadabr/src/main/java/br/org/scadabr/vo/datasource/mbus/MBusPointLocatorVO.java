@@ -18,6 +18,7 @@
  */
 package br.org.scadabr.vo.datasource.mbus;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -36,7 +37,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import br.org.scadabr.rt.datasource.mbus.MBusPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -94,7 +94,7 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     private MBusAddressing addressing;
 
     @Override
-    public int getDataTypeId() {
+    public DataType getDataType() {
         switch (DataFieldCode.fromLabel(difCode)) {
             case _12_DIGIT_BCD:
             case _16_BIT_INTEGER:
@@ -108,11 +108,11 @@ public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             case _6_DIGIT_BCD:
             case _8_BIT_INTEGER:
             case _8_DIGIT_BCD:
-                return DataTypes.NUMERIC;
+                return DataType.NUMERIC;
             case VARIABLE_LENGTH:
-                return DataTypes.ALPHANUMERIC;
+                return DataType.ALPHANUMERIC;
             default:
-                return DataTypes.UNKNOWN;
+                return DataType.UNKNOWN;
         }
     }
 

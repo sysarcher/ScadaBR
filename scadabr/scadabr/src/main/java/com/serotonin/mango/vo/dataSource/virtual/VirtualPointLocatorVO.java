@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.virtual;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -34,7 +35,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.virtual.VirtualPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -44,6 +44,7 @@ import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
@@ -92,8 +93,6 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
         return alternateBooleanChange;
     }
 
-    
-    
     @Override
     public PointLocatorRT createRuntime() {
         return new VirtualPointLocatorRT(this);
@@ -101,9 +100,6 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
 
     @Override
     public void validate(DwrResponseI18n response) {
-        if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextual("dataTypeId", "validate.invalidValue");
-        }
 
         // Alternate boolean
         if (changeTypeId == ChangeTypeVO.Types.ALTERNATE_BOOLEAN) {
@@ -142,7 +138,7 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
             }
         } // No change
         else if (changeTypeId == ChangeTypeVO.Types.NO_CHANGE) {
-            if (noChange.getStartValue().isEmpty() && dataTypeId != DataTypes.ALPHANUMERIC) {
+            if (noChange.getStartValue().isEmpty() && dataType != DataType.ALPHANUMERIC) {
                 response.addContextual("noChange.startValue", "validate.required");
             }
         } // Random analog
@@ -187,7 +183,7 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
         ChangeTypeVO changeType = getChangeType();
         if (changeType != null) {
             boolean found = false;
-            for (IntMessagePair imp : ChangeTypeVO.getChangeTypes(dataTypeId)) {
+            for (IntMessagePair imp : ChangeTypeVO.getChangeTypes(dataType)) {
                 if (imp.getKey() == changeTypeId) {
                     found = true;
                     break;
@@ -200,7 +196,7 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
         }
     }
 
-    private int dataTypeId = DataTypes.BINARY;
+    private DataType dataType = DataType.BINARY;
     private int changeTypeId = ChangeTypeVO.Types.ALTERNATE_BOOLEAN;
     @JsonRemoteProperty
     private boolean settable;
@@ -223,12 +219,12 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
     }
 
     @Override
-    public int getDataTypeId() {
-        return dataTypeId;
+    public DataType getDataType() {
+        return dataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
     }
 
     public AlternateBooleanChangeVO getAlternateBooleanChange() {
@@ -315,7 +311,7 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
     @Override
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.settable", settable);
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addExportCodeMessage(list, "dsEdit.virtual.changeType", ChangeTypeVO.CHANGE_TYPE_CODES,
                 changeTypeId);
         getChangeType().addProperties(list);
@@ -325,7 +321,7 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         VirtualPointLocatorVO from = (VirtualPointLocatorVO) o;
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.settable", from.settable, settable);
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddExportCodeChangeMessage(list, "dsEdit.virtual.changeType",
                 ChangeTypeVO.CHANGE_TYPE_CODES, from.changeTypeId, changeTypeId);
         if (from.changeTypeId == changeTypeId) {
@@ -345,7 +341,7 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(dataTypeId);
+        out.writeInt(dataType.ordinal());
         out.writeInt(changeTypeId);
         out.writeBoolean(settable);
         out.writeObject(alternateBooleanChange);
@@ -364,7 +360,7 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
             changeTypeId = in.readInt();
             settable = in.readBoolean();
             alternateBooleanChange = (AlternateBooleanChangeVO) in.readObject();
@@ -381,9 +377,9 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        Integer value = deserializeDataType(json, DataTypes.IMAGE);
+        DataType value = deserializeDataType(json, EnumSet.of(DataType.IMAGE));
         if (value != null) {
-            dataTypeId = value;
+            dataType = value;
         }
 
         JsonObject ctjson = json.getJsonObject("changeType");

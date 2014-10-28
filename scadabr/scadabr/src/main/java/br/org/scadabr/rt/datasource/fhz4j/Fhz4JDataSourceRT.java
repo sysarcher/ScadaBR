@@ -18,6 +18,7 @@
  */
 package br.org.scadabr.rt.datasource.fhz4j;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.ImplementMeException;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.logger.LogUtils;
@@ -45,7 +46,6 @@ import net.sf.fhz4j.scada.ScadaProperty;
 import net.sf.fhz4j.scada.ScadaValueAccessor;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -436,12 +436,12 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         dp.setLoggingType(DataPointVO.LoggingTypes.ALL);
         dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
 
-        switch (dp.getDataTypeId()) {
-            case DataTypes.NUMERIC:
+        switch (dp.getDataType()) {
+            case NUMERIC:
                 dp.setTextRenderer(new AnalogRenderer("#,##0.0", fhtMessage.getCommand().getUnitOfMeasurement()));
                 dp.setChartRenderer(new ImageChartRenderer(Common.TimePeriods.DAYS, 1));
                 break;
-            case DataTypes.MULTISTATE:
+            case MULTISTATE:
                 MultistateRenderer mr = new MultistateRenderer();
                 switch (fhtLocator.getProperty()) {
                     case MODE:
@@ -491,7 +491,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         dp.setLoggingType(DataPointVO.LoggingTypes.ALL);
         dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
 
-        if (dp.getPointLocator().getDataTypeId() == DataTypes.MULTISTATE) {
+        if (dp.getPointLocator().getDataType() == DataType.MULTISTATE) {
             MultistateRenderer mr = new MultistateRenderer();
             mr.addMultistateValue(FS20CommandValues.OFF.getValue(), FS20CommandValues.OFF.getLabel(), Color.RED);
             mr.addMultistateValue(FS20CommandValues.DIM_DOWN.getValue(), FS20CommandValues.DIM_DOWN.getLabel(), Color.RED.brighter().brighter());
@@ -530,7 +530,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
 
         dp.setPointLocator(fhzLocator);
-        if (dp.getPointLocator().getDataTypeId() == DataTypes.NUMERIC) {
+        if (dp.getPointLocator().getDataType() == DataType.NUMERIC) {
             dp.setTextRenderer(new AnalogRenderer("#,##0.0", prop.getUnitOfMeasurement()));
             dp.setChartRenderer(new ImageChartRenderer(Common.TimePeriods.DAYS, 1));
         }
@@ -739,12 +739,12 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
 
         dp.setPointLocator(fhzLocator);
-        switch (dp.getPointLocator().getDataTypeId()) {
-            case DataTypes.NUMERIC:
+        switch (dp.getDataType()) {
+            case NUMERIC:
                 dp.setTextRenderer(new AnalogRenderer("#,##0.0", prop.getUnitOfMeasurement()));
                 dp.setChartRenderer(new ImageChartRenderer(Common.TimePeriods.DAYS, 1));
                 break;
-            case DataTypes.BINARY:
+            case BINARY:
                 dp.setTextRenderer(new BinaryTextRenderer("0", null, "1", null));
             default:;
         }
@@ -856,7 +856,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
 
         dp.setPointLocator(fhzLocator);
-        if (dp.getPointLocator().getDataTypeId() == DataTypes.NUMERIC) {
+        if (dp.getDataType() == DataType.NUMERIC) {
             dp.setTextRenderer(new AnalogRenderer("#,##0.0", fhtMultiMsgMessage.getProperty().getUnitOfMeasurement()));
             dp.setChartRenderer(new ImageChartRenderer(Common.TimePeriods.DAYS, 1));
         }

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.internal;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -29,7 +30,6 @@ import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.internal.InternalPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -106,8 +106,8 @@ public class InternalPointLocatorVO extends AbstractPointLocatorVO implements Js
     }
 
     @Override
-    public int getDataTypeId() {
-        return DataTypes.NUMERIC;
+    public DataType getDataType() {
+        return DataType.NUMERIC;
     }
 
     public int getAttributeId() {

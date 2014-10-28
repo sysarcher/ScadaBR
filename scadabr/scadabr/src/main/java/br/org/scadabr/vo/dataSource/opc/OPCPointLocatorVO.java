@@ -1,5 +1,6 @@
 package br.org.scadabr.vo.dataSource.opc;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,13 +14,13 @@ import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
+import java.util.EnumSet;
 
 public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
         JsonSerializable {
@@ -35,11 +36,11 @@ public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
     }
 
     @Override
-    public int getDataTypeId() {
+    public DataType getDataType() {
         return dataType;
     }
 
-    public void setDataTypeId(int dataType) {
+    public void setDataType(DataType dataType) {
         this.dataType = dataType;
     }
 
@@ -55,7 +56,7 @@ public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
     @JsonRemoteProperty
     private String tag = "";
     @JsonRemoteProperty
-    private int dataType = DataTypes.BINARY;
+    private DataType dataType = DataType.BINARY;
     @JsonRemoteProperty
     private boolean settable;
 
@@ -89,7 +90,7 @@ public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, tag);
-        out.writeInt(dataType);
+        out.writeInt(dataType.ordinal());
         out.writeBoolean(settable);
 
     }
@@ -99,7 +100,7 @@ public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
         int ver = in.readInt();
         if (ver == 1) {
             tag = SerializationHelper.readSafeUTF(in);
-            dataType = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
             settable = in.readBoolean();
         }
     }
@@ -107,7 +108,7 @@ public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json)
             throws JsonException {
-        Integer value = deserializeDataType(json, DataTypes.IMAGE);
+        DataType value = deserializeDataType(json, EnumSet.of(DataType.IMAGE));
         if (value != null) {
             dataType = value;
         }

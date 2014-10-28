@@ -33,7 +33,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.modbus.ModbusPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -149,17 +148,17 @@ public class ModbusPointLocatorVO extends AbstractPointLocatorVO implements
     }
 
     @Override
-    public int getDataTypeId() {
+    public br.org.scadabr.DataType getDataType() {
         if (slaveMonitor) {
-            return DataTypes.BINARY;
+            return br.org.scadabr.DataType.BINARY;
         }
         if (modbusDataType == DataType.BINARY) {
-            return DataTypes.BINARY;
+            return br.org.scadabr.DataType.BINARY;
         }
         if (isString()) {
-            return DataTypes.ALPHANUMERIC;
+            return br.org.scadabr.DataType.ALPHANUMERIC;
         }
-        return DataTypes.NUMERIC;
+        return br.org.scadabr.DataType.NUMERIC;
     }
 
     @Override

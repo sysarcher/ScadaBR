@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view.text;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -27,17 +28,17 @@ import java.util.List;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class RangeRenderer extends BaseTextRenderer {
 
     private static ImplDefinition definition = new ImplDefinition("textRendererRange", "RANGE", "textRenderer.range",
-            new int[]{DataTypes.NUMERIC});
+            EnumSet.of(DataType.NUMERIC));
 
     public static ImplDefinition getDefinition() {
         return definition;

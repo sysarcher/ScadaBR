@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view.component;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -34,12 +35,12 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonValue;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -48,7 +49,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 public class MultistateGraphicComponent extends ImageSetComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("multistateGraphic", "MULTISTATE_GRAPHIC",
-            "graphic.multistateGraphic", new int[]{DataTypes.MULTISTATE});
+            "graphic.multistateGraphic", EnumSet.of(DataType.MULTISTATE));
 
     private Map<Integer, Integer> stateImageMap = new HashMap<>();
     @JsonRemoteProperty

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr;
 
+import br.org.scadabr.DataType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +33,6 @@ import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.logger.LogUtils;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -57,11 +57,10 @@ public class WatchListDwr extends BaseDwr {
 
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_DWR);
 
-    
     public WatchListDwr() {
-    super();
+        super();
     }
-    
+
     @Inject
     private WatchListDao watchListDao;
 
@@ -98,7 +97,7 @@ public class WatchListDwr extends BaseDwr {
      * @return
      */
     public List<WatchListState> getPointData() {
-		// Get the watch list from the user's session. It should have been set
+        // Get the watch list from the user's session. It should have been set
         // by the controller.
         return getPointDataImpl(Common.getUser().getWatchList());
     }
@@ -191,7 +190,7 @@ public class WatchListDwr extends BaseDwr {
         user.setSelectedWatchList(watchListId);
 
         Map<String, Object> data = getWatchListData(user, watchList);
-		// Set the watchlist in the user object after getting the data since it
+        // Set the watchlist in the user object after getting the data since it
         // may take a while, and the long poll
         // updates will all be missed in the meantime.
         user.setWatchList(watchList);
@@ -347,8 +346,8 @@ public class WatchListDwr extends BaseDwr {
         List<DataPointVO> watchList = Common.getUser().getWatchList()
                 .getPointList();
         for (DataPointVO dp : watchList) {
-            int dtid = dp.getPointLocator().getDataTypeId();
-            if ((dtid == DataTypes.NUMERIC || dtid == DataTypes.BINARY || dtid == DataTypes.MULTISTATE)
+            DataType dtid = dp.getPointLocator().getDataType();
+            if ((dtid == DataType.NUMERIC || dtid == DataType.BINARY || dtid == DataType.MULTISTATE)
                     && ArrayUtils.contains(pointIds, dp.getId())) {
                 pointsFound = true;
                 htmlData.append('_');
@@ -419,7 +418,7 @@ public class WatchListDwr extends BaseDwr {
         point.setSettable(true);
     }
 
-	//
+    //
     // Share users
     //
     @MethodFilter

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataImage;
 
+import br.org.scadabr.DataType;
 import java.util.List;
 
 /**
@@ -41,5 +42,5 @@ public interface IDataPoint {
 
     List<PointValueTime> getPointValuesBetween(long from, long to);
 
-    int getDataTypeId();
+    DataType getDataType();
 }

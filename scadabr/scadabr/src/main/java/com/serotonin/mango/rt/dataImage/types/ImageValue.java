@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataImage.types;
 
+import br.org.scadabr.DataType;
 import java.awt.Image;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,7 +29,6 @@ import java.util.Arrays;
 import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.io.StreamUtils;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import br.org.scadabr.util.ArrayUtils;
 import br.org.scadabr.util.image.ImageUtils;
 
@@ -253,8 +253,8 @@ public class ImageValue extends MangoValue implements Comparable<ImageValue> {
     }
 
     @Override
-    public int getDataType() {
-        return DataTypes.IMAGE;
+    public DataType getDataType() {
+        return DataType.IMAGE;
     }
 
     @Override

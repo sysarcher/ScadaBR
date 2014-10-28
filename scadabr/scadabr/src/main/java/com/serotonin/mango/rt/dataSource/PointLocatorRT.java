@@ -18,7 +18,8 @@
  */
 package com.serotonin.mango.rt.dataSource;
 
-import com.serotonin.mango.vo.dataSource.PointLocatorVO;
+import br.org.scadabr.DataType;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
 
 /**
  * This type provides the data source with the information that it needs to
@@ -38,12 +39,16 @@ abstract public class PointLocatorRT<T extends PointLocatorVO> {
         return vo.isSettable();
     }
 
-
     public boolean isRelinquishable() {
         return false;
     }
-    
-    public T getVo() {
+
+    public final T getVo() {
         return vo;
     }
+
+    public final DataType getDataType() {
+        return vo.getDataType();
+    }
+
 }

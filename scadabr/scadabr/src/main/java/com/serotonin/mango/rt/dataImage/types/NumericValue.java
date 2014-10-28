@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataImage.types;
 
-import com.serotonin.mango.DataTypes;
+import br.org.scadabr.DataType;
 
 /**
  * @author Matthew Lohbihler
@@ -99,8 +99,8 @@ public class NumericValue extends MangoValue implements Comparable<NumericValue>
     }
 
     @Override
-    public int getDataType() {
-        return DataTypes.NUMERIC;
+    public DataType getDataType() {
+        return DataType.NUMERIC;
     }
 
     @Override

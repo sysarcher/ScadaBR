@@ -931,8 +931,7 @@ public class ImportTask extends ProgressiveTask implements SystemRunnable {
             String value = json.getString("value");
             PointValueDao dao = PointValueDao.getInstance();
             PointValueTime pointValue = new PointValueTime(
-                    MangoValue.stringToValue(value, dp.getPointLocator()
-                            .getDataTypeId()), time);
+                    MangoValue.stringToValue(value, dp.getDataType()), time);
             dao.savePointValue(dp.getId(), pointValue);
         }
 

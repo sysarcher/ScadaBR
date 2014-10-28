@@ -4,6 +4,7 @@
  */
 package com.serotonin.mango.web.servlet;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.ImplementMeException;
 import java.awt.Color;
 import java.io.IOException;
@@ -18,8 +19,6 @@ import org.jfree.data.time.TimeSeries;
 
 import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.db.RowCallback;
-import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -201,15 +200,15 @@ public class AsyncImageChartServlet extends BaseInfoServlet {
                 // no op
             }
 
-            int dataType = dp.getPointLocator().getDataTypeId();
+            final DataType dataType = dp.getDataType();
 
-            if (dataType == DataTypes.NUMERIC) {
+            if (dataType == DataType.NUMERIC) {
                 ts = new TimeSeries(dp.getName(), null, null, Second.class);
                 quantizer = new NumericDataQuantizer(from, to, imageWidth, this);
-            } else if (dataType == DataTypes.MULTISTATE) {
+            } else if (dataType == DataType.MULTISTATE) {
                 quantizer = new MultistateDataQuantizer(from, to, imageWidth, this);
                 dts = new DiscreteTimeSeries(dp.getName(), dp.getTextRenderer(), colour);
-            } else if (dataType == DataTypes.BINARY) {
+            } else if (dataType == DataType.BINARY) {
                 quantizer = new BinaryDataQuantizer(from, to, imageWidth, this);
                 dts = new DiscreteTimeSeries(dp.getName(), dp.getTextRenderer(), colour);
             }

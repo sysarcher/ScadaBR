@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.galil;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -29,7 +30,6 @@ import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.mango.rt.dataSource.galil.VariablePointTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -47,7 +47,7 @@ public class VariablePointTypeVO extends PointTypeVO {
 
     @JsonRemoteProperty
     private String variableName = "";
-    private int dataTypeId = DataTypes.NUMERIC;
+    private DataType dataType = DataType.NUMERIC;
 
     @Override
     public PointTypeRT createRuntime() {
@@ -60,8 +60,8 @@ public class VariablePointTypeVO extends PointTypeVO {
     }
 
     @Override
-    public int getDataTypeId() {
-        return dataTypeId;
+    public DataType getDataType() {
+        return dataType;
     }
 
     @Override
@@ -76,7 +76,7 @@ public class VariablePointTypeVO extends PointTypeVO {
 
     @Override
     public void validate(DwrResponseI18n response) {
-        if (!DataTypes.CODES.isValidId(dataTypeId, DataTypes.IMAGE)) {
+        if (dataType == DataType.IMAGE) {
             response.addContextual("dataTypeId", "validate.invalidValue");
         }
         if (variableName.isEmpty()) {
@@ -92,21 +92,21 @@ public class VariablePointTypeVO extends PointTypeVO {
         this.variableName = variableName;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
     }
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.galil.varName", variableName);
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
     }
 
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         VariablePointTypeVO from = (VariablePointTypeVO) o;
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.galil.varName", from.variableName, variableName);
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
     }
 
     //
@@ -120,7 +120,7 @@ public class VariablePointTypeVO extends PointTypeVO {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, variableName);
-        out.writeInt(dataTypeId);
+        out.writeInt(dataType.ordinal());
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
@@ -129,7 +129,7 @@ public class VariablePointTypeVO extends PointTypeVO {
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
             variableName = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
         }
     }
 
@@ -139,10 +139,10 @@ public class VariablePointTypeVO extends PointTypeVO {
 
         String text = json.getString("dataType");
         if (text != null) {
-            dataTypeId = DataTypes.CODES.getId(text);
-            if (!DataTypes.CODES.isValidId(dataTypeId, DataTypes.IMAGE)) {
-                throw new LocalizableJsonException("emport.error.invalid", "dataType", text, DataTypes.CODES
-                        .getCodeList(DataTypes.IMAGE));
+            try {
+                dataType = DataType.valueOf(text);
+            } catch (Exception e) {
+                throw new LocalizableJsonException("emport.error.invalid", "dataType", text, DataType.IMAGE);
             }
         }
     }
@@ -150,6 +150,6 @@ public class VariablePointTypeVO extends PointTypeVO {
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        map.put("dataType", DataTypes.CODES.getCode(dataTypeId));
+        map.put("dataType", dataType.name());
     }
 }

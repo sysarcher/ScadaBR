@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
+import br.org.scadabr.DataType;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -34,7 +35,6 @@ import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.io.StreamUtils;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
@@ -44,8 +44,6 @@ import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 import javax.script.Invocable;
 
 /**
@@ -78,7 +76,7 @@ public class ScriptExecutor {
     }
 
     public PointValueTime execute(String script, Map<String, IDataPoint> context, long runtime,
-            int dataTypeId, long timestamp) throws ScriptException, ResultTypeException {
+            DataType dataType, long timestamp) throws ScriptException, ResultTypeException {
         ensureFunctions();
 
         // Create the script engine.
@@ -108,17 +106,22 @@ public class ScriptExecutor {
         // Put the context variables into the engine with engine scope.
         for (String varName : context.keySet()) {
             IDataPoint point = context.get(varName);
-            int dt = point.getDataTypeId();
-            if (dt == DataTypes.BINARY) {
-                engine.put(varName, new BinaryPointWrapper(point, wrapperContext));
-            } else if (dt == DataTypes.MULTISTATE) {
-                engine.put(varName, new MultistatePointWrapper(point, wrapperContext));
-            } else if (dt == DataTypes.NUMERIC) {
-                engine.put(varName, new NumericPointWrapper(point, wrapperContext));
-            } else if (dt == DataTypes.ALPHANUMERIC) {
-                engine.put(varName, new AlphanumericPointWrapper(point, wrapperContext));
-            } else {
-                throw new ShouldNeverHappenException("Unknown data type id: " + point.getDataTypeId());
+            DataType dt = point.getDataType();
+            switch (dt) {
+                case BINARY:
+                    engine.put(varName, new BinaryPointWrapper(point, wrapperContext));
+                    break;
+                case MULTISTATE:
+                    engine.put(varName, new MultistatePointWrapper(point, wrapperContext));
+                    break;
+                case NUMERIC:
+                    engine.put(varName, new NumericPointWrapper(point, wrapperContext));
+                    break;
+                case ALPHANUMERIC:
+                    engine.put(varName, new AlphanumericPointWrapper(point, wrapperContext));
+                    break;
+                default:
+                    throw new ShouldNeverHappenException("Unknown data type : " + point.getDataType());
             }
         }
 
@@ -154,31 +157,36 @@ public class ScriptExecutor {
 
         MangoValue value;
         if (result == null) {
-            if (dataTypeId == DataTypes.BINARY) {
-                value = new BinaryValue(false);
-            } else if (dataTypeId == DataTypes.MULTISTATE) {
-                value = new MultistateValue(0);
-            } else if (dataTypeId == DataTypes.NUMERIC) {
-                value = new NumericValue(0);
-            } else if (dataTypeId == DataTypes.ALPHANUMERIC) {
-                value = new AlphanumericValue("");
-            } else {
-                value = null;
+            switch (dataType) {
+                case BINARY:
+                    value = new BinaryValue(false);
+                    break;
+                case MULTISTATE:
+                    value = new MultistateValue(0);
+                    break;
+                case NUMERIC:
+                    value = new NumericValue(0);
+                    break;
+                case ALPHANUMERIC:
+                    value = new AlphanumericValue("");
+                    break;
+                default:
+                    value = null;
             }
         } else if (result instanceof AbstractPointWrapper) {
             value = ((AbstractPointWrapper) result).getValueImpl();
         } // See if the type matches.
-        else if (dataTypeId == DataTypes.BINARY && result instanceof Boolean) {
+        else if (dataType == DataType.BINARY && result instanceof Boolean) {
             value = new BinaryValue((Boolean) result);
-        } else if (dataTypeId == DataTypes.MULTISTATE && result instanceof Number) {
+        } else if (dataType == DataType.MULTISTATE && result instanceof Number) {
             value = new MultistateValue(((Number) result).intValue());
-        } else if (dataTypeId == DataTypes.NUMERIC && result instanceof Number) {
+        } else if (dataType == DataType.NUMERIC && result instanceof Number) {
             value = new NumericValue(((Number) result).doubleValue());
-        } else if (dataTypeId == DataTypes.ALPHANUMERIC && result instanceof String) {
+        } else if (dataType == DataType.ALPHANUMERIC && result instanceof String) {
             value = new AlphanumericValue((String) result);
         } else // If not, ditch it.
         {
-            throw new ResultTypeException("event.script.convertError", result, DataTypes.getDataTypeMessage(dataTypeId));
+            throw new ResultTypeException("event.script.convertError", result, dataType);
         }
 
         return new PointValueTime(value, timestamp);

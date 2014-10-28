@@ -6,34 +6,32 @@
 
 package com.serotonin.mango.view.chart;
 
-import com.serotonin.mango.DataTypes;
+import br.org.scadabr.DataType;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.Set;
 
 /**
  *
  * @author aploese
  */
 public enum ChartType {
-    NONE("chartRenderer.none", DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC, DataTypes.IMAGE), 
-    TABLE("chartRenderer.table", DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC), 
-    IMAGE("chartRenderer.image", DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC), 
-    STATS("chartRenderer.statistics", DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC),
-    IMAGE_FLIPBOOK("chartRenderer.flipbook", DataTypes.IMAGE);
+    NONE("chartRenderer.none", DataType.ALPHANUMERIC, DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC, DataType.IMAGE), 
+    TABLE("chartRenderer.table", DataType.ALPHANUMERIC, DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC), 
+    IMAGE("chartRenderer.image", DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC), 
+    STATS("chartRenderer.statistics", DataType.ALPHANUMERIC, DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC),
+    IMAGE_FLIPBOOK("chartRenderer.flipbook", DataType.IMAGE);
     
     final String i18nKey;
-    final int[] dataTypes;
+    final Set<DataType> dataTypes;
     
-    private ChartType (String i18nKey, int ... dataTypes) {
+    private ChartType (String i18nKey, DataType ... dataTypes) {
         this.i18nKey = i18nKey;
-        this.dataTypes = dataTypes;
+        this.dataTypes = EnumSet.copyOf(Arrays.asList(dataTypes));
     }
     
-    public boolean supports(int dataType) {
-        for (int dt: dataTypes) {
-            if (dt == dataType) {
-                return true;
-            }
-        }
-        return false;
+    public boolean supports(DataType dataType) {
+        return dataTypes.contains(dataType);
     }
     
 }

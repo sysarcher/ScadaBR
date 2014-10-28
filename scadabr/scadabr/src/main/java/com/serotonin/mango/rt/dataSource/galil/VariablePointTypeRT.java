@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.galil;
 
-import com.serotonin.mango.DataTypes;
+import br.org.scadabr.DataType;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -26,8 +26,6 @@ import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.vo.dataSource.galil.VariablePointTypeVO;
 import br.org.scadabr.web.i18n.LocalizableException;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler
@@ -43,7 +41,7 @@ public class VariablePointTypeRT extends PointTypeRT {
 
     @Override
     protected String getPollRequestImpl() {
-        if (vo.getDataTypeId() == DataTypes.ALPHANUMERIC) {
+        if (vo.getDataType() == DataType.ALPHANUMERIC) {
             return vo.getVariableName() + "={S6}";
         }
         return vo.getVariableName() + "=";
@@ -51,18 +49,18 @@ public class VariablePointTypeRT extends PointTypeRT {
 
     @Override
     public MangoValue parsePollResponse(String data, String pointName) throws LocalizableException {
-        if (vo.getDataTypeId() == DataTypes.ALPHANUMERIC) {
+        if (vo.getDataType() == DataType.ALPHANUMERIC) {
             return new AlphanumericValue(data);
         }
 
         try {
             double value = Double.parseDouble(data);
 
-            if (vo.getDataTypeId() == DataTypes.BINARY) {
+            if (vo.getDataType() == DataType.BINARY) {
                 return new BinaryValue(value != 0);
             }
 
-            if (vo.getDataTypeId() == DataTypes.MULTISTATE) {
+            if (vo.getDataType() == DataType.MULTISTATE) {
                 return new MultistateValue((int) value);
             }
 
@@ -78,11 +76,11 @@ public class VariablePointTypeRT extends PointTypeRT {
         StringBuilder data = new StringBuilder();
         data.append(vo.getVariableName()).append('=');
 
-        if (vo.getDataTypeId() == DataTypes.BINARY) {
+        if (vo.getDataType() == DataType.BINARY) {
             data.append(value.getBooleanValue() ? '1' : '0');
-        } else if (vo.getDataTypeId() == DataTypes.MULTISTATE) {
+        } else if (vo.getDataType() == DataType.MULTISTATE) {
             data.append(value.getIntegerValue());
-        } else if (vo.getDataTypeId() == DataTypes.NUMERIC) {
+        } else if (vo.getDataType() == DataType.NUMERIC) {
             data.append(value.getDoubleValue());
         } else {
             data.append('"').append(value.getStringValue()).append('"');

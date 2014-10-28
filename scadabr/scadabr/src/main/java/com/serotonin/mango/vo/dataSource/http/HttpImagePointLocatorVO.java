@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.http;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,7 +31,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.http.HttpImagePointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -166,8 +166,8 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO implements J
     }
 
     @Override
-    public int getDataTypeId() {
-        return DataTypes.IMAGE;
+    public DataType getDataType() {
+        return DataType.IMAGE;
     }
 
     @Override

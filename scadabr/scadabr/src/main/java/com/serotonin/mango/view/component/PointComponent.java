@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view.component;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -35,6 +36,7 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.Set;
 
 /**
  * @author Matthew Lohbihler
@@ -71,7 +73,7 @@ abstract public class PointComponent extends ViewComponent {
             visible = false;
         } else {
             visible = Permissions.hasDataPointReadPermission(user, dataPoint);
-            valid = definition().supports(dataPoint.getPointLocator().getDataTypeId());
+            valid = definition().supports(dataPoint.getPointLocator().getDataType());
         }
 
         if (makeReadOnly) {
@@ -98,7 +100,7 @@ abstract public class PointComponent extends ViewComponent {
         return dataPoint.getId() == dataPointId;
     }
 
-    public int[] getSupportedDataTypes() {
+    public Set<DataType> getSupportedDataTypes() {
         return definition().getSupportedDataTypes();
     }
 

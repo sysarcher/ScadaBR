@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view.component;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -37,10 +38,8 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.l10n.Localizer;
+import java.util.Set;
 
 /**
  * @author Matthew Lohbihler
@@ -80,11 +79,11 @@ abstract public class CompoundComponent extends ViewComponent {
         addChildImpl(id, descriptionKey, htmlComponent, null);
     }
 
-    protected void addChild(String id, String descriptionKey, PointComponent pointComponent, int[] dataTypesOverride) {
+    protected void addChild(String id, String descriptionKey, PointComponent pointComponent, Set<DataType> dataTypesOverride) {
         addChildImpl(id, descriptionKey, pointComponent, dataTypesOverride);
     }
 
-    private void addChildImpl(String id, String descriptionKey, ViewComponent viewComponent, int[] dataTypesOverride) {
+    private void addChildImpl(String id, String descriptionKey, ViewComponent viewComponent, Set<DataType> dataTypesOverride) {
         viewComponent.setIndex(getIndex());
         viewComponent.setIdSuffix("-" + id);
         children.add(new CompoundChild(id, new LocalizableMessageImpl(descriptionKey), viewComponent, dataTypesOverride));

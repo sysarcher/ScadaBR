@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.onewire;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.ImplementMeException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,7 +41,6 @@ import com.dalsemi.onewire.utils.Address;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.timer.cron.CronExpression;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -295,10 +295,10 @@ public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> 
 
                 if (result != null) {
                     // The value was correctly extracted from the device.
-                    if (DataTypes.getDataType(result) != locator.getVo().getDataTypeId()) // Huh?
+                    if (result.getDataType() != locator.getDataType()) // Huh?
                     {
-                        throw new ShouldNeverHappenException("Got " + DataTypes.getDataType(result) + ", expected "
-                                + locator.getVo().getDataTypeId());
+                        throw new ShouldNeverHappenException("Got " + result.getDataType() + ", expected "
+                                + locator.getDataType());
                     }
 
                     // Update the data image with the new value.
@@ -318,73 +318,73 @@ public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> 
     public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source) {
         throw new ImplementMeException();
         /*
-        LocalizableMessage exceptionMessage = null;
+         LocalizableMessage exceptionMessage = null;
 
-        Network localNetwork = network;
-        if (localNetwork == null) {
-            return;
-        }
+         Network localNetwork = network;
+         if (localNetwork == null) {
+         return;
+         }
 
-        // Ensure that the write doesn't conflict with a read.
-        synchronized (pointListChangeLock) {
-            OneWirePointLocatorRT locator = dataPoint.getPointLocator();
+         // Ensure that the write doesn't conflict with a read.
+         synchronized (pointListChangeLock) {
+         OneWirePointLocatorRT locator = dataPoint.getPointLocator();
 
-            NetworkPath path = null;
-            try {
-                localNetwork.lock();
+         NetworkPath path = null;
+         try {
+         localNetwork.lock();
 
-                path = localNetwork.getNetworkPath(locator.getAddress());
-                if (path == null) {
-                    exceptionMessage = new LocalizableMessageImpl("event.1wire.noDevice", Address.toString(locator
-                            .getAddress()), dataPoint.getVoName());
-                } else {
-                    path.open();
+         path = localNetwork.getNetworkPath(locator.getAddress());
+         if (path == null) {
+         exceptionMessage = new LocalizableMessageImpl("event.1wire.noDevice", Address.toString(locator
+         .getAddress()), dataPoint.getVoName());
+         } else {
+         path.open();
 
-                    int attributeId = locator.getVo().getAttributeId();
-                    int index = locator.getVo().getIndex();
+         int attributeId = locator.getVo().getAttributeId();
+         int index = locator.getVo().getIndex();
 
-                    if (attributeId == OneWirePointLocatorVO.AttributeTypes.LATCH_STATE) {
-                        SwitchContainer sc = (SwitchContainer) path.getTarget();
-                        byte[] state = sc.readDevice();
-                        boolean value = valueTime.getBooleanValue();
-                        sc.setLatchState(index, value, sc.hasSmartOn(), state);
-                        sc.writeDevice(state);
-                    } else if (attributeId == OneWirePointLocatorVO.AttributeTypes.WIPER_POSITION) {
-                        PotentiometerContainer pc = (PotentiometerContainer) path.getTarget();
-                        byte[] state = pc.readDevice();
-                        int value = valueTime.getIntegerValue();
-                        pc.setCurrentWiperNumber(index, state);
-                        boolean success = pc.setWiperPosition(value);
-                        if (success) {
-                            pc.writeDevice(state);
-                        } else {
-                            exceptionMessage = new LocalizableMessageImpl("event.1wire.setWiper", Address.toString(locator
-                                    .getAddress()), dataPoint.getVoName());
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                exceptionMessage = wrapSerialException(e, vo.getCommPortId());
-            } finally {
-                try {
-                    if (path != null) {
-                        path.close();
-                    }
-                } catch (Exception e) {
-                    // no op
-                }
+         if (attributeId == OneWirePointLocatorVO.AttributeTypes.LATCH_STATE) {
+         SwitchContainer sc = (SwitchContainer) path.getTarget();
+         byte[] state = sc.readDevice();
+         boolean value = valueTime.getBooleanValue();
+         sc.setLatchState(index, value, sc.hasSmartOn(), state);
+         sc.writeDevice(state);
+         } else if (attributeId == OneWirePointLocatorVO.AttributeTypes.WIPER_POSITION) {
+         PotentiometerContainer pc = (PotentiometerContainer) path.getTarget();
+         byte[] state = pc.readDevice();
+         int value = valueTime.getIntegerValue();
+         pc.setCurrentWiperNumber(index, state);
+         boolean success = pc.setWiperPosition(value);
+         if (success) {
+         pc.writeDevice(state);
+         } else {
+         exceptionMessage = new LocalizableMessageImpl("event.1wire.setWiper", Address.toString(locator
+         .getAddress()), dataPoint.getVoName());
+         }
+         }
+         }
+         } catch (Exception e) {
+         exceptionMessage = wrapSerialException(e, vo.getCommPortId());
+         } finally {
+         try {
+         if (path != null) {
+         path.close();
+         }
+         } catch (Exception e) {
+         // no op
+         }
 
-                localNetwork.unlock();
-            }
+         localNetwork.unlock();
+         }
 
-            // Event handling.
-            if (exceptionMessage != null) {
-                raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), false, exceptionMessage);
-            } else {
-                dataPoint.setPointValue(valueTime, source);
-            }
-        }
-                */
+         // Event handling.
+         if (exceptionMessage != null) {
+         raiseEvent(POINT_WRITE_EXCEPTION_EVENT, System.currentTimeMillis(), false, exceptionMessage);
+         } else {
+         dataPoint.setPointValue(valueTime, source);
+         }
+         }
+         */
     }
 
     //
@@ -447,6 +447,7 @@ public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> 
     private void updateNextRescan(long time) {
         nextRescan = time + Common.getMillis(vo.getRescanPeriodType(), vo.getRescanPeriods());
     }
+
     @Override
     protected CronExpression getCronExpression() throws ParseException {
         throw new ImplementMeException();

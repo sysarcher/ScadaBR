@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.nmea;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,7 +31,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.nmea.NmeaPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -39,6 +39,7 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -65,7 +66,7 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     private String messageName;
     @JsonRemoteProperty
     private int fieldIndex = 1;
-    private int dataTypeId;
+    private DataType dataType;
     @JsonRemoteProperty
     private String binary0Value;
 
@@ -86,12 +87,12 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     @Override
-    public int getDataTypeId() {
-        return dataTypeId;
+    public DataType getDataType() {
+        return dataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
     }
 
     public String getBinary0Value() {
@@ -115,7 +116,7 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.nmea.messageName", messageName);
         AuditEventType.addPropertyMessage(list, "dsEdit.nmea.binary0Value", binary0Value);
         AuditEventType.addPropertyMessage(list, "dsEdit.nmea.fieldIndex", fieldIndex);
@@ -124,7 +125,7 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         NmeaPointLocatorVO from = (NmeaPointLocatorVO) o;
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.nmea.messageName", from.messageName, messageName);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.nmea.binary0Value", from.binary0Value, binary0Value);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.nmea.fieldIndex", from.fieldIndex, fieldIndex);
@@ -142,7 +143,7 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, messageName);
         out.writeInt(fieldIndex);
-        out.writeInt(dataTypeId);
+        out.writeInt(dataType.ordinal());
         SerializationHelper.writeSafeUTF(out, binary0Value);
     }
 
@@ -153,16 +154,16 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         if (ver == 1) {
             messageName = SerializationHelper.readSafeUTF(in);
             fieldIndex = in.readInt();
-            dataTypeId = in.readInt();
+            dataType = DataType.valueOf(in.readInt());
             binary0Value = SerializationHelper.readSafeUTF(in);
         }
     }
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        Integer value = deserializeDataType(json, DataTypes.IMAGE);
+        DataType value = deserializeDataType(json, EnumSet.of(DataType.IMAGE));
         if (value != null) {
-            dataTypeId = value;
+            dataType = value;
         }
     }
 

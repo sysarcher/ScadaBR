@@ -88,19 +88,20 @@ public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> 
                 new DefaultHttpMethodRetryHandler(retries, true));
         return httpClient;
     }
-/*
-    @Override
-    public void addDataPoint(DataPointRT dataPoint) {
-        super.addDataPoint(dataPoint);
-        dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
-    }
+    /*
+     @Override
+     public void addDataPoint(DataPointRT dataPoint) {
+     super.addDataPoint(dataPoint);
+     dataPoint.setAttribute(ATTR_UNRELIABLE_KEY, true);
+     }
 
-    @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
-        returnToNormal(PARSE_EXCEPTION_EVENT, System.currentTimeMillis());
-        super.removeDataPoint(dataPoint);
-    }
-*/
+     @Override
+     public void removeDataPoint(DataPointRT dataPoint) {
+     returnToNormal(PARSE_EXCEPTION_EVENT, System.currentTimeMillis());
+     super.removeDataPoint(dataPoint);
+     }
+     */
+
     @Override
     public void forcePointRead(DataPointRT dataPoint) {
         PachubePointLocatorRT locator = dataPoint.getPointLocator();
@@ -113,26 +114,26 @@ public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> 
     public void doPoll(long time) {
         throw new ImplementMeException();
         /*
-        Map<Integer, List<DataPointRT>> devicePoints = new HashMap<>();
+         Map<Integer, List<DataPointRT>> devicePoints = new HashMap<>();
 
-        synchronized (pointListChangeLock) {
-            for (DataPointRT dp : dataPoints) {
-                PachubePointLocatorRT locator = dp.getPointLocator();
+         synchronized (pointListChangeLock) {
+         for (DataPointRT dp : dataPoints) {
+         PachubePointLocatorRT locator = dp.getPointLocator();
 
-                List<DataPointRT> points = devicePoints.get(locator.getFeedId());
-                if (points == null) {
-                    points = new ArrayList<>();
-                    devicePoints.put(locator.getFeedId(), points);
-                }
+         List<DataPointRT> points = devicePoints.get(locator.getFeedId());
+         if (points == null) {
+         points = new ArrayList<>();
+         devicePoints.put(locator.getFeedId(), points);
+         }
 
-                points.add(dp);
-            }
-        }
+         points.add(dp);
+         }
+         }
 
-        for (Map.Entry<Integer, List<DataPointRT>> entry : devicePoints.entrySet()) {
-            pollFeed(entry.getKey(), entry.getValue(), time);
-        }
-                */
+         for (Map.Entry<Integer, List<DataPointRT>> entry : devicePoints.entrySet()) {
+         pollFeed(entry.getKey(), entry.getValue(), time);
+         }
+         */
     }
 
     protected void pollFeed(int feedId, List<DataPointRT> points, long time) {
@@ -173,7 +174,7 @@ public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> 
             } else {
                 try {
                     // Get the value
-                    MangoValue value = DataSourceUtils.getValue(dataValue.getValue(), locator.getDataTypeId(),
+                    MangoValue value = DataSourceUtils.getValue(dataValue.getValue(), locator.getDataType(),
                             locator.getBinary0Value(), dp.getVo().getTextRenderer(), null, dp.getVoName());
 
                     // Get the time.
@@ -285,6 +286,7 @@ public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> 
                     "event.exception2", dataPoint.getVoName(), e.getMessage()));
         }
     }
+
     @Override
     protected CronExpression getCronExpression() throws ParseException {
         throw new ImplementMeException();

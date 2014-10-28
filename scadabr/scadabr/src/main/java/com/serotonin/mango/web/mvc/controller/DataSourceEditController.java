@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.mvc.controller;
 
+import br.org.scadabr.DataType;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.util.CommPortConfigException;
@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class DataSourceEditController {
 
     //TODO split the methods by param ...
- //   @Override
+    //   @Override
     @RequestMapping(method = RequestMethod.GET)
     public String showForm(ModelMap modelMap, HttpServletRequest request) {
         DataSourceVO<?> dataSourceVO = null;
@@ -106,7 +106,7 @@ public class DataSourceEditController {
         for (DataPointVO dp : allPoints) {
             if (Permissions.hasDataPointReadPermission(user, dp)) {
                 userPoints.add(dp);
-                if (dp.getPointLocator().getDataTypeId() == DataTypes.NUMERIC) {
+                if (dp.getDataType() == DataType.NUMERIC) {
                     analogPoints.add(dp);
                 }
             }

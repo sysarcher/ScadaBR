@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.event;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -35,7 +36,6 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.db.dao.MailingListDao;
@@ -386,7 +386,7 @@ public class EventHandlerVO implements Serializable,
             if (dp == null) {
                 response.addGeneric("eventHandlers.noTargetPoint");
             } else {
-                int dataType = dp.getPointLocator().getDataTypeId();
+                final DataType dataType = dp.getDataType();
 
                 if (activeAction == SET_ACTION_NONE
                         && inactiveAction == SET_ACTION_NONE) {
@@ -395,7 +395,7 @@ public class EventHandlerVO implements Serializable,
 
                 // Active
                 if (activeAction == SET_ACTION_STATIC_VALUE
-                        && dataType == DataTypes.MULTISTATE) {
+                        && dataType == DataType.MULTISTATE) {
                     try {
                         Integer.parseInt(activeValueToSet);
                     } catch (NumberFormatException e) {
@@ -404,7 +404,7 @@ public class EventHandlerVO implements Serializable,
                 }
 
                 if (activeAction == SET_ACTION_STATIC_VALUE
-                        && dataType == DataTypes.NUMERIC) {
+                        && dataType == DataType.NUMERIC) {
                     try {
                         Double.parseDouble(activeValueToSet);
                     } catch (NumberFormatException e) {
@@ -417,15 +417,14 @@ public class EventHandlerVO implements Serializable,
 
                     if (dpActive == null) {
                         response.addGeneric("eventHandlers.invalidActiveSource");
-                    } else if (dataType != dpActive.getPointLocator()
-                            .getDataTypeId()) {
+                    } else if (dataType != dpActive.getDataType()) {
                         response.addGeneric("eventHandlers.invalidActiveSourceType");
                     }
                 }
 
                 // Inactive
                 if (inactiveAction == SET_ACTION_STATIC_VALUE
-                        && dataType == DataTypes.MULTISTATE) {
+                        && dataType == DataType.MULTISTATE) {
                     try {
                         Integer.parseInt(inactiveValueToSet);
                     } catch (NumberFormatException e) {
@@ -434,7 +433,7 @@ public class EventHandlerVO implements Serializable,
                 }
 
                 if (inactiveAction == SET_ACTION_STATIC_VALUE
-                        && dataType == DataTypes.NUMERIC) {
+                        && dataType == DataType.NUMERIC) {
                     try {
                         Double.parseDouble(inactiveValueToSet);
                     } catch (NumberFormatException e) {
@@ -447,8 +446,7 @@ public class EventHandlerVO implements Serializable,
 
                     if (dpInactive == null) {
                         response.addGeneric("eventHandlers.invalidInactiveSource");
-                    } else if (dataType != dpInactive.getPointLocator()
-                            .getDataTypeId()) {
+                    } else if (dataType != dpInactive.getDataType()) {
                         response.addGeneric("eventHandlers.invalidInactiveSourceType");
                     }
                 }

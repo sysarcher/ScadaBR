@@ -18,14 +18,13 @@
  */
 package com.serotonin.mango.rt.dataSource.pop3;
 
+import br.org.scadabr.DataType;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.pop3.Pop3PointLocatorVO;
-import br.org.scadabr.util.StringUtils;
 
 /**
  * @author Matthew Lohbihler
@@ -33,7 +32,6 @@ import br.org.scadabr.util.StringUtils;
 public class Pop3PointLocatorRT extends PointLocatorRT<Pop3PointLocatorVO> {
 
     private final Pattern valuePattern;
-    private final int dataTypeId;
     private String binary0Value;
     private DecimalFormat valueFormat;
     private final Pattern timePattern;
@@ -43,11 +41,10 @@ public class Pop3PointLocatorRT extends PointLocatorRT<Pop3PointLocatorVO> {
     public Pop3PointLocatorRT(Pop3PointLocatorVO vo) {
         super(vo);
         valuePattern = Pattern.compile(vo.getValueRegex());
-        dataTypeId = vo.getDataTypeId();
 
-        if (dataTypeId == DataTypes.BINARY) {
+        if (getDataType() == DataType.BINARY) {
             binary0Value = vo.getValueFormat();
-        } else if (dataTypeId == DataTypes.NUMERIC && !vo.getValueFormat().isEmpty()) {
+        } else if (getDataType() == DataType.NUMERIC && !vo.getValueFormat().isEmpty()) {
             valueFormat = new DecimalFormat(vo.getValueFormat());
         }
 
@@ -76,10 +73,6 @@ public class Pop3PointLocatorRT extends PointLocatorRT<Pop3PointLocatorVO> {
 
     public DecimalFormat getValueFormat() {
         return valueFormat;
-    }
-
-    public int getDataTypeId() {
-        return dataTypeId;
     }
 
     public String getBinary0Value() {

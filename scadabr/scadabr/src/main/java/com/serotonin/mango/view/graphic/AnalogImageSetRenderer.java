@@ -18,30 +18,33 @@
  */
 package com.serotonin.mango.view.graphic;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImageSet;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 @Deprecated
 // Use ViewComponent instead
 public class AnalogImageSetRenderer extends ImageSetRenderer {
 
-    private static ImplDefinition definition = new ImplDefinition("graphicRendererAnalogImage", "ANALOG_IMAGE",
-            "graphic.multistateImage", new int[]{DataTypes.NUMERIC});
+    private static final ImplDefinition definition = new ImplDefinition("graphicRendererAnalogImage", "ANALOG_IMAGE",
+            "graphic.multistateImage", EnumSet.of(DataType.NUMERIC));
 
     public static ImplDefinition getDefinition() {
         return definition;
     }
 
+    @Override
     public String getTypeName() {
         return definition.getName();
     }
 
+    @Override
     public ImplDefinition getDef() {
         return definition;
     }

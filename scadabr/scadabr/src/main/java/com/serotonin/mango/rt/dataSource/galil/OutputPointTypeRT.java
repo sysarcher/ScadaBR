@@ -43,7 +43,7 @@ public class OutputPointTypeRT extends PointTypeRT {
 
     @Override
     public MangoValue parsePollResponse(String data, String pointName) throws LocalizableException {
-        return super.parseValue(data, vo.getDataTypeId(), pointName);
+        return super.parseValue(data, vo.getDataType(), pointName);
     }
 
     @Override

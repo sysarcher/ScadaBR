@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt;
 
+import br.org.scadabr.DataType;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -115,7 +116,7 @@ public class RuntimeManager {
     private final List<MaintenanceEventRT> maintenanceEvents = new CopyOnWriteArrayList<>();
 
     private boolean started = false;
-    
+
     @Inject
     private DataSourceDao dataSourceDao;
     @Inject
@@ -134,9 +135,9 @@ public class RuntimeManager {
     private PointValueDao pointValueDao;
     @Inject
     private EventManager eventManager;
-    
+
     public RuntimeManager() {
-        
+
     }
 
     //
@@ -363,7 +364,7 @@ public class RuntimeManager {
 
             // Initialize and thus start the runtime version of the data source.
             dataSource.initialize();
-            
+
             LOG.info("Data source '" + vo.getName() + "' initialized");
 
             return true;
@@ -409,7 +410,7 @@ public class RuntimeManager {
         // Since the point's data type may have changed, we must ensure that the
         // other attrtibutes are still ok with
         // it.
-        int dataType = point.getPointLocator().getDataTypeId();
+        DataType dataType = point.getDataType();
 
         // Chart renderer
         if (point.getChartRenderer() != null

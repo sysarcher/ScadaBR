@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view.text;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -25,25 +26,23 @@ import java.text.DecimalFormat;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.view.FormatPatternHolder;
 import java.text.MessageFormat;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class AnalogRenderer extends BaseTextRenderer {
-    
+
     private static ImplDefinition definition = new ImplDefinition("textRendererAnalog", "ANALOG",
-            "textRenderer.analog", new int[]{DataTypes.NUMERIC});
+            "textRenderer.analog", EnumSet.of(DataType.NUMERIC));
 
     public static ImplDefinition getDefinition() {
         return definition;
     }
 
-    
     @Override
     public String getTypeName() {
         return definition.getName();
@@ -65,7 +64,7 @@ public class AnalogRenderer extends BaseTextRenderer {
     }
 
     public AnalogRenderer(String format, String suffix) {
-        this.decimalPattern  = format;
+        this.decimalPattern = format;
         this.suffix = suffix;
     }
 
@@ -146,7 +145,7 @@ public class AnalogRenderer extends BaseTextRenderer {
     @Override
     public String getMessagePattern() {
         if (fullPattern == null) {
-          fullPattern = String.format("{0,number,%s} %s", decimalPattern, suffix);
+            fullPattern = String.format("{0,number,%s} %s", decimalPattern, suffix);
         }
         return fullPattern;
     }

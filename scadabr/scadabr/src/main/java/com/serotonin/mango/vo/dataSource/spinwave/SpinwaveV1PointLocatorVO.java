@@ -18,12 +18,12 @@
  */
 package com.serotonin.mango.vo.dataSource.spinwave;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import br.org.scadabr.json.JsonRemoteEntity;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
@@ -61,11 +61,11 @@ public class SpinwaveV1PointLocatorVO extends BaseSpinwavePointLocatorVO {
         return "Unknown";
     }
 
-    public static int getAttributeDataType(int attributeId) {
+    public static DataType getAttributeDataType(int attributeId) {
         if (attributeId == AttributeTypes.OVERRIDE) {
-            return DataTypes.BINARY;
+            return DataType.BINARY;
         }
-        return DataTypes.NUMERIC;
+        return DataType.NUMERIC;
     }
 
     @Override
@@ -73,7 +73,7 @@ public class SpinwaveV1PointLocatorVO extends BaseSpinwavePointLocatorVO {
         return getAttributeDescription(getAttributeId());
     }
 
-    public int getDataTypeId() {
+    public DataType getDataType() {
         return getAttributeDataType(getAttributeId());
     }
 

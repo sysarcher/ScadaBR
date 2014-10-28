@@ -18,7 +18,6 @@
  */
 package com.serotonin.mango.rt.dataSource.virtual;
 
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -36,18 +35,18 @@ public class VirtualPointLocatorRT extends PointLocatorRT<VirtualPointLocatorVO>
         super(vo);
         changeType = vo.getChangeType().createRuntime();
         String startValue = vo.getChangeType().getStartValue();
-        switch (vo.getDataTypeId()) {
-            case DataTypes.BINARY:
+        switch (vo.getDataType()) {
+            case BINARY:
                 currentValue = BinaryValue.parseBinary(startValue);
                 break;
-            case DataTypes.MULTISTATE:
+            case MULTISTATE:
                 try {
                     currentValue = MultistateValue.parseMultistate(startValue);
                 } catch (NumberFormatException e) {
                     currentValue = new MultistateValue(0);
                 }
                 break;
-            case DataTypes.NUMERIC:
+            case NUMERIC:
                 try {
                     currentValue = NumericValue.parseNumeric(startValue);
                 } catch (NumberFormatException e) {

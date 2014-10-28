@@ -18,28 +18,31 @@
  */
 package com.serotonin.mango.view.graphic;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.view.ImplDefinition;
+import java.util.EnumSet;
 
 @Deprecated
 // Use ViewComponent instead
 public class ThumbnailRenderer extends BaseGraphicRenderer {
 
-    private static ImplDefinition definition = new ImplDefinition("graphicRendererThumbnailImage", "THUMBNAIL",
-            "graphic.thumbnailImage", new int[]{DataTypes.IMAGE});
+    private static final ImplDefinition definition = new ImplDefinition("graphicRendererThumbnailImage", "THUMBNAIL",
+            "graphic.thumbnailImage", EnumSet.of(DataType.IMAGE));
 
     public static ImplDefinition getDefinition() {
         return definition;
     }
 
+    @Override
     public String getTypeName() {
         return definition.getName();
     }
 
+    @Override
     public ImplDefinition getDef() {
         return definition;
     }

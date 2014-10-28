@@ -18,10 +18,10 @@
  */
 package com.serotonin.mango.web.taglib;
 
+import br.org.scadabr.DataType;
 import java.util.regex.Pattern;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
@@ -37,7 +37,7 @@ public class Functions {
         }
         String text = point.getTextRenderer().getText(pointValue, TextRenderer.HINT_FULL);
         String colour = point.getTextRenderer().getColour(pointValue);
-        return getHtml(colour, text, point.getPointLocator().getDataTypeId() == DataTypes.ALPHANUMERIC);
+        return getHtml(colour, text, point.getDataType() == DataType.ALPHANUMERIC);
     }
 
     public static String getRenderedText(DataPointVO point, PointValueTime pointValue) {
@@ -78,7 +78,7 @@ public class Functions {
         }
         String text = point.getTextRenderer().getText(value, hint);
         String colour = point.getTextRenderer().getColour(value);
-        return getHtml(colour, text, point.getPointLocator().getDataTypeId() == DataTypes.ALPHANUMERIC);
+        return getHtml(colour, text, point.getPointLocator().getDataType() == DataType.ALPHANUMERIC);
     }
 
     private static String getHtml(String colour, String text, boolean detectOverflow) {

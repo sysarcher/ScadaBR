@@ -147,7 +147,7 @@ public class DataPointDetailsController {
             modelMap.addAttribute("historyLimit", historyLimit);
 
             // Determine our image chart rendering capabilities.
-            if (ChartType.IMAGE.supports(point.getPointLocator().getDataTypeId())) {
+            if (ChartType.IMAGE.supports(point.getDataType())) {
                 // This point can render an image chart. Carry on...
                 int periodType = Common.TimePeriods.DAYS;
                 int periodCount = 1;
@@ -161,7 +161,7 @@ public class DataPointDetailsController {
             }
 
             // Determine out flipbook rendering capabilities
-            if (ChartType.IMAGE_FLIPBOOK.supports(point.getPointLocator().getDataTypeId())) {
+            if (ChartType.IMAGE_FLIPBOOK.supports(point.getDataType())) {
                 modelMap.addAttribute("flipbookLimit", 10);
             }
 

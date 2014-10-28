@@ -35,10 +35,6 @@ public class PachubePointLocatorRT extends PointLocatorRT<PachubePointLocatorVO>
         return vo.getDataStreamId();
     }
 
-    public int getDataTypeId() {
-        return vo.getDataTypeId();
-    }
-
     public String getBinary0Value() {
         return vo.getBinary0Value();
     }

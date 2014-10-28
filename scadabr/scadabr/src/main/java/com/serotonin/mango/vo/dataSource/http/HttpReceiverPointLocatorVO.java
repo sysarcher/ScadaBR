@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.http;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,7 +31,6 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -39,6 +39,7 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -63,17 +64,17 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
 
     @JsonRemoteProperty
     private String parameterName;
-    private int dataTypeId;
+    private DataType dataType;
     @JsonRemoteProperty
     private String binary0Value;
 
     @Override
-    public int getDataTypeId() {
-        return dataTypeId;
+    public DataType getDataType() {
+        return dataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
     }
 
     public String getParameterName() {
@@ -97,15 +98,12 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
         if (parameterName.isEmpty()) {
             response.addContextual("parameterName", "validate.required");
         }
-        if (!DataTypes.CODES.isValidId(dataTypeId)) {
-            response.addContextual("dataTypeId", "validate.invalidValue");
-        }
     }
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.httpReceiver.httpParamName", parameterName);
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataTypeId);
+        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpReceiver.binaryZeroValue", binary0Value);
     }
 
@@ -114,7 +112,7 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
         HttpReceiverPointLocatorVO from = (HttpReceiverPointLocatorVO) o;
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpReceiver.httpParamName", from.parameterName,
                 parameterName);
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataTypeId, dataTypeId);
+        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpReceiver.binaryZeroValue", from.binary0Value,
                 binary0Value);
     }
@@ -130,7 +128,7 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, parameterName);
-        out.writeInt(dataTypeId);
+        out.writeInt(dataType.ordinal());
         SerializationHelper.writeSafeUTF(out, binary0Value);
     }
 
@@ -140,16 +138,16 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
             parameterName = SerializationHelper.readSafeUTF(in);
-            dataTypeId = in.readInt();
+            dataType = dataType.valueOf(in.readInt());
             binary0Value = SerializationHelper.readSafeUTF(in);
         }
     }
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        Integer value = deserializeDataType(json, DataTypes.IMAGE);
+        DataType value = deserializeDataType(json, EnumSet.of(DataType.IMAGE));
         if (value != null) {
-            dataTypeId = value;
+            dataType = value;
         }
     }
 

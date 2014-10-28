@@ -18,12 +18,12 @@
  */
 package com.serotonin.mango.web.dwr;
 
+import br.org.scadabr.DataType;
 import java.util.Iterator;
 import java.util.List;
 
 import br.org.scadabr.db.KeyValuePair;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.publish.persistent.PersistentSenderRT;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
@@ -67,7 +67,7 @@ public class PublisherEditDwr extends BaseDwr {
         Iterator<DataPointVO> iter = allPoints.iterator();
         while (iter.hasNext()) {
             DataPointVO dp = iter.next();
-            if (dp.getPointLocator().getDataTypeId() == DataTypes.IMAGE) {
+            if (dp.getDataType() == DataType.IMAGE) {
                 iter.remove();
             }
         }
@@ -184,11 +184,11 @@ public class PublisherEditDwr extends BaseDwr {
             response.addGeneric("publisherEdit.persistent.status.pointCount", rt.getPointCount());
             response.addGeneric("publisherEdit.persistent.status.queueSize", rt.getQueueSize());
             if (rt.getConnectingIndex() != -1) {
-                response.addGeneric("publisherEdit.persistent.status.connectionState", new LocalizableMessageImpl( "publisherEdit.persistent.status.connecting", rt.getConnectingIndex(), rt.getPointCount()));
+                response.addGeneric("publisherEdit.persistent.status.connectionState", new LocalizableMessageImpl("publisherEdit.persistent.status.connecting", rt.getConnectingIndex(), rt.getPointCount()));
             } else if (rt.isConnected()) {
-                response.addGeneric("publisherEdit.persistent.status.connectionState", new LocalizableMessageImpl( "publisherEdit.persistent.status.connected"));
+                response.addGeneric("publisherEdit.persistent.status.connectionState", new LocalizableMessageImpl("publisherEdit.persistent.status.connected"));
             } else {
-                response.addGeneric("publisherEdit.persistent.status.connectionState", new LocalizableMessageImpl( "publisherEdit.persistent.status.notConnected"));
+                response.addGeneric("publisherEdit.persistent.status.connectionState", new LocalizableMessageImpl("publisherEdit.persistent.status.notConnected"));
             }
             response.addGeneric("publisherEdit.persistent.status.packetQueueSize", rt.getPacketsToSend());
 

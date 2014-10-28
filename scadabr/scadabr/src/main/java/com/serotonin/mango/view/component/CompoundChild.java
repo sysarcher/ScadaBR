@@ -18,7 +18,9 @@
  */
 package com.serotonin.mango.view.component;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.web.i18n.LocalizableMessage;
+import java.util.Set;
 
 /**
  * @author Matthew Lohbihler
@@ -28,9 +30,9 @@ public class CompoundChild {
     private final String id;
     private final LocalizableMessage description;
     private final ViewComponent viewComponent;
-    private final int[] dataTypesOverride;
+    private final Set<DataType> dataTypesOverride;
 
-    public CompoundChild(String id, LocalizableMessage description, ViewComponent viewComponent, int[] dataTypesOverride) {
+    public CompoundChild(String id, LocalizableMessage description, ViewComponent viewComponent, Set<DataType> dataTypesOverride) {
         this.id = id;
         this.description = description;
         this.viewComponent = viewComponent;
@@ -49,7 +51,7 @@ public class CompoundChild {
         return viewComponent;
     }
 
-    public int[] getDataTypes() {
+    public Set<DataType> getDataTypes() {
         if (dataTypesOverride != null) {
             return dataTypesOverride;
         }

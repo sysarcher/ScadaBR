@@ -18,13 +18,14 @@
  */
 package com.serotonin.mango.view.graphic;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
+import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
@@ -33,17 +34,19 @@ import br.org.scadabr.util.SerializationHelper;
 // Use ViewComponent instead
 public class ScriptRenderer extends BaseGraphicRenderer {
 
-    private static ImplDefinition definition = new ImplDefinition("graphicRendererScript", "SCRIPT", "graphic.script",
-            new int[]{DataTypes.ALPHANUMERIC, DataTypes.BINARY, DataTypes.MULTISTATE, DataTypes.NUMERIC,});
+    private static final ImplDefinition definition = new ImplDefinition("graphicRendererScript", "SCRIPT", "graphic.script",
+            EnumSet.of(DataType.ALPHANUMERIC, DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC));
 
     public static ImplDefinition getDefinition() {
         return definition;
     }
 
+    @Override
     public String getTypeName() {
         return definition.getName();
     }
 
+    @Override
     public ImplDefinition getDef() {
         return definition;
     }

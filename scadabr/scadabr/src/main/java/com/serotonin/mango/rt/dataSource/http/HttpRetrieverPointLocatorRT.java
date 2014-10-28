@@ -18,11 +18,11 @@
  */
 package com.serotonin.mango.rt.dataSource.http;
 
+import br.org.scadabr.DataType;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.http.HttpRetrieverPointLocatorVO;
 
@@ -33,7 +33,6 @@ public class HttpRetrieverPointLocatorRT extends PointLocatorRT<HttpRetrieverPoi
 
     private final Pattern valuePattern;
     private final boolean ignoreIfMissing;
-    private final int dataTypeId;
     private String binary0Value;
     private DecimalFormat valueFormat;
     private final Pattern timePattern;
@@ -43,11 +42,10 @@ public class HttpRetrieverPointLocatorRT extends PointLocatorRT<HttpRetrieverPoi
         super(vo);
         valuePattern = Pattern.compile(vo.getValueRegex());
         ignoreIfMissing = vo.isIgnoreIfMissing();
-        dataTypeId = vo.getDataTypeId();
 
-        if (dataTypeId == DataTypes.BINARY) {
+        if (getDataType() == DataType.BINARY) {
             binary0Value = vo.getValueFormat();
-        } else if (dataTypeId == DataTypes.NUMERIC && !vo.getValueFormat().isEmpty()) {
+        } else if (getDataType() == DataType.NUMERIC && !vo.getValueFormat().isEmpty()) {
             valueFormat = new DecimalFormat(vo.getValueFormat());
         }
 
@@ -71,10 +69,6 @@ public class HttpRetrieverPointLocatorRT extends PointLocatorRT<HttpRetrieverPoi
 
     public DecimalFormat getValueFormat() {
         return valueFormat;
-    }
-
-    public int getDataTypeId() {
-        return dataTypeId;
     }
 
     public String getBinary0Value() {

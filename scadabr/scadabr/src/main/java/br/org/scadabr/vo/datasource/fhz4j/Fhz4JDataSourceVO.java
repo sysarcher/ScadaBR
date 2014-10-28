@@ -20,6 +20,7 @@ package br.org.scadabr.vo.datasource.fhz4j;
 
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.rt.datasource.fhz4j.Fhz4JDataSourceRT;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
@@ -27,7 +28,6 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -51,9 +51,9 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
         EVENT_CODES.addElement(Fhz4JDataSourceRT.POINT_READ_EXCEPTION_EVENT, "POINT_READ_EXCEPTION");
         EVENT_CODES.addElement(Fhz4JDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, "POINT_WRITE_EXCEPTION");
     }
-    
+
     private String commPort;
-    private short fhzHousecode = (short)0x1234;
+    private short fhzHousecode = (short) 0x1234;
     private boolean fhtMaster;
 
     @Override
@@ -205,9 +205,9 @@ public class Fhz4JDataSourceVO extends DataSourceVO<Fhz4JDataSourceVO> {
     public void setFhtMaster(boolean fhtMaster) {
         this.fhtMaster = fhtMaster;
     }
-    
+
     //TODO helper for JSP
-    public FhzProtocol[] getFhzProtocols()  {
+    public FhzProtocol[] getFhzProtocols() {
         return FhzProtocol.values();
     }
 

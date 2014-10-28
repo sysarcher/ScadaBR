@@ -18,13 +18,13 @@
  */
 package com.serotonin.mango.rt.event.handlers;
 
+import br.org.scadabr.DataType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -34,10 +34,8 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.work.SetPointWorkItem;
 import com.serotonin.mango.vo.event.EventHandlerVO;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.i18n.LocalizableMessage;
 import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.l10n.Localizer;
 
 public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource {
 
@@ -65,7 +63,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
             return;
         }
 
-        int targetDataType = targetPoint.getVo().getPointLocator().getDataTypeId();
+        final DataType targetDataType = targetPoint.getDataType();
 
         MangoValue value;
         if (vo.getActiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {
@@ -82,7 +80,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
                 return;
             }
 
-            if (DataTypes.getDataType(valueTime.getValue()) != targetDataType) {
+            if (valueTime.getDataType() != targetDataType) {
                 raiseFailureEvent(new LocalizableMessageImpl("event.setPoint.activePointDataType"), evt.getEventType());
                 return;
             }
@@ -117,7 +115,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
             return;
         }
 
-        int targetDataType = targetPoint.getVo().getPointLocator().getDataTypeId();
+        final DataType targetDataType = targetPoint.getDataType();
 
         MangoValue value;
         if (vo.getInactiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {
@@ -134,7 +132,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
                 return;
             }
 
-            if (DataTypes.getDataType(valueTime.getValue()) != targetDataType) {
+            if (valueTime.getDataType() != targetDataType) {
                 raiseFailureEvent(new LocalizableMessageImpl("event.setPoint.inactivePointDataType"), evt.getEventType());
                 return;
             }

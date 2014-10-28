@@ -18,21 +18,21 @@
  */
 package com.serotonin.mango.view.text;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import br.org.scadabr.json.JsonRemoteEntity;
-import com.serotonin.mango.DataTypes;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.ImplDefinition;
-import java.util.Locale;
+import java.util.EnumSet;
 
 @JsonRemoteEntity
 public class NoneRenderer extends BaseTextRenderer {
 
     private static final ImplDefinition definition = new ImplDefinition("textRendererNone", "NONE", "textRenderer.none",
-            new int[]{DataTypes.IMAGE});
+            EnumSet.of(DataType.IMAGE));
 
     public static ImplDefinition getDefinition() {
         return definition;

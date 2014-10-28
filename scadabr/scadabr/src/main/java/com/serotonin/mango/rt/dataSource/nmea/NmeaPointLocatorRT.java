@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.nmea;
 
+import br.org.scadabr.DataType;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.nmea.NmeaPointLocatorVO;
 
@@ -36,10 +37,6 @@ public class NmeaPointLocatorRT extends PointLocatorRT<NmeaPointLocatorVO> {
 
     public int getFieldIndex() {
         return vo.getFieldIndex();
-    }
-
-    public int getDataTypeId() {
-        return vo.getDataTypeId();
     }
 
     public String getBinary0Value() {

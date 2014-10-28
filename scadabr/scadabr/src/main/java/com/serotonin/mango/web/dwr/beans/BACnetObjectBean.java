@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr.beans;
 
+import br.org.scadabr.DataType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class BACnetObjectBean {
     private boolean cov;
 
     // Default values for points
-    private int dataTypeId;
+    private DataType dataType;
     private List<String> unitsDescription = new ArrayList<String>();
 
     public String getPrettyPresentValue() {
@@ -107,12 +108,12 @@ public class BACnetObjectBean {
         this.objectName = objectName;
     }
 
-    public int getDataTypeId() {
-        return dataTypeId;
+    public DataType getDataType() {
+        return dataType;
     }
 
-    public void setDataTypeId(int dataTypeId) {
-        this.dataTypeId = dataTypeId;
+    public void setDataTypeId(DataType dataType) {
+        this.dataType = dataType;
     }
 
     public List<String> getUnitsDescription() {

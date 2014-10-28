@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataImage;
 
+import br.org.scadabr.DataType;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -161,5 +162,9 @@ public class PointValueTime implements Serializable, IValueTime,
     public void jsonSerialize(Map<String, Object> arg0) {
         System.out.println("POINT VALUES SERIALIZE");
 
+    }
+
+    public DataType getDataType() {
+        return value.getDataType();
     }
 }
