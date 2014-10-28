@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.WeakHashMap;
 import java.util.logging.Logger;
 import net.sf.mbus4j.log.LogUtils;
 
@@ -32,7 +31,7 @@ public abstract class AbstractLocalizer implements Serializable, Localizer {
         synchronized (pvtMessageFormatMap) {
             Map<String, MessageFormat> localizedMap = pvtMessageFormatMap.get(locale);
             if (localizedMap == null) {
-                localizedMap = new WeakHashMap<>();
+                localizedMap = new HashMap<>();
                 pvtMessageFormatMap.put(getLocale(), localizedMap);
             }
             MessageFormat result = localizedMap.get(messagePattern);
