@@ -5,6 +5,8 @@
  */
 package br.org.scadabr.timer;
 
+import br.org.scadabr.utils.ImplementMeException;
+
 /**
  *
  * @author aploese
