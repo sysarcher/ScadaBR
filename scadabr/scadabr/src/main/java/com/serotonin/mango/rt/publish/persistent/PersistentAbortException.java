@@ -1,6 +1,6 @@
 package com.serotonin.mango.rt.publish.persistent;
 
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessage;
 
 public class PersistentAbortException extends Exception {
 

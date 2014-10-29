@@ -3,38 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.org.scadabr.web.i18n;
+package br.org.scadabr.i18n;
 
 import java.util.LinkedList;
 import java.util.ResourceBundle;
-import javax.servlet.ServletRequest;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.jstl.core.Config;
-import javax.servlet.jsp.jstl.fmt.LocalizationContext;
 
 /**
  *
  * @author aploese
  */
 public class I18NUtils {
-
-    @Deprecated // USE RequestContextAwareTag
-    public static ResourceBundle getBundle(ServletRequest request) {
-        LocalizationContext lc = (LocalizationContext) Config.get(request, Config.FMT_LOCALIZATION_CONTEXT);
-        if (lc != null) {
-            return lc.getResourceBundle();
-        }
-        return null;
-    }
-
-    @Deprecated // USE RequestContextAwareTag
-    public static ResourceBundle getBundle(PageContext pc) {
-        LocalizationContext lc = (LocalizationContext) Config.find(pc, Config.FMT_LOCALIZATION_CONTEXT);
-        if (lc != null) {
-            return lc.getResourceBundle();
-        }
-        return null;
-    }
 
     public static String serialize(LocalizableMessage msg) {
         StringBuilder sb = new StringBuilder();

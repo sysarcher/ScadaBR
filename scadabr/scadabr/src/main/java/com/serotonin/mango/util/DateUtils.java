@@ -22,8 +22,8 @@ import org.joda.time.DateTime;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.Common.TimePeriods;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler

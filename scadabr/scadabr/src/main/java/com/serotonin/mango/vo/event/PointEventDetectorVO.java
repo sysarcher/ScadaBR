@@ -52,8 +52,8 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import java.util.EnumSet;
 
 @JsonRemoteEntity

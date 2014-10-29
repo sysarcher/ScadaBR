@@ -1,6 +1,6 @@
 package com.serotonin.mango.rt.publish.persistent;
 
-import br.org.scadabr.web.i18n.I18NUtils;
+import br.org.scadabr.i18n.I18NUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,9 +13,8 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.io.StreamUtils;
 import br.org.scadabr.util.queue.ByteQueue;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.i18n.LocalizableMessageParseException;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessageParseException;
 
 public class Packet {
 

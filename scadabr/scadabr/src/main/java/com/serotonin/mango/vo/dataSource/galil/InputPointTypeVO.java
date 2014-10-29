@@ -35,8 +35,8 @@ import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.LocalizableJsonException;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import java.util.EnumSet;
 import java.util.Set;
 

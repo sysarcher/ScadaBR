@@ -20,7 +20,7 @@ package com.serotonin.mango.rt.dataSource.modbus;
 
 import br.org.scadabr.DataType;
 import br.org.scadabr.ImplementMeException;
-import br.org.scadabr.web.i18n.LocalizableException;
+import br.org.scadabr.i18n.LocalizableException;
 import java.net.ConnectException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -46,7 +46,7 @@ import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.exception.ErrorResponseException;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.locator.BaseLocator;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 
 abstract public class ModbusDataSource<T extends ModbusDataSourceVO<T>> extends PollingDataSource<T> implements MessagingExceptionHandler {
 

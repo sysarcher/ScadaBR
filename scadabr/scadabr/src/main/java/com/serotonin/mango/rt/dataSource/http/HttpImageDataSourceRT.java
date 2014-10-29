@@ -45,9 +45,9 @@ import br.org.scadabr.util.image.BoxScaledImage;
 import br.org.scadabr.util.image.ImageUtils;
 import br.org.scadabr.util.image.JpegImageFormat;
 import br.org.scadabr.util.image.PercentScaledImage;
-import br.org.scadabr.web.i18n.LocalizableException;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableException;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
 /**

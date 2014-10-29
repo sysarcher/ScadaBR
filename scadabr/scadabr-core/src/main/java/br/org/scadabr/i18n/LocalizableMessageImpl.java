@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.org.scadabr.web.i18n;
+package br.org.scadabr.i18n;
 
 /**
  *

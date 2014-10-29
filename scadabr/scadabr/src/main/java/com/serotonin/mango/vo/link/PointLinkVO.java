@@ -35,7 +35,7 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessage;
 
 /**
  * @author Matthew Lohbihler

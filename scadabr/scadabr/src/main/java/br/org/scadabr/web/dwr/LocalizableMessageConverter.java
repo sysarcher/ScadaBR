@@ -7,7 +7,7 @@ package br.org.scadabr.web.dwr;
 
 import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessage;
 import br.org.scadabr.l10n.Localizer;
 import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;

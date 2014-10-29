@@ -9,7 +9,7 @@ import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.web.LazyTreeNode;
 import br.org.scadabr.l10n.Localizer;
 import br.org.scadabr.web.i18n.LocaleResolver;
-import br.org.scadabr.web.i18n.MessageSource;
+import br.org.scadabr.i18n.MessageSource;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;

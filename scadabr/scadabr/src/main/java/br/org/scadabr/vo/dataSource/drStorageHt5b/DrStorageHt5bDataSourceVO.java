@@ -21,8 +21,8 @@ import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
 public class DrStorageHt5bDataSourceVO extends DataSourceVO<DrStorageHt5bDataSourceVO> {

@@ -20,7 +20,7 @@ package com.serotonin.mango.util;
 
 import java.util.List;
 
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessage;
 
 /**
  * This interface is meant for comparable objects (for audit purposes) that are

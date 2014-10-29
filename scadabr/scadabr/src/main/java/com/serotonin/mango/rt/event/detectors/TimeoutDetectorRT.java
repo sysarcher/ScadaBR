@@ -23,7 +23,7 @@ import java.util.Date;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.util.timeout.RunClient;
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessage;
 import com.serotonin.mango.util.timeout.SystemRunTask;
 
 /**

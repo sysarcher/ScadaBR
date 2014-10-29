@@ -35,9 +35,9 @@ import com.serotonin.mango.rt.dataSource.NoMatchException;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.vo.dataSource.http.HttpRetrieverDataSourceVO;
 import br.org.scadabr.web.http.HttpUtils;
-import br.org.scadabr.web.i18n.LocalizableException;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableException;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
 /**

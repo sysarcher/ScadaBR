@@ -48,7 +48,7 @@ import com.serotonin.mango.web.dwr.beans.DataExportDefinition;
 import com.serotonin.mango.web.dwr.beans.WatchListState;
 import br.org.scadabr.util.ArrayUtils;
 import br.org.scadabr.web.dwr.MethodFilter;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import java.util.Objects;
 import java.util.logging.Logger;
 import javax.inject.Inject;

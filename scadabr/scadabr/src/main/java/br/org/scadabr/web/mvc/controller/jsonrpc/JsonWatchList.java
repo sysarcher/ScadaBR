@@ -1,6 +1,5 @@
 package br.org.scadabr.web.mvc.controller.jsonrpc;
 
-import br.org.scadabr.web.i18n.MessageSource;
 import br.org.scadabr.l10n.Localizer;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.RuntimeManager;
@@ -10,8 +9,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 /**
  *

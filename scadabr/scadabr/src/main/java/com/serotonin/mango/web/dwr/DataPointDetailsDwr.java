@@ -48,7 +48,7 @@ import com.serotonin.mango.web.servlet.ImageValueServlet;
 import com.serotonin.mango.web.taglib.Functions;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.dwr.MethodFilter;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import br.org.scadabr.l10n.Localizer;
 import java.util.Date;
 import java.util.Locale;

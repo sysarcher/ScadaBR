@@ -1,7 +1,7 @@
 package com.serotonin.mango.rt.dataSource.persistent;
 
 import br.org.scadabr.ImplementMeException;
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessage;
 
 public class DoAbortException extends Exception implements LocalizableMessage {
 

@@ -6,7 +6,7 @@ package br.org.scadabr.vo.datasource.fhz4j;
 
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.web.i18n.LocalizableI18nKey;
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessage;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import java.io.IOException;
 import java.io.ObjectInputStream;

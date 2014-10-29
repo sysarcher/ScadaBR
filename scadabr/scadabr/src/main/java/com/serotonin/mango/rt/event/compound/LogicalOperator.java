@@ -21,7 +21,7 @@ package com.serotonin.mango.rt.event.compound;
 import java.util.LinkedList;
 import java.util.List;
 
-import br.org.scadabr.web.i18n.LocalizableException;
+import br.org.scadabr.i18n.LocalizableException;
 
 /**
  * @author Matthew Lohbihler

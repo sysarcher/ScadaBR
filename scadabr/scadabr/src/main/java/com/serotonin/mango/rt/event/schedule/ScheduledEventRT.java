@@ -28,8 +28,8 @@ import com.serotonin.mango.util.timeout.RunWithArgClient;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.util.timeout.EventRunWithArgTask;
 import java.text.ParseException;
 

@@ -25,8 +25,8 @@ import java.io.ObjectOutputStream;
 import br.org.scadabr.json.JsonRemoteEntity;
 import com.serotonin.mango.rt.dataSource.virtual.ChangeTypeRT;
 import com.serotonin.mango.rt.dataSource.virtual.NoChangeRT;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
 public class NoChangeVO extends ChangeTypeVO {

@@ -11,7 +11,7 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
 import br.org.scadabr.timer.SimulationTimer;
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessage;
 
 public class HistoricalMetaPointLocatorRT extends MetaPointLocatorRT {
 

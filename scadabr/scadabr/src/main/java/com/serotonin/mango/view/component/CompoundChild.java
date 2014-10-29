@@ -19,7 +19,7 @@
 package com.serotonin.mango.view.component;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessage;
 import java.util.Set;
 
 /**

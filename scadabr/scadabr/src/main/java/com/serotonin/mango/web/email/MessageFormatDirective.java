@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessage;
 import br.org.scadabr.l10n.Localizer;
 
 import freemarker.core.Environment;

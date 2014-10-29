@@ -7,8 +7,8 @@ package br.org.scadabr.web.l10n;
 
 import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.web.i18n.LocaleResolver;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.MessageSource;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.MessageSource;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.vo.DataPointVO;
 import java.text.DateFormat;

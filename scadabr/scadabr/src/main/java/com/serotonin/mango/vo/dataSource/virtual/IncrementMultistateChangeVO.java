@@ -28,8 +28,8 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import com.serotonin.mango.rt.dataSource.virtual.ChangeTypeRT;
 import com.serotonin.mango.rt.dataSource.virtual.IncrementMultistateChangeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
 public class IncrementMultistateChangeVO extends ChangeTypeVO {

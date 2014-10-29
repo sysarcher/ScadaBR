@@ -37,7 +37,7 @@ import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.timer.TimerTask;
 import br.org.scadabr.vo.event.AlarmLevel;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler

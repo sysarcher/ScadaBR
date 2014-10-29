@@ -32,9 +32,9 @@ import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
 import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.util.LifecycleException;
 import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.web.i18n.LocalizableException;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableException;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler

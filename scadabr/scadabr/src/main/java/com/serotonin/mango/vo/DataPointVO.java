@@ -55,7 +55,7 @@ import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessage;
 import java.util.Objects;
 
 @JsonRemoteEntity
