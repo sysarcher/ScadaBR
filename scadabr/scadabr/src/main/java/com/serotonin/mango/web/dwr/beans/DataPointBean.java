@@ -20,7 +20,7 @@ package com.serotonin.mango.web.dwr.beans;
 
 import br.org.scadabr.DataType;
 import com.serotonin.mango.vo.DataPointVO;
-import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 
 public class DataPointBean {
 

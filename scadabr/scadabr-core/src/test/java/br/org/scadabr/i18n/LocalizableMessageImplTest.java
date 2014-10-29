@@ -5,6 +5,8 @@
  */
 package br.org.scadabr.i18n;
 
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 import java.text.MessageFormat;
 import java.util.Locale;
 import org.junit.After;

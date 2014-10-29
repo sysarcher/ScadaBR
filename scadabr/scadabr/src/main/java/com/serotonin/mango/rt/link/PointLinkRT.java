@@ -36,8 +36,8 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.work.SetPointWorkItem;
 import com.serotonin.mango.vo.link.PointLinkVO;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler

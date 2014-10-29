@@ -19,7 +19,7 @@
 package com.serotonin.mango.rt.dataSource.viconics;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +73,7 @@ import com.serotonin.viconics.config.StatPoint;
 import com.serotonin.viconics.config.Thermostat;
 import com.serotonin.viconics.io.ViconicsIncomingResponse;
 import com.serotonin.viconics.io.ViconicsOutgoingRequest;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler

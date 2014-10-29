@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.timer.cron.CronExpression;

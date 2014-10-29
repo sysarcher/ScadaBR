@@ -5,7 +5,7 @@
  */
 package br.org.scadabr.sync;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.concurrent.ExecutorService;
 
 /**

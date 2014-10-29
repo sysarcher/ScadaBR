@@ -20,8 +20,8 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 abstract public class Dnp3DataSourceVO<T extends Dnp3DataSourceVO<T>> extends DataSourceVO<T> {
 

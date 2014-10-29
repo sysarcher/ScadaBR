@@ -28,7 +28,7 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.util.LocalizableJsonException;
-import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 import java.util.Set;
 
 abstract public class AbstractPointLocatorVO implements PointLocatorVO {

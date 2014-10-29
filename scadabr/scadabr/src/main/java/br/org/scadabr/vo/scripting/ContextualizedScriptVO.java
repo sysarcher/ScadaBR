@@ -23,7 +23,7 @@ import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
-import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 
 @JsonRemoteEntity
 public class ContextualizedScriptVO extends ScriptVO<ContextualizedScriptVO>

@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource;
 
-import br.org.scadabr.i18n.LocalizableException;
+import br.org.scadabr.utils.i18n.LocalizableException;
 
 public class NoMatchException extends LocalizableException {
 

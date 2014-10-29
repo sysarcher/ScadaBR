@@ -13,7 +13,7 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.io.StreamUtils;
 import br.org.scadabr.util.queue.ByteQueue;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.i18n.LocalizableMessageParseException;
 
 public class Packet {

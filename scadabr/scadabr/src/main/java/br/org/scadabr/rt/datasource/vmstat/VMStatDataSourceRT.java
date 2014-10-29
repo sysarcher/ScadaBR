@@ -28,10 +28,10 @@ import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.mango.rt.dataSource.EventDataSource;
 import br.org.scadabr.vo.datasource.vmstat.VMStatDataSourceVO;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.datasource.vmstat.Attribute;
 import br.org.scadabr.vo.datasource.vmstat.VMStatPointLocatorVO;
-import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import java.util.EnumMap;

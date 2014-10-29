@@ -1,6 +1,6 @@
 package com.serotonin.mango.rt.publish.persistent;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,8 +19,8 @@ import com.serotonin.mango.vo.publish.persistent.PersistentPointVO;
 import br.org.scadabr.sync.Synchronizer;
 import br.org.scadabr.timer.cron.SystemRunnable;
 import br.org.scadabr.util.queue.ByteQueue;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 class SyncHandler implements SystemRunnable {
 

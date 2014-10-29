@@ -1,6 +1,6 @@
 package com.serotonin.mango.util.timeout;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.EventCronTask;
 import java.text.ParseException;

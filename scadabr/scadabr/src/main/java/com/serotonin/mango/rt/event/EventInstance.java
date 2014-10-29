@@ -27,8 +27,8 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.handlers.EventHandlerRT;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.UserComment;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import com.serotonin.bacnet4j.type.enumerated.EventState;
 
 public class EventInstance {

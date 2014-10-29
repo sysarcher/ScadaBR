@@ -3,18 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.org.scadabr.i18n;
+package br.org.scadabr.utils.i18n;
 
 /**
  *
  * @author aploese
  */
-public class LocalizableException extends RuntimeException implements LocalizableMessage {
+public class LocalizableMessageImpl implements LocalizableMessage {
 
     private final String i18nKey;
     private final Object[] args;
 
-    public LocalizableException(String i18nKey, Object... args) {
+    public LocalizableMessageImpl(String i18nKey, Object... args) {
         this.i18nKey = i18nKey;
         this.args = args;
     }

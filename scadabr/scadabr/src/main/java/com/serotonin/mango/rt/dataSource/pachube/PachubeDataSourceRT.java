@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.pachube;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
@@ -55,9 +55,9 @@ import com.serotonin.mango.rt.dataSource.DataSourceUtils;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.vo.dataSource.pachube.PachubeDataSourceVO;
 import br.org.scadabr.web.http.HttpUtils;
-import br.org.scadabr.i18n.LocalizableException;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableException;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.util.Objects;
 
 public class PachubeDataSourceRT extends PollingDataSource<PachubeDataSourceVO> {

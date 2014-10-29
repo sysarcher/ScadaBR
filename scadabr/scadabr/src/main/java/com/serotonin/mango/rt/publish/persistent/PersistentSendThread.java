@@ -1,6 +1,6 @@
 package com.serotonin.mango.rt.publish.persistent;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

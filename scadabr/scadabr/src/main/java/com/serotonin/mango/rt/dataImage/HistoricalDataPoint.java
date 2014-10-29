@@ -3,7 +3,7 @@ package com.serotonin.mango.rt.dataImage;
 import br.org.scadabr.DataType;
 import java.util.List;
 
-import br.org.scadabr.NotImplementedException;
+import br.org.scadabr.utils.NotImplementedException;
 import com.serotonin.mango.db.dao.PointValueDao;
 import br.org.scadabr.timer.SimulationTimer;
 

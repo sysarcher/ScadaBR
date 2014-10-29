@@ -1,6 +1,6 @@
 package com.serotonin.mango.rt.maint;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.Collection;
 
 import com.serotonin.mango.Common;

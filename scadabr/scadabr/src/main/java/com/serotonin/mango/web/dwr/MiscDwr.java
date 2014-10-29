@@ -53,7 +53,7 @@ import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import com.serotonin.mango.web.email.MangoEmailContent;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.dwr.MethodFilter;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import javax.inject.Inject;
 
 public class MiscDwr extends BaseDwr {

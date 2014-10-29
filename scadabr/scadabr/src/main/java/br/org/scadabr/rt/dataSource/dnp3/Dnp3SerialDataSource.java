@@ -4,7 +4,7 @@ package br.org.scadabr.rt.dataSource.dnp3;
 import java.util.Date;
 
 import br.org.scadabr.vo.dataSource.dnp3.Dnp3SerialDataSourceVO;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 public class Dnp3SerialDataSource extends Dnp3DataSource<Dnp3SerialDataSourceVO> {
 

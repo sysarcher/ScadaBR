@@ -1,6 +1,6 @@
 package com.serotonin.mango.rt.dataSource.persistent;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,7 +44,7 @@ import br.org.scadabr.util.ArrayUtils;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.i18n.I18NUtils;
 import br.org.scadabr.util.queue.ByteQueue;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.io.ByteArrayInputStream;
 
 public class PersistentDataSourceRT extends EventDataSource<PersistentDataSourceVO> implements Runnable {

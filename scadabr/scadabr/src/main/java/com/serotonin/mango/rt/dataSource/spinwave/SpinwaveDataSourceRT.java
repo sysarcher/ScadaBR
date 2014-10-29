@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.spinwave;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -34,7 +34,7 @@ import com.serotonin.mango.vo.dataSource.spinwave.SpinwaveDataSourceVO;
 import com.serotonin.spinwave.SpinwaveReceiver;
 import com.serotonin.spinwave.SwListener;
 import com.serotonin.spinwave.SwMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler

@@ -7,7 +7,7 @@ package br.org.scadabr.web.taglib;
 
 import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 import java.io.IOException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;

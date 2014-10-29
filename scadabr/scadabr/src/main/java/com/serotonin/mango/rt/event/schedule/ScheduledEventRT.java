@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.event.schedule;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.SimpleEventDetector;
@@ -28,8 +28,8 @@ import com.serotonin.mango.util.timeout.RunWithArgClient;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.util.timeout.EventRunWithArgTask;
 import java.text.ParseException;
 

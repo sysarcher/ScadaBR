@@ -25,7 +25,7 @@ import java.util.ResourceBundle;
 
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.view.export.CsvWriter;
-import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 
 /**
  * @author Matthew Lohbihler

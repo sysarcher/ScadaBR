@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.vo.report;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;

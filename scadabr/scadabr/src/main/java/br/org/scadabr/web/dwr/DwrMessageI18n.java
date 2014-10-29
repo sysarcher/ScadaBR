@@ -5,7 +5,7 @@
  */
 package br.org.scadabr.web.dwr;
 
-import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 
 /**
  * @TODO rename this properly

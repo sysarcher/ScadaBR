@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.modbus;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.timer.cron.CronExpression;
 import com.serotonin.io.serial.SerialParameters;
 import com.serotonin.mango.vo.dataSource.modbus.ModbusSerialDataSourceVO;

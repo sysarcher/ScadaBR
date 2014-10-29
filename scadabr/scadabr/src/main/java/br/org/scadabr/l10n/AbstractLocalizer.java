@@ -1,6 +1,6 @@
 package br.org.scadabr.l10n;
 
-import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.MessageFormat;

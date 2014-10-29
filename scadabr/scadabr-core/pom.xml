@@ -17,6 +17,10 @@
     
     <dependencies>
         <dependency>
+            <groupId>br.org.scadabr</groupId>
+            <artifactId>scheduler</artifactId>
+        </dependency>
+        <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
         </dependency>

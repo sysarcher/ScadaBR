@@ -28,7 +28,7 @@ import com.serotonin.mango.rt.dataSource.nmea.NmeaMessage;
 import com.serotonin.mango.rt.dataSource.nmea.NmeaMessageListener;
 import com.serotonin.mango.rt.dataSource.nmea.NmeaReceiver;
 import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.l10n.Localizer;
 
 /**

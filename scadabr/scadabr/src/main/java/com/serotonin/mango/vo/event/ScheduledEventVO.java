@@ -42,8 +42,8 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
 import java.text.ParseException;
 

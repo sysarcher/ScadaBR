@@ -5,7 +5,7 @@
 package com.serotonin.mango.web.servlet;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;

@@ -1,5 +1,6 @@
 package br.org.scadabr.i18n;
 
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;

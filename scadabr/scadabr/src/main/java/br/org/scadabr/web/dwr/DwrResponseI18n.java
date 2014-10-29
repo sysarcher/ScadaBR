@@ -5,7 +5,7 @@
  */
 package br.org.scadabr.web.dwr;
 
-import br.org.scadabr.i18n.LocalizableException;
+import br.org.scadabr.utils.i18n.LocalizableException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

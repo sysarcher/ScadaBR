@@ -5,16 +5,20 @@
  */
 package br.org.scadabr.timer;
 
-import br.org.scadabr.ImplementMeException;
+import java.util.Date;
 
 /**
  *
  * @author aploese
  */
-public class SimulationTimer extends AbstractTimer {
+@Deprecated
+public class OneTimeTrigger extends TimerTrigger {
 
-    @Override
-    public long currentTimeMillis() {
+    public OneTimeTrigger(Date date) {
+        throw new ImplementMeException();
+    }
+
+    public OneTimeTrigger(long delay) {
         throw new ImplementMeException();
     }
 
