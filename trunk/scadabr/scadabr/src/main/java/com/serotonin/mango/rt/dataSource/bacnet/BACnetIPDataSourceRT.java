@@ -80,7 +80,7 @@ import com.serotonin.mango.vo.dataSource.bacnet.BACnetIPDataSourceVO;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.SystemCronTask;
 import com.serotonin.util.queue.ByteQueue;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;

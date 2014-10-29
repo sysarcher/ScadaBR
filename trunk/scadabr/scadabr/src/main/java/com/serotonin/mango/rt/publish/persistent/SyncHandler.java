@@ -19,8 +19,8 @@ import com.serotonin.mango.vo.publish.persistent.PersistentPointVO;
 import br.org.scadabr.sync.Synchronizer;
 import br.org.scadabr.timer.cron.SystemRunnable;
 import br.org.scadabr.util.queue.ByteQueue;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 
 class SyncHandler implements SystemRunnable {
 

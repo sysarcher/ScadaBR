@@ -21,7 +21,7 @@ package com.serotonin.mango.rt.dataSource.galil;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.vo.dataSource.galil.TellPositionPointTypeVO;
-import br.org.scadabr.web.i18n.LocalizableException;
+import br.org.scadabr.i18n.LocalizableException;
 
 /**
  * @author Matthew Lohbihler

@@ -43,8 +43,8 @@ import com.serotonin.mango.vo.publish.httpSender.HttpPointVO;
 import com.serotonin.mango.vo.publish.httpSender.HttpSenderVO;
 import com.serotonin.mango.web.servlet.HttpDataSourceServlet;
 import br.org.scadabr.web.http.HttpUtils;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import java.util.Objects;
 
 /**

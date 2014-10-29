@@ -51,8 +51,8 @@ import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.timer.cron.SystemCronTask;
 import br.org.scadabr.util.queue.ByteQueue;
 import br.org.scadabr.web.http.HttpUtils;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 import java.util.TimeZone;
 

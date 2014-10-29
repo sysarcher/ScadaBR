@@ -19,7 +19,7 @@
 package com.serotonin.mango.rt.dataSource.ebro;
 
 import br.org.scadabr.ImplementMeException;
-import br.org.scadabr.web.i18n.LocalizableException;
+import br.org.scadabr.i18n.LocalizableException;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ import com.serotonin.modbus4j.BatchRead;
 import com.serotonin.modbus4j.BatchResults;
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
 /**

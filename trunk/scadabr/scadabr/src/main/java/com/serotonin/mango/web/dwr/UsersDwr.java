@@ -42,7 +42,7 @@ import com.serotonin.mango.vo.permission.PermissionException;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.email.MangoEmailContent;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import br.org.scadabr.l10n.Localizer;
 import br.org.scadabr.vo.event.AlarmLevel;
 import freemarker.template.TemplateException;

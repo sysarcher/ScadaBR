@@ -26,8 +26,8 @@ import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 
 public class StateChangeCountDetectorRT extends TimeoutDetectorRT {
 

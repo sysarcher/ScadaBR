@@ -5,7 +5,7 @@
  */
 package com.serotonin.mango.web;
 
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.vo.User;

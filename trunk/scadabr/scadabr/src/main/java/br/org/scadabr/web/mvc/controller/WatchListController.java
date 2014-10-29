@@ -28,7 +28,7 @@ import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.l10n.Localizer;
-import br.org.scadabr.web.i18n.MessageSource;
+import br.org.scadabr.i18n.MessageSource;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.UserDao;

@@ -24,7 +24,7 @@ import java.text.DecimalFormat;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.DataSourceUtils;
 import com.serotonin.mango.vo.dataSource.galil.PointTypeVO;
-import br.org.scadabr.web.i18n.LocalizableException;
+import br.org.scadabr.i18n.LocalizableException;
 
 /**
  * @author Matthew Lohbihler

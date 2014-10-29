@@ -6,7 +6,7 @@
 
 package br.org.scadabr.web.dwr;
 
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessage;
 import java.util.List;
 import java.util.ResourceBundle;
 import org.junit.After;

@@ -1,11 +1,8 @@
-package br.org.scadabr.web.i18n;
+package br.org.scadabr.i18n;
 
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.TimeZone;
 
 public class MessageSource extends org.springframework.context.support.ResourceBundleMessageSource {
 

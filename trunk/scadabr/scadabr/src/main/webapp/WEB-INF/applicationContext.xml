@@ -54,7 +54,7 @@
     <!-- i18n TODO overhaul this to use userSessionContextBean ...  -->
     <bean id="localeResolver" class="br.org.scadabr.web.i18n.LocaleResolver"/>
   
-    <bean id="messageSource" class="br.org.scadabr.web.i18n.MessageSource">
+    <bean id="messageSource" class="br.org.scadabr.i18n.MessageSource">
         <property name="basename">
             <value>messages</value>
         </property>

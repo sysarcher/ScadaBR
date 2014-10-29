@@ -42,8 +42,8 @@ import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.OneTimeTrigger;
 import br.org.scadabr.timer.TimerTask;
 import br.org.scadabr.timer.cron.CronParser;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler

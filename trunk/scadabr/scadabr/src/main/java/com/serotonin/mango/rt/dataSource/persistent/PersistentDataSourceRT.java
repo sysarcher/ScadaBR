@@ -42,9 +42,9 @@ import com.serotonin.mango.vo.hierarchy.PointFolder;
 import com.serotonin.mango.vo.hierarchy.PointHierarchy;
 import br.org.scadabr.util.ArrayUtils;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.web.i18n.I18NUtils;
+import br.org.scadabr.i18n.I18NUtils;
 import br.org.scadabr.util.queue.ByteQueue;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import java.io.ByteArrayInputStream;
 
 public class PersistentDataSourceRT extends EventDataSource<PersistentDataSourceVO> implements Runnable {

@@ -65,9 +65,8 @@ import br.org.scadabr.timer.cron.EventRunnable;
 import br.org.scadabr.timer.cron.SystemCronTask;
 import br.org.scadabr.timer.cron.SystemRunnable;
 import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
-import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import java.util.MissingResourceException;
 
 @Deprecated // Convert to singleton bean

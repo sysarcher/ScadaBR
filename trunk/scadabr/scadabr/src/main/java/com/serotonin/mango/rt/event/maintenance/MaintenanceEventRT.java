@@ -12,8 +12,8 @@ import com.serotonin.mango.util.timeout.SystemRunWithArgTask;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 
 public class MaintenanceEventRT implements RunWithArgClient<Boolean> {
 

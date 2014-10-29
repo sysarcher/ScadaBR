@@ -4,7 +4,7 @@ import java.util.Date;
 
 import br.org.scadabr.vo.dataSource.dnp3.Dnp3IpDataSourceVO;
 
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 
 public class Dnp3IpDataSource extends Dnp3DataSource<Dnp3IpDataSourceVO> {
 

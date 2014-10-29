@@ -3,20 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.org.scadabr;
+package br.org.scadabr.vo.event;
 
 /**
  *
  * @author aploese
  */
-public class InvalidArgumentException extends Exception {
+public enum EventStatus {
+    ACTIVE,
+    RTN,
+    NORTN;
     
-    public InvalidArgumentException(String message) {
-        super(message);
-    } 
-
-    public InvalidArgumentException() {
-        super();
+    public String getName() {
+        return name();
     }
-
+    
+    public final static String ANY = "ANY";
 }

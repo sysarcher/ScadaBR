@@ -37,9 +37,9 @@ import com.serotonin.mango.vo.dataSource.galil.GalilDataSourceVO;
 import com.serotonin.messaging.MessageControl;
 import com.serotonin.messaging.MessagingExceptionHandler;
 import com.serotonin.messaging.StreamTransport;
-import br.org.scadabr.web.i18n.LocalizableException;
-import br.org.scadabr.web.i18n.LocalizableMessage;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableException;
+import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
 /**

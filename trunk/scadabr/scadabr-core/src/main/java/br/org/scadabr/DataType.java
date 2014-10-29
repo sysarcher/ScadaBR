@@ -1,6 +1,6 @@
 package br.org.scadabr;
 
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessage;
 import java.util.Collection;
 
 //TODO Make enum out of this ...

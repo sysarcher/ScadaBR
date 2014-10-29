@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.org.scadabr.web.i18n;
+package br.org.scadabr.i18n;
 
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -44,7 +44,7 @@ public class LocalizableMessageImplTest {
         System.out.println("testBoolArg");
         LocalizableMessage instance = new LocalizableMessageImpl("i18nKey", true, false, Boolean.TRUE, Boolean.FALSE);
         String expResult = "i18nKey|\\Ztrue|\\Zfalse|\\Ztrue|\\Zfalse|";
-        //expResult = new br.org.scadabr.web.i18n.LocalizableMessage(instance.getI18nKey(), instance.getArgs()).serialize();
+        //expResult = new br.org.scadabr.i18n.LocalizableMessage(instance.getI18nKey(), instance.getArgs()).serialize();
         String serialized = I18NUtils.serialize(instance);
         assertEquals(expResult, serialized);
         LocalizableMessage deserialized = I18NUtils.deserialize(serialized);
@@ -57,7 +57,7 @@ public class LocalizableMessageImplTest {
         System.out.println("testBoolArg");
         LocalizableMessage instance = new LocalizableMessageImpl("i18nKey", "\\B127", Byte.MAX_VALUE, Short.MAX_VALUE, Integer.MAX_VALUE, Long.MAX_VALUE, Float.MAX_VALUE, Double.MAX_VALUE);
         String expResult = "i18nKey|\\\\B127|\\B127|\\S32767|\\I2147483647|\\J9223372036854775807|\\F3.4028235E38|\\D1.7976931348623157E308|";
-        //expResult = new br.org.scadabr.web.i18n.LocalizableMessage(instance.getI18nKey(), instance.getArgs()).serialize();
+        //expResult = new br.org.scadabr.i18n.LocalizableMessage(instance.getI18nKey(), instance.getArgs()).serialize();
         String serialized = I18NUtils.serialize(instance);
         assertEquals(expResult, serialized);
         LocalizableMessage deserialized = I18NUtils.deserialize(serialized);
@@ -70,7 +70,7 @@ public class LocalizableMessageImplTest {
         System.out.println("testSpecialChars");
         LocalizableMessage instance = new LocalizableMessageImpl("i18nKey", "\\", "|", "[", "]", "|[dummykey]");
         String expResult = "i18nKey|\\\\|\\||\\[|\\]|\\|\\[dummykey\\]|";
-        //expResult = new br.org.scadabr.web.i18n.LocalizableMessage(instance.getI18nKey(), instance.getArgs()).serialize(); // This handles a "\" not correctly, we do ;-)
+        //expResult = new br.org.scadabr.i18n.LocalizableMessage(instance.getI18nKey(), instance.getArgs()).serialize(); // This handles a "\" not correctly, we do ;-)
         String serialized = I18NUtils.serialize(instance);
         assertEquals(expResult, serialized);
         LocalizableMessage deserialized = I18NUtils.deserialize(serialized);
@@ -86,7 +86,7 @@ public class LocalizableMessageImplTest {
         System.out.println("testNested");
         LocalizableMessage instance = new LocalizableMessageImpl("i18nKey", null, new LocalizableMessageImpl("someKey"));
         String expResult = "i18nKey||[someKey|]|";
-        //expResult = new br.org.scadabr.web.i18n.LocalizableMessage("i18nKey", null, new br.org.scadabr.web.i18n.LocalizableMessage("someKey")).serialize(); // Orig after a Localizable MSG no | was written
+        //expResult = new br.org.scadabr.i18n.LocalizableMessage("i18nKey", null, new br.org.scadabr.i18n.LocalizableMessage("someKey")).serialize(); // Orig after a Localizable MSG no | was written
         String serialized = I18NUtils.serialize(instance);
         assertEquals(expResult, serialized);
         LocalizableMessage deserialized = I18NUtils.deserialize(serialized);

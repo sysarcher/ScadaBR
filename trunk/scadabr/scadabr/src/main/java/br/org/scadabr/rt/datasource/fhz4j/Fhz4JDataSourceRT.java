@@ -29,7 +29,7 @@ import br.org.scadabr.vo.datasource.fhz4j.FhtPointLocator;
 import br.org.scadabr.vo.datasource.fhz4j.Fhz4JDataSourceVO;
 import br.org.scadabr.vo.datasource.fhz4j.Fhz4JPointLocatorVO;
 import br.org.scadabr.vo.datasource.fhz4j.HmsPointLocator;
-import br.org.scadabr.web.i18n.LocalizableMessageImpl;
+import br.org.scadabr.i18n.LocalizableMessageImpl;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;

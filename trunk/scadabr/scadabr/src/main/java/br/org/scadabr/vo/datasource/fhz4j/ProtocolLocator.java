@@ -10,7 +10,7 @@ import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.logger.LogUtils;
-import br.org.scadabr.web.i18n.LocalizableMessage;
+import br.org.scadabr.i18n.LocalizableMessage;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
