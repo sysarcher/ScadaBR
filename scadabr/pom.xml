@@ -14,6 +14,7 @@
         <module>scadabr-deprecated</module>
         <module>scheduler</module>
         <module>utils</module>
+        <module>scadabr-flexproject</module>
     </modules>
 
     
@@ -53,6 +54,13 @@
                 <artifactId>scadabr-core</artifactId>
                 <version>1.1.0-SNAPSHOT</version>
             </dependency>
+
+            <dependency>
+                <groupId>br.org.scadabr</groupId>
+                <artifactId>scadabr-flexproject</artifactId>
+                <version>1.1.0-SNAPSHOT</version>
+            </dependency>
+
             <dependency>
                 <groupId>br.org.scadabr</groupId>
                 <artifactId>scadabr-deprecated</artifactId>
