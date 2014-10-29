@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.web.dwr.beans;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import java.util.LinkedList;
 import java.util.List;

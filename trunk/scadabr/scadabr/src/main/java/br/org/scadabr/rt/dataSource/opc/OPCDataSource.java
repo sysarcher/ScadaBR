@@ -1,6 +1,6 @@
 package br.org.scadabr.rt.dataSource.opc;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
@@ -19,7 +19,7 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
 public class OPCDataSource extends PollingDataSource<OPCDataSourceVO> {

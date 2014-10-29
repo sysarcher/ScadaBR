@@ -18,8 +18,8 @@
  */
 package com.serotonin.mango.rt.dataSource.ebro;
 
-import br.org.scadabr.ImplementMeException;
-import br.org.scadabr.i18n.LocalizableException;
+import br.org.scadabr.utils.ImplementMeException;
+import br.org.scadabr.utils.i18n.LocalizableException;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import br.org.scadabr.NotImplementedException;
+import br.org.scadabr.utils.NotImplementedException;
 import br.org.scadabr.timer.cron.CronExpression;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -42,7 +42,7 @@ import com.serotonin.modbus4j.BatchRead;
 import com.serotonin.modbus4j.BatchResults;
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
 /**

@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.galil;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.timer.cron.CronExpression;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -37,9 +37,9 @@ import com.serotonin.mango.vo.dataSource.galil.GalilDataSourceVO;
 import com.serotonin.messaging.MessageControl;
 import com.serotonin.messaging.MessagingExceptionHandler;
 import com.serotonin.messaging.StreamTransport;
-import br.org.scadabr.i18n.LocalizableException;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableException;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
 /**

@@ -3,16 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.org.scadabr.i18n;
+package br.org.scadabr.timer;
+
 
 /**
  *
  * @author aploese
  */
-public interface LocalizableMessage {
+@Deprecated
+public class TimerTrigger {
 
-    String getI18nKey();
-
-    Object[] getArgs();
+    public long getNextExecutionTime() {
+        throw new ImplementMeException();
+    }
 
 }

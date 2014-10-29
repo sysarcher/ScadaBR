@@ -5,22 +5,27 @@
  */
 package br.org.scadabr.timer;
 
-import br.org.scadabr.ImplementMeException;
-import java.util.Date;
+import br.org.scadabr.utils.ImplementMeException;
 
 /**
  *
  * @author aploese
  */
 @Deprecated
-public class OneTimeTrigger extends TimerTrigger {
+public abstract class TimerTask implements Runnable {
 
-    public OneTimeTrigger(Date date) {
+    public TimerTask(TimerTrigger trigger) {
         throw new ImplementMeException();
     }
 
-    public OneTimeTrigger(long delay) {
+    public void cancel() {
         throw new ImplementMeException();
     }
 
+    protected abstract void run(long fireTime);
+
+    @Override
+    public void run() {
+        throw new ImplementMeException();
+    }
 }

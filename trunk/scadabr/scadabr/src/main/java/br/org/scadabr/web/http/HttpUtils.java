@@ -5,7 +5,7 @@
  */
 package br.org.scadabr.web.http;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.io.IOException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;

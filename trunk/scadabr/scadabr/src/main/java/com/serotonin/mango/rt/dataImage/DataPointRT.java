@@ -19,7 +19,7 @@
 package com.serotonin.mango.rt.dataImage;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

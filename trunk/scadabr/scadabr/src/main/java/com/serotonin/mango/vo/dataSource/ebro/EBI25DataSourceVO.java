@@ -40,8 +40,8 @@ import com.serotonin.modbus4j.base.ModbusUtils;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler

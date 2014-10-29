@@ -5,6 +5,8 @@
  */
 package br.org.scadabr.i18n;
 
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
 

@@ -29,8 +29,8 @@ import com.serotonin.mango.rt.event.type.DataPointEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 abstract public class PointEventDetectorRT extends SimpleEventDetector implements DataPointListener {
 

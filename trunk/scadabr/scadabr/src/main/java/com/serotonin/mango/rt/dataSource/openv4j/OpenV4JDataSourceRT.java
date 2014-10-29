@@ -19,7 +19,7 @@
 package com.serotonin.mango.rt.dataSource.openv4j;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import gnu.io.SerialPort;
 
 import java.util.Date;
@@ -40,7 +40,7 @@ import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
 /**

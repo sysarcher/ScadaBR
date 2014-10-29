@@ -6,13 +6,13 @@
 
 package br.org.scadabr.timer.cron;
 
-import br.org.scadabr.web.i18n.LocalizableI18nKey;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 
 /**
  *
  * @author aploese
  */
-public enum CronPatterns implements LocalizableI18nKey {
+public enum CronPatterns implements LocalizableMessage {
     _1_SECOND("0 */1 * * * * * *"),
     _2_SECONDS("0 */2 * * * * * *"),
     _5_SECONDS("0 */5 * * * *  **"),
@@ -55,6 +55,11 @@ public enum CronPatterns implements LocalizableI18nKey {
     
     public String getPattern() {
         return pattern;
+    }
+
+    @Override
+    public Object[] getArgs() {
+        return null;
     }
 
     

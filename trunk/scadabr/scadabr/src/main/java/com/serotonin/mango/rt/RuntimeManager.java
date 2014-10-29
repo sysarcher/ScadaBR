@@ -66,8 +66,8 @@ import com.serotonin.mango.vo.link.PointLinkVO;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.util.LifecycleException;
-import br.org.scadabr.i18n.LocalizableException;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableException;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import javax.inject.Inject;
 import javax.inject.Named;
 

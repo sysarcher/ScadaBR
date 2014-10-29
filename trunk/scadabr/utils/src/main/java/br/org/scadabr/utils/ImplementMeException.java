@@ -1,4 +1,4 @@
-package br.org.scadabr;
+package br.org.scadabr.utils;
 
 /**
  *

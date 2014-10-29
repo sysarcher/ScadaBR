@@ -28,8 +28,8 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import com.serotonin.mango.rt.dataSource.galil.CommandPointTypeRT;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler

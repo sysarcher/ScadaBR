@@ -5,22 +5,16 @@
  */
 package br.org.scadabr.timer;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 
 /**
  *
  * @author aploese
  */
-@Deprecated
-public class AbstractTimer {
+public class SimulationTimer extends AbstractTimer {
 
-    @Deprecated
+    @Override
     public long currentTimeMillis() {
-        throw new ImplementMeException();
-    }
-
-    @Deprecated
-    public void schedule(Runnable r) {
         throw new ImplementMeException();
     }
 

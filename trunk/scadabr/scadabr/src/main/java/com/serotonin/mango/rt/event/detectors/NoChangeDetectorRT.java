@@ -20,8 +20,8 @@ package com.serotonin.mango.rt.event.detectors;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 /**
  * @author Matthew Lohbihler

@@ -19,7 +19,7 @@
 package br.org.scadabr.rt.datasource.fhz4j;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.vo.datasource.fhz4j.EmPointLocator;
@@ -29,7 +29,7 @@ import br.org.scadabr.vo.datasource.fhz4j.FhtPointLocator;
 import br.org.scadabr.vo.datasource.fhz4j.Fhz4JDataSourceVO;
 import br.org.scadabr.vo.datasource.fhz4j.Fhz4JPointLocatorVO;
 import br.org.scadabr.vo.datasource.fhz4j.HmsPointLocator;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;

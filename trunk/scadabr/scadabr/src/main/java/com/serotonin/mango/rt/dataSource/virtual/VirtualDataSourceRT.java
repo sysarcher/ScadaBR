@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.virtual;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.timer.cron.CronExpression;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;

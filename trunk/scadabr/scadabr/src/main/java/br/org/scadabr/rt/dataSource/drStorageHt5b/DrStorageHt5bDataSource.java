@@ -1,6 +1,6 @@
 package br.org.scadabr.rt.dataSource.drStorageHt5b;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.timer.cron.CronExpression;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
@@ -20,7 +20,7 @@ import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.io.IOException;
 import java.text.ParseException;
 

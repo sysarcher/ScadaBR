@@ -8,7 +8,7 @@ package br.org.scadabr.web.l10n;
 
 import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.l10n.Localizer;
-import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;

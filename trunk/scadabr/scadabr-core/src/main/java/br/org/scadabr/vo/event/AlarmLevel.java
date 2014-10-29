@@ -1,6 +1,6 @@
 package br.org.scadabr.vo.event;
 
-import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 
 public enum AlarmLevel implements LocalizableMessage {
 

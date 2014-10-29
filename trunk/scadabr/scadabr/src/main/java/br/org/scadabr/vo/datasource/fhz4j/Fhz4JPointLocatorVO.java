@@ -19,7 +19,7 @@
 package br.org.scadabr.vo.datasource.fhz4j;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
@@ -27,8 +27,8 @@ import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.rt.datasource.fhz4j.Fhz4JPointLocatorRT;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import java.io.IOException;

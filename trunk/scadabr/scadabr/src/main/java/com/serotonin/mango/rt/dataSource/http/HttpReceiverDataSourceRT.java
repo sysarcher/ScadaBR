@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.http;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

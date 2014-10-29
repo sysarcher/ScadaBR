@@ -3,12 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.org.scadabr;
+package br.org.scadabr.utils.i18n;
 
 /**
  *
  * @author aploese
  */
-public class NotImplementedException extends RuntimeException {
+public interface LocalizableMessage {
+
+    String getI18nKey();
+
+    Object[] getArgs();
 
 }

@@ -18,12 +18,12 @@
  */
 package com.serotonin.mango.rt.event.detectors;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.Date;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.util.timeout.RunClient;
-import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 import com.serotonin.mango.util.timeout.SystemRunTask;
 
 /**

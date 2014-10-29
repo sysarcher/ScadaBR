@@ -5,9 +5,7 @@
  */
 package br.org.scadabr.timer.cron;
 
-import br.org.scadabr.ImplementMeException;
 import java.text.ParseException;
-import java.util.Calendar;
 import java.util.TimeZone;
 
 /**

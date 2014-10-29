@@ -65,8 +65,8 @@ import com.serotonin.mango.vo.report.ReportTask;
 import com.serotonin.mango.vo.report.ReportVO;
 import com.serotonin.mango.web.ContextWrapper;
 import com.serotonin.mango.web.dwr.BaseDwr;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;

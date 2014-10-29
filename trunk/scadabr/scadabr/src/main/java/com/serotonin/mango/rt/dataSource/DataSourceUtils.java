@@ -33,7 +33,7 @@ import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.text.MultistateRenderer;
 import com.serotonin.mango.view.text.MultistateValue;
 import com.serotonin.mango.view.text.TextRenderer;
-import br.org.scadabr.i18n.LocalizableException;
+import br.org.scadabr.utils.i18n.LocalizableException;
 
 /**
  * @author Matthew Lohbihler

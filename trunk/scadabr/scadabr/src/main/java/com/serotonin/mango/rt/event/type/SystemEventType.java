@@ -31,8 +31,8 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.event.EventTypeVO;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 @JsonRemoteEntity
 public class SystemEventType extends EventType {

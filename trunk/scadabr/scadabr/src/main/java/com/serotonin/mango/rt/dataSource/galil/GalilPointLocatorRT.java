@@ -20,7 +20,7 @@ package com.serotonin.mango.rt.dataSource.galil;
 
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
-import br.org.scadabr.i18n.LocalizableException;
+import br.org.scadabr.utils.i18n.LocalizableException;
 import com.serotonin.mango.vo.dataSource.galil.GalilPointLocatorVO;
 import com.serotonin.mango.vo.dataSource.galil.PointTypeVO;
 

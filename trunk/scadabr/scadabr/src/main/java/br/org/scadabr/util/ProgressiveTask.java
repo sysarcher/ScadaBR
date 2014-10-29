@@ -5,7 +5,7 @@
  */
 package br.org.scadabr.util;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 
 /**
  *

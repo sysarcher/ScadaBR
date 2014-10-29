@@ -5,7 +5,7 @@
  */
 package br.org.scadabr.web.email;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.io.File;
 import javax.mail.MessagingException;
 import org.springframework.mail.javamail.MimeMessageHelper;

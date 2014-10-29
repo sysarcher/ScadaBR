@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.nmea;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -30,9 +30,9 @@ import com.serotonin.mango.rt.dataSource.DataSourceUtils;
 import com.serotonin.mango.rt.dataSource.EventDataSource;
 import com.serotonin.mango.util.timeout.RunClient;
 import com.serotonin.mango.vo.dataSource.nmea.NmeaDataSourceVO;
-import br.org.scadabr.i18n.LocalizableException;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableException;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.util.timeout.SystemRunTask;
 
 /**

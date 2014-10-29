@@ -20,7 +20,7 @@ package com.serotonin.mango.util;
 
 import java.util.List;
 
-import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 
 /**
  * @author Matthew Lohbihler

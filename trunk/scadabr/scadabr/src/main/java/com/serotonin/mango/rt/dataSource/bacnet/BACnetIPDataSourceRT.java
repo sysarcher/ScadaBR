@@ -19,7 +19,7 @@
 package com.serotonin.mango.rt.dataSource.bacnet;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +80,7 @@ import com.serotonin.mango.vo.dataSource.bacnet.BACnetIPDataSourceVO;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.SystemCronTask;
 import com.serotonin.util.queue.ByteQueue;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;

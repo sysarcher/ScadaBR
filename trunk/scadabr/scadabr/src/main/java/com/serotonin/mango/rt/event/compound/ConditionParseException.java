@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.event.compound;
 
-import br.org.scadabr.i18n.LocalizableException;
+import br.org.scadabr.utils.i18n.LocalizableException;
 
 /**
  * @author Matthew Lohbihler

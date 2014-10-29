@@ -19,7 +19,7 @@
 package com.serotonin.mango.util;
 
 import br.org.scadabr.json.JsonException;
-import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 
 /**
  * @author Matthew Lohbihler

@@ -5,10 +5,8 @@
  */
 package br.org.scadabr.timer;
 
-import br.org.scadabr.logger.LogUtils;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +20,7 @@ import java.util.logging.Logger;
  */
 public class CronTimerPool<T extends CronTask, V extends Runnable> {
     
-    private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_CORE);
+    private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_SCHEDULER);
 
     class TimerThread extends Thread {
 

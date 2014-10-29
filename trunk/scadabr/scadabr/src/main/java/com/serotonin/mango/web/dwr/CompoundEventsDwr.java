@@ -37,7 +37,7 @@ import com.serotonin.mango.vo.event.ScheduledEventVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.dwr.beans.EventSourceBean;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import javax.inject.Inject;
 
 /**

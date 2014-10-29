@@ -19,7 +19,7 @@
 package com.serotonin.mango.rt.dataSource.sql;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -50,7 +50,7 @@ import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.vo.dataSource.sql.SqlDataSourceVO;
 import com.serotonin.mango.vo.dataSource.sql.SqlPointLocatorVO;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
 /**

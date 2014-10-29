@@ -5,7 +5,7 @@
  */
 package br.org.scadabr.web.content;
 
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;

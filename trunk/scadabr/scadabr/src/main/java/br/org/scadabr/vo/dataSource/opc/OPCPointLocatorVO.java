@@ -19,7 +19,7 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
-import br.org.scadabr.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 import java.util.EnumSet;
 
 public class OPCPointLocatorVO extends AbstractPointLocatorVO implements

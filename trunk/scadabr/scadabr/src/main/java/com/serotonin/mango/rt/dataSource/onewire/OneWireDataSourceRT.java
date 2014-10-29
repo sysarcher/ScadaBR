@@ -19,7 +19,7 @@
 package com.serotonin.mango.rt.dataSource.onewire;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.ImplementMeException;
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -51,9 +51,9 @@ import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.vo.dataSource.onewire.OneWireDataSourceVO;
 import com.serotonin.mango.vo.dataSource.onewire.OneWirePointLocatorVO;
-import br.org.scadabr.i18n.LocalizableException;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableException;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
 
 /**

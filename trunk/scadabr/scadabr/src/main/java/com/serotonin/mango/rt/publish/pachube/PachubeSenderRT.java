@@ -41,8 +41,8 @@ import com.serotonin.mango.rt.publish.SendThread;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import com.serotonin.mango.vo.publish.pachube.PachubePointVO;
 import com.serotonin.mango.vo.publish.pachube.PachubeSenderVO;
-import br.org.scadabr.i18n.LocalizableMessage;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 public class PachubeSenderRT extends PublisherRT<PachubePointVO> {
 

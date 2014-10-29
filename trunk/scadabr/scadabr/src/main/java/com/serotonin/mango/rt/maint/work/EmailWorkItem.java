@@ -27,7 +27,7 @@ import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.web.email.MangoEmailContent;
 import br.org.scadabr.web.email.EmailContent;
 import br.org.scadabr.web.email.EmailSender;
-import br.org.scadabr.i18n.LocalizableMessageImpl;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.io.UnsupportedEncodingException;
 
 /**
