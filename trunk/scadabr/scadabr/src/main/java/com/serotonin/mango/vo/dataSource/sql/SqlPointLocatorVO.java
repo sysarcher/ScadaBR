@@ -113,7 +113,7 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
+        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.sql.rowId", fieldName);
         AuditEventType.addPropertyMessage(list, "dsEdit.sql.timeColumn", timeOverrideName);
         AuditEventType.addPropertyMessage(list, "dsEdit.sql.update", updateStatement);
@@ -122,7 +122,7 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         SqlPointLocatorVO from = (SqlPointLocatorVO) o;
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.rowId", from.fieldName, fieldName);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.timeColumn", from.timeOverrideName,
                 timeOverrideName);
@@ -142,7 +142,7 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
         SerializationHelper.writeSafeUTF(out, fieldName);
         SerializationHelper.writeSafeUTF(out, timeOverrideName);
         SerializationHelper.writeSafeUTF(out, updateStatement);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
@@ -153,12 +153,12 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
             fieldName = SerializationHelper.readSafeUTF(in);
             timeOverrideName = "";
             updateStatement = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
         } else if (ver == 2) {
             fieldName = SerializationHelper.readSafeUTF(in);
             timeOverrideName = SerializationHelper.readSafeUTF(in);
             updateStatement = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
         }
     }
 

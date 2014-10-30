@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
-import com.serotonin.mango.util.DateUtils;
+import br.org.scadabr.utils.TimePeriods;
 
 /**
  * @author Matthew Lohbihler
@@ -35,30 +35,30 @@ public class WrapperContext {
         return runtime;
     }
 
-    public long millisInPrev(int periodType) {
+    public long millisInPrev(TimePeriods periodType) {
         return millisInPrevious(periodType, 1);
     }
 
-    public long millisInPrevious(int periodType) {
+    public long millisInPrevious(TimePeriods periodType) {
         return millisInPrevious(periodType, 1);
     }
 
-    public long millisInPrev(int periodType, int count) {
+    public long millisInPrev(TimePeriods periodType, int count) {
         return millisInPrevious(periodType, count);
     }
 
-    public long millisInPrevious(int periodType, int count) {
-        long to = DateUtils.truncate(runtime, periodType);
-        long from = DateUtils.minus(to, periodType, count);
+    public long millisInPrevious(TimePeriods periodType, int count) {
+        long to = periodType.truncate(runtime);
+        long from = periodType.minus(to, count);
         return to - from;
     }
 
-    public long millisInPast(int periodType) {
+    public long millisInPast(TimePeriods periodType) {
         return millisInPast(periodType, 1);
     }
 
-    public long millisInPast(int periodType, int count) {
-        long from = DateUtils.minus(runtime, periodType, count);
+    public long millisInPast(TimePeriods periodType, int count) {
+        long from = periodType.minus(runtime, count);
         return runtime - from;
     }
 

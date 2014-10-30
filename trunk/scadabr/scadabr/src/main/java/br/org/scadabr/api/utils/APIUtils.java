@@ -735,7 +735,7 @@ public final class APIUtils {
             br.org.scadabr.vo.event.AlarmLevel alarmLevel, EventType eventType) {
         EventDefinition event = new EventDefinition();
         event.setMessage(name);
-        switch (alarmLevel.ordinal()) {
+        switch (alarmLevel.mangoDbId) {
             case 0:
                 event.setAlarmLevel(AlarmLevel.NONE);
                 break;
@@ -928,7 +928,7 @@ public final class APIUtils {
     }
 
     public static AlarmLevel toAlarmLevel(br.org.scadabr.vo.event.AlarmLevel alarmLevel) {
-        switch (alarmLevel.ordinal()) {
+        switch (alarmLevel.mangoDbId) {
             case 0:
                 return AlarmLevel.NONE;
             case 1:

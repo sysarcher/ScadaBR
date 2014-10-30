@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import br.org.scadabr.db.KeyValuePair;
+import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.publish.persistent.PersistentSenderRT;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
@@ -85,7 +86,7 @@ public class PublisherEditDwr extends BaseDwr {
     public DwrResponseI18n saveHttpSender(String name, String xid, boolean enabled, List<HttpPointVO> points,
             String url, boolean usePost, List<KeyValuePair> staticHeaders, List<KeyValuePair> staticParameters,
             int cacheWarningSize, boolean changesOnly, boolean raiseResultWarning, int dateFormat,
-            boolean sendSnapshot, int snapshotSendPeriods, int snapshotSendPeriodType) {
+            boolean sendSnapshot, int snapshotSendPeriods, TimePeriods snapshotSendPeriodType) {
         HttpSenderVO p = (HttpSenderVO) Common.getUser().getEditPublisher();
 
         p.setName(name);
@@ -126,7 +127,7 @@ public class PublisherEditDwr extends BaseDwr {
     //
     public DwrResponseI18n savePachubeSender(String name, String xid, boolean enabled, List<PachubePointVO> points,
             String apiKey, int timeoutSeconds, int retries, int cacheWarningSize, boolean changesOnly,
-            boolean sendSnapshot, int snapshotSendPeriods, int snapshotSendPeriodType) {
+            boolean sendSnapshot, int snapshotSendPeriods, TimePeriods snapshotSendPeriodType) {
         PachubeSenderVO p = (PachubeSenderVO) Common.getUser().getEditPublisher();
 
         p.setName(name);
@@ -152,7 +153,7 @@ public class PublisherEditDwr extends BaseDwr {
     public DwrResponseI18n savePersistentSender(String name, String xid, boolean enabled,
             List<PersistentPointVO> points, String host, int port, String authorizationKey, String xidPrefix,
             int syncType, int cacheWarningSize, boolean changesOnly, boolean sendSnapshot, int snapshotSendPeriods,
-            int snapshotSendPeriodType) {
+            TimePeriods snapshotSendPeriodType) {
         PersistentSenderVO p = (PersistentSenderVO) Common.getUser().getEditPublisher();
 
         p.setName(name);

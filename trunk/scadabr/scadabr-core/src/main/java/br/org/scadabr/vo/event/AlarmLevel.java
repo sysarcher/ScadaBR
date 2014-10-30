@@ -1,8 +1,8 @@
 package br.org.scadabr.vo.event;
 
-import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableEnum;
 
-public enum AlarmLevel implements LocalizableMessage {
+public enum AlarmLevel implements LocalizableEnum<AlarmLevel> {
 
     //do not reorder!!
     NONE(0, "common.alarmLevel.none"),
@@ -11,12 +11,11 @@ public enum AlarmLevel implements LocalizableMessage {
     CRITICAL(3, "common.alarmLevel.critical"),
     LIFE_SAFETY(4, "common.alarmLevel.lifeSafety");
     private final String i18nKey;
-
-    private AlarmLevel(int ord, String i18nKey) {
+    public final int mangoDbId;
+    
+    private AlarmLevel(int mangoDbId, String i18nKey) {
         this.i18nKey = i18nKey;
-        if (this.ordinal() != ord) {
-            throw new RuntimeException("Alarmlevels Ordinal does not match: " + this.name());
-        }
+        this.mangoDbId = mangoDbId;
     }
 
     @Deprecated //For JSON Export ...
@@ -39,7 +38,7 @@ public enum AlarmLevel implements LocalizableMessage {
         return i18nKey;
     }
 
-    public static AlarmLevel valueOf(int ordinal) {
+    public static AlarmLevel fromMangoDbId(int ordinal) {
         switch (ordinal) {
             case 0:
                 return NONE;
@@ -59,6 +58,10 @@ public enum AlarmLevel implements LocalizableMessage {
     @Override
     public Object[] getArgs() {
         return null;
+    }
+
+    public int toMangoDbId() {
+        return mangoDbId;
     }
 
     public boolean otherIsHigher(AlarmLevel o) {

@@ -253,7 +253,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
         AuditEventType.addPropertyMessage(list, "dsEdit.bacnetIp.objectInstanceNumber", objectInstanceNumber);
         AuditEventType.addPropertyMessage(list, "dsEdit.bacnetIp.useCov", useCovSubscription);
         AuditEventType.addPropertyMessage(list, "dsEdit.settable", settable);
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
+        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.bacnetIp.writePriority", writePriority);
     }
 
@@ -279,7 +279,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.bacnetIp.useCov", from.useCovSubscription,
                 useCovSubscription);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.settable", from.settable, settable);
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.bacnetIp.writePriority", from.writePriority,
                 writePriority);
     }
@@ -304,7 +304,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
         out.writeInt(propertyIdentifierId);
         out.writeBoolean(useCovSubscription);
         out.writeBoolean(settable);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
         out.writeInt(writePriority);
     }
 
@@ -323,7 +323,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
             propertyIdentifierId = in.readInt();
             useCovSubscription = in.readBoolean();
             settable = in.readBoolean();
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             writePriority = 16;
         } else if (ver == 2) {
             remoteDeviceIp = SerializationHelper.readSafeUTF(in);
@@ -336,7 +336,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
             propertyIdentifierId = in.readInt();
             useCovSubscription = in.readBoolean();
             settable = in.readBoolean();
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             writePriority = in.readInt();
         } else if (ver == 3) {
             remoteDeviceIp = SerializationHelper.readSafeUTF(in);
@@ -349,7 +349,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
             propertyIdentifierId = in.readInt();
             useCovSubscription = in.readBoolean();
             settable = in.readBoolean();
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             writePriority = in.readInt();
         } else if (ver == 4) {
             remoteDeviceIp = SerializationHelper.readSafeUTF(in);
@@ -362,7 +362,7 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
             propertyIdentifierId = in.readInt();
             useCovSubscription = in.readBoolean();
             settable = in.readBoolean();
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             writePriority = in.readInt();
         }
     }

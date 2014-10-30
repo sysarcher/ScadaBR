@@ -41,6 +41,7 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
@@ -137,7 +138,7 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
     private int retries = 2;
     @JsonRemoteProperty
     private int timeout = 1000;
-    private int updatePeriodType = Common.TimePeriods.MINUTES;
+    private TimePeriods updatePeriodType = TimePeriods.MINUTES;
     @JsonRemoteProperty
     private int updatePeriods = 5;
     @JsonRemoteProperty
@@ -233,11 +234,11 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
         this.updatePeriods = updatePeriods;
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 
@@ -292,9 +293,6 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextual("updatePeriodType", "validate.invalidValue");
-        }
         if (updatePeriods <= 0) {
             response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
@@ -331,7 +329,7 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
 
     @Override
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
-        AuditEventType.addPeriodMessage(list, "dsEdit.updatePeriod", updatePeriodType, updatePeriods);
+        AuditEventType.addPropertyMessage(list, "dsEdit.updatePeriod", updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.addPropertyMessage(list, "dsEdit.snmp.host", host);
         AuditEventType.addPropertyMessage(list, "dsEdit.snmp.port", port);
         AuditEventType.addPropertyMessage(list, "dsEdit.snmp.version", snmpVersion);
@@ -352,8 +350,9 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
 
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, SnmpDataSourceVO from) {
-        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", from.updatePeriodType,
-                from.updatePeriods, updatePeriodType, updatePeriods);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.updatePeriod", 
+                from.updatePeriodType.getPeriodDescription(from.updatePeriods), 
+                updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.snmp.host", from.host, host);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.snmp.port", from.port, port);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.snmp.version", from.snmpVersion, snmpVersion);
@@ -399,7 +398,7 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
         SerializationHelper.writeSafeUTF(out, privPassphrase);
         out.writeInt(retries);
         out.writeInt(timeout);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(updatePeriods);
         out.writeInt(trapPort);
         SerializationHelper.writeSafeUTF(out, localAddress);
@@ -424,7 +423,7 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
             privPassphrase = SerializationHelper.readSafeUTF(in);
             retries = in.readInt();
             timeout = in.readInt();
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             trapPort = in.readInt();
             localAddress = "";
@@ -443,7 +442,7 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
             privPassphrase = SerializationHelper.readSafeUTF(in);
             retries = in.readInt();
             timeout = in.readInt();
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             trapPort = in.readInt();
             localAddress = SerializationHelper.readSafeUTF(in);
@@ -453,7 +452,7 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }

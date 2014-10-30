@@ -176,7 +176,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
+        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpRetriever.valueRegex", valueRegex);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpRetriever.ignoreIfMissing", ignoreIfMissing);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpRetriever.numberFormat", valueFormat);
@@ -187,7 +187,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         HttpRetrieverPointLocatorVO from = (HttpRetrieverPointLocatorVO) o;
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpRetriever.valueRegex", from.valueRegex,
                 valueRegex);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpRetriever.ignoreIfMissing",
@@ -211,7 +211,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, valueRegex);
         out.writeBoolean(ignoreIfMissing);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
         SerializationHelper.writeSafeUTF(out, valueFormat);
         SerializationHelper.writeSafeUTF(out, timeRegex);
         SerializationHelper.writeSafeUTF(out, timeFormat);
@@ -224,7 +224,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
         if (ver == 1) {
             valueRegex = SerializationHelper.readSafeUTF(in);
             ignoreIfMissing = in.readBoolean();
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             valueFormat = SerializationHelper.readSafeUTF(in);
             timeRegex = SerializationHelper.readSafeUTF(in);
             timeFormat = SerializationHelper.readSafeUTF(in);

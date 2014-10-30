@@ -1,10 +1,10 @@
 package br.org.scadabr;
 
-import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableEnum;
 import java.util.Collection;
 
 //TODO Make enum out of this ...
-public enum DataType implements LocalizableMessage {
+public enum DataType implements LocalizableEnum<DataType> {
 
     UNKNOWN(0, "common.unknown"),
     BINARY(1, "common.dataTypes.binary"),
@@ -13,12 +13,11 @@ public enum DataType implements LocalizableMessage {
     ALPHANUMERIC(4, "common.dataTypes.alphanumeric"),
     IMAGE(5, "common.dataTypes.image");
     private final String i18nKey;
-
-    private DataType(int ord, String i18nKey) {
+    public final int mangoDbId;
+    
+    private DataType(int mangoDbId, String i18nKey) {
         this.i18nKey = i18nKey;
-        if (this.ordinal() != ord) {
-            throw new RuntimeException("Alarmlevels Ordinal does not match: " + this.name());
-        }
+        this.mangoDbId = mangoDbId;
     }
 
     @Deprecated //For JSON Export ...
@@ -51,7 +50,7 @@ public enum DataType implements LocalizableMessage {
         return i18nKey;
     }
 
-    public static DataType valueOf(int ordinal) {
+    public static DataType fromMangoDbId(int ordinal) {
         switch (ordinal) {
             case 0:
                 return UNKNOWN;

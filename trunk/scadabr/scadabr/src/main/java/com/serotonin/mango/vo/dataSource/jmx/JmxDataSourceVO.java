@@ -38,6 +38,7 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
@@ -101,7 +102,7 @@ public class JmxDataSourceVO extends DataSourceVO<JmxDataSourceVO> {
     private boolean useLocalServer;
     @JsonRemoteProperty
     private String remoteServerAddr;
-    private int updatePeriodType = Common.TimePeriods.MINUTES;
+    private TimePeriods updatePeriodType = TimePeriods.MINUTES;
     @JsonRemoteProperty
     private int updatePeriods = 5;
     @JsonRemoteProperty
@@ -123,11 +124,11 @@ public class JmxDataSourceVO extends DataSourceVO<JmxDataSourceVO> {
         this.remoteServerAddr = remoteServerAddr;
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 
@@ -154,9 +155,6 @@ public class JmxDataSourceVO extends DataSourceVO<JmxDataSourceVO> {
         if (!useLocalServer && remoteServerAddr.isEmpty()) {
             response.addContextual("remoteServerAddr", "validate.required");
         }
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextual("updatePeriodType", "validate.invalidValue");
-        }
         if (updatePeriods <= 0) {
             response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
@@ -166,7 +164,7 @@ public class JmxDataSourceVO extends DataSourceVO<JmxDataSourceVO> {
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.jmx.useLocalServer", useLocalServer);
         AuditEventType.addPropertyMessage(list, "dsEdit.jmx.remoteServerAddr", remoteServerAddr);
-        AuditEventType.addPeriodMessage(list, "dsEdit.updatePeriod", updatePeriodType, updatePeriods);
+        AuditEventType.addPropertyMessage(list, "dsEdit.updatePeriod", updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.addPropertyMessage(list, "dsEdit.quantize", quantize);
     }
 
@@ -176,8 +174,9 @@ public class JmxDataSourceVO extends DataSourceVO<JmxDataSourceVO> {
                 useLocalServer);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.jmx.remoteServerAddr", from.remoteServerAddr,
                 remoteServerAddr);
-        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", from.updatePeriodType,
-                from.updatePeriods, updatePeriodType, updatePeriods);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.updatePeriod",
+                from.updatePeriodType.getPeriodDescription(from.updatePeriods),
+                updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.quantize", from.quantize, quantize);
     }
 
@@ -192,7 +191,7 @@ public class JmxDataSourceVO extends DataSourceVO<JmxDataSourceVO> {
         out.writeInt(version);
         out.writeBoolean(useLocalServer);
         SerializationHelper.writeSafeUTF(out, remoteServerAddr);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(updatePeriods);
         out.writeBoolean(quantize);
     }
@@ -204,7 +203,7 @@ public class JmxDataSourceVO extends DataSourceVO<JmxDataSourceVO> {
         if (ver == 1) {
             useLocalServer = in.readBoolean();
             remoteServerAddr = SerializationHelper.readSafeUTF(in);
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             quantize = in.readBoolean();
         }
@@ -213,7 +212,7 @@ public class JmxDataSourceVO extends DataSourceVO<JmxDataSourceVO> {
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }

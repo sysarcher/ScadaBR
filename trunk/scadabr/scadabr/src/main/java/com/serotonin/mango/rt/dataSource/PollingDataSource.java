@@ -23,6 +23,7 @@ import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.DataSourceCronTask;
+import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.text.ParseException;
@@ -90,7 +91,7 @@ abstract public class PollingDataSource<T extends DataSourceVO<T>> extends DataS
     protected abstract CronExpression getCronExpression() throws ParseException;
     
     @Deprecated
-    protected void setPollingPeriod(int updatePeriodType, int updatePeriods, boolean quantize) {
+    protected void setPollingPeriod(TimePeriods updatePeriodType, int updatePeriods, boolean quantize) {
         // Set cronpattern from this
         throw new ImplementMeException();
     }

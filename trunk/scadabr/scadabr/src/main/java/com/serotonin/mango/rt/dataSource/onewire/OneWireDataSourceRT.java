@@ -18,7 +18,6 @@
  */
 package com.serotonin.mango.rt.dataSource.onewire;
 
-import br.org.scadabr.DataType;
 import br.org.scadabr.utils.ImplementMeException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,7 +39,6 @@ import com.dalsemi.onewire.container.TemperatureContainer;
 import com.dalsemi.onewire.utils.Address;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.timer.cron.CronExpression;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -82,7 +80,7 @@ public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> 
     @Override
     public void doPoll(long time) {
         updateChangedPoints();
-        if (vo.getRescanPeriodType() != OneWireDataSourceVO.RESCAN_NONE) {
+        if (vo.isRescan()) {
             if (nextRescan == 0) {
                 updateNextRescan(time);
             }
@@ -445,7 +443,7 @@ public class OneWireDataSourceRT extends PollingDataSource<OneWireDataSourceVO> 
     }
 
     private void updateNextRescan(long time) {
-        nextRescan = time + Common.getMillis(vo.getRescanPeriodType(), vo.getRescanPeriods());
+        nextRescan = time + vo.getRescanPeriodType().getMillis(vo.getRescanPeriods());
     }
 
     @Override

@@ -97,28 +97,28 @@ class DataPointDetailsController {
             if (dp.getChartRenderer() instanceof ImageChartRenderer) {
                 ImageChartRenderer r = (ImageChartRenderer) dp.getChartRenderer();
                 switch (r.getTimePeriod()) {
-                    case Common.TimePeriods.YEARS:
+                    case YEARS:
                         c.add(Calendar.YEAR, -r.getNumberOfPeriods());
                         break;
-                    case Common.TimePeriods.MONTHS:
+                    case MONTHS:
                         c.add(Calendar.MONTH, -r.getNumberOfPeriods());
                         break;
-                    case Common.TimePeriods.WEEKS:
+                    case WEEKS:
                         c.add(Calendar.DATE, -r.getNumberOfPeriods() * 7);
                         break;
-                    case Common.TimePeriods.DAYS:
+                    case DAYS:
                         c.add(Calendar.DATE, -r.getNumberOfPeriods());
                         break;
-                    case Common.TimePeriods.HOURS:
+                    case HOURS:
                         c.add(Calendar.HOUR_OF_DAY, -r.getNumberOfPeriods());
                         break;
-                    case Common.TimePeriods.MINUTES:
+                    case MINUTES:
                         c.add(Calendar.MINUTE, -r.getNumberOfPeriods());
                         break;
-                    case Common.TimePeriods.SECONDS:
+                    case SECONDS:
                         c.add(Calendar.SECOND, -r.getNumberOfPeriods());
                         break;
-                    case Common.TimePeriods.MILLISECONDS:
+                    case MILLISECONDS:
                         c.add(Calendar.MILLISECOND, -r.getNumberOfPeriods());
                         break;
                     default:

@@ -114,7 +114,7 @@ public class ASCIISerialPointLocatorVO extends AbstractPointLocatorVO implements
         SerializationHelper.writeSafeUTF(out, command);
         SerializationHelper.writeSafeUTF(out, timestampFormat);
         SerializationHelper.writeSafeUTF(out, timestampRegex);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
         out.writeBoolean(settable);
         out.writeBoolean(customTimestamp);
 
@@ -128,7 +128,7 @@ public class ASCIISerialPointLocatorVO extends AbstractPointLocatorVO implements
             command = SerializationHelper.readSafeUTF(in);
             timestampFormat = SerializationHelper.readSafeUTF(in);
             timestampRegex = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             settable = in.readBoolean();
             customTimestamp = in.readBoolean();
         }
@@ -152,7 +152,7 @@ public class ASCIISerialPointLocatorVO extends AbstractPointLocatorVO implements
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType",
+        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType",
                 dataType);
         AuditEventType.addPropertyMessage(list,
                 "dsEdit.asciiSerial.valueRegex", valueRegex);
@@ -171,7 +171,7 @@ public class ASCIISerialPointLocatorVO extends AbstractPointLocatorVO implements
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         ASCIISerialPointLocatorVO from = (ASCIISerialPointLocatorVO) o;
 
-        AuditEventType.maybeAddDataTypeChangeMessage(list,
+        AuditEventType.maybeAddPropertyChangeMessage(list,
                 "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list,
                 "dsEdit.asciiSerial.valueRegex", from.valueRegex, valueRegex);

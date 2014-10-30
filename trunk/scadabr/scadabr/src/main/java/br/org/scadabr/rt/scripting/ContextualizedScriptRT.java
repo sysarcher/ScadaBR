@@ -12,6 +12,7 @@ import br.org.scadabr.vo.scripting.ContextualizedScriptVO;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.IntValuePair;
+import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
@@ -58,13 +59,13 @@ public class ContextualizedScriptRT extends ScriptRT {
                 .currentTimeMillis());
 
         // Add constants to the context.
-        engine.put("SECOND", Common.TimePeriods.SECONDS);
-        engine.put("MINUTE", Common.TimePeriods.MINUTES);
-        engine.put("HOUR", Common.TimePeriods.HOURS);
-        engine.put("DAY", Common.TimePeriods.DAYS);
-        engine.put("WEEK", Common.TimePeriods.WEEKS);
-        engine.put("MONTH", Common.TimePeriods.MONTHS);
-        engine.put("YEAR", Common.TimePeriods.YEARS);
+        engine.put("SECOND", TimePeriods.SECONDS.mangoDbId);
+        engine.put("MINUTE", TimePeriods.MINUTES.mangoDbId);
+        engine.put("HOUR", TimePeriods.HOURS.mangoDbId);
+        engine.put("DAY", TimePeriods.DAYS.mangoDbId);
+        engine.put("WEEK", TimePeriods.WEEKS.mangoDbId);
+        engine.put("MONTH", TimePeriods.MONTHS.mangoDbId);
+        engine.put("YEAR", TimePeriods.YEARS.mangoDbId);
         engine.put("CONTEXT", wrapperContext);
         Map<String, IDataPoint> context = null;
 

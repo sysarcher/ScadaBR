@@ -52,6 +52,7 @@ import com.serotonin.modbus4j.code.DataType;
 import com.serotonin.modbus4j.code.RegisterRange;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.queue.IntQueue;
+import br.org.scadabr.utils.TimePeriods;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
@@ -190,12 +191,12 @@ public class Upgrade0_7_0 extends DBUpgrade {
             if (typeId == 1) {
                 VirtualDataSourceVO d = new VirtualDataSourceVO();
                 d.setUpdatePeriods(rs.getInt(5));
-                d.setUpdatePeriodType(Common.TimePeriods.SECONDS);
+                d.setUpdatePeriodType(TimePeriods.SECONDS);
                 ds = d;
             } else if (typeId == 2) {
                 ModbusSerialDataSourceVO d = new ModbusSerialDataSourceVO();
                 d.setUpdatePeriods(rs.getInt(6));
-                d.setUpdatePeriodType(Common.TimePeriods.SECONDS);
+                d.setUpdatePeriodType(TimePeriods.SECONDS);
                 d.setCommPortId(rs.getString(7));
                 d.setBaudRate(rs.getInt(8));
                 d.setFlowControlIn(rs.getInt(9));
@@ -209,7 +210,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
             } else if (typeId == 3) {
                 ModbusIpDataSourceVO d = new ModbusIpDataSourceVO();
                 d.setUpdatePeriods(rs.getInt(16));
-                d.setUpdatePeriodType(Common.TimePeriods.SECONDS);
+                d.setUpdatePeriodType(TimePeriods.SECONDS);
                 d.setTransportTypeStr(rs.getString(17));
                 d.setHost(rs.getString(18));
                 d.setPort(rs.getInt(19));
@@ -278,7 +279,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
             dp.setEnabled(charToBool(rs.getString(++i)));
             dp.setLoggingType(rs.getInt(++i));
             dp.setTolerance(rs.getDouble(++i));
-            dp.setPurgeType(rs.getInt(++i));
+            dp.setPurgeType(TimePeriods.fromMangoDbId(rs.getInt(++i)));
             dp.setPurgePeriod(rs.getInt(++i));
 
             // Set the text renderer.
@@ -318,9 +319,9 @@ public class Upgrade0_7_0 extends DBUpgrade {
             // Set the chart renderer.
             int crType = rs.getInt(++i);
             int tableLimit = rs.getInt(++i);
-            int imageTimePeriod = rs.getInt(++i);
+            TimePeriods imageTimePeriod = TimePeriods.fromMangoDbId(rs.getInt(++i));
             int imageNumberOfPeriods = rs.getInt(++i);
-            int statsTimePeriod = rs.getInt(++i);
+            TimePeriods statsTimePeriod = TimePeriods.fromMangoDbId(rs.getInt(++i));
             int statsNumberOfPeriods = rs.getInt(++i);
 
             ChartRenderer chartRenderer;
@@ -351,7 +352,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
                 case 1:
                     VirtualPointLocatorVO pl1 = new VirtualPointLocatorVO();
                     dp.setPointLocator(pl1);
-                    pl1.setDataType(br.org.scadabr.DataType.valueOf(rs.getInt(i + 1)));
+                    pl1.setDataType(br.org.scadabr.DataType.fromMangoDbId(rs.getInt(i + 1)));
                     pl1.setChangeTypeId(rs.getInt(i + 2));
                     pl1.setSettable(charToBool(rs.getString(i + 3)));
 
@@ -409,7 +410,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
                     dp.setPointLocator(pl2);
 
                     // pl2.setRange(RegisterRange.valueOf(rs.getString(i+18)));
-                    // pl2.setModbusDataType(DataType.valueOf(rs.getString(i+19)));
+                    // pl2.setModbusDataType(DataType.fromMangoDbId(rs.getString(i+19)));
                     pl2.setRange(RegisterRange.COIL_STATUS);
                     pl2.setModbusDataType(DataType.BINARY);
                     pl2.setSlaveId(rs.getInt(i + 20));

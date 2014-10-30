@@ -99,14 +99,14 @@ public class VariablePointTypeVO extends PointTypeVO {
     @Override
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.galil.varName", variableName);
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
+        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType", dataType);
     }
 
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         VariablePointTypeVO from = (VariablePointTypeVO) o;
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.galil.varName", from.variableName, variableName);
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
     }
 
     //
@@ -120,7 +120,7 @@ public class VariablePointTypeVO extends PointTypeVO {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, variableName);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
@@ -129,7 +129,7 @@ public class VariablePointTypeVO extends PointTypeVO {
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
             variableName = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
         }
     }
 

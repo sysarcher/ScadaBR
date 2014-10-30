@@ -20,6 +20,7 @@ package com.serotonin.mango.rt.maint;
 
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.timer.cron.SystemCronTask;
+import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
@@ -28,7 +29,6 @@ import com.serotonin.mango.db.dao.ReportDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
-import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.vo.DataPointVO;
 import java.io.File;
 import java.text.ParseException;
@@ -86,8 +86,8 @@ public class DataPurge {
 
         // No matter when this purge actually runs, we want it to act like it's midnight.
         DateTime cutoff = new DateTime(runtime);
-        cutoff = DateUtils.truncateDateTime(cutoff, Common.TimePeriods.DAYS);
-        cutoff = DateUtils.minus(cutoff, dataPoint.getPurgeType(), dataPoint.getPurgePeriod());
+        cutoff = TimePeriods.DAYS.truncateDateTime(cutoff);
+        cutoff = dataPoint.getPurgeType().minus(cutoff, dataPoint.getPurgePeriod());
 
         return rm.purgeDataPointValues(dataPoint.getId(), cutoff.getMillis());
     }
@@ -118,9 +118,8 @@ public class DataPurge {
     }
 
     private void eventPurge() {
-        DateTime cutoff = DateUtils.truncateDateTime(new DateTime(runtime), Common.TimePeriods.DAYS);
-        cutoff = DateUtils.minus(cutoff, SystemSettingsDao.getIntValue(SystemSettingsDao.EVENT_PURGE_PERIOD_TYPE),
-                SystemSettingsDao.getIntValue(SystemSettingsDao.EVENT_PURGE_PERIODS));
+        DateTime cutoff = TimePeriods.DAYS.truncateDateTime(new DateTime(runtime));
+        cutoff = SystemSettingsDao.getTimePeriodsValue(SystemSettingsDao.EVENT_PURGE_PERIOD_TYPE).minus(cutoff, SystemSettingsDao.getIntValue(SystemSettingsDao.EVENT_PURGE_PERIODS));
 
         int deleteCount = EventDao.getInstance().purgeEventsBefore(cutoff.getMillis());
         if (deleteCount > 0) {
@@ -129,9 +128,8 @@ public class DataPurge {
     }
 
     private void reportPurge() {
-        DateTime cutoff = DateUtils.truncateDateTime(new DateTime(runtime), Common.TimePeriods.DAYS);
-        cutoff = DateUtils.minus(cutoff, SystemSettingsDao.getIntValue(SystemSettingsDao.REPORT_PURGE_PERIOD_TYPE),
-                SystemSettingsDao.getIntValue(SystemSettingsDao.REPORT_PURGE_PERIODS));
+        DateTime cutoff = TimePeriods.DAYS.truncateDateTime(new DateTime(runtime));
+        cutoff = SystemSettingsDao.getTimePeriodsValue(SystemSettingsDao.REPORT_PURGE_PERIOD_TYPE).minus(cutoff, SystemSettingsDao.getIntValue(SystemSettingsDao.REPORT_PURGE_PERIODS));
 
         int deleteCount = ReportDao.getInstance().purgeReportsBefore(cutoff.getMillis());
         if (deleteCount > 0) {

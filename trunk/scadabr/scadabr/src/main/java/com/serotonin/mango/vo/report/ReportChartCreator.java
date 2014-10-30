@@ -132,11 +132,11 @@ public class ReportChartCreator {
         model.put("points", pointStatistics);
         model.put("inline", inlinePrefix == null ? "" : "cid:");
 
-        model.put("ALPHANUMERIC", DataType.ALPHANUMERIC.ordinal());
-        model.put("BINARY", DataType.BINARY.ordinal());
-        model.put("MULTISTATE", DataType.MULTISTATE.ordinal());
-        model.put("NUMERIC", DataType.NUMERIC.ordinal());
-        model.put("IMAGE", DataType.IMAGE.ordinal());
+        model.put("ALPHANUMERIC", DataType.ALPHANUMERIC.mangoDbId);
+        model.put("BINARY", DataType.BINARY.mangoDbId);
+        model.put("MULTISTATE", DataType.MULTISTATE.mangoDbId);
+        model.put("NUMERIC", DataType.NUMERIC.mangoDbId);
+        model.put("IMAGE", DataType.IMAGE.mangoDbId);
 
         // Create the individual point charts
         for (PointStatistics pointStat : pointStatistics) {

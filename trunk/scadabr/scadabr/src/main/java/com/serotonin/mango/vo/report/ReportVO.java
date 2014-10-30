@@ -28,9 +28,9 @@ import java.util.List;
 import org.joda.time.DateTime;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import java.util.TimeZone;
 
 /**
@@ -48,7 +48,9 @@ public class ReportVO implements Serializable {
     public static final int RELATIVE_DATE_TYPE_PREVIOUS = 1;
     public static final int RELATIVE_DATE_TYPE_PAST = 2;
 
-    public static final int SCHEDULE_CRON = 0;
+    public static boolean isCronScheduled(TimePeriods schedulePeriod) {
+        return schedulePeriod == null;
+    }
 
     private int id = Common.NEW_ID;
     private int userId;
@@ -60,9 +62,9 @@ public class ReportVO implements Serializable {
     private int relativeDateType = RELATIVE_DATE_TYPE_PREVIOUS;
 
     private int previousPeriodCount = 1;
-    private int previousPeriodType = Common.TimePeriods.DAYS;
+    private TimePeriods previousPeriodType = TimePeriods.DAYS;
     private int pastPeriodCount = 1;
-    private int pastPeriodType = Common.TimePeriods.DAYS;
+    private TimePeriods pastPeriodType = TimePeriods.DAYS;
 
     private boolean fromNone;
     private int fromYear;
@@ -79,7 +81,7 @@ public class ReportVO implements Serializable {
     private int toMinute;
 
     private boolean schedule;
-    private int schedulePeriod = Common.TimePeriods.DAYS;
+    private TimePeriods schedulePeriod = TimePeriods.DAYS;
     private int runDelayMinutes;
     private String scheduleCron;
 
@@ -90,14 +92,14 @@ public class ReportVO implements Serializable {
 
     public ReportVO() {
         // Default the specific date fields.
-        DateTime dt = DateUtils.truncateDateTime(new DateTime(), Common.TimePeriods.DAYS);
+        DateTime dt = TimePeriods.DAYS.truncateDateTime(new DateTime());
         toYear = dt.getYear();
         toMonth = dt.getMonthOfYear();
         toDay = dt.getDayOfMonth();
         toHour = dt.getHourOfDay();
         toMinute = dt.getMinuteOfHour();
 
-        dt = DateUtils.minus(dt, Common.TimePeriods.DAYS, 1);
+        dt = TimePeriods.DAYS.minus(dt, 1);
         fromYear = dt.getYear();
         fromMonth = dt.getMonthOfYear();
         fromDay = dt.getDayOfMonth();
@@ -177,11 +179,11 @@ public class ReportVO implements Serializable {
         this.previousPeriodCount = previousPeriodCount;
     }
 
-    public int getPreviousPeriodType() {
+    public TimePeriods getPreviousPeriodType() {
         return previousPeriodType;
     }
 
-    public void setPreviousPeriodType(int previousPeriodType) {
+    public void setPreviousPeriodType(TimePeriods previousPeriodType) {
         this.previousPeriodType = previousPeriodType;
     }
 
@@ -193,11 +195,11 @@ public class ReportVO implements Serializable {
         this.pastPeriodCount = pastPeriodCount;
     }
 
-    public int getPastPeriodType() {
+    public TimePeriods getPastPeriodType() {
         return pastPeriodType;
     }
 
-    public void setPastPeriodType(int pastPeriodType) {
+    public void setPastPeriodType(TimePeriods pastPeriodType) {
         this.pastPeriodType = pastPeriodType;
     }
 
@@ -305,11 +307,15 @@ public class ReportVO implements Serializable {
         this.schedule = schedule;
     }
 
-    public int getSchedulePeriod() {
+    public boolean isCronScheduled() {
+        return schedulePeriod == null;
+    }
+    
+    public TimePeriods getSchedulePeriod() {
         return schedulePeriod;
     }
 
-    public void setSchedulePeriod(int schedulePeriod) {
+    public void setSchedulePeriod(TimePeriods schedulePeriod) {
         this.schedulePeriod = schedulePeriod;
     }
 
@@ -378,9 +384,9 @@ public class ReportVO implements Serializable {
         out.writeInt(relativeDateType);
 
         out.writeInt(previousPeriodCount);
-        out.writeInt(previousPeriodType);
+        out.writeInt(previousPeriodType.mangoDbId);
         out.writeInt(pastPeriodCount);
-        out.writeInt(pastPeriodType);
+        out.writeInt(pastPeriodType.mangoDbId);
 
         out.writeBoolean(fromNone);
         out.writeInt(fromYear);
@@ -396,7 +402,7 @@ public class ReportVO implements Serializable {
         out.writeInt(toMinute);
 
         out.writeBoolean(schedule);
-        out.writeInt(schedulePeriod);
+        out.writeInt(schedulePeriod.mangoDbId);
         out.writeInt(runDelayMinutes);
         SerializationHelper.writeSafeUTF(out, scheduleCron);
         out.writeBoolean(email);
@@ -418,9 +424,9 @@ public class ReportVO implements Serializable {
             relativeDateType = in.readInt();
 
             previousPeriodCount = in.readInt();
-            previousPeriodType = in.readInt();
+            previousPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             pastPeriodCount = in.readInt();
-            pastPeriodType = in.readInt();
+            pastPeriodType = TimePeriods.fromMangoDbId(in.readInt());
 
             fromNone = in.readBoolean();
             fromYear = in.readInt();
@@ -436,7 +442,7 @@ public class ReportVO implements Serializable {
             toMinute = in.readInt();
 
             schedule = in.readBoolean();
-            schedulePeriod = in.readInt();
+            schedulePeriod = TimePeriods.fromMangoDbId(in.readInt());
             runDelayMinutes = 0;
             scheduleCron = SerializationHelper.readSafeUTF(in);
             email = in.readBoolean();
@@ -451,9 +457,9 @@ public class ReportVO implements Serializable {
             relativeDateType = in.readInt();
 
             previousPeriodCount = in.readInt();
-            previousPeriodType = in.readInt();
+            previousPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             pastPeriodCount = in.readInt();
-            pastPeriodType = in.readInt();
+            pastPeriodType = TimePeriods.fromMangoDbId(in.readInt());
 
             fromNone = in.readBoolean();
             fromYear = in.readInt();
@@ -469,7 +475,7 @@ public class ReportVO implements Serializable {
             toMinute = in.readInt();
 
             schedule = in.readBoolean();
-            schedulePeriod = in.readInt();
+            schedulePeriod = TimePeriods.fromMangoDbId(in.readInt());
             runDelayMinutes = in.readInt();
             scheduleCron = SerializationHelper.readSafeUTF(in);
             email = in.readBoolean();
@@ -484,9 +490,9 @@ public class ReportVO implements Serializable {
             relativeDateType = in.readInt();
 
             previousPeriodCount = in.readInt();
-            previousPeriodType = in.readInt();
+            previousPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             pastPeriodCount = in.readInt();
-            pastPeriodType = in.readInt();
+            pastPeriodType = TimePeriods.fromMangoDbId(in.readInt());
 
             fromNone = in.readBoolean();
             fromYear = in.readInt();
@@ -502,7 +508,7 @@ public class ReportVO implements Serializable {
             toMinute = in.readInt();
 
             schedule = in.readBoolean();
-            schedulePeriod = in.readInt();
+            schedulePeriod = TimePeriods.fromMangoDbId(in.readInt());
             runDelayMinutes = in.readInt();
             scheduleCron = SerializationHelper.readSafeUTF(in);
             email = in.readBoolean();
@@ -517,9 +523,9 @@ public class ReportVO implements Serializable {
             relativeDateType = in.readInt();
 
             previousPeriodCount = in.readInt();
-            previousPeriodType = in.readInt();
+            previousPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             pastPeriodCount = in.readInt();
-            pastPeriodType = in.readInt();
+            pastPeriodType = TimePeriods.fromMangoDbId(in.readInt());
 
             fromNone = in.readBoolean();
             fromYear = in.readInt();
@@ -535,7 +541,7 @@ public class ReportVO implements Serializable {
             toMinute = in.readInt();
 
             schedule = in.readBoolean();
-            schedulePeriod = in.readInt();
+            schedulePeriod = TimePeriods.fromMangoDbId(in.readInt());
             runDelayMinutes = in.readInt();
             scheduleCron = SerializationHelper.readSafeUTF(in);
             email = in.readBoolean();
@@ -550,9 +556,9 @@ public class ReportVO implements Serializable {
             relativeDateType = in.readInt();
 
             previousPeriodCount = in.readInt();
-            previousPeriodType = in.readInt();
+            previousPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             pastPeriodCount = in.readInt();
-            pastPeriodType = in.readInt();
+            pastPeriodType = TimePeriods.fromMangoDbId(in.readInt());
 
             fromNone = in.readBoolean();
             fromYear = in.readInt();
@@ -568,7 +574,7 @@ public class ReportVO implements Serializable {
             toMinute = in.readInt();
 
             schedule = in.readBoolean();
-            schedulePeriod = in.readInt();
+            schedulePeriod = TimePeriods.fromMangoDbId(in.readInt());
             runDelayMinutes = in.readInt();
             scheduleCron = SerializationHelper.readSafeUTF(in);
             email = in.readBoolean();
@@ -583,9 +589,9 @@ public class ReportVO implements Serializable {
             relativeDateType = in.readInt();
 
             previousPeriodCount = in.readInt();
-            previousPeriodType = in.readInt();
+            previousPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             pastPeriodCount = in.readInt();
-            pastPeriodType = in.readInt();
+            pastPeriodType = TimePeriods.fromMangoDbId(in.readInt());
 
             fromNone = in.readBoolean();
             fromYear = in.readInt();
@@ -601,7 +607,7 @@ public class ReportVO implements Serializable {
             toMinute = in.readInt();
 
             schedule = in.readBoolean();
-            schedulePeriod = in.readInt();
+            schedulePeriod = TimePeriods.fromMangoDbId(in.readInt());
             runDelayMinutes = in.readInt();
             scheduleCron = SerializationHelper.readSafeUTF(in);
             email = in.readBoolean();

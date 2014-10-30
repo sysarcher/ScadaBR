@@ -18,7 +18,6 @@
  */
 package com.serotonin.mango.rt.event.type;
 
-import br.org.scadabr.DataType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +26,7 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
@@ -162,11 +162,6 @@ public class AuditEventType extends EventType {
     // / Utility methods for other classes
     // /
     //
-    public static void addPropertyMessage(List<LocalizableMessage> list, String propertyNameKey, LocalizableI18nKey propertyValue) {
-        list.add(new LocalizableMessageImpl("event.audit.property", new LocalizableMessageImpl(propertyNameKey), propertyValue));
-    }
-
-    @Deprecated // use datatypes
     public static void addPropertyMessage(List<LocalizableMessage> list, String propertyNameKey, Object propertyValue) {
         list.add(new LocalizableMessageImpl("event.audit.property", new LocalizableMessageImpl(propertyNameKey), propertyValue));
     }
@@ -180,20 +175,10 @@ public class AuditEventType extends EventType {
                 getBooleanMessage(propertyValue)));
     }
 
-    public static void addPeriodMessage(List<LocalizableMessage> list, String propertyNameKey, int periodType,
-            int period) {
-        list.add(new LocalizableMessageImpl("event.audit.property", new LocalizableMessageImpl(propertyNameKey), Common
-                .getPeriodDescription(periodType, period)));
-    }
-
     public static void addExportCodeMessage(List<LocalizableMessage> list, String propertyNameKey, ExportCodes codes,
             int id) {
         list.add(new LocalizableMessageImpl("event.audit.property", new LocalizableMessageImpl(propertyNameKey),
                 getExportCodeMessage(codes, id)));
-    }
-
-    public static void addDataTypeMessage(List<LocalizableMessage> list, String propertyNameKey, DataType dataType) {
-        list.add(new LocalizableMessageImpl("event.audit.property", new LocalizableMessageImpl(propertyNameKey), dataType));
     }
 
     public static void maybeAddPropertyChangeMessage(List<LocalizableMessage> list, String propertyNameKey,
@@ -225,26 +210,12 @@ public class AuditEventType extends EventType {
         }
     }
 
-    public static void evaluateDoubleScientific(List<LocalizableMessage> list, String propertyNameKey, double fromValue, double toValue) {
+    public static void evaluateDoubleScientific(List<LocalizableMessage> list, String propertyNameKey, String formatPattern, double fromValue, double toValue) {
+//TODO user MessageFormatPattern
         if (fromValue != toValue) {
             list.add(new LocalizableMessageImpl("event.audit.changedPropertyDoubleScientific", propertyNameKey, fromValue, toValue));
         }
-    }
-
-    public static void maybeAddAlarmLevelChangeMessage(List<LocalizableMessage> list, String propertyNameKey,
-            AlarmLevel fromAlarmLevel, AlarmLevel toAlarmLevel) {
-        if (fromAlarmLevel != toAlarmLevel) {
-            addPropertyChangeMessage(list, propertyNameKey, fromAlarmLevel.getI18nKey(), toAlarmLevel.getI18nKey());
-        }
-    }
-
-    @Deprecated
-    public static void maybeAddPeriodChangeMessage(List<LocalizableMessage> list, String propertyNameKey,
-            int fromPeriodType, int fromPeriod, int toPeriodType, int toPeriod) {
-        if (fromPeriodType != toPeriodType || fromPeriod != toPeriod) {
-            addPropertyChangeMessage(list, propertyNameKey, Common.getPeriodDescription(fromPeriodType, fromPeriod),
-                    Common.getPeriodDescription(toPeriodType, toPeriod));
-        }
+throw new ImplementMeException(); //"MessageFormat");
     }
 
     public static void maybeAddExportCodeChangeMessage(List<LocalizableMessage> list, String propertyNameKey,
@@ -252,13 +223,6 @@ public class AuditEventType extends EventType {
         if (fromId != toId) {
             addPropertyChangeMessage(list, propertyNameKey, getExportCodeMessage(exportCodes, fromId),
                     getExportCodeMessage(exportCodes, toId));
-        }
-    }
-
-    public static void maybeAddDataTypeChangeMessage(List<LocalizableMessage> list, String propertyNameKey,
-            DataType fromDataType, DataType toDataType) {
-        if (fromDataType != toDataType) {
-            addPropertyChangeMessage(list, propertyNameKey, fromDataType, toDataType);
         }
     }
 

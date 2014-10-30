@@ -26,9 +26,9 @@ import br.org.scadabr.api.vo.ItemValue;
 import br.org.scadabr.api.vo.ModbusIPConfig;
 import br.org.scadabr.api.vo.ModbusPointConfig;
 import br.org.scadabr.api.vo.ModbusSerialConfig;
+import br.org.scadabr.utils.TimePeriods;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.Common.TimePeriods;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
@@ -793,8 +793,7 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
             dataSource.setName(modbusDS.getName());
             dataSource.setEnabled(modbusDS.isEnabled());
             dataSource.setHost(modbusDS.getHost());
-            dataSource.setPollingPeriod(toMillis(modbusDS.getUpdatePeriods(),
-                    modbusDS.getUpdatePeriodType()));
+            dataSource.setPollingPeriod(modbusDS.getUpdatePeriodType().getMillis(modbusDS.getUpdatePeriods()));
             dataSource.setPort(modbusDS.getPort());
             dataSource.setRetries(modbusDS.getRetries());
             dataSource.setContiguousBatches(modbusDS.isContiguousBatches());
@@ -816,36 +815,12 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
             dataSource.setCreateSlaveMonitorPoints(modbusDS
                     .isCreateSlaveMonitorPoints());
             dataSource.setTimeout(modbusDS.getTimeout());
-            dataSource.setPollingPeriod(toMillis(modbusDS.getUpdatePeriods(),
-                    modbusDS.getUpdatePeriodType()));
+            dataSource.setPollingPeriod(modbusDS.getUpdatePeriodType().getMillis(modbusDS.getUpdatePeriods()));
 
             return dataSource;
         }
         throw new ScadaBRAPIException(new APIError(ErrorCode.INVALID_PARAMETER,
                 "DS type not supported yet"));
-    }
-
-    private long toMillis(int updatePeriods, int updatePeriodType) {
-        long periodInMillis = 0;
-        switch (updatePeriodType) {
-            case TimePeriods.MILLISECONDS:
-                periodInMillis = updatePeriods;
-                break;
-
-            case TimePeriods.SECONDS:
-                periodInMillis = (updatePeriods * 1000);
-                break;
-
-            case TimePeriods.MINUTES:
-                periodInMillis = (updatePeriods * 1000 * 60);
-                break;
-
-            case TimePeriods.HOURS:
-                periodInMillis = (updatePeriods * 60 * 60 * 1000);
-                break;
-        }
-
-        return periodInMillis;
     }
 
     private Type getDataSourceType(DataSourceType dsType)

@@ -29,6 +29,7 @@ import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.virtual.VirtualDataSourceRT;
@@ -56,7 +57,7 @@ public class VirtualDataSourceVO extends DataSourceVO<VirtualDataSourceVO> {
 
     @Override
     public LocalizableMessage getConnectionDescription() {
-        return Common.getPeriodDescription(updatePeriodType, updatePeriods);
+        return updatePeriodType.getPeriodDescription(updatePeriods);
     }
 
     @Override
@@ -74,7 +75,7 @@ public class VirtualDataSourceVO extends DataSourceVO<VirtualDataSourceVO> {
         return new VirtualPointLocatorVO();
     }
 
-    private int updatePeriodType = Common.TimePeriods.MINUTES;
+    private TimePeriods updatePeriodType = TimePeriods.MINUTES;
     @JsonRemoteProperty
     private int updatePeriods = 5;
 
@@ -86,20 +87,17 @@ public class VirtualDataSourceVO extends DataSourceVO<VirtualDataSourceVO> {
         this.updatePeriods = updatePeriods;
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextual("updatePeriodType", "validate.invalidValue");
-        }
         if (updatePeriods <= 0) {
             response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
@@ -107,13 +105,14 @@ public class VirtualDataSourceVO extends DataSourceVO<VirtualDataSourceVO> {
 
     @Override
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
-        AuditEventType.addPeriodMessage(list, "dsEdit.updatePeriod", updatePeriodType, updatePeriods);
+        AuditEventType.addPropertyMessage(list, "dsEdit.updatePeriod", updatePeriodType.getPeriodDescription(updatePeriods));
     }
 
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, VirtualDataSourceVO from) {
-        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", from.updatePeriodType,
-                from.updatePeriods, updatePeriodType, updatePeriods);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.updatePeriod",
+                from.updatePeriodType.getPeriodDescription(from.updatePeriods),
+                updatePeriodType.getPeriodDescription(updatePeriods));
     }
 
     //
@@ -126,7 +125,7 @@ public class VirtualDataSourceVO extends DataSourceVO<VirtualDataSourceVO> {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(updatePeriods);
     }
 
@@ -135,10 +134,10 @@ public class VirtualDataSourceVO extends DataSourceVO<VirtualDataSourceVO> {
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            updatePeriodType = Common.TimePeriods.SECONDS;
+            updatePeriodType = TimePeriods.SECONDS;
             updatePeriods = in.readInt();
         } else if (ver == 2) {
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
         }
     }
@@ -146,7 +145,7 @@ public class VirtualDataSourceVO extends DataSourceVO<VirtualDataSourceVO> {
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }

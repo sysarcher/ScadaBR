@@ -121,7 +121,7 @@ public class PachubePointLocatorVO extends AbstractPointLocatorVO implements Jso
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.pachube.feedId", feedId);
         AuditEventType.addPropertyMessage(list, "dsEdit.pachube.dataStreamId", dataStreamId);
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
+        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.pachube.binaryZeroValue", binary0Value);
         AuditEventType.addPropertyMessage(list, "dsEdit.settable", settable);
     }
@@ -129,7 +129,7 @@ public class PachubePointLocatorVO extends AbstractPointLocatorVO implements Jso
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         PachubePointLocatorVO from = (PachubePointLocatorVO) o;
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pachube.feedId", from.feedId, feedId);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pachube.dataStreamId", from.dataStreamId,
                 dataStreamId);
@@ -150,7 +150,7 @@ public class PachubePointLocatorVO extends AbstractPointLocatorVO implements Jso
         out.writeInt(version);
         out.writeInt(feedId);
         SerializationHelper.writeSafeUTF(out, dataStreamId);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
         SerializationHelper.writeSafeUTF(out, binary0Value);
         out.writeBoolean(settable);
     }
@@ -162,7 +162,7 @@ public class PachubePointLocatorVO extends AbstractPointLocatorVO implements Jso
         if (ver == 1) {
             feedId = in.readInt();
             dataStreamId = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             binary0Value = SerializationHelper.readSafeUTF(in);
             settable = in.readBoolean();
         }

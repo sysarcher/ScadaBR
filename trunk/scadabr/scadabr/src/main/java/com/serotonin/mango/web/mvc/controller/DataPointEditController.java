@@ -45,6 +45,7 @@ import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.propertyEditor.DoubleFormatEditor;
 import br.org.scadabr.propertyEditor.IntegerFormatEditor;
 import br.org.scadabr.util.ValidationUtils;
+import br.org.scadabr.utils.TimePeriods;
 import javax.inject.Inject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -160,10 +161,7 @@ public class DataPointEditController {
         }
 
         if (point.getLoggingType() != DataPointVO.LoggingTypes.NONE) {
-            if (point.getPurgeType() != DataPointVO.PurgeTypes.DAYS
-                    && point.getPurgeType() != DataPointVO.PurgeTypes.WEEKS
-                    && point.getPurgeType() != DataPointVO.PurgeTypes.MONTHS
-                    && point.getPurgeType() != DataPointVO.PurgeTypes.YEARS) {
+            if (!DataPointVO.PURGE_TYPES.contains(point.getPurgeType())) {
                 ValidationUtils.rejectValue(errors, "purgeType", "validate.required");
             }
 

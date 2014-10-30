@@ -20,6 +20,7 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
@@ -82,7 +83,7 @@ public class OPCDataSourceVO extends DataSourceVO<OPCDataSourceVO> {
         return TYPE;
     }
 
-    private int updatePeriodType = Common.TimePeriods.SECONDS;
+    private TimePeriods updatePeriodType = TimePeriods.SECONDS;
     @JsonRemoteProperty
     private int updatePeriods = 1;
     @JsonRemoteProperty
@@ -108,11 +109,11 @@ public class OPCDataSourceVO extends DataSourceVO<OPCDataSourceVO> {
         this.creationMode = creationMode;
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 
@@ -196,8 +197,8 @@ public class OPCDataSourceVO extends DataSourceVO<OPCDataSourceVO> {
 
     @Override
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
-        AuditEventType.addPeriodMessage(list, "dsEdit.dnp3.rbePeriod",
-                updatePeriodType, updatePeriods);
+        AuditEventType.addPropertyMessage(list, "dsEdit.dnp3.rbePeriod",
+                updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.addPropertyMessage(list, "dsEdit.opc.host", host);
         AuditEventType.addPropertyMessage(list, "dsEdit.opc.domain", domain);
         AuditEventType.addPropertyMessage(list, "dsEdit.opc.user", user);
@@ -213,9 +214,10 @@ public class OPCDataSourceVO extends DataSourceVO<OPCDataSourceVO> {
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, OPCDataSourceVO from) {
         final OPCDataSourceVO fromVO = (OPCDataSourceVO) from;
-        AuditEventType.maybeAddPeriodChangeMessage(list,
-                "dsEdit.dnp3.rbePeriod", fromVO.updatePeriodType,
-                fromVO.updatePeriods, updatePeriodType, updatePeriods);
+        AuditEventType.maybeAddPropertyChangeMessage(list,
+                "dsEdit.dnp3.rbePeriod",
+                fromVO.updatePeriodType.getPeriodDescription(fromVO.updatePeriods),
+                updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.opc.host",
                 fromVO.host, host);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.opc.domain",
@@ -247,7 +249,7 @@ public class OPCDataSourceVO extends DataSourceVO<OPCDataSourceVO> {
         SerializationHelper.writeSafeUTF(out, user);
         SerializationHelper.writeSafeUTF(out, password);
         SerializationHelper.writeSafeUTF(out, server);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(updatePeriods);
         out.writeBoolean(quantize);
         out.writeInt(creationMode);
@@ -264,7 +266,7 @@ public class OPCDataSourceVO extends DataSourceVO<OPCDataSourceVO> {
             password = SerializationHelper.readSafeUTF(in);
             server = SerializationHelper.readSafeUTF(in);
 
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             quantize = in.readBoolean();
             creationMode = in.readInt();
@@ -275,7 +277,7 @@ public class OPCDataSourceVO extends DataSourceVO<OPCDataSourceVO> {
     public void jsonDeserialize(JsonReader reader, JsonObject json)
             throws JsonException {
         super.jsonDeserialize(reader, json);
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }

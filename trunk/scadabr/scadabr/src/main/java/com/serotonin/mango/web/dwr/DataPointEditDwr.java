@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr;
 
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
 import java.util.List;
 
@@ -109,11 +110,11 @@ public class DataPointEditDwr extends BaseDwr {
         setChartRenderer(new TableChartRenderer(limit));
     }
 
-    public void setImageChartRenderer(int timePeriod, int numberOfPeriods) {
+    public void setImageChartRenderer(TimePeriods timePeriod, int numberOfPeriods) {
         setChartRenderer(new ImageChartRenderer(timePeriod, numberOfPeriods));
     }
 
-    public void setStatisticsChartRenderer(int timePeriod, int numberOfPeriods, boolean includeSum) {
+    public void setStatisticsChartRenderer(TimePeriods timePeriod, int numberOfPeriods, boolean includeSum) {
         setChartRenderer(new StatisticsChartRenderer(timePeriod, numberOfPeriods, includeSum));
     }
 
@@ -128,7 +129,7 @@ public class DataPointEditDwr extends BaseDwr {
     //
     // Data purge
     //
-    public long purgeNow(int purgeType, int purgePeriod, boolean allData) {
+    public long purgeNow(TimePeriods purgeType, int purgePeriod, boolean allData) {
         DataPointVO point = getDataPoint();
         Long count;
         if (allData) {
@@ -196,7 +197,7 @@ public class DataPointEditDwr extends BaseDwr {
     }
 
     public void updateHighLimitDetector(int pedId, String xid, String alias, double limit, int duration,
-            int durationType, AlarmLevel alarmLevel) {
+            TimePeriods durationType, AlarmLevel alarmLevel) {
         PointEventDetectorVO ped = getEventDetector(pedId);
         ped.setXid(xid);
         ped.setAlias(alias);
@@ -207,7 +208,7 @@ public class DataPointEditDwr extends BaseDwr {
     }
 
     public void updateLowLimitDetector(int pedId, String xid, String alias, double limit, int duration,
-            int durationType, AlarmLevel alarmLevel) {
+            TimePeriods durationType, AlarmLevel alarmLevel) {
         PointEventDetectorVO ped = getEventDetector(pedId);
         ped.setXid(xid);
         ped.setAlias(alias);
@@ -218,7 +219,7 @@ public class DataPointEditDwr extends BaseDwr {
     }
 
     public void updateBinaryStateDetector(int pedId, String xid, String alias, boolean state, int duration,
-            int durationType, AlarmLevel alarmLevel) {
+            TimePeriods durationType, AlarmLevel alarmLevel) {
         PointEventDetectorVO ped = getEventDetector(pedId);
         ped.setXid(xid);
         ped.setAlias(alias);
@@ -229,7 +230,7 @@ public class DataPointEditDwr extends BaseDwr {
     }
 
     public void updateMultistateStateDetector(int pedId, String xid, String alias, int state, int duration,
-            int durationType, AlarmLevel alarmLevel) {
+            TimePeriods durationType, AlarmLevel alarmLevel) {
         PointEventDetectorVO ped = getEventDetector(pedId);
         ped.setXid(xid);
         ped.setAlias(alias);
@@ -247,7 +248,7 @@ public class DataPointEditDwr extends BaseDwr {
     }
 
     public void updateStateChangeCountDetector(int pedId, String xid, String alias, int count, int duration,
-            int durationType, AlarmLevel alarmLevel) {
+            TimePeriods durationType, AlarmLevel alarmLevel) {
         PointEventDetectorVO ped = getEventDetector(pedId);
         ped.setXid(xid);
         ped.setAlias(alias);
@@ -257,7 +258,7 @@ public class DataPointEditDwr extends BaseDwr {
         ped.setAlarmLevel(alarmLevel);
     }
 
-    public void updateNoChangeDetector(int pedId, String xid, String alias, int duration, int durationType,
+    public void updateNoChangeDetector(int pedId, String xid, String alias, int duration, TimePeriods durationType,
             AlarmLevel alarmLevel) {
         PointEventDetectorVO ped = getEventDetector(pedId);
         ped.setXid(xid);
@@ -267,7 +268,7 @@ public class DataPointEditDwr extends BaseDwr {
         ped.setAlarmLevel(alarmLevel);
     }
 
-    public void updateNoUpdateDetector(int pedId, String xid, String alias, int duration, int durationType,
+    public void updateNoUpdateDetector(int pedId, String xid, String alias, int duration, TimePeriods durationType,
             AlarmLevel alarmLevel) {
         PointEventDetectorVO ped = getEventDetector(pedId);
         ped.setXid(xid);
@@ -278,7 +279,7 @@ public class DataPointEditDwr extends BaseDwr {
     }
 
     public void updateAlphanumericStateDetector(int pedId, String xid, String alias, String state, int duration,
-            int durationType, AlarmLevel alarmLevel) {
+            TimePeriods durationType, AlarmLevel alarmLevel) {
         PointEventDetectorVO ped = getEventDetector(pedId);
         ped.setXid(xid);
         ped.setAlias(alias);
@@ -289,7 +290,7 @@ public class DataPointEditDwr extends BaseDwr {
     }
 
     public void updatePositiveCusumDetector(int pedId, String xid, String alias, double limit, double weight,
-            int duration, int durationType, AlarmLevel alarmLevel) {
+            int duration, TimePeriods durationType, AlarmLevel alarmLevel) {
         PointEventDetectorVO ped = getEventDetector(pedId);
         ped.setXid(xid);
         ped.setAlias(alias);
@@ -301,7 +302,7 @@ public class DataPointEditDwr extends BaseDwr {
     }
 
     public void updateNegativeCusumDetector(int pedId, String xid, String alias, double limit, double weight,
-            int duration, int durationType, AlarmLevel alarmLevel) {
+            int duration, TimePeriods durationType, AlarmLevel alarmLevel) {
         PointEventDetectorVO ped = getEventDetector(pedId);
         ped.setXid(xid);
         ped.setAlias(alias);

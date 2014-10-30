@@ -54,6 +54,7 @@ import com.serotonin.mango.vo.mailingList.EmailRecipient;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
@@ -69,7 +70,7 @@ public class EventHandlerVO implements Serializable,
     public static final int TYPE_PROCESS = 3;
     public static final int TYPE_SCRIPT = 4;
 
-    public static ExportCodes TYPE_CODES = new ExportCodes();
+    public static final ExportCodes TYPE_CODES = new ExportCodes();
 
     static {
         TYPE_CODES.addElement(TYPE_SET_POINT, "SET_POINT",
@@ -85,7 +86,7 @@ public class EventHandlerVO implements Serializable,
     public static final int RECIPIENT_TYPE_ESCALATION = 2;
     public static final int RECIPIENT_TYPE_INACTIVE = 3;
 
-    public static ExportCodes RECIPIENT_TYPE_CODES = new ExportCodes();
+    public static final ExportCodes RECIPIENT_TYPE_CODES = new ExportCodes();
 
     static {
         RECIPIENT_TYPE_CODES.addElement(RECIPIENT_TYPE_ACTIVE, "ACTIVE",
@@ -100,7 +101,7 @@ public class EventHandlerVO implements Serializable,
     public static final int SET_ACTION_POINT_VALUE = 1;
     public static final int SET_ACTION_STATIC_VALUE = 2;
 
-    public static ExportCodes SET_ACTION_CODES = new ExportCodes();
+    public static final ExportCodes SET_ACTION_CODES = new ExportCodes();
 
     static {
         SET_ACTION_CODES.addElement(SET_ACTION_NONE, "NONE",
@@ -132,7 +133,7 @@ public class EventHandlerVO implements Serializable,
     // Email handler fields.
     private List<RecipientListEntryBean> activeRecipients;
     private boolean sendEscalation;
-    private int escalationDelayType;
+    private TimePeriods escalationDelayType;
     private int escalationDelay;
     private List<RecipientListEntryBean> escalationRecipients;
     private boolean sendInactive;
@@ -308,11 +309,11 @@ public class EventHandlerVO implements Serializable,
         this.escalationDelay = escalationDelay;
     }
 
-    public int getEscalationDelayType() {
+    public TimePeriods getEscalationDelayType() {
         return escalationDelayType;
     }
 
-    public void setEscalationDelayType(int escalationDelayType) {
+    public void setEscalationDelayType(TimePeriods escalationDelayType) {
         this.escalationDelayType = escalationDelayType;
     }
 
@@ -522,9 +523,8 @@ public class EventHandlerVO implements Serializable,
             AuditEventType.addPropertyMessage(list, "eventHandlers.escal",
                     sendEscalation);
             if (sendEscalation) {
-                AuditEventType.addPeriodMessage(list,
-                        "eventHandlers.escalPeriod", escalationDelayType,
-                        escalationDelay);
+                AuditEventType.addPropertyMessage(list,
+                        "eventHandlers.escalPeriod", escalationDelayType.getPeriodDescription(escalationDelay));
                 AuditEventType.addPropertyMessage(list,
                         "eventHandlers.escalRecipients",
                         createRecipientMessage(escalationRecipients));
@@ -598,9 +598,10 @@ public class EventHandlerVO implements Serializable,
                     createRecipientMessage(activeRecipients));
             AuditEventType.maybeAddPropertyChangeMessage(list,
                     "eventHandlers.escal", from.sendEscalation, sendEscalation);
-            AuditEventType.maybeAddPeriodChangeMessage(list,
-                    "eventHandlers.escalPeriod", from.escalationDelayType,
-                    from.escalationDelay, escalationDelayType, escalationDelay);
+            AuditEventType.maybeAddPropertyChangeMessage(list,
+                    "eventHandlers.escalPeriod",
+                    from.escalationDelayType.getPeriodDescription(from.escalationDelay),
+                    escalationDelayType.getPeriodDescription(escalationDelay));
             AuditEventType.maybeAddPropertyChangeMessage(list,
                     "eventHandlers.escalRecipients",
                     createRecipientMessage(from.escalationRecipients),
@@ -679,7 +680,7 @@ public class EventHandlerVO implements Serializable,
         } else if (handlerType == TYPE_EMAIL) {
             out.writeObject(activeRecipients);
             out.writeBoolean(sendEscalation);
-            out.writeInt(escalationDelayType);
+            out.writeInt(escalationDelayType.mangoDbId);
             out.writeInt(escalationDelay);
             out.writeObject(escalationRecipients);
             out.writeBoolean(sendInactive);
@@ -716,7 +717,7 @@ public class EventHandlerVO implements Serializable,
                 activeRecipients = (List<RecipientListEntryBean>) in
                         .readObject();
                 sendEscalation = in.readBoolean();
-                escalationDelayType = in.readInt();
+                escalationDelayType = TimePeriods.fromMangoDbId(in.readInt());
                 escalationDelay = in.readInt();
                 escalationRecipients = (List<RecipientListEntryBean>) in
                         .readObject();
@@ -742,7 +743,7 @@ public class EventHandlerVO implements Serializable,
                 activeRecipients = (List<RecipientListEntryBean>) in
                         .readObject();
                 sendEscalation = in.readBoolean();
-                escalationDelayType = in.readInt();
+                escalationDelayType = TimePeriods.fromMangoDbId(in.readInt());
                 escalationDelay = in.readInt();
                 escalationRecipients = (List<RecipientListEntryBean>) in
                         .readObject();
@@ -769,7 +770,7 @@ public class EventHandlerVO implements Serializable,
                 activeRecipients = (List<RecipientListEntryBean>) in
                         .readObject();
                 sendEscalation = in.readBoolean();
-                escalationDelayType = in.readInt();
+                escalationDelayType = TimePeriods.fromMangoDbId(in.readInt());
                 escalationDelay = in.readInt();
                 escalationRecipients = (List<RecipientListEntryBean>) in
                         .readObject();
@@ -826,8 +827,7 @@ public class EventHandlerVO implements Serializable,
             map.put("activeRecipients", activeRecipients);
             map.put("sendEscalation", sendEscalation);
             if (sendEscalation) {
-                map.put("escalationDelayType", Common.TIME_PERIOD_CODES
-                        .getCode(escalationDelayType));
+                map.put("escalationDelayType", escalationDelayType.name());
                 map.put("escalationDelay", escalationDelay);
                 map.put("escalationRecipients", escalationRecipients);
             }
@@ -948,11 +948,12 @@ public class EventHandlerVO implements Serializable,
             if (sendEscalation) {
                 text = json.getString("escalationDelayType");
                 if (text != null) {
-                    escalationDelayType = Common.TIME_PERIOD_CODES.getId(text);
-                    if (escalationDelayType == -1) {
+                    try {
+                        escalationDelayType = TimePeriods.valueOf(text);
+                    } catch (Exception e) {
                         throw new LocalizableJsonException(
                                 "emport.error.invalid", "escalationDelayType",
-                                text, Common.TIME_PERIOD_CODES.getCodeList());
+                                text, TimePeriods.values());
                     }
                 }
 

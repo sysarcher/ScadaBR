@@ -27,12 +27,13 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.util.LocalizableJsonException;
 
 abstract public class TimePeriodChartRenderer extends BaseChartRenderer {
 
-    private int timePeriod;
+    private TimePeriods timePeriod;
     @JsonRemoteProperty
     private int numberOfPeriods;
 
@@ -49,19 +50,19 @@ abstract public class TimePeriodChartRenderer extends BaseChartRenderer {
     public long getEndTime(long timestamp) {
         return timestamp;
     }
-    
+
     /**
      * Convenience method for getting the duration of the chart period.
      */
     public long getDuration() {
-        return Common.getMillis(timePeriod, numberOfPeriods);
+        return timePeriod.getMillis(numberOfPeriods);
     }
 
     public TimePeriodChartRenderer() {
         // no op
     }
 
-    public TimePeriodChartRenderer(int timePeriod, int numberOfPeriods) {
+    public TimePeriodChartRenderer(TimePeriods timePeriod, int numberOfPeriods) {
         this.timePeriod = timePeriod;
         this.numberOfPeriods = numberOfPeriods;
     }
@@ -74,11 +75,11 @@ abstract public class TimePeriodChartRenderer extends BaseChartRenderer {
         this.numberOfPeriods = numberOfPeriods;
     }
 
-    public int getTimePeriod() {
+    public TimePeriods getTimePeriod() {
         return timePeriod;
     }
 
-    public void setTimePeriod(int timePeriod) {
+    public void setTimePeriod(TimePeriods timePeriod) {
         this.timePeriod = timePeriod;
     }
 
@@ -92,7 +93,7 @@ abstract public class TimePeriodChartRenderer extends BaseChartRenderer {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(timePeriod);
+        out.writeInt(timePeriod.mangoDbId);
         out.writeInt(numberOfPeriods);
     }
 
@@ -101,7 +102,7 @@ abstract public class TimePeriodChartRenderer extends BaseChartRenderer {
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            timePeriod = in.readInt();
+            timePeriod = timePeriod.fromMangoDbId(in.readInt());
             numberOfPeriods = in.readInt();
         }
     }
@@ -111,20 +112,20 @@ abstract public class TimePeriodChartRenderer extends BaseChartRenderer {
         super.jsonDeserialize(reader, json);
         String text = json.getString("timePeriodType");
         if (text == null) {
-            throw new LocalizableJsonException("emport.error.chart.missing", "timePeriodType", Common.TIME_PERIOD_CODES
-                    .getCodeList());
+            throw new LocalizableJsonException("emport.error.chart.missing", "timePeriodType", TimePeriods.values());
         }
 
-        timePeriod = Common.TIME_PERIOD_CODES.getId(text);
-        if (timePeriod == -1) {
+        try {
+            timePeriod = timePeriod.valueOf(text);
+        } catch (Exception e) {
             throw new LocalizableJsonException("emport.error.chart.invalid", "timePeriodType", text,
-                    Common.TIME_PERIOD_CODES.getCodeList());
+                    TimePeriods.values());
         }
     }
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        map.put("timePeriodType", Common.TIME_PERIOD_CODES.getCode(timePeriod));
+        map.put("timePeriodType", timePeriod.name());
     }
 }

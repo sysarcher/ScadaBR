@@ -67,7 +67,7 @@ public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addDataTypeMessage(list, "dsEdit.sql.rowId", dataType);
+        AuditEventType.addPropertyMessage(list, "dsEdit.sql.rowId", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.opc.tag", tag);
         AuditEventType.addPropertyMessage(list, "dsEdit.settable", settable);
     }
@@ -76,7 +76,7 @@ public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         OPCPointLocatorVO from = (OPCPointLocatorVO) o;
 
-        AuditEventType.maybeAddDataTypeChangeMessage(list,
+        AuditEventType.maybeAddPropertyChangeMessage(list,
                 "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.opc.tag",
                 from.tag, tag);
@@ -90,7 +90,7 @@ public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, tag);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
         out.writeBoolean(settable);
 
     }
@@ -100,7 +100,7 @@ public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
         int ver = in.readInt();
         if (ver == 1) {
             tag = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             settable = in.readBoolean();
         }
     }

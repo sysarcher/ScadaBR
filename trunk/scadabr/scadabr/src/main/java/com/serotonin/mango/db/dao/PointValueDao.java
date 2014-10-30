@@ -279,7 +279,7 @@ public class PointValueDao extends BaseDao {
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareStatement(POINT_VALUE_INSERT, Statement.RETURN_GENERATED_KEYS);
                 ps.setInt(1, pointId);
-                ps.setInt(2, dataType.ordinal());
+                ps.setInt(2, dataType.mangoDbId);
                 ps.setDouble(3, dvalue);
                 ps.setLong(4, time);
                 return ps;
@@ -503,7 +503,7 @@ public class PointValueDao extends BaseDao {
     
     MangoValue createMangoValue(ResultSet rs, int firstParameter)
             throws SQLException {
-        final DataType dataType = DataType.valueOf(rs.getInt(firstParameter));
+        final DataType dataType = DataType.fromMangoDbId(rs.getInt(firstParameter));
         MangoValue value;
         switch (dataType) {
             case NUMERIC:
@@ -640,7 +640,7 @@ public class PointValueDao extends BaseDao {
             DataType dataType) {
         return deletePointValues(
                 "delete from pointValues where dataPointId=? and dataType<>?",
-                new Object[]{dataPointId, dataType.ordinal()});
+                new Object[]{dataPointId, dataType.mangoDbId});
     }
     
     public void compressTables() {
@@ -721,12 +721,12 @@ public class PointValueDao extends BaseDao {
         final StringBuilder sb = new StringBuilder();
         sb.append("select distinct id from ( ");
         sb.append("  select id as id from pointValues where dataType=");
-        sb.append(DataType.IMAGE.ordinal());
+        sb.append(DataType.IMAGE.mangoDbId);
         sb.append("  union");
         sb.append("  select d.pointValueId as id from reportInstanceData d ");
         sb.append("    join reportInstancePoints p on d.reportInstancePointId=p.id");
         sb.append("  where p.dataType=");
-        sb.append(DataType.IMAGE.ordinal());
+        sb.append(DataType.IMAGE.mangoDbId);
         sb.append(") a order by 1");
         return ejt.queryForList(sb.toString(), Long.class);
     }
@@ -781,7 +781,7 @@ public class PointValueDao extends BaseDao {
         public void writeInto(Object[] params, int index) {
             index *= POINT_VALUE_INSERT_VALUES_COUNT;
             params[index++] = pointId;
-            params[index++] = dataType.ordinal();
+            params[index++] = dataType.mangoDbId;
             params[index++] = dvalue;
             params[index++] = time;
         }

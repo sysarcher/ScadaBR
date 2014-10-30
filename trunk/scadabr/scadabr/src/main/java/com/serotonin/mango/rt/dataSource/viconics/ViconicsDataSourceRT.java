@@ -61,6 +61,7 @@ import com.serotonin.mango.vo.hierarchy.PointFolder;
 import com.serotonin.mango.vo.hierarchy.PointHierarchy;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.viconics.RequestFailureException;
 import com.serotonin.viconics.ViconicsDevice;
 import com.serotonin.viconics.ViconicsNetwork;
@@ -264,7 +265,7 @@ public class ViconicsDataSourceRT extends EventDataSource<ViconicsDataSourceVO> 
                 dp.setEnabled(true);
                 dp.setPointFolderId(folderId);
                 dp.setLoggingType(LoggingTypes.ON_CHANGE);
-                dp.setChartRenderer(new ImageChartRenderer(Common.TimePeriods.HOURS, 1));
+                dp.setChartRenderer(new ImageChartRenderer(TimePeriods.HOURS, 1));
                 dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
 
                 ViconicsPointLocatorVO locator = new ViconicsPointLocatorVO();

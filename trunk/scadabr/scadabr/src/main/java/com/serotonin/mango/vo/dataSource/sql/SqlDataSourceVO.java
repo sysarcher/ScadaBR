@@ -38,6 +38,7 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
@@ -102,7 +103,7 @@ public class SqlDataSourceVO extends DataSourceVO<SqlDataSourceVO> {
     private String password;
     @JsonRemoteProperty
     private String selectStatement;
-    private int updatePeriodType = Common.TimePeriods.MINUTES;
+    private TimePeriods updatePeriodType = TimePeriods.MINUTES;
     @JsonRemoteProperty
     private int updatePeriods = 5;
     @JsonRemoteProperty
@@ -132,11 +133,11 @@ public class SqlDataSourceVO extends DataSourceVO<SqlDataSourceVO> {
         this.updatePeriods = updatePeriods;
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 
@@ -175,9 +176,6 @@ public class SqlDataSourceVO extends DataSourceVO<SqlDataSourceVO> {
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextual("updatePeriodType", "validate.invalidValue");
-        }
         if (updatePeriods <= 0) {
             response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
@@ -191,11 +189,11 @@ public class SqlDataSourceVO extends DataSourceVO<SqlDataSourceVO> {
 
     @Override
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
-        AuditEventType.addPeriodMessage(list, "dsEdit.updatePeriod", updatePeriodType, updatePeriods);
+        AuditEventType.addPropertyMessage(list, "dsEdit.updatePeriod", updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.addPropertyMessage(list, "dsEdit.sql.driverClassName", driverClassname);
         AuditEventType.addPropertyMessage(list, "dsEdit.sql.connectionString", connectionUrl);
-        AuditEventType .addPropertyMessage(list, "dsEdit.sql.username", username);
-        AuditEventType .addPropertyMessage(list, "dsEdit.sql.password", password);
+        AuditEventType.addPropertyMessage(list, "dsEdit.sql.username", username);
+        AuditEventType.addPropertyMessage(list, "dsEdit.sql.password", password);
         AuditEventType.addPropertyMessage(list, "dsEdit.sql.select", selectStatement);
         AuditEventType.addPropertyMessage(list, "dsEdit.sql.rowQuery", rowBasedQuery);
     }
@@ -203,7 +201,9 @@ public class SqlDataSourceVO extends DataSourceVO<SqlDataSourceVO> {
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list,
             SqlDataSourceVO from) {
-        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", from.updatePeriodType, from.updatePeriods, updatePeriodType, updatePeriods);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.updatePeriod",
+                from.updatePeriodType.getPeriodDescription(from.updatePeriods),
+                updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.driverClassName", from.driverClassname, driverClassname);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.connectionString", from.connectionUrl, connectionUrl);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.username", from.username, username);
@@ -212,7 +212,7 @@ public class SqlDataSourceVO extends DataSourceVO<SqlDataSourceVO> {
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.sql.rowQuery", from.rowBasedQuery, rowBasedQuery);
     }
 
-	//
+    //
     // /
     // / Serialization
     // /
@@ -227,7 +227,7 @@ public class SqlDataSourceVO extends DataSourceVO<SqlDataSourceVO> {
         SerializationHelper.writeSafeUTF(out, username);
         SerializationHelper.writeSafeUTF(out, password);
         SerializationHelper.writeSafeUTF(out, selectStatement);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(updatePeriods);
         out.writeBoolean(rowBasedQuery);
     }
@@ -235,7 +235,7 @@ public class SqlDataSourceVO extends DataSourceVO<SqlDataSourceVO> {
     private void readObject(ObjectInputStream in) throws IOException {
         int ver = in.readInt();
 
-		// Switch on the version of the class so that version changes can be
+        // Switch on the version of the class so that version changes can be
         // elegantly handled.
         if (ver == 1) {
             driverClassname = SerializationHelper.readSafeUTF(in);
@@ -243,7 +243,7 @@ public class SqlDataSourceVO extends DataSourceVO<SqlDataSourceVO> {
             username = SerializationHelper.readSafeUTF(in);
             password = SerializationHelper.readSafeUTF(in);
             selectStatement = SerializationHelper.readSafeUTF(in);
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             rowBasedQuery = false;
         } else if (ver == 2) {
@@ -252,7 +252,7 @@ public class SqlDataSourceVO extends DataSourceVO<SqlDataSourceVO> {
             username = SerializationHelper.readSafeUTF(in);
             password = SerializationHelper.readSafeUTF(in);
             selectStatement = SerializationHelper.readSafeUTF(in);
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             rowBasedQuery = in.readBoolean();
         }
@@ -262,7 +262,7 @@ public class SqlDataSourceVO extends DataSourceVO<SqlDataSourceVO> {
     public void jsonDeserialize(JsonReader reader, JsonObject json)
             throws JsonException {
         super.jsonDeserialize(reader, json);
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }

@@ -81,6 +81,7 @@ import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.dwr.beans.DataPointBean;
 import com.serotonin.mango.web.dwr.beans.ViewComponentState;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.dwr.MethodFilter;
@@ -752,7 +753,7 @@ public class ViewDwr extends BaseDwr {
 
     @MethodFilter
     public DwrResponseI18n saveImageChartComponent(String viewComponentId,
-            String name, int width, int height, int durationType,
+            String name, int width, int height, TimePeriods durationType,
             int durationPeriods, List<KeyValuePair> childPointIds) {
         DwrResponseI18n response = new DwrResponseI18n();
 
@@ -762,9 +763,6 @@ public class ViewDwr extends BaseDwr {
         }
         if (height < 1) {
             response.addContextual("imageChartHeight", "validate.greaterThanZero");
-        }
-        if (!Common.TIME_PERIOD_CODES.isValidId(durationType)) {
-            response.addContextual("imageChartDurationType", "validate.invalidValue");
         }
         if (durationPeriods <= 0) {
             response.addContextual("imageChartDurationPeriods", "validate.greaterThanZero");

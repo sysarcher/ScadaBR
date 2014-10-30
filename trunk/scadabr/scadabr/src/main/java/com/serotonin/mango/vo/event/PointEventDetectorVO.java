@@ -30,6 +30,7 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.detectors.AlphanumericStateDetectorRT;
@@ -122,7 +123,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
     private AlarmLevel alarmLevel;
     private double limit;
     private int duration;
-    private int durationType = Common.TimePeriods.SECONDS;
+    private TimePeriods durationType = TimePeriods.SECONDS;
     private boolean binaryState;
     private int multistateState;
     private int changeCount = 2;
@@ -270,7 +271,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
         if (duration == 0) {
             return null;
         }
-        return Common.getPeriodDescription(durationType, duration);
+        return durationType.getPeriodDescription(duration);
     }
 
     public PointEventDetectorVO copy() {
@@ -304,7 +305,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
             AuditEventType.addPropertyChangeMessage(list, "pointEdit.detectors.type", from.getDef().getNameKey(),
                     getDef().getNameKey());
         }
-        AuditEventType.maybeAddAlarmLevelChangeMessage(list, "common.alarmLevel", from.alarmLevel, alarmLevel);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "common.alarmLevel", from.alarmLevel, alarmLevel);
         if (from.limit != limit || from.duration != duration || from.durationType != durationType
                 || from.binaryState != binaryState || from.multistateState != multistateState
                 || from.changeCount != changeCount || from.alphanumericState != alphanumericState) {
@@ -386,11 +387,11 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
         this.duration = duration;
     }
 
-    public int getDurationType() {
+    public TimePeriods getDurationType() {
         return durationType;
     }
 
-    public void setDurationType(int durationType) {
+    public void setDurationType(TimePeriods durationType) {
         this.durationType = durationType;
     }
 
@@ -580,14 +581,14 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
     private void updateDuration(JsonObject json) throws JsonException {
         String text = json.getString("durationType");
         if (text == null) {
-            throw new LocalizableJsonException("emport.error.ped.missing", "durationType", Common.TIME_PERIOD_CODES
-                    .getCodeList());
+            throw new LocalizableJsonException("emport.error.ped.missing", "durationType", TimePeriods.values());
         }
 
-        durationType = Common.TIME_PERIOD_CODES.getId(text);
-        if (!Common.TIME_PERIOD_CODES.isValidId(durationType)) {
+        try {
+        durationType = TimePeriods.valueOf(text);
+        } catch (Exception e) {
             throw new LocalizableJsonException("emport.error.ped.invalid", "durationType", text,
-                    Common.TIME_PERIOD_CODES.getCodeList());
+                    TimePeriods.values());
         }
 
         duration = getInt(json, "duration");
@@ -610,7 +611,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
     }
 
     private void addDuration(Map<String, Object> map) {
-        map.put("durationType", Common.TIME_PERIOD_CODES.getCode(durationType));
+        map.put("durationType", durationType.name());
         map.put("duration", duration);
     }
 }

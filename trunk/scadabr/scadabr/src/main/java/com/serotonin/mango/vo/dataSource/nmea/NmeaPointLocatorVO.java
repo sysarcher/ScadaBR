@@ -116,7 +116,7 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
+        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.nmea.messageName", messageName);
         AuditEventType.addPropertyMessage(list, "dsEdit.nmea.binary0Value", binary0Value);
         AuditEventType.addPropertyMessage(list, "dsEdit.nmea.fieldIndex", fieldIndex);
@@ -125,7 +125,7 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         NmeaPointLocatorVO from = (NmeaPointLocatorVO) o;
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.nmea.messageName", from.messageName, messageName);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.nmea.binary0Value", from.binary0Value, binary0Value);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.nmea.fieldIndex", from.fieldIndex, fieldIndex);
@@ -143,7 +143,7 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, messageName);
         out.writeInt(fieldIndex);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
         SerializationHelper.writeSafeUTF(out, binary0Value);
     }
 
@@ -154,7 +154,7 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         if (ver == 1) {
             messageName = SerializationHelper.readSafeUTF(in);
             fieldIndex = in.readInt();
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             binary0Value = SerializationHelper.readSafeUTF(in);
         }
     }

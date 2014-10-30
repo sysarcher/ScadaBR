@@ -32,7 +32,7 @@ public class RequestContextAwareLocalizer extends AbstractLocalizer {
     @Inject
     private MessageSource messageSource;
     @Inject
-    private LocaleResolver localeResolver;
+    transient private LocaleResolver localeResolver;
 
 
     public RequestContextAwareLocalizer() {

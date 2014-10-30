@@ -14,11 +14,11 @@ import org.apache.commons.logging.LogFactory;
 import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.publish.PublishedPointRT;
-import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.vo.publish.persistent.PersistentPointVO;
 import br.org.scadabr.sync.Synchronizer;
 import br.org.scadabr.timer.cron.SystemRunnable;
 import br.org.scadabr.util.queue.ByteQueue;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
@@ -106,7 +106,7 @@ class SyncHandler implements SystemRunnable {
 
         LocalizableMessage lm = new LocalizableMessageImpl("event.pb.persistent.syncCompleted.details",
                 sendThread.publisher.getPointRTs().size(), requestsSent, recordsSynced, targetOvercountPoints.size(),
-                responseErrors, DateUtils.getDuration(System.currentTimeMillis() - start));
+                responseErrors, TimePeriods.getDuration(System.currentTimeMillis() - start));
         sendThread.publisher.raiseSyncCompletionEvent(lm);
     }
 

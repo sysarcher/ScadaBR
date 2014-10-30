@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr;
 
+import br.org.scadabr.utils.TimePeriods;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -264,7 +265,7 @@ public class EventHandlersDwr extends BaseDwr {
             int eventTypeRef1, int eventTypeRef2, int handlerId, String xid,
             String alias, boolean disabled,
             List<RecipientListEntryBean> activeRecipients,
-            boolean sendEscalation, int escalationDelayType,
+            boolean sendEscalation, TimePeriods escalationDelayType,
             int escalationDelay,
             List<RecipientListEntryBean> escalationRecipients,
             boolean sendInactive, boolean inactiveOverride,

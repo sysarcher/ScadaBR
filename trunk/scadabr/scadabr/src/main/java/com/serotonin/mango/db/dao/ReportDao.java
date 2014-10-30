@@ -337,7 +337,7 @@ public class ReportDao extends BaseDao {
                     ps.setInt(1, instance.getId());
                     ps.setString(2, point.getDeviceName());
                     ps.setString(3, name);
-                    ps.setInt(4, point.getDataType().ordinal());
+                    ps.setInt(4, point.getDataType().mangoDbId);
                     ps.setString(5, Objects.toString(finalStartValue));
                     ps.setBlob(6, SerializationHelper.writeObject(point.getTextRenderer()));
                     ps.setString(7, pointInfo.getColour());
@@ -507,7 +507,7 @@ public class ReportDao extends BaseDao {
                         rp.setReportPointId(rs.getInt(1));
                         rp.setDeviceName(rs.getString(2));
                         rp.setPointName(rs.getString(3));
-                        rp.setDataType(DataType.valueOf(rs.getInt(4)));
+                        rp.setDataType(DataType.fromMangoDbId(rs.getInt(4)));
                         String startValue = rs.getString(5);
                         if (startValue != null) {
                             rp.setStartValue(MangoValue.stringToValue(startValue, rp.getDataType()));

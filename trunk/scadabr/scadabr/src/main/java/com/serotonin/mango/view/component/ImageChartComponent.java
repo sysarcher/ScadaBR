@@ -29,6 +29,7 @@ import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImplDefinition;
@@ -57,7 +58,7 @@ public class ImageChartComponent extends CompoundComponent {
     private int width = 500;
     @JsonRemoteProperty
     private int height = 300;
-    private int durationType = Common.TimePeriods.DAYS;
+    private TimePeriods durationType = TimePeriods.DAYS;
     @JsonRemoteProperty
     private int durationPeriods = 1;
 
@@ -100,11 +101,11 @@ public class ImageChartComponent extends CompoundComponent {
         this.height = height;
     }
 
-    public int getDurationType() {
+    public TimePeriods getDurationType() {
         return durationType;
     }
 
-    public void setDurationType(int durationType) {
+    public void setDurationType(TimePeriods durationType) {
         this.durationType = durationType;
     }
 
@@ -133,7 +134,7 @@ public class ImageChartComponent extends CompoundComponent {
 
     @Override
     public String getImageChartData(ResourceBundle bundle) {
-        return generateImageChartData(bundle, Common.getMillis(durationType, durationPeriods), width, height, POINT_1,
+        return generateImageChartData(bundle, durationType.getMillis(durationPeriods), width, height, POINT_1,
                 POINT_2, POINT_3, POINT_4, POINT_5, POINT_6, POINT_7, POINT_8, POINT_9, POINT_10);
     }
 
@@ -149,7 +150,7 @@ public class ImageChartComponent extends CompoundComponent {
         out.writeInt(version);
         out.writeInt(width);
         out.writeInt(height);
-        out.writeInt(durationType);
+        out.writeInt(durationType.mangoDbId);
         out.writeInt(durationPeriods);
     }
 
@@ -160,7 +161,7 @@ public class ImageChartComponent extends CompoundComponent {
         if (ver == 1) {
             width = in.readInt();
             height = in.readInt();
-            durationType = in.readInt();
+            durationType = TimePeriods.fromMangoDbId(in.readInt());
             durationPeriods = in.readInt();
         }
     }
@@ -171,14 +172,14 @@ public class ImageChartComponent extends CompoundComponent {
 
         String text = json.getString("durationType");
         if (text == null) {
-            throw new LocalizableJsonException("emport.error.chart.missing", "durationType", Common.TIME_PERIOD_CODES
-                    .getCodeList());
+            throw new LocalizableJsonException("emport.error.chart.missing", "durationType", TimePeriods.values());
         }
 
-        durationType = Common.TIME_PERIOD_CODES.getId(text);
-        if (durationType == -1) {
+        try {
+        durationType = TimePeriods.valueOf(text);
+        } catch (Exception e) {
             throw new LocalizableJsonException("emport.error.chart.invalid", "durationType", text,
-                    Common.TIME_PERIOD_CODES.getCodeList());
+                    TimePeriods.values());
         }
     }
 
@@ -186,6 +187,6 @@ public class ImageChartComponent extends CompoundComponent {
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
 
-        map.put("durationType", Common.TIME_PERIOD_CODES.getCode(durationType));
+        map.put("durationType", durationType.name());
     }
 }

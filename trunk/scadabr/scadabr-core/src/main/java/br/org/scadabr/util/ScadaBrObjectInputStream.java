@@ -5,8 +5,6 @@
  */
 package br.org.scadabr.util;
 
-import br.org.scadabr.vo.datasource.vmstat.VMStatDataSourceVO;
-import br.org.scadabr.vo.datasource.vmstat.VMStatPointLocatorVO;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -27,11 +25,14 @@ class ScadaBrObjectInputStream extends ObjectInputStream {
         final ObjectStreamClass osc = super.readClassDescriptor();
         switch (osc.getName()) {
             case "com.serotonin.mango.vo.datasource.mbus.VMStatDataSourceVO":
-                return ObjectStreamClass.lookup(VMStatDataSourceVO.class);
+                return ObjectStreamClass.lookup(Class.forName("br.org.scadabr.vo.datasource.vmstat.VMStatDataSourceVO"));
             case "com.serotonin.mango.vo.datasource.mbus.VMStatPointLocatorVO":
-                return ObjectStreamClass.lookup(VMStatPointLocatorVO.class);
+                return ObjectStreamClass.lookup(Class.forName("br.org.scadabr.vo.datasource.vmstat.VMStatPointLocatorVO"));
             default:
-                return osc;
+                //This is a mean workaround for changed Object fields ...
+                // We changed some field types from int to I.E. from int to TimePeriods in DataPointVO, so we must discart the streamed ObjectInfo as well...
+                //TODO change the upgrade to do this once ... and then simply load the updated streams ...
+                return ObjectStreamClass.lookup(Class.forName(osc.getName()));
         }
     }
 }

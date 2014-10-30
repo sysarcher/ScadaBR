@@ -353,7 +353,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     public void addPropertyChanges(List<LocalizableMessage> list, ScheduledEventVO from) {
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.xid", from.xid, xid);
         AuditEventType.maybeAddPropertyChangeMessage(list, "scheduledEvents.alias", from.alias, alias);
-        AuditEventType.maybeAddAlarmLevelChangeMessage(list, "common.alarmLevel", from.alarmLevel, alarmLevel);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "common.alarmLevel", from.alarmLevel, alarmLevel);
         if (from.scheduleType != scheduleType) {
             AuditEventType.addPropertyChangeMessage(list, "scheduledEvents.type", from.getTypeMessage(),
                     getTypeMessage());

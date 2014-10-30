@@ -18,10 +18,10 @@
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
+import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import com.serotonin.mango.util.DateUtils;
 
 /**
  * @author Matthew Lohbihler
@@ -46,12 +46,12 @@ public class MultistatePointWrapper extends DistinctPointWrapper {
                 + "previous(periodType, count)}";
     }
 
-    public int ago(int periodType) {
+    public int ago(TimePeriods periodType) {
         return ago(periodType, 1);
     }
 
-    public int ago(int periodType, int count) {
-        long from = DateUtils.minus(context.getRuntime(), periodType, count);
+    public int ago(TimePeriods periodType, int count) {
+        long from = periodType.minus(context.getRuntime(), count);
         PointValueTime pvt = point.getPointValueBefore(from);
         if (pvt == null) {
             return 0;

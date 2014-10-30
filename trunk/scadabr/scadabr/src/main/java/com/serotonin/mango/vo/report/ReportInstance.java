@@ -18,11 +18,9 @@
  */
 package com.serotonin.mango.vo.report;
 
-
 import org.joda.time.DateTime;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.util.DateUtils;
 
 /**
  * @author Matthew Lohbihler
@@ -58,14 +56,14 @@ public class ReportInstance {
 
         if (template.getDateRangeType() == ReportVO.DATE_RANGE_TYPE_RELATIVE) {
             if (template.getRelativeDateType() == ReportVO.RELATIVE_DATE_TYPE_PREVIOUS) {
-                DateTime date = DateUtils.truncateDateTime(new DateTime(), template.getPreviousPeriodType());
+                DateTime date = template.getPreviousPeriodType().truncateDateTime(new DateTime());
                 reportEndTime = date.getMillis();
-                date = DateUtils.minus(date, template.getPreviousPeriodType(), template.getPreviousPeriodCount());
+                date = template.getPreviousPeriodType().minus(date, template.getPreviousPeriodCount());
                 reportStartTime = date.getMillis();
             } else {
                 DateTime date = new DateTime();
                 reportEndTime = date.getMillis();
-                date = DateUtils.minus(date, template.getPastPeriodType(), template.getPastPeriodCount());
+                date = template.getPastPeriodType().minus(date, template.getPastPeriodCount());
                 reportStartTime = date.getMillis();
             }
         } else {

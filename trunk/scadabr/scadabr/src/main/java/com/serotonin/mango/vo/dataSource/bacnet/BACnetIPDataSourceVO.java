@@ -40,6 +40,7 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.IpAddressUtils;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
@@ -96,7 +97,7 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
         return new BACnetIPPointLocatorVO();
     }
 
-    private int updatePeriodType = Common.TimePeriods.MINUTES;
+    private TimePeriods updatePeriodType = TimePeriods.MINUTES;
     @JsonRemoteProperty
     private int updatePeriods = 5;
     @JsonRemoteProperty
@@ -131,11 +132,11 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
         retries = localDevice.getRetries();
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 
@@ -231,10 +232,6 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
     public void validate(DwrResponseI18n response) {
         super.validate(response);
 
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextual("updatePeriodType", "validate.invalidValue");
-        }
-
         if (updatePeriods <= 0) {
             response.addContextual("updatePeriods", "validate.cannotBeNegative");
         }
@@ -286,7 +283,7 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
 
     @Override
     public void addPropertiesImpl(List<LocalizableMessage> list) {
-        AuditEventType.addPeriodMessage(list, "dsEdit.updatePeriod", updatePeriodType, updatePeriods);
+        AuditEventType.addPropertyMessage(list, "dsEdit.updatePeriod", updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.addPropertyMessage(list, "dsEdit.bacnetIp.deviceId", deviceId);
         AuditEventType.addPropertyMessage(list, "dsEdit.bacnetIp.broadcastAddress", broadcastAddress);
         AuditEventType.addPropertyMessage(list, "dsEdit.bacnetIp.port", port);
@@ -302,8 +299,9 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
 
     @Override
     public void addPropertyChangesImpl(List<LocalizableMessage> list, BACnetIPDataSourceVO from) {
-        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", from.updatePeriodType,
-                from.updatePeriods, updatePeriodType, updatePeriods);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.updatePeriod",
+                from.updatePeriodType.getPeriodDescription(from.updatePeriods),
+                updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.bacnetIp.deviceId", from.deviceId, deviceId);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.bacnetIp.broadcastAddress", from.broadcastAddress,
                 broadcastAddress);
@@ -331,7 +329,7 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(updatePeriods);
         out.writeInt(deviceId);
         SerializationHelper.writeSafeUTF(out, broadcastAddress);
@@ -350,7 +348,7 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             deviceId = in.readInt();
             broadcastAddress = SerializationHelper.readSafeUTF(in);
@@ -363,7 +361,7 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
             maxReadMultipleReferencesSegmented = 200;
             maxReadMultipleReferencesNonsegmented = 20;
         } else if (ver == 2) {
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             deviceId = in.readInt();
             broadcastAddress = SerializationHelper.readSafeUTF(in);
@@ -381,7 +379,7 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }

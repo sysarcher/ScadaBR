@@ -55,7 +55,6 @@ import com.serotonin.mango.rt.event.maintenance.MaintenanceEventRT;
 import com.serotonin.mango.rt.event.schedule.ScheduledEventRT;
 import com.serotonin.mango.rt.link.PointLinkRT;
 import com.serotonin.mango.rt.publish.PublisherRT;
-import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
@@ -66,6 +65,7 @@ import com.serotonin.mango.vo.link.PointLinkVO;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.util.LifecycleException;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import javax.inject.Inject;
@@ -621,10 +621,9 @@ public class RuntimeManager {
         return count;
     }
 
-    public long purgeDataPointValues(int dataPointId, int periodType,
+    public long purgeDataPointValues(int dataPointId, TimePeriods periodType,
             int periodCount) {
-        long before = DateUtils.minus(System.currentTimeMillis(), periodType,
-                periodCount);
+        long before = periodType.minus(System.currentTimeMillis(), periodCount);
         return purgeDataPointValues(dataPointId, before);
     }
 

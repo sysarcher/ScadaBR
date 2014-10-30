@@ -34,6 +34,7 @@ import javax.script.ScriptException;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.io.StreamUtils;
+import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -94,13 +95,13 @@ public class ScriptExecutor {
         WrapperContext wrapperContext = new WrapperContext(runtime);
 
         // Add constants to the context.
-        engine.put("SECOND", Common.TimePeriods.SECONDS);
-        engine.put("MINUTE", Common.TimePeriods.MINUTES);
-        engine.put("HOUR", Common.TimePeriods.HOURS);
-        engine.put("DAY", Common.TimePeriods.DAYS);
-        engine.put("WEEK", Common.TimePeriods.WEEKS);
-        engine.put("MONTH", Common.TimePeriods.MONTHS);
-        engine.put("YEAR", Common.TimePeriods.YEARS);
+        engine.put("SECOND", TimePeriods.SECONDS.mangoDbId);
+        engine.put("MINUTE", TimePeriods.MINUTES.mangoDbId);
+        engine.put("HOUR", TimePeriods.HOURS.mangoDbId);
+        engine.put("DAY", TimePeriods.DAYS.mangoDbId);
+        engine.put("WEEK", TimePeriods.WEEKS.mangoDbId);
+        engine.put("MONTH", TimePeriods.MONTHS.mangoDbId);
+        engine.put("YEAR", TimePeriods.YEARS.mangoDbId);
         engine.put("CONTEXT", wrapperContext);
 
         // Put the context variables into the engine with engine scope.
