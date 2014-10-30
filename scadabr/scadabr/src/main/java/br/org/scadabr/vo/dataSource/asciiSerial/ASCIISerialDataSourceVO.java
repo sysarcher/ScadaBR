@@ -20,6 +20,7 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
@@ -84,7 +85,7 @@ public class ASCIISerialDataSourceVO extends DataSourceVO<ASCIISerialDataSourceV
         return TYPE;
     }
 
-    private int updatePeriodType = Common.TimePeriods.SECONDS;
+    private TimePeriods updatePeriodType = TimePeriods.SECONDS;
     @JsonRemoteProperty
     private int updatePeriods = 1;
     @JsonRemoteProperty
@@ -125,11 +126,11 @@ public class ASCIISerialDataSourceVO extends DataSourceVO<ASCIISerialDataSourceV
         super.validate(response);
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 
@@ -271,8 +272,8 @@ public class ASCIISerialDataSourceVO extends DataSourceVO<ASCIISerialDataSourceV
 
     @Override
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
-        AuditEventType.addPeriodMessage(list, "dsEdit.dnp3.rbePeriod",
-                updatePeriodType, updatePeriods);
+        AuditEventType.addPropertyMessage(list, "dsEdit.dnp3.rbePeriod",
+                updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.addPropertyMessage(list,
                 "dsEdit.asciiSerial.commPortId", commPortId);
         AuditEventType.addPropertyMessage(list, "dsEdit.asciiSerial.baudRate",
@@ -315,9 +316,10 @@ public class ASCIISerialDataSourceVO extends DataSourceVO<ASCIISerialDataSourceV
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, ASCIISerialDataSourceVO from) {
         final ASCIISerialDataSourceVO fromVO = (ASCIISerialDataSourceVO) from;
-        AuditEventType.maybeAddPeriodChangeMessage(list,
-                "dsEdit.dnp3.rbePeriod", fromVO.updatePeriodType,
-                fromVO.updatePeriods, updatePeriodType, updatePeriods);
+        AuditEventType.maybeAddPropertyChangeMessage(list,
+                "dsEdit.dnp3.rbePeriod", 
+                fromVO.updatePeriodType.getPeriodDescription(fromVO.updatePeriods), 
+                updatePeriodType.getPeriodDescription(updatePeriods));
 
         AuditEventType.maybeAddPropertyChangeMessage(list,
                 "dsEdit.asciiSerial.commPortId", fromVO.commPortId, commPortId);
@@ -363,7 +365,7 @@ public class ASCIISerialDataSourceVO extends DataSourceVO<ASCIISerialDataSourceV
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(updatePeriods);
         SerializationHelper.writeSafeUTF(out, commPortId);
         out.writeInt(baudRate);
@@ -387,7 +389,7 @@ public class ASCIISerialDataSourceVO extends DataSourceVO<ASCIISerialDataSourceV
             ClassNotFoundException {
         int ver = in.readInt();
         if (ver == 1) {
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             commPortId = SerializationHelper.readSafeUTF(in);
             baudRate = in.readInt();
@@ -411,7 +413,7 @@ public class ASCIISerialDataSourceVO extends DataSourceVO<ASCIISerialDataSourceV
     public void jsonDeserialize(JsonReader reader, JsonObject json)
             throws JsonException {
         super.jsonDeserialize(reader, json);
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }

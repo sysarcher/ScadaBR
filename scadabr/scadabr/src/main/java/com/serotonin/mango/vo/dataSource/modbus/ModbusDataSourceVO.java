@@ -28,6 +28,7 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.modbus.ModbusDataSource;
@@ -73,7 +74,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extend
         return new ModbusPointLocatorVO();
     }
 
-    private int updatePeriodType = Common.TimePeriods.MINUTES;
+    private TimePeriods updatePeriodType = TimePeriods.MINUTES;
     @JsonRemoteProperty
     private int updatePeriods = 5;
     @JsonRemoteProperty
@@ -101,11 +102,11 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extend
         this.updatePeriods = updatePeriods;
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 
@@ -176,9 +177,6 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extend
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextual("updatePeriodType", "validate.invalidValue");
-        }
         if (updatePeriods <= 0) {
             response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
@@ -201,7 +199,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extend
 
     @Override
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
-        AuditEventType.addPeriodMessage(list, "dsEdit.updatePeriod", updatePeriodType, updatePeriods);
+        AuditEventType.addPropertyMessage(list, "dsEdit.updatePeriod", updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.addPropertyMessage(list, "dsEdit.quantize", quantize);
         AuditEventType.addPropertyMessage(list, "dsEdit.modbus.timeout", timeout);
         AuditEventType.addPropertyMessage(list, "dsEdit.modbus.retries", retries);
@@ -215,8 +213,9 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extend
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, T from) {
         final ModbusDataSourceVO fromVO = (ModbusDataSourceVO) from;
-        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", fromVO.updatePeriodType,
-                fromVO.updatePeriods, updatePeriodType, updatePeriods);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.updatePeriod", 
+                fromVO.updatePeriodType.getPeriodDescription(fromVO.updatePeriods), 
+                updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.quantize", fromVO.quantize, quantize);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbus.timeout", fromVO.timeout, timeout);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.modbus.retries", fromVO.retries, retries);
@@ -242,7 +241,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extend
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(updatePeriods);
         out.writeBoolean(quantize);
         out.writeInt(timeout);
@@ -259,7 +258,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extend
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            updatePeriodType = Common.TimePeriods.SECONDS;
+            updatePeriodType = TimePeriods.SECONDS;
             updatePeriods = in.readInt();
             timeout = 500;
             retries = 2;
@@ -269,7 +268,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extend
             maxReadRegisterCount = Modbus.DEFAULT_MAX_READ_REGISTER_COUNT;
             maxWriteRegisterCount = Modbus.DEFAULT_MAX_WRITE_REGISTER_COUNT;
         } else if (ver == 2) {
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             timeout = 500;
             retries = 2;
@@ -279,7 +278,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extend
             maxReadRegisterCount = Modbus.DEFAULT_MAX_READ_REGISTER_COUNT;
             maxWriteRegisterCount = Modbus.DEFAULT_MAX_WRITE_REGISTER_COUNT;
         } else if (ver == 3) {
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             timeout = in.readInt();
             retries = in.readInt();
@@ -289,7 +288,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extend
             maxReadRegisterCount = Modbus.DEFAULT_MAX_READ_REGISTER_COUNT;
             maxWriteRegisterCount = Modbus.DEFAULT_MAX_WRITE_REGISTER_COUNT;
         } else if (ver == 4) {
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             timeout = in.readInt();
             retries = in.readInt();
@@ -299,7 +298,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extend
             maxReadRegisterCount = Modbus.DEFAULT_MAX_READ_REGISTER_COUNT;
             maxWriteRegisterCount = Modbus.DEFAULT_MAX_WRITE_REGISTER_COUNT;
         } else if (ver == 5) {
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             timeout = in.readInt();
             retries = in.readInt();
@@ -309,7 +308,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extend
             maxReadRegisterCount = Modbus.DEFAULT_MAX_READ_REGISTER_COUNT;
             maxWriteRegisterCount = Modbus.DEFAULT_MAX_WRITE_REGISTER_COUNT;
         } else if (ver == 6) {
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             quantize = in.readBoolean();
             timeout = in.readInt();
@@ -320,7 +319,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extend
             maxReadRegisterCount = Modbus.DEFAULT_MAX_READ_REGISTER_COUNT;
             maxWriteRegisterCount = Modbus.DEFAULT_MAX_WRITE_REGISTER_COUNT;
         } else if (ver == 7) {
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             quantize = in.readBoolean();
             timeout = in.readInt();
@@ -336,7 +335,7 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extend
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }

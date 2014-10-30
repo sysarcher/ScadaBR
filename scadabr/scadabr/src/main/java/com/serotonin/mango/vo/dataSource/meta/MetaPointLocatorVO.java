@@ -39,7 +39,6 @@ import br.org.scadabr.json.JsonValue;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.Common.TimePeriods;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.meta.MetaPointLocatorRT;
@@ -49,9 +48,11 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.datasource.meta.UpdateEvent;
 import java.text.ParseException;
 import java.util.EnumSet;
 
@@ -61,29 +62,13 @@ import java.util.EnumSet;
 @JsonRemoteEntity
 public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
-    public static final int UPDATE_EVENT_CONTEXT_UPDATE = 0;
-    public static final int UPDATE_EVENT_CRON = 100;
-
-    public final static ExportCodes UPDATE_EVENT_CODES = new ExportCodes();
-
-    static {
-        UPDATE_EVENT_CODES.addElement(UPDATE_EVENT_CONTEXT_UPDATE, "CONTEXT_UPDATE", "dsEdit.meta.event.context");
-        UPDATE_EVENT_CODES.addElement(TimePeriods.MINUTES, "MINUTES", "dsEdit.meta.event.minute");
-        UPDATE_EVENT_CODES.addElement(TimePeriods.HOURS, "HOURS", "dsEdit.meta.event.hour");
-        UPDATE_EVENT_CODES.addElement(TimePeriods.DAYS, "DAYS", "dsEdit.meta.event.day");
-        UPDATE_EVENT_CODES.addElement(TimePeriods.WEEKS, "WEEKS", "dsEdit.meta.event.week");
-        UPDATE_EVENT_CODES.addElement(TimePeriods.MONTHS, "MONTHS", "dsEdit.meta.event.month");
-        UPDATE_EVENT_CODES.addElement(TimePeriods.YEARS, "YEARS", "dsEdit.meta.event.year");
-        UPDATE_EVENT_CODES.addElement(UPDATE_EVENT_CRON, "CRON", "dsEdit.meta.event.cron");
-    }
-
     private List<IntValuePair> context = new ArrayList<>();
     @JsonRemoteProperty
     private String script;
     private DataType dataType;
     @JsonRemoteProperty
     private boolean settable;
-    private int updateEvent = UPDATE_EVENT_CONTEXT_UPDATE;
+    private UpdateEvent updateEvent = UpdateEvent.CONTEXT_UPDATE;
     @JsonRemoteProperty
     private String updateCronPattern;
     @JsonRemoteProperty
@@ -145,11 +130,11 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         this.settable = settable;
     }
 
-    public int getUpdateEvent() {
+    public UpdateEvent getUpdateEvent() {
         return updateEvent;
     }
 
-    public void setUpdateEvent(int updateEvent) {
+    public void setUpdateEvent(UpdateEvent updateEvent) {
         this.updateEvent = updateEvent;
     }
 
@@ -188,14 +173,12 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             varNameSpace.add(varName);
         }
 
-        if (updateEvent == UPDATE_EVENT_CRON) {
+        if (updateEvent == UpdateEvent.CRON) {
             try {
                 new CronParser().parse(updateCronPattern, CronExpression.TIMEZONE_UTC);
             } catch (ParseException e) {
                 response.addContextual("updateCronPattern", "validate.invalidCron", updateCronPattern);
             }
-        } else if (updateEvent != UPDATE_EVENT_CONTEXT_UPDATE && !Common.TIME_PERIOD_CODES.isValidId(updateEvent)) {
-            response.addContextual("updateEvent", "validate.invalidValue");
         }
 
         if (executionDelaySeconds < 0) {
@@ -219,12 +202,12 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
+        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.settable", settable);
         AuditEventType.addPropertyMessage(list, "dsEdit.meta.scriptContext", contextToString());
         AuditEventType.addPropertyMessage(list, "dsEdit.meta.script", script);
-        AuditEventType.addExportCodeMessage(list, "dsEdit.meta.event", UPDATE_EVENT_CODES, updateEvent);
-        if (updateEvent == UPDATE_EVENT_CRON) {
+        AuditEventType.addPropertyMessage(list, "dsEdit.meta.event", updateEvent);
+        if (updateEvent == updateEvent.CRON) {
             AuditEventType.addPropertyMessage(list, "dsEdit.meta.event.cron", updateCronPattern);
         }
         AuditEventType.addPropertyMessage(list, "dsEdit.meta.delay", executionDelaySeconds);
@@ -233,17 +216,15 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         MetaPointLocatorVO from = (MetaPointLocatorVO) o;
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.settable", from.settable, settable);
         if (!context.equals(context)) {
             AuditEventType.addPropertyChangeMessage(list, "dsEdit.meta.scriptContext", from.contextToString(),
                     contextToString());
         }
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.meta.script", from.script, script);
-        AuditEventType.maybeAddExportCodeChangeMessage(list, "dsEdit.meta.event", UPDATE_EVENT_CODES, from.updateEvent,
-                updateEvent);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.meta.event.cron", from.updateCronPattern,
-                updateCronPattern);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.meta.event", from.updateEvent, updateEvent);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.meta.event.cron", from.updateCronPattern, updateCronPattern);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.meta.delay", from.executionDelaySeconds,
                 executionDelaySeconds);
     }
@@ -281,9 +262,9 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         out.writeInt(version);
         out.writeObject(context);
         SerializationHelper.writeSafeUTF(out, script);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
         out.writeBoolean(settable);
-        out.writeInt(updateEvent);
+        out.writeInt(updateEvent.mangoDbId);
         SerializationHelper.writeSafeUTF(out, updateCronPattern);
         out.writeInt(executionDelaySeconds);
     }
@@ -301,33 +282,33 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             }
 
             script = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             settable = false;
-            updateEvent = in.readInt();
+            updateEvent = UpdateEvent.fromMangoDbId(in.readInt());
             updateCronPattern = "";
             executionDelaySeconds = in.readInt();
         } else if (ver == 2) {
             context = (List<IntValuePair>) in.readObject();
             script = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             settable = false;
-            updateEvent = in.readInt();
+            updateEvent = UpdateEvent.fromMangoDbId(in.readInt());
             updateCronPattern = "";
             executionDelaySeconds = in.readInt();
         } else if (ver == 3) {
             context = (List<IntValuePair>) in.readObject();
             script = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             settable = false;
-            updateEvent = in.readInt();
+            updateEvent = UpdateEvent.fromMangoDbId(in.readInt());
             updateCronPattern = SerializationHelper.readSafeUTF(in);
             executionDelaySeconds = in.readInt();
         } else if (ver == 4) {
             context = (List<IntValuePair>) in.readObject();
             script = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             settable = in.readBoolean();
-            updateEvent = in.readInt();
+            updateEvent = UpdateEvent.fromMangoDbId(in.readInt());
             updateCronPattern = SerializationHelper.readSafeUTF(in);
             executionDelaySeconds = in.readInt();
         }
@@ -342,10 +323,11 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
         String text = json.getString("updateEvent");
         if (text != null) {
-            updateEvent = UPDATE_EVENT_CODES.getId(text);
-            if (updateEvent == -1) {
+            try {
+            updateEvent = UpdateEvent.valueOf(text);
+            } catch (Exception e) {
                 throw new LocalizableJsonException("emport.error.invalid", "updateEvent", text,
-                        UPDATE_EVENT_CODES.getCodeList());
+                        UpdateEvent.values());
             }
         }
 
@@ -380,7 +362,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     public void jsonSerialize(Map<String, Object> map) {
         serializeDataType(map);
 
-        map.put("updateEvent", UPDATE_EVENT_CODES.getCode(updateEvent));
+        map.put("updateEvent", updateEvent.name());
 
         DataPointDao dataPointDao = DataPointDao.getInstance();
         List<Map<String, Object>> pointList = new ArrayList<>();

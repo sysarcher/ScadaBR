@@ -100,7 +100,7 @@ public class ScheduledEventDao extends BaseDao {
             se.setId(rs.getInt(++i));
             se.setXid(rs.getString(++i));
             se.setAlias(rs.getString(++i));
-            se.setAlarmLevel(AlarmLevel.valueOf(rs.getInt(++i)));
+            se.setAlarmLevel(AlarmLevel.fromMangoDbId(rs.getInt(++i)));
             se.setScheduleType(rs.getInt(++i));
             se.setReturnToNormal(charToBool(rs.getString(++i)));
             se.setDisabled(charToBool(rs.getString(++i)));
@@ -143,7 +143,7 @@ public class ScheduledEventDao extends BaseDao {
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, se.getXid());
-                ps.setInt(2, se.getAlarmLevel().ordinal());
+                ps.setInt(2, se.getAlarmLevel().mangoDbId);
                 ps.setString(3, se.getAlias());
                 ps.setInt(4, se.getScheduleType());
                 ps.setString(5, boolToChar(se.isReturnToNormal()));

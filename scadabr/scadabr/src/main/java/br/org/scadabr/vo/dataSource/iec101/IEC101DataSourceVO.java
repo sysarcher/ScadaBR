@@ -12,6 +12,7 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.util.ExportCodes;
@@ -58,7 +59,7 @@ abstract public class IEC101DataSourceVO<T extends IEC101DataSourceVO<T>> extend
     @JsonRemoteProperty
     private int transmissionProcedure = 1; // 0 - balanced / 1 - unbalanced
 
-    private int updatePeriodType = Common.TimePeriods.MINUTES;
+    private TimePeriods updatePeriodType = TimePeriods.MINUTES;
     @JsonRemoteProperty
     private int updatePeriods = 5;
     @JsonRemoteProperty
@@ -91,9 +92,6 @@ abstract public class IEC101DataSourceVO<T extends IEC101DataSourceVO<T>> extend
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextual("updatePeriodType", "validate.invalidValue");
-        }
         if (updatePeriods <= 0) {
             response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
@@ -142,7 +140,7 @@ abstract public class IEC101DataSourceVO<T extends IEC101DataSourceVO<T>> extend
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
         out.writeInt(transmissionProcedure);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(updatePeriods);
         out.writeInt(giRelativePeriod);
         out.writeInt(clockSynchRelativePeriod);
@@ -164,7 +162,7 @@ abstract public class IEC101DataSourceVO<T extends IEC101DataSourceVO<T>> extend
         // elegantly handled.
         if (ver == 1) {
             transmissionProcedure = in.readInt();
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             giRelativePeriod = in.readInt();
             clockSynchRelativePeriod = in.readInt();
@@ -184,7 +182,7 @@ abstract public class IEC101DataSourceVO<T extends IEC101DataSourceVO<T>> extend
     public void jsonDeserialize(JsonReader reader, JsonObject json)
             throws JsonException {
         super.jsonDeserialize(reader, json);
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }
@@ -204,11 +202,11 @@ abstract public class IEC101DataSourceVO<T extends IEC101DataSourceVO<T>> extend
         this.transmissionProcedure = transmissionProcedure;
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 

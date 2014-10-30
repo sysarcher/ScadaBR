@@ -30,6 +30,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.ParameterizableViewController;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
@@ -149,7 +150,7 @@ public class DataPointDetailsController {
             // Determine our image chart rendering capabilities.
             if (ChartType.IMAGE.supports(point.getDataType())) {
                 // This point can render an image chart. Carry on...
-                int periodType = Common.TimePeriods.DAYS;
+                TimePeriods periodType = TimePeriods.DAYS;
                 int periodCount = 1;
                 if (point.getChartRenderer() instanceof ImageChartRenderer) {
                     ImageChartRenderer r = (ImageChartRenderer) point.getChartRenderer();

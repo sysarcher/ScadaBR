@@ -22,6 +22,7 @@ import br.org.scadabr.DataType;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.datasource.fhz4j.EmPointLocator;
 import br.org.scadabr.vo.datasource.fhz4j.FS20PointLocator;
 import br.org.scadabr.vo.datasource.fhz4j.FhtMultiMsgPointLocator;
@@ -439,7 +440,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         switch (dp.getDataType()) {
             case NUMERIC:
                 dp.setTextRenderer(new AnalogRenderer("#,##0.0", fhtMessage.getCommand().getUnitOfMeasurement()));
-                dp.setChartRenderer(new ImageChartRenderer(Common.TimePeriods.DAYS, 1));
+                dp.setChartRenderer(new ImageChartRenderer(TimePeriods.DAYS, 1));
                 break;
             case MULTISTATE:
                 MultistateRenderer mr = new MultistateRenderer();
@@ -457,7 +458,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
                     default:
                 }
                 dp.setTextRenderer(mr);
-                dp.setChartRenderer(new ImageChartRenderer(Common.TimePeriods.DAYS, 1));
+                dp.setChartRenderer(new ImageChartRenderer(TimePeriods.DAYS, 1));
                 break;
             default:
         }
@@ -499,7 +500,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
             mr.addMultistateValue(FS20CommandValues.ON.getValue(), FS20CommandValues.ON.getLabel(), Color.GREEN);
 
             dp.setTextRenderer(mr);
-            dp.setChartRenderer(new ImageChartRenderer(Common.TimePeriods.DAYS, 1));
+            dp.setChartRenderer(new ImageChartRenderer(TimePeriods.DAYS, 1));
         }
 
         DataPointRT dataPointRT = Common.ctx.getRuntimeManager().saveDataPoint(dp);
@@ -532,7 +533,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         dp.setPointLocator(fhzLocator);
         if (dp.getPointLocator().getDataType() == DataType.NUMERIC) {
             dp.setTextRenderer(new AnalogRenderer("#,##0.0", prop.getUnitOfMeasurement()));
-            dp.setChartRenderer(new ImageChartRenderer(Common.TimePeriods.DAYS, 1));
+            dp.setChartRenderer(new ImageChartRenderer(TimePeriods.DAYS, 1));
         }
 
         DataPointRT dataPointRT = Common.ctx.getRuntimeManager().saveDataPoint(dp);
@@ -742,7 +743,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         switch (dp.getDataType()) {
             case NUMERIC:
                 dp.setTextRenderer(new AnalogRenderer("#,##0.0", prop.getUnitOfMeasurement()));
-                dp.setChartRenderer(new ImageChartRenderer(Common.TimePeriods.DAYS, 1));
+                dp.setChartRenderer(new ImageChartRenderer(TimePeriods.DAYS, 1));
                 break;
             case BINARY:
                 dp.setTextRenderer(new BinaryTextRenderer("0", null, "1", null));
@@ -858,7 +859,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         dp.setPointLocator(fhzLocator);
         if (dp.getDataType() == DataType.NUMERIC) {
             dp.setTextRenderer(new AnalogRenderer("#,##0.0", fhtMultiMsgMessage.getProperty().getUnitOfMeasurement()));
-            dp.setChartRenderer(new ImageChartRenderer(Common.TimePeriods.DAYS, 1));
+            dp.setChartRenderer(new ImageChartRenderer(TimePeriods.DAYS, 1));
         }
 
         DataPointRT dataPointRT = Common.ctx.getRuntimeManager().saveDataPoint(dp);

@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import br.org.scadabr.vo.dataSource.alpha2.Alpha2DataSourceVO;
 import br.org.scadabr.vo.dataSource.asciiFile.ASCIIFileDataSourceVO;
@@ -79,7 +78,7 @@ import br.org.scadabr.vo.datasource.vmstat.VMStatDataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.vo.datasource.fhz4j.Fhz4JDataSourceVO;
 import br.org.scadabr.vo.datasource.mbus.MBusDataSourceVO;
@@ -532,7 +531,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         out.writeBoolean(enabled);
         final Map<Integer, Integer> _alarmLevels = new HashMap<>();
         for (Map.Entry<Integer, AlarmLevel> e : alarmLevels.entrySet()) {
-            _alarmLevels.put(e.getKey(), e.getValue().ordinal());
+            _alarmLevels.put(e.getKey(), e.getValue().mangoDbId);
         }
         out.writeObject(alarmLevels);
     }
@@ -552,7 +551,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
             final Map<Integer, Integer> _alarmLevels = (HashMap<Integer, Integer>) in.readObject();
             alarmLevels = new HashMap<>();
             for (Map.Entry<Integer, Integer> e : _alarmLevels.entrySet()) {
-                alarmLevels.put(e.getKey(), AlarmLevel.valueOf(e.getValue()));
+                alarmLevels.put(e.getKey(), AlarmLevel.fromMangoDbId(e.getValue()));
             }
 
         }
@@ -610,23 +609,23 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
     }
 
     protected void serializeUpdatePeriodType(Map<String, Object> map,
-            int updatePeriodType) {
-        map.put("updatePeriodType",
-                Common.TIME_PERIOD_CODES.getCode(updatePeriodType));
+            TimePeriods updatePeriodType) {
+        map.put("updatePeriodType", updatePeriodType.name());
     }
 
-    protected Integer deserializeUpdatePeriodType(JsonObject json)
+    protected TimePeriods deserializeUpdatePeriodType(JsonObject json)
             throws JsonException {
         String text = json.getString("updatePeriodType");
         if (text == null) {
             return null;
         }
-
-        int value = Common.TIME_PERIOD_CODES.getId(text);
-        if (value == -1) {
+        TimePeriods value;
+        try {
+            value = TimePeriods.valueOf(text);
+        } catch (Exception e) {
             throw new LocalizableJsonException("emport.error.invalid",
                     "updatePeriodType", text,
-                    Common.TIME_PERIOD_CODES.getCodeList());
+                    TimePeriods.values());
         }
 
         return value;

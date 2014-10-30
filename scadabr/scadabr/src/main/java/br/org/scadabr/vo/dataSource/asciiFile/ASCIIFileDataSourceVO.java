@@ -21,6 +21,7 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
@@ -89,7 +90,7 @@ public class ASCIIFileDataSourceVO extends DataSourceVO<ASCIIFileDataSourceVO> {
         return TYPE;
     }
 
-    private int updatePeriodType = Common.TimePeriods.SECONDS;
+    private TimePeriods updatePeriodType = TimePeriods.SECONDS;
     @JsonRemoteProperty
     private int updatePeriods = 1;
     @JsonRemoteProperty
@@ -105,11 +106,11 @@ public class ASCIIFileDataSourceVO extends DataSourceVO<ASCIIFileDataSourceVO> {
         }
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 
@@ -143,7 +144,7 @@ public class ASCIIFileDataSourceVO extends DataSourceVO<ASCIIFileDataSourceVO> {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, filePath);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(updatePeriods);
         out.writeBoolean(quantize);
 
@@ -154,7 +155,7 @@ public class ASCIIFileDataSourceVO extends DataSourceVO<ASCIIFileDataSourceVO> {
         int ver = in.readInt();
         if (ver == 1) {
             filePath = SerializationHelper.readSafeUTF(in);
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             quantize = in.readBoolean();
         }
@@ -164,7 +165,7 @@ public class ASCIIFileDataSourceVO extends DataSourceVO<ASCIIFileDataSourceVO> {
     public void jsonDeserialize(JsonReader reader, JsonObject json)
             throws JsonException {
         super.jsonDeserialize(reader, json);
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }

@@ -45,6 +45,7 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
@@ -63,7 +64,7 @@ public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
     }
     @JsonRemoteProperty
     private String commPortId;
-    private int updatePeriodType = Common.TimePeriods.MINUTES;
+    private TimePeriods updatePeriodType = TimePeriods.MINUTES;
     @JsonRemoteProperty
     private int updatePeriods = 1;
     @JsonRemoteProperty
@@ -109,14 +110,15 @@ public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
     @Override
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.openv4j.port", commPortId);
-        AuditEventType.addPeriodMessage(list, "dsEdit.updatePeriod", updatePeriodType, updatePeriods);
+        AuditEventType.addPropertyMessage(list, "dsEdit.updatePeriod", updatePeriodType.getPeriodDescription(updatePeriods));
     }
 
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, OpenV4JDataSourceVO from) {
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.openv4j.port", from.commPortId, commPortId);
-        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", from.updatePeriodType,
-                from.updatePeriods, updatePeriodType, updatePeriods);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.updatePeriod", 
+                from.updatePeriodType.getPeriodDescription(from.updatePeriods), 
+                updatePeriodType.getPeriodDescription(updatePeriods));
     }
 
     public String getCommPortId() {
@@ -127,11 +129,11 @@ public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
         this.commPortId = commPortId;
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 
@@ -150,9 +152,6 @@ public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
         if (commPortId.isEmpty()) {
             response.addContextual("commPortId", "validate.required");
         }
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextual("updatePeriodType", "validate.invalidValue");
-        }
         if (updatePeriods <= 0) {
             response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
@@ -169,7 +168,7 @@ public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
     // Serialization for saveDataSource
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(SERIAL_VERSION);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(updatePeriods);
         SerializationHelper.writeSafeUTF(out, commPortId);
         SerializationHelper.writeSafeUTF(out, device.name());
@@ -182,14 +181,14 @@ public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
         // Switch on the version of the class so that version changes can be elegantly handled.
         switch (ver) {
             case 1:
-                updatePeriodType = in.readInt();
+                updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
                 updatePeriods = in.readInt();
                 commPortId = SerializationHelper.readSafeUTF(in);
                 device = Devices.valueOf(SerializationHelper.readSafeUTF(in));
                 protocol = Protocol.valueOf(SerializationHelper.readSafeUTF(in));
                 break;
             case 2:
-                updatePeriodType = in.readInt();
+                updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
                 updatePeriods = in.readInt();
                 commPortId = SerializationHelper.readSafeUTF(in);
                 device = Devices.valueOf(SerializationHelper.readSafeUTF(in));
@@ -203,7 +202,7 @@ public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
         LOG.info("WRITE TO JSON");
         super.jsonDeserialize(reader, json);
         LOG.info("SUPER TO JSON");
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }

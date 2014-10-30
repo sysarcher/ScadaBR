@@ -63,7 +63,7 @@ public class PersistentPointLocatorVO extends AbstractPointLocatorVO {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
@@ -71,7 +71,7 @@ public class PersistentPointLocatorVO extends AbstractPointLocatorVO {
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
         }
     }
 

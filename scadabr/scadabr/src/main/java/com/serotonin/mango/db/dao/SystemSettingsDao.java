@@ -29,6 +29,7 @@ import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import br.org.scadabr.util.ColorUtils;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -161,6 +162,14 @@ public class SystemSettingsDao extends BaseDao {
         return getIntValue(key, defaultValue);
     }
 
+    public static TimePeriods getTimePeriodsValue(String key) {
+        TimePeriods defaultValue = (TimePeriods) DEFAULT_VALUES.get(key);
+        if (defaultValue == null) {
+            throw  new ShouldNeverHappenException("No default for: " + key);
+        }
+        return TimePeriods.fromMangoDbId(getIntValue(key, defaultValue.mangoDbId));
+    }
+
     public static int getIntValue(String key, int defaultValue) {
         String value = getValue(key, null);
         if (value == null) {
@@ -230,9 +239,7 @@ public class SystemSettingsDao extends BaseDao {
 
     public static long getFutureDateLimit() {
         if (FUTURE_DATE_LIMIT == -1) {
-            FUTURE_DATE_LIMIT = Common.getMillis(
-                    getIntValue(FUTURE_DATE_LIMIT_PERIOD_TYPE),
-                    getIntValue(FUTURE_DATE_LIMIT_PERIODS));
+            FUTURE_DATE_LIMIT = getTimePeriodsValue(FUTURE_DATE_LIMIT_PERIOD_TYPE).getMillis(getIntValue(FUTURE_DATE_LIMIT_PERIODS));
         }
         return FUTURE_DATE_LIMIT;
     }
@@ -257,7 +264,7 @@ public class SystemSettingsDao extends BaseDao {
      */
     private static long FUTURE_DATE_LIMIT = -1;
 
-    public static final Map<String, Object> DEFAULT_VALUES = new HashMap<String, Object>();
+    public static final Map<String, Object> DEFAULT_VALUES = new HashMap<>();
 
     static {
         DEFAULT_VALUES.put(DATABASE_SCHEMA_VERSION, "0.7.0");
@@ -274,10 +281,10 @@ public class SystemSettingsDao extends BaseDao {
         DEFAULT_VALUES.put(EMAIL_SMTP_PASSWORD, "");
         DEFAULT_VALUES.put(EMAIL_FROM_NAME, "ScadaBR");
 
-        DEFAULT_VALUES.put(EVENT_PURGE_PERIOD_TYPE, Common.TimePeriods.YEARS);
+        DEFAULT_VALUES.put(EVENT_PURGE_PERIOD_TYPE, TimePeriods.YEARS);
         DEFAULT_VALUES.put(EVENT_PURGE_PERIODS, 1);
 
-        DEFAULT_VALUES.put(REPORT_PURGE_PERIOD_TYPE, Common.TimePeriods.MONTHS);
+        DEFAULT_VALUES.put(REPORT_PURGE_PERIOD_TYPE, TimePeriods.MONTHS);
         DEFAULT_VALUES.put(REPORT_PURGE_PERIODS, 1);
 
         DEFAULT_VALUES.put(NEW_VERSION_NOTIFICATION_LEVEL,
@@ -292,7 +299,7 @@ public class SystemSettingsDao extends BaseDao {
         DEFAULT_VALUES.put(GROVE_LOGGING, false);
         DEFAULT_VALUES.put(FUTURE_DATE_LIMIT_PERIODS, 24);
         DEFAULT_VALUES.put(FUTURE_DATE_LIMIT_PERIOD_TYPE,
-                Common.TimePeriods.HOURS);
+                TimePeriods.HOURS);
         try {
             DEFAULT_VALUES.put(INSTANCE_DESCRIPTION, String.format("ScadaBR @%s", InetAddress.getLocalHost().getCanonicalHostName()));
         } catch (UnknownHostException uhe) {
@@ -349,6 +356,6 @@ public class SystemSettingsDao extends BaseDao {
     }
 
     public void setAlarmLevel(String key, AlarmLevel alarmLevel) {
-        setValue(key, Integer.toString(alarmLevel.ordinal()));
+        setValue(key, Integer.toString(alarmLevel.mangoDbId));
     }
 }

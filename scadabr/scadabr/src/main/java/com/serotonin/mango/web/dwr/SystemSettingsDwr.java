@@ -254,7 +254,7 @@ public class SystemSettingsDwr extends BaseDwr {
         Permissions.ensureAdmin();
         for (IntegerPair eventAlarmLevel : eventAlarmLevels) {
             SystemEventType.setEventTypeAlarmLevel(eventAlarmLevel.getI1(),
-                    AlarmLevel.valueOf(eventAlarmLevel.getI2()));
+                    AlarmLevel.fromMangoDbId(eventAlarmLevel.getI2()));
         }
     }
 
@@ -263,7 +263,7 @@ public class SystemSettingsDwr extends BaseDwr {
         Permissions.ensureAdmin();
         for (IntegerPair eventAlarmLevel : eventAlarmLevels) {
             AuditEventType.setEventTypeAlarmLevel(eventAlarmLevel.getI1(),
-                    AlarmLevel.valueOf(eventAlarmLevel.getI2()));
+                    AlarmLevel.fromMangoDbId(eventAlarmLevel.getI2()));
         }
     }
 

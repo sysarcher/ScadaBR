@@ -146,7 +146,7 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     @Override
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.snmp.oid", oid);
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
+        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.snmp.binary0Value", binary0Value);
         AuditEventType.addPropertyMessage(list, "dsEdit.snmp.setType", setType);
         AuditEventType.addPropertyMessage(list, "dsEdit.snmp.polling", trapOnly);
@@ -156,7 +156,7 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         SnmpPointLocatorVO from = (SnmpPointLocatorVO) o;
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.snmp.oid", from.oid, oid);
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.snmp.binary0Value", from.binary0Value, binary0Value);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.snmp.setType", from.setType, setType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.snmp.polling", from.trapOnly, trapOnly);
@@ -173,7 +173,7 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, oid);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
         SerializationHelper.writeSafeUTF(out, binary0Value);
         out.writeInt(setType);
         out.writeBoolean(trapOnly);
@@ -185,19 +185,19 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
             oid = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             binary0Value = "0";
             setType = in.readInt();
             trapOnly = false;
         } else if (ver == 2) {
             oid = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             binary0Value = "0";
             setType = in.readInt();
             trapOnly = in.readBoolean();
         } else if (ver == 3) {
             oid = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             binary0Value = SerializationHelper.readSafeUTF(in);
             setType = in.readInt();
             trapOnly = in.readBoolean();

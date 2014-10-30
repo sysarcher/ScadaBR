@@ -24,6 +24,7 @@ import java.io.ObjectOutputStream;
 import java.util.Map;
 
 import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.vo.DataPointVO;
 
 @JsonRemoteEntity
@@ -38,7 +39,7 @@ public class ImageChartRenderer extends TimePeriodChartRenderer {
         // no op
     }
 
-    public ImageChartRenderer(int timePeriod, int numberOfPeriods) {
+    public ImageChartRenderer(TimePeriods timePeriod, int numberOfPeriods) {
         super(timePeriod, numberOfPeriods);
     }
 

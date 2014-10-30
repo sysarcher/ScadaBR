@@ -32,6 +32,7 @@ import com.serotonin.mango.vo.event.EventHandlerVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
@@ -121,7 +122,7 @@ public class Upgrade1_1_1 extends DBUpgrade {
             }
             h.setActiveValueToSet(rs.getString(++i));
             h.setSendEscalation(charToBool(rs.getString(++i)));
-            h.setEscalationDelayType(rs.getInt(++i));
+            h.setEscalationDelayType(TimePeriods.fromMangoDbId(rs.getInt(++i)));
             h.setEscalationDelay(rs.getInt(++i));
             h.setSendInactive(charToBool(rs.getString(++i)));
 

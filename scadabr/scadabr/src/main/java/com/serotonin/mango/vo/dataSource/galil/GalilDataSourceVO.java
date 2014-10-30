@@ -37,6 +37,7 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
@@ -101,7 +102,7 @@ public class GalilDataSourceVO extends DataSourceVO<GalilDataSourceVO> {
     private int timeout = 1000;
     @JsonRemoteProperty
     private int retries = 2;
-    private int updatePeriodType = Common.TimePeriods.MINUTES;
+    private TimePeriods updatePeriodType = TimePeriods.MINUTES;
     @JsonRemoteProperty
     private int updatePeriods = 5;
 
@@ -145,20 +146,17 @@ public class GalilDataSourceVO extends DataSourceVO<GalilDataSourceVO> {
         this.updatePeriods = updatePeriods;
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextual("updatePeriodType", "validate.invalidValue");
-        }
         if (updatePeriods <= 0) {
             response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
@@ -182,7 +180,7 @@ public class GalilDataSourceVO extends DataSourceVO<GalilDataSourceVO> {
         AuditEventType.addPropertyMessage(list, "dsEdit.galil.port", port);
         AuditEventType.addPropertyMessage(list, "dsEdit.galil.timeout", timeout);
         AuditEventType.addPropertyMessage(list, "dsEdit.galil.retries", retries);
-        AuditEventType.addPeriodMessage(list, "dsEdit.updatePeriod", updatePeriodType, updatePeriods);
+        AuditEventType.addPropertyMessage(list, "dsEdit.updatePeriod", updatePeriodType.getPeriodDescription(updatePeriods));
     }
 
     @Override
@@ -191,8 +189,9 @@ public class GalilDataSourceVO extends DataSourceVO<GalilDataSourceVO> {
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.galil.port", from.port, port);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.galil.timeout", from.timeout, timeout);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.galil.retries", from.retries, retries);
-        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", from.updatePeriodType,
-                from.updatePeriods, updatePeriodType, updatePeriods);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.updatePeriod",
+                from.updatePeriodType.getPeriodDescription(from.updatePeriods),
+                updatePeriodType.getPeriodDescription(updatePeriods));
     }
 
     //
@@ -209,7 +208,7 @@ public class GalilDataSourceVO extends DataSourceVO<GalilDataSourceVO> {
         out.writeInt(port);
         out.writeInt(timeout);
         out.writeInt(retries);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(updatePeriods);
     }
 
@@ -222,7 +221,7 @@ public class GalilDataSourceVO extends DataSourceVO<GalilDataSourceVO> {
             port = in.readInt();
             timeout = in.readInt();
             retries = in.readInt();
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
         }
     }
@@ -230,7 +229,7 @@ public class GalilDataSourceVO extends DataSourceVO<GalilDataSourceVO> {
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }

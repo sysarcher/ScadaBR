@@ -19,7 +19,6 @@
 package br.org.scadabr.web.mvc.controller;
 
 import br.org.scadabr.web.i18n.LocaleResolver;
-import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import br.org.scadabr.web.mvc.form.LoginForm;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,7 +37,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 import javax.inject.Inject;
 import javax.validation.Valid;
-import org.junit.runner.Request;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.i18n.SimpleTimeZoneAwareLocaleContext;
 import org.springframework.stereotype.Controller;
@@ -47,8 +45,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.LocaleContextResolver;
-import org.springframework.web.servlet.support.RequestContextUtils;
 
 @Controller
 @RequestMapping("/login")
@@ -64,7 +60,7 @@ class LoginController {
     private UserDao userDao;
 
     @Inject
-    private LocaleResolver localeResolver;
+    transient private LocaleResolver localeResolver;
 
     @Inject
     private UserSessionContextBean userSessionContextBean;

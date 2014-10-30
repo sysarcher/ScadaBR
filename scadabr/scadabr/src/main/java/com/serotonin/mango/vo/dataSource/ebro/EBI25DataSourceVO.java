@@ -38,6 +38,7 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.modbus4j.base.ModbusUtils;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
@@ -96,7 +97,7 @@ public class EBI25DataSourceVO extends DataSourceVO<EBI25DataSourceVO> {
     private boolean keepAlive = true;
     @JsonRemoteProperty
     private int updatePeriods = 5;
-    private int updatePeriodType = Common.TimePeriods.MINUTES;
+    private TimePeriods updatePeriodType = TimePeriods.MINUTES;
     @JsonRemoteProperty
     private int timeout = 500;
     @JsonRemoteProperty
@@ -140,11 +141,11 @@ public class EBI25DataSourceVO extends DataSourceVO<EBI25DataSourceVO> {
         this.updatePeriods = updatePeriods;
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 
@@ -208,9 +209,6 @@ public class EBI25DataSourceVO extends DataSourceVO<EBI25DataSourceVO> {
         if (updatePeriods <= 0) {
             response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextual("updatePeriodType", "validate.invalidValue");
-        }
         if (timeout <= 0) {
             response.addContextual("timeout", "validate.greaterThanZero");
         }
@@ -224,7 +222,7 @@ public class EBI25DataSourceVO extends DataSourceVO<EBI25DataSourceVO> {
         AuditEventType.addPropertyMessage(list, "dsEdit.ebi25.host", host);
         AuditEventType.addPropertyMessage(list, "dsEdit.ebi25.port", port);
         AuditEventType.addPropertyMessage(list, "dsEdit.ebi25.keepAlive", keepAlive);
-        AuditEventType.addPeriodMessage(list, "dsEdit.updatePeriod", updatePeriodType, updatePeriods);
+        AuditEventType.addPropertyMessage(list, "dsEdit.updatePeriod", updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.addPropertyMessage(list, "dsEdit.ebi25.timeout", timeout);
         AuditEventType.addPropertyMessage(list, "dsEdit.ebi25.retries", retries);
     }
@@ -234,8 +232,9 @@ public class EBI25DataSourceVO extends DataSourceVO<EBI25DataSourceVO> {
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.ebi25.host", from.host, host);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.ebi25.port", from.port, port);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.ebi25.keepAlive", from.keepAlive, keepAlive);
-        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", from.updatePeriodType, updatePeriods,
-                from.updatePeriodType, updatePeriods);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.updatePeriod",
+                from.updatePeriodType.getPeriodDescription(updatePeriods),
+                updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.ebi25.timeout", from.timeout, timeout);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.ebi25.retries", from.retries, retries);
     }
@@ -254,7 +253,7 @@ public class EBI25DataSourceVO extends DataSourceVO<EBI25DataSourceVO> {
         out.writeInt(port);
         out.writeBoolean(keepAlive);
         out.writeInt(updatePeriods);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(timeout);
         out.writeInt(retries);
         SerializationHelper.writeSafeUTF(out, serialNumber);
@@ -272,7 +271,7 @@ public class EBI25DataSourceVO extends DataSourceVO<EBI25DataSourceVO> {
             port = in.readInt();
             keepAlive = in.readBoolean();
             updatePeriods = in.readInt();
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             timeout = in.readInt();
             retries = in.readInt();
             serialNumber = SerializationHelper.readSafeUTF(in);
@@ -285,7 +284,7 @@ public class EBI25DataSourceVO extends DataSourceVO<EBI25DataSourceVO> {
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }

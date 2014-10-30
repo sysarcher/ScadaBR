@@ -38,6 +38,7 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
@@ -97,7 +98,7 @@ public class Pop3DataSourceVO extends DataSourceVO<Pop3DataSourceVO> {
     private String username;
     @JsonRemoteProperty
     private String password;
-    private int updatePeriodType = Common.TimePeriods.MINUTES;
+    private TimePeriods updatePeriodType = TimePeriods.MINUTES;
     @JsonRemoteProperty
     private int updatePeriods = 5;
 
@@ -125,11 +126,11 @@ public class Pop3DataSourceVO extends DataSourceVO<Pop3DataSourceVO> {
         this.password = password;
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 
@@ -153,9 +154,6 @@ public class Pop3DataSourceVO extends DataSourceVO<Pop3DataSourceVO> {
         if (password.isEmpty()) {
             response.addContextual("password", "validate.required");
         }
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextual("updatePeriodType", "validate.invalidValue");
-        }
         if (updatePeriods <= 0) {
             response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
@@ -163,7 +161,7 @@ public class Pop3DataSourceVO extends DataSourceVO<Pop3DataSourceVO> {
 
     @Override
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
-        AuditEventType.addPeriodMessage(list, "dsEdit.pop3.checkPeriod", updatePeriodType, updatePeriods);
+        AuditEventType.addPropertyMessage(list, "dsEdit.pop3.checkPeriod", updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.addPropertyMessage(list, "dsEdit.pop3.server", pop3Server);
         AuditEventType.addPropertyMessage(list, "dsEdit.pop3.username", username);
         AuditEventType.addPropertyMessage(list, "dsEdit.pop3.password", password);
@@ -171,8 +169,9 @@ public class Pop3DataSourceVO extends DataSourceVO<Pop3DataSourceVO> {
 
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, Pop3DataSourceVO from) {
-        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.pop3.checkPeriod", from.updatePeriodType,
-                from.updatePeriods, updatePeriodType, updatePeriods);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pop3.checkPeriod",
+                from.updatePeriodType.getPeriodDescription(from.updatePeriods),
+                updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pop3.server", from.pop3Server, pop3Server);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pop3.username", from.username, username);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pop3.password", from.password, password);
@@ -191,7 +190,7 @@ public class Pop3DataSourceVO extends DataSourceVO<Pop3DataSourceVO> {
         SerializationHelper.writeSafeUTF(out, pop3Server);
         SerializationHelper.writeSafeUTF(out, username);
         SerializationHelper.writeSafeUTF(out, password);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(updatePeriods);
     }
 
@@ -203,7 +202,7 @@ public class Pop3DataSourceVO extends DataSourceVO<Pop3DataSourceVO> {
             pop3Server = SerializationHelper.readSafeUTF(in);
             username = SerializationHelper.readSafeUTF(in);
             password = SerializationHelper.readSafeUTF(in);
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
         }
     }
@@ -211,7 +210,7 @@ public class Pop3DataSourceVO extends DataSourceVO<Pop3DataSourceVO> {
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }

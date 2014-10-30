@@ -311,7 +311,7 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
     @Override
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.settable", settable);
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
+        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addExportCodeMessage(list, "dsEdit.virtual.changeType", ChangeTypeVO.CHANGE_TYPE_CODES,
                 changeTypeId);
         getChangeType().addProperties(list);
@@ -321,7 +321,7 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         VirtualPointLocatorVO from = (VirtualPointLocatorVO) o;
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.settable", from.settable, settable);
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddExportCodeChangeMessage(list, "dsEdit.virtual.changeType",
                 ChangeTypeVO.CHANGE_TYPE_CODES, from.changeTypeId, changeTypeId);
         if (from.changeTypeId == changeTypeId) {
@@ -341,7 +341,7 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
         out.writeInt(changeTypeId);
         out.writeBoolean(settable);
         out.writeObject(alternateBooleanChange);
@@ -360,7 +360,7 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             changeTypeId = in.readInt();
             settable = in.readBoolean();
             alternateBooleanChange = (AlternateBooleanChangeVO) in.readObject();

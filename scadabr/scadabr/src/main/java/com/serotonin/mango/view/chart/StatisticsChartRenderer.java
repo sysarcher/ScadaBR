@@ -27,6 +27,7 @@ import java.util.Map;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.rt.dataImage.PointValueFacade;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.stats.AnalogStatistics;
@@ -49,7 +50,7 @@ public class StatisticsChartRenderer extends TimePeriodChartRenderer {
         // no op
     }
 
-    public StatisticsChartRenderer(int timePeriod, int numberOfPeriods, boolean includeSum) {
+    public StatisticsChartRenderer(TimePeriods timePeriod, int numberOfPeriods, boolean includeSum) {
         super(timePeriod, numberOfPeriods);
         this.includeSum = includeSum;
     }

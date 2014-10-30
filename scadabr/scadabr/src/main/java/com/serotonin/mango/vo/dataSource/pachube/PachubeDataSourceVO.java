@@ -37,6 +37,7 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
@@ -92,7 +93,7 @@ public class PachubeDataSourceVO extends DataSourceVO<PachubeDataSourceVO> {
 
     @JsonRemoteProperty
     private String apiKey;
-    private int updatePeriodType = Common.TimePeriods.MINUTES;
+    private TimePeriods updatePeriodType = TimePeriods.MINUTES;
     @JsonRemoteProperty
     private int updatePeriods = 5;
     @JsonRemoteProperty
@@ -108,11 +109,11 @@ public class PachubeDataSourceVO extends DataSourceVO<PachubeDataSourceVO> {
         this.apiKey = apiKey;
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 
@@ -146,9 +147,6 @@ public class PachubeDataSourceVO extends DataSourceVO<PachubeDataSourceVO> {
         if (apiKey.isEmpty()) {
             response.addContextual("apiKey", "validate.required");
         }
-        if (!Common.TIME_PERIOD_CODES.isValidId(updatePeriodType)) {
-            response.addContextual("updatePeriodType", "validate.invalidValue");
-        }
         if (updatePeriods <= 0) {
             response.addContextual("updatePeriods", "validate.greaterThanZero");
         }
@@ -163,7 +161,7 @@ public class PachubeDataSourceVO extends DataSourceVO<PachubeDataSourceVO> {
     @Override
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.pachube.apiKey", apiKey);
-        AuditEventType.addPeriodMessage(list, "dsEdit.updatePeriod", updatePeriodType, updatePeriods);
+        AuditEventType.addPropertyMessage(list, "dsEdit.updatePeriod", updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.addPropertyMessage(list, "dsEdit.pachube.timeout", timeoutSeconds);
         AuditEventType.addPropertyMessage(list, "dsEdit.pachube.retries", retries);
     }
@@ -171,8 +169,9 @@ public class PachubeDataSourceVO extends DataSourceVO<PachubeDataSourceVO> {
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, PachubeDataSourceVO from) {
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pachube.apiKey", from.apiKey, apiKey);
-        AuditEventType.maybeAddPeriodChangeMessage(list, "dsEdit.updatePeriod", from.updatePeriodType,
-                from.updatePeriods, updatePeriodType, updatePeriods);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.updatePeriod", 
+                from.updatePeriodType.getPeriodDescription(from.updatePeriods), 
+                updatePeriodType.getPeriodDescription(updatePeriods));
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pachube.timeout", from.timeoutSeconds,
                 timeoutSeconds);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pachube.retries", from.retries, retries);
@@ -189,7 +188,7 @@ public class PachubeDataSourceVO extends DataSourceVO<PachubeDataSourceVO> {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, apiKey);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(updatePeriods);
         out.writeInt(timeoutSeconds);
         out.writeInt(retries);
@@ -201,7 +200,7 @@ public class PachubeDataSourceVO extends DataSourceVO<PachubeDataSourceVO> {
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
             apiKey = SerializationHelper.readSafeUTF(in);
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             timeoutSeconds = in.readInt();
             retries = in.readInt();
@@ -211,7 +210,7 @@ public class PachubeDataSourceVO extends DataSourceVO<PachubeDataSourceVO> {
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }

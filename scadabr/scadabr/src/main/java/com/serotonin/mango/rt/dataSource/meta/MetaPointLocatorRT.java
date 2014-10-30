@@ -35,7 +35,6 @@ import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
-import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
 import br.org.scadabr.timer.AbstractTimer;
 import br.org.scadabr.timer.cron.CronExpression;
@@ -44,6 +43,7 @@ import br.org.scadabr.timer.TimerTask;
 import br.org.scadabr.timer.cron.CronParser;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.datasource.meta.UpdateEvent;
 
 /**
  * @author Matthew Lohbihler
@@ -97,8 +97,8 @@ public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> imple
     }
 
     protected void initializeTimerTask() {
-        int updateEventId = vo.getUpdateEvent();
-        if (updateEventId != MetaPointLocatorVO.UPDATE_EVENT_CONTEXT_UPDATE) // Scheduled update. Create the timeout that will update this point.
+        UpdateEvent updateEvent = vo.getUpdateEvent();
+        if (updateEvent != UpdateEvent.CONTEXT_UPDATE) // Scheduled update. Create the timeout that will update this point.
         {
             timerTask = new ScheduledUpdateTimeout(calculateTimeout(timer.currentTimeMillis()));
         }
@@ -137,7 +137,7 @@ public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> imple
     @Override
     public void pointUpdated(PointValueTime newValue) {
         // Ignore if this is not a context update.
-        if (vo.getUpdateEvent() == MetaPointLocatorVO.UPDATE_EVENT_CONTEXT_UPDATE) {
+        if (vo.getUpdateEvent() == UpdateEvent.CONTEXT_UPDATE) {
             // Check for infinite loops
             List<Integer> sourceIds;
             if (threadLocal.get() == null) {
@@ -205,9 +205,9 @@ public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> imple
     }
 
     long calculateTimeout(long time) {
-        int updateEventId = vo.getUpdateEvent();
+        UpdateEvent updateEvent = vo.getUpdateEvent();
         long timeout;
-        if (updateEventId == MetaPointLocatorVO.UPDATE_EVENT_CRON) {
+        if (updateEvent == UpdateEvent.CRON) {
             try {
                 CronExpression ce = new CronParser().parse(vo.getUpdateCronPattern(), CronExpression.TIMEZONE_UTC);
                 timeout = ce.getNextValidTimeAfter(new Date(time)).getTime();
@@ -215,7 +215,7 @@ public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> imple
                 throw new ShouldNeverHappenException(e);
             }
         } else {
-            timeout = DateUtils.next(time, updateEventId);
+            timeout = updateEvent.getTimePeriods().next(time);
         }
         return timeout + vo.getExecutionDelaySeconds() * 1000;
     }

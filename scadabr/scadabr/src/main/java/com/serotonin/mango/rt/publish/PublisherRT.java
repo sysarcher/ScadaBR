@@ -197,7 +197,7 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
 
         if (vo.isSendSnapshot()) {
             // Add a schedule to send the snapshot
-            long snapshotPeriodMillis = Common.getMillis(vo.getSnapshotSendPeriodType(), vo.getSnapshotSendPeriods());
+            long snapshotPeriodMillis = vo.getSnapshotSendPeriodType().getMillis(vo.getSnapshotSendPeriods());
             throw new ImplementMeException(); //WAS: snapshotTask = new TimeoutTask(new FixedRateTrigger(0, snapshotPeriodMillis), this);
         }
 

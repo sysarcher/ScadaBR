@@ -126,7 +126,7 @@ public class EventDao extends BaseDao {
                     ps.setNull(6, Types.BIGINT);
                     ps.setNull(7, Types.INTEGER);
                 }
-                ps.setInt(8, event.getAlarmLevel().ordinal());
+                ps.setInt(8, event.getAlarmLevel().mangoDbId);
                 ps.setString(9, I18NUtils.serialize(event.getMessage()));
                 if (!event.isAlarm()) {
                     event.setAcknowledgedTimestamp(event.getActiveTimestamp());
@@ -341,7 +341,7 @@ public class EventDao extends BaseDao {
             }
 
             EventInstance event = new EventInstance(type, rs.getLong(5),
-                    charToBool(rs.getString(6)), AlarmLevel.valueOf(rs.getInt(9)), message, null);
+                    charToBool(rs.getString(6)), AlarmLevel.fromMangoDbId(rs.getInt(9)), message, null);
             event.setId(rs.getInt(1));
             long rtnTs = rs.getLong(7);
             if (!rs.wasNull()) {

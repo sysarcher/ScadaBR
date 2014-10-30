@@ -18,12 +18,12 @@
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
+import br.org.scadabr.utils.TimePeriods;
 import java.util.List;
 
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.view.stats.ValueChangeCounter;
 
 /**
@@ -48,12 +48,12 @@ public class AlphanumericPointWrapper extends AbstractPointWrapper {
         return "{value=" + getValue() + ", ago(periodType, count)}";
     }
 
-    public String ago(int periodType) {
+    public String ago(TimePeriods periodType) {
         return ago(periodType, 1);
     }
 
-    public String ago(int periodType, int count) {
-        long from = DateUtils.minus(context.getRuntime(), periodType, count);
+    public String ago(TimePeriods periodType, int count) {
+        long from = periodType.minus(context.getRuntime(), count);
         PointValueTime pvt = point.getPointValueBefore(from);
         if (pvt == null) {
             return null;
@@ -61,31 +61,31 @@ public class AlphanumericPointWrapper extends AbstractPointWrapper {
         return pvt.getValue().getStringValue();
     }
 
-    public ValueChangeCounter past(int periodType) {
+    public ValueChangeCounter past(TimePeriods periodType) {
         return past(periodType, 1);
     }
 
-    public ValueChangeCounter past(int periodType, int count) {
+    public ValueChangeCounter past(TimePeriods periodType, int count) {
         long to = context.getRuntime();
-        long from = DateUtils.minus(to, periodType, count);
+        long from = periodType.minus(to, count);
         return getStats(from, to);
     }
 
-    public ValueChangeCounter prev(int periodType) {
+    public ValueChangeCounter prev(TimePeriods periodType) {
         return previous(periodType, 1);
     }
 
-    public ValueChangeCounter prev(int periodType, int count) {
+    public ValueChangeCounter prev(TimePeriods periodType, int count) {
         return previous(periodType, count);
     }
 
-    public ValueChangeCounter previous(int periodType) {
+    public ValueChangeCounter previous(TimePeriods periodType) {
         return previous(periodType, 1);
     }
 
-    public ValueChangeCounter previous(int periodType, int count) {
-        long to = DateUtils.truncate(context.getRuntime(), periodType);
-        long from = DateUtils.minus(to, periodType, count);
+    public ValueChangeCounter previous(TimePeriods periodType, int count) {
+        long to = periodType.truncate(context.getRuntime());
+        long from = periodType.minus(to, count);
         return getStats(from, to);
     }
 

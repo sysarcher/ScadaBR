@@ -41,6 +41,8 @@ import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.utils.ImplementMeException;
+import br.org.scadabr.utils.TimePeriods;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,9 +95,9 @@ public class ReportsDwr extends BaseDwr {
 
     public DwrResponseI18n saveReport(int id, String name, List<ReportPointVO> points, int includeEvents,
             boolean includeUserComments, int dateRangeType, int relativeDateType, int previousPeriodCount,
-            int previousPeriodType, int pastPeriodCount, int pastPeriodType, boolean fromNone, int fromYear,
+            TimePeriods previousPeriodType, int pastPeriodCount, TimePeriods pastPeriodType, boolean fromNone, int fromYear,
             int fromMonth, int fromDay, int fromHour, int fromMinute, boolean toNone, int toYear, int toMonth,
-            int toDay, int toHour, int toMinute, boolean schedule, int schedulePeriod, int runDelayMinutes,
+            int toDay, int toHour, int toMinute, boolean schedule, TimePeriods schedulePeriod, int runDelayMinutes,
             String scheduleCron, boolean email, boolean includeData, boolean zipData,
             List<RecipientListEntryBean> recipients) {
 
@@ -105,7 +107,8 @@ public class ReportsDwr extends BaseDwr {
         validateData(response, name, points, dateRangeType, relativeDateType, previousPeriodCount, pastPeriodCount);
 
         if (schedule) {
-            if (schedulePeriod == ReportVO.SCHEDULE_CRON) {
+            if (true) throw new ImplementMeException(); //"Dirty things happend here ... WAS: if (schedulePeriod == ReportVO.SCHEDULE_CRON) {");
+            if (ReportVO.isCronScheduled(schedulePeriod)) {
                 // Check the cron pattern.
                 try {
                     new CronParser().parse(scheduleCron, CronExpression.TIMEZONE_UTC);
@@ -185,7 +188,7 @@ public class ReportsDwr extends BaseDwr {
 
     public DwrResponseI18n runReport(String name, List<ReportPointVO> points, int includeEvents,
             boolean includeUserComments, int dateRangeType, int relativeDateType, int previousPeriodCount,
-            int previousPeriodType, int pastPeriodCount, int pastPeriodType, boolean fromNone, int fromYear,
+            TimePeriods previousPeriodType, int pastPeriodCount, TimePeriods pastPeriodType, boolean fromNone, int fromYear,
             int fromMonth, int fromDay, int fromHour, int fromMinute, boolean toNone, int toYear, int toMonth,
             int toDay, int toHour, int toMinute, boolean email, boolean includeData, boolean zipData,
             List<RecipientListEntryBean> recipients) {

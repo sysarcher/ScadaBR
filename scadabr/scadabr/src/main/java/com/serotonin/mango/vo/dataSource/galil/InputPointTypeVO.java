@@ -154,7 +154,7 @@ public class InputPointTypeVO extends PointTypeVO {
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
+        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.galil.inputNumber", inputId);
         AuditEventType.addPropertyMessage(list, "dsEdit.galil.scaleLow", scaleRawLow);
         AuditEventType.addPropertyMessage(list, "dsEdit.galil.scaleHigh", scaleRawHigh);
@@ -165,7 +165,7 @@ public class InputPointTypeVO extends PointTypeVO {
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         InputPointTypeVO from = (InputPointTypeVO) o;
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.galil.inputNumber", from.inputId, inputId);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.galil.scaleLow", from.scaleRawLow, scaleRawLow);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.galil.scaleHigh", from.scaleRawHigh, scaleRawHigh);
@@ -183,7 +183,7 @@ public class InputPointTypeVO extends PointTypeVO {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
         out.writeInt(inputId);
         out.writeDouble(scaleRawLow);
         out.writeDouble(scaleRawHigh);
@@ -196,7 +196,7 @@ public class InputPointTypeVO extends PointTypeVO {
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             inputId = in.readInt();
             scaleRawLow = in.readDouble();
             scaleRawHigh = in.readDouble();

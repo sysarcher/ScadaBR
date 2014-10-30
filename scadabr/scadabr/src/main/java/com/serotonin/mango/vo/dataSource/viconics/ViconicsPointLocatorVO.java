@@ -126,7 +126,7 @@ public class ViconicsPointLocatorVO extends AbstractPointLocatorVO {
         out.writeObject(deviceIeee);
         out.writeInt(deviceCommAddress);
         out.writeInt(pointAddress);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
         out.writeBoolean(settable);
     }
 
@@ -138,7 +138,7 @@ public class ViconicsPointLocatorVO extends AbstractPointLocatorVO {
             deviceIeee = (byte[]) in.readObject();
             deviceCommAddress = in.readInt();
             pointAddress = in.readInt();
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             settable = in.readBoolean();
         }
     }

@@ -155,7 +155,7 @@ public class NodaveS7PointLocatorVO extends AbstractPointLocatorVO implements
         SerializationHelper.writeSafeUTF(out, valueRegex);
         SerializationHelper.writeSafeUTF(out, timestampFormat);
         SerializationHelper.writeSafeUTF(out, timestampRegex);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
         out.writeBoolean(settable);
         out.writeBoolean(customTimestamp);
         SerializationHelper.writeSafeUTF(out, s7writeMemoryArea);
@@ -173,7 +173,7 @@ public class NodaveS7PointLocatorVO extends AbstractPointLocatorVO implements
         valueRegex = SerializationHelper.readSafeUTF(in);
         timestampFormat = SerializationHelper.readSafeUTF(in);
         timestampRegex = SerializationHelper.readSafeUTF(in);
-        dataType = DataType.valueOf(in.readInt());
+        dataType = DataType.fromMangoDbId(in.readInt());
         settable = in.readBoolean();
         customTimestamp = in.readBoolean();
 

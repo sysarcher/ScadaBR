@@ -50,6 +50,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.utils.TimePeriods;
 import java.util.Date;
 import java.util.Locale;
 import javax.inject.Named;
@@ -162,7 +163,7 @@ public class DataPointDetailsDwr extends BaseDwr {
     }
 
     @MethodFilter
-    public DwrResponseI18n getStatsChartData(int periodType, int period,
+    public DwrResponseI18n getStatsChartData(TimePeriods periodType, int period,
             boolean includeSum) {
         HttpServletRequest request = WebContextFactory.get()
                 .getHttpServletRequest();

@@ -82,7 +82,7 @@ public class MaintenanceEventDao extends BaseDao {
             me.setXid(rs.getString(++i));
             me.setDataSourceId(rs.getInt(++i));
             me.setAlias(rs.getString(++i));
-            me.setAlarmLevel(AlarmLevel.valueOf(rs.getInt(++i)));
+            me.setAlarmLevel(AlarmLevel.fromMangoDbId(rs.getInt(++i)));
             me.setScheduleType(rs.getInt(++i));
             me.setDisabled(charToBool(rs.getString(++i)));
             me.setActiveYear(rs.getInt(++i));
@@ -129,7 +129,7 @@ public class MaintenanceEventDao extends BaseDao {
                 ps.setString(1, me.getXid());
                 ps.setInt(2, me.getDataSourceId());
                 ps.setString(3, me.getAlias());
-                ps.setInt(4, me.getAlarmLevel().ordinal());
+                ps.setInt(4, me.getAlarmLevel().mangoDbId);
                 ps.setInt(5, me.getScheduleType());
                 ps.setString(6, boolToChar(me.isDisabled()));
                 ps.setInt(7, me.getActiveYear());

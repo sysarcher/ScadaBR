@@ -115,7 +115,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
         // If an escalation is to be sent, set up timeout to trigger it.
         if (vo.isSendEscalation()) {
             GregorianCalendar c = new GregorianCalendar();
-            c.setTimeInMillis(Common.getMillis(vo.getEscalationDelayType(), vo.getEscalationDelay()));
+            c.setTimeInMillis(vo.getEscalationDelayType().getMillis(vo.getEscalationDelay()));
             escalationTask = new EventRunWithArgTask<>(new CronExpression(c), this, evt);
             Common.eventCronPool.schedule(escalationTask);
         }

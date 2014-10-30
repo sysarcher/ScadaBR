@@ -18,11 +18,11 @@
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
+import br.org.scadabr.utils.TimePeriods;
 import java.util.List;
 
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.view.stats.StartsAndRuntimeList;
 
 /**
@@ -34,31 +34,31 @@ abstract public class DistinctPointWrapper extends AbstractPointWrapper {
         super(point, context);
     }
 
-    public StartsAndRuntimeList past(int periodType) {
+    public StartsAndRuntimeList past(TimePeriods periodType) {
         return past(periodType, 1);
     }
 
-    public StartsAndRuntimeList past(int periodType, int count) {
+    public StartsAndRuntimeList past(TimePeriods periodType, int count) {
         long to = context.getRuntime();
-        long from = DateUtils.minus(to, periodType, count);
+        long from = periodType.minus(to, count);
         return getStats(from, to);
     }
 
-    public StartsAndRuntimeList prev(int periodType) {
+    public StartsAndRuntimeList prev(TimePeriods periodType) {
         return previous(periodType, 1);
     }
 
-    public StartsAndRuntimeList prev(int periodType, int count) {
+    public StartsAndRuntimeList prev(TimePeriods periodType, int count) {
         return previous(periodType, count);
     }
 
-    public StartsAndRuntimeList previous(int periodType) {
+    public StartsAndRuntimeList previous(TimePeriods periodType) {
         return previous(periodType, 1);
     }
 
-    public StartsAndRuntimeList previous(int periodType, int count) {
-        long to = DateUtils.truncate(context.getRuntime(), periodType);
-        long from = DateUtils.minus(to, periodType, count);
+    public StartsAndRuntimeList previous(TimePeriods periodType, int count) {
+        long to = periodType.truncate(context.getRuntime());
+        long from = periodType.minus(to, count);
         return getStats(from, to);
     }
 

@@ -129,7 +129,7 @@ public class JmxPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
         AuditEventType.addPropertyMessage(list, "dsEdit.jmx.objectName", objectName);
         AuditEventType.addPropertyMessage(list, "dsEdit.jmx.attributeName", attributeName);
         AuditEventType.addPropertyMessage(list, "dsEdit.jmx.compositeItemName", compositeItemName);
-        AuditEventType.addDataTypeMessage(list, "dsEdit.pointDataType", dataType);
+        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.settable", settable);
     }
 
@@ -141,7 +141,7 @@ public class JmxPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
                 attributeName);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.jmx.compositeItemName", from.compositeItemName,
                 compositeItemName);
-        AuditEventType.maybeAddDataTypeChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.settable", from.settable, settable);
     }
 
@@ -157,7 +157,7 @@ public class JmxPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
         SerializationHelper.writeSafeUTF(out, objectName);
         SerializationHelper.writeSafeUTF(out, attributeName);
         SerializationHelper.writeSafeUTF(out, compositeItemName);
-        out.writeInt(dataType.ordinal());
+        out.writeInt(dataType.mangoDbId);
         out.writeBoolean(settable);
     }
 
@@ -169,7 +169,7 @@ public class JmxPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
             objectName = SerializationHelper.readSafeUTF(in);
             attributeName = SerializationHelper.readSafeUTF(in);
             compositeItemName = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.valueOf(in.readInt());
+            dataType = DataType.fromMangoDbId(in.readInt());
             settable = in.readBoolean();
         }
     }

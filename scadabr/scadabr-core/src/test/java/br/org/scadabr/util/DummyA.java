@@ -14,14 +14,25 @@ import java.io.Serializable;
  *
  * @author aploese
  */
-public class DummyB implements Serializable {
+public class DummyA implements Serializable {
 
     private static final long serialVersionUID = -1;
+    private final static int version = 1;
+    private int field1;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(version);
+        out.writeInt(field1);
     }
 
     private void readObject(ObjectInputStream in) throws IOException {
+        switch (in.readInt()) {
+            case 1:
+                field1 = in.readInt();
+                break;
+            default:
+                throw new RuntimeException();
+        }
     }
 
 }

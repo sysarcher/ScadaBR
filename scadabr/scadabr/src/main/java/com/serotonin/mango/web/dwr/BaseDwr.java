@@ -37,6 +37,7 @@ import org.joda.time.IllegalFieldValueException;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.l10n.AbstractLocalizer;
+import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
@@ -46,7 +47,6 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.event.EventInstance;
-import com.serotonin.mango.util.DateUtils;
 import com.serotonin.mango.view.chart.ChartRenderer;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
@@ -282,7 +282,7 @@ abstract public class BaseDwr {
         return result;
     }
 
-    public Map<String, Object> getDateRangeDefaults(int periodType, int period) {
+    public Map<String, Object> getDateRangeDefaults(TimePeriods periodType, int period) {
         Map<String, Object> result = new HashMap<>();
 
         // Default the specific date fields.
@@ -294,7 +294,7 @@ abstract public class BaseDwr {
         result.put("toMinute", dt.getMinuteOfHour());
         result.put("toSecond", 0);
 
-        dt = DateUtils.minus(dt, periodType, period);
+        dt = periodType.minus(dt, period);
         result.put("fromYear", dt.getYear());
         result.put("fromMonth", dt.getMonthOfYear());
         result.put("fromDay", dt.getDayOfMonth());

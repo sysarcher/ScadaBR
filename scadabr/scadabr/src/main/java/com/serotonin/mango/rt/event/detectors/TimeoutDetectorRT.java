@@ -19,9 +19,6 @@
 package com.serotonin.mango.rt.event.detectors;
 
 import br.org.scadabr.utils.ImplementMeException;
-import java.util.Date;
-
-import com.serotonin.mango.Common;
 import com.serotonin.mango.util.timeout.RunClient;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import com.serotonin.mango.util.timeout.SystemRunTask;
@@ -56,7 +53,7 @@ abstract public class TimeoutDetectorRT extends PointEventDetectorRT implements 
 
     @Override
     public void initialize() {
-        durationMS = Common.getMillis(vo.getDurationType(), vo.getDuration());
+        durationMS = vo.getDurationType().getMillis(vo.getDuration());
         durationDescription = vo.getDurationDescription();
 
         super.initialize();

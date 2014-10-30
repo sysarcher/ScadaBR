@@ -44,6 +44,7 @@ import com.serotonin.mango.vo.publish.httpSender.HttpSenderVO;
 import com.serotonin.mango.vo.publish.pachube.PachubeSenderVO;
 import com.serotonin.mango.vo.publish.persistent.PersistentSenderVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
@@ -177,7 +178,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
     private int cacheWarningSize = 100;
     @JsonRemoteProperty
     private boolean sendSnapshot;
-    private int snapshotSendPeriodType = Common.TimePeriods.MINUTES;
+    private TimePeriods snapshotSendPeriodType = TimePeriods.MINUTES;
     @JsonRemoteProperty
     private int snapshotSendPeriods = 5;
 
@@ -245,11 +246,11 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
         this.sendSnapshot = sendSnapshot;
     }
 
-    public int getSnapshotSendPeriodType() {
+    public TimePeriods getSnapshotSendPeriodType() {
         return snapshotSendPeriodType;
     }
 
-    public void setSnapshotSendPeriodType(int snapshotSendPeriodType) {
+    public void setSnapshotSendPeriodType(TimePeriods snapshotSendPeriodType) {
         this.snapshotSendPeriodType = snapshotSendPeriodType;
     }
 
@@ -305,7 +306,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
         out.writeBoolean(changesOnly);
         out.writeInt(cacheWarningSize);
         out.writeBoolean(sendSnapshot);
-        out.writeInt(snapshotSendPeriodType);
+        out.writeInt(snapshotSendPeriodType.mangoDbId);
         out.writeInt(snapshotSendPeriods);
     }
 
@@ -321,7 +322,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
             changesOnly = in.readBoolean();
             cacheWarningSize = in.readInt();
             sendSnapshot = false;
-            snapshotSendPeriodType = Common.TimePeriods.MINUTES;
+            snapshotSendPeriodType = TimePeriods.MINUTES;
             snapshotSendPeriods = 5;
         } else if (ver == 2) {
             name = SerializationHelper.readSafeUTF(in);
@@ -330,7 +331,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
             changesOnly = in.readBoolean();
             cacheWarningSize = in.readInt();
             sendSnapshot = in.readBoolean();
-            snapshotSendPeriodType = in.readInt();
+            snapshotSendPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             snapshotSendPeriods = in.readInt();
         }
     }
@@ -340,7 +341,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
         map.put("xid", xid);
         map.put("type", getType().name());
         map.put("points", points);
-        map.put("snapshotSendPeriodType", Common.TIME_PERIOD_CODES.getCode(snapshotSendPeriodType));
+        map.put("snapshotSendPeriodType", snapshotSendPeriodType.name());
     }
 
     @Override
@@ -357,10 +358,11 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
 
         String text = json.getString("snapshotSendPeriodType");
         if (text != null) {
-            snapshotSendPeriodType = Common.TIME_PERIOD_CODES.getId(text);
-            if (snapshotSendPeriodType == -1) {
+            try {
+                snapshotSendPeriodType = TimePeriods.valueOf(text);
+            } catch (Exception e) {
                 throw new LocalizableJsonException("emport.error.invalid", "snapshotSendPeriodType", text,
-                        Common.TIME_PERIOD_CODES.getCodeList());
+                        TimePeriods.values());
             }
         }
     }

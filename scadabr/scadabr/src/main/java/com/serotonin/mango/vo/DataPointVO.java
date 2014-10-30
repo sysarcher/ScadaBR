@@ -53,10 +53,13 @@ import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
+import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Set;
 
 @JsonRemoteEntity
 public class DataPointVO implements Serializable, Cloneable, JsonSerializable, ChangeComparable<DataPointVO> {
@@ -69,6 +72,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     }
 
     //TODO Enum
+    @Deprecated
     public interface LoggingTypes {
 
         int ON_CHANGE = 1;
@@ -88,14 +92,9 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         LOGGING_TYPE_CODES.addElement(LoggingTypes.ON_TS_CHANGE, "ON_TS_CHANGE", "pointEdit.logging.type.tsChange");
     }
 
-    public interface PurgeTypes {
+    public static final Set<TimePeriods> PURGE_TYPES = EnumSet.of(TimePeriods.DAYS, TimePeriods.WEEKS, TimePeriods.MONTHS, TimePeriods.YEARS);
 
-        int DAYS = Common.TimePeriods.DAYS;
-        int WEEKS = Common.TimePeriods.WEEKS;
-        int MONTHS = Common.TimePeriods.MONTHS;
-        int YEARS = Common.TimePeriods.YEARS;
-    }
-
+    @Deprecated
     public interface IntervalLoggingTypes {
 
         int INSTANT = 1;
@@ -149,13 +148,13 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     private boolean enabled;
     private int pointFolderId;
     private int loggingType = LoggingTypes.ON_CHANGE;
-    private int intervalLoggingPeriodType = Common.TimePeriods.MINUTES;
+    private TimePeriods intervalLoggingPeriodType = TimePeriods.MINUTES;
     @JsonRemoteProperty
     private int intervalLoggingPeriod = 15;
     private int intervalLoggingType = IntervalLoggingTypes.INSTANT;
     @JsonRemoteProperty
     private double tolerance = 0;
-    private int purgeType = Common.TimePeriods.YEARS;
+    private TimePeriods _purgeType = TimePeriods.YEARS;
     @JsonRemoteProperty
     private int purgePeriod = 1;
     @JsonRemoteProperty(typeFactory = BaseTextRenderer.Factory.class)
@@ -259,10 +258,10 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         AuditEventType.addPropertyMessage(list, "dsEdit.points.name", name);
         AuditEventType.addPropertyMessage(list, "common.enabled", enabled);
         AuditEventType.addExportCodeMessage(list, "pointEdit.logging.type", LOGGING_TYPE_CODES, loggingType);
-        AuditEventType.addPeriodMessage(list, "pointEdit.logging.period", intervalLoggingPeriodType, intervalLoggingPeriod);
+        AuditEventType.addPropertyMessage(list, "pointEdit.logging.period", intervalLoggingPeriodType.getPeriodDescription(intervalLoggingPeriod));
         AuditEventType.addExportCodeMessage(list, "pointEdit.logging.valueType", INTERVAL_LOGGING_TYPE_CODES, intervalLoggingType);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.tolerance", tolerance);
-        AuditEventType.addPeriodMessage(list, "pointEdit.logging.purge", purgeType, purgePeriod);
+        AuditEventType.addPropertyMessage(list, "pointEdit.logging.purge", _purgeType.getPeriodDescription(purgePeriod));
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.defaultCache", defaultCacheSize);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.discard", discardExtremeValues);
         AuditEventType.addDoubleSientificProperty(list, "pointEdit.logging.discardLow", discardLowLimit);
@@ -279,14 +278,16 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.points.name", from.name, name);
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.enabled", from.enabled, enabled);
         AuditEventType.maybeAddExportCodeChangeMessage(list, "pointEdit.logging.type", LOGGING_TYPE_CODES, from.loggingType, loggingType);
-        AuditEventType.maybeAddPeriodChangeMessage(list, "pointEdit.logging.period", from.intervalLoggingPeriodType, from.intervalLoggingPeriod, intervalLoggingPeriodType, intervalLoggingPeriod);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.period",
+                from.intervalLoggingPeriodType.getPeriod(from.intervalLoggingPeriod),
+                intervalLoggingPeriodType.getPeriod(intervalLoggingPeriod));
         AuditEventType.maybeAddExportCodeChangeMessage(list, "pointEdit.logging.valueType", INTERVAL_LOGGING_TYPE_CODES, from.intervalLoggingType, intervalLoggingType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.tolerance", from.tolerance, tolerance);
-        AuditEventType.maybeAddPeriodChangeMessage(list, "pointEdit.logging.purge", from.purgeType, from.purgePeriod, purgeType, purgePeriod);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.purge", from._purgeType.getPeriodDescription(from.purgePeriod), _purgeType.getPeriodDescription(purgePeriod));
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.defaultCache", from.defaultCacheSize, defaultCacheSize);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.discard", from.discardExtremeValues, discardExtremeValues);
-        AuditEventType.evaluateDoubleScientific(list, "pointEdit.logging.discardLow", from.discardLowLimit, discardLowLimit);
-        AuditEventType.evaluateDoubleScientific(list, "pointEdit.logging.discardHigh", from.discardHighLimit, discardHighLimit);
+        AuditEventType.evaluateDoubleScientific(list, textRenderer.getMessagePattern(), "pointEdit.logging.discardLow", from.discardLowLimit, discardLowLimit);
+        AuditEventType.evaluateDoubleScientific(list, textRenderer.getMessagePattern(), "pointEdit.logging.discardHigh", from.discardHighLimit, discardHighLimit);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.engineeringUnits", from.engineeringUnits, engineeringUnits);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.props.chartColour", from.chartColour, chartColour);
 
@@ -402,12 +403,12 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         this.purgePeriod = purgePeriod;
     }
 
-    public int getPurgeType() {
-        return purgeType;
+    public TimePeriods getPurgeType() {
+        return _purgeType;
     }
 
-    public void setPurgeType(int purgeType) {
-        this.purgeType = purgeType;
+    public void setPurgeType(TimePeriods purgeType) {
+        this._purgeType = purgeType;
     }
 
     public double getTolerance() {
@@ -459,11 +460,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         this.defaultCacheSize = defaultCacheSize;
     }
 
-    public int getIntervalLoggingPeriodType() {
+    public TimePeriods getIntervalLoggingPeriodType() {
         return intervalLoggingPeriodType;
     }
 
-    public void setIntervalLoggingPeriodType(int intervalLoggingPeriodType) {
+    public void setIntervalLoggingPeriodType(TimePeriods intervalLoggingPeriodType) {
         this.intervalLoggingPeriodType = intervalLoggingPeriodType;
     }
 
@@ -537,7 +538,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
                 + ", deviceName=" + deviceName + ", enabled=" + enabled + ", pointFolderId=" + pointFolderId
                 + ", loggingType=" + loggingType + ", intervalLoggingPeriodType=" + intervalLoggingPeriodType
                 + ", intervalLoggingPeriod=" + intervalLoggingPeriod + ", intervalLoggingType=" + intervalLoggingType
-                + ", tolerance=" + tolerance + ", purgeType=" + purgeType + ", purgePeriod=" + purgePeriod
+                + ", tolerance=" + tolerance + ", purgeType=" + _purgeType + ", purgePeriod=" + purgePeriod
                 + ", textRenderer=" + textRenderer + ", chartRenderer=" + chartRenderer + ", eventDetectors="
                 + eventDetectors + ", comments=" + comments + ", defaultCacheSize=" + defaultCacheSize
                 + ", discardExtremeValues=" + discardExtremeValues + ", discardLowLimit=" + discardLowLimit
@@ -569,9 +570,6 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             }
         }
 
-        if (!Common.TIME_PERIOD_CODES.isValidId(intervalLoggingPeriodType)) {
-            response.addContextual("intervalLoggingPeriodType", "validate.invalidValue");
-        }
         if (intervalLoggingPeriod <= 0) {
             response.addContextual("intervalLoggingPeriod", "validate.greaterThanZero");
         }
@@ -579,9 +577,6 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             response.addContextual("intervalLoggingType", "validate.invalidValue");
         }
 
-        if (!Common.TIME_PERIOD_CODES.isValidId(purgeType)) {
-            response.addContextual("purgeType", "validate.invalidValue");
-        }
         if (purgePeriod <= 0) {
             response.addContextual("purgePeriod", "validate.greaterThanZero");
         }
@@ -632,11 +627,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         out.writeBoolean(enabled);
         out.writeInt(pointFolderId);
         out.writeInt(loggingType);
-        out.writeInt(intervalLoggingPeriodType);
+        out.writeInt(intervalLoggingPeriodType.mangoDbId);
         out.writeInt(intervalLoggingPeriod);
         out.writeInt(intervalLoggingType);
         out.writeDouble(tolerance);
-        out.writeInt(purgeType);
+        out.writeInt(_purgeType.mangoDbId);
         out.writeInt(purgePeriod);
         out.writeObject(textRenderer);
         out.writeObject(chartRenderer);
@@ -659,11 +654,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             enabled = in.readBoolean();
             pointFolderId = 0;
             loggingType = in.readInt();
-            intervalLoggingPeriodType = Common.TimePeriods.MINUTES;
+            intervalLoggingPeriodType = TimePeriods.MINUTES;
             intervalLoggingPeriod = 15;
             intervalLoggingType = IntervalLoggingTypes.INSTANT;
             tolerance = in.readDouble();
-            purgeType = in.readInt();
+            _purgeType = TimePeriods.fromMangoDbId(in.readInt());
             purgePeriod = in.readInt();
             textRenderer = (TextRenderer) in.readObject();
             chartRenderer = (ChartRenderer) in.readObject();
@@ -677,11 +672,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             enabled = in.readBoolean();
             pointFolderId = in.readInt();
             loggingType = in.readInt();
-            intervalLoggingPeriodType = Common.TimePeriods.MINUTES;
+            intervalLoggingPeriodType = TimePeriods.MINUTES;
             intervalLoggingPeriod = 15;
             intervalLoggingType = IntervalLoggingTypes.INSTANT;
             tolerance = in.readDouble();
-            purgeType = in.readInt();
+            _purgeType = TimePeriods.fromMangoDbId(in.readInt());
             purgePeriod = in.readInt();
             textRenderer = (TextRenderer) in.readObject();
             chartRenderer = (ChartRenderer) in.readObject();
@@ -702,11 +697,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             enabled = in.readBoolean();
             pointFolderId = in.readInt();
             loggingType = in.readInt();
-            intervalLoggingPeriodType = Common.TimePeriods.MINUTES;
+            intervalLoggingPeriodType = TimePeriods.MINUTES;
             intervalLoggingPeriod = 15;
             intervalLoggingType = IntervalLoggingTypes.INSTANT;
             tolerance = in.readDouble();
-            purgeType = in.readInt();
+            _purgeType = TimePeriods.fromMangoDbId(in.readInt());
             purgePeriod = in.readInt();
             textRenderer = (TextRenderer) in.readObject();
             chartRenderer = (ChartRenderer) in.readObject();
@@ -727,11 +722,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             enabled = in.readBoolean();
             pointFolderId = in.readInt();
             loggingType = in.readInt();
-            intervalLoggingPeriodType = in.readInt();
+            intervalLoggingPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             intervalLoggingPeriod = in.readInt();
             intervalLoggingType = in.readInt();
             tolerance = in.readDouble();
-            purgeType = in.readInt();
+            _purgeType = TimePeriods.fromMangoDbId(in.readInt());
             purgePeriod = in.readInt();
             textRenderer = (TextRenderer) in.readObject();
             chartRenderer = (ChartRenderer) in.readObject();
@@ -752,11 +747,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             enabled = in.readBoolean();
             pointFolderId = in.readInt();
             loggingType = in.readInt();
-            intervalLoggingPeriodType = in.readInt();
+            intervalLoggingPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             intervalLoggingPeriod = in.readInt();
             intervalLoggingType = in.readInt();
             tolerance = in.readDouble();
-            purgeType = in.readInt();
+            _purgeType = TimePeriods.fromMangoDbId(in.readInt());
             purgePeriod = in.readInt();
             textRenderer = (TextRenderer) in.readObject();
             chartRenderer = (ChartRenderer) in.readObject();
@@ -773,11 +768,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             enabled = in.readBoolean();
             pointFolderId = in.readInt();
             loggingType = in.readInt();
-            intervalLoggingPeriodType = in.readInt();
+            intervalLoggingPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             intervalLoggingPeriod = in.readInt();
             intervalLoggingType = in.readInt();
             tolerance = in.readDouble();
-            purgeType = in.readInt();
+            _purgeType = TimePeriods.fromMangoDbId(in.readInt());
             purgePeriod = in.readInt();
             textRenderer = (TextRenderer) in.readObject();
             chartRenderer = (ChartRenderer) in.readObject();
@@ -794,11 +789,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             enabled = in.readBoolean();
             pointFolderId = in.readInt();
             loggingType = in.readInt();
-            intervalLoggingPeriodType = in.readInt();
+            intervalLoggingPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             intervalLoggingPeriod = in.readInt();
             intervalLoggingType = in.readInt();
             tolerance = in.readDouble();
-            purgeType = in.readInt();
+            _purgeType = TimePeriods.fromMangoDbId(in.readInt());
             purgePeriod = in.readInt();
             textRenderer = (TextRenderer) in.readObject();
             chartRenderer = (ChartRenderer) in.readObject();
@@ -815,11 +810,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             enabled = in.readBoolean();
             pointFolderId = in.readInt();
             loggingType = in.readInt();
-            intervalLoggingPeriodType = in.readInt();
+            intervalLoggingPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             intervalLoggingPeriod = in.readInt();
             intervalLoggingType = in.readInt();
             tolerance = in.readDouble();
-            purgeType = in.readInt();
+            _purgeType = TimePeriods.fromMangoDbId(in.readInt());
             purgePeriod = in.readInt();
             textRenderer = (TextRenderer) in.readObject();
             chartRenderer = (ChartRenderer) in.readObject();
@@ -833,8 +828,8 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         }
 
         // Check the purge type. Weird how this could have been set to 0.
-        if (purgeType == 0) {
-            purgeType = Common.TimePeriods.YEARS;
+        if (_purgeType == null) {
+            _purgeType = TimePeriods.YEARS;
         }
         // Ditto for purge period
         if (purgePeriod == 0) {
@@ -846,9 +841,9 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
         map.put("loggingType", LOGGING_TYPE_CODES.getCode(loggingType));
-        map.put("intervalLoggingPeriodType", Common.TIME_PERIOD_CODES.getCode(intervalLoggingPeriodType));
+        map.put("intervalLoggingPeriodType", intervalLoggingPeriodType.name());
         map.put("intervalLoggingType", INTERVAL_LOGGING_TYPE_CODES.getCode(intervalLoggingType));
-        map.put("purgeType", Common.TIME_PERIOD_CODES.getCode(purgeType));
+        map.put("purgeType", _purgeType.name());
         map.put("pointLocator", pointLocator);
         map.put("eventDetectors", eventDetectors);
         map.put("engineeringUnits", ENGINEERING_UNITS_CODES.getCode(engineeringUnits));
@@ -867,10 +862,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
 
         text = json.getString("intervalLoggingPeriodType");
         if (text != null) {
-            intervalLoggingPeriodType = Common.TIME_PERIOD_CODES.getId(text);
-            if (intervalLoggingPeriodType == -1) {
+            try {
+                intervalLoggingPeriodType = TimePeriods.valueOf(text);
+            } catch (Exception e) {
                 throw new LocalizableJsonException("emport.error.invalid", "intervalLoggingPeriodType", text,
-                        Common.TIME_PERIOD_CODES.getCodeList());
+                        TimePeriods.values());
             }
         }
 
@@ -885,10 +881,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
 
         text = json.getString("purgeType");
         if (text != null) {
-            purgeType = Common.TIME_PERIOD_CODES.getId(text);
-            if (purgeType == -1) {
+            try {
+                _purgeType = TimePeriods.valueOf(text);
+            } catch (Exception e) {
                 throw new LocalizableJsonException("emport.error.invalid", "purgeType", text,
-                        Common.TIME_PERIOD_CODES.getCodeList());
+                        TimePeriods.values());
             }
         }
 

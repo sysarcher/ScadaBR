@@ -204,6 +204,7 @@ import com.serotonin.modbus4j.msg.ModbusRequest;
 import com.serotonin.modbus4j.msg.ReadResponse;
 import br.org.scadabr.util.IpAddressUtils;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.vo.datasource.fhz4j.FhtPointLocator;
 import br.org.scadabr.vo.event.AlarmLevel;
@@ -417,7 +418,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public DwrResponseI18n saveVirtualDataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType) {
+            int updatePeriods, TimePeriods updatePeriodType) {
         VirtualDataSourceVO ds = (VirtualDataSourceVO) Common.getUser()
                 .getEditDataSource();
 
@@ -554,7 +555,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public DwrResponseI18n saveModbusSerialDataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType, boolean quantize,
+            int updatePeriods, TimePeriods updatePeriodType, boolean quantize,
             int timeout, int retries, boolean contiguousBatches,
             boolean createSlaveMonitorPoints, int maxReadBitCount,
             int maxReadRegisterCount, int maxWriteRegisterCount,
@@ -689,7 +690,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public DwrResponseI18n saveModbusIpDataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType, boolean quantize,
+            int updatePeriods, TimePeriods updatePeriodType, boolean quantize,
             int timeout, int retries, boolean contiguousBatches,
             boolean createSlaveMonitorPoints, int maxReadBitCount,
             int maxReadRegisterCount, int maxWriteRegisterCount,
@@ -838,7 +839,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public DwrResponseI18n saveSnmpDataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType, String host, int port,
+            int updatePeriods, TimePeriods updatePeriodType, String host, int port,
             int snmpVersion, String community, String securityName,
             String authProtocol, String authPassphrase, String privProtocol,
             String privPassphrase, String engineId, String contextEngineId,
@@ -909,7 +910,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public DwrResponseI18n saveSqlDataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType, String driverClassname,
+            int updatePeriods, TimePeriods updatePeriodType, String driverClassname,
             String connectionUrl, String username, String password,
             String selectStatement, boolean rowBasedQuery) {
         SqlDataSourceVO ds = (SqlDataSourceVO) Common.getUser()
@@ -1031,8 +1032,8 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public DwrResponseI18n saveOneWireDataSource(String name, String xid,
-            String commPortId, int updatePeriodType, int updatePeriods,
-            int rescanPeriodType, int rescanPeriods) {
+            String commPortId, TimePeriods updatePeriodType, int updatePeriods,
+            TimePeriods rescanPeriodType, int rescanPeriods) {
         OneWireDataSourceVO ds = (OneWireDataSourceVO) Common.getUser()
                 .getEditDataSource();
 
@@ -1163,7 +1164,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public DwrResponseI18n saveBACnetIpDataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType, int deviceId,
+            int updatePeriods, TimePeriods updatePeriodType, int deviceId,
             String broadcastAddress, int port, int timeout, int segTimeout,
             int segWindow, int retries, int covSubscriptionTimeoutMinutes,
             int maxReadMultipleReferencesSegmented,
@@ -1328,7 +1329,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public DwrResponseI18n saveHttpRetrieverDataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType, String url,
+            int updatePeriods, TimePeriods updatePeriodType, String url,
             int timeoutSeconds, int retries) {
         HttpRetrieverDataSourceVO ds = (HttpRetrieverDataSourceVO) Common
                 .getUser().getEditDataSource();
@@ -1391,7 +1392,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public DwrResponseI18n saveHttpImageDataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType) {
+            int updatePeriods, TimePeriods updatePeriodType) {
         HttpImageDataSourceVO ds = (HttpImageDataSourceVO) Common.getUser()
                 .getEditDataSource();
 
@@ -1422,7 +1423,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public DwrResponseI18n savePop3DataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType, String pop3Server,
+            int updatePeriods, TimePeriods updatePeriodType, String pop3Server,
             String username, String password) {
         Pop3DataSourceVO ds = (Pop3DataSourceVO) Common.getUser()
                 .getEditDataSource();
@@ -1527,7 +1528,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     @MethodFilter
     public DwrResponseI18n saveGalilDataSource(String name, String xid,
             String host, int port, int timeout, int retries, int updatePeriods,
-            int updatePeriodType) {
+            TimePeriods updatePeriodType) {
         GalilDataSourceVO ds = (GalilDataSourceVO) Common.getUser()
                 .getEditDataSource();
 
@@ -1575,7 +1576,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public DwrResponseI18n saveEBI25DataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType, int timeout, int retries,
+            int updatePeriods, TimePeriods updatePeriodType, int timeout, int retries,
             String host, int port, boolean keepAlive) {
         EBI25DataSourceVO ds = (EBI25DataSourceVO) Common.getUser()
                 .getEditDataSource();
@@ -1931,7 +1932,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     }
 
     public DwrResponseI18n saveOpenV4JDataSource(String name, String xid,
-            String commPortId, int updatePeriodType, int updatePeriods,
+            String commPortId, TimePeriods updatePeriodType, int updatePeriods,
             String device, String protocol) {
         OpenV4JDataSourceVO ds = (OpenV4JDataSourceVO) Common.getUser()
                 .getEditDataSource();
@@ -2053,7 +2054,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     @MethodFilter
     public DwrResponseI18n saveDNP3IpDataSource(String name, String xid,
             int sourceAddress, int slaveAddress, String host, int port,
-            int staticPollPeriods, int rbePollPeriods, int rbePeriodType,
+            int staticPollPeriods, int rbePollPeriods, TimePeriods rbePeriodType,
             boolean quantize, int timeout, int retries) {
         Dnp3IpDataSourceVO ds = (Dnp3IpDataSourceVO) Common.getUser()
                 .getEditDataSource();
@@ -2079,7 +2080,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     public DwrResponseI18n saveDNP3SerialDataSource(String name, String xid,
             int sourceAddress, int slaveAddress, String commPortId,
             int baudRate, int staticPollPeriods, int rbePollPeriods,
-            int rbePeriodType, boolean quantize, int timeout, int retries) {
+            TimePeriods rbePeriodType, boolean quantize, int timeout, int retries) {
         Dnp3SerialDataSourceVO ds = (Dnp3SerialDataSourceVO) Common.getUser()
                 .getEditDataSource();
 
@@ -2205,7 +2206,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     @MethodFilter
     public DwrResponseI18n saveOPCDataSource(String name, String xid,
             String host, String domain, String user, String password,
-            String server, int updatePeriods, int updatePeriodType,
+            String server, int updatePeriods, TimePeriods updatePeriodType,
             boolean quantize) {
         OPCDataSourceVO ds = (OPCDataSourceVO) Common.getUser().getEditDataSource();
         ds.setXid(xid);
@@ -2331,7 +2332,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     // ASCII File Reader
     // ////
     public DwrResponseI18n saveASCIIFileDataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType, String filePath,
+            int updatePeriods, TimePeriods updatePeriodType, String filePath,
             boolean quantize) {
 
         ASCIIFileDataSourceVO ds = (ASCIIFileDataSourceVO) Common.getUser()
@@ -2362,7 +2363,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     // DR_STORAGE_HT5B
     // ////
     public DwrResponseI18n saveDrStorageHt5bDataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType, String commPortId,
+            int updatePeriods, TimePeriods updatePeriodType, String commPortId,
             int baudRate, int dataBits, int stopBits, int parity, int timeout,
             int retries, String initString, boolean quantize) {
 
@@ -2397,7 +2398,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     // ASCII Serial
     // ////
     public DwrResponseI18n saveASCIISerialDataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType, String commPortId,
+            int updatePeriods, TimePeriods updatePeriodType, String commPortId,
             int baudRate, int dataBits, int stopBits, int parity, int timeout,
             int retries, int stopMode, int nChar, int charStopMode,
             String charX, String hexValue, int stopTimeout, String initString,
@@ -2444,7 +2445,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public DwrResponseI18n saveIEC101SerialDataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType, int giRelativePeriod,
+            int updatePeriods, TimePeriods updatePeriodType, int giRelativePeriod,
             int clockSynchRelativePeriod, int linkLayerAddressSize,
             int linkLayerAddress, int asduAddressSize, int asduAddress,
             int cotSize, int objectAddressSize, int timeout, int retries,
@@ -2480,7 +2481,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
 
     @MethodFilter
     public DwrResponseI18n saveIEC101EthernetDataSource(String name,
-            String xid, int updatePeriods, int updatePeriodType,
+            String xid, int updatePeriods, TimePeriods updatePeriodType,
             int giRelativePeriod, int clockSynchRelativePeriod,
             int linkLayerAddressSize, int linkLayerAddress,
             int asduAddressSize, int asduAddress, int cotSize,
@@ -2523,7 +2524,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public DwrResponseI18n savePachubeDataSource(String name, String xid,
-            String apiKey, int updatePeriods, int updatePeriodType,
+            String apiKey, int updatePeriods, TimePeriods updatePeriodType,
             int timeoutSeconds, int retries) {
         PachubeDataSourceVO ds = (PachubeDataSourceVO) Common.getUser()
                 .getEditDataSource();
@@ -2577,7 +2578,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     @MethodFilter
     public DwrResponseI18n saveJmxDataSource(String name, String xid,
             boolean useLocalServer, String remoteServerAddr,
-            int updatePeriodType, int updatePeriods, boolean quantize) {
+            TimePeriods updatePeriodType, int updatePeriods, boolean quantize) {
         JmxDataSourceVO ds = (JmxDataSourceVO) Common.getUser()
                 .getEditDataSource();
 
@@ -2716,7 +2717,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     }
 
     public DwrResponseI18n saveNodaveS7DataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType, String filePath,
+            int updatePeriods, TimePeriods updatePeriodType, String filePath,
             boolean quantize, String nodaveWriteBaseCmd) {
 
         NodaveS7DataSourceVO ds = (NodaveS7DataSourceVO) Common.getUser()
@@ -2741,7 +2742,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     }
 
     public DwrResponseI18n saveAlpha2DataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType, String commPortId,
+            int updatePeriods, TimePeriods updatePeriodType, String commPortId,
             int baudRate, int dataBits, int stopBits, int parity, int timeout,
             int retries, int station) {
 
@@ -2777,7 +2778,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
     //
     @MethodFilter
     public DwrResponseI18n saveInternalDataSource(String name, String xid,
-            int updatePeriods, int updatePeriodType) {
+            int updatePeriods, TimePeriods updatePeriodType) {
         InternalDataSourceVO ds = (InternalDataSourceVO) Common.getUser()
                 .getEditDataSource();
 

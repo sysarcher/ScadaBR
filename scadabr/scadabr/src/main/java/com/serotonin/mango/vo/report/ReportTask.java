@@ -35,7 +35,7 @@ import java.util.logging.Logger;
  * @author Matthew Lohbihler
  */
 public class ReportTask extends SystemCronTask {
-    
+
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_REPORTS);
 
     private static final Map<Integer, ReportTask> JOB_REGISTRY = new HashMap<>();
@@ -47,7 +47,7 @@ public class ReportTask extends SystemCronTask {
 
             if (report.isSchedule()) {
                 ReportTask reportJob;
-                if (report.getSchedulePeriod() == ReportVO.SCHEDULE_CRON) {
+                if (report.isCronScheduled()) {
                     try {
                         reportJob = new ReportTask(report.getScheduleCron(), report.getTimeZone(), report);
                     } catch (ParseException e) {
@@ -83,10 +83,11 @@ public class ReportTask extends SystemCronTask {
     protected void run(long scheduledExecutionTime) {
         ReportWorkItem.queueReport(report);
     }
-        @Override
-        protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
-            LOG.severe("Report Overrun detected");
-            return true;
-        }
-    
+
+    @Override
+    protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
+        LOG.severe("Report Overrun detected");
+        return true;
+    }
+
 }

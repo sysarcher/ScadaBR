@@ -19,6 +19,7 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
@@ -88,7 +89,7 @@ public class DrStorageHt5bDataSourceVO extends DataSourceVO<DrStorageHt5bDataSou
         return TYPE;
     }
 
-    private int updatePeriodType = Common.TimePeriods.SECONDS;
+    private TimePeriods updatePeriodType = TimePeriods.SECONDS;
     @JsonRemoteProperty
     private int updatePeriods = 1;
     @JsonRemoteProperty
@@ -116,11 +117,11 @@ public class DrStorageHt5bDataSourceVO extends DataSourceVO<DrStorageHt5bDataSou
         super.validate(response);
     }
 
-    public int getUpdatePeriodType() {
+    public TimePeriods getUpdatePeriodType() {
         return updatePeriodType;
     }
 
-    public void setUpdatePeriodType(int updatePeriodType) {
+    public void setUpdatePeriodType(TimePeriods updatePeriodType) {
         this.updatePeriodType = updatePeriodType;
     }
 
@@ -209,7 +210,7 @@ public class DrStorageHt5bDataSourceVO extends DataSourceVO<DrStorageHt5bDataSou
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(updatePeriodType);
+        out.writeInt(updatePeriodType.mangoDbId);
         out.writeInt(updatePeriods);
         SerializationHelper.writeSafeUTF(out, commPortId);
         out.writeInt(baudRate);
@@ -226,7 +227,7 @@ public class DrStorageHt5bDataSourceVO extends DataSourceVO<DrStorageHt5bDataSou
             ClassNotFoundException {
         int ver = in.readInt();
         if (ver == 1) {
-            updatePeriodType = in.readInt();
+            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
             updatePeriods = in.readInt();
             commPortId = SerializationHelper.readSafeUTF(in);
             baudRate = in.readInt();
@@ -243,7 +244,7 @@ public class DrStorageHt5bDataSourceVO extends DataSourceVO<DrStorageHt5bDataSou
     public void jsonDeserialize(JsonReader reader, JsonObject json)
             throws JsonException {
         super.jsonDeserialize(reader, json);
-        Integer value = deserializeUpdatePeriodType(json);
+        TimePeriods value = deserializeUpdatePeriodType(json);
         if (value != null) {
             updatePeriodType = value;
         }

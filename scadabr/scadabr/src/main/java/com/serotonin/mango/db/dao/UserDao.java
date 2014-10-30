@@ -99,7 +99,7 @@ public class UserDao extends BaseDao {
             user.setSelectedWatchList(rs.getInt(++i));
             user.setHomeUrl(rs.getString(++i));
             user.setLastLogin(rs.getLong(++i));
-            AlarmLevel l = AlarmLevel.valueOf(rs.getInt(++i));
+            AlarmLevel l = AlarmLevel.fromMangoDbId(rs.getInt(++i));
             user.setReceiveAlarmEmails(l == AlarmLevel.NONE ? null : l);
             user.setReceiveOwnAuditEvents(charToBool(rs.getString(++i)));
             return user;
@@ -174,7 +174,7 @@ public class UserDao extends BaseDao {
                 ps.setString(5, boolToChar(user.isAdmin()));
                 ps.setString(6, boolToChar(user.isDisabled()));
                 ps.setString(7, user.getHomeUrl());
-                ps.setInt(8, user.getReceiveAlarmEmails().ordinal());
+                ps.setInt(8, user.getReceiveAlarmEmails().mangoDbId);
                 ps.setString(9, boolToChar(user.isReceiveOwnAuditEvents()));
                 return ps;
             }

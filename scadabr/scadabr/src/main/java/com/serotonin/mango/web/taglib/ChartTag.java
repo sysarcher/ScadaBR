@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.taglib;
 
+import br.org.scadabr.utils.TimePeriods;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,10 +28,12 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.view.custom.CustomView;
 import com.serotonin.mango.view.custom.CustomViewChartPoint;
 import com.serotonin.mango.vo.DataPointVO;
+import org.jfree.data.time.TimePeriod;
 
 /**
  * @author Matthew Lohbihler
  */
+@Deprecated
 public class ChartTag extends ViewTagSupport {
 
     private static final long serialVersionUID = -1;
@@ -75,11 +78,13 @@ public class ChartTag extends ViewTagSupport {
 
     @Override
     public int doEndTag() throws JspException {
-        int periodType = Common.TIME_PERIOD_CODES.getId(durationType.toUpperCase());
-        if (periodType == -1) {
-            throw new JspException("Invalid durationType. Must be one of " + Common.TIME_PERIOD_CODES.getCodeList());
+        TimePeriods periodType;
+        try {
+            periodType = TimePeriods.valueOf(durationType.toUpperCase());
+        } catch (Exception e) {
+            throw new JspException("Invalid durationType. Must be one of " + TimePeriods.values());
         }
-        long millis = Common.getMillis(periodType, duration);
+        long millis = periodType.getMillis(duration);
 
         // Add the chart to the view
         int id = view.addChart(millis, width, height, points);

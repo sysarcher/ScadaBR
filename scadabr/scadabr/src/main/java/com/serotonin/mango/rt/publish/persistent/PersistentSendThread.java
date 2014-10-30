@@ -225,7 +225,7 @@ class PersistentSendThread extends SendThread {
         // Data
         writeBuffer.pushU2B(entry.getVo().getIndex());
         MangoValue value = entry.getPvt().getValue();
-        writeBuffer.push(value.getDataType().ordinal());
+        writeBuffer.push(value.getDataType().mangoDbId);
         switch (entry.getPvt().getValue().getDataType()) {
             case BINARY:
                 writeBuffer.push(value.getBooleanValue() ? 1 : 0);
