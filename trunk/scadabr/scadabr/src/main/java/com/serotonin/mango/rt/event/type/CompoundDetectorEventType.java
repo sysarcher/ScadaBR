@@ -24,6 +24,8 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.rt.event.type.DuplicateHandling;
+import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 
 /**
@@ -33,7 +35,7 @@ import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 public class CompoundDetectorEventType extends EventType {
 
     private int compoundDetectorId;
-    private int duplicateHandling = EventType.DuplicateHandling.IGNORE;
+    private DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
 
     public CompoundDetectorEventType() {
         // Required for reflection.
@@ -44,8 +46,8 @@ public class CompoundDetectorEventType extends EventType {
     }
 
     @Override
-    public int getEventSourceId() {
-        return EventType.EventSources.COMPOUND;
+    public EventSources getEventSource() {
+        return EventSources.COMPOUND;
     }
 
     public int getCompoundDetectorId() {
@@ -58,11 +60,11 @@ public class CompoundDetectorEventType extends EventType {
     }
 
     @Override
-    public int getDuplicateHandling() {
+    public DuplicateHandling getDuplicateHandling() {
         return duplicateHandling;
     }
 
-    public void setDuplicateHandling(int duplicateHandling) {
+    public void setDuplicateHandling(DuplicateHandling duplicateHandling) {
         this.duplicateHandling = duplicateHandling;
     }
 

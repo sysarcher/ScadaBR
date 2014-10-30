@@ -44,6 +44,8 @@ import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
+import br.org.scadabr.rt.event.type.DuplicateHandling;
+import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
@@ -448,14 +450,13 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
 
     protected EventTypeVO createEventType(int eventId,
             LocalizableMessage message) {
-        return createEventType(eventId, message,
-                EventType.DuplicateHandling.IGNORE, AlarmLevel.URGENT);
+        return createEventType(eventId, message, DuplicateHandling.IGNORE, AlarmLevel.URGENT);
     }
 
     protected EventTypeVO createEventType(int eventId,
-            LocalizableMessage message, int duplicateHandling,
+            LocalizableMessage message, DuplicateHandling duplicateHandling,
             AlarmLevel defaultAlarmLevel) {
-        return new EventTypeVO(EventType.EventSources.DATA_SOURCE, getId(),
+        return new EventTypeVO(EventSources.DATA_SOURCE, getId(),
                 eventId, message, getAlarmLevel(eventId, defaultAlarmLevel),
                 duplicateHandling);
     }

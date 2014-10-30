@@ -53,6 +53,7 @@ import com.serotonin.mango.vo.report.ReportVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.rt.event.type.EventSources;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -405,7 +406,7 @@ public class ReportDao extends BaseDao {
                         + "    left join users u on e.ackUserId=u.id " //
                         + "  where ue.userId=? " //
                         + "    and e.typeId=" //
-                        + EventType.EventSources.DATA_POINT //
+                        +  EventSources.DATA_POINT.mangoDbId //
                         + "    and e.typeRef1=? ";
 
                 if (instance.getIncludeEvents() == ReportVO.EVENTS_ALARMS) {

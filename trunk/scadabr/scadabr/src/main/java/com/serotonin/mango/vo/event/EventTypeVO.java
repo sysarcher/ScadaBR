@@ -18,6 +18,8 @@
  */
 package com.serotonin.mango.vo.event;
 
+import br.org.scadabr.rt.event.type.DuplicateHandling;
+import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import java.util.List;
 
@@ -35,9 +37,9 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 public class EventTypeVO {
 
     /**
-     * The type of event. @see EventType.EventSources
+     * The type of event. @see EventSources
      */
-    private int typeId;
+    private EventSources eventSource;
     /**
      * For data point event, the data point id For data source event, the data
      * source id For system event, the type id
@@ -52,68 +54,63 @@ public class EventTypeVO {
     private List<EventHandlerVO> handlers;
     private AlarmLevel alarmLevel;
     private String eventDetectorKey;
-    private int duplicateHandling;
+    private DuplicateHandling duplicateHandling;
 
-    public EventTypeVO(int typeId, int typeRef1, int typeRef2) {
-        this.typeId = typeId;
+    public EventTypeVO(EventSources eventSource, int typeRef1, int typeRef2) {
+        this.eventSource = eventSource;
         this.typeRef1 = typeRef1;
         this.typeRef2 = typeRef2;
     }
 
-    public EventTypeVO(int typeId, int typeRef1, int typeRef2, LocalizableMessage description, AlarmLevel alarmLevel) {
-        this(typeId, typeRef1, typeRef2);
+    public EventTypeVO(EventSources eventSource, int typeRef1, int typeRef2, LocalizableMessage description, AlarmLevel alarmLevel) {
+        this(eventSource, typeRef1, typeRef2);
         this.description = description;
         this.alarmLevel = alarmLevel;
     }
 
-    public EventTypeVO(int typeId, int typeRef1, int typeRef2, LocalizableMessage description, AlarmLevel alarmLevel,
-            int duplicateHandling) {
-        this(typeId, typeRef1, typeRef2);
+    public EventTypeVO(EventSources eventSource, int typeRef1, int typeRef2, LocalizableMessage description, AlarmLevel alarmLevel,
+            DuplicateHandling duplicateHandling) {
+        this(eventSource, typeRef1, typeRef2);
         this.description = description;
         this.alarmLevel = alarmLevel;
         this.duplicateHandling = duplicateHandling;
     }
 
-    public EventTypeVO(int typeId, int typeRef1, int typeRef2, LocalizableMessage description, AlarmLevel alarmLevel,
+    public EventTypeVO(EventSources eventSource, int typeRef1, int typeRef2, LocalizableMessage description, AlarmLevel alarmLevel,
             String eventDetectorKey) {
-        this(typeId, typeRef1, typeRef2, description, alarmLevel);
+        this(eventSource, typeRef1, typeRef2, description, alarmLevel);
         this.eventDetectorKey = eventDetectorKey;
     }
 
     public EventType createEventType() {
-        if (typeId == EventType.EventSources.DATA_POINT) {
-            return new DataPointEventType(typeRef1, typeRef2);
+        switch (eventSource) {
+            case DATA_POINT:
+                return new DataPointEventType(typeRef1, typeRef2);
+            case DATA_SOURCE:
+                return new DataSourceEventType(typeRef1, typeRef2, alarmLevel, duplicateHandling);
+            case SYSTEM:
+                return new SystemEventType(typeRef1, typeRef2);
+            case COMPOUND:
+                return new CompoundDetectorEventType(typeRef1);
+            case SCHEDULED:
+                return new ScheduledEventType(typeRef1);
+            case PUBLISHER:
+                return new PublisherEventType(typeRef1, typeRef2);
+            case AUDIT:
+                return new AuditEventType(typeRef1, typeRef2);
+            case MAINTENANCE:
+                return new MaintenanceEventType(typeRef1);
+            default:
+                throw new RuntimeException("Cant handle EventType");
         }
-        if (typeId == EventType.EventSources.DATA_SOURCE) {
-            return new DataSourceEventType(typeRef1, typeRef2, alarmLevel, duplicateHandling);
-        }
-        if (typeId == EventType.EventSources.SYSTEM) {
-            return new SystemEventType(typeRef1, typeRef2);
-        }
-        if (typeId == EventType.EventSources.COMPOUND) {
-            return new CompoundDetectorEventType(typeRef1);
-        }
-        if (typeId == EventType.EventSources.SCHEDULED) {
-            return new ScheduledEventType(typeRef1);
-        }
-        if (typeId == EventType.EventSources.PUBLISHER) {
-            return new PublisherEventType(typeRef1, typeRef2);
-        }
-        if (typeId == EventType.EventSources.AUDIT) {
-            return new AuditEventType(typeRef1, typeRef2);
-        }
-        if (typeId == EventType.EventSources.MAINTENANCE) {
-            return new MaintenanceEventType(typeRef1);
-        }
-        return null;
     }
 
-    public int getTypeId() {
-        return typeId;
+    public EventSources getEventSource() {
+        return eventSource;
     }
 
-    public void setTypeId(int typeId) {
-        this.typeId = typeId;
+    public void setEventSource(EventSources eventSource) {
+        this.eventSource = eventSource;
     }
 
     public int getTypeRef1() {

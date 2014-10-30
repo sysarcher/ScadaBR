@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.db.dao;
 
+import br.org.scadabr.rt.event.type.EventSources;
 import java.io.Serializable;
 import java.sql.Blob;
 import java.sql.ResultSet;
@@ -159,7 +160,7 @@ public class PublisherDao extends BaseDao {
         getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
-                ejt2.update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.PUBLISHER
+                ejt2.update("delete from eventHandlers where eventTypeId=" + EventSources.PUBLISHER.mangoDbId
                         + " and eventTypeRef1=?", new Object[]{publisherId});
                 ejt2.update("delete from publishers where id=?", new Object[]{publisherId});
             }

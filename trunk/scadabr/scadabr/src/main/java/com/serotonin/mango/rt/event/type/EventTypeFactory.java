@@ -22,7 +22,7 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonValue;
 import br.org.scadabr.json.TypeFactory;
-import com.serotonin.mango.rt.event.type.EventType.EventSources;
+import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.util.LocalizableJsonException;
 
 public class EventTypeFactory implements TypeFactory {
@@ -38,40 +38,32 @@ public class EventTypeFactory implements TypeFactory {
         String text = json.getString("sourceType");
         if (text == null) {
             throw new LocalizableJsonException("emport.error.eventType.missing", "sourceType",
-                    EventType.SOURCE_CODES.getCodeList());
+                    EventSources.values());
         }
-
-        int source = EventType.SOURCE_CODES.getId(text);
-        if (!EventType.SOURCE_CODES.isValidId(source)) {
+        try {
+            switch (EventSources.valueOf(text)) {
+                case DATA_POINT:
+                    return DataPointEventType.class;
+                case DATA_SOURCE:
+                    return DataSourceEventType.class;
+                case SYSTEM:
+                    return SystemEventType.class;
+                case COMPOUND:
+                    return CompoundDetectorEventType.class;
+                case SCHEDULED:
+                    return ScheduledEventType.class;
+                case PUBLISHER:
+                    return PublisherEventType.class;
+                case AUDIT:
+                    return AuditEventType.class;
+                case MAINTENANCE:
+                    return MaintenanceEventType.class;
+                default:
+                    return null;
+            }
+        } catch (Exception e) {
             throw new LocalizableJsonException("emport.error.eventType.invalid", "sourceType", text,
-                    EventType.SOURCE_CODES.getCodeList());
+                    EventSources.values());
         }
-
-        if (source == EventSources.DATA_POINT) {
-            return DataPointEventType.class;
-        }
-        if (source == EventSources.DATA_SOURCE) {
-            return DataSourceEventType.class;
-        }
-        if (source == EventSources.SYSTEM) {
-            return SystemEventType.class;
-        }
-        if (source == EventSources.COMPOUND) {
-            return CompoundDetectorEventType.class;
-        }
-        if (source == EventSources.SCHEDULED) {
-            return ScheduledEventType.class;
-        }
-        if (source == EventSources.PUBLISHER) {
-            return PublisherEventType.class;
-        }
-        if (source == EventSources.AUDIT) {
-            return AuditEventType.class;
-        }
-        if (source == EventSources.MAINTENANCE) {
-            return MaintenanceEventType.class;
-        }
-
-        return null;
     }
 }

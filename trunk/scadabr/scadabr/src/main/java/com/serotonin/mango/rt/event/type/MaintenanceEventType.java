@@ -5,6 +5,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
+import br.org.scadabr.rt.event.type.DuplicateHandling;
+import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.db.dao.MaintenanceEventDao;
 
 public class MaintenanceEventType extends EventType {
@@ -20,8 +22,8 @@ public class MaintenanceEventType extends EventType {
     }
 
     @Override
-    public int getEventSourceId() {
-        return EventType.EventSources.MAINTENANCE;
+    public EventSources getEventSource() {
+        return EventSources.MAINTENANCE;
     }
 
     public int getMaintenanceId() {
@@ -34,8 +36,8 @@ public class MaintenanceEventType extends EventType {
     }
 
     @Override
-    public int getDuplicateHandling() {
-        return EventType.DuplicateHandling.IGNORE;
+    public DuplicateHandling getDuplicateHandling() {
+        return DuplicateHandling.IGNORE;
     }
 
     @Override

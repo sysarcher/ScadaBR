@@ -46,6 +46,7 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.timer.cron.DataSourceCronTask;
 import br.org.scadabr.util.ILifecycle;
+import br.org.scadabr.vo.IntervalLoggingTypes;
 import br.org.scadabr.vo.LoggingTypes;
 import java.util.Objects;
 
@@ -295,7 +296,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
                 throw new ImplementMeException(); //WAS: intervalLoggingTask = new TimeoutTask(this, vo.getIntervalLoggingPeriodType(), vo.getIntervalLoggingPeriod());
             }
             intervalValue = pointValue;
-            if (vo.getIntervalLoggingType() == DataPointVO.IntervalLoggingTypes.AVERAGE) {
+            if (vo.getIntervalLoggingType() == IntervalLoggingTypes.AVERAGE) {
                 intervalStartTime = System.currentTimeMillis();
                 averagingValues = new ArrayList<>();
             }
@@ -314,24 +315,27 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
 
     private void intervalSave(PointValueTime pvt) {
         synchronized (intervalLoggingLock) {
-            if (vo.getIntervalLoggingType() == DataPointVO.IntervalLoggingTypes.MAXIMUM) {
-                if (intervalValue == null) {
-                    intervalValue = pvt;
-                } else if (pvt != null) {
-                    if (intervalValue.getDoubleValue() < pvt.getDoubleValue()) {
+            switch (vo.getIntervalLoggingType()) {
+                case MAXIMUM:
+                    if (intervalValue == null) {
                         intervalValue = pvt;
+                    } else if (pvt != null) {
+                        if (intervalValue.getDoubleValue() < pvt.getDoubleValue()) {
+                            intervalValue = pvt;
+                        }
                     }
-                }
-            } else if (vo.getIntervalLoggingType() == DataPointVO.IntervalLoggingTypes.MINIMUM) {
-                if (intervalValue == null) {
-                    intervalValue = pvt;
-                } else if (pvt != null) {
-                    if (intervalValue.getDoubleValue() > pvt.getDoubleValue()) {
+                    break;
+                case MINIMUM:
+                    if (intervalValue == null) {
                         intervalValue = pvt;
+                    } else if (pvt != null) {
+                        if (intervalValue.getDoubleValue() > pvt.getDoubleValue()) {
+                            intervalValue = pvt;
+                        }
                     }
-                }
-            } else if (vo.getIntervalLoggingType() == DataPointVO.IntervalLoggingTypes.AVERAGE) {
-                averagingValues.add(pvt);
+                    break;
+                case AVERAGE:
+                    averagingValues.add(pvt);
             }
         }
     }
@@ -345,22 +349,26 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     public void run(long fireTime) {
         synchronized (intervalLoggingLock) {
             MangoValue value;
-            if (vo.getIntervalLoggingType() == DataPointVO.IntervalLoggingTypes.INSTANT) {
-                value = PointValueTime.getValue(pointValue);
-            } else if (vo.getIntervalLoggingType() == DataPointVO.IntervalLoggingTypes.MAXIMUM
-                    || vo.getIntervalLoggingType() == DataPointVO.IntervalLoggingTypes.MINIMUM) {
-                value = PointValueTime.getValue(intervalValue);
-                intervalValue = pointValue;
-            } else if (vo.getIntervalLoggingType() == DataPointVO.IntervalLoggingTypes.AVERAGE) {
-                AnalogStatistics stats = new AnalogStatistics(intervalValue, averagingValues, intervalStartTime,
-                        fireTime);
-                value = new NumericValue(stats.getAverage());
+            switch (vo.getIntervalLoggingType()) {
+                case INSTANT:
+                    value = PointValueTime.getValue(pointValue);
+                    break;
+                case MAXIMUM:
+                case MINIMUM:
+                    value = PointValueTime.getValue(intervalValue);
+                    intervalValue = pointValue;
+                    break;
+                case AVERAGE:
+                    AnalogStatistics stats = new AnalogStatistics(intervalValue, averagingValues, intervalStartTime,
+                            fireTime);
+                    value = new NumericValue(stats.getAverage());
 
-                intervalValue = pointValue;
-                averagingValues.clear();
-                intervalStartTime = fireTime;
-            } else {
-                throw new ShouldNeverHappenException("Unknown interval logging type: " + vo.getIntervalLoggingType());
+                    intervalValue = pointValue;
+                    averagingValues.clear();
+                    intervalStartTime = fireTime;
+                    break;
+                default:
+                    throw new ShouldNeverHappenException("Unknown interval logging type: " + vo.getIntervalLoggingType());
             }
 
             if (value != null) {

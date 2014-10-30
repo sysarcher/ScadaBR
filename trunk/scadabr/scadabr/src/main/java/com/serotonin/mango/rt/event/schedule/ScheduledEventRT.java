@@ -20,6 +20,7 @@ package com.serotonin.mango.rt.event.schedule;
 
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.rt.event.type.DuplicateHandling;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.SimpleEventDetector;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -95,7 +96,7 @@ public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgC
     public void initialize() {
         eventType = new ScheduledEventType(vo.getId());
         if (!vo.isReturnToNormal()) {
-            eventType.setDuplicateHandling(EventType.DuplicateHandling.ALLOW);
+            eventType.setDuplicateHandling(DuplicateHandling.ALLOW);
         }
 
         // Schedule the active event.

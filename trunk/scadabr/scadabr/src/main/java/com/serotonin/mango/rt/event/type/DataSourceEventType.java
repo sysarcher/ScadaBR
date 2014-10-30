@@ -24,6 +24,8 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.rt.event.type.DuplicateHandling;
+import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
@@ -34,17 +36,17 @@ public class DataSourceEventType extends EventType {
     private int dataSourceId;
     private int dataSourceEventTypeId;
     private AlarmLevel alarmLevel;
-    private int duplicateHandling;
+    private DuplicateHandling duplicateHandling;
 
     public DataSourceEventType() {
         // Required for reflection.
     }
 
     public DataSourceEventType(int dataSourceId, int dataSourceEventTypeId) {
-        this(dataSourceId, dataSourceEventTypeId, AlarmLevel.URGENT, EventType.DuplicateHandling.IGNORE);
+        this(dataSourceId, dataSourceEventTypeId, AlarmLevel.URGENT, DuplicateHandling.IGNORE);
     }
 
-    public DataSourceEventType(int dataSourceId, int dataSourceEventTypeId, AlarmLevel alarmLevel, int duplicateHandling) {
+    public DataSourceEventType(int dataSourceId, int dataSourceEventTypeId, AlarmLevel alarmLevel, DuplicateHandling duplicateHandling) {
         this.dataSourceId = dataSourceId;
         this.dataSourceEventTypeId = dataSourceEventTypeId;
         this.alarmLevel = alarmLevel;
@@ -52,8 +54,8 @@ public class DataSourceEventType extends EventType {
     }
 
     @Override
-    public int getEventSourceId() {
-        return EventType.EventSources.DATA_SOURCE;
+    public EventSources getEventSource() {
+        return EventSources.DATA_SOURCE;
     }
 
     public int getDataSourceEventTypeId() {
@@ -75,7 +77,7 @@ public class DataSourceEventType extends EventType {
     }
 
     @Override
-    public int getDuplicateHandling() {
+    public DuplicateHandling getDuplicateHandling() {
         return duplicateHandling;
     }
 

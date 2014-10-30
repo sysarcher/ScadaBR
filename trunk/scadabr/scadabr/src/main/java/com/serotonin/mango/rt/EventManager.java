@@ -19,6 +19,8 @@
 package com.serotonin.mango.rt;
 
 import br.org.scadabr.l10n.AbstractLocalizer;
+import br.org.scadabr.rt.event.type.DuplicateHandling;
+import br.org.scadabr.rt.event.type.EventSources;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -80,28 +82,25 @@ public class EventManager implements ILifecycle, Serializable {
         EventInstance dup = get(type);
         if (dup != null) {
             // Check the duplicate handling.
-            int dh = type.getDuplicateHandling();
-            if (dh == EventType.DuplicateHandling.DO_NOT_ALLOW) {
-                // Create a log error...
-                log.error("An event was raised for a type that is already active: type=" + type + ", message="
-                        + message.getI18nKey());
-                // ... but ultimately just ignore the thing.
-                return;
-            }
-
-            if (dh == EventType.DuplicateHandling.IGNORE) // Safely return.
-            {
-                return;
-            }
-
-            if (dh == EventType.DuplicateHandling.IGNORE_SAME_MESSAGE) {
-                // Ignore only if the message is the same. There may be events of this type with different messages,
-                // so look through them all for a match.
-                for (EventInstance e : getAll(type)) {
-                    if (e.getMessage().equals(message)) {
-                        return;
+            switch (type.getDuplicateHandling()) {
+                case DO_NOT_ALLOW:
+                    // Create a log error...
+                    log.error("An event was raised for a type that is already active: type=" + type + ", message="
+                            + message.getI18nKey());
+                    // ... but ultimately just ignore the thing.
+                    return;
+                case IGNORE: // Safely return.
+                    return;
+                case IGNORE_SAME_MESSAGE:
+                    // Ignore only if the message is the same. There may be events of this type with different messages,
+                    // so look through them all for a match.
+                    for (EventInstance e : getAll(type)) {
+                        if (e.getMessage().equals(message)) {
+                            return;
+                        }
                     }
-                }
+                    break;
+                default:
             }
 
             // Otherwise we just continue...
@@ -215,7 +214,8 @@ public class EventManager implements ILifecycle, Serializable {
     //
     public void cancelEventsForDataPoint(int dataPointId) {
         for (EventInstance e : activeEvents) {
-            if (e.getEventType().getDataPointId() == dataPointId) {
+            final EventType et = e.getEventType();
+            if (et.getEventSource() == EventSources.DATA_POINT && et.getDataPointId() == dataPointId) {
                 deactivateEvent(e, System.currentTimeMillis(), EventInstance.RtnCauses.SOURCE_DISABLED);
             }
         }
@@ -223,7 +223,8 @@ public class EventManager implements ILifecycle, Serializable {
 
     public void cancelEventsForDataSource(int dataSourceId) {
         for (EventInstance e : activeEvents) {
-            if (e.getEventType().getDataSourceId() == dataSourceId) {
+            final EventType et = e.getEventType();
+            if (et.getEventSource() == EventSources.DATA_SOURCE && et.getDataSourceId() == dataSourceId) {
                 deactivateEvent(e, System.currentTimeMillis(), EventInstance.RtnCauses.SOURCE_DISABLED);
             }
         }
@@ -231,7 +232,8 @@ public class EventManager implements ILifecycle, Serializable {
 
     public void cancelEventsForPublisher(int publisherId) {
         for (EventInstance e : activeEvents) {
-            if (e.getEventType().getPublisherId() == publisherId) {
+            final EventType et = e.getEventType();
+            if (et.getEventSource() == EventSources.PUBLISHER && et.getPublisherId() == publisherId) {
                 deactivateEvent(e, System.currentTimeMillis(), EventInstance.RtnCauses.SOURCE_DISABLED);
             }
         }

@@ -27,6 +27,7 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
+import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.event.compound.CompoundEventDetectorRT;
@@ -70,7 +71,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
     }
 
     public EventTypeVO getEventType() {
-        return new EventTypeVO(EventType.EventSources.COMPOUND, id, 0, new LocalizableMessageImpl("common.default", name),
+        return new EventTypeVO(EventSources.COMPOUND, id, 0, new LocalizableMessageImpl("common.default", name),
                 alarmLevel);
     }
 

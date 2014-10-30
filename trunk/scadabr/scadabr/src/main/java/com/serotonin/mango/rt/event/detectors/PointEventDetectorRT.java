@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.event.detectors;
 
+import br.org.scadabr.rt.event.type.DuplicateHandling;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,6 @@ import com.serotonin.mango.rt.event.SimpleEventDetector;
 import com.serotonin.mango.rt.event.type.DataPointEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
@@ -39,7 +39,7 @@ abstract public class PointEventDetectorRT extends SimpleEventDetector implement
     protected EventType getEventType() {
         DataPointEventType et = new DataPointEventType(vo.njbGetDataPoint().getId(), vo.getId());
         if (!vo.isRtnApplicable()) {
-            et.setDuplicateHandling(EventType.DuplicateHandling.ALLOW);
+            et.setDuplicateHandling(DuplicateHandling.ALLOW);
         }
         return et;
     }

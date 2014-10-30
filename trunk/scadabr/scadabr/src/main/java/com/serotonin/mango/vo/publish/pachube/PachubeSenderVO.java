@@ -25,6 +25,7 @@ import java.util.List;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.publish.PublisherRT;
 import com.serotonin.mango.rt.publish.httpSender.HttpSenderRT;
@@ -43,7 +44,7 @@ public class PachubeSenderVO extends PublisherVO<PachubePointVO> {
 
     @Override
     protected void getEventTypesImpl(List<EventTypeVO> eventTypes) {
-        eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(), HttpSenderRT.SEND_EXCEPTION_EVENT,
+        eventTypes.add(new EventTypeVO(EventSources.PUBLISHER, getId(), HttpSenderRT.SEND_EXCEPTION_EVENT,
                 new LocalizableMessageImpl("event.pb.httpSend"), AlarmLevel.URGENT));
     }
 

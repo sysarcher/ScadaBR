@@ -26,6 +26,8 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.rt.event.type.DuplicateHandling;
+import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
@@ -91,7 +93,7 @@ public class SystemEventType extends EventType {
     }
 
     private static void addEventTypeVO(int type, String key, AlarmLevel defaultAlarmLevel) {
-        systemEventTypes.add(new EventTypeVO(EventType.EventSources.SYSTEM, type, 0, new LocalizableMessageImpl(key),
+        systemEventTypes.add(new EventTypeVO(EventSources.SYSTEM, type, 0, new LocalizableMessageImpl(key),
                 SystemSettingsDao.getAlarmLevel(SYSTEM_SETTINGS_PREFIX + type, defaultAlarmLevel)));
     }
 
@@ -131,7 +133,7 @@ public class SystemEventType extends EventType {
     //
     private int systemEventTypeId;
     private int refId2;
-    private int duplicateHandling = EventType.DuplicateHandling.ALLOW;
+    private DuplicateHandling duplicateHandling = DuplicateHandling.ALLOW;
 
     public SystemEventType() {
         // Required for reflection.
@@ -146,15 +148,15 @@ public class SystemEventType extends EventType {
         this.refId2 = refId2;
     }
 
-    public SystemEventType(int systemEventTypeId, int refId2, int duplicateHandling) {
+    public SystemEventType(int systemEventTypeId, int refId2, DuplicateHandling duplicateHandling) {
         this(systemEventTypeId);
         this.refId2 = refId2;
         this.duplicateHandling = duplicateHandling;
     }
 
     @Override
-    public int getEventSourceId() {
-        return EventType.EventSources.SYSTEM;
+    public EventSources getEventSource() {
+        return EventSources.SYSTEM;
     }
 
     public int getSystemEventTypeId() {
@@ -172,7 +174,7 @@ public class SystemEventType extends EventType {
     }
 
     @Override
-    public int getDuplicateHandling() {
+    public DuplicateHandling getDuplicateHandling() {
         return duplicateHandling;
     }
 

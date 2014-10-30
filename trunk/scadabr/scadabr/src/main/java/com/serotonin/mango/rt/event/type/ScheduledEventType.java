@@ -24,6 +24,8 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.rt.event.type.DuplicateHandling;
+import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.db.dao.ScheduledEventDao;
 
 /**
@@ -34,7 +36,7 @@ import com.serotonin.mango.db.dao.ScheduledEventDao;
 public class ScheduledEventType extends EventType {
 
     private int scheduleId;
-    private int duplicateHandling = EventType.DuplicateHandling.IGNORE;
+    private DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
 
     public ScheduledEventType() {
         // Required for reflection.
@@ -45,8 +47,8 @@ public class ScheduledEventType extends EventType {
     }
 
     @Override
-    public int getEventSourceId() {
-        return EventType.EventSources.SCHEDULED;
+    public EventSources getEventSource() {
+        return EventSources.SCHEDULED;
     }
 
     @Override
@@ -60,11 +62,11 @@ public class ScheduledEventType extends EventType {
     }
 
     @Override
-    public int getDuplicateHandling() {
+    public DuplicateHandling getDuplicateHandling() {
         return duplicateHandling;
     }
 
-    public void setDuplicateHandling(int duplicateHandling) {
+    public void setDuplicateHandling(DuplicateHandling duplicateHandling) {
         this.duplicateHandling = duplicateHandling;
     }
 

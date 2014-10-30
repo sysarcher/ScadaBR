@@ -33,6 +33,7 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.json.JsonValue;
+import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.PublisherDao;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -140,9 +141,9 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
 
     public List<EventTypeVO> getEventTypes() {
         List<EventTypeVO> eventTypes = new ArrayList<>();
-        eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(), PublisherRT.POINT_DISABLED_EVENT,
+        eventTypes.add(new EventTypeVO(EventSources.PUBLISHER, getId(), PublisherRT.POINT_DISABLED_EVENT,
                 new LocalizableMessageImpl("event.pb.pointMissing"), AlarmLevel.URGENT));
-        eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(), PublisherRT.QUEUE_SIZE_WARNING_EVENT,
+        eventTypes.add(new EventTypeVO(EventSources.PUBLISHER, getId(), PublisherRT.QUEUE_SIZE_WARNING_EVENT,
                 new LocalizableMessageImpl("event.pb.queueSize"), AlarmLevel.URGENT));
 
         getEventTypesImpl(eventTypes);

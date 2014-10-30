@@ -12,6 +12,7 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
+import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.Common;
@@ -300,7 +301,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     }
 
     public EventTypeVO getEventType() {
-        return new EventTypeVO(EventType.EventSources.MAINTENANCE, id, 0, getDescription(), alarmLevel);
+        return new EventTypeVO(EventSources.MAINTENANCE, id, 0, getDescription(), alarmLevel);
     }
 
     public LocalizableMessage getDescription() {

@@ -37,7 +37,7 @@ abstract public class LogicalOperator {
     abstract public void terminate(CompoundEventDetectorRT parent);
 
     public List<String> getDetectorKeys() {
-        List<String> keys = new LinkedList<String>();
+        List<String> keys = new LinkedList<>();
         appendDetectorKeys(keys);
         return keys;
     }

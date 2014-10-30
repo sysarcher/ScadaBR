@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.db.upgrade;
 
+import br.org.scadabr.rt.event.type.EventSources;
 import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -110,7 +111,7 @@ public class Upgrade1_1_1 extends DBUpgrade {
             int i = 0;
             h.setId(rs.getInt(++i));
 
-            EventTypeVO t = new EventTypeVO(rs.getInt(++i), rs.getInt(++i), rs.getInt(++i));
+            EventTypeVO t = new EventTypeVO(EventSources.fromMangoDbId(rs.getInt(++i)), rs.getInt(++i), rs.getInt(++i));
 
             h.setHandlerType(rs.getInt(++i));
             h.setTargetPointId(rs.getInt(++i));
@@ -160,7 +161,7 @@ public class Upgrade1_1_1 extends DBUpgrade {
                     @Override
                     public void setValues(PreparedStatement ps) throws SQLException {
                         ps.setInt(1, handler.getId());
-                        ps.setInt(2, type.getTypeId());
+                        ps.setInt(2, type.getEventSource().mangoDbId);
                         ps.setInt(3, type.getTypeRef1());
                         ps.setInt(4, type.getTypeRef2());
                         ps.setBlob(5, SerializationHelper.writeObject(handler));
