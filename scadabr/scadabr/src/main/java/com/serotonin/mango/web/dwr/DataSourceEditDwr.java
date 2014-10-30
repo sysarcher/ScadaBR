@@ -219,6 +219,7 @@ import br.org.scadabr.web.dwr.MethodFilter;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.LoggingTypes;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import java.util.Date;
 import javax.management.AttributeNotFoundException;
@@ -1411,7 +1412,7 @@ public class DataSourceEditDwr extends DataSourceListDwr {
             @Override
             public void setDefaultValues(DataPointVO dp) {
                 if (dp.isNew()) {
-                    dp.setLoggingType(DataPointVO.LoggingTypes.NONE);
+                    dp.setLoggingType(LoggingTypes.NONE);
                 }
             }
         });

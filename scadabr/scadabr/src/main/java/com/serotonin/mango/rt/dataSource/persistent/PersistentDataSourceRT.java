@@ -45,6 +45,7 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.i18n.I18NUtils;
 import br.org.scadabr.util.queue.ByteQueue;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.LoggingTypes;
 import java.io.ByteArrayInputStream;
 
 public class PersistentDataSourceRT extends EventDataSource<PersistentDataSourceVO> implements Runnable {
@@ -491,7 +492,7 @@ public class PersistentDataSourceRT extends EventDataSource<PersistentDataSource
                 newDpvo.setEnabled(true);
                 newDpvo.setPointFolderId(0);
                 newDpvo.setEventDetectors(new ArrayList<PointEventDetectorVO>());
-                newDpvo.setLoggingType(DataPointVO.LoggingTypes.ALL);
+                newDpvo.setLoggingType(LoggingTypes.ALL);
                 PersistentPointLocatorVO locator = new PersistentPointLocatorVO();
                 locator.setDataType(newDpvo.getDataType());
                 newDpvo.setPointLocator(locator);

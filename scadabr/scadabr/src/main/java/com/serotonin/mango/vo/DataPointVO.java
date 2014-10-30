@@ -57,6 +57,7 @@ import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.vo.LoggingTypes;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
@@ -71,26 +72,6 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         return pointLocator.getDataType();
     }
 
-    //TODO Enum
-    @Deprecated
-    public interface LoggingTypes {
-
-        int ON_CHANGE = 1;
-        int ALL = 2;
-        int NONE = 3;
-        int INTERVAL = 4;
-        int ON_TS_CHANGE = 5;
-    }
-
-    private static final ExportCodes LOGGING_TYPE_CODES = new ExportCodes();
-
-    static {
-        LOGGING_TYPE_CODES.addElement(LoggingTypes.ON_CHANGE, "ON_CHANGE", "pointEdit.logging.type.change");
-        LOGGING_TYPE_CODES.addElement(LoggingTypes.ALL, "ALL", "pointEdit.logging.type.all");
-        LOGGING_TYPE_CODES.addElement(LoggingTypes.NONE, "NONE", "pointEdit.logging.type.never");
-        LOGGING_TYPE_CODES.addElement(LoggingTypes.INTERVAL, "INTERVAL", "pointEdit.logging.type.interval");
-        LOGGING_TYPE_CODES.addElement(LoggingTypes.ON_TS_CHANGE, "ON_TS_CHANGE", "pointEdit.logging.type.tsChange");
-    }
 
     public static final Set<TimePeriods> PURGE_TYPES = EnumSet.of(TimePeriods.DAYS, TimePeriods.WEEKS, TimePeriods.MONTHS, TimePeriods.YEARS);
 
@@ -147,7 +128,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     @JsonRemoteProperty
     private boolean enabled;
     private int pointFolderId;
-    private int loggingType = LoggingTypes.ON_CHANGE;
+    private LoggingTypes loggingType = LoggingTypes.ON_CHANGE;
     private TimePeriods intervalLoggingPeriodType = TimePeriods.MINUTES;
     @JsonRemoteProperty
     private int intervalLoggingPeriod = 15;
@@ -257,7 +238,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "dsEdit.points.name", name);
         AuditEventType.addPropertyMessage(list, "common.enabled", enabled);
-        AuditEventType.addExportCodeMessage(list, "pointEdit.logging.type", LOGGING_TYPE_CODES, loggingType);
+        AuditEventType.addPropertyMessage(list, "pointEdit.logging.type", loggingType);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.period", intervalLoggingPeriodType.getPeriodDescription(intervalLoggingPeriod));
         AuditEventType.addExportCodeMessage(list, "pointEdit.logging.valueType", INTERVAL_LOGGING_TYPE_CODES, intervalLoggingType);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.tolerance", tolerance);
@@ -277,7 +258,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.xid", from.xid, xid);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.points.name", from.name, name);
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.enabled", from.enabled, enabled);
-        AuditEventType.maybeAddExportCodeChangeMessage(list, "pointEdit.logging.type", LOGGING_TYPE_CODES, from.loggingType, loggingType);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.type", from.loggingType, loggingType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.period",
                 from.intervalLoggingPeriodType.getPeriod(from.intervalLoggingPeriod),
                 intervalLoggingPeriodType.getPeriod(intervalLoggingPeriod));
@@ -387,11 +368,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         this.dataSourceTypeId = dataSourceTypeId;
     }
 
-    public int getLoggingType() {
+    public LoggingTypes getLoggingType() {
         return loggingType;
     }
 
-    public void setLoggingType(int loggingType) {
+    public void setLoggingType(LoggingTypes loggingType) {
         this.loggingType = loggingType;
     }
 
@@ -561,10 +542,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             response.addContextual("name", "validate.required");
         }
 
-        if (!LOGGING_TYPE_CODES.isValidId(loggingType)) {
-            response.addContextual("loggingType", "validate.invalidValue");
-        }
-        if (loggingType == DataPointVO.LoggingTypes.ON_CHANGE && getDataType() == DataType.NUMERIC) {
+        if (loggingType == LoggingTypes.ON_CHANGE && getDataType() == DataType.NUMERIC) {
             if (tolerance < 0) {
                 response.addContextual("tolerance", "validate.cannotBeNegative");
             }
@@ -626,7 +604,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         SerializationHelper.writeSafeUTF(out, deviceName);
         out.writeBoolean(enabled);
         out.writeInt(pointFolderId);
-        out.writeInt(loggingType);
+        out.writeInt(loggingType.mangoDbId);
         out.writeInt(intervalLoggingPeriodType.mangoDbId);
         out.writeInt(intervalLoggingPeriod);
         out.writeInt(intervalLoggingType);
@@ -653,7 +631,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             deviceName = null;
             enabled = in.readBoolean();
             pointFolderId = 0;
-            loggingType = in.readInt();
+            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
             intervalLoggingPeriodType = TimePeriods.MINUTES;
             intervalLoggingPeriod = 15;
             intervalLoggingType = IntervalLoggingTypes.INSTANT;
@@ -671,7 +649,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             deviceName = null;
             enabled = in.readBoolean();
             pointFolderId = in.readInt();
-            loggingType = in.readInt();
+            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
             intervalLoggingPeriodType = TimePeriods.MINUTES;
             intervalLoggingPeriod = 15;
             intervalLoggingType = IntervalLoggingTypes.INSTANT;
@@ -696,7 +674,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             deviceName = null;
             enabled = in.readBoolean();
             pointFolderId = in.readInt();
-            loggingType = in.readInt();
+            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
             intervalLoggingPeriodType = TimePeriods.MINUTES;
             intervalLoggingPeriod = 15;
             intervalLoggingType = IntervalLoggingTypes.INSTANT;
@@ -721,7 +699,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             deviceName = null;
             enabled = in.readBoolean();
             pointFolderId = in.readInt();
-            loggingType = in.readInt();
+            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
             intervalLoggingPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             intervalLoggingPeriod = in.readInt();
             intervalLoggingType = in.readInt();
@@ -746,7 +724,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             deviceName = null;
             enabled = in.readBoolean();
             pointFolderId = in.readInt();
-            loggingType = in.readInt();
+            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
             intervalLoggingPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             intervalLoggingPeriod = in.readInt();
             intervalLoggingType = in.readInt();
@@ -767,7 +745,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             deviceName = null;
             enabled = in.readBoolean();
             pointFolderId = in.readInt();
-            loggingType = in.readInt();
+            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
             intervalLoggingPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             intervalLoggingPeriod = in.readInt();
             intervalLoggingType = in.readInt();
@@ -788,7 +766,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             deviceName = null;
             enabled = in.readBoolean();
             pointFolderId = in.readInt();
-            loggingType = in.readInt();
+            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
             intervalLoggingPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             intervalLoggingPeriod = in.readInt();
             intervalLoggingType = in.readInt();
@@ -809,7 +787,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             deviceName = SerializationHelper.readSafeUTF(in);
             enabled = in.readBoolean();
             pointFolderId = in.readInt();
-            loggingType = in.readInt();
+            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
             intervalLoggingPeriodType = TimePeriods.fromMangoDbId(in.readInt());
             intervalLoggingPeriod = in.readInt();
             intervalLoggingType = in.readInt();
@@ -840,7 +818,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
-        map.put("loggingType", LOGGING_TYPE_CODES.getCode(loggingType));
+        map.put("loggingType", loggingType.name());
         map.put("intervalLoggingPeriodType", intervalLoggingPeriodType.name());
         map.put("intervalLoggingType", INTERVAL_LOGGING_TYPE_CODES.getCode(intervalLoggingType));
         map.put("purgeType", _purgeType.name());
@@ -853,10 +831,11 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("loggingType");
         if (text != null) {
-            loggingType = LOGGING_TYPE_CODES.getId(text);
-            if (loggingType == -1) {
+            try {
+            loggingType = LoggingTypes.valueOf(text);
+            } catch (Exception e) {
                 throw new LocalizableJsonException("emport.error.invalid", "loggingType", text,
-                        LOGGING_TYPE_CODES.getCodeList());
+                        loggingType.values());
             }
         }
 

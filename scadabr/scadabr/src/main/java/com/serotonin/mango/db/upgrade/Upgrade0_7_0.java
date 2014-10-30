@@ -53,6 +53,7 @@ import com.serotonin.modbus4j.code.RegisterRange;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.queue.IntQueue;
 import br.org.scadabr.utils.TimePeriods;
+import br.org.scadabr.vo.LoggingTypes;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
@@ -277,7 +278,7 @@ public class Upgrade0_7_0 extends DBUpgrade {
             dp.setName(rs.getString(++i));
             dp.setDataSourceId(rs.getInt(++i));
             dp.setEnabled(charToBool(rs.getString(++i)));
-            dp.setLoggingType(rs.getInt(++i));
+            dp.setLoggingType(LoggingTypes.fromMangoDbId(rs.getInt(++i)));
             dp.setTolerance(rs.getDouble(++i));
             dp.setPurgeType(TimePeriods.fromMangoDbId(rs.getInt(++i)));
             dp.setPurgePeriod(rs.getInt(++i));

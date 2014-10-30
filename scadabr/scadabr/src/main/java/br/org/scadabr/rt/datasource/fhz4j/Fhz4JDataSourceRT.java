@@ -31,6 +31,7 @@ import br.org.scadabr.vo.datasource.fhz4j.Fhz4JDataSourceVO;
 import br.org.scadabr.vo.datasource.fhz4j.Fhz4JPointLocatorVO;
 import br.org.scadabr.vo.datasource.fhz4j.HmsPointLocator;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.LoggingTypes;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -434,7 +435,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         dp.setXid(String.format("FHT-%04x-%s", fhtMessage.getHousecode(), fhtMessage.getCommand().getName()));
         dp.setPointLocator(fhzLocator);
         dp.setEnabled(true);
-        dp.setLoggingType(DataPointVO.LoggingTypes.ALL);
+        dp.setLoggingType(LoggingTypes.ALL);
         dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
 
         switch (dp.getDataType()) {
@@ -489,7 +490,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         dp.setXid(String.format("%04x-%d-%s", fs20Message.getHousecode(), fs20Message.getOffset(), fs20Message.getDeviceType().getName()));
         dp.setPointLocator(fhzLocator);
         dp.setEnabled(true);
-        dp.setLoggingType(DataPointVO.LoggingTypes.ALL);
+        dp.setLoggingType(LoggingTypes.ALL);
         dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
 
         if (dp.getPointLocator().getDataType() == DataType.MULTISTATE) {
@@ -527,7 +528,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         dp.setXid(String.format("%04x-%s", emMessage.getAddress(), prop.getName()));
         dp.setDataSourceId(vo.getId());
         dp.setEnabled(true);
-        dp.setLoggingType(DataPointVO.LoggingTypes.ALL);
+        dp.setLoggingType(LoggingTypes.ALL);
         dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
 
         dp.setPointLocator(fhzLocator);
@@ -736,7 +737,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         dp.setXid(String.format("%04x-%s-%s", hmsMessage.getHousecode(), hmsMessage.getDeviceType().getName(), prop.getName()));
         dp.setDataSourceId(vo.getId());
         dp.setEnabled(true);
-        dp.setLoggingType(DataPointVO.LoggingTypes.ALL);
+        dp.setLoggingType(LoggingTypes.ALL);
         dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
 
         dp.setPointLocator(fhzLocator);
@@ -853,7 +854,7 @@ public class Fhz4JDataSourceRT extends DataSourceRT<Fhz4JDataSourceVO> implement
         dp.setEnabled(true);
         dp.setXid(String.format("%04x-%s", fhtMultiMsgMessage.getHousecode(), fhtMultiMsgMessage.getProperty()));
         dp.setDataSourceId(vo.getId());
-        dp.setLoggingType(DataPointVO.LoggingTypes.ALL);
+        dp.setLoggingType(LoggingTypes.ALL);
         dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
 
         dp.setPointLocator(fhzLocator);

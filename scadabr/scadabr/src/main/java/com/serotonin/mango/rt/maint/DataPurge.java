@@ -21,6 +21,7 @@ package com.serotonin.mango.rt.maint;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.timer.cron.SystemCronTask;
 import br.org.scadabr.utils.TimePeriods;
+import br.org.scadabr.vo.LoggingTypes;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.EventDao;
@@ -78,7 +79,7 @@ public class DataPurge {
     }
 
     private long purgePoint(DataPointVO dataPoint) {
-        if (dataPoint.getLoggingType() == DataPointVO.LoggingTypes.NONE) // If there is no logging, then there should be no data, unless logging was just changed to none. In either
+        if (dataPoint.getLoggingType() == LoggingTypes.NONE) // If there is no logging, then there should be no data, unless logging was just changed to none. In either
         // case, it's ok to delete everything.
         {
             return rm.purgeDataPointValues(dataPoint.getId());
