@@ -46,6 +46,7 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.timer.cron.DataSourceCronTask;
 import br.org.scadabr.util.ILifecycle;
+import br.org.scadabr.vo.LoggingTypes;
 import java.util.Objects;
 
 public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
@@ -214,7 +215,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
         // ... or even saving in the cache.
         boolean saveValue = true;
         switch (vo.getLoggingType()) {
-            case DataPointVO.LoggingTypes.ON_CHANGE:
+            case ON_CHANGE:
                 if (pointValue == null) {
                     logValue = true;
                 } else if (backdated) // Backdated. Ignore it
@@ -244,10 +245,10 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
 
                 saveValue = logValue;
                 break;
-            case DataPointVO.LoggingTypes.ALL:
+            case ALL:
                 logValue = true;
                 break;
-            case DataPointVO.LoggingTypes.ON_TS_CHANGE:
+            case ON_TS_CHANGE:
                 if (pointValue == null) {
                     logValue = true;
                 } else if (backdated) // Backdated. Ignore it
@@ -259,7 +260,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
 
                 saveValue = logValue;
                 break;
-            case DataPointVO.LoggingTypes.INTERVAL:
+            case INTERVAL:
                 if (!backdated) {
                     intervalSave(newValue);
                 }
@@ -286,7 +287,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     //
     private void initializeIntervalLogging() {
         synchronized (intervalLoggingLock) {
-            if (vo.getLoggingType() != DataPointVO.LoggingTypes.INTERVAL) {
+            if (vo.getLoggingType() != LoggingTypes.INTERVAL) {
                 return;
             }
 
@@ -303,7 +304,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
 
     private void terminateIntervalLogging() {
         synchronized (intervalLoggingLock) {
-            if (vo.getLoggingType() != DataPointVO.LoggingTypes.INTERVAL) {
+            if (vo.getLoggingType() != LoggingTypes.INTERVAL) {
                 return;
             }
 
@@ -373,7 +374,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     //
     public void resetValues() {
         valueCache.reset();
-        if (vo.getLoggingType() != DataPointVO.LoggingTypes.NONE) {
+        if (vo.getLoggingType() != LoggingTypes.NONE) {
             pointValue = valueCache.getLatestPointValue();
         }
     }

@@ -51,7 +51,6 @@ import com.serotonin.mango.view.text.AnalogRenderer;
 import com.serotonin.mango.view.text.BinaryTextRenderer;
 import com.serotonin.mango.view.text.MultistateRenderer;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.DataPointVO.LoggingTypes;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.dataSource.viconics.ViconicsDataSourceVO;
@@ -75,6 +74,7 @@ import com.serotonin.viconics.config.Thermostat;
 import com.serotonin.viconics.io.ViconicsIncomingResponse;
 import com.serotonin.viconics.io.ViconicsOutgoingRequest;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.LoggingTypes;
 
 /**
  * @author Matthew Lohbihler

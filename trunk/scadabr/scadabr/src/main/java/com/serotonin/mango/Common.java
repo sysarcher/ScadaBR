@@ -42,7 +42,6 @@ import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;
-import org.joda.time.Period;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.KeyValuePair;
@@ -50,7 +49,6 @@ import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.util.BackgroundContext;
 import com.serotonin.mango.util.CommPortConfigException;
-import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.view.View;
 import com.serotonin.mango.view.custom.CustomView;
 import com.serotonin.mango.vo.CommPortProxy;
@@ -65,8 +63,6 @@ import br.org.scadabr.timer.cron.EventRunnable;
 import br.org.scadabr.timer.cron.SystemCronTask;
 import br.org.scadabr.timer.cron.SystemRunnable;
 import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.util.MissingResourceException;
 
 @Deprecated // Convert to singleton bean
@@ -99,10 +95,12 @@ public class Common {
      * is still required to update the system settings so that the database has
      * the correct version.
      */
+    @Deprecated // Use ScadaBrVersion bean
     public static final String getVersion() {
         return "0.9.1";
     }
 
+    @Deprecated
     public interface ContextKeys {
 
         @Deprecated

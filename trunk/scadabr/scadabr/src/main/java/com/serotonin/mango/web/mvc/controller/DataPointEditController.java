@@ -46,6 +46,7 @@ import br.org.scadabr.propertyEditor.DoubleFormatEditor;
 import br.org.scadabr.propertyEditor.IntegerFormatEditor;
 import br.org.scadabr.util.ValidationUtils;
 import br.org.scadabr.utils.TimePeriods;
+import br.org.scadabr.vo.LoggingTypes;
 import javax.inject.Inject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -134,22 +135,13 @@ public class DataPointEditController {
             ValidationUtils.rejectValue(errors, "name", "validate.required");
         }
 
-        // Logging properties validation
-        if (point.getLoggingType() != DataPointVO.LoggingTypes.ON_CHANGE
-                && point.getLoggingType() != DataPointVO.LoggingTypes.ALL
-                && point.getLoggingType() != DataPointVO.LoggingTypes.NONE
-                && point.getLoggingType() != DataPointVO.LoggingTypes.INTERVAL
-                && point.getLoggingType() != DataPointVO.LoggingTypes.ON_TS_CHANGE) {
-            ValidationUtils.rejectValue(errors, "loggingType", "validate.required");
-        }
-
-        if (point.getLoggingType() == DataPointVO.LoggingTypes.INTERVAL) {
+        if (point.getLoggingType() == LoggingTypes.INTERVAL) {
             if (point.getIntervalLoggingPeriod() <= 0) {
                 ValidationUtils.rejectValue(errors, "intervalLoggingPeriod", "validate.greaterThanZero");
             }
         }
 
-        if (point.getLoggingType() == DataPointVO.LoggingTypes.ON_CHANGE
+        if (point.getLoggingType() == LoggingTypes.ON_CHANGE
                 && point.getDataType() == DataType.NUMERIC) {
             if (point.getTolerance() < 0) {
                 ValidationUtils.rejectValue(errors, "tolerance", "validate.cannotBeNegative");
@@ -160,7 +152,7 @@ public class DataPointEditController {
             ValidationUtils.rejectValue(errors, "discardHighLimit", "validate.greaterThanDiscardLow");
         }
 
-        if (point.getLoggingType() != DataPointVO.LoggingTypes.NONE) {
+        if (point.getLoggingType() != LoggingTypes.NONE) {
             if (!DataPointVO.PURGE_TYPES.contains(point.getPurgeType())) {
                 ValidationUtils.rejectValue(errors, "purgeType", "validate.required");
             }
