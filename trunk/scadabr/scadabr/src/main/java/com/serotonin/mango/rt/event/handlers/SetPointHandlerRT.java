@@ -36,6 +36,7 @@ import com.serotonin.mango.rt.maint.work.SetPointWorkItem;
 import com.serotonin.mango.vo.event.EventHandlerVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.SystemEventSource;
 
 public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource {
 
@@ -150,7 +151,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
 
     private void raiseFailureEvent(LocalizableMessage message, EventType et) {
         if (et != null && et.isSystemMessage()) {
-            if (((SystemEventType) et).getSystemEventTypeId() == SystemEventType.TYPE_SET_POINT_HANDLER_FAILURE) {
+            if (((SystemEventType) et).getSystemEventType() == SystemEventSource.SET_POINT_HANDLER_FAILURE) {
                 // The set point attempt failed for an event that is a set point handler failure in the first place.
                 // Do not propagate the event, but rather just write a log message.
                 LOG.warn("A set point event due to a set point handler failure itself failed. The failure event "
@@ -159,7 +160,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
             }
         }
 
-        SystemEventType eventType = new SystemEventType(SystemEventType.TYPE_SET_POINT_HANDLER_FAILURE, vo.getId());
+        SystemEventType eventType = new SystemEventType(SystemEventSource.SET_POINT_HANDLER_FAILURE, vo.getId());
         if (vo.getAlias().isEmpty()) {
             message = new LocalizableMessageImpl("event.setPointFailed", message);
         } else {

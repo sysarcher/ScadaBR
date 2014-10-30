@@ -39,6 +39,7 @@ import com.serotonin.mango.rt.maint.work.SetPointWorkItem;
 import com.serotonin.mango.vo.link.PointLinkVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.SystemEventSource;
 
 /**
  * @author Matthew Lohbihler
@@ -51,7 +52,7 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
 
     public PointLinkRT(PointLinkVO vo) {
         this.vo = vo;
-        eventType = new SystemEventType(SystemEventType.TYPE_POINT_LINK_FAILURE, vo.getId(),
+        eventType = new SystemEventType(SystemEventSource.POINT_LINK_FAILURE, vo.getId(),
                 DuplicateHandling.IGNORE_SAME_MESSAGE);
     }
 

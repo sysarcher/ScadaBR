@@ -60,10 +60,6 @@ public enum AlarmLevel implements LocalizableEnum<AlarmLevel> {
         return null;
     }
 
-    public int toMangoDbId() {
-        return mangoDbId;
-    }
-
     public boolean otherIsHigher(AlarmLevel o) {
         return this.ordinal() < o.ordinal();
     }

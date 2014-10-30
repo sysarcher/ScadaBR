@@ -70,12 +70,10 @@ public class ScheduledEventType extends EventType {
         this.duplicateHandling = duplicateHandling;
     }
 
-    @Override
     public int getReferenceId1() {
         return scheduleId;
     }
 
-    @Override
     public int getReferenceId2() {
         return 0;
     }

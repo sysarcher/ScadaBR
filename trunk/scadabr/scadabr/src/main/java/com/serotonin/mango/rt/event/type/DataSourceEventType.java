@@ -81,12 +81,10 @@ public class DataSourceEventType extends EventType {
         return duplicateHandling;
     }
 
-    @Override
     public int getReferenceId1() {
         return dataSourceId;
     }
 
-    @Override
     public int getReferenceId2() {
         return dataSourceEventTypeId;
     }

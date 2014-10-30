@@ -81,12 +81,10 @@ public class DataPointEventType extends EventType {
         this.duplicateHandling = duplicateHandling;
     }
 
-    @Override
     public int getReferenceId1() {
         return dataPointId;
     }
 
-    @Override
     public int getReferenceId2() {
         return pointEventDetectorId;
     }

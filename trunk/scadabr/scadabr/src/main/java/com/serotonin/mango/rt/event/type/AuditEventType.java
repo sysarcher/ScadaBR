@@ -39,6 +39,8 @@ import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.web.i18n.LocalizableI18nKey;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.AuditEventSource;
+import java.util.EnumMap;
 import java.util.Objects;
 
 @JsonRemoteEntity
@@ -51,61 +53,27 @@ public class AuditEventType extends EventType {
     //
     private static final String AUDIT_SETTINGS_PREFIX = "auditEventAlarmLevel";
 
-    public static final int TYPE_DATA_SOURCE = 1;
-    public static final int TYPE_DATA_POINT = 2;
-    public static final int TYPE_POINT_EVENT_DETECTOR = 3;
-    public static final int TYPE_COMPOUND_EVENT_DETECTOR = 4;
-    public static final int TYPE_SCHEDULED_EVENT = 5;
-    public static final int TYPE_EVENT_HANDLER = 6;
-    public static final int TYPE_POINT_LINK = 7;
-    public static final int TYPE_MAINTENANCE_EVENT = 8;
+    public static final Map<AuditEventSource, EventTypeVO> AUDIT_EVENT_TYPES = new EnumMap<>(AuditEventSource.class);
 
-    private static final ExportCodes TYPE_CODES = new ExportCodes();
-
+    //TODO fix Alarmlevel from SystemSettingsDao for now only default 
     static {
-        TYPE_CODES.addElement(TYPE_DATA_SOURCE, "DATA_SOURCE");
-        TYPE_CODES.addElement(TYPE_DATA_POINT, "DATA_POINT");
-        TYPE_CODES.addElement(TYPE_POINT_EVENT_DETECTOR, "POINT_EVENT_DETECTOR");
-        TYPE_CODES.addElement(TYPE_COMPOUND_EVENT_DETECTOR, "COMPOUND_EVENT_DETECTOR");
-        TYPE_CODES.addElement(TYPE_SCHEDULED_EVENT, "SCHEDULED_EVENT");
-        TYPE_CODES.addElement(TYPE_EVENT_HANDLER, "EVENT_HANDLER");
-        TYPE_CODES.addElement(TYPE_POINT_LINK, "POINT_LINK");
-        TYPE_CODES.addElement(TYPE_MAINTENANCE_EVENT, "MAINTENANCE_EVENT");
-    }
-
-    private static List<EventTypeVO> auditEventTypes;
-
-    public static List<EventTypeVO> getAuditEventTypes() {
-        if (auditEventTypes == null) {
-            auditEventTypes = new ArrayList<>();
-
-            addEventTypeVO(TYPE_DATA_SOURCE, "event.audit.dataSource");
-            addEventTypeVO(TYPE_DATA_POINT, "event.audit.dataPoint");
-            addEventTypeVO(TYPE_POINT_EVENT_DETECTOR, "event.audit.pointEventDetector");
-            addEventTypeVO(TYPE_COMPOUND_EVENT_DETECTOR, "event.audit.compoundEventDetector");
-            addEventTypeVO(TYPE_SCHEDULED_EVENT, "event.audit.scheduledEvent");
-            addEventTypeVO(TYPE_EVENT_HANDLER, "event.audit.eventHandler");
-            addEventTypeVO(TYPE_POINT_LINK, "event.audit.pointLink");
-            addEventTypeVO(TYPE_MAINTENANCE_EVENT, "event.audit.maintenanceEvent");
+        for (AuditEventSource s : AuditEventSource.values()) {
+            AUDIT_EVENT_TYPES.put(s, new EventTypeVO(EventSources.AUDIT, s.mangoDbId, 0, s, AlarmLevel.INFORMATION));
         }
-        return auditEventTypes;
+        
     }
-
-    private static void addEventTypeVO(int type, String key) {
+/*    
+    private static void addEventTypeVO(AuditEventSource type, String key) {
         auditEventTypes.add(new EventTypeVO(EventSources.AUDIT, type, 0, new LocalizableMessageImpl(key),
                 SystemSettingsDao.getAlarmLevel(AUDIT_SETTINGS_PREFIX + type, AlarmLevel.INFORMATION)));
     }
-
-    public static EventTypeVO getEventType(int type) {
-        for (EventTypeVO et : getAuditEventTypes()) {
-            if (et.getTypeRef1() == type) {
-                return et;
-            }
-        }
-        return null;
+*/
+    
+    public static EventTypeVO getEventType(AuditEventSource type) {
+        return AUDIT_EVENT_TYPES.get(type);
     }
 
-    public static void setEventTypeAlarmLevel(int type, AlarmLevel alarmLevel) {
+    public static void setEventTypeAlarmLevel(AuditEventSource type, AlarmLevel alarmLevel) {
         EventTypeVO et = getEventType(type);
         et.setAlarmLevel(alarmLevel);
 
@@ -113,29 +81,29 @@ public class AuditEventType extends EventType {
         dao.setAlarmLevel(AUDIT_SETTINGS_PREFIX + type, alarmLevel);
     }
 
-    public static void raiseAddedEvent(int auditEventTypeId, ChangeComparable<?> o) {
+    public static void raiseAddedEvent(AuditEventSource auditEventType, ChangeComparable<?> o) {
         List<LocalizableMessage> list = new ArrayList<>();
         o.addProperties(list);
-        raiseEvent(auditEventTypeId, o, "event.audit.added", list.toArray());
+        raiseEvent(auditEventType, o, "event.audit.added", list.toArray());
     }
 
-    public static <T> void raiseChangedEvent(int auditEventTypeId, T from, ChangeComparable<T> to) {
+    public static <T> void raiseChangedEvent(AuditEventSource auditEventType, T from, ChangeComparable<T> to) {
         List<LocalizableMessage> changes = new ArrayList<>();
         to.addPropertyChanges(changes, from);
         if (changes.isEmpty()) // If the object wasn't in fact changed, don't raise an event.
         {
             return;
         }
-        raiseEvent(auditEventTypeId, to, "event.audit.changed", changes.toArray());
+        raiseEvent(auditEventType, to, "event.audit.changed", changes.toArray());
     }
 
-    public static void raiseDeletedEvent(int auditEventTypeId, ChangeComparable<?> o) {
+    public static void raiseDeletedEvent(AuditEventSource auditEventType, ChangeComparable<?> o) {
         List<LocalizableMessage> list = new ArrayList<>();
         o.addProperties(list);
-        raiseEvent(auditEventTypeId, o, "event.audit.deleted", list.toArray());
+        raiseEvent(auditEventType, o, "event.audit.deleted", list.toArray());
     }
 
-    private static void raiseEvent(int auditEventTypeId, ChangeComparable<?> o, String key, Object[] props) {
+    private static void raiseEvent(AuditEventSource auditEventType, ChangeComparable<?> o, String key, Object[] props) {
         User user = Common.getUser();
         Object username;
         if (user != null) {
@@ -152,11 +120,11 @@ public class AuditEventType extends EventType {
         LocalizableMessage message = new LocalizableMessageImpl(key, username, new LocalizableMessageImpl(o.getTypeKey()),
                 o.getId(), new LocalizableMessageImpl("event.audit.propertyList." + props.length, props));
 
-        AuditEventType type = new AuditEventType(auditEventTypeId, o.getId());
+        AuditEventType type = new AuditEventType(auditEventType, o.getId());
         type.setRaisingUser(user);
 
         Common.ctx.getEventManager().raiseEvent(type, System.currentTimeMillis(), false,
-                getEventType(type.getAuditEventTypeId()).getAlarmLevel(), message, null);
+                getEventType(type.getAuditEventType()).getAlarmLevel(), message, null);
     }
 
     //
@@ -252,7 +220,7 @@ throw new ImplementMeException(); //"MessageFormat");
     // / Instance stuff
     // /
     //
-    private int auditEventTypeId;
+    private AuditEventSource auditEventType;
     private int referenceId;
     private User raisingUser;
 
@@ -260,8 +228,8 @@ throw new ImplementMeException(); //"MessageFormat");
         // Required for reflection.
     }
 
-    public AuditEventType(int auditEventTypeId, int referenceId) {
-        this.auditEventTypeId = auditEventTypeId;
+    public AuditEventType(AuditEventSource auditEventType, int referenceId) {
+        this.auditEventType = auditEventType;
         this.referenceId = referenceId;
     }
 
@@ -270,13 +238,13 @@ throw new ImplementMeException(); //"MessageFormat");
         return EventSources.AUDIT;
     }
 
-    public int getAuditEventTypeId() {
-        return auditEventTypeId;
+    public AuditEventSource getAuditEventType() {
+        return auditEventType;
     }
 
     @Override
     public String toString() {
-        return "AuditEventType(auditTypeId=" + auditEventTypeId + ", referenceId=" + referenceId + ")";
+        return "AuditEventType(auditType=" + auditEventType + ", referenceId=" + referenceId + ")";
     }
 
     @Override
@@ -284,13 +252,7 @@ throw new ImplementMeException(); //"MessageFormat");
         return DuplicateHandling.ALLOW;
     }
 
-    @Override
-    public int getReferenceId1() {
-        return auditEventTypeId;
-    }
-
-    @Override
-    public int getReferenceId2() {
+    public int getReferenceId() {
         return referenceId;
     }
 
@@ -310,7 +272,7 @@ throw new ImplementMeException(); //"MessageFormat");
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + auditEventTypeId;
+        result = prime * result + auditEventType.mangoDbId;
         result = prime * result + referenceId;
         return result;
     }
@@ -327,13 +289,10 @@ throw new ImplementMeException(); //"MessageFormat");
             return false;
         }
         AuditEventType other = (AuditEventType) obj;
-        if (auditEventTypeId != other.auditEventTypeId) {
+        if (auditEventType != other.auditEventType) {
             return false;
         }
-        if (referenceId != other.referenceId) {
-            return false;
-        }
-        return true;
+        return referenceId == other.referenceId;
     }
 
     //
@@ -344,12 +303,12 @@ throw new ImplementMeException(); //"MessageFormat");
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        map.put("auditType", TYPE_CODES.getCode(auditEventTypeId));
+        map.put("auditType", auditEventType.name());
     }
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
-        auditEventTypeId = getInt(json, "auditType", TYPE_CODES);
+        auditEventType = AuditEventSource.valueOf(json.getString("auditType"));
     }
 }

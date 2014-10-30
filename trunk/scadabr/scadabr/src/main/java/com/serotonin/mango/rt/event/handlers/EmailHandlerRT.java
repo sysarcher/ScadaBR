@@ -22,6 +22,7 @@ import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.SystemEventSource;
 import br.org.scadabr.web.email.EmailInline;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.MailingListDao;
@@ -163,7 +164,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
     private static void sendEmail(EventInstance evt, NotificationType notificationType, Set<String> addresses,
             String alias) {
         if (evt.getEventType().isSystemMessage()) {
-            if (((SystemEventType) evt.getEventType()).getSystemEventTypeId() == SystemEventType.TYPE_EMAIL_SEND_FAILURE) {
+            if (((SystemEventType) evt.getEventType()).getSystemEventType() == SystemEventSource.EMAIL_SEND_FAILURE) {
                 // Don't send email notifications about email send failures.
                 LOG.info("Not sending email for event raised due to email failure");
                 return;

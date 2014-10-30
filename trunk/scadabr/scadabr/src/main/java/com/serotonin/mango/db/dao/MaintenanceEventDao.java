@@ -2,6 +2,7 @@ package com.serotonin.mango.db.dao;
 
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.type.AuditEventSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -151,7 +152,7 @@ public class MaintenanceEventDao extends BaseDao {
             }
         });
         me.setId(id);
-        AuditEventType.raiseAddedEvent(AuditEventType.TYPE_MAINTENANCE_EVENT, me);
+        AuditEventType.raiseAddedEvent(AuditEventSource.MAINTENANCE_EVENT, me);
     }
 
     private void updateMaintenanceEvent(MaintenanceEventVO me) {
@@ -169,7 +170,7 @@ public class MaintenanceEventDao extends BaseDao {
                     me.getActiveCron(), me.getInactiveYear(), me.getInactiveMonth(), me.getInactiveDay(),
                     me.getInactiveHour(), me.getInactiveMinute(), me.getInactiveSecond(), me.getInactiveCron(),
                     me.getId()});
-        AuditEventType.raiseChangedEvent(AuditEventType.TYPE_MAINTENANCE_EVENT, old, me);
+        AuditEventType.raiseChangedEvent(AuditEventSource.MAINTENANCE_EVENT, old, me);
     }
 
     public void deleteMaintenanceEventsForDataSource(int dataSourceId) {
@@ -193,7 +194,7 @@ public class MaintenanceEventDao extends BaseDao {
                 }
             });
 
-            AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_MAINTENANCE_EVENT, me);
+            AuditEventType.raiseDeletedEvent(AuditEventSource.MAINTENANCE_EVENT, me);
         }
     }
 }

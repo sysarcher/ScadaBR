@@ -40,12 +40,10 @@ public class MaintenanceEventType extends EventType {
         return DuplicateHandling.IGNORE;
     }
 
-    @Override
     public int getReferenceId1() {
         return maintenanceId;
     }
 
-    @Override
     public int getReferenceId2() {
         return 0;
     }

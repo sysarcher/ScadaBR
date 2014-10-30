@@ -193,7 +193,7 @@ public class EventHandlersDwr extends BaseDwr {
 
             // Get the system events
             List<EventTypeVO> systemEvents = new ArrayList<>();
-            for (EventTypeVO sets : SystemEventType.getSystemEventTypes()) {
+            for (EventTypeVO sets : SystemEventType.SYSTEM_EVENT_TYPES.values()) {
                 sets.setHandlers(eventDao.getEventHandlers(sets));
                 systemEvents.add(sets);
             }
@@ -201,7 +201,7 @@ public class EventHandlersDwr extends BaseDwr {
 
             // Get the audit events
             List<EventTypeVO> auditEvents = new ArrayList<>();
-            for (EventTypeVO aets : AuditEventType.getAuditEventTypes()) {
+            for (EventTypeVO aets : AuditEventType.AUDIT_EVENT_TYPES.values()) {
                 aets.setHandlers(eventDao.getEventHandlers(aets));
                 auditEvents.add(aets);
             }

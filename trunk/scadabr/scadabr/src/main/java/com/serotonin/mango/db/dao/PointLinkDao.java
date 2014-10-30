@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.db.dao;
 
+import br.org.scadabr.vo.event.type.AuditEventSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -134,7 +135,7 @@ public class PointLinkDao extends BaseDao {
             }
         });
         pl.setId(id);
-        AuditEventType.raiseAddedEvent(AuditEventType.TYPE_POINT_LINK, pl);
+        AuditEventType.raiseAddedEvent(AuditEventSource.POINT_LINK, pl);
     }
 
     private static final String POINT_LINK_UPDATE = "update pointLinks set xid=?, sourcePointId=?, targetPointId=?, script=?, eventType=?, disabled=? "
@@ -146,14 +147,14 @@ public class PointLinkDao extends BaseDao {
         ejt.update(POINT_LINK_UPDATE, pl.getXid(), pl.getSourcePointId(), pl.getTargetPointId(), pl.getScript(),
                 pl.getEvent(), boolToChar(pl.isDisabled()), pl.getId());
 
-        AuditEventType.raiseChangedEvent(AuditEventType.TYPE_POINT_LINK, old, pl);
+        AuditEventType.raiseChangedEvent(AuditEventSource.POINT_LINK, old, pl);
     }
 
     public void deletePointLink(final int pointLinkId) {
         PointLinkVO pl = getPointLink(pointLinkId);
         if (pl != null) {
             ejt.update("delete from pointLinks where id=?", pointLinkId);
-            AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_POINT_LINK, pl);
+            AuditEventType.raiseDeletedEvent(AuditEventSource.POINT_LINK, pl);
         }
     }
 }

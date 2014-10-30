@@ -67,6 +67,7 @@ import com.serotonin.mango.web.ContextWrapper;
 import com.serotonin.mango.web.dwr.BaseDwr;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.SystemEventSource;
 
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -136,7 +137,7 @@ public class MangoContextListener implements ServletContextListener {
 
         // Notify the event manager of the startup.
         SystemEventType.raiseEvent(new SystemEventType(
-                SystemEventType.TYPE_SYSTEM_STARTUP), System
+                SystemEventSource.SYSTEM_STARTUP), System
                 .currentTimeMillis(), false, new LocalizableMessageImpl(
                         "event.system.startup"));
 
@@ -151,7 +152,7 @@ public class MangoContextListener implements ServletContextListener {
         if (eventManager != null) {
             // Notify the event manager of the shutdown.
             SystemEventType.raiseEvent(new SystemEventType(
-                    SystemEventType.TYPE_SYSTEM_SHUTDOWN), System
+                    SystemEventSource.SYSTEM_SHUTDOWN), System
                     .currentTimeMillis(), false, new LocalizableMessageImpl(
                             "event.system.shutdown"));
         }
@@ -290,25 +291,6 @@ public class MangoContextListener implements ServletContextListener {
         ctx.setAttribute("constants.Permissions.DataPointAccessTypes.SET", Permissions.DataPointAccessTypes.SET);
         ctx.setAttribute("constants.Permissions.DataPointAccessTypes.DATA_SOURCE", Permissions.DataPointAccessTypes.DATA_SOURCE);
         ctx.setAttribute("constants.Permissions.DataPointAccessTypes.ADMIN", Permissions.DataPointAccessTypes.ADMIN);
-
-        ctx.setAttribute("constants.SystemEventType.TYPE_SYSTEM_STARTUP", SystemEventType.TYPE_SYSTEM_STARTUP);
-        ctx.setAttribute("constants.SystemEventType.TYPE_SYSTEM_SHUTDOWN", SystemEventType.TYPE_SYSTEM_SHUTDOWN);
-        ctx.setAttribute("constants.SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED", SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED);
-        ctx.setAttribute("constants.SystemEventType.TYPE_USER_LOGIN", SystemEventType.TYPE_USER_LOGIN);
-        ctx.setAttribute("constants.SystemEventType.TYPE_VERSION_CHECK", SystemEventType.TYPE_VERSION_CHECK);
-        ctx.setAttribute("constants.SystemEventType.TYPE_COMPOUND_DETECTOR_FAILURE", SystemEventType.TYPE_COMPOUND_DETECTOR_FAILURE);
-        ctx.setAttribute("constants.SystemEventType.TYPE_SET_POINT_HANDLER_FAILURE", SystemEventType.TYPE_SET_POINT_HANDLER_FAILURE);
-        ctx.setAttribute("constants.SystemEventType.TYPE_EMAIL_SEND_FAILURE", SystemEventType.TYPE_EMAIL_SEND_FAILURE);
-        ctx.setAttribute("constants.SystemEventType.TYPE_POINT_LINK_FAILURE", SystemEventType.TYPE_POINT_LINK_FAILURE);
-        ctx.setAttribute("constants.SystemEventType.TYPE_PROCESS_FAILURE", SystemEventType.TYPE_PROCESS_FAILURE);
-
-        ctx.setAttribute("constants.AuditEventType.TYPE_DATA_SOURCE", AuditEventType.TYPE_DATA_SOURCE);
-        ctx.setAttribute("constants.AuditEventType.TYPE_DATA_POINT", AuditEventType.TYPE_DATA_POINT);
-        ctx.setAttribute("constants.AuditEventType.TYPE_POINT_EVENT_DETECTOR", AuditEventType.TYPE_POINT_EVENT_DETECTOR);
-        ctx.setAttribute("constants.AuditEventType.TYPE_COMPOUND_EVENT_DETECTOR", AuditEventType.TYPE_COMPOUND_EVENT_DETECTOR);
-        ctx.setAttribute("constants.AuditEventType.TYPE_SCHEDULED_EVENT", AuditEventType.TYPE_SCHEDULED_EVENT);
-        ctx.setAttribute("constants.AuditEventType.TYPE_EVENT_HANDLER", AuditEventType.TYPE_EVENT_HANDLER);
-        ctx.setAttribute("constants.AuditEventType.TYPE_POINT_LINK", AuditEventType.TYPE_POINT_LINK);
 
         ctx.setAttribute("constants.PublisherVO.Types.HTTP_SENDER", PublisherVO.Type.HTTP_SENDER.getId());
         ctx.setAttribute("constants.PublisherVO.Types.PACHUBE", PublisherVO.Type.PACHUBE.getId());

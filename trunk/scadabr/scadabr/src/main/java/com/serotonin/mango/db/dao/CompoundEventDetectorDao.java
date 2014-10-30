@@ -20,6 +20,7 @@ package com.serotonin.mango.db.dao;
 
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.type.AuditEventSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -133,7 +134,7 @@ public class CompoundEventDetectorDao extends BaseDao {
             }
         });
         ced.setId(id);
-        AuditEventType.raiseAddedEvent(AuditEventType.TYPE_COMPOUND_EVENT_DETECTOR, ced);
+        AuditEventType.raiseAddedEvent(AuditEventSource.COMPOUND_EVENT_DETECTOR, ced);
     }
 
     private static final String COMPOUND_EVENT_DETECTOR_UPDATE = "update compoundEventDetectors set xid=?, name=?, alarmLevel=?, returnToNormal=?, disabled=?, conditionText=? "
@@ -145,7 +146,7 @@ public class CompoundEventDetectorDao extends BaseDao {
         ejt.update(COMPOUND_EVENT_DETECTOR_UPDATE, new Object[]{ced.getXid(), ced.getName(), ced.getAlarmLevel(),
             boolToChar(ced.isReturnToNormal()), boolToChar(ced.isDisabled()), ced.getCondition(), ced.getId()});
 
-        AuditEventType.raiseChangedEvent(AuditEventType.TYPE_COMPOUND_EVENT_DETECTOR, old, ced);
+        AuditEventType.raiseChangedEvent(AuditEventSource.COMPOUND_EVENT_DETECTOR, old, ced);
 
     }
 
@@ -163,7 +164,7 @@ public class CompoundEventDetectorDao extends BaseDao {
                 }
             });
 
-            AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_COMPOUND_EVENT_DETECTOR, ced);
+            AuditEventType.raiseDeletedEvent(AuditEventSource.COMPOUND_EVENT_DETECTOR, ced);
         }
     }
 }

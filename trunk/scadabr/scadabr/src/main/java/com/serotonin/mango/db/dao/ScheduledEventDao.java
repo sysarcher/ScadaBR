@@ -20,6 +20,7 @@ package com.serotonin.mango.db.dao;
 
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.type.AuditEventSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -168,7 +169,7 @@ public class ScheduledEventDao extends BaseDao {
 
         });
         se.setId(id);
-        AuditEventType.raiseAddedEvent(AuditEventType.TYPE_SCHEDULED_EVENT, se);
+        AuditEventType.raiseAddedEvent(AuditEventSource.SCHEDULED_EVENT, se);
     }
 
     private void updateScheduledEvent(ScheduledEventVO se) {
@@ -186,7 +187,7 @@ public class ScheduledEventDao extends BaseDao {
                             se.getActiveCron(), se.getInactiveYear(), se.getInactiveMonth(), se.getInactiveDay(),
                             se.getInactiveHour(), se.getInactiveMinute(), se.getInactiveSecond(),
                             se.getInactiveCron(), se.getId()});
-        AuditEventType.raiseChangedEvent(AuditEventType.TYPE_SCHEDULED_EVENT, old, se);
+        AuditEventType.raiseChangedEvent(AuditEventSource.SCHEDULED_EVENT, old, se);
     }
 
     public void deleteScheduledEvent(final int scheduledEventId) {
@@ -202,7 +203,7 @@ public class ScheduledEventDao extends BaseDao {
                 }
             });
 
-            AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_SCHEDULED_EVENT, se);
+            AuditEventType.raiseDeletedEvent(AuditEventSource.SCHEDULED_EVENT, se);
         }
     }
 }

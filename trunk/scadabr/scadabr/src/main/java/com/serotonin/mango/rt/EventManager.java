@@ -48,6 +48,7 @@ import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.type.SystemEventSource;
 import static com.serotonin.mango.rt.event.type.SystemEventType.getEventType;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import java.io.Serializable;
@@ -154,7 +155,7 @@ public class EventManager implements ILifecycle, Serializable {
                 if (alarmLevel.meIsHigher(highestActiveAlarmLevel)) {
                     AlarmLevel oldValue = highestActiveAlarmLevel;
                     highestActiveAlarmLevel = alarmLevel;
-                    SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED), time,
+                    SystemEventType.raiseEvent(new SystemEventType(SystemEventSource.MAX_ALARM_LEVEL_CHANGED), time,
                             false, getAlarmLevelChangeMessage("event.alarmMaxIncreased", oldValue));
                 }
             }
@@ -251,12 +252,12 @@ public class EventManager implements ILifecycle, Serializable {
             if (max.meIsHigher(highestActiveAlarmLevel)) {
                 AlarmLevel oldValue = highestActiveAlarmLevel;
                 highestActiveAlarmLevel = max;
-                SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED), time,
+                SystemEventType.raiseEvent(new SystemEventType(SystemEventSource.MAX_ALARM_LEVEL_CHANGED), time,
                         false, getAlarmLevelChangeMessage("event.alarmMaxIncreased", oldValue));
             } else if (max.meIsLower(highestActiveAlarmLevel)) {
                 AlarmLevel oldValue = highestActiveAlarmLevel;
                 highestActiveAlarmLevel = max;
-                SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED), time,
+                SystemEventType.raiseEvent(new SystemEventType(SystemEventSource.MAX_ALARM_LEVEL_CHANGED), time,
                         false, getAlarmLevelChangeMessage("event.alarmMaxDecreased", oldValue));
             }
         }
@@ -392,7 +393,7 @@ public class EventManager implements ILifecycle, Serializable {
     }
 
     public void raiseEvent(SystemEventType type, long time, boolean rtn, LocalizableMessage message) {
-        EventTypeVO vo = getEventType(type.getSystemEventTypeId());
+        EventTypeVO vo = getEventType(type.getSystemEventType());
         AlarmLevel alarmLevel = vo.getAlarmLevel();
         raiseEvent(type, time, rtn, alarmLevel, message, null);
     }

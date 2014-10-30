@@ -729,10 +729,8 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
             }
         }
         if ((eventType == null) || eventType == EventType.SYSTEM_EVENT) {
-            List<EventTypeVO> systemEvents = SystemEventType
-                    .getSystemEventTypes();
 
-            for (EventTypeVO eventTypeVO : systemEvents) {
+            for (EventTypeVO eventTypeVO : SystemEventType.SYSTEM_EVENT_TYPES.values()) {
                 EventDefinition event = APIUtils.toEventDefinition(eventTypeVO
                         .getDescription().getI18nKey(),
                         eventTypeVO.getAlarmLevel(), EventType.SYSTEM_EVENT);
@@ -740,9 +738,8 @@ public class MangoDaoImpl implements ScadaBRAPIDao {
                 event.setConfiguration("No configuration");
                 events.add(event);
             }
-            List<EventTypeVO> auditEvents = AuditEventType.getAuditEventTypes();
 
-            for (EventTypeVO eventTypeVO : auditEvents) {
+            for (EventTypeVO eventTypeVO : AuditEventType.AUDIT_EVENT_TYPES.values()) {
                 EventDefinition event = APIUtils.toEventDefinition(eventTypeVO
                         .getDescription().getI18nKey(),
                         eventTypeVO.getAlarmLevel(), EventType.SYSTEM_EVENT);

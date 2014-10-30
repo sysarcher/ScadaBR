@@ -36,6 +36,7 @@ import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.SystemEventSource;
 
 /**
  * @author Matthew Lohbihler
@@ -217,7 +218,7 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
     // }
     // }
     public void raiseFailureEvent(LocalizableMessage message) {
-        SystemEventType eventType = new SystemEventType(SystemEventType.TYPE_COMPOUND_DETECTOR_FAILURE, vo.getId());
+        SystemEventType eventType = new SystemEventType(SystemEventSource.COMPOUND_DETECTOR_FAILURE, vo.getId());
         SystemEventType.raiseEvent(eventType, System.currentTimeMillis(), false, message);
         vo.setDisabled(true);
         CompoundEventDetectorDao.getInstance().saveCompoundEventDetector(vo);

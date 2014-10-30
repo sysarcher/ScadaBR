@@ -52,6 +52,8 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.l10n.Localizer;
 import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.type.AuditEventSource;
+import br.org.scadabr.vo.event.type.SystemEventSource;
 import com.serotonin.mango.db.dao.UserDao;
 import javax.inject.Inject;
 
@@ -86,10 +88,10 @@ public class SystemSettingsDwr extends BaseDwr {
                 .getIntValue(SystemSettingsDao.EMAIL_CONTENT_TYPE));
 
         // System event types
-        settings.put("systemEventTypes", SystemEventType.getSystemEventTypes());
+        settings.put("systemEventTypes", SystemEventType.SYSTEM_EVENT_TYPES.keySet());
 
         // System event types
-        settings.put("auditEventTypes", AuditEventType.getAuditEventTypes());
+        settings.put("auditEventTypes", AuditEventType.AUDIT_EVENT_TYPES.keySet());
 
         // Http
         settings.put(SystemSettingsDao.HTTP_CLIENT_USE_PROXY, SystemSettingsDao
@@ -253,7 +255,7 @@ public class SystemSettingsDwr extends BaseDwr {
     public void saveSystemEventAlarmLevels(List<IntegerPair> eventAlarmLevels) {
         Permissions.ensureAdmin();
         for (IntegerPair eventAlarmLevel : eventAlarmLevels) {
-            SystemEventType.setEventTypeAlarmLevel(eventAlarmLevel.getI1(),
+            SystemEventType.setEventTypeAlarmLevel(SystemEventSource.fromMangoDbId(eventAlarmLevel.getI1()),
                     AlarmLevel.fromMangoDbId(eventAlarmLevel.getI2()));
         }
     }
@@ -262,7 +264,7 @@ public class SystemSettingsDwr extends BaseDwr {
     public void saveAuditEventAlarmLevels(List<IntegerPair> eventAlarmLevels) {
         Permissions.ensureAdmin();
         for (IntegerPair eventAlarmLevel : eventAlarmLevels) {
-            AuditEventType.setEventTypeAlarmLevel(eventAlarmLevel.getI1(),
+            AuditEventType.setEventTypeAlarmLevel(AuditEventSource.fromMangoDbId(eventAlarmLevel.getI1()),
                     AlarmLevel.fromMangoDbId(eventAlarmLevel.getI2()));
         }
     }
