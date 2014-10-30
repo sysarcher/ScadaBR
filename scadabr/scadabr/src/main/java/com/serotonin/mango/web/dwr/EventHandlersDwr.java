@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.dwr;
 
+import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.utils.TimePeriods;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -243,7 +244,7 @@ public class EventHandlersDwr extends BaseDwr {
                 snippet, model);
     }
 
-    public DwrResponseI18n saveSetPointEventHandler(int eventSourceId,
+    public DwrResponseI18n saveSetPointEventHandler(EventSources eventSource,
             int eventTypeRef1, int eventTypeRef2, int handlerId, String xid,
             String alias, boolean disabled, int targetPointId,
             int activeAction, String activeValueToSet, int activePointId,
@@ -257,11 +258,11 @@ public class EventHandlersDwr extends BaseDwr {
         handler.setInactiveAction(inactiveAction);
         handler.setInactiveValueToSet(inactiveValueToSet);
         handler.setInactivePointId(inactivePointId);
-        return save(eventSourceId, eventTypeRef1, eventTypeRef2, handler,
+        return save(eventSource, eventTypeRef1, eventTypeRef2, handler,
                 handlerId, xid, alias, disabled);
     }
 
-    public DwrResponseI18n saveEmailEventHandler(int eventSourceId,
+    public DwrResponseI18n saveEmailEventHandler(EventSources eventSource,
             int eventTypeRef1, int eventTypeRef2, int handlerId, String xid,
             String alias, boolean disabled,
             List<RecipientListEntryBean> activeRecipients,
@@ -280,11 +281,11 @@ public class EventHandlersDwr extends BaseDwr {
         handler.setSendInactive(sendInactive);
         handler.setInactiveOverride(inactiveOverride);
         handler.setInactiveRecipients(inactiveRecipients);
-        return save(eventSourceId, eventTypeRef1, eventTypeRef2, handler,
+        return save(eventSource, eventTypeRef1, eventTypeRef2, handler,
                 handlerId, xid, alias, disabled);
     }
 
-    public DwrResponseI18n saveProcessEventHandler(int eventSourceId,
+    public DwrResponseI18n saveProcessEventHandler(EventSources eventSource,
             int eventTypeRef1, int eventTypeRef2, int handlerId, String xid,
             String alias, boolean disabled, String activeProcessCommand,
             String inactiveProcessCommand) {
@@ -292,11 +293,11 @@ public class EventHandlersDwr extends BaseDwr {
         handler.setHandlerType(EventHandlerVO.TYPE_PROCESS);
         handler.setActiveProcessCommand(activeProcessCommand);
         handler.setInactiveProcessCommand(inactiveProcessCommand);
-        return save(eventSourceId, eventTypeRef1, eventTypeRef2, handler,
+        return save(eventSource, eventTypeRef1, eventTypeRef2, handler,
                 handlerId, xid, alias, disabled);
     }
 
-    public DwrResponseI18n saveScriptEventHandler(int eventSourceId,
+    public DwrResponseI18n saveScriptEventHandler(EventSources eventSource,
             int eventTypeRef1, int eventTypeRef2, int handlerId, String xid,
             String alias, boolean disabled, int activeScriptCommand,
             int inactiveScriptCommand) {
@@ -304,14 +305,14 @@ public class EventHandlersDwr extends BaseDwr {
         handler.setHandlerType(EventHandlerVO.TYPE_SCRIPT);
         handler.setActiveScriptCommand(activeScriptCommand);
         handler.setInactiveScriptCommand(inactiveScriptCommand);
-        return save(eventSourceId, eventTypeRef1, eventTypeRef2, handler,
+        return save(eventSource, eventTypeRef1, eventTypeRef2, handler,
                 handlerId, xid, alias, disabled);
     }
 
-    private DwrResponseI18n save(int eventSourceId, int eventTypeRef1,
+    private DwrResponseI18n save(EventSources eventSource, int eventTypeRef1,
             int eventTypeRef2, EventHandlerVO vo, int handlerId, String xid,
             String alias, boolean disabled) {
-        EventTypeVO type = new EventTypeVO(eventSourceId, eventTypeRef1,
+        EventTypeVO type = new EventTypeVO(eventSource, eventTypeRef1,
                 eventTypeRef2);
         Permissions.ensureEventTypePermission(Common.getUser(), type);
 

@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.maint;
 
+import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.timer.cron.CronExpression;
 import java.net.InetAddress;
@@ -119,7 +120,7 @@ public class VersionCheck extends SystemCronTask {
 
     private static SystemEventType getEventType() {
         return new SystemEventType(SystemEventType.TYPE_VERSION_CHECK, 0,
-                EventType.DuplicateHandling.IGNORE_SAME_MESSAGE);
+                DuplicateHandling.IGNORE_SAME_MESSAGE);
     }
 
     private static LocalizableMessage newVersionCheck(long fireTime, String notifLevel) throws Exception {

@@ -1,5 +1,6 @@
 package com.serotonin.mango.db.dao;
 
+import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -186,7 +187,7 @@ public class MaintenanceEventDao extends BaseDao {
             getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
                 @Override
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    ejt2.update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.MAINTENANCE
+                    ejt2.update("delete from eventHandlers where eventTypeId=" + EventSources.MAINTENANCE.mangoDbId
                             + " and eventTypeRef1=?", new Object[]{maintenanceEventId});
                     ejt2.update("delete from maintenanceEvents where id=?", new Object[]{maintenanceEventId});
                 }

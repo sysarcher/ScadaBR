@@ -291,15 +291,6 @@ public class MangoContextListener implements ServletContextListener {
         ctx.setAttribute("constants.Permissions.DataPointAccessTypes.DATA_SOURCE", Permissions.DataPointAccessTypes.DATA_SOURCE);
         ctx.setAttribute("constants.Permissions.DataPointAccessTypes.ADMIN", Permissions.DataPointAccessTypes.ADMIN);
 
-        ctx.setAttribute("constants.EventType.EventSources.DATA_POINT", EventType.EventSources.DATA_POINT);
-        ctx.setAttribute("constants.EventType.EventSources.DATA_SOURCE", EventType.EventSources.DATA_SOURCE);
-        ctx.setAttribute("constants.EventType.EventSources.SYSTEM", EventType.EventSources.SYSTEM);
-        ctx.setAttribute("constants.EventType.EventSources.COMPOUND", EventType.EventSources.COMPOUND);
-        ctx.setAttribute("constants.EventType.EventSources.SCHEDULED", EventType.EventSources.SCHEDULED);
-        ctx.setAttribute("constants.EventType.EventSources.PUBLISHER", EventType.EventSources.PUBLISHER);
-        ctx.setAttribute("constants.EventType.EventSources.AUDIT", EventType.EventSources.AUDIT);
-        ctx.setAttribute("constants.EventType.EventSources.MAINTENANCE", EventType.EventSources.MAINTENANCE);
-
         ctx.setAttribute("constants.SystemEventType.TYPE_SYSTEM_STARTUP", SystemEventType.TYPE_SYSTEM_STARTUP);
         ctx.setAttribute("constants.SystemEventType.TYPE_SYSTEM_SHUTDOWN", SystemEventType.TYPE_SYSTEM_SHUTDOWN);
         ctx.setAttribute("constants.SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED", SystemEventType.TYPE_MAX_ALARM_LEVEL_CHANGED);

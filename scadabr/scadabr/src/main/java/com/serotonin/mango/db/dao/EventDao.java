@@ -62,6 +62,7 @@ import br.org.scadabr.vo.event.EventStatus;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.i18n.LocalizableMessageParseException;
+import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.vo.User;
 import java.sql.Connection;
 import java.sql.Statement;
@@ -114,7 +115,7 @@ public class EventDao extends BaseDao {
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                 final EventType type = event.getEventType();
-                ps.setInt(1, type.getEventSourceId());
+                ps.setInt(1, type.getEventSource().mangoDbId);
                 ps.setInt(2, type.getReferenceId1());
                 ps.setInt(3, type.getReferenceId2());
                 ps.setLong(4, event.getActiveTimestamp());
@@ -212,7 +213,7 @@ public class EventDao extends BaseDao {
 
     public List<EventInstance> getEventsForDataPoint(int dataPointId, int userId) {
         List<EventInstance> results = ejt.query(EVENT_SELECT_WITH_USER_DATA
-                + "where e.typeId=" + EventType.EventSources.DATA_POINT
+                + "where e.typeId=" + EventSources.DATA_POINT.mangoDbId
                 + "  and e.typeRef1=? " + "  and ue.userId=? "
                 + "order by e.activeTs desc", new Object[]{dataPointId,
                     userId}, new UserEventInstanceRowMapper());
@@ -259,34 +260,32 @@ public class EventDao extends BaseDao {
         public void run() {
             addToCache(
                     userId,
-                    getPendingEvents(EventType.EventSources.DATA_POINT, -1,
-                            userId));
+                    getPendingEvents(EventSources.DATA_POINT, -1, userId));
         }
     }
 
     public List<EventInstance> getPendingEventsForDataSource(int dataSourceId,
             int userId) {
-        return getPendingEvents(EventType.EventSources.DATA_SOURCE,
-                dataSourceId, userId);
+        return getPendingEvents(EventSources.DATA_SOURCE, dataSourceId, userId);
     }
 
     public List<EventInstance> getPendingEventsForPublisher(int publisherId,
             int userId) {
-        return getPendingEvents(EventType.EventSources.PUBLISHER, publisherId,
+        return getPendingEvents(EventSources.PUBLISHER, publisherId,
                 userId);
     }
 
-    List<EventInstance> getPendingEvents(int typeId, int typeRef1, int userId) {
+    List<EventInstance> getPendingEvents(EventSources eventSource, int typeRef1, int userId) {
         Object[] params;
         StringBuilder sb = new StringBuilder();
         sb.append(EVENT_SELECT_WITH_USER_DATA);
         sb.append("where e.typeId=?");
 
         if (typeRef1 == -1) {
-            params = new Object[]{typeId, userId, boolToChar(true)};
+            params = new Object[]{eventSource.mangoDbId, userId, boolToChar(true)};
         } else {
             sb.append("  and e.typeRef1=?");
-            params = new Object[]{typeId, typeRef1, userId, boolToChar(true)};
+            params = new Object[]{eventSource.mangoDbId, typeRef1, userId, boolToChar(true)};
         }
         sb.append("  and ue.userId=? ");
         sb.append("  and (e.ackTs is null or (e.rtnApplicable=? and e.rtnTs is null and e.alarmLevel > 0)) ");
@@ -377,34 +376,27 @@ public class EventDao extends BaseDao {
 
     static EventType createEventType(ResultSet rs, int offset)
             throws SQLException {
-        int typeId = rs.getInt(offset);
-        EventType type;
-        if (typeId == EventType.EventSources.DATA_POINT) {
-            type = new DataPointEventType(rs.getInt(offset + 1),
-                    rs.getInt(offset + 2));
-        } else if (typeId == EventType.EventSources.DATA_SOURCE) {
-            type = new DataSourceEventType(rs.getInt(offset + 1),
-                    rs.getInt(offset + 2));
-        } else if (typeId == EventType.EventSources.SYSTEM) {
-            type = new SystemEventType(rs.getInt(offset + 1),
-                    rs.getInt(offset + 2));
-        } else if (typeId == EventType.EventSources.COMPOUND) {
-            type = new CompoundDetectorEventType(rs.getInt(offset + 1));
-        } else if (typeId == EventType.EventSources.SCHEDULED) {
-            type = new ScheduledEventType(rs.getInt(offset + 1));
-        } else if (typeId == EventType.EventSources.PUBLISHER) {
-            type = new PublisherEventType(rs.getInt(offset + 1),
-                    rs.getInt(offset + 2));
-        } else if (typeId == EventType.EventSources.AUDIT) {
-            type = new AuditEventType(rs.getInt(offset + 1),
-                    rs.getInt(offset + 2));
-        } else if (typeId == EventType.EventSources.MAINTENANCE) {
-            type = new MaintenanceEventType(rs.getInt(offset + 1));
-        } else {
-            throw new ShouldNeverHappenException("Unknown event type: "
-                    + typeId);
+        switch (EventSources.fromMangoDbId(rs.getInt(offset))) {
+            case DATA_POINT:
+                return new DataPointEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
+            case DATA_SOURCE:
+                return new DataSourceEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
+            case SYSTEM:
+                return new SystemEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
+            case COMPOUND:
+                return new CompoundDetectorEventType(rs.getInt(offset + 1));
+            case SCHEDULED:
+                return new ScheduledEventType(rs.getInt(offset + 1));
+            case PUBLISHER:
+                return new PublisherEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
+            case AUDIT:
+                return new AuditEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
+            case MAINTENANCE:
+                return new MaintenanceEventType(rs.getInt(offset + 1));
+            default:
+                throw new ShouldNeverHappenException("Unknown eventSource: "
+                        + rs.getInt(offset));
         }
-        return type;
     }
 
     private void attachRelationalInfo(List<EventInstance> list) {
@@ -646,12 +638,12 @@ public class EventDao extends BaseDao {
     }
 
     public List<EventHandlerVO> getEventHandlers(EventType type) {
-        return getEventHandlers(type.getEventSourceId(),
+        return getEventHandlers(type.getEventSource(),
                 type.getReferenceId1(), type.getReferenceId2());
     }
 
     public List<EventHandlerVO> getEventHandlers(EventTypeVO type) {
-        return getEventHandlers(type.getTypeId(), type.getTypeRef1(),
+        return getEventHandlers(type.getEventSource(), type.getTypeRef1(),
                 type.getTypeRef2());
     }
 
@@ -664,11 +656,11 @@ public class EventDao extends BaseDao {
      * This is to allow a single set of event handlers to be defined for user
      * login events, rather than have to individually define them for each user.
      */
-    private List<EventHandlerVO> getEventHandlers(int typeId, int ref1, int ref2) {
+    private List<EventHandlerVO> getEventHandlers(EventSources eventSource, int ref1, int ref2) {
         return ejt.query(EVENT_HANDLER_SELECT
                 + "where eventTypeId=? and eventTypeRef1=? "
                 + "  and (eventTypeRef2=? or eventTypeRef2=0)", new Object[]{
-                    typeId, ref1, ref2}, new EventHandlerRowMapper());
+                    eventSource.mangoDbId, ref1, ref2}, new EventHandlerRowMapper());
     }
 
     public EventHandlerVO getEventHandler(int eventHandlerId) {
@@ -704,22 +696,24 @@ public class EventDao extends BaseDao {
     public EventHandlerVO saveEventHandler(final EventType type,
             final EventHandlerVO handler) {
         if (type == null) {
-            return saveEventHandler(0, 0, 0, handler);
+            throw new ShouldNeverHappenException("saveEventHandler EventType is null"); 
+//            return saveEventHandler(0, 0, 0, handler);
         }
-        return saveEventHandler(type.getEventSourceId(),
+        return saveEventHandler(type.getEventSource(),
                 type.getReferenceId1(), type.getReferenceId2(), handler);
     }
 
     public EventHandlerVO saveEventHandler(final EventTypeVO type,
             final EventHandlerVO handler) {
         if (type == null) {
-            return saveEventHandler(0, 0, 0, handler);
+            throw new ShouldNeverHappenException("saveEventHandler EventTypeVO is null"); 
+//            return saveEventHandler(0, 0, 0, handler);
         }
-        return saveEventHandler(type.getTypeId(), type.getTypeRef1(),
+        return saveEventHandler(type.getEventSource(), type.getTypeRef1(),
                 type.getTypeRef2(), handler);
     }
 
-    private EventHandlerVO saveEventHandler(final int typeId,
+    private EventHandlerVO saveEventHandler(final EventSources evetnSource,
             final int typeRef1, final int typeRef2, final EventHandlerVO handler) {
         getTransactionTemplate().execute(
                 new TransactionCallbackWithoutResult() {
@@ -727,7 +721,7 @@ public class EventDao extends BaseDao {
                     protected void doInTransactionWithoutResult(
                             TransactionStatus status) {
                                 if (handler.getId() == Common.NEW_ID) {
-                                    insertEventHandler(typeId, typeRef1, typeRef2,
+                                    insertEventHandler(evetnSource, typeRef1, typeRef2,
                                             handler);
                                 } else {
                                     updateEventHandler(handler);
@@ -737,7 +731,7 @@ public class EventDao extends BaseDao {
         return getEventHandler(handler.getId());
     }
 
-    void insertEventHandler(final int typeId, final int typeRef1, final int typeRef2,
+    void insertEventHandler(final EventSources eventSource, final int typeRef1, final int typeRef2,
             final EventHandlerVO handler) {
         handler.setId(doInsert(
                 new PreparedStatementCreator() {
@@ -749,7 +743,7 @@ public class EventDao extends BaseDao {
                         PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                         ps.setString(1, handler.getXid());
                         ps.setString(2, handler.getAlias());
-                        ps.setInt(3, typeId);
+                        ps.setInt(3, eventSource.mangoDbId);
                         ps.setInt(4, typeRef1);
                         ps.setInt(5, typeRef2);
                         ps.setBlob(6, SerializationHelper.writeObject(handler));
@@ -864,7 +858,7 @@ public class EventDao extends BaseDao {
 
     public static void updateCache(EventInstance event) {
         if (event.isAlarm()
-                && event.getEventType().getEventSourceId() == EventType.EventSources.DATA_POINT) {
+                && event.getEventType().getEventSource() == EventSources.DATA_POINT) {
             pendingEventCache.clear();
         }
     }

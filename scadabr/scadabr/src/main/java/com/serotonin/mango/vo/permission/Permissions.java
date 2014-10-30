@@ -270,17 +270,17 @@ public class Permissions {
     // / Event access
     //
     public static boolean hasEventTypePermission(User user, EventType eventType) {
-        switch (eventType.getEventSourceId()) {
-            case EventType.EventSources.DATA_POINT:
+        switch (eventType.getEventSource()) {
+            case DATA_POINT:
                 return hasDataPointReadPermission(user, eventType.getDataSourceId(), eventType.getDataPointId());
-            case EventType.EventSources.DATA_SOURCE:
+            case DATA_SOURCE:
                 return hasDataSourcePermission(user, eventType.getDataSourceId());
-            case EventType.EventSources.SYSTEM:
-            case EventType.EventSources.COMPOUND:
-            case EventType.EventSources.SCHEDULED:
-            case EventType.EventSources.PUBLISHER:
-            case EventType.EventSources.AUDIT:
-            case EventType.EventSources.MAINTENANCE:
+            case SYSTEM:
+            case COMPOUND:
+            case SCHEDULED:
+            case PUBLISHER:
+            case AUDIT:
+            case MAINTENANCE:
                 return hasAdmin(user);
         }
         return false;

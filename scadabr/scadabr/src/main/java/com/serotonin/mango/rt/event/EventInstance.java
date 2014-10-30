@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.event;
 
+import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.EventStatus;
 import java.util.List;
@@ -29,7 +30,6 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.UserComment;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import com.serotonin.bacnet4j.type.enumerated.EventState;
 
 public class EventInstance {
 
@@ -129,29 +129,28 @@ public class EventInstance {
     }
 
     public LocalizableMessage getRtnMessage() {
-        LocalizableMessage rtnKey = null;
-
-        if (!isActive()) {
+        if (isActive()) {
             if (rtnCause == RtnCauses.RETURN_TO_NORMAL) {
-                rtnKey = new LocalizableMessageImpl("event.rtn.rtn");
+                return new LocalizableMessageImpl("event.rtn.rtn");
             } else if (rtnCause == RtnCauses.SOURCE_DISABLED) {
-                if (eventType.getEventSourceId() == EventType.EventSources.DATA_POINT) {
-                    rtnKey = new LocalizableMessageImpl("event.rtn.pointDisabled");
-                } else if (eventType.getEventSourceId() == EventType.EventSources.DATA_SOURCE) {
-                    rtnKey = new LocalizableMessageImpl("event.rtn.dsDisabled");
-                } else if (eventType.getEventSourceId() == EventType.EventSources.PUBLISHER) {
-                    rtnKey = new LocalizableMessageImpl("event.rtn.pubDisabled");
-                } else if (eventType.getEventSourceId() == EventType.EventSources.MAINTENANCE) {
-                    rtnKey = new LocalizableMessageImpl("event.rtn.maintDisabled");
-                } else {
-                    rtnKey = new LocalizableMessageImpl("event.rtn.shutdown");
+                switch (eventType.getEventSource()) {
+                    case DATA_POINT:
+                        return new LocalizableMessageImpl("event.rtn.pointDisabled");
+                    case DATA_SOURCE:
+                        return new LocalizableMessageImpl("event.rtn.dsDisabled");
+                    case PUBLISHER:
+                        return new LocalizableMessageImpl("event.rtn.pubDisabled");
+                    case MAINTENANCE:
+                        return new LocalizableMessageImpl("event.rtn.maintDisabled");
+                    default:
+                        return new LocalizableMessageImpl("event.rtn.shutdown");
                 }
             } else {
-                rtnKey = new LocalizableMessageImpl("event.rtn.unknown");
+                return new LocalizableMessageImpl("event.rtn.unknown");
             }
+        } else {
+            return null;
         }
-
-        return rtnKey;
     }
 
     public LocalizableMessage getAckMessage() {
@@ -202,14 +201,14 @@ public class EventInstance {
 
     public EventStatus getEventState() {
         if (isActive()) {
-            return EventStatus.ACTIVE; 
+            return EventStatus.ACTIVE;
         } else if (isRtnApplicable()) {
             return EventStatus.RTN;
         } else {
             return EventStatus.NORTN;
         }
     }
-    
+
     public boolean isActive() {
         return rtnApplicable && rtnTimestamp == 0;
     }
@@ -237,6 +236,10 @@ public class EventInstance {
         return eventType;
     }
 
+    public EventSources getEventSource() {
+        return eventType.getEventSource();
+    }
+    
     public int getId() {
         return id;
     }

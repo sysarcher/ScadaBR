@@ -39,6 +39,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.IntValuePair;
+import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.Common;
 import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -428,7 +429,7 @@ public class DataPointDao extends BaseDao {
 
     void deleteDataPointImpl(String dataPointIdList) {
         dataPointIdList = "(" + dataPointIdList + ")";
-        ejt.update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.DATA_POINT
+        ejt.update("delete from eventHandlers where eventTypeId=" + EventSources.DATA_POINT.mangoDbId
                 + " and eventTypeRef1 in " + dataPointIdList);
         ejt.update("delete from userComments where commentType=2 and typeKey in " + dataPointIdList);
         ejt.update("delete from pointEventDetectors where dataPointId in " + dataPointIdList);
@@ -575,7 +576,7 @@ public class DataPointDao extends BaseDao {
 
         // Delete detectors for any remaining ids in the list of existing detectors.
         for (PointEventDetectorVO ped : existingDetectors) {
-            ejt.update("delete from eventHandlers " + "where eventTypeId=" + EventType.EventSources.DATA_POINT
+            ejt.update("delete from eventHandlers " + "where eventTypeId=" + EventSources.DATA_POINT.mangoDbId
                     + " and eventTypeRef1=? and eventTypeRef2=?", new Object[]{dp.getId(), ped.getId()});
             ejt.update("delete from pointEventDetectors where id=?", new Object[]{ped.getId()});
 

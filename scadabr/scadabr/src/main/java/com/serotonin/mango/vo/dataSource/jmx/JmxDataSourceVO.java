@@ -29,6 +29,7 @@ import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.rt.event.type.DuplicateHandling;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.jmx.JmxDataSourceRT;
@@ -55,7 +56,7 @@ public class JmxDataSourceVO extends DataSourceVO<JmxDataSourceVO> {
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
         ets.add(createEventType(JmxDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessageImpl(
-                "event.ds.dataSource"), EventType.DuplicateHandling.IGNORE_SAME_MESSAGE, AlarmLevel.URGENT));
+                "event.ds.dataSource"), DuplicateHandling.IGNORE_SAME_MESSAGE, AlarmLevel.URGENT));
         ets.add(createEventType(JmxDataSourceRT.POINT_READ_EXCEPTION_EVENT,
                 new LocalizableMessageImpl("event.ds.pointRead")));
         ets.add(createEventType(JmxDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, new LocalizableMessageImpl(

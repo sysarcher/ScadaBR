@@ -42,6 +42,7 @@ import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.rt.event.type.EventSources;
 import java.sql.Connection;
 import java.sql.Statement;
 import javax.inject.Named;
@@ -184,7 +185,7 @@ public class DataSourceDao extends BaseDao {
                 @Override
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
                     MaintenanceEventDao.getInstance().deleteMaintenanceEventsForDataSource(dataSourceId);
-                    ejt2.update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.DATA_SOURCE
+                    ejt2.update("delete from eventHandlers where eventTypeId=" + EventSources.DATA_SOURCE.mangoDbId
                             + " and eventTypeRef1=?", new Object[]{dataSourceId});
                     ejt2.update("delete from dataSourceUsers where dataSourceId=?", new Object[]{dataSourceId});
                     ejt2.update("delete from dataSources where id=?", new Object[]{dataSourceId});

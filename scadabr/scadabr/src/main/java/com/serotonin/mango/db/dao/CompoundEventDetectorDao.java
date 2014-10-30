@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.db.dao;
 
+import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -155,7 +156,7 @@ public class CompoundEventDetectorDao extends BaseDao {
             getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
                 @Override
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    ejt2.update("delete from eventHandlers where eventTypeId=" + EventType.EventSources.COMPOUND
+                    ejt2.update("delete from eventHandlers where eventTypeId=" + EventSources.COMPOUND.mangoDbId
                             + " and eventTypeRef1=?", new Object[]{compoundEventDetectorId});
                     ejt2.update("delete from compoundEventDetectors where id=?",
                             new Object[]{compoundEventDetectorId});

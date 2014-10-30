@@ -24,6 +24,8 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.rt.event.type.DuplicateHandling;
+import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.db.dao.DataPointDao;
 
 @JsonRemoteEntity
@@ -32,7 +34,7 @@ public class DataPointEventType extends EventType {
     private int dataSourceId = -1;
     private int dataPointId;
     private int pointEventDetectorId;
-    private int duplicateHandling = EventType.DuplicateHandling.IGNORE;
+    private DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
 
     public DataPointEventType() {
         // Required for reflection.
@@ -44,8 +46,8 @@ public class DataPointEventType extends EventType {
     }
 
     @Override
-    public int getEventSourceId() {
-        return EventType.EventSources.DATA_POINT;
+    public EventSources getEventSource() {
+        return EventSources.DATA_POINT;
     }
 
     @Override
@@ -71,11 +73,11 @@ public class DataPointEventType extends EventType {
     }
 
     @Override
-    public int getDuplicateHandling() {
+    public DuplicateHandling getDuplicateHandling() {
         return duplicateHandling;
     }
 
-    public void setDuplicateHandling(int duplicateHandling) {
+    public void setDuplicateHandling(DuplicateHandling duplicateHandling) {
         this.duplicateHandling = duplicateHandling;
     }
 

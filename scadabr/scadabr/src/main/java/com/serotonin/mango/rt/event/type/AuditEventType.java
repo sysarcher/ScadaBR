@@ -26,6 +26,8 @@ import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
+import br.org.scadabr.rt.event.type.DuplicateHandling;
+import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
@@ -90,7 +92,7 @@ public class AuditEventType extends EventType {
     }
 
     private static void addEventTypeVO(int type, String key) {
-        auditEventTypes.add(new EventTypeVO(EventType.EventSources.AUDIT, type, 0, new LocalizableMessageImpl(key),
+        auditEventTypes.add(new EventTypeVO(EventSources.AUDIT, type, 0, new LocalizableMessageImpl(key),
                 SystemSettingsDao.getAlarmLevel(AUDIT_SETTINGS_PREFIX + type, AlarmLevel.INFORMATION)));
     }
 
@@ -264,8 +266,8 @@ throw new ImplementMeException(); //"MessageFormat");
     }
 
     @Override
-    public int getEventSourceId() {
-        return EventType.EventSources.AUDIT;
+    public EventSources getEventSource() {
+        return EventSources.AUDIT;
     }
 
     public int getAuditEventTypeId() {
@@ -278,7 +280,7 @@ throw new ImplementMeException(); //"MessageFormat");
     }
 
     @Override
-    public int getDuplicateHandling() {
+    public DuplicateHandling getDuplicateHandling() {
         return DuplicateHandling.ALLOW;
     }
 

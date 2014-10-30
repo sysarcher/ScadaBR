@@ -30,6 +30,7 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
+import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
@@ -131,7 +132,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
     private double weight;
 
     public EventTypeVO getEventType() {
-        return new EventTypeVO(EventType.EventSources.DATA_POINT, dataPoint.getId(), id, getDescription(), alarmLevel,
+        return new EventTypeVO(EventSources.DATA_POINT, dataPoint.getId(), id, getDescription(), alarmLevel,
                 getEventDetectorKey());
     }
 

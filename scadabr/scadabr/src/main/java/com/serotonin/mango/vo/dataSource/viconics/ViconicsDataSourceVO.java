@@ -25,6 +25,7 @@ import java.util.List;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.rt.event.type.DuplicateHandling;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.viconics.ViconicsDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -55,9 +56,9 @@ public class ViconicsDataSourceVO extends DataSourceVO<ViconicsDataSourceVO> {
                 "event.ds.initialization")));
         ets
                 .add(createEventType(ViconicsDataSourceRT.MESSAGE_EXCEPTION_EVENT, new LocalizableMessageImpl(
-                                        "event.ds.message"), EventType.DuplicateHandling.IGNORE, AlarmLevel.INFORMATION));
+                                        "event.ds.message"), DuplicateHandling.IGNORE, AlarmLevel.INFORMATION));
         ets.add(createEventType(ViconicsDataSourceRT.DEVICE_OFFLINE_EVENT, new LocalizableMessageImpl("event.ds.device"),
-                EventType.DuplicateHandling.IGNORE, AlarmLevel.INFORMATION));
+                DuplicateHandling.IGNORE, AlarmLevel.INFORMATION));
         ets
                 .add(createEventType(ViconicsDataSourceRT.NETWORK_OFFLINE_EVENT, new LocalizableMessageImpl(
                                         "event.ds.network")));

@@ -26,6 +26,7 @@ import java.util.List;
 import br.org.scadabr.json.JsonRemoteEntity;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import br.org.scadabr.rt.datasource.vmstat.VMStatDataSourceRT;
+import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -46,7 +47,7 @@ public class VMStatDataSourceVO extends DataSourceVO<VMStatDataSourceVO> {
     @Override
     protected void addEventTypes(List<EventTypeVO> ets) {
         ets.add(createEventType(VMStatDataSourceRT.DATA_SOURCE_EXCEPTION_EVENT, new LocalizableMessageImpl(
-                "event.ds.dataSource"), EventType.DuplicateHandling.IGNORE_SAME_MESSAGE, AlarmLevel.URGENT));
+                "event.ds.dataSource"), DuplicateHandling.IGNORE_SAME_MESSAGE, AlarmLevel.URGENT));
         ets.add(createEventType(VMStatDataSourceRT.PARSE_EXCEPTION_EVENT, new LocalizableMessageImpl(
                 "event.ds.dataParse")));
     }

@@ -29,6 +29,7 @@ import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.publish.PublisherRT;
 import com.serotonin.mango.rt.publish.persistent.PersistentSenderRT;
@@ -47,19 +48,19 @@ public class PersistentSenderVO extends PublisherVO<PersistentPointVO> {
 
     @Override
     protected void getEventTypesImpl(List<EventTypeVO> eventTypes) {
-        eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(),
+        eventTypes.add(new EventTypeVO(EventSources.PUBLISHER, getId(),
                 PersistentSenderRT.CONNECTION_FAILED_EVENT, new LocalizableMessageImpl(
                         "event.pb.persistent.connectionFailed"), AlarmLevel.URGENT));
-        eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(),
+        eventTypes.add(new EventTypeVO(EventSources.PUBLISHER, getId(),
                 PersistentSenderRT.PROTOCOL_FAILURE_EVENT,
                 new LocalizableMessageImpl("event.pb.persistent.protocolFailure"), AlarmLevel.URGENT));
-        eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(),
+        eventTypes.add(new EventTypeVO(EventSources.PUBLISHER, getId(),
                 PersistentSenderRT.CONNECTION_ABORTED_EVENT, new LocalizableMessageImpl(
                         "event.pb.persistent.connectionAborted"), AlarmLevel.URGENT));
-        eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(),
+        eventTypes.add(new EventTypeVO(EventSources.PUBLISHER, getId(),
                 PersistentSenderRT.CONNECTION_LOST_EVENT, new LocalizableMessageImpl("event.pb.persistent.connectionLost"),
                 AlarmLevel.URGENT));
-        eventTypes.add(new EventTypeVO(EventType.EventSources.PUBLISHER, getId(),
+        eventTypes.add(new EventTypeVO(EventSources.PUBLISHER, getId(),
                 PersistentSenderRT.SYNC_COMPLETION_EVENT, new LocalizableMessageImpl("event.pb.persistent.syncCompleted"),
                 AlarmLevel.NONE));
     }
