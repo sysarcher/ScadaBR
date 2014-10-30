@@ -33,6 +33,8 @@ import com.serotonin.mango.rt.event.type.PublisherEventType;
 import com.serotonin.mango.rt.event.type.ScheduledEventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.vo.event.type.AuditEventSource;
+import br.org.scadabr.vo.event.type.SystemEventSource;
 
 public class EventTypeVO {
 
@@ -89,7 +91,7 @@ public class EventTypeVO {
             case DATA_SOURCE:
                 return new DataSourceEventType(typeRef1, typeRef2, alarmLevel, duplicateHandling);
             case SYSTEM:
-                return new SystemEventType(typeRef1, typeRef2);
+                return new SystemEventType(SystemEventSource.fromMangoDbId(typeRef1), typeRef2);
             case COMPOUND:
                 return new CompoundDetectorEventType(typeRef1);
             case SCHEDULED:
@@ -97,7 +99,7 @@ public class EventTypeVO {
             case PUBLISHER:
                 return new PublisherEventType(typeRef1, typeRef2);
             case AUDIT:
-                return new AuditEventType(typeRef1, typeRef2);
+                return new AuditEventType(AuditEventSource.fromMangoDbId(typeRef1), typeRef2);
             case MAINTENANCE:
                 return new MaintenanceEventType(typeRef1);
             default:

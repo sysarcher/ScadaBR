@@ -71,12 +71,10 @@ public class PublisherEventType extends EventType {
         return DuplicateHandling.IGNORE;
     }
 
-    @Override
     public int getReferenceId1() {
         return publisherId;
     }
 
-    @Override
     public int getReferenceId2() {
         return publisherEventTypeId;
     }

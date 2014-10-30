@@ -35,6 +35,8 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.SystemEventSource;
+import java.util.EnumMap;
 
 @JsonRemoteEntity
 public class SystemEventType extends EventType {
@@ -46,67 +48,27 @@ public class SystemEventType extends EventType {
     //
     private static final String SYSTEM_SETTINGS_PREFIX = "systemEventAlarmLevel";
 
-    public static final int TYPE_SYSTEM_STARTUP = 1;
-    public static final int TYPE_SYSTEM_SHUTDOWN = 2;
-    public static final int TYPE_MAX_ALARM_LEVEL_CHANGED = 3;
-    public static final int TYPE_USER_LOGIN = 4;
-    public static final int TYPE_VERSION_CHECK = 5;
-    public static final int TYPE_COMPOUND_DETECTOR_FAILURE = 6;
-    public static final int TYPE_SET_POINT_HANDLER_FAILURE = 7;
-    public static final int TYPE_EMAIL_SEND_FAILURE = 8;
-    public static final int TYPE_POINT_LINK_FAILURE = 9;
-    public static final int TYPE_PROCESS_FAILURE = 10;
+    public static final Map<SystemEventSource, EventTypeVO> SYSTEM_EVENT_TYPES = new EnumMap<>(SystemEventSource.class);
 
-    public static final ExportCodes TYPE_CODES = new ExportCodes();
-
+    //TODO fix Alarmlevel from SystemSettingsDao for now only default 
     static {
-        TYPE_CODES.addElement(TYPE_SYSTEM_STARTUP, "SYSTEM_STARTUP");
-        TYPE_CODES.addElement(TYPE_SYSTEM_SHUTDOWN, "SYSTEM_SHUTDOWN");
-        TYPE_CODES.addElement(TYPE_MAX_ALARM_LEVEL_CHANGED, "MAX_ALARM_LEVEL_CHANGED");
-        TYPE_CODES.addElement(TYPE_USER_LOGIN, "USER_LOGIN");
-        TYPE_CODES.addElement(TYPE_VERSION_CHECK, "VERSION_CHECK");
-        TYPE_CODES.addElement(TYPE_COMPOUND_DETECTOR_FAILURE, "COMPOUND_DETECTOR_FAILURE");
-        TYPE_CODES.addElement(TYPE_SET_POINT_HANDLER_FAILURE, "SET_POINT_HANDLER_FAILURE");
-        TYPE_CODES.addElement(TYPE_EMAIL_SEND_FAILURE, "EMAIL_SEND_FAILURE");
-        TYPE_CODES.addElement(TYPE_POINT_LINK_FAILURE, "POINT_LINK_FAILURE");
-        TYPE_CODES.addElement(TYPE_PROCESS_FAILURE, "PROCESS_FAILURE");
-    }
-
-    private static List<EventTypeVO> systemEventTypes;
-
-    public static List<EventTypeVO> getSystemEventTypes() {
-        if (systemEventTypes == null) {
-            systemEventTypes = new ArrayList<EventTypeVO>();
-
-            addEventTypeVO(TYPE_SYSTEM_STARTUP, "event.system.startup", AlarmLevel.INFORMATION);
-            addEventTypeVO(TYPE_SYSTEM_SHUTDOWN, "event.system.shutdown", AlarmLevel.INFORMATION);
-            addEventTypeVO(TYPE_MAX_ALARM_LEVEL_CHANGED, "event.system.maxAlarmChanged", AlarmLevel.NONE);
-            addEventTypeVO(TYPE_USER_LOGIN, "event.system.userLogin", AlarmLevel.INFORMATION);
-            addEventTypeVO(TYPE_VERSION_CHECK, "event.system.versionCheck", AlarmLevel.INFORMATION);
-            addEventTypeVO(TYPE_COMPOUND_DETECTOR_FAILURE, "event.system.compound", AlarmLevel.URGENT);
-            addEventTypeVO(TYPE_SET_POINT_HANDLER_FAILURE, "event.system.setPoint", AlarmLevel.URGENT);
-            addEventTypeVO(TYPE_EMAIL_SEND_FAILURE, "event.system.email", AlarmLevel.INFORMATION);
-            addEventTypeVO(TYPE_POINT_LINK_FAILURE, "event.system.pointLink", AlarmLevel.URGENT);
-            addEventTypeVO(TYPE_PROCESS_FAILURE, "event.system.process", AlarmLevel.URGENT);
+        for (SystemEventSource s : SystemEventSource.values()) {
+            SYSTEM_EVENT_TYPES.put(s, new EventTypeVO(EventSources.SYSTEM, s.mangoDbId, 0, s, s.defaultAlarmLevel));
         }
-        return systemEventTypes;
+
+    }
+    /*    
+     private static void addEventTypeVO(AuditEventSource type, String key) {
+     auditEventTypes.add(new EventTypeVO(EventSources.AUDIT, type, 0, new LocalizableMessageImpl(key),
+     SystemSettingsDao.getAlarmLevel(AUDIT_SETTINGS_PREFIX + type, AlarmLevel.INFORMATION)));
+     }
+     */
+
+    public static EventTypeVO getEventType(SystemEventSource type) {
+        return SYSTEM_EVENT_TYPES.get(type);
     }
 
-    private static void addEventTypeVO(int type, String key, AlarmLevel defaultAlarmLevel) {
-        systemEventTypes.add(new EventTypeVO(EventSources.SYSTEM, type, 0, new LocalizableMessageImpl(key),
-                SystemSettingsDao.getAlarmLevel(SYSTEM_SETTINGS_PREFIX + type, defaultAlarmLevel)));
-    }
-
-    public static EventTypeVO getEventType(int type) {
-        for (EventTypeVO et : getSystemEventTypes()) {
-            if (et.getTypeRef1() == type) {
-                return et;
-            }
-        }
-        return null;
-    }
-
-    public static void setEventTypeAlarmLevel(int type, AlarmLevel alarmLevel) {
+    public static void setEventTypeAlarmLevel(SystemEventSource type, AlarmLevel alarmLevel) {
         EventTypeVO et = getEventType(type);
         et.setAlarmLevel(alarmLevel);
 
@@ -116,7 +78,7 @@ public class SystemEventType extends EventType {
 
     @Deprecated // Use Eventmanager
     public static void raiseEvent(SystemEventType type, long time, boolean rtn, LocalizableMessage message) {
-        EventTypeVO vo = getEventType(type.getSystemEventTypeId());
+        EventTypeVO vo = getEventType(type.getSystemEventType());
         AlarmLevel alarmLevel = vo.getAlarmLevel();
         Common.ctx.getEventManager().raiseEvent(type, time, rtn, alarmLevel, message, null);
     }
@@ -131,26 +93,26 @@ public class SystemEventType extends EventType {
     // / Instance stuff
     // /
     //
-    private int systemEventTypeId;
-    private int refId2;
+    private SystemEventSource systemEventType;
+    private int referenceId;
     private DuplicateHandling duplicateHandling = DuplicateHandling.ALLOW;
 
     public SystemEventType() {
         // Required for reflection.
     }
 
-    public SystemEventType(int systemEventTypeId) {
-        this.systemEventTypeId = systemEventTypeId;
+    public SystemEventType(SystemEventSource systemEventType) {
+        this.systemEventType = systemEventType;
     }
 
-    public SystemEventType(int systemEventTypeId, int refId2) {
-        this(systemEventTypeId);
-        this.refId2 = refId2;
+    public SystemEventType(SystemEventSource systemEventType, int referenceId) {
+        this(systemEventType);
+        this.referenceId = referenceId;
     }
 
-    public SystemEventType(int systemEventTypeId, int refId2, DuplicateHandling duplicateHandling) {
-        this(systemEventTypeId);
-        this.refId2 = refId2;
+    public SystemEventType(SystemEventSource systemEventType, int referenceId, DuplicateHandling duplicateHandling) {
+        this(systemEventType);
+        this.referenceId = referenceId;
         this.duplicateHandling = duplicateHandling;
     }
 
@@ -159,8 +121,8 @@ public class SystemEventType extends EventType {
         return EventSources.SYSTEM;
     }
 
-    public int getSystemEventTypeId() {
-        return systemEventTypeId;
+    public SystemEventSource getSystemEventType() {
+        return systemEventType;
     }
 
     @Override
@@ -170,7 +132,7 @@ public class SystemEventType extends EventType {
 
     @Override
     public String toString() {
-        return "SystemEventType(eventTypeId=" + systemEventTypeId + ")";
+        return "SystemEventType(eventType=" + systemEventType + ")";
     }
 
     @Override
@@ -178,22 +140,16 @@ public class SystemEventType extends EventType {
         return duplicateHandling;
     }
 
-    @Override
-    public int getReferenceId1() {
-        return systemEventTypeId;
-    }
-
-    @Override
-    public int getReferenceId2() {
-        return refId2;
+    public int getReferenceId() {
+        return referenceId;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + refId2;
-        result = prime * result + systemEventTypeId;
+        result = prime * result + referenceId;
+        result = prime * result + systemEventType.mangoDbId;
         return result;
     }
 
@@ -209,13 +165,10 @@ public class SystemEventType extends EventType {
             return false;
         }
         SystemEventType other = (SystemEventType) obj;
-        if (refId2 != other.refId2) {
+        if (referenceId != other.referenceId) {
             return false;
         }
-        if (systemEventTypeId != other.systemEventTypeId) {
-            return false;
-        }
-        return true;
+        return systemEventType == other.systemEventType;
     }
 
     //
@@ -226,12 +179,12 @@ public class SystemEventType extends EventType {
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        map.put("systemType", TYPE_CODES.getCode(systemEventTypeId));
+        map.put("systemType", systemEventType.name());
     }
 
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
-        systemEventTypeId = getInt(json, "systemType", TYPE_CODES);
+        systemEventType = SystemEventSource.valueOf(json.getString("systemType"));
     }
 }

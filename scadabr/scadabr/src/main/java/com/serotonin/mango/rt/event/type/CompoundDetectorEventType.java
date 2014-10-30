@@ -68,12 +68,10 @@ public class CompoundDetectorEventType extends EventType {
         this.duplicateHandling = duplicateHandling;
     }
 
-    @Override
     public int getReferenceId1() {
         return compoundDetectorId;
     }
 
-    @Override
     public int getReferenceId2() {
         return 0;
     }

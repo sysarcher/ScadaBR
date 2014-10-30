@@ -28,6 +28,7 @@ import com.serotonin.mango.web.email.MangoEmailContent;
 import br.org.scadabr.web.email.EmailContent;
 import br.org.scadabr.web.email.EmailSender;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.SystemEventSource;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -101,7 +102,7 @@ public class EmailWorkItem implements WorkItem {
                 }
                 to += addr.getAddress();
             }
-            SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_EMAIL_SEND_FAILURE),
+            SystemEventType.raiseEvent(new SystemEventType(SystemEventSource.EMAIL_SEND_FAILURE),
                     System.currentTimeMillis(), false,
                     new LocalizableMessageImpl("event.email.failure", subject, to, e.getMessage()));
         } finally {

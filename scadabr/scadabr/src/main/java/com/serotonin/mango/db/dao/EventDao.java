@@ -63,6 +63,9 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.i18n.LocalizableMessageParseException;
 import br.org.scadabr.rt.event.type.EventSources;
+import br.org.scadabr.utils.ImplementMeException;
+import br.org.scadabr.vo.event.type.AuditEventSource;
+import br.org.scadabr.vo.event.type.SystemEventSource;
 import com.serotonin.mango.vo.User;
 import java.sql.Connection;
 import java.sql.Statement;
@@ -116,8 +119,46 @@ public class EventDao extends BaseDao {
                 PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                 final EventType type = event.getEventType();
                 ps.setInt(1, type.getEventSource().mangoDbId);
-                ps.setInt(2, type.getReferenceId1());
-                ps.setInt(3, type.getReferenceId2());
+                switch (type.getEventSource()) {
+                    case AUDIT: {
+                        final AuditEventType et = (AuditEventType) type;
+                        ps.setInt(2, et.getAuditEventType().mangoDbId);
+                        ps.setInt(3, et.getReferenceId());
+                    }
+                    break;
+                    /*TODO                    case COMPOUND:
+                     ps.setInt(2, ((CompoundEventTy) type).getAuditEventType().mangoDbId);
+                     ps.setInt(3, type.getReferenceId2());
+                     break;
+                     */ case DATA_POINT:
+                        ps.setInt(2, ((DataPointEventType) type).getReferenceId1());
+                        ps.setInt(3, ((DataPointEventType) type).getReferenceId2());
+                        break;
+                    case DATA_SOURCE:
+                        ps.setInt(2, ((DataSourceEventType) type).getReferenceId1());
+                        ps.setInt(3, ((DataSourceEventType) type).getReferenceId2());
+                        break;
+                    case MAINTENANCE:
+                        ps.setInt(2, ((MaintenanceEventType) type).getReferenceId1());
+                        ps.setInt(3, ((MaintenanceEventType) type).getReferenceId2());
+                        break;
+                    case PUBLISHER:
+                        ps.setInt(2, ((PublisherEventType) type).getReferenceId1());
+                        ps.setInt(3, ((PublisherEventType) type).getReferenceId2());
+                        break;
+                    case SCHEDULED:
+                        ps.setInt(2, ((ScheduledEventType) type).getReferenceId1());
+                        ps.setInt(3, ((ScheduledEventType) type).getReferenceId2());
+                        break;
+                    case SYSTEM: {
+                        final SystemEventType et = (SystemEventType) type;
+                        ps.setInt(2, et.getSystemEventType().mangoDbId);
+                        ps.setInt(3, et.getReferenceId());
+                    }
+                    break;
+                    default:
+                        throw new ImplementMeException();
+                }
                 ps.setLong(4, event.getActiveTimestamp());
                 ps.setString(5, boolToChar(event.isRtnApplicable()));
                 if (!event.isActive()) {
@@ -382,7 +423,7 @@ public class EventDao extends BaseDao {
             case DATA_SOURCE:
                 return new DataSourceEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
             case SYSTEM:
-                return new SystemEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
+                return new SystemEventType(SystemEventSource.fromMangoDbId(rs.getInt(offset + 1)), rs.getInt(offset + 2));
             case COMPOUND:
                 return new CompoundDetectorEventType(rs.getInt(offset + 1));
             case SCHEDULED:
@@ -390,7 +431,7 @@ public class EventDao extends BaseDao {
             case PUBLISHER:
                 return new PublisherEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
             case AUDIT:
-                return new AuditEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
+                return new AuditEventType(AuditEventSource.fromMangoDbId(rs.getInt(offset + 1)), rs.getInt(offset + 2));
             case MAINTENANCE:
                 return new MaintenanceEventType(rs.getInt(offset + 1));
             default:
@@ -638,8 +679,38 @@ public class EventDao extends BaseDao {
     }
 
     public List<EventHandlerVO> getEventHandlers(EventType type) {
-        return getEventHandlers(type.getEventSource(),
-                type.getReferenceId1(), type.getReferenceId2());
+        switch (type.getEventSource()) {
+            case AUDIT: {
+                final AuditEventType et = (AuditEventType) type;
+                return getEventHandlers(et.getEventSource(), et.getAuditEventType().mangoDbId, et.getReferenceId());
+            }
+            case DATA_POINT: {
+                final DataPointEventType et = (DataPointEventType) type;
+                return getEventHandlers(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2());
+            }
+            case DATA_SOURCE: {
+                final DataSourceEventType et = (DataSourceEventType) type;
+                return getEventHandlers(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2());
+            }
+            case MAINTENANCE: {
+                final MaintenanceEventType et = (MaintenanceEventType) type;
+                return getEventHandlers(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2());
+            }
+            case PUBLISHER: {
+                final PublisherEventType et = (PublisherEventType) type;
+                return getEventHandlers(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2());
+            }
+            case SCHEDULED: {
+                final ScheduledEventType et = (ScheduledEventType) type;
+                return getEventHandlers(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2());
+            }
+            case SYSTEM: {
+                final SystemEventType et = (SystemEventType) type;
+                return getEventHandlers(et.getEventSource(), et.getSystemEventType().mangoDbId, et.getReferenceId());
+            }
+            default:
+                throw new ShouldNeverHappenException("Eventtype not supported");
+        }
     }
 
     public List<EventHandlerVO> getEventHandlers(EventTypeVO type) {
@@ -696,17 +767,47 @@ public class EventDao extends BaseDao {
     public EventHandlerVO saveEventHandler(final EventType type,
             final EventHandlerVO handler) {
         if (type == null) {
-            throw new ShouldNeverHappenException("saveEventHandler EventType is null"); 
+            throw new ShouldNeverHappenException("saveEventHandler EventType is null");
 //            return saveEventHandler(0, 0, 0, handler);
         }
-        return saveEventHandler(type.getEventSource(),
-                type.getReferenceId1(), type.getReferenceId2(), handler);
+        switch (type.getEventSource()) {
+            case AUDIT: {
+                final AuditEventType et = (AuditEventType) type;
+                return saveEventHandler(et.getEventSource(), et.getAuditEventType().mangoDbId, et.getReferenceId(), handler);
+            }
+            case DATA_POINT: {
+                final DataPointEventType et = (DataPointEventType) type;
+                return saveEventHandler(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2(), handler);
+            }
+            case DATA_SOURCE: {
+                final DataSourceEventType et = (DataSourceEventType) type;
+                return saveEventHandler(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2(), handler);
+            }
+            case MAINTENANCE: {
+                final MaintenanceEventType et = (MaintenanceEventType) type;
+                return saveEventHandler(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2(), handler);
+            }
+            case PUBLISHER: {
+                final PublisherEventType et = (PublisherEventType) type;
+                return saveEventHandler(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2(), handler);
+            }
+            case SCHEDULED: {
+                final ScheduledEventType et = (ScheduledEventType) type;
+                return saveEventHandler(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2(), handler);
+            }
+            case SYSTEM: {
+                final SystemEventType et = (SystemEventType) type;
+                return saveEventHandler(et.getEventSource(), et.getSystemEventType().mangoDbId, et.getReferenceId(), handler);
+            }
+            default:
+                throw new ShouldNeverHappenException("Eventtype not supported");
+        }
     }
 
     public EventHandlerVO saveEventHandler(final EventTypeVO type,
             final EventHandlerVO handler) {
         if (type == null) {
-            throw new ShouldNeverHappenException("saveEventHandler EventTypeVO is null"); 
+            throw new ShouldNeverHappenException("saveEventHandler EventTypeVO is null");
 //            return saveEventHandler(0, 0, 0, handler);
         }
         return saveEventHandler(type.getEventSource(), type.getTypeRef1(),
@@ -751,7 +852,7 @@ public class EventDao extends BaseDao {
                     }
                 }));
 
-        AuditEventType.raiseAddedEvent(AuditEventType.TYPE_EVENT_HANDLER,
+        AuditEventType.raiseAddedEvent(AuditEventSource.EVENT_HANDLER,
                 handler);
     }
 
@@ -771,7 +872,7 @@ public class EventDao extends BaseDao {
             }
         });
 
-        AuditEventType.raiseChangedEvent(AuditEventType.TYPE_EVENT_HANDLER,
+        AuditEventType.raiseChangedEvent(AuditEventSource.EVENT_HANDLER,
                 old, handler);
     }
 
@@ -779,7 +880,7 @@ public class EventDao extends BaseDao {
         EventHandlerVO handler = getEventHandler(handlerId);
         ejt.update("delete from eventHandlers where id=?",
                 new Object[]{handlerId});
-        AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_EVENT_HANDLER,
+        AuditEventType.raiseDeletedEvent(AuditEventSource.EVENT_HANDLER,
                 handler);
     }
 

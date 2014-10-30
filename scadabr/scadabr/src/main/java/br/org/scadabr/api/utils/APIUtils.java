@@ -30,6 +30,7 @@ import br.org.scadabr.api.vo.EventNotification;
 import br.org.scadabr.api.vo.ModbusIPConfig;
 import br.org.scadabr.api.vo.ModbusPointConfig;
 import br.org.scadabr.api.vo.ModbusSerialConfig;
+import br.org.scadabr.utils.ImplementMeException;
 
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -784,8 +785,7 @@ public final class APIUtils {
         if (eventInstance.getEventType().getDataPointId() != -1) {
             event.setEventType(EventType.POINT_CONDITION_EVENT);
             int dataPointId = eventInstance.getEventType().getDataPointId();
-            int pointDetectorId = eventInstance.getEventType()
-                    .getReferenceId2();
+            int pointDetectorId = -1;  if (true) throw  new ImplementMeException(); //WAS: eventInstance.getEventType().getReferenceId2();
 
             List<PointEventDetectorVO> peDetectors = DataPointDao.getInstance().getDataPoint(dataPointId).getEventDetectors();
 

@@ -6,6 +6,7 @@
 package com.serotonin.mango.web;
 
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.SystemEventSource;
 import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.vo.User;
@@ -51,7 +52,7 @@ public class UserSessionContextBean implements Serializable {
     public void loginUser(User user) {
         this.user = user;
         eventManager.raiseEvent(new SystemEventType(
-                SystemEventType.TYPE_USER_LOGIN, user.getId()), System
+                SystemEventSource.USER_LOGIN, user.getId()), System
                 .currentTimeMillis(), true, new LocalizableMessageImpl(
                         "event.login", user.getUsername()));
     }
@@ -62,7 +63,7 @@ public class UserSessionContextBean implements Serializable {
     public void logoutUser(User user) {
         this.user = null;
         eventManager.returnToNormal(new SystemEventType(
-                SystemEventType.TYPE_USER_LOGIN, user.getId()), System
+                SystemEventSource.USER_LOGIN, user.getId()), System
                 .currentTimeMillis());
         user.cancelTestingUtility();
     }

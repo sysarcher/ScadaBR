@@ -127,10 +127,6 @@ abstract public class EventType implements JsonSerializable {
      */
     abstract public DuplicateHandling getDuplicateHandling();
 
-    abstract public int getReferenceId1();
-
-    abstract public int getReferenceId2();
-
     /**
      * Determines if the notification of this event to the given user should be
      * suppressed. Useful if the action of the user resulted in the event being

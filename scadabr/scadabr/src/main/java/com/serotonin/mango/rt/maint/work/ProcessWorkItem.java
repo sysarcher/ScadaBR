@@ -33,6 +33,7 @@ import com.serotonin.mango.rt.maint.BackgroundProcessing;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.SystemEventSource;
 
 /**
  * @author Matthew Lohbihler
@@ -58,7 +59,7 @@ public class ProcessWorkItem implements WorkItem {
         try {
             executeProcessCommand(command);
         } catch (IOException e) {
-            SystemEventType.raiseEvent(new SystemEventType(SystemEventType.TYPE_PROCESS_FAILURE),
+            SystemEventType.raiseEvent(new SystemEventType(SystemEventSource.PROCESS_FAILURE),
                     System.currentTimeMillis(), false,
                     new LocalizableMessageImpl("event.process.failure", command, e.getMessage()));
         }

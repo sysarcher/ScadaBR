@@ -57,6 +57,7 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.Tuple;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.type.AuditEventSource;
 import br.org.scadabr.web.LazyTreeNode;
 import com.serotonin.mango.rt.RuntimeManager;
 import java.sql.Connection;
@@ -319,7 +320,7 @@ public class DataPointDao extends BaseDao {
         // Save the relational information.
         saveEventDetectors(dp);
 
-        AuditEventType.raiseAddedEvent(AuditEventType.TYPE_DATA_POINT, dp);
+        AuditEventType.raiseAddedEvent(AuditEventSource.DATA_POINT, dp);
     }
 
     void updateDataPoint(final DataPointVO dp) {
@@ -335,7 +336,7 @@ public class DataPointDao extends BaseDao {
         // Save the VO information.
         updateDataPointShallow(dp);
 
-        AuditEventType.raiseChangedEvent(AuditEventType.TYPE_DATA_POINT, old, dp);
+        AuditEventType.raiseChangedEvent(AuditEventSource.DATA_POINT, old, dp);
 
         // Save the relational information.
         saveEventDetectors(dp);
@@ -377,7 +378,7 @@ public class DataPointDao extends BaseDao {
         });
 
         for (DataPointVO dp : old) {
-            AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_DATA_POINT, dp);
+            AuditEventType.raiseDeletedEvent(AuditEventSource.DATA_POINT, dp);
         }
     }
 
@@ -393,7 +394,7 @@ public class DataPointDao extends BaseDao {
                 }
             });
 
-            AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_DATA_POINT, dp);
+            AuditEventType.raiseDeletedEvent(AuditEventSource.DATA_POINT, dp);
         }
     }
 
@@ -555,7 +556,7 @@ public class DataPointDao extends BaseDao {
                     }
                 });
                 ped.setId(id);
-                AuditEventType.raiseAddedEvent(AuditEventType.TYPE_POINT_EVENT_DETECTOR, ped);
+                AuditEventType.raiseAddedEvent(AuditEventSource.POINT_EVENT_DETECTOR, ped);
             } else {
                 PointEventDetectorVO old = removeFromList(existingDetectors, ped.getId());
 
@@ -570,7 +571,7 @@ public class DataPointDao extends BaseDao {
                             Types.INTEGER, Types.DOUBLE, Types.INTEGER, Types.INTEGER, Types.VARCHAR,
                             Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.DOUBLE, Types.INTEGER});
 
-                AuditEventType.raiseChangedEvent(AuditEventType.TYPE_POINT_EVENT_DETECTOR, old, ped);
+                AuditEventType.raiseChangedEvent(AuditEventSource.POINT_EVENT_DETECTOR, old, ped);
             }
         }
 
@@ -580,7 +581,7 @@ public class DataPointDao extends BaseDao {
                     + " and eventTypeRef1=? and eventTypeRef2=?", new Object[]{dp.getId(), ped.getId()});
             ejt.update("delete from pointEventDetectors where id=?", new Object[]{ped.getId()});
 
-            AuditEventType.raiseDeletedEvent(AuditEventType.TYPE_POINT_EVENT_DETECTOR, ped);
+            AuditEventType.raiseDeletedEvent(AuditEventSource.POINT_EVENT_DETECTOR, ped);
         }
     }
 
