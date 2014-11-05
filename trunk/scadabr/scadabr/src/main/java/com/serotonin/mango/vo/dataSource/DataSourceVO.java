@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import br.org.scadabr.vo.dataSource.alpha2.Alpha2DataSourceVO;
 import br.org.scadabr.vo.dataSource.asciiFile.ASCIIFileDataSourceVO;
 import br.org.scadabr.vo.dataSource.asciiSerial.ASCIISerialDataSourceVO;
 import br.org.scadabr.vo.dataSource.dnp3.Dnp3IpDataSourceVO;
@@ -293,12 +292,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new DrStorageHt5bDataSourceVO();
-                    }
-                },
-        ALPHA_2(39, "dsEdit.alpha2", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new Alpha2DataSourceVO();
                     }
                 };
 

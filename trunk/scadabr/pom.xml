@@ -15,6 +15,8 @@
         <module>scheduler</module>
         <module>utils</module>
         <module>scadabr-flexproject</module>
+        <!--module>scadabr-ds-alpha2</module-->
+        <!--module>scadabr-old-jsp-dwr</module-->
     </modules>
 
     
@@ -108,11 +110,6 @@
                 <version>3.3.2</version>
             </dependency>
         
-            <dependency>
-                <groupId>br.org.scadabr.legacy</groupId>
-                <artifactId>alpha24j</artifactId>
-                <version>version-unknown</version>
-            </dependency>
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz</artifactId>
