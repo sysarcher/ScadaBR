@@ -1,5 +1,6 @@
 package br.org.scadabr.l10n;
 
+import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -10,7 +11,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
-import net.sf.mbus4j.log.LogUtils;
 
 /**
  * This class localizes I18N keys and messages with the default #ResourceBundle
@@ -22,7 +22,7 @@ public abstract class AbstractLocalizer implements Serializable, Localizer {
     /**
      * the logger to use.
      */
-    private final static Logger LOG = LogUtils.getCoreLogger();
+    private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_CORE);
 
     //TODO APL move this map out to a Singleton bean?
     private final Map<Locale, Map<String, MessageFormat>> pvtMessageFormatMap = new HashMap<>();

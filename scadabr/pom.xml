@@ -23,7 +23,8 @@
         <!--module>sacadabr-ds-iec101</module-->
         <!--module>scadabr-ds-nodave-s7</module-->
         <!--module>scadabr-ds-opc</module-->
-        <module>scadabr-ds-fhz4j</module>
+        <!--module>scadabr-ds-fhz4j</module-->
+        <!--module>scadabr-ds-mbus4j</module-->
     </modules>
 
     
