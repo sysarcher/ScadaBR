@@ -70,7 +70,6 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
-import br.org.scadabr.vo.datasource.mbus.MBusDataSourceVO;
 import br.org.scadabr.vo.event.AlarmLevel;
 
 abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
@@ -130,12 +129,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new JmxDataSourceVO();
-                    }
-                },
-        M_BUS(20, "dsEdit.mbus", true) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return MBusDataSourceVO.createNewDataSource();
                     }
                 },
         META(9, "dsEdit.meta", true) {

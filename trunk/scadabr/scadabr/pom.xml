@@ -218,10 +218,6 @@
             <artifactId>onewire</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.sf.mbus4j</groupId>
-            <artifactId>mbus4j-master</artifactId>
-        </dependency>
-        <dependency>
             <groupId>br.org.scadabr.legacy</groupId>
             <artifactId>openv4j-core</artifactId>
         </dependency>

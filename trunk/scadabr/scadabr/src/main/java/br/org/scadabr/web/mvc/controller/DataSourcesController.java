@@ -51,7 +51,7 @@ public class DataSourcesController {
         }
         
         model.addAttribute("dataSourceTypes", typeMap);
-        model.addAttribute("defaultDataSourceType", DataSourceVO.Type.M_BUS.name());
+//        model.addAttribute("defaultDataSourceType", DataSourceVO.Type.M_BUS.name());
                 
         
     }
