@@ -64,7 +64,6 @@ import com.serotonin.mango.vo.dataSource.spinwave.SpinwaveDataSourceVO;
 import com.serotonin.mango.vo.dataSource.sql.SqlDataSourceVO;
 import com.serotonin.mango.vo.dataSource.viconics.ViconicsDataSourceVO;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualDataSourceVO;
-import br.org.scadabr.vo.datasource.vmstat.VMStatDataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
@@ -207,12 +206,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new VirtualDataSourceVO();
-                    }
-                },
-        VMSTAT(17, "dsEdit.vmstat", true) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new VMStatDataSourceVO();
                     }
                 };
 
