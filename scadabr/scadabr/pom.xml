@@ -226,10 +226,6 @@
             <artifactId>openv4j-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.sf.fhz4j</groupId>
-            <artifactId>fhz4j-core</artifactId>
-        </dependency>
-        <dependency>
             <!-- snapshot from serotonin 1.7.0 -->
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
