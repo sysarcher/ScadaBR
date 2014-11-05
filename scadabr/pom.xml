@@ -25,6 +25,7 @@
         <!--module>scadabr-ds-opc</module-->
         <!--module>scadabr-ds-fhz4j</module-->
         <!--module>scadabr-ds-mbus4j</module-->
+        <module>scadabr-ds-vm-stat</module>
     </modules>
 
     
