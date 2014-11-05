@@ -8,14 +8,12 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import br.org.scadabr.rt.dataSource.asciiFile.ASCIIFileDataSource;
 import br.org.scadabr.rt.dataSource.nodaves7.NodaveS7DataSource;
 
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
@@ -34,10 +32,10 @@ public class NodaveS7DataSourceVO extends DataSourceVO<NodaveS7DataSourceVO> {
     @Override
     protected void addEventTypes(List<EventTypeVO> eventTypes) {
         eventTypes.add(createEventType(
-                ASCIIFileDataSource.POINT_READ_EXCEPTION_EVENT,
+                NodaveS7DataSource.POINT_READ_EXCEPTION_EVENT,
                 new LocalizableMessageImpl("event.ds.pointRead")));
         eventTypes.add(createEventType(
-                ASCIIFileDataSource.DATA_SOURCE_EXCEPTION_EVENT,
+                NodaveS7DataSource.DATA_SOURCE_EXCEPTION_EVENT,
                 new LocalizableMessageImpl("event.ds.dataSource")));
 
     }
@@ -45,9 +43,9 @@ public class NodaveS7DataSourceVO extends DataSourceVO<NodaveS7DataSourceVO> {
     private static final ExportCodes EVENT_CODES = new ExportCodes();
 
     static {
-        EVENT_CODES.addElement(ASCIIFileDataSource.DATA_SOURCE_EXCEPTION_EVENT,
+        EVENT_CODES.addElement(NodaveS7DataSource.DATA_SOURCE_EXCEPTION_EVENT,
                 "DATA_SOURCE_EXCEPTION");
-        EVENT_CODES.addElement(ASCIIFileDataSource.POINT_READ_EXCEPTION_EVENT,
+        EVENT_CODES.addElement(NodaveS7DataSource.POINT_READ_EXCEPTION_EVENT,
                 "POINT_READ_EXCEPTION");
     }
 

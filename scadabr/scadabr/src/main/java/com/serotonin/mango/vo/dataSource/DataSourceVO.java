@@ -27,14 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import br.org.scadabr.vo.dataSource.asciiFile.ASCIIFileDataSourceVO;
-import br.org.scadabr.vo.dataSource.asciiSerial.ASCIISerialDataSourceVO;
-import br.org.scadabr.vo.dataSource.dnp3.Dnp3IpDataSourceVO;
-import br.org.scadabr.vo.dataSource.dnp3.Dnp3SerialDataSourceVO;
-import br.org.scadabr.vo.dataSource.drStorageHt5b.DrStorageHt5bDataSourceVO;
-import br.org.scadabr.vo.dataSource.iec101.IEC101EthernetDataSourceVO;
-import br.org.scadabr.vo.dataSource.iec101.IEC101SerialDataSourceVO;
-import br.org.scadabr.vo.dataSource.nodaves7.NodaveS7DataSourceVO;
 import br.org.scadabr.vo.dataSource.opc.OPCDataSourceVO;
 
 import br.org.scadabr.ShouldNeverHappenException;
@@ -49,7 +41,6 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
@@ -106,18 +97,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new BACnetIPDataSourceVO();
-                    }
-                },
-        DNP3_IP(21, "dsEdit.dnp3Ip", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new Dnp3IpDataSourceVO();
-                    }
-                },
-        DNP3_SERIAL(22, "dsEdit.dnp3Serial", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new Dnp3SerialDataSourceVO();
                     }
                 },
         GALIL(14, "dsEdit.galil", false) {
@@ -256,42 +235,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new OPCDataSourceVO();
-                    }
-                },
-        ASCII_FILE(33, "dsEdit.asciiFile", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new ASCIIFileDataSourceVO();
-                    }
-                },
-        ASCII_SERIAL(34, "dsEdit.asciiSerial", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new ASCIISerialDataSourceVO();
-                    }
-                },
-        IEC101_SERIAL(35, "dsEdit.iec101Serial", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new IEC101SerialDataSourceVO();
-                    }
-                },
-        IEC101_ETHERNET(36, "dsEdit.iec101Ethernet", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new IEC101EthernetDataSourceVO();
-                    }
-                },
-        NODAVE_S7(37, "dsEdit.nodaves7", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new NodaveS7DataSourceVO();
-                    }
-                },
-        DR_STORAGE_HT5B(38, "dsEdit.drStorageHt5b", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new DrStorageHt5bDataSourceVO();
                     }
                 };
 
