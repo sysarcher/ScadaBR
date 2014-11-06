@@ -42,7 +42,6 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
-import com.serotonin.mango.vo.dataSource.bacnet.BACnetIPDataSourceVO;
 import com.serotonin.mango.vo.dataSource.ebro.EBI25DataSourceVO;
 import com.serotonin.mango.vo.dataSource.galil.GalilDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpImageDataSourceVO;
@@ -86,12 +85,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new ViconicsDataSourceVO();
-                    }
-                },
-        BACNET(10, "dsEdit.bacnetIp", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new BACnetIPDataSourceVO();
                     }
                 },
         GALIL(14, "dsEdit.galil", false) {
