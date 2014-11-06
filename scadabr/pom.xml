@@ -31,6 +31,7 @@
         <module>scadabr-ds-ebro</module>
         <module>scadabr-ds-modbus</module>
         -->
+        <module>scadabr-ds-galil</module>
     </modules>
 
     
