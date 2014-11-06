@@ -42,6 +42,8 @@
         <module>scadabr-ds-snmp</module>
         <module>scadabr-ds-pop3</module>
         <module>scadabr-ds-sql</module>
+        <module>scadabr-ds-persistent</module>
+        <module>scadabr-publish-persistent</module>
     </modules>
 
     
