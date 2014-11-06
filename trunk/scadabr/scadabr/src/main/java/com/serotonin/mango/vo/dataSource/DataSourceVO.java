@@ -48,16 +48,12 @@ import com.serotonin.mango.vo.dataSource.http.HttpRetrieverDataSourceVO;
 import com.serotonin.mango.vo.dataSource.internal.InternalDataSourceVO;
 import com.serotonin.mango.vo.dataSource.jmx.JmxDataSourceVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
-import com.serotonin.mango.vo.dataSource.nmea.NmeaDataSourceVO;
-import com.serotonin.mango.vo.dataSource.onewire.OneWireDataSourceVO;
-import com.serotonin.mango.vo.dataSource.openv4j.OpenV4JDataSourceVO;
 import com.serotonin.mango.vo.dataSource.pachube.PachubeDataSourceVO;
 import com.serotonin.mango.vo.dataSource.persistent.PersistentDataSourceVO;
 import com.serotonin.mango.vo.dataSource.pop3.Pop3DataSourceVO;
 import com.serotonin.mango.vo.dataSource.snmp.SnmpDataSourceVO;
 import com.serotonin.mango.vo.dataSource.spinwave.SpinwaveDataSourceVO;
 import com.serotonin.mango.vo.dataSource.sql.SqlDataSourceVO;
-import com.serotonin.mango.vo.dataSource.viconics.ViconicsDataSourceVO;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualDataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
@@ -71,12 +67,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
 
     public enum Type {
 
-        VICONICS(18, "dsEdit.viconics", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new ViconicsDataSourceVO();
-                    }
-                },
         HTTP_RECEIVER(7, "dsEdit.httpReceiver", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
@@ -111,24 +101,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new MetaDataSourceVO();
-                    }
-                },
-        NMEA(13, "dsEdit.nmea", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new NmeaDataSourceVO();
-                    }
-                },
-        ONE_WIRE(8, "dsEdit.1wire", true) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new OneWireDataSourceVO();
-                    }
-                },
-        OPEN_V_4_J(19, "dsEdit.openv4j", true) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new OpenV4JDataSourceVO();
                     }
                 },
         PACHUBE(23, "dsEdit.pachube", false) {

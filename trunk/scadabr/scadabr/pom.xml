@@ -87,11 +87,6 @@
         </dependency>
 
         <dependency>
-            <groupId>br.org.scadabr.legacy</groupId>
-            <artifactId>viconics-ScadaBR</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
         </dependency>
@@ -194,14 +189,6 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>br.org.scadabr.legacy</groupId>
-            <artifactId>onewire</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>br.org.scadabr.legacy</groupId>
-            <artifactId>openv4j-core</artifactId>
         </dependency>
         <dependency>
             <!-- snapshot from serotonin 1.7.0 -->
