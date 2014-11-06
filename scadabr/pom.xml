@@ -32,6 +32,10 @@
         <module>scadabr-ds-modbus</module>
         -->
         <module>scadabr-ds-galil</module>
+        <module>scadabr-ds-nmea</module>
+        <module>scadabr-ds-onewire</module>
+        <module>scadabr-ds-viconics</module>
+        <module>scadabr-ds-openv4j</module>
     </modules>
 
     
