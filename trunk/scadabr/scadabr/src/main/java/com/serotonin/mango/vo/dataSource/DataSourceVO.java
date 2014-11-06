@@ -49,7 +49,6 @@ import com.serotonin.mango.vo.dataSource.internal.InternalDataSourceVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import com.serotonin.mango.vo.dataSource.persistent.PersistentDataSourceVO;
 import com.serotonin.mango.vo.dataSource.pop3.Pop3DataSourceVO;
-import com.serotonin.mango.vo.dataSource.snmp.SnmpDataSourceVO;
 import com.serotonin.mango.vo.dataSource.sql.SqlDataSourceVO;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualDataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
@@ -104,12 +103,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new Pop3DataSourceVO();
-                    }
-                },
-        SNMP(5, "dsEdit.snmp", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new SnmpDataSourceVO();
                     }
                 },
         SQL(6, "dsEdit.sql", false) {
