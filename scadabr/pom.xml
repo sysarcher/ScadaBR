@@ -45,6 +45,7 @@
         <module>scadabr-publish-persistent</module>
         -->
         <module>scadabr-ds-virtual</module>
+        <module>scadabr-ds-internal</module>
     </modules>
 
     
