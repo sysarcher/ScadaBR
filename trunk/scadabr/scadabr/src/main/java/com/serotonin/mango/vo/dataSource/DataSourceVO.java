@@ -48,11 +48,9 @@ import com.serotonin.mango.vo.dataSource.http.HttpRetrieverDataSourceVO;
 import com.serotonin.mango.vo.dataSource.internal.InternalDataSourceVO;
 import com.serotonin.mango.vo.dataSource.jmx.JmxDataSourceVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
-import com.serotonin.mango.vo.dataSource.pachube.PachubeDataSourceVO;
 import com.serotonin.mango.vo.dataSource.persistent.PersistentDataSourceVO;
 import com.serotonin.mango.vo.dataSource.pop3.Pop3DataSourceVO;
 import com.serotonin.mango.vo.dataSource.snmp.SnmpDataSourceVO;
-import com.serotonin.mango.vo.dataSource.spinwave.SpinwaveDataSourceVO;
 import com.serotonin.mango.vo.dataSource.sql.SqlDataSourceVO;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualDataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
@@ -103,12 +101,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                         return new MetaDataSourceVO();
                     }
                 },
-        PACHUBE(23, "dsEdit.pachube", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new PachubeDataSourceVO();
-                    }
-                },
         PERSISTENT(24, "dsEdit.persistent", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
@@ -125,12 +117,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new SnmpDataSourceVO();
-                    }
-                },
-        SPINWAVE(4, "dsEdit.spinwave", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new SpinwaveDataSourceVO();
                     }
                 },
         SQL(6, "dsEdit.sql", false) {

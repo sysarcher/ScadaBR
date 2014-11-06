@@ -42,9 +42,9 @@ import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.mango.vo.publish.httpSender.HttpSenderVO;
-import com.serotonin.mango.vo.publish.pachube.PachubeSenderVO;
 import com.serotonin.mango.vo.publish.persistent.PersistentSenderVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
@@ -68,7 +68,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
         PACHUBE(2, "publisherEdit.pachube") {
                     @Override
                     public PublisherVO<?> createPublisherVO() {
-                        return new PachubeSenderVO();
+                        throw new ImplementMeException(); // return new PachubeSenderVO();
                     }
                 },
         PERSISTENT(3, "publisherEdit.persistent") {
