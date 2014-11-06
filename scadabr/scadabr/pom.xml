@@ -70,10 +70,6 @@
         </dependency>
         <dependency>
             <groupId>br.org.scadabr.legacy</groupId>
-            <artifactId>spinwave-mango</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>br.org.scadabr.legacy</groupId>
             <artifactId>seroUtils-mango</artifactId>
         </dependency>
         <!--TODO remove dependencies to modbus4J-mango and bacnet4J-mango in the code -->

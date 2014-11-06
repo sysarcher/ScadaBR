@@ -36,6 +36,8 @@
         <module>scadabr-ds-onewire</module>
         <module>scadabr-ds-viconics</module>
         <module>scadabr-ds-openv4j</module>
+        <module>scadabr-ds-pachube</module>
+        <module>scadabr-ds-spinwave</module>
     </modules>
 
     
