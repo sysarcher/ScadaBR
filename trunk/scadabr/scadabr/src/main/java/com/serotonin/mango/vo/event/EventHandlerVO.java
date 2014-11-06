@@ -43,7 +43,7 @@ import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.event.handlers.EmailHandlerRT;
 import com.serotonin.mango.rt.event.handlers.EventHandlerRT;
 import com.serotonin.mango.rt.event.handlers.ProcessHandlerRT;
-import com.serotonin.mango.rt.event.handlers.ScriptHandlerRT;
+//import com.serotonin.mango.rt.event.handlers.ScriptHandlerRT;
 import com.serotonin.mango.rt.event.handlers.SetPointHandlerRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
@@ -54,6 +54,7 @@ import com.serotonin.mango.vo.mailingList.EmailRecipient;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
@@ -157,7 +158,7 @@ public class EventHandlerVO implements Serializable,
             case TYPE_PROCESS:
                 return new ProcessHandlerRT(this);
             case TYPE_SCRIPT:
-                return new ScriptHandlerRT(this);
+                throw new ImplementMeException(); //return new ScriptHandlerRT(this);
         }
         throw new ShouldNeverHappenException("Unknown handler type: "
                 + handlerType);
