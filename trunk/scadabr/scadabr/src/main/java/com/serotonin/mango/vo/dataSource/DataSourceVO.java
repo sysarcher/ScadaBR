@@ -47,7 +47,6 @@ import com.serotonin.mango.vo.dataSource.http.HttpReceiverDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpRetrieverDataSourceVO;
 import com.serotonin.mango.vo.dataSource.internal.InternalDataSourceVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
-import com.serotonin.mango.vo.dataSource.virtual.VirtualDataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
@@ -88,12 +87,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new MetaDataSourceVO();
-                    }
-                },
-        VIRTUAL(1, "dsEdit.virtual", true) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new VirtualDataSourceVO();
                     }
                 };
 
