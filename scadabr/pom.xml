@@ -41,6 +41,7 @@
         -->
         <module>scadabr-ds-snmp</module>
         <module>scadabr-ds-pop3</module>
+        <module>scadabr-ds-sql</module>
     </modules>
 
     
