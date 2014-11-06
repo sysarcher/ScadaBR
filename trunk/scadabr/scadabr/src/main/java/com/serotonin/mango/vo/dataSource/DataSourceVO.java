@@ -42,7 +42,6 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
-import com.serotonin.mango.vo.dataSource.ebro.EBI25DataSourceVO;
 import com.serotonin.mango.vo.dataSource.galil.GalilDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpImageDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpReceiverDataSourceVO;
@@ -50,8 +49,6 @@ import com.serotonin.mango.vo.dataSource.http.HttpRetrieverDataSourceVO;
 import com.serotonin.mango.vo.dataSource.internal.InternalDataSourceVO;
 import com.serotonin.mango.vo.dataSource.jmx.JmxDataSourceVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
-import com.serotonin.mango.vo.dataSource.modbus.ModbusIpDataSourceVO;
-import com.serotonin.mango.vo.dataSource.modbus.ModbusSerialDataSourceVO;
 import com.serotonin.mango.vo.dataSource.nmea.NmeaDataSourceVO;
 import com.serotonin.mango.vo.dataSource.onewire.OneWireDataSourceVO;
 import com.serotonin.mango.vo.dataSource.openv4j.OpenV4JDataSourceVO;
@@ -75,12 +72,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
 
     public enum Type {
 
-        EBI25(16, "dsEdit.ebi25", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new EBI25DataSourceVO();
-                    }
-                },
         VICONICS(18, "dsEdit.viconics", false) {
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
@@ -127,18 +118,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new MetaDataSourceVO();
-                    }
-                },
-        MODBUS_IP(3, "dsEdit.modbusIp", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new ModbusIpDataSourceVO();
-                    }
-                },
-        MODBUS_SERIAL(2, "dsEdit.modbusSerial", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new ModbusSerialDataSourceVO();
                     }
                 },
         NMEA(13, "dsEdit.nmea", false) {

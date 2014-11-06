@@ -28,7 +28,6 @@ import java.util.Map;
 
 import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.ShouldNeverHappenException;
-import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
 import br.org.scadabr.json.JsonArray;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
@@ -59,6 +58,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.vo.IntervalLoggingTypes;
 import br.org.scadabr.vo.LoggingTypes;
+import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;

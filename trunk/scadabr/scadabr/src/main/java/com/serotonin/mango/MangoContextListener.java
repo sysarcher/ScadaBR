@@ -32,7 +32,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import br.org.scadabr.api.utils.APIUtils;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.logger.LogUtils;
@@ -44,8 +43,6 @@ import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverMulticaster;
-import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.BackgroundProcessing;
 import com.serotonin.mango.rt.maint.DataPurge;
@@ -221,25 +218,6 @@ public class MangoContextListener implements ServletContextListener {
         Common.ctx = null;
 
         LOG.info("Mango context terminated");
-    }
-
-    @Deprecated // unused???
-    private void dataPointsNameToIdMapping(ServletContext ctx) {
-        PointHierarchy pH = DataPointDao.getInstance().getPointHierarchy();
-        List<DataPointVO> datapoints = DataPointDao.getInstance().getDataPoints(null,
-                false);
-
-        Map<String, Integer> mapping = new HashMap<>();
-
-        for (DataPointVO dataPointVO : datapoints) {
-            String completeName = APIUtils.getCompletePath(
-                    dataPointVO.getPointFolderId(), pH)
-                    + dataPointVO.getName();
-            mapping.put(completeName, dataPointVO.getId());
-        }
-
-        Common.ctx.getServletContext().setAttribute(Common.ContextKeys.DATA_POINTS_NAME_ID_MAPPING, mapping);
-
     }
 
     //

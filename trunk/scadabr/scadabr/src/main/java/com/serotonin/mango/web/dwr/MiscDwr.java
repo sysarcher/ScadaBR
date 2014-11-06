@@ -67,8 +67,6 @@ public class MiscDwr extends BaseDwr {
     @Inject
     protected DataPointDetailsDwr dataPointDetailsDwr;
     @Inject
-    protected ViewDwr viewDwr;
-    @Inject
     protected CustomViewDwr customViewDwr;
     @Inject
     private MailingListDao mailingListDao;
@@ -225,20 +223,6 @@ public class MiscDwr extends BaseDwr {
      */
     public void setDataPointDetailsDwr(DataPointDetailsDwr dataPointDetailsDwr) {
         this.dataPointDetailsDwr = dataPointDetailsDwr;
-    }
-
-    /**
-     * @return the viewDwr
-     */
-    public ViewDwr getViewDwr() {
-        return viewDwr;
-    }
-
-    /**
-     * @param viewDwr the viewDwr to set
-     */
-    public void setViewDwr(ViewDwr viewDwr) {
-        this.viewDwr = viewDwr;
     }
 
     /**

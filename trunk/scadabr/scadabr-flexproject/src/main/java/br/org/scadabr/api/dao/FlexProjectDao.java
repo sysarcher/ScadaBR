@@ -1,4 +1,4 @@
-package br.org.scadabr.db.dao;
+package br.org.scadabr.api.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
