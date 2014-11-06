@@ -43,9 +43,9 @@ import com.serotonin.mango.view.text.RangeRenderer;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.dataSource.modbus.ModbusIpDataSourceVO;
-import com.serotonin.mango.vo.dataSource.modbus.ModbusPointLocatorVO;
-import com.serotonin.mango.vo.dataSource.modbus.ModbusSerialDataSourceVO;
+//import com.serotonin.mango.vo.dataSource.modbus.ModbusIpDataSourceVO;
+//import com.serotonin.mango.vo.dataSource.modbus.ModbusPointLocatorVO;
+//import com.serotonin.mango.vo.dataSource.modbus.ModbusSerialDataSourceVO;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualDataSourceVO;
 import com.serotonin.mango.vo.dataSource.virtual.VirtualPointLocatorVO;
 import com.serotonin.modbus4j.code.DataType;
@@ -61,6 +61,16 @@ import org.springframework.jdbc.core.RowMapper;
  */
 public class Upgrade0_7_0 extends DBUpgrade {
 
+    @Override
+    protected void upgrade() throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected String getNewSchemaVersion() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+/*
     private static final Log log = LogFactory.getLog(Upgrade0_7_0.class);
 
     @Override
@@ -485,4 +495,5 @@ public class Upgrade0_7_0 extends DBUpgrade {
             }
         });
     }
+    */
 }

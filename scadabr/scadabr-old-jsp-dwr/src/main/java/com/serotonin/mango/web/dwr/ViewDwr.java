@@ -33,8 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;
 
-import br.org.scadabr.api.vo.FlexProject;
-import br.org.scadabr.db.dao.FlexProjectDao;
 import br.org.scadabr.db.dao.ScriptDao;
 import br.org.scadabr.rt.scripting.ScriptRT;
 import br.org.scadabr.view.component.AlarmListComponent;
@@ -101,8 +99,8 @@ public class ViewDwr extends BaseDwr {
     private ViewDao viewDao;
     @Inject
     private ScriptDao scriptDao;
-    @Inject
-    private FlexProjectDao flexProjectDao;
+//    @Inject
+//    private FlexProjectDao flexProjectDao;
 
     //
     //
@@ -152,11 +150,12 @@ public class ViewDwr extends BaseDwr {
         return scriptDao.getScripts();
     }
 
+/*
     @MethodFilter
     public List<FlexProject> getFlexProjects() {
         return flexProjectDao.getFlexProjects();
     }
-
+*/
     /**
      * Retrieves point state for all points on a given view. This is the
      * monitoring version of the method. See below for the view editing version.

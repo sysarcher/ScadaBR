@@ -36,10 +36,6 @@
         </dependency>
         <dependency>
             <groupId>br.org.scadabr</groupId>
-            <artifactId>scadabr-flexproject</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>br.org.scadabr</groupId>
             <artifactId>scadabr-deprecated</artifactId>
         </dependency>
         <dependency>
@@ -96,10 +92,16 @@
             <groupId>br.org.scadabr.legacy</groupId>
             <artifactId>seroUtils-mango</artifactId>
         </dependency>
+        <!--TODO remove dependencies to modbus4J-mango and bacnet4J-mango in the code -->
         <dependency>
             <groupId>br.org.scadabr.legacy</groupId>
             <artifactId>modbus4J-mango</artifactId>
         </dependency>
+        <dependency>
+            <groupId>br.org.scadabr.legacy</groupId>
+            <artifactId>bacnet4J-mango</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>br.org.scadabr.legacy</groupId>
             <artifactId>viconics-ScadaBR</artifactId>

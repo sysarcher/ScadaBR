@@ -14,18 +14,23 @@
         <module>scadabr-deprecated</module>
         <module>scheduler</module>
         <module>utils</module>
+        <!--  Moved out for easier refactoring...
         <module>scadabr-flexproject</module>
-        <!--module>scadabr-ds-alpha2</module-->
-        <!--module>scadabr-old-jsp-dwr</module-->
-        <!--module>scadabr-ds-ascii</module-->
-        <!--module>scadabr-ds-dnp3</module-->
-        <!--module>scadabr-ds-dr-storage-ht-5b</module-->
-        <!--module>sacadabr-ds-iec101</module-->
-        <!--module>scadabr-ds-nodave-s7</module-->
-        <!--module>scadabr-ds-opc</module-->
-        <!--module>scadabr-ds-fhz4j</module-->
-        <!--module>scadabr-ds-mbus4j</module-->
+
+        <module>scadabr-ds-alpha2</module>
+        <module>scadabr-old-jsp-dwr</module>
+        <module>scadabr-ds-ascii</module>
+        <module>scadabr-ds-dnp3</module>
+        <module>scadabr-ds-dr-storage-ht-5b</module>
+        <module>sacadabr-ds-iec101</module>
+        <module>scadabr-ds-nodave-s7</module>
+        <module>scadabr-ds-opc</module>
+        <module>scadabr-ds-fhz4j</module>
+        <module>scadabr-ds-mbus4j</module>
         <module>scadabr-ds-vm-stat</module>
+        <module>scadabr-ds-ebro</module>
+        <module>scadabr-ds-modbus</module>
+        -->
     </modules>
 
     
