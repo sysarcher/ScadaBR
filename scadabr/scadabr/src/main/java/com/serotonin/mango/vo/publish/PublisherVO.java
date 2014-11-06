@@ -36,13 +36,11 @@ import br.org.scadabr.json.JsonValue;
 import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.PublisherDao;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.publish.PublisherRT;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import com.serotonin.mango.vo.publish.httpSender.HttpSenderVO;
-import com.serotonin.mango.vo.publish.persistent.PersistentSenderVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
@@ -74,7 +72,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
         PERSISTENT(3, "publisherEdit.persistent") {
                     @Override
                     public PublisherVO<?> createPublisherVO() {
-                        return new PersistentSenderVO();
+                        throw new ImplementMeException(); //return new PersistentSenderVO();
                     }
                 };
 
