@@ -102,10 +102,6 @@
         </dependency>
         <dependency>
             <groupId>br.org.scadabr.legacy</groupId>
-            <artifactId>bacnet4J-mango</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>br.org.scadabr.legacy</groupId>
             <artifactId>viconics-ScadaBR</artifactId>
         </dependency>
 
