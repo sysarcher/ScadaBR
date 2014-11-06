@@ -30,7 +30,6 @@
         <module>scadabr-ds-vm-stat</module>
         <module>scadabr-ds-ebro</module>
         <module>scadabr-ds-modbus</module>
-        -->
         <module>scadabr-ds-galil</module>
         <module>scadabr-ds-nmea</module>
         <module>scadabr-ds-onewire</module>
@@ -38,6 +37,8 @@
         <module>scadabr-ds-openv4j</module>
         <module>scadabr-ds-pachube</module>
         <module>scadabr-ds-spinwave</module>
+        <module>scadabr-ds-jmx</module>
+        -->
     </modules>
 
     
@@ -323,12 +324,6 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>jstl</artifactId>
                 <version>1.2</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>taglibs</groupId>
-                <artifactId>standard</artifactId>
-                <version>1.1.2</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>

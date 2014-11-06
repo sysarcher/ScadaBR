@@ -176,10 +176,6 @@
         </dependency>
         <dependency>
             <groupId>taglibs</groupId>
-            <artifactId>standard</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>taglibs</groupId>
             <artifactId>log</artifactId>
         </dependency>
         <dependency>

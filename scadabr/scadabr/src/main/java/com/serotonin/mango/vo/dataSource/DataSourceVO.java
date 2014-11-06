@@ -46,7 +46,6 @@ import com.serotonin.mango.vo.dataSource.http.HttpImageDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpReceiverDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpRetrieverDataSourceVO;
 import com.serotonin.mango.vo.dataSource.internal.InternalDataSourceVO;
-import com.serotonin.mango.vo.dataSource.jmx.JmxDataSourceVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import com.serotonin.mango.vo.dataSource.persistent.PersistentDataSourceVO;
 import com.serotonin.mango.vo.dataSource.pop3.Pop3DataSourceVO;
@@ -87,12 +86,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new InternalDataSourceVO();
-                    }
-                },
-        JMX(26, "dsEdit.jmx", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new JmxDataSourceVO();
                     }
                 },
         META(9, "dsEdit.meta", true) {
