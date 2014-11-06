@@ -28,7 +28,7 @@ import br.org.scadabr.web.mvc.controller.ProjectExporterController;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.vo.User;
-import com.serotonin.mango.web.dwr.EmportDwr;
+//TODO import com.serotonin.mango.web.dwr.EmportDwr;
 
 public class ZIPProjectManager {
 
@@ -126,8 +126,7 @@ public class ZIPProjectManager {
 
         String jsonContent = getJsonContent();
 
-        EmportDwr.importDataImpl(jsonContent, Common.getBundle(),
-                Common.getUser());
+//TODO implement        EmportDwr.importDataImpl(jsonContent, Common.getBundle(), Common.getUser());
 
     }
 
@@ -201,11 +200,8 @@ public class ZIPProjectManager {
     }
 
     private FileToPack buildJSONFile(String packAs, boolean includePointValues) {
-        String jsonToExport = EmportDwr.createExportJSON(3, true, true, true,
-                true, true, true, true, true, true, true, true, true, true,
-                true, includePointValues, maxPointValues, true);
-        FileToPack file = new FileToPack(packAs, FileUtil.createTxtTempFile(
-                packAs, jsonToExport));
+         String jsonToExport = null; //TODO EmportDwr.createExportJSON(3, true, true, true, true, true, true, true, true, true, true, true, true, true, true, includePointValues, maxPointValues, true);
+        FileToPack file = new FileToPack(packAs, FileUtil.createTxtTempFile( packAs, jsonToExport));
         return file;
     }
 

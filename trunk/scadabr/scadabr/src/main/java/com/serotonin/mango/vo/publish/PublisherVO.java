@@ -40,7 +40,6 @@ import com.serotonin.mango.rt.publish.PublisherRT;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.event.EventTypeVO;
-import com.serotonin.mango.vo.publish.httpSender.HttpSenderVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
@@ -60,7 +59,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
         HTTP_SENDER(1, "publisherEdit.httpSender") {
                     @Override
                     public PublisherVO<?> createPublisherVO() {
-                        return new HttpSenderVO();
+                        throw new ImplementMeException(); // return new HttpSenderVO();
                     }
                 },
         PACHUBE(2, "publisherEdit.pachube") {
