@@ -42,7 +42,6 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
-import com.serotonin.mango.vo.dataSource.galil.GalilDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpImageDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpReceiverDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpRetrieverDataSourceVO;
@@ -76,12 +75,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
                     @Override
                     public DataSourceVO<?> createDataSourceVO() {
                         return new ViconicsDataSourceVO();
-                    }
-                },
-        GALIL(14, "dsEdit.galil", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new GalilDataSourceVO();
                     }
                 },
         HTTP_RECEIVER(7, "dsEdit.httpReceiver", false) {

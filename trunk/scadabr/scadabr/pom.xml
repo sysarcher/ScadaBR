@@ -70,22 +70,6 @@
         </dependency>
         <dependency>
             <groupId>br.org.scadabr.legacy</groupId>
-            <artifactId>opc-driver</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>br.org.scadabr.legacy</groupId>
-            <artifactId>openscada-utils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>br.org.scadabr.legacy</groupId>
-            <artifactId>opc-dcom</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>br.org.scadabr.legacy</groupId>
-            <artifactId>opc-lib</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>br.org.scadabr.legacy</groupId>
             <artifactId>spinwave-mango</artifactId>
         </dependency>
         <dependency>
@@ -231,10 +215,6 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>br.org.scadabr.legacy</groupId>
-            <artifactId>dnp34j</artifactId>
         </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>

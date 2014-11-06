@@ -11,4 +11,22 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>br.org.scadabr.legacy</groupId>
+            <artifactId>opc-driver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>br.org.scadabr.legacy</groupId>
+            <artifactId>openscada-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>br.org.scadabr.legacy</groupId>
+            <artifactId>opc-dcom</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>br.org.scadabr.legacy</groupId>
+            <artifactId>opc-lib</artifactId>
+        </dependency>
+    </dependencies>
 </project>
