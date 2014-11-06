@@ -39,6 +39,7 @@
         <module>scadabr-ds-spinwave</module>
         <module>scadabr-ds-jmx</module>
         -->
+        <module>scadabr-ds-snmp</module>
     </modules>
 
     
