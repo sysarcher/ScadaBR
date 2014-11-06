@@ -47,7 +47,6 @@ import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import com.serotonin.mango.web.dwr.beans.DataExportDefinition;
-import com.serotonin.mango.web.dwr.beans.ImportTask;
 import com.serotonin.mango.web.dwr.beans.TestingUtility;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import java.io.Serializable;
@@ -91,7 +90,6 @@ public class User implements Serializable, SetPointSource, JsonSerializable {
     private transient TestingUtility testingUtility;
     private transient Map<String, byte[]> reportImageData;
     private transient PublisherVO<? extends PublishedPointVO> editPublisher;
-    private transient ImportTask importTask;
     private transient boolean muted = false;
     private transient DataExportDefinition dataExportDefinition;
     private final transient Map<String, Object> attributes = new HashMap<>();
@@ -307,14 +305,6 @@ public class User implements Serializable, SetPointSource, JsonSerializable {
     public void setEditPublisher(
             PublisherVO<? extends PublishedPointVO> editPublisher) {
         this.editPublisher = editPublisher;
-    }
-
-    public ImportTask getImportTask() {
-        return importTask;
-    }
-
-    public void setImportTask(ImportTask importTask) {
-        this.importTask = importTask;
     }
 
     public boolean isMuted() {

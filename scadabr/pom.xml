@@ -43,9 +43,11 @@
         <module>scadabr-ds-sql</module>
         <module>scadabr-ds-persistent</module>
         <module>scadabr-publish-persistent</module>
-        -->
         <module>scadabr-ds-virtual</module>
         <module>scadabr-ds-internal</module>
+        <module>scadabr-publish-http</module>
+        <module>scadabr-ds-http</module>
+        -->
     </modules>
 
     
