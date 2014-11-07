@@ -7,6 +7,7 @@ import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
+import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.MaintenanceEventDao;
 
 public class MaintenanceEventType extends EventType {
@@ -89,4 +90,10 @@ public class MaintenanceEventType extends EventType {
         super.jsonDeserialize(reader, json);
         maintenanceId = getMaintenanceEventId(json, "XID");
     }
+
+    @Override
+    public AlarmLevel getAlarmLevel() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

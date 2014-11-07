@@ -160,13 +160,12 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
             }
         }
 
-        SystemEventType eventType = new SystemEventType(SystemEventSource.SET_POINT_HANDLER_FAILURE, vo.getId());
+        final SystemEventType eventType = new SystemEventType(SystemEventSource.SET_POINT_HANDLER_FAILURE, vo.getId());
         if (vo.getAlias().isEmpty()) {
-            message = new LocalizableMessageImpl("event.setPointFailed", message);
+            eventType.fire("event.setPointFailed", message);
         } else {
-            message = new LocalizableMessageImpl("event.setPointFailed.alias", vo.getAlias(), message);
+            eventType.fire("event.setPointFailed.alias", vo.getAlias(), message);
         }
-        SystemEventType.raiseEvent(eventType, System.currentTimeMillis(), false, message);
     }
 
     @Override

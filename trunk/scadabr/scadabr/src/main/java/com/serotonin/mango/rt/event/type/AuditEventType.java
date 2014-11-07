@@ -78,7 +78,7 @@ public class AuditEventType extends EventType {
         et.setAlarmLevel(alarmLevel);
 
         SystemSettingsDao dao = SystemSettingsDao.getInstance();
-        dao.setAlarmLevel(AUDIT_SETTINGS_PREFIX + type, alarmLevel);
+        dao.setAuditAlarmLevel(AUDIT_SETTINGS_PREFIX + type, alarmLevel);
     }
 
     public static void raiseAddedEvent(AuditEventSource auditEventType, ChangeComparable<?> o) {
@@ -311,4 +311,10 @@ throw new ImplementMeException(); //"MessageFormat");
         super.jsonDeserialize(reader, json);
         auditEventType = AuditEventSource.valueOf(json.getString("auditType"));
     }
+
+    @Override
+    public AlarmLevel getAlarmLevel() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

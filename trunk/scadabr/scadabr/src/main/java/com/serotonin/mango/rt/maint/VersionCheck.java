@@ -110,8 +110,7 @@ public class VersionCheck extends SystemCronTask {
         } catch (SocketTimeoutException e) {
             // Ignore
         } catch (Exception e) {
-            SystemEventType.raiseEvent(getEventType(), scheduledExecutionTime, true, new LocalizableMessageImpl("event.version.error", e
-                    .getClass().getName(), e.getMessage()));
+            getEventType().raiseAlarm(scheduledExecutionTime, "event.version.error", e.getClass().getName(), e.getMessage());
         }
     }
 
@@ -128,13 +127,13 @@ public class VersionCheck extends SystemCronTask {
         String result = newVersionCheckImpl(notifLevel);
         if (result == null) {
             // If the version matches, clear any outstanding event.
-            SystemEventType.returnToNormal(getEventType(), fireTime);
+            getEventType().clearAlarm(fireTime);
             return new LocalizableMessageImpl("event.version.uptodate");
         }
 
         // If the version doesn't match this version, raise an event.
-        LocalizableMessage message = new LocalizableMessageImpl("event.version.available", result);
-        SystemEventType.raiseEvent(getEventType(), fireTime, true, message);
+        final LocalizableMessage message = new LocalizableMessageImpl("event.version.available", result);
+        getEventType().raiseAlarm(fireTime, message);
         return message;
     }
 

@@ -31,9 +31,10 @@ import com.serotonin.mango.Common;
 import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.type.SystemEventSource;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
+import javax.annotation.PostConstruct;
 import javax.inject.Named;
 import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -99,20 +100,41 @@ public class SystemSettingsDao extends BaseDao {
     public static final String PLOT_BACKGROUND_COLOUR = "plotBackgroundColour";
     public static final String PLOT_GRIDLINE_COLOUR = "plotGridlineColour";
 
-    // Value cache
-    private static final Map<String, String> cache = new HashMap<>();
+    
+    //
+    // /
+    // / Static stuff
+    // /
+    //
+    private static final String SYSTEM_EVENT_ALARMLEVEL_PREFIX = "systemEventAlarmLevel";
 
-    public static AlarmLevel getAlarmLevel(String key, AlarmLevel defaultAlarmLevel) {
-        String value = getValue(key, null);
+    // Value cache 
+    //TODO cache real objects???
+    private static final Map<String, String> cache = new HashMap<>();
+    
+//    @PostConstruct // todo if getInstance is removed and no static access use this ...
+    @Override
+    public void init() {
+        super.init();
+        for (SystemEventSource s : SystemEventSource.values()) {
+            final AlarmLevel l = s.getAlarmLevel();
+            if (l != null) {
+                // override if avail
+                s.setAlarmLevel(l);
+            }
+        }
+    }
+
+    public AlarmLevel getAlarmLevel(SystemEventSource key) {
+        String value = getValue(SYSTEM_EVENT_ALARMLEVEL_PREFIX + key.name(), null);
         if (value == null) {
-            return defaultAlarmLevel;
+            return null;
         }
-        try {
-            return AlarmLevel.values()[Integer.parseInt(value)];
-        } catch (Exception e) {
-            LOG.log(Level.WARNING, "Can''t get Default Alarmlevel of {0}", key);
-            return defaultAlarmLevel;
-        }
+        return AlarmLevel.values()[Integer.parseInt(value)];
+    }
+
+    public static void setValue(JdbcTemplate ejt, String key, String value) {
+        ejt.execute(String.format("insert into systemSettings values ('%s','%s')", key, value));
     }
 
     public SystemSettingsDao() {
@@ -355,7 +377,11 @@ public class SystemSettingsDao extends BaseDao {
 
     }
 
-    public void setAlarmLevel(String key, AlarmLevel alarmLevel) {
-        setValue(key, Integer.toString(alarmLevel.mangoDbId));
+    public void saveAlarmLevel(SystemEventSource key) {
+        setValue(SYSTEM_EVENT_ALARMLEVEL_PREFIX + key.name(), Integer.toString(key.getAlarmLevel().mangoDbId));
+    }
+
+    public void setAuditAlarmLevel(String string, AlarmLevel alarmLevel) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

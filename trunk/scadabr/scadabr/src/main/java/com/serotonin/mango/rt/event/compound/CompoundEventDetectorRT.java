@@ -218,8 +218,8 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
     // }
     // }
     public void raiseFailureEvent(LocalizableMessage message) {
-        SystemEventType eventType = new SystemEventType(SystemEventSource.COMPOUND_DETECTOR_FAILURE, vo.getId());
-        SystemEventType.raiseEvent(eventType, System.currentTimeMillis(), false, message);
+        final SystemEventType eventType = new SystemEventType(SystemEventSource.COMPOUND_DETECTOR_FAILURE, vo.getId());
+        eventType.fire(message);
         vo.setDisabled(true);
         CompoundEventDetectorDao.getInstance().saveCompoundEventDetector(vo);
     }

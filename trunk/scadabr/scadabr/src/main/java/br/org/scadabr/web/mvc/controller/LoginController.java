@@ -18,6 +18,7 @@
  */
 package br.org.scadabr.web.mvc.controller;
 
+import br.org.scadabr.vo.event.type.SystemEventSource;
 import br.org.scadabr.web.i18n.LocaleResolver;
 import br.org.scadabr.web.mvc.form.LoginForm;
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +30,7 @@ import org.springframework.validation.BindException;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.UserDao;
+import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.UserSessionContextBean;
 import com.serotonin.mango.web.integration.CrowdUtils;
@@ -127,7 +129,9 @@ class LoginController {
     //TODO @Valid does not work with <spring:bind ????
     @RequestMapping(method = RequestMethod.POST)
     public String onSubmit(@ModelAttribute("login") @Valid LoginForm loginForm, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response) throws BindException {
-        if (bindingResult.hasErrors()) {
+//NPE??? AspectJ konfigurieren       
+       
+       if (bindingResult.hasErrors()) {
             return "login";
         }
 

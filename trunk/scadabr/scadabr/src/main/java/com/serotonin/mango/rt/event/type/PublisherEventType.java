@@ -26,6 +26,7 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
+import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.PublisherDao;
 import com.serotonin.mango.vo.publish.PublisherVO;
 
@@ -129,4 +130,10 @@ public class PublisherEventType extends EventType {
         publisherId = pb.getId();
         publisherEventTypeId = getInt(json, "publisherEventTypeId", pb.getEventCodes());
     }
+
+    @Override
+    public AlarmLevel getAlarmLevel() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

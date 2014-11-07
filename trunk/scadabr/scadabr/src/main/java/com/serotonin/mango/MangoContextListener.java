@@ -131,15 +131,10 @@ public class MangoContextListener implements ServletContextListener {
         runtimeManagerInitialize(ctx);
         reportsInitialize();
         maintenanceInitialize();
-
         // Notify the event manager of the startup.
-        SystemEventType.raiseEvent(new SystemEventType(
-                SystemEventSource.SYSTEM_STARTUP), System
-                .currentTimeMillis(), false, new LocalizableMessageImpl(
-                        "event.system.startup"));
+        new SystemEventType(SystemEventSource.SYSTEM_STARTUP).fire("event.system.startup");
 
         LOG.info("Mango context started");
-
     }
 
     @Override
@@ -148,10 +143,7 @@ public class MangoContextListener implements ServletContextListener {
 
         if (eventManager != null) {
             // Notify the event manager of the shutdown.
-            SystemEventType.raiseEvent(new SystemEventType(
-                    SystemEventSource.SYSTEM_SHUTDOWN), System
-                    .currentTimeMillis(), false, new LocalizableMessageImpl(
-                            "event.system.shutdown"));
+            new SystemEventType(SystemEventSource.SYSTEM_SHUTDOWN).fire("event.system.shutdown");
         }
         Logger.getLogger(MangoContextListener.class.getName()).log(Level.INFO, "Shutdown Event created");
 

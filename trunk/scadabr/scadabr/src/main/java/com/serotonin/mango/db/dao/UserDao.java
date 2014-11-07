@@ -40,6 +40,7 @@ import java.sql.Statement;
 import javax.inject.Named;
 import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -48,6 +49,11 @@ public class UserDao extends BaseDao {
 
     private static final String USER_SELECT = "select id, username, password, email, phone, admin, disabled, selectedWatchList, homeUrl, lastLogin, "
             + "  receiveAlarmEmails, receiveOwnAuditEvents " + "from users ";
+
+    public static void createAdmin(JdbcTemplate ejt) {
+        ejt.execute(String.format("insert into users (username, password, email, phone, admin, disabled, homeUrl, receiveAlarmEmails, receiveOwnAuditEvents)"
+                + "values ('admin', '%s', 'admin@yourScadaBRDomain.com', '', 'Y', 'N', 'events', 0, 'N')", Common.encrypt("admin")));
+    }
 
     public UserDao() {
         super();
@@ -157,7 +163,7 @@ public class UserDao extends BaseDao {
         });
     }
 
-    void insertUser(final User user) {
+    private void insertUser(final User user) {
         final int id = doInsert(new PreparedStatementCreator() {
 
             final static String SQL_INSERT = "insert into users ("

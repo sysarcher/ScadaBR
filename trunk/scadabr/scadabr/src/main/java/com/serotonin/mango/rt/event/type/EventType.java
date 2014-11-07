@@ -28,6 +28,7 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
+import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
@@ -51,8 +52,7 @@ import com.serotonin.mango.vo.publish.PublisherVO;
  */
 @JsonRemoteEntity(typeFactory = EventTypeFactory.class)
 abstract public class EventType implements JsonSerializable {
-
- 
+    
     abstract public EventSources getEventSource();
 
     /**
@@ -287,4 +287,11 @@ abstract public class EventType implements JsonSerializable {
         }
         return me.getId();
     }
+
+     /**
+     * Currently ony the Alarmlevel for firing the event or raising the alarm. EventIntsance does not know the Alarmlevel.
+     * @return the alarmLevel
+     */
+    public abstract AlarmLevel getAlarmLevel();
+
 }

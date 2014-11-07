@@ -25,13 +25,15 @@ public enum SystemEventSource implements LocalizableEnum<SystemEventSource> {
     POINT_LINK_FAILURE(9, "event.system.pointLink", AlarmLevel.URGENT),
     PROCESS_FAILURE(10, "event.system.process", AlarmLevel.URGENT);
     private final String i18nKey;
-    public final int mangoDbId;
-    public final AlarmLevel defaultAlarmLevel;
+    private final int id;
+    private final AlarmLevel defaultAlarmLevel;
+    private AlarmLevel alarmLevel;
 
-    private SystemEventSource(int mangoDbId, String i18nKey, AlarmLevel defaultAlarmLevel) {
+    private SystemEventSource(int id, String i18nKey, AlarmLevel defaultAlarmLevel) {
         this.i18nKey = i18nKey;
-        this.mangoDbId = mangoDbId;
+        this.id = id;
         this.defaultAlarmLevel = defaultAlarmLevel;
+        this.alarmLevel = defaultAlarmLevel;
     }
 
     @Override
@@ -39,7 +41,7 @@ public enum SystemEventSource implements LocalizableEnum<SystemEventSource> {
         return i18nKey;
     }
 
-    public static SystemEventSource fromMangoDbId(int ordinal) {
+    public static SystemEventSource fromId(int ordinal) {
         switch (ordinal) {
             case 1:
                 return SYSTEM_STARTUP;
@@ -69,6 +71,38 @@ public enum SystemEventSource implements LocalizableEnum<SystemEventSource> {
     @Override
     public Object[] getArgs() {
         return null;
+    }
+
+    /**
+     * @return the id
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * @return the defaultAlarmLevel
+     */
+    public AlarmLevel getDefaultAlarmLevel() {
+        return defaultAlarmLevel;
+    }
+
+    /**
+     * @return the alarmLevel
+     */
+    public AlarmLevel getAlarmLevel() {
+        return alarmLevel;
+    }
+
+    /**
+     * @param alarmLevel the alarmLevel to set
+     */
+    public void setAlarmLevel(AlarmLevel alarmLevel) {
+        this.alarmLevel = alarmLevel;
+    }
+    
+    public boolean isDefaultAlarmlevel() {
+        return defaultAlarmLevel == alarmLevel;
     }
 
 }
