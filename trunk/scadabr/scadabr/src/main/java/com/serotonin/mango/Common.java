@@ -105,7 +105,9 @@ public class Common {
 
         @Deprecated
         String DATABASE_ACCESS = "DATABASE_ACCESS";
+        @Deprecated
         String IMAGE_SETS = "IMAGE_SETS";
+        @Deprecated
         String DYNAMIC_IMAGES = "DYNAMIC_IMAGES";
         @Deprecated
         String RUNTIME_MANAGER = "RUNTIME_MANAGER";

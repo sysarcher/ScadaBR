@@ -77,7 +77,7 @@
     <dijit:headlineLayoutContainer>
         <dijit:topContentPane>
             <div class="smallTitle titlePadding" style="float:left;">
-                <tag:img png="flag_white" title="events.alarms"/>
+                <!--tag:img png="flag_white" title="events.alarms"/-->
                 <fmt:message key="events.pending"/>
             </div>
 
@@ -108,7 +108,7 @@
                         <option value="<c:out value="<%= EventStatus.RTN.getName()%>"/>"><fmt:message key="event.rtn.rtn"/></option>
                         <option value="<c:out value="<%= EventStatus.NORTN.getName()%>"/>"><fmt:message key="common.nortn"/></option>
                     </select>
-                    <select id="alarmLevel" data-dojo-type="dijit/form/Select" title="<fmt:message key="common.alarmLevel"/>"><tag:alarmLevelOptions allOption="true"/></select>
+                        <%--select id="alarmLevel"data-dojo-type="dijit/form/Select" title="<fmt:message key="common.alarmLevel"/>"><tag:alarmLevelOptions allOption="true"/></select--%>
                     <dijit:textBox id="keywords" i18nLabel="events.search.keywords"/>
                     <dijit:button i18nLabel="events.search.search"/>
                     <span id="searchMessage" class="formError"></span>
