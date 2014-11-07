@@ -111,8 +111,8 @@ public class MangoContextListener implements ServletContextListener {
 
         // Create all the stuff we need.
         constantsInitialize(ctx);
-        freemarkerInitialize(ctx);
-        imageSetInitialize(ctx);
+//TODO        freemarkerInitialize(ctx);
+//TODO        imageSetInitialize(ctx);
         databaseAccessFactory.startDB();
 
         // Check if the known servlet context path has changed.
