@@ -36,9 +36,9 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import org.springframework.validation.Errors;
 
 /**
  * @author Craig McFetridge
@@ -46,6 +46,24 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
  */
 @JsonRemoteEntity
 public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
+
+    public static class HttpImageDataSourceValidator extends DataSourceVO.DataSourceValidator<HttpImageDataSourceVO> {
+
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return HttpImageDataSourceVO.class.isAssignableFrom(clazz);
+        }
+
+        @Override
+        public void validate(Object target, Errors errors) {
+            super.validate(target, errors);
+            final HttpImageDataSourceVO vo = (HttpImageDataSourceVO) target;
+            if (vo.updatePeriods <= 0) {
+                errors.rejectValue("updatePeriods", "validate.greaterThanZero");
+            }
+        }
+
+    }
 
     public static final Type TYPE = Type.HTTP_IMAGE;
 
@@ -107,14 +125,6 @@ public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
 
     public void setUpdatePeriods(int updatePeriods) {
         this.updatePeriods = updatePeriods;
-    }
-
-    @Override
-    public void validate(DwrResponseI18n response) {
-        super.validate(response);
-        if (updatePeriods <= 0) {
-            response.addContextual("updatePeriods", "validate.greaterThanZero");
-        }
     }
 
     @Override

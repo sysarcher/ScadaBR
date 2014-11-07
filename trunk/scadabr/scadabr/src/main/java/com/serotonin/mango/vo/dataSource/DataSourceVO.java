@@ -47,14 +47,49 @@ import com.serotonin.mango.vo.dataSource.http.HttpReceiverDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpRetrieverDataSourceVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.vo.event.AlarmLevel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         Serializable, Cloneable, JsonSerializable, ChangeComparable<T> {
+
+    @Configurable
+    public static class DataSourceValidator<T extends DataSourceVO<T>> implements Validator {
+
+        @Autowired
+        private DataSourceDao dataSourceDao;
+
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return DataSourceVO.class.isAssignableFrom(clazz);
+        }
+
+        @Override
+        public void validate(Object target, Errors errors) {
+            final DataSourceVO<T> vo = (DataSourceVO<T>) target;
+
+            if (vo.xid.isEmpty()) {
+                errors.rejectValue("xid", "validate.required");
+            } else if (!dataSourceDao.isXidUnique(vo.xid, vo.id)) {
+                errors.rejectValue("xid", "validate.xidUsed");
+            } else if (vo.xid.length() > 50) {
+                errors.rejectValue("xid", "validate.notLongerThan", new Object[]{50}, "validate.notLongerThan");
+            }
+            if (vo.name.isEmpty()) {
+                errors.reject("name", "validate.nameRequired");
+            }
+            if (vo.name.length() > 40) {
+                errors.reject("name", "validate.nameTooLong");
+            }
+        }
+
+    }
 
     public enum Type {
 
@@ -240,23 +275,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         return new EventTypeVO(EventSources.DATA_SOURCE, getId(),
                 eventId, message, getAlarmLevel(eventId, defaultAlarmLevel),
                 duplicateHandling);
-    }
-
-    public void validate(DwrResponseI18n response) {
-        if (xid.isEmpty()) {
-            response.addContextual("xid", "validate.required");
-        } else if (!DataSourceDao.getInstance().isXidUnique(xid, id)) {
-            response.addContextual("xid", "validate.xidUsed");
-        } else if (xid.length() > 50) {
-            response.addContextual("xid", "validate.notLongerThan", 50);
-        }
-
-        if (name.isEmpty()) {
-            response.addContextual("dataSourceName", "validate.nameRequired");
-        }
-        if (name.length() > 40) {
-            response.addContextual("dataSourceName", "validate.nameTooLong");
-        }
     }
 
     public DataSourceVO<?> copy() {

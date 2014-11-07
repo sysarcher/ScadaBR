@@ -42,12 +42,40 @@ import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import org.springframework.validation.Errors;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSourceVO> {
+
+    public static class HttpRetrieverDataSourceVOValidator extends DataSourceVO.DataSourceValidator<HttpRetrieverDataSourceVO> {
+
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return HttpRetrieverDataSourceVO.class.isAssignableFrom(clazz);
+        }
+
+        @Override
+        public void validate(Object target, Errors errors) {
+            super.validate(target, errors);
+            final HttpRetrieverDataSourceVO vo = (HttpRetrieverDataSourceVO) target;
+            if (vo.url.isEmpty()) {
+                errors.rejectValue("url", "validate.required");
+            }
+            if (vo.updatePeriods <= 0) {
+                errors.rejectValue("updatePeriods", "validate.greaterThanZero");
+            }
+            if (vo.timeoutSeconds <= 0) {
+                errors.rejectValue("updatePeriods", "validate.greaterThanZero");
+            }
+            if (vo.retries < 0) {
+                errors.rejectValue("retries", "validate.cannotBeNegative");
+            }
+        }
+
+    }
 
     public static final Type TYPE = Type.HTTP_RETRIEVER;
 
@@ -139,23 +167,6 @@ public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSou
 
     public void setRetries(int retries) {
         this.retries = retries;
-    }
-
-    @Override
-    public void validate(DwrResponseI18n response) {
-        super.validate(response);
-        if (url.isEmpty()) {
-            response.addContextual("url", "validate.required");
-        }
-        if (updatePeriods <= 0) {
-            response.addContextual("updatePeriods", "validate.greaterThanZero");
-        }
-        if (timeoutSeconds <= 0) {
-            response.addContextual("updatePeriods", "validate.greaterThanZero");
-        }
-        if (retries < 0) {
-            response.addContextual("retries", "validate.cannotBeNegative");
-        }
     }
 
     @Override
