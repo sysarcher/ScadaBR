@@ -34,16 +34,43 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.ArrayUtils;
 import br.org.scadabr.util.IpAddressUtils;
-import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import org.springframework.validation.Errors;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
 public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourceVO> {
+
+    public static class HttpReceiverDataSourceVOValidator extends DataSourceVO.DataSourceValidator<HttpReceiverDataSourceVO> {
+
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return HttpReceiverDataSourceVO.class.isAssignableFrom(clazz);
+        }
+
+        @Override
+        public void validate(Object target, Errors errors) {
+            super.validate(target, errors);
+            final HttpReceiverDataSourceVO vo = (HttpReceiverDataSourceVO) target;
+
+            for (String ipmask : vo.ipWhiteList) {
+                String msg = IpAddressUtils.checkIpMask(ipmask);
+                if (msg != null) {
+                    errors.rejectValue("ipWhiteList", "common.default", new Object[]{msg}, "common.default");
+                }
+            }
+
+            for (String deviceId : vo.deviceIdWhiteList) {
+                if (deviceId.isEmpty()) {
+                    errors.rejectValue("deviceIdWhiteList", "validate.missingDeviceId");
+                }
+            }
+        }
+
+    }
 
     public static final Type TYPE = Type.HTTP_RECEIVER;
 
@@ -114,24 +141,6 @@ public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourc
 
     public void setDeviceIdWhiteList(String[] deviceIdWhiteList) {
         this.deviceIdWhiteList = deviceIdWhiteList;
-    }
-
-    @Override
-    public void validate(DwrResponseI18n response) {
-        super.validate(response);
-
-        for (String ipmask : ipWhiteList) {
-            String msg = IpAddressUtils.checkIpMask(ipmask);
-            if (msg != null) {
-                response.addContextual("ipWhiteList", "common.default", msg);
-            }
-        }
-
-        for (String deviceId : deviceIdWhiteList) {
-            if (deviceId.isEmpty()) {
-                response.addContextual("deviceIdWhiteList", "validate.missingDeviceId");
-            }
-        }
     }
 
     @Override

@@ -15,6 +15,7 @@ import java.util.Map;
  * @TODO rename this properly
  * @author aploese
  */
+@Deprecated
 public class DwrResponseI18n {
 
     private List<DwrMessageI18n> messages = new ArrayList<>();
