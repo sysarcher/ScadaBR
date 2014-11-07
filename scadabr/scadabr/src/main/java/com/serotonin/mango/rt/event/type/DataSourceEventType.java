@@ -136,4 +136,5 @@ public class DataSourceEventType extends EventType {
         dataSourceId = ds.getId();
         dataSourceEventTypeId = getInt(json, "dataSourceEventType", ds.getEventCodes());
     }
+
 }

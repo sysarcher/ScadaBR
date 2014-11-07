@@ -19,7 +19,6 @@
 package com.serotonin.mango.rt;
 
 import br.org.scadabr.l10n.AbstractLocalizer;
-import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -49,8 +48,6 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.SystemEventSource;
-import static com.serotonin.mango.rt.event.type.SystemEventType.getEventType;
-import com.serotonin.mango.vo.event.EventTypeVO;
 import java.io.Serializable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -77,6 +74,59 @@ public class EventManager implements ILifecycle, Serializable {
     //
     // Basic event management.
     //
+    /**
+     * An event get fired as single point in time
+     * An alarm gets raised if the outcom of the event exists longer - and must be cleared...
+     *
+     * TODO ducument this properly
+     * @param type
+     * @param i18nKey
+     * @param i18nArgs 
+     */
+    public void handleFiredEvent(EventType type, String i18nKey, Object ... i18nArgs) {
+        raiseEvent(type, System.currentTimeMillis(), false, type.getAlarmLevel(), new LocalizableMessageImpl(i18nKey, i18nArgs), null);
+    }
+    
+    public void handleFiredEvent(EventType type, long timestamp, String i18nKey, Object ... i18nArgs) {
+        raiseEvent(type, timestamp, false, type.getAlarmLevel(), new LocalizableMessageImpl(i18nKey, i18nArgs), null);
+    }
+    
+    public void handleFiredEvent(EventType type, LocalizableMessage msg) {
+        raiseEvent(type, System.currentTimeMillis(), false, type.getAlarmLevel(), msg, null);
+    }
+    
+    public void handleFiredEvent(EventType type, long timestamp, LocalizableMessage msg) {
+        raiseEvent(type, timestamp, false, type.getAlarmLevel(), msg, null);
+    }
+    
+    public void handleRaisedAlarm(EventType type, String i18nKey, Object ... i18nArgs) {
+        raiseEvent(type, System.currentTimeMillis(), true, type.getAlarmLevel(), new LocalizableMessageImpl(i18nKey, i18nArgs), null);
+    }
+    
+    public void handleRaisedAlarm(EventType type, long timestamp, String i18nKey, Object ... i18nArgs) {
+        raiseEvent(type, timestamp, true, type.getAlarmLevel(), new LocalizableMessageImpl(i18nKey, i18nArgs), null);
+    }
+    
+    public void handleRaisedAlarm(EventType type, LocalizableMessage msg) {
+        raiseEvent(type, System.currentTimeMillis(), true, type.getAlarmLevel(), msg, null);
+    }
+    
+    public void handleRaisedAlarm(EventType type, long timestamp, LocalizableMessage msg) {
+        raiseEvent(type, timestamp, true, type.getAlarmLevel(), msg, null);
+    }
+    
+    /**
+     * Deprecated Use {link #handleFiredEvent}
+     * 
+     * @param type
+     * @param time
+     * @param rtnApplicable
+     * @param alarmLevel
+     * @param message
+     * @param context
+     * @deprecated
+     */
+    @Deprecated
     public void raiseEvent(EventType type, long time, boolean rtnApplicable, AlarmLevel alarmLevel,
             LocalizableMessage message, Map<String, Object> context) {
         // Check if there is an event for this type already active.
@@ -155,8 +205,7 @@ public class EventManager implements ILifecycle, Serializable {
                 if (alarmLevel.meIsHigher(highestActiveAlarmLevel)) {
                     AlarmLevel oldValue = highestActiveAlarmLevel;
                     highestActiveAlarmLevel = alarmLevel;
-                    SystemEventType.raiseEvent(new SystemEventType(SystemEventSource.MAX_ALARM_LEVEL_CHANGED), time,
-                            false, getAlarmLevelChangeMessage("event.alarmMaxIncreased", oldValue));
+                    new SystemEventType(SystemEventSource.MAX_ALARM_LEVEL_CHANGED).fire(time, "event.alarmMaxIncreased", oldValue, highestActiveAlarmLevel);
                 }
             }
 
@@ -169,10 +218,33 @@ public class EventManager implements ILifecycle, Serializable {
         }
     }
 
+    public void handleAlarmCleared(EventType type) {
+        returnToNormal(type, System.currentTimeMillis(), EventInstance.RtnCauses.RETURN_TO_NORMAL);
+    }
+
+    public void handleAlarmCleared(EventType type, long time) {
+        returnToNormal(type, time, EventInstance.RtnCauses.RETURN_TO_NORMAL);
+    }
+
+    /**
+     * Use clearAlarm
+     * @param type
+     * @param time
+     * @deprecated
+     */
+    @Deprecated
     public void returnToNormal(EventType type, long time) {
         returnToNormal(type, time, EventInstance.RtnCauses.RETURN_TO_NORMAL);
     }
 
+    /**
+     * Use clearAlarm
+     * @param type
+     * @param time
+     * @param cause
+     * @deprecated
+     */
+    @Deprecated
     public void returnToNormal(EventType type, long time, int cause) {
         EventInstance evt = remove(type);
 
@@ -252,13 +324,11 @@ public class EventManager implements ILifecycle, Serializable {
             if (max.meIsHigher(highestActiveAlarmLevel)) {
                 AlarmLevel oldValue = highestActiveAlarmLevel;
                 highestActiveAlarmLevel = max;
-                SystemEventType.raiseEvent(new SystemEventType(SystemEventSource.MAX_ALARM_LEVEL_CHANGED), time,
-                        false, getAlarmLevelChangeMessage("event.alarmMaxIncreased", oldValue));
+                new SystemEventType(SystemEventSource.MAX_ALARM_LEVEL_CHANGED).fire(time, "event.alarmMaxIncreased", oldValue, highestActiveAlarmLevel);
             } else if (max.meIsLower(highestActiveAlarmLevel)) {
                 AlarmLevel oldValue = highestActiveAlarmLevel;
                 highestActiveAlarmLevel = max;
-                SystemEventType.raiseEvent(new SystemEventType(SystemEventSource.MAX_ALARM_LEVEL_CHANGED), time,
-                        false, getAlarmLevelChangeMessage("event.alarmMaxDecreased", oldValue));
+                new SystemEventType(SystemEventSource.MAX_ALARM_LEVEL_CHANGED).fire(time, "event.alarmMaxDecreased", oldValue, highestActiveAlarmLevel);
             }
         }
     }
@@ -390,12 +460,6 @@ public class EventManager implements ILifecycle, Serializable {
         }
 
         return false;
-    }
-
-    public void raiseEvent(SystemEventType type, long time, boolean rtn, LocalizableMessage message) {
-        EventTypeVO vo = getEventType(type.getSystemEventType());
-        AlarmLevel alarmLevel = vo.getAlarmLevel();
-        raiseEvent(type, time, rtn, alarmLevel, message, null);
     }
 
 }

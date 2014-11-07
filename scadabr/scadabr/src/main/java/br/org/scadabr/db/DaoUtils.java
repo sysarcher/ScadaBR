@@ -14,7 +14,6 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@Deprecated
 public class DaoUtils {
 
     protected final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_DAO);

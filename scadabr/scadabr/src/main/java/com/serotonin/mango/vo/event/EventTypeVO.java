@@ -91,7 +91,7 @@ public class EventTypeVO {
             case DATA_SOURCE:
                 return new DataSourceEventType(typeRef1, typeRef2, alarmLevel, duplicateHandling);
             case SYSTEM:
-                return new SystemEventType(SystemEventSource.fromMangoDbId(typeRef1), typeRef2);
+                return new SystemEventType(SystemEventSource.fromId(typeRef1), typeRef2);
             case COMPOUND:
                 return new CompoundDetectorEventType(typeRef1);
             case SCHEDULED:

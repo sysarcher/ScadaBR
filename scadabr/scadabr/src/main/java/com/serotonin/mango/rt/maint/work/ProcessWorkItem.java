@@ -59,9 +59,7 @@ public class ProcessWorkItem implements WorkItem {
         try {
             executeProcessCommand(command);
         } catch (IOException e) {
-            SystemEventType.raiseEvent(new SystemEventType(SystemEventSource.PROCESS_FAILURE),
-                    System.currentTimeMillis(), false,
-                    new LocalizableMessageImpl("event.process.failure", command, e.getMessage()));
+            new SystemEventType(SystemEventSource.PROCESS_FAILURE).fire("event.process.failure", command, e.getMessage());
         }
     }
 

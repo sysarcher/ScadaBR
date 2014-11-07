@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.MissingResourceException;
 
 import javax.servlet.ServletContext;
@@ -38,8 +37,6 @@ import br.org.scadabr.db.spring.ConnectionCallbackVoid;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.db.dao.UserDao;
-import com.serotonin.mango.vo.User;
-import com.serotonin.mango.vo.permission.DataPointAccess;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 abstract public class DatabaseAccess {
@@ -129,24 +126,16 @@ abstract public class DatabaseAccess {
 
                     sourceAccess.terminate();
                 } else {
+                    log.info("Setup user admin in db");
+
                     // New database. Create a default user.
-                    User user = new User();
-                    user.setId(Common.NEW_ID);
-                    user.setUsername("admin");
-                    user.setPassword(Common.encrypt("admin"));
-                    user.setEmail("admin@yourScadaBRDomain.com");
-                    user.setHomeUrl("");
-                    user.setPhone("");
-                    user.setAdmin(true);
-                    user.setDisabled(false);
-                    user.setDataSourcePermissions(new LinkedList<Integer>());
-                    user.setDataPointPermissions(new LinkedList<DataPointAccess>());
-                    new UserDao(this.getDataSource()).saveUser(user);
+                    UserDao.createAdmin(ejt);
 
                     // Record the current version.
-                    new SystemSettingsDao(this.getDataSource()).setValue(
-                            SystemSettingsDao.DATABASE_SCHEMA_VERSION,
+                    SystemSettingsDao.setValue(ejt, SystemSettingsDao.DATABASE_SCHEMA_VERSION,
                             Common.getVersion());
+                    log.info("database sucessfully created");
+                    
                 }
             }
 			// else

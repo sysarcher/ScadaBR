@@ -18,8 +18,6 @@
  */
 package com.serotonin.mango.rt.event.type;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import br.org.scadabr.json.JsonException;
@@ -28,64 +26,60 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
-import br.org.scadabr.vo.event.AlarmLevel;
-import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.SystemSettingsDao;
-import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.SystemEventSource;
-import java.util.EnumMap;
+import com.serotonin.mango.rt.EventManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @JsonRemoteEntity
+@Configurable
 public class SystemEventType extends EventType {
 
-    //
-    // /
-    // / Static stuff
-    // /
-    //
-    private static final String SYSTEM_SETTINGS_PREFIX = "systemEventAlarmLevel";
-
-    public static final Map<SystemEventSource, EventTypeVO> SYSTEM_EVENT_TYPES = new EnumMap<>(SystemEventSource.class);
-
-    //TODO fix Alarmlevel from SystemSettingsDao for now only default 
-    static {
-        for (SystemEventSource s : SystemEventSource.values()) {
-            SYSTEM_EVENT_TYPES.put(s, new EventTypeVO(EventSources.SYSTEM, s.mangoDbId, 0, s, s.defaultAlarmLevel));
-        }
-
+    @Autowired
+    private EventManager eventManager;
+    public void fire(String i18nKey, Object ... i18nArgs) {
+        eventManager.handleFiredEvent(this, i18nKey, i18nArgs);
     }
-    /*    
-     private static void addEventTypeVO(AuditEventSource type, String key) {
-     auditEventTypes.add(new EventTypeVO(EventSources.AUDIT, type, 0, new LocalizableMessageImpl(key),
-     SystemSettingsDao.getAlarmLevel(AUDIT_SETTINGS_PREFIX + type, AlarmLevel.INFORMATION)));
-     }
+
+    public void fire(long timestamp, String i18nKey, Object ... i18nArgs) {
+        eventManager.handleFiredEvent(this, timestamp, i18nKey, i18nArgs);
+    }
+
+    public void fire(LocalizableMessage msg) {
+        eventManager.handleFiredEvent(this, msg);
+    }
+
+    public void fire(long timestamp, LocalizableMessage msg) {
+        eventManager.handleFiredEvent(this, timestamp, msg);
+    }
+
+    public void raiseAlarm(String i18nKey, Object ... i18nArgs) {
+        eventManager.handleRaisedAlarm(this, i18nKey, i18nArgs);
+    }
+
+    public void raiseAlarm(long timestamp, String i18nKey, Object ... i18nArgs) {
+        eventManager.handleRaisedAlarm(this, timestamp, i18nKey, i18nArgs);
+    }
+
+    public void raiseAlarm(LocalizableMessage msg) {
+        eventManager.handleRaisedAlarm(this, msg);
+    }
+
+    public void raiseAlarm(long timestamp, LocalizableMessage msg) {
+        eventManager.handleRaisedAlarm(this, timestamp, msg);
+    }
+
+    public void clearAlarm() {
+        eventManager.handleAlarmCleared(this);
+    }
+    /**
+     * Alarm is gone, so clear it 
+     * @param timestamp 
      */
-
-    public static EventTypeVO getEventType(SystemEventSource type) {
-        return SYSTEM_EVENT_TYPES.get(type);
-    }
-
-    public static void setEventTypeAlarmLevel(SystemEventSource type, AlarmLevel alarmLevel) {
-        EventTypeVO et = getEventType(type);
-        et.setAlarmLevel(alarmLevel);
-
-        SystemSettingsDao dao = SystemSettingsDao.getInstance();
-        dao.setAlarmLevel(SYSTEM_SETTINGS_PREFIX + type, alarmLevel);
-    }
-
-    @Deprecated // Use Eventmanager
-    public static void raiseEvent(SystemEventType type, long time, boolean rtn, LocalizableMessage message) {
-        EventTypeVO vo = getEventType(type.getSystemEventType());
-        AlarmLevel alarmLevel = vo.getAlarmLevel();
-        Common.ctx.getEventManager().raiseEvent(type, time, rtn, alarmLevel, message, null);
-    }
-
-    @Deprecated // Use Eventmanager
-    public static void returnToNormal(SystemEventType type, long time) {
-        Common.ctx.getEventManager().returnToNormal(type, time);
+    public void clearAlarm(long timestamp) {
+        eventManager.handleAlarmCleared(this, timestamp);
     }
 
     //
@@ -149,7 +143,7 @@ public class SystemEventType extends EventType {
         final int prime = 31;
         int result = 1;
         result = prime * result + referenceId;
-        result = prime * result + systemEventType.mangoDbId;
+        result = prime * result + systemEventType.getId();
         return result;
     }
 
@@ -186,5 +180,10 @@ public class SystemEventType extends EventType {
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         super.jsonDeserialize(reader, json);
         systemEventType = SystemEventSource.valueOf(json.getString("systemType"));
+    }
+
+    @Override
+    public AlarmLevel getAlarmLevel() {
+        return systemEventType.getAlarmLevel();
     }
 }

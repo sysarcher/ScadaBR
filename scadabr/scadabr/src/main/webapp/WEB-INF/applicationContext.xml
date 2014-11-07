@@ -30,6 +30,8 @@
                
     <context:annotation-config/>
     <context:component-scan base-package="com.serotonin,br.org.scadabr" />
+    <context:load-time-weaver/>
+    <context:spring-configured/>
     
     <!-- Configures the annotation-driven Spring MVC Controller programming model.
     Note that, with Spring 3.0, this tag works in Servlet MVC only!  

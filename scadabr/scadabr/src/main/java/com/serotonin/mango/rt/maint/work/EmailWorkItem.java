@@ -102,9 +102,7 @@ public class EmailWorkItem implements WorkItem {
                 }
                 to += addr.getAddress();
             }
-            SystemEventType.raiseEvent(new SystemEventType(SystemEventSource.EMAIL_SEND_FAILURE),
-                    System.currentTimeMillis(), false,
-                    new LocalizableMessageImpl("event.email.failure", subject, to, e.getMessage()));
+            new SystemEventType(SystemEventSource.EMAIL_SEND_FAILURE).fire("event.email.failure", subject, to, e.getMessage());
         } finally {
             if (postSendExecution != null) {
                 for (Runnable runnable : postSendExecution) {

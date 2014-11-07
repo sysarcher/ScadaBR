@@ -152,7 +152,7 @@ public class EventDao extends BaseDao {
                         break;
                     case SYSTEM: {
                         final SystemEventType et = (SystemEventType) type;
-                        ps.setInt(2, et.getSystemEventType().mangoDbId);
+                        ps.setInt(2, et.getSystemEventType().getId());
                         ps.setInt(3, et.getReferenceId());
                     }
                     break;
@@ -423,7 +423,7 @@ public class EventDao extends BaseDao {
             case DATA_SOURCE:
                 return new DataSourceEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
             case SYSTEM:
-                return new SystemEventType(SystemEventSource.fromMangoDbId(rs.getInt(offset + 1)), rs.getInt(offset + 2));
+                return new SystemEventType(SystemEventSource.fromId(rs.getInt(offset + 1)), rs.getInt(offset + 2));
             case COMPOUND:
                 return new CompoundDetectorEventType(rs.getInt(offset + 1));
             case SCHEDULED:
@@ -706,7 +706,7 @@ public class EventDao extends BaseDao {
             }
             case SYSTEM: {
                 final SystemEventType et = (SystemEventType) type;
-                return getEventHandlers(et.getEventSource(), et.getSystemEventType().mangoDbId, et.getReferenceId());
+                return getEventHandlers(et.getEventSource(), et.getSystemEventType().getId(), et.getReferenceId());
             }
             default:
                 throw new ShouldNeverHappenException("Eventtype not supported");
@@ -797,7 +797,7 @@ public class EventDao extends BaseDao {
             }
             case SYSTEM: {
                 final SystemEventType et = (SystemEventType) type;
-                return saveEventHandler(et.getEventSource(), et.getSystemEventType().mangoDbId, et.getReferenceId(), handler);
+                return saveEventHandler(et.getEventSource(), et.getSystemEventType().getId(), et.getReferenceId(), handler);
             }
             default:
                 throw new ShouldNeverHappenException("Eventtype not supported");

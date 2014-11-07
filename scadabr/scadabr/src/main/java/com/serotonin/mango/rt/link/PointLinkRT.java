@@ -86,11 +86,11 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
     }
 
     private void raiseFailureEvent(long time, LocalizableMessage message) {
-        SystemEventType.raiseEvent(eventType, time, true, message);
+        eventType.raiseAlarm(time, message);
     }
 
     private void returnToNormal() {
-        SystemEventType.returnToNormal(eventType, System.currentTimeMillis());
+        eventType.clearAlarm();
     }
 
     private void execute(PointValueTime newValue) {

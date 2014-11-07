@@ -33,6 +33,7 @@ public class DatabaseAccessFactory {
     private final static Logger log = Logger.getLogger(LogUtils.LOGGER_SCADABR_DAO);
     private DatabaseAccess databaseAccess;
 
+    @Deprecated
     @Inject
     ServletContext ctx;
 

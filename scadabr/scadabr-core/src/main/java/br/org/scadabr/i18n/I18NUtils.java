@@ -8,7 +8,6 @@ package br.org.scadabr.i18n;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import java.util.LinkedList;
-import java.util.ResourceBundle;
 
 /**
  *
@@ -19,6 +18,10 @@ public class I18NUtils {
     public static String serialize(LocalizableMessage msg) {
         StringBuilder sb = new StringBuilder();
         sb.append(msg.getI18nKey()).append('|');
+        if (msg.getArgs() == null) {
+            sb.append('|');
+            return sb.toString();
+        }
         for (Object arg : msg.getArgs()) {
             if (arg != null) {
                 if (arg instanceof String) {

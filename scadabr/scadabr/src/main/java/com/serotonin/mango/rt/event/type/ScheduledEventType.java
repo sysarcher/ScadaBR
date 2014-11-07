@@ -26,6 +26,7 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
+import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.ScheduledEventDao;
 
 /**
@@ -120,4 +121,10 @@ public class ScheduledEventType extends EventType {
         super.jsonDeserialize(reader, json);
         scheduleId = getScheduledEventId(json, "XID");
     }
+
+    @Override
+    public AlarmLevel getAlarmLevel() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

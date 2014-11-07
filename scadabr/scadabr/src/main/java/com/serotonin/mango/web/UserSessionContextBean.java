@@ -28,9 +28,6 @@ import org.springframework.context.annotation.Scope;
 @Scope("session")
 public class UserSessionContextBean implements Serializable {
 
-    @Inject
-    private transient EventManager eventManager;
-
     private User user;
     private Locale locale = Locale.getDefault();
     private TimeZone timeZone = TimeZone.getDefault();
@@ -51,10 +48,7 @@ public class UserSessionContextBean implements Serializable {
      */
     public void loginUser(User user) {
         this.user = user;
-        eventManager.raiseEvent(new SystemEventType(
-                SystemEventSource.USER_LOGIN, user.getId()), System
-                .currentTimeMillis(), true, new LocalizableMessageImpl(
-                        "event.login", user.getUsername()));
+        new SystemEventType(SystemEventSource.USER_LOGIN, user.getId()).raiseAlarm("event.login", user.getUsername());
     }
 
     /**
@@ -62,9 +56,7 @@ public class UserSessionContextBean implements Serializable {
      */
     public void logoutUser(User user) {
         this.user = null;
-        eventManager.returnToNormal(new SystemEventType(
-                SystemEventSource.USER_LOGIN, user.getId()), System
-                .currentTimeMillis());
+        new SystemEventType(SystemEventSource.USER_LOGIN, user.getId()).clearAlarm();
         user.cancelTestingUtility();
     }
 
