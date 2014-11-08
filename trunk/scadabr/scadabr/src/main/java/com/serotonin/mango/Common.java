@@ -77,6 +77,7 @@ public class Common {
     public static final Charset UTF8_CS = Charset.forName(UTF8);
 
     public static final int NEW_ID = -1;
+    @Deprecated
     public static ContextWrapper ctx;
 
     //TODO inject this
@@ -111,6 +112,7 @@ public class Common {
         String DYNAMIC_IMAGES = "DYNAMIC_IMAGES";
         @Deprecated
         String RUNTIME_MANAGER = "RUNTIME_MANAGER";
+        @Deprecated
         String SCHEDULER = "SCHEDULER";
         @Deprecated
         String EVENT_MANAGER = "EVENT_MANAGER";

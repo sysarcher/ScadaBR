@@ -28,6 +28,7 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -35,6 +36,7 @@ import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.db.dao.MaintenanceEventDao;
 import com.serotonin.mango.db.dao.PublisherDao;
 import com.serotonin.mango.db.dao.ScheduledEventDao;
+import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
@@ -44,6 +46,8 @@ import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * An event class specifies the type of event that was raised.
@@ -51,8 +55,57 @@ import com.serotonin.mango.vo.publish.PublisherVO;
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity(typeFactory = EventTypeFactory.class)
+@Configurable
 abstract public class EventType implements JsonSerializable {
-    
+
+    @Autowired
+    private EventManager eventManager;
+
+    public void fire(String i18nKey, Object... i18nArgs) {
+        eventManager.handleFiredEvent(this, i18nKey, i18nArgs);
+    }
+
+    public void fire(long timestamp, String i18nKey, Object... i18nArgs) {
+        eventManager.handleFiredEvent(this, timestamp, i18nKey, i18nArgs);
+    }
+
+    public void fire(LocalizableMessage msg) {
+        eventManager.handleFiredEvent(this, msg);
+    }
+
+    public void fire(long timestamp, LocalizableMessage msg) {
+        eventManager.handleFiredEvent(this, timestamp, msg);
+    }
+
+    public void raiseAlarm(String i18nKey, Object... i18nArgs) {
+        eventManager.handleRaisedAlarm(this, i18nKey, i18nArgs);
+    }
+
+    public void raiseAlarm(long timestamp, String i18nKey, Object... i18nArgs) {
+        eventManager.handleRaisedAlarm(this, timestamp, i18nKey, i18nArgs);
+    }
+
+    public void raiseAlarm(LocalizableMessage msg) {
+        eventManager.handleRaisedAlarm(this, msg);
+    }
+
+    public void raiseAlarm(long timestamp, LocalizableMessage msg) {
+        eventManager.handleRaisedAlarm(this, timestamp, msg);
+    }
+
+    public void clearAlarm() {
+        eventManager.handleAlarmCleared(this);
+    }
+
+    /**
+     * Alarm is gone, so clear it
+     *
+     * @param timestamp
+     */
+    public void clearAlarm(long timestamp) {
+        eventManager.handleAlarmCleared(this, timestamp);
+    }
+
     abstract public EventSources getEventSource();
 
     /**
@@ -68,7 +121,7 @@ abstract public class EventType implements JsonSerializable {
     /**
      * Convenience method that keeps us from having to cast.
      *
-     * @return 
+     * @return
      * @throws ShouldNeverHappenException if accessed from wrong childInstance
      */
     public int getDataSourceId() throws ShouldNeverHappenException {
@@ -78,7 +131,7 @@ abstract public class EventType implements JsonSerializable {
     /**
      * Convenience method that keeps us from having to cast.
      *
-     * @return 
+     * @return
      * @throws ShouldNeverHappenException if accessed from wrong childInstance
      */
     public int getDataPointId() throws ShouldNeverHappenException {
@@ -88,7 +141,7 @@ abstract public class EventType implements JsonSerializable {
     /**
      * Convenience method that keeps us from having to cast.
      *
-     * @return 
+     * @return
      * @throws ShouldNeverHappenException if accessed from wrong childInstance
      */
     public int getScheduleId() throws ShouldNeverHappenException {
@@ -98,7 +151,7 @@ abstract public class EventType implements JsonSerializable {
     /**
      * Convenience method that keeps us from having to cast.
      *
-     * @return 
+     * @return
      * @throws ShouldNeverHappenException if accessed from wrong childInstance
      */
     public int getCompoundEventDetectorId() throws ShouldNeverHappenException {
@@ -108,7 +161,7 @@ abstract public class EventType implements JsonSerializable {
     /**
      * Convenience method that keeps us from having to cast.
      *
-     * @return 
+     * @return
      * @throws ShouldNeverHappenException if accessed from wrong childInstance
      */
     public int getPublisherId() throws ShouldNeverHappenException {
@@ -288,8 +341,10 @@ abstract public class EventType implements JsonSerializable {
         return me.getId();
     }
 
-     /**
-     * Currently ony the Alarmlevel for firing the event or raising the alarm. EventIntsance does not know the Alarmlevel.
+    /**
+     * Currently ony the Alarmlevel for firing the event or raising the alarm.
+     * EventIntsance does not know the Alarmlevel.
+     *
      * @return the alarmLevel
      */
     public abstract AlarmLevel getAlarmLevel();

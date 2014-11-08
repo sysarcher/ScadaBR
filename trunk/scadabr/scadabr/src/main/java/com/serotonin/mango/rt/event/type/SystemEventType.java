@@ -34,53 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
 @JsonRemoteEntity
-@Configurable
 public class SystemEventType extends EventType {
-
-    @Autowired
-    private EventManager eventManager;
-    public void fire(String i18nKey, Object ... i18nArgs) {
-        eventManager.handleFiredEvent(this, i18nKey, i18nArgs);
-    }
-
-    public void fire(long timestamp, String i18nKey, Object ... i18nArgs) {
-        eventManager.handleFiredEvent(this, timestamp, i18nKey, i18nArgs);
-    }
-
-    public void fire(LocalizableMessage msg) {
-        eventManager.handleFiredEvent(this, msg);
-    }
-
-    public void fire(long timestamp, LocalizableMessage msg) {
-        eventManager.handleFiredEvent(this, timestamp, msg);
-    }
-
-    public void raiseAlarm(String i18nKey, Object ... i18nArgs) {
-        eventManager.handleRaisedAlarm(this, i18nKey, i18nArgs);
-    }
-
-    public void raiseAlarm(long timestamp, String i18nKey, Object ... i18nArgs) {
-        eventManager.handleRaisedAlarm(this, timestamp, i18nKey, i18nArgs);
-    }
-
-    public void raiseAlarm(LocalizableMessage msg) {
-        eventManager.handleRaisedAlarm(this, msg);
-    }
-
-    public void raiseAlarm(long timestamp, LocalizableMessage msg) {
-        eventManager.handleRaisedAlarm(this, timestamp, msg);
-    }
-
-    public void clearAlarm() {
-        eventManager.handleAlarmCleared(this);
-    }
-    /**
-     * Alarm is gone, so clear it 
-     * @param timestamp 
-     */
-    public void clearAlarm(long timestamp) {
-        eventManager.handleAlarmCleared(this, timestamp);
-    }
 
     //
     // /
