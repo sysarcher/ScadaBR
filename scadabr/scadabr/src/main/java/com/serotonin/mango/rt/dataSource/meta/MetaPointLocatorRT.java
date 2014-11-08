@@ -28,7 +28,6 @@ import javax.script.ScriptException;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.IntValuePair;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointListener;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -44,14 +43,19 @@ import br.org.scadabr.timer.cron.CronParser;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.datasource.meta.UpdateEvent;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> implements DataPointListener {
 
     private static final ThreadLocal<List<Integer>> threadLocal = new ThreadLocal<>();
     private static final int MAX_RECURSION = 10;
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     final Object LOCK = new Object();
 
@@ -83,7 +87,7 @@ public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> imple
         createContext();
 
         // Add listener registrations
-        RuntimeManager rm = Common.ctx.getRuntimeManager();
+        RuntimeManager rm = runtimeManager;
         for (IntValuePair contextKey : vo.getContext()) {
             // Points shouldn't listen for their own updates.
             if (dataPoint.getId() != contextKey.getKey()) {
@@ -107,7 +111,7 @@ public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> imple
     public void terminate() {
         synchronized (LOCK) {
             // Remove listener registrations
-            RuntimeManager rm = Common.ctx.getRuntimeManager();
+            RuntimeManager rm = runtimeManager;
             for (IntValuePair contextKey : vo.getContext()) {
                 rm.removeDataPointListener(contextKey.getKey(), this);
             }

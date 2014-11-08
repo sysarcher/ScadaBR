@@ -39,12 +39,17 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ShareUser;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import java.util.Iterator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
+@Configurable
 public class WatchList implements JsonSerializable, Iterable<DataPointVO> {
+    @Autowired
+    private DataPointDao dataPointDao;
 
     public static final String XID_PREFIX = "WL_";
 
@@ -171,7 +176,6 @@ public class WatchList implements JsonSerializable, Iterable<DataPointVO> {
         JsonArray jsonDataPoints = json.getJsonArray("dataPoints");
         if (jsonDataPoints != null) {
             pointList.clear();
-            DataPointDao dataPointDao = DataPointDao.getInstance();
             for (JsonValue jv : jsonDataPoints.getElements()) {
                 String xid = jv.toJsonString().getValue();
                 DataPointVO dpVO = dataPointDao.getDataPoint(xid);

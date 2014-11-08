@@ -62,9 +62,14 @@ import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @JsonRemoteEntity
+
 public class DataPointVO implements Serializable, Cloneable, JsonSerializable, ChangeComparable<DataPointVO> {
+
+    @Autowired //TODO use @Configurable for Validator
+    private DataPointDao dataPointDao;
 
     private static final long serialVersionUID = -1;
     public static final String XID_PREFIX = "DP_";
@@ -515,7 +520,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             response.addContextual("xid", "validate.required");
         } else if (xid.length() > 50) {
             response.addContextual("xid", "validate.notLongerThan", 50);
-        } else if (!DataPointDao.getInstance().isXidUnique(xid, id)) {
+        } else if (!dataPointDao.isXidUnique(xid, id)) {
             response.addContextual("xid", "validate.xidUsed");
         }
 

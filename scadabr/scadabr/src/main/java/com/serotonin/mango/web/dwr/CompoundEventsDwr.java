@@ -155,7 +155,7 @@ public class CompoundEventsDwr extends BaseDwr {
 
     public DwrResponseI18n validateCondition(String condition) {
         DwrResponseI18n response = new DwrResponseI18n();
-        CompoundEventDetectorVO.validate(condition, response);
+        new CompoundEventDetectorVO().validate(condition, response);
         return response;
     }
 

@@ -49,12 +49,17 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity(typeFactory = ViewComponent.Factory.class)
+@Configurable
 abstract public class ViewComponent implements Serializable, JsonSerializable {
+    @Autowired
+    private DataPointDao dataPointDao;
 
     private static List<ImplDefinition> DEFINITIONS;
 
@@ -306,7 +311,7 @@ abstract public class ViewComponent implements Serializable, JsonSerializable {
 
     protected DataPointVO readDataPoint(ObjectInputStream in)
             throws IOException {
-        return DataPointDao.getInstance().getDataPoint(in.readInt());
+        return dataPointDao.getDataPoint(in.readInt());
     }
 
     /**
@@ -340,7 +345,7 @@ abstract public class ViewComponent implements Serializable, JsonSerializable {
                 comp.tsetDataPoint(null);
             } else {
                 String xid = jsonXid.toJsonString().getValue();
-                DataPointVO dataPoint = DataPointDao.getInstance().getDataPoint(xid);
+                DataPointVO dataPoint = dataPointDao.getDataPoint(xid);
                 if (dataPoint == null) {
                     throw new LocalizableJsonException(
                             "emport.error.missingPoint", xid);

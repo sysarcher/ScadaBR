@@ -60,6 +60,10 @@ abstract public class EventType implements JsonSerializable {
 
     @Autowired
     private EventManager eventManager;
+    @Autowired
+    private DataPointDao dataPointDao;
+    @Autowired
+    private DataSourceDao dataSourceDao;
 
     public void fire(String i18nKey, Object... i18nArgs) {
         eventManager.handleFiredEvent(this, i18nKey, i18nArgs);
@@ -272,7 +276,7 @@ abstract public class EventType implements JsonSerializable {
         if (xid == null) {
             throw new LocalizableJsonException("emport.error.eventType.missing.reference", name);
         }
-        DataPointVO dp = DataPointDao.getInstance().getDataPoint(xid);
+        DataPointVO dp = dataPointDao.getDataPoint(xid);
         if (dp == null) {
             throw new LocalizableJsonException("emport.error.eventType.invalid.reference", name, xid);
         }
@@ -297,7 +301,7 @@ abstract public class EventType implements JsonSerializable {
         if (pedXid == null) {
             throw new LocalizableJsonException("emport.error.eventType.missing.reference", pedName);
         }
-        int id = DataPointDao.getInstance().getDetectorId(pedXid, dpId);
+        int id = dataPointDao.getDetectorId(pedXid, dpId);
         if (id == -1) {
             throw new LocalizableJsonException("emport.error.eventType.invalid.reference", pedName, pedXid);
         }
@@ -310,7 +314,7 @@ abstract public class EventType implements JsonSerializable {
         if (xid == null) {
             throw new LocalizableJsonException("emport.error.eventType.missing.reference", name);
         }
-        DataSourceVO<?> ds = DataSourceDao.getInstance().getDataSource(xid);
+        DataSourceVO<?> ds = dataSourceDao.getDataSource(xid);
         if (ds == null) {
             throw new LocalizableJsonException("emport.error.eventType.invalid.reference", name, xid);
         }

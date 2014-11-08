@@ -28,9 +28,14 @@ import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.DataPointDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @JsonRemoteEntity
+@Configurable
 public class DataPointEventType extends EventType {
+    @Autowired
+    private DataPointDao dataPointDao;
 
     private int dataSourceId = -1;
     private int dataPointId;
@@ -54,7 +59,7 @@ public class DataPointEventType extends EventType {
     @Override
     public int getDataSourceId() {
         if (dataSourceId == -1) {
-            dataSourceId = DataPointDao.getInstance().getDataPoint(dataPointId).getDataSourceId();
+            dataSourceId = dataPointDao.getDataPoint(dataPointId).getDataSourceId();
         }
         return dataSourceId;
     }
@@ -121,7 +126,6 @@ public class DataPointEventType extends EventType {
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        DataPointDao dataPointDao = DataPointDao.getInstance();
         map.put("dataPointXID", dataPointDao.getDataPoint(dataPointId).getXid());
         map.put("detectorXID", dataPointDao.getDetectorXid(pointEventDetectorId));
     }

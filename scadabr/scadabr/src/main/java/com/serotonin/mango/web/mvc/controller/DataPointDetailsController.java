@@ -173,7 +173,7 @@ public class DataPointDetailsController {
         user.setEditPoint(point);
 
         // Find accessible points for the goto list
-        ControllerUtils.addPointListDataToModel(user, id, modelMap);
+        new ControllerUtils().addPointListDataToModel(user, id, modelMap);
 
         return "dataPointDetails";
     }

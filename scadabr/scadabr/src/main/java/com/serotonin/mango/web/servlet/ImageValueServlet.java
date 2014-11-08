@@ -68,7 +68,7 @@ public class ImageValueServlet extends BaseInfoServlet {
             int width = getIntRequestParameter(request, "w", -1);
             int height = getIntRequestParameter(request, "h", -1);
 
-            // DataPointRT dp = Common.ctx.getRuntimeManager().getDataPoint(dataPointId);
+            // DataPointRT dp = runtimeManger.getDataPoint(dataPointId);
             // Permissions.ensureDataPointReadPermission(Common.getUser(request), dp.getVO());
             PointValueFacade pointValueFacade = new PointValueFacade(dataPointId);
             PointValueTime pvt = null;

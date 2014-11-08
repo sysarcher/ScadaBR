@@ -77,20 +77,11 @@ public class DataPointDao extends BaseDao {
 
     @Inject
     private RuntimeManager runtimeManager;
-
+    @Inject
+    private DataSourceDao dataSourceDao;
+    
     public DataPointDao() {
         super();
-    }
-
-    @Deprecated
-    protected DataPointDao(DataSource dataSource) {
-        super(dataSource);
-        this.runtimeManager = Common.ctx.getRuntimeManager();
-    }
-
-    @Deprecated
-    public static DataPointDao getInstance() {
-        return new DataPointDao(Common.ctx.getDatabaseAccess().getDataSource());
     }
 
     //
@@ -259,7 +250,7 @@ public class DataPointDao extends BaseDao {
             // The spinwave changes were not correctly implemented, so we need to handle potential errors here.
             if (dp.getPointLocator() == null) {
                 // Use the data source tpe id to determine what type of locator is needed.
-                dp.setPointLocator(DataSourceDao.getInstance().getDataSource(dp.getDataSourceId()).createPointLocator());
+                dp.setPointLocator(dataSourceDao.getDataSource(dp.getDataSourceId()).createPointLocator());
             }
 
             return dp;

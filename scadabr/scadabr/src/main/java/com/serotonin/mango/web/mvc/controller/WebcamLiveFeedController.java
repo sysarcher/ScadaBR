@@ -30,17 +30,21 @@ import org.springframework.web.servlet.mvc.ParameterizableViewController;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.http.HttpImagePointLocatorVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class WebcamLiveFeedController extends ParameterizableViewController {
+    @Autowired
+    private DataPointDao dataPointDao;
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         int pointId = Integer.parseInt(request.getParameter("pointId"));
-        DataPointDao dataPointDao = DataPointDao.getInstance();
         DataPointVO dp = dataPointDao.getDataPoint(pointId);
 
         if (!(dp.getPointLocator() instanceof HttpImagePointLocatorVO)) {

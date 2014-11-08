@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 
-import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
@@ -34,13 +34,18 @@ import com.serotonin.mango.view.custom.CustomView;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.web.dwr.BaseDwr;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class StaticPointTag extends ViewTagSupport {
 
     private static final long serialVersionUID = -1;
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     private String xid;
     private boolean raw;
@@ -70,7 +75,7 @@ public class StaticPointTag extends ViewTagSupport {
         JspWriter out = pageContext.getOut();
         HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
 
-        DataPointRT dataPointRT = Common.ctx.getRuntimeManager().getDataPoint(dataPointVO.getId());
+        DataPointRT dataPointRT = runtimeManager.getDataPoint(dataPointVO.getId());
         if (dataPointRT == null) {
             write(out, disabledValue);
         } else {
@@ -78,7 +83,7 @@ public class StaticPointTag extends ViewTagSupport {
 
             if (pvt != null && pvt.getValue() instanceof ImageValue) {
                 // Text renderers don't help here. Create a thumbnail.
-                Map<String, Object> model = new HashMap<String, Object>();
+                Map<String, Object> model = new HashMap<>();
                 model.put("point", dataPointVO);
                 model.put("pointValue", pvt);
                 write(out, BaseDwr.generateContent(request, "imageValueThumbnail.jsp", model));

@@ -18,16 +18,19 @@
  */
 package com.serotonin.mango.rt.maint.work;
 
+import com.serotonin.mango.rt.RuntimeManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class SetPointWorkItem implements WorkItem {
 
     private static final ThreadLocal<List<String>> threadLocal = new ThreadLocal<List<String>>();
@@ -37,6 +40,8 @@ public class SetPointWorkItem implements WorkItem {
     private final PointValueTime pvt;
     private final SetPointSource source;
     private final List<String> sourceIds;
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     public SetPointWorkItem(int targetPointId, PointValueTime pvt, SetPointSource source) {
         this.targetPointId = targetPointId;
@@ -71,7 +76,7 @@ public class SetPointWorkItem implements WorkItem {
         sourceIds.add(sourceId);
         threadLocal.set(sourceIds);
         try {
-            Common.ctx.getRuntimeManager().setDataPointValue(targetPointId, pvt, source);
+            runtimeManager.setDataPointValue(targetPointId, pvt, source);
         } finally {
             threadLocal.remove();
         }

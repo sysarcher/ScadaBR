@@ -53,16 +53,19 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.mailingList.EmailRecipient;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @JsonRemoteEntity
-public class EventHandlerVO implements Serializable,
-        ChangeComparable<EventHandlerVO>, JsonSerializable {
+@Configurable
+public class EventHandlerVO implements Serializable, ChangeComparable<EventHandlerVO>, JsonSerializable {
+    @Autowired
+    private DataPointDao dataPointDao;
 
     public static final String XID_PREFIX = "EH_";
 
@@ -383,7 +386,7 @@ public class EventHandlerVO implements Serializable,
 
     public void validate(DwrResponseI18n response) {
         if (handlerType == TYPE_SET_POINT) {
-            DataPointVO dp = DataPointDao.getInstance().getDataPoint(targetPointId);
+            DataPointVO dp = dataPointDao.getDataPoint(targetPointId);
 
             if (dp == null) {
                 response.addGeneric("eventHandlers.noTargetPoint");
@@ -415,7 +418,7 @@ public class EventHandlerVO implements Serializable,
                 }
 
                 if (activeAction == SET_ACTION_POINT_VALUE) {
-                    DataPointVO dpActive = DataPointDao.getInstance().getDataPoint(activePointId);
+                    DataPointVO dpActive = dataPointDao.getDataPoint(activePointId);
 
                     if (dpActive == null) {
                         response.addGeneric("eventHandlers.invalidActiveSource");
@@ -444,7 +447,7 @@ public class EventHandlerVO implements Serializable,
                 }
 
                 if (inactiveAction == SET_ACTION_POINT_VALUE) {
-                    DataPointVO dpInactive = DataPointDao.getInstance().getDataPoint(inactivePointId);
+                    DataPointVO dpInactive = dataPointDao.getDataPoint(inactivePointId);
 
                     if (dpInactive == null) {
                         response.addGeneric("eventHandlers.invalidInactiveSource");
@@ -485,7 +488,6 @@ public class EventHandlerVO implements Serializable,
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        DataPointDao dataPointDao = DataPointDao.getInstance();
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "eventHandlers.alias", alias);
         AuditEventType.addPropertyMessage(list, "eventHandlers.type",
@@ -557,7 +559,6 @@ public class EventHandlerVO implements Serializable,
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list,
             EventHandlerVO from) {
-        DataPointDao dataPointDao = DataPointDao.getInstance();
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.xid",
                 from.xid, xid);
         AuditEventType.maybeAddPropertyChangeMessage(list,
@@ -791,7 +792,6 @@ public class EventHandlerVO implements Serializable,
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        DataPointDao dataPointDao = DataPointDao.getInstance();
         map.put("eventType", EventDao.getInstance().getEventHandlerType(id));
 
         map.put("xid", xid);
@@ -852,7 +852,6 @@ public class EventHandlerVO implements Serializable,
     @Override
     public void jsonDeserialize(JsonReader reader, JsonObject json)
             throws JsonException {
-        DataPointDao dataPointDao = DataPointDao.getInstance();
 
         String text = json.getString("handlerType");
         if (text != null) {

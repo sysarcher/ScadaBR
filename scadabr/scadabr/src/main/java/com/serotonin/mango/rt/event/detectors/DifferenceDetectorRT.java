@@ -18,13 +18,19 @@
  */
 package com.serotonin.mango.rt.event.detectors;
 
-import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 abstract public class DifferenceDetectorRT extends TimeDelayedEventDetectorRT {
+
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     /**
      * State field. Whether the event is currently active or not. This field is
@@ -53,7 +59,7 @@ abstract public class DifferenceDetectorRT extends TimeDelayedEventDetectorRT {
     public void initializeState() {
         // Get historical data for the point out of the database.
         int pointId = vo.njbGetDataPoint().getId();
-        PointValueTime latest = Common.ctx.getRuntimeManager().getDataPoint(pointId).getPointValue();
+        PointValueTime latest = runtimeManager.getDataPoint(pointId).getPointValue();
         if (latest != null) {
             lastChange = latest.getTime();
         } else // The point may be new or not logged, so don't go active immediately.

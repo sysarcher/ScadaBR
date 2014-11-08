@@ -27,11 +27,16 @@ import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.view.custom.CustomView;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.permission.Permissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 abstract public class ViewTagSupport extends TagSupport {
+    @Autowired
+    private DataPointDao dataPointDao;
 
     private static final long serialVersionUID = -1;
 
@@ -45,7 +50,7 @@ abstract public class ViewTagSupport extends TagSupport {
 
     protected DataPointVO getDataPointVO(CustomView view, String xid) throws JspException {
         // Find the point.
-        DataPointVO dataPointVO = DataPointDao.getInstance().getDataPoint(xid);
+        DataPointVO dataPointVO = dataPointDao.getDataPoint(xid);
         if (dataPointVO == null) {
             throw new JspException("Point with XID '" + xid + "' not found");
         }

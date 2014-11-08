@@ -29,9 +29,14 @@ import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @JsonRemoteEntity
+@Configurable
 public class DataSourceEventType extends EventType {
+    @Autowired
+    private DataSourceDao dataSourceDao;
 
     private int dataSourceId;
     private int dataSourceEventTypeId;
@@ -124,7 +129,7 @@ public class DataSourceEventType extends EventType {
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        DataSourceVO<?> ds = DataSourceDao.getInstance().getDataSource(dataSourceId);
+        DataSourceVO<?> ds = dataSourceDao.getDataSource(dataSourceId);
         map.put("XID", ds.getXid());
         map.put("dataSourceEventType", ds.getEventCodes().getCode(dataSourceEventTypeId));
     }

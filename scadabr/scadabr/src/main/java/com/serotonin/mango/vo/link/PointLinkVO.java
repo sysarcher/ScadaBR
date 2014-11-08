@@ -36,12 +36,18 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
+@Configurable
 public class PointLinkVO implements ChangeComparable<PointLinkVO>, JsonSerializable {
+
+    @Autowired
+    private DataPointDao dataPointDao;
 
     public static final String XID_PREFIX = "PL_";
 
@@ -144,7 +150,6 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO>, JsonSerializa
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        DataPointDao dataPointDao = DataPointDao.getInstance();
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "pointLinks.source", dataPointDao.getExtendedPointName(sourcePointId));
         AuditEventType.addPropertyMessage(list, "pointLinks.target", dataPointDao.getExtendedPointName(targetPointId));
@@ -155,7 +160,6 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO>, JsonSerializa
 
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, PointLinkVO from) {
-        DataPointDao dataPointDao = DataPointDao.getInstance();
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.xid", from.xid, xid);
         AuditEventType
                 .maybeAddPropertyChangeMessage(list, "pointLinks.source",
@@ -175,7 +179,6 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO>, JsonSerializa
     // Serialization
     //
     public void jsonSerialize(Map<String, Object> map) {
-        DataPointDao dataPointDao = DataPointDao.getInstance();
 
         map.put("xid", xid);
 
@@ -193,7 +196,6 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO>, JsonSerializa
     }
 
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        DataPointDao dataPointDao = DataPointDao.getInstance();
 
         String xid = json.getString("sourcePointId");
         if (xid != null) {

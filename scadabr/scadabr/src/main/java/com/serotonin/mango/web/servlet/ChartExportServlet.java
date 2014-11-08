@@ -20,9 +20,12 @@ import com.serotonin.mango.vo.report.ReportCsvStreamer;
 import com.serotonin.mango.vo.report.ReportDataValue;
 import com.serotonin.mango.vo.report.ReportPointInfo;
 import com.serotonin.mango.web.dwr.beans.DataExportDefinition;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Deprecated //TODO APL Use rest to fetch image
 public class ChartExportServlet extends HttpServlet {
+    @Autowired
+    private DataPointDao dataPointDao;
 
     private static final long serialVersionUID = 1L;
 
@@ -38,7 +41,6 @@ public class ChartExportServlet extends HttpServlet {
             return;
         }
 
-        DataPointDao dataPointDao = DataPointDao.getInstance();
         PointValueDao pointValueDao = PointValueDao.getInstance();
 
         long from = def.getFrom() == null ? -1 : def.getFrom().getMillis();

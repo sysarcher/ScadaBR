@@ -159,7 +159,7 @@ public class SnmpTrapHandlerRT /* extends EventHandlerRT */ {
     // @Override
     // public void eventRaised(EventInstance evt) {
     // // Validate that the target point is available.
-    // DataPointRT targetPoint = Common.ctx.getRuntimeManager().getDataPoint(vo.getTargetPointId());
+    // DataPointRT targetPoint = runtimeManger.getDataPoint(vo.getTargetPointId());
     // if (targetPoint == null) {
     // raiseFailureEvent(new LocalizableMessage("event.setPoint.targetPointMissing"));
     // return;
@@ -175,7 +175,7 @@ public class SnmpTrapHandlerRT /* extends EventHandlerRT */ {
     // Object value;
     // if (vo.getActiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {
     // // Get the source data point.
-    // DataPointRT sourcePoint = Common.ctx.getRuntimeManager().getDataPoint(vo.getActivePointId());
+    // DataPointRT sourcePoint = runtimeManger.getDataPoint(vo.getActivePointId());
     // if (sourcePoint == null) {
     // raiseFailureEvent(new LocalizableMessage("event.setPoint.activePointMissing"));
     // return;
@@ -208,7 +208,7 @@ public class SnmpTrapHandlerRT /* extends EventHandlerRT */ {
     // @Override
     // public void eventInactive(EventInstance evt) {
     // // Validate that the target point is available.
-    // DataPointRT targetPoint = Common.ctx.getRuntimeManager().getDataPoint(vo.getTargetPointId());
+    // DataPointRT targetPoint = runtimeManger.getDataPoint(vo.getTargetPointId());
     // if (targetPoint == null) {
     // raiseFailureEvent(new LocalizableMessage("event.setPoint.targetPointMissing"));
     // return;
@@ -224,7 +224,7 @@ public class SnmpTrapHandlerRT /* extends EventHandlerRT */ {
     // Object value;
     // if (vo.getInactiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {
     // // Get the source data point.
-    // DataPointRT sourcePoint = Common.ctx.getRuntimeManager().getDataPoint(vo.getInactivePointId());
+    // DataPointRT sourcePoint = runtimeManger.getDataPoint(vo.getInactivePointId());
     // if (targetPoint == null) {
     // raiseFailureEvent(new LocalizableMessage("event.setPoint.inactivePointMissing"));
     // return;

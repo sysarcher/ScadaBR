@@ -40,7 +40,10 @@ import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.vo.DataPointVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * Data sources are things that produce data for consumption of this system.
@@ -58,6 +61,7 @@ import com.serotonin.mango.vo.DataPointVO;
  *
  * @author Matthew Lohbihler
  */
+@Configurable
 abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecycle, IDataPointLiveCycleListener {
 
     public static final String ATTR_UNRELIABLE_KEY = "UNRELIABLE";
@@ -96,6 +100,8 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
     private final boolean caching;
     private boolean cacheChanged;
     protected boolean enabledDataPointsChanged;
+    @Autowired
+    private DataSourceDao dataSourceDao;
 
     /**
      *
@@ -126,7 +132,7 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
      * using the setPersistentData method.
      */
     public Object getPersistentData() {
-        return DataSourceDao.getInstance().getPersistentData(vo.getId());
+        return dataSourceDao.getPersistentData(vo.getId());
     }
 
     /**
@@ -137,7 +143,7 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
      * failover purposes.
      */
     protected void setPersistentData(Object persistentData) {
-        DataSourceDao.getInstance().savePersistentData(vo.getId(), persistentData);
+        dataSourceDao.savePersistentData(vo.getId(), persistentData);
     }
 
     /*

@@ -42,9 +42,12 @@ import com.serotonin.mango.vo.report.ImageChartUtils;
 import com.serotonin.mango.vo.report.PointTimeSeriesCollection;
 import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Deprecated //TODO APL Use rest to fetch image
 public class ImageChartServlet extends BaseInfoServlet {
+    @Autowired
+    private DataPointDao dataPointDao;
 
     private static final long serialVersionUID = -1;
     private static final long CACHE_PURGE_INTERVAL = 1000 * 60 * 10; // 10 minutes
@@ -155,7 +158,7 @@ public class ImageChartServlet extends BaseInfoServlet {
                         data = pointValueFacade.getPointValuesBetween(from, to);
                     }
 
-                    DataPointVO dp = DataPointDao.getInstance().getDataPoint(dataPointId);
+                    DataPointVO dp = dataPointDao.getDataPoint(dataPointId);
                     if (dp == null || dp.getName() == null) {
                     } else if (dp.getDataType() == DataType.NUMERIC) {
                         TimeSeries ts = new TimeSeries(dp.getName(), null, null, Second.class);
