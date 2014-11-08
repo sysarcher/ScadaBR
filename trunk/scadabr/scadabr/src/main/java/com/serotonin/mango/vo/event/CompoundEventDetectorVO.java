@@ -34,23 +34,26 @@ import com.serotonin.mango.rt.event.compound.CompoundEventDetectorRT;
 import com.serotonin.mango.rt.event.compound.ConditionParseException;
 import com.serotonin.mango.rt.event.compound.LogicalOperator;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
+@Configurable
 public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDetectorVO>, JsonSerializable {
+    @Autowired
+    private DataPointDao dataPointDao;
 
     public static final String XID_PREFIX = "CED_";
 
@@ -88,7 +91,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
         validate(condition, response);
     }
 
-    public static void validate(String condition, DwrResponseI18n response) {
+    public void validate(String condition, DwrResponseI18n response) {
         try {
             User user = Common.getUser();
             Permissions.ensureDataSourcePermission(user);
@@ -97,7 +100,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
             List<String> keys = l.getDetectorKeys();
 
             // Get all of the point event detectors.
-            List<DataPointVO> dataPoints = DataPointDao.getInstance().getDataPoints(null, true);
+            List<DataPointVO> dataPoints = dataPointDao.getDataPoints(null, true);
 
             for (String key : keys) {
                 if (!key.startsWith(SimpleEventDetectorVO.POINT_EVENT_DETECTOR_PREFIX)) {

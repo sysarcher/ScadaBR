@@ -35,12 +35,15 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  *
  */
 @JsonRemoteEntity
+@Configurable
 public class PointFolder implements JsonSerializable {
 
     private int id = Common.NEW_ID;
@@ -51,6 +54,8 @@ public class PointFolder implements JsonSerializable {
     private List<PointFolder> subfolders = new ArrayList<>();
 
     private List<IntValuePair> points = new ArrayList<>();
+    @Autowired
+    private DataPointDao dataPointDao;
 
     public PointFolder() {
         // no op
@@ -158,7 +163,6 @@ public class PointFolder implements JsonSerializable {
     //
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        DataPointDao dataPointDao = DataPointDao.getInstance();
         List<String> pointList = new ArrayList<>();
         for (IntValuePair p : points) {
             DataPointVO dp = dataPointDao.getDataPoint(p.getKey());
@@ -174,7 +178,6 @@ public class PointFolder implements JsonSerializable {
         JsonArray jsonPoints = json.getJsonArray("points");
         if (jsonPoints != null) {
             points.clear();
-            DataPointDao dataPointDao = DataPointDao.getInstance();
 
             for (JsonValue jv : jsonPoints.getElements()) {
                 String xid = jv.toJsonString().getValue();

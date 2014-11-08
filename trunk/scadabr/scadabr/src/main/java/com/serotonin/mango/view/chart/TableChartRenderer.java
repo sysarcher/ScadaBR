@@ -25,12 +25,18 @@ import java.util.Map;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.vo.DataPointVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @JsonRemoteEntity
+@Configurable
 public class TableChartRenderer extends BaseChartRenderer {
+
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     @Override
     public ChartType getType() {
@@ -58,7 +64,7 @@ public class TableChartRenderer extends BaseChartRenderer {
 
     @Override
     public void addDataToModel(Map<String, Object> model, DataPointVO point) {
-        DataPointRT rt = Common.ctx.getRuntimeManager().getDataPoint(point.getId());
+        DataPointRT rt = runtimeManager.getDataPoint(point.getId());
         if (rt != null) {
             model.put("chartData", rt.getLatestPointValues(limit));
         }

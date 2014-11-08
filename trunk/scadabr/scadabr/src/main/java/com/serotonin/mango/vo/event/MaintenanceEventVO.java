@@ -29,9 +29,15 @@ import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.db.dao.DataPointDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @JsonRemoteEntity
+@Configurable
 public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>, JsonSerializable {
+    @Autowired
+    private DataSourceDao dataSourceDao;
 
     public static final String XID_PREFIX = "ME_";
 
@@ -525,7 +531,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
         String text = json.getString("dataSourceXid");
         if (text != null) {
-            DataSourceVO<?> ds = DataSourceDao.getInstance().getDataSource(text);
+            DataSourceVO<?> ds = dataSourceDao.getDataSource(text);
             if (ds == null) {
                 throw new LocalizableJsonException("emport.error.maintenanceEvent.invalid", "dataSourceXid", text);
             }

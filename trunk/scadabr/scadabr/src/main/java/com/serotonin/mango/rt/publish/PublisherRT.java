@@ -38,10 +38,13 @@ import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.timer.TimerTask;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 abstract public class PublisherRT<T extends PublishedPointVO> implements RunClient {
 
     public static final int POINT_DISABLED_EVENT = 1;
@@ -55,6 +58,8 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
     private final PublisherVO<T> vo;
     protected final List<PublishedPointRT<T>> pointRTs = new ArrayList<>();
     protected final PublishQueue<T> queue;
+    @Autowired
+    private RuntimeManager runtimeManager;
     private boolean pointDisabledEventActive;
     private volatile Thread jobThread;
     private SendThread sendThread;
@@ -249,7 +254,7 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
         jobThread = Thread.currentThread();
 
         try {
-            RuntimeManager rm = Common.ctx.getRuntimeManager();
+            RuntimeManager rm = runtimeManager;
             synchronized (this) {
                 for (PublishedPointRT<T> rt : pointRTs) {
                     if (rt.isPointEnabled()) {

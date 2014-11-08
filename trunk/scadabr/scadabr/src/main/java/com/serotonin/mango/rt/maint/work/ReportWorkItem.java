@@ -56,12 +56,16 @@ import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.web.email.EmailAttachment;
 import br.org.scadabr.web.email.EmailContent;
 import br.org.scadabr.web.email.EmailInline;
-import br.org.scadabr.l10n.Localizer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class ReportWorkItem implements WorkItem {
+    @Autowired
+    private DataPointDao dataPointDao;
 
     static final Log LOG = LogFactory.getLog(ReportWorkItem.class);
 
@@ -112,7 +116,6 @@ public class ReportWorkItem implements WorkItem {
         ResourceBundle bundle = Common.getBundle();
 
         // Create a list of DataPointVOs to which the user has permission.
-        DataPointDao dataPointDao = DataPointDao.getInstance();
         List<ReportDao.PointInfo> points = new ArrayList<>(reportConfig.getPoints().size());
         for (ReportPointVO reportPoint : reportConfig.getPoints()) {
             DataPointVO point = dataPointDao.getDataPoint(reportPoint.getPointId());

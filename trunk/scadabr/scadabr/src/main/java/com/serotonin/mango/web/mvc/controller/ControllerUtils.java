@@ -35,12 +35,16 @@ import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
  */
 @Deprecated // Use UserSessionContextBean
+
 public class ControllerUtils {
+    @Autowired
+    private DataPointDao dataPointDao;
 
     @Deprecated // Use UserSessionContextBean
     public static ResourceBundle getResourceBundle(HttpServletRequest request) {
@@ -56,8 +60,8 @@ public class ControllerUtils {
     }
 
     @Deprecated // Use UserSessionContextBean
-    public static void addPointListDataToModel(User user, int pointId, Map<String, Object> model) {
-        List<DataPointVO> allPoints = DataPointDao.getInstance().getDataPoints(DataPointExtendedNameComparator.instance, false);
+    public void addPointListDataToModel(User user, int pointId, Map<String, Object> model) {
+        List<DataPointVO> allPoints = dataPointDao.getDataPoints(DataPointExtendedNameComparator.instance, false);
         List<DataPointVO> userPoints = new LinkedList<>();
         int pointIndex = -1;
         for (DataPointVO dp : allPoints) {

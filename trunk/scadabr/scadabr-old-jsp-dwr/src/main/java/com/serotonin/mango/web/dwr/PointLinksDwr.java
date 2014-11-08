@@ -46,8 +46,10 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.db.dao.UserDao;
+import com.serotonin.mango.rt.RuntimeManager;
 import java.util.Date;
 import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Matthew Lohbihler
@@ -56,6 +58,8 @@ public class PointLinksDwr extends BaseDwr {
 
     @Inject
     private PointLinkDao pointLinkDao;
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     public Map<String, Object> init() {
         User user = Common.getUser();
@@ -135,7 +139,7 @@ public class PointLinksDwr extends BaseDwr {
 
         // Save it
         if (response.isEmpty()) {
-            Common.ctx.getRuntimeManager().savePointLink(vo);
+            runtimeManager.savePointLink(vo);
         }
 
         response.addData("plId", vo.getId());

@@ -49,7 +49,10 @@ import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.vo.IntervalLoggingTypes;
 import br.org.scadabr.vo.LoggingTypes;
 import java.util.Objects;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
+@Configurable
 public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
 
     private static final Log LOG = LogFactory.getLog(DataPointRT.class);
@@ -62,7 +65,8 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     // Runtime data.
     private volatile PointValueTime pointValue;
     private final PointValueCache valueCache;
-    private RuntimeManager rm;
+    @Autowired
+    private RuntimeManager runtimeManager;
     private List<PointEventDetectorRT> detectors;
     private final Map<String, Object> attributes = new HashMap<>();
 
@@ -469,7 +473,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     // /
     //
     private void fireEvents(PointValueTime oldValue, PointValueTime newValue, boolean set, boolean backdate) {
-        DataPointListener l = rm.getDataPointListeners(vo.getId());
+        DataPointListener l = runtimeManager.getDataPointListeners(vo.getId());
         if (l != null) {
             Common.ctx.getBackgroundProcessing().addWorkItem(
                     new EventNotifyWorkItem(l, oldValue, newValue, set, backdate));
@@ -525,8 +529,6 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     //
     @Override
     public void initialize() {
-        rm = Common.ctx.getRuntimeManager();
-
         // Get the latest value for the point from the database.
         pointValue = valueCache.getLatestPointValue();
 
@@ -543,8 +545,8 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
 
             PointEventDetectorRT pedRT = ped.createRuntime();
             detectors.add(pedRT);
-            rm.addPointEventDetector(pedRT);
-            rm.addDataPointListener(vo.getId(), pedRT);
+            runtimeManager.addPointEventDetector(pedRT);
+            runtimeManager.addDataPointListener(vo.getId(), pedRT);
         }
 
         initializeIntervalLogging();
@@ -556,8 +558,8 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
 
         if (detectors != null) {
             for (PointEventDetectorRT pedRT : detectors) {
-                rm.removeDataPointListener(vo.getId(), pedRT);
-                rm.removePointEventDetector(pedRT.getEventDetectorKey());
+                runtimeManager.removeDataPointListener(vo.getId(), pedRT);
+                runtimeManager.removePointEventDetector(pedRT.getEventDetectorKey());
             }
         }
         Common.ctx.getEventManager().cancelEventsForDataPoint(vo.getId());
@@ -569,7 +571,6 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     }
 
     public void initializeHistorical() {
-        rm = Common.ctx.getRuntimeManager();
         initializeIntervalLogging();
     }
 

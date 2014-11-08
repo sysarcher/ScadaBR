@@ -20,21 +20,26 @@ package com.serotonin.mango.rt.dataImage;
 
 import java.util.List;
 
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.PointValueDao;
+import com.serotonin.mango.rt.RuntimeManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class PointValueFacade {
 
     private final int dataPointId;
     private final DataPointRT point;
     private final PointValueDao pointValueDao;
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     public PointValueFacade(int dataPointId) {
         this.dataPointId = dataPointId;
-        point = Common.ctx.getRuntimeManager().getDataPoint(dataPointId);
+        point = runtimeManager.getDataPoint(dataPointId);
         pointValueDao = PointValueDao.getInstance();
     }
 

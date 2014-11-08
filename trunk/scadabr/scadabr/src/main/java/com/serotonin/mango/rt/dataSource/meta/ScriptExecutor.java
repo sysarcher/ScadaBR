@@ -46,10 +46,13 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import javax.script.Invocable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class ScriptExecutor {
 
     private static final String SCRIPT_PREFIX = "function __scriptExecutor__() {";
@@ -61,8 +64,11 @@ public class ScriptExecutor {
         SCRIPT_FUNCTION_PATH = path;
     }
 
+    @Autowired
+    private RuntimeManager runtimeManager;
+
     public Map<String, IDataPoint> convertContext(List<IntValuePair> context) throws DataPointStateException {
-        RuntimeManager rtm = Common.ctx.getRuntimeManager();
+        RuntimeManager rtm = runtimeManager;
 
         Map<String, IDataPoint> converted = new HashMap<>();
         for (IntValuePair contextEntry : context) {

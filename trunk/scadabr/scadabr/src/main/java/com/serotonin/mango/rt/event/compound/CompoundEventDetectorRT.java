@@ -27,26 +27,30 @@ import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.rt.event.EventDetectorListener;
 import com.serotonin.mango.rt.event.SimpleEventDetector;
 import com.serotonin.mango.rt.event.type.CompoundDetectorEventType;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
 import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.util.LifecycleException;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.SystemEventSource;
+import com.serotonin.mango.rt.RuntimeManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycle {
 
     private static final char[] TOKEN_OR = {'|', '|'};
     private static final char[] TOKEN_AND = {'&', '&'};
 
     private final CompoundEventDetectorVO vo;
+    @Autowired
+    private RuntimeManager runtimeManager;
     private CompoundDetectorEventType eventType;
     private LogicalOperator condition;
     private boolean currentState;
@@ -247,7 +251,7 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
 
     @Override
     public void eventDetectorTerminated(SimpleEventDetector source) {
-        Common.ctx.getRuntimeManager().stopCompoundEventDetector(vo.getId());
+        runtimeManager.stopCompoundEventDetector(vo.getId());
         raiseFailureEvent(new LocalizableMessageImpl("event.compound.sourceFailure", vo.getName()));
     }
 

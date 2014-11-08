@@ -23,9 +23,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
@@ -37,7 +35,6 @@ import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.timer.CronTimerPool;
 import br.org.scadabr.timer.cron.CronExpression;
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.ReportDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.EventManager;
@@ -52,18 +49,9 @@ import com.serotonin.mango.view.DynamicImage;
 import com.serotonin.mango.view.ImageSet;
 import com.serotonin.mango.view.ViewGraphic;
 import com.serotonin.mango.view.ViewGraphicLoader;
-import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.UserComment;
-import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.hierarchy.PointHierarchy;
-import com.serotonin.mango.vo.permission.Permissions;
-import com.serotonin.mango.vo.publish.PublisherVO;
 import com.serotonin.mango.vo.report.ReportTask;
 import com.serotonin.mango.vo.report.ReportVO;
 import com.serotonin.mango.web.ContextWrapper;
-import com.serotonin.mango.web.dwr.BaseDwr;
-import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.SystemEventSource;
 
 import freemarker.cache.FileTemplateLoader;
@@ -110,7 +98,6 @@ public class MangoContextListener implements ServletContextListener {
         Common.eventCronPool = new CronTimerPool(2, 5, 30, TimeUnit.SECONDS);
 
         // Create all the stuff we need.
-        constantsInitialize(ctx);
 //TODO        freemarkerInitialize(ctx);
 //TODO        imageSetInitialize(ctx);
         databaseAccessFactory.startDB();
@@ -151,9 +138,9 @@ public class MangoContextListener implements ServletContextListener {
         ContextWrapper ctx = new ContextWrapper(evt.getServletContext());
 
         // Stop everything.
-        runtimeManagerTerminate(ctx);
+        terminateRuntimeManager();
         Logger.getLogger(MangoContextListener.class.getName()).log(Level.INFO, "RuntimeManger terminated");
-        eventManagerTerminate(ctx);
+        terminateEventManager();
         Logger.getLogger(MangoContextListener.class.getName()).log(Level.INFO, "EventManager terminated");
         utilitiesTerminate(ctx);
         Logger.getLogger(MangoContextListener.class.getName()).log(Level.INFO, "utilitues terminated");
@@ -214,70 +201,6 @@ public class MangoContextListener implements ServletContextListener {
 
     //
     //
-    // Constants
-    //
-    @Deprecated // for old pages and dwr needed ...
-    private void constantsInitialize(ServletContext ctx) {
-        ctx.setAttribute("constants.Common.NEW_ID", Common.NEW_ID);
-
-        ctx.setAttribute("constants.Permissions.DataPointAccessTypes.NONE", Permissions.DataPointAccessTypes.NONE);
-        ctx.setAttribute("constants.Permissions.DataPointAccessTypes.READ", Permissions.DataPointAccessTypes.READ);
-        ctx.setAttribute("constants.Permissions.DataPointAccessTypes.SET", Permissions.DataPointAccessTypes.SET);
-        ctx.setAttribute("constants.Permissions.DataPointAccessTypes.DATA_SOURCE", Permissions.DataPointAccessTypes.DATA_SOURCE);
-        ctx.setAttribute("constants.Permissions.DataPointAccessTypes.ADMIN", Permissions.DataPointAccessTypes.ADMIN);
-
-        ctx.setAttribute("constants.PublisherVO.Types.HTTP_SENDER", PublisherVO.Type.HTTP_SENDER.getId());
-        ctx.setAttribute("constants.PublisherVO.Types.PACHUBE", PublisherVO.Type.PACHUBE.getId());
-        ctx.setAttribute("constants.PublisherVO.Types.PERSISTENT", PublisherVO.Type.PERSISTENT.getId());
-
-        ctx.setAttribute("constants.UserComment.TYPE_EVENT", UserComment.TYPE_EVENT);
-        ctx.setAttribute("constants.UserComment.TYPE_POINT", UserComment.TYPE_POINT);
-
-        String[] codes = {"common.access.read",
-            "common.access.set",
-            "common.alarmLevel.none",
-            "common.alarmLevel.info",
-            "common.alarmLevel.urgent",
-            "common.alarmLevel.critical",
-            "common.alarmLevel.lifeSafety",
-            "common.disabled",
-            "common.administrator",
-            "common.user",
-            "js.disabledSe",
-            "scheduledEvents.se",
-            "js.disabledCed",
-            "compoundDetectors.compoundEventDetector",
-            "common.disabledToggle",
-            "common.enabledToggle",
-            "common.maximize",
-            "common.minimize",
-            "js.help.loading",
-            "js.help.error",
-            "js.help.related",
-            "js.help.lastUpdated",
-            "common.sendTestEmail",
-            "js.email.noRecipients",
-            "js.email.addMailingList",
-            "js.email.addUser",
-            "js.email.addAddress",
-            "js.email.noRecipForEmail",
-            "js.email.testSent",
-            "events.silence",
-            "events.unsilence",
-            "js.disabledPointLink",
-            "pointLinks.pointLink",
-            "header.mute",
-            "header.unmute",};
-
-        Map<String, LocalizableMessage> messages = new HashMap<>();
-        for (String code : codes) {
-            messages.put(code, new LocalizableMessageImpl(code));
-        }
-        ctx.setAttribute("clientSideMessages", messages);
-    }
-
-    //
-    //
     // Utilities.
     //
     private void utilitiesInitialize(ServletContext ctx) {
@@ -311,7 +234,7 @@ public class MangoContextListener implements ServletContextListener {
         eventManager.initialize();
     }
 
-    private void eventManagerTerminate(ContextWrapper ctx) {
+    private void terminateEventManager() {
         if (eventManager != null) {
             eventManager.terminate();
             eventManager.joinTermination();
@@ -323,7 +246,6 @@ public class MangoContextListener implements ServletContextListener {
     // Runtime manager
     //
     private void runtimeManagerInitialize(ServletContext ctx) {
-        ctx.setAttribute(Common.ContextKeys.RUNTIME_MANAGER, runtimeManager);
 
         File safeFile = null;
         // Check for safe mode.
@@ -371,11 +293,10 @@ public class MangoContextListener implements ServletContextListener {
         }
     }
 
-    private void runtimeManagerTerminate(ContextWrapper ctx) {
-        RuntimeManager rtm = ctx.getRuntimeManager();
-        if (rtm != null) {
-            rtm.terminate();
-            rtm.joinTermination();
+    private void terminateRuntimeManager() {
+        if (runtimeManager != null) {
+            runtimeManager.terminate();
+            runtimeManager.joinTermination();
         }
     }
 

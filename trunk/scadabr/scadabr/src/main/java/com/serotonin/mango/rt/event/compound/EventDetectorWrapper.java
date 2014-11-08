@@ -21,18 +21,21 @@ package com.serotonin.mango.rt.event.compound;
 import java.util.List;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.SimpleEventDetector;
 import br.org.scadabr.utils.i18n.LocalizableException;
-import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.rt.RuntimeManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class EventDetectorWrapper extends LogicalOperator {
 
     private final String detectorKey;
+    @Autowired
+    private RuntimeManager runtimeManager;
     private SimpleEventDetector source;
 
     public EventDetectorWrapper(String detectorKey) {
@@ -54,7 +57,7 @@ public class EventDetectorWrapper extends LogicalOperator {
 
     @Override
     public void initialize() throws LocalizableException {
-        source = Common.ctx.getRuntimeManager().getSimpleEventDetector(detectorKey);
+        source = runtimeManager.getSimpleEventDetector(detectorKey);
         if (source == null) {
             throw new LocalizableException("compoundDetectors.initError.wrapper", detectorKey);
         }

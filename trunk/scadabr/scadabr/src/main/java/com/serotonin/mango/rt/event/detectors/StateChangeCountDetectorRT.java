@@ -70,7 +70,7 @@ public class StateChangeCountDetectorRT extends TimeoutDetectorRT {
         // // Get historical data for the point out of the database.
         // List<PointValueTime> data = new PointValueDao().getPointValues(dataPoint, then);
         //
-        // List<PointValueTime> history = Common.ctx.getRuntimeManager().getDataPoint(
+        // List<PointValueTime> history = runtimeManger.getDataPoint(
         // vo.njbGetDataPoint().getId()).getLatestPointValues(vo.getChangeCount());
         //
         // PointValueTime lastValue = null;

@@ -29,17 +29,21 @@ import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
-import br.org.scadabr.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  *
  */
 @JsonRemoteEntity
+@Configurable
 public class DataPointAccess implements JsonSerializable {
 
     public static final int READ = 1;
     public static final int SET = 2;
+    @Autowired
+    private DataPointDao dataPointDao;
 
     private static final ExportCodes ACCESS_CODES = new ExportCodes();
 
@@ -74,7 +78,7 @@ public class DataPointAccess implements JsonSerializable {
             throw new LocalizableJsonException("emport.error.permission.missing", "dataPointXid");
         }
 
-        DataPointVO dp = DataPointDao.getInstance().getDataPoint(text);
+        DataPointVO dp = dataPointDao.getDataPoint(text);
         if (dp == null) {
             throw new LocalizableJsonException("emport.error.missingPoint", text);
         }
@@ -92,7 +96,7 @@ public class DataPointAccess implements JsonSerializable {
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        map.put("dataPointXid", DataPointDao.getInstance().getDataPoint(dataPointId).getXid());
+        map.put("dataPointXid", dataPointDao.getDataPoint(dataPointId).getXid());
         map.put("permission", ACCESS_CODES.getCode(permission));
     }
 }

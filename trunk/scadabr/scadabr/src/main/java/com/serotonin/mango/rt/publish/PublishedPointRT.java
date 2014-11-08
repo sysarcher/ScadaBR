@@ -18,47 +18,56 @@
  */
 package com.serotonin.mango.rt.publish;
 
-import com.serotonin.mango.Common;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointListener;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class PublishedPointRT<T extends PublishedPointVO> implements DataPointListener {
 
     private final T vo;
     private final PublisherRT<T> parent;
+    @Autowired
+    private RuntimeManager runtimeManager;
     private boolean pointEnabled;
 
     public PublishedPointRT(T vo, PublisherRT<T> parent) {
         this.vo = vo;
         this.parent = parent;
-        Common.ctx.getRuntimeManager().addDataPointListener(vo.getDataPointId(), this);
-        pointEnabled = Common.ctx.getRuntimeManager().isDataPointRunning(vo.getDataPointId());
+        runtimeManager.addDataPointListener(vo.getDataPointId(), this);
+        pointEnabled = runtimeManager.isDataPointRunning(vo.getDataPointId());
     }
 
     public void terminate() {
-        Common.ctx.getRuntimeManager().removeDataPointListener(vo.getDataPointId(), this);
+        runtimeManager.removeDataPointListener(vo.getDataPointId(), this);
     }
 
+    @Override
     public void pointChanged(PointValueTime oldValue, PointValueTime newValue) {
         if (parent.getVo().isChangesOnly()) {
             parent.publish(vo, newValue);
         }
     }
 
+    @Override
     public void pointSet(PointValueTime oldValue, PointValueTime newValue) {
         // no op. Everything gets handled in the other methods.
     }
 
+    @Override
     public void pointUpdated(PointValueTime newValue) {
         if (!parent.getVo().isChangesOnly()) {
             parent.publish(vo, newValue);
         }
     }
 
+    @Override
     public void pointBackdated(PointValueTime value) {
         // no op
     }
@@ -67,11 +76,13 @@ public class PublishedPointRT<T extends PublishedPointVO> implements DataPointLi
         return pointEnabled;
     }
 
+    @Override
     public void pointInitialized() {
         pointEnabled = true;
         parent.pointInitialized(this);
     }
 
+    @Override
     public void pointTerminated() {
         pointEnabled = false;
         parent.pointTerminated(this);

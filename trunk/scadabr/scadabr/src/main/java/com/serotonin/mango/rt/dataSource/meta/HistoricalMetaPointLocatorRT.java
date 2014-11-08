@@ -12,10 +12,13 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
 import br.org.scadabr.timer.SimulationTimer;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class HistoricalMetaPointLocatorRT extends MetaPointLocatorRT {
 
     private long updates;
+    @Autowired
+    private DataPointDao dataPointDao;
 
     public HistoricalMetaPointLocatorRT(MetaPointLocatorVO vo) {
         super(vo);
@@ -28,7 +31,6 @@ public class HistoricalMetaPointLocatorRT extends MetaPointLocatorRT {
         initializeTimerTask();
 
         context = new HashMap<>();
-        DataPointDao dataPointDao = DataPointDao.getInstance();
         PointValueDao pointValueDao = PointValueDao.getInstance();
         for (IntValuePair contextEntry : vo.getContext()) {
             DataPointVO cvo = dataPointDao.getDataPoint(contextEntry.getKey());

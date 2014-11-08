@@ -29,7 +29,6 @@ import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.rt.EventManager;
-import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverMulticaster;
 import com.serotonin.mango.rt.maint.BackgroundProcessing;
 import com.serotonin.mango.util.DocumentationManifest;
@@ -110,12 +109,6 @@ public class ContextWrapper {
             }
         }
         return null;
-    }
-
-    @Deprecated // use Bean
-    public RuntimeManager getRuntimeManager() {
-        return (RuntimeManager) ctx
-                .getAttribute(Common.ContextKeys.RUNTIME_MANAGER);
     }
 
     @Deprecated // use Bean

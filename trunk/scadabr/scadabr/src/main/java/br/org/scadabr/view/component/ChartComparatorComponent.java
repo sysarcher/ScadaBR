@@ -16,9 +16,14 @@ import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.component.HtmlComponent;
 import com.serotonin.mango.vo.DataPointVO;
 import br.org.scadabr.util.SerializationHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @JsonRemoteEntity
+@Configurable
 public class ChartComparatorComponent extends HtmlComponent {
+    @Autowired
+    private DataPointDao dataPointDao;
 
     public static ImplDefinition DEFINITION = new ImplDefinition(
             "chartComparator", "CHART_COMPARATOR", "graphic.chartComparator",
@@ -82,7 +87,7 @@ public class ChartComparatorComponent extends HtmlComponent {
     }
 
     private String createDataPointsSelectComponent(String idPrefix) {
-        List<DataPointVO> dataPoints = DataPointDao.getInstance().getDataPoints(null,
+        List<DataPointVO> dataPoints = dataPointDao.getDataPoints(null,
                 false);
 
         StringBuilder sb = new StringBuilder();

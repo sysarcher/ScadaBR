@@ -37,10 +37,16 @@ import com.serotonin.mango.vo.event.EventHandlerVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.SystemEventSource;
+import com.serotonin.mango.rt.RuntimeManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
+@Configurable
 public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource {
 
     private static final Log LOG = LogFactory.getLog(SetPointHandlerRT.class);
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     public SetPointHandlerRT(EventHandlerVO vo) {
         this.vo = vo;
@@ -53,7 +59,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
         }
 
         // Validate that the target point is available.
-        DataPointRT targetPoint = Common.ctx.getRuntimeManager().getDataPoint(vo.getTargetPointId());
+        DataPointRT targetPoint = runtimeManager.getDataPoint(vo.getTargetPointId());
         if (targetPoint == null) {
             raiseFailureEvent(new LocalizableMessageImpl("event.setPoint.targetPointMissing"), evt.getEventType());
             return;
@@ -69,7 +75,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
         MangoValue value;
         if (vo.getActiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {
             // Get the source data point.
-            DataPointRT sourcePoint = Common.ctx.getRuntimeManager().getDataPoint(vo.getActivePointId());
+            DataPointRT sourcePoint = runtimeManager.getDataPoint(vo.getActivePointId());
             if (sourcePoint == null) {
                 raiseFailureEvent(new LocalizableMessageImpl("event.setPoint.activePointMissing"), evt.getEventType());
                 return;
@@ -105,7 +111,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
         }
 
         // Validate that the target point is available.
-        DataPointRT targetPoint = Common.ctx.getRuntimeManager().getDataPoint(vo.getTargetPointId());
+        DataPointRT targetPoint = runtimeManager.getDataPoint(vo.getTargetPointId());
         if (targetPoint == null) {
             raiseFailureEvent(new LocalizableMessageImpl("event.setPoint.targetPointMissing"), evt.getEventType());
             return;
@@ -121,7 +127,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
         MangoValue value;
         if (vo.getInactiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {
             // Get the source data point.
-            DataPointRT sourcePoint = Common.ctx.getRuntimeManager().getDataPoint(vo.getInactivePointId());
+            DataPointRT sourcePoint = runtimeManager.getDataPoint(vo.getInactivePointId());
             if (sourcePoint == null) {
                 raiseFailureEvent(new LocalizableMessageImpl("event.setPoint.inactivePointMissing"), evt.getEventType());
                 return;

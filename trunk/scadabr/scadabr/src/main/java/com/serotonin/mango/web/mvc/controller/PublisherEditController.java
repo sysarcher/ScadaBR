@@ -36,17 +36,24 @@ import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.db.dao.PublisherDao;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import com.serotonin.mango.web.dwr.beans.EventInstanceBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class PublisherEditController extends ParameterizableViewController {
+
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
@@ -69,7 +76,7 @@ public class PublisherEditController extends ParameterizableViewController {
             // An existing configuration.
             int id = Integer.parseInt(idStr);
 
-            publisherVO = Common.ctx.getRuntimeManager().getPublisher(id);
+            publisherVO = runtimeManager.getPublisher(id);
             if (publisherVO == null) {
                 throw new ShouldNeverHappenException("Publisher not found with id " + id);
             }

@@ -50,8 +50,11 @@ import com.serotonin.mango.web.dwr.beans.DataExportDefinition;
 import com.serotonin.mango.web.dwr.beans.TestingUtility;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import java.io.Serializable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @JsonRemoteEntity
+@Configurable //TODO this is not Working, so manually insert Runtimemanager for JSON
 public class User implements Serializable, SetPointSource, JsonSerializable {
 
     private int id = Common.NEW_ID;
@@ -76,6 +79,10 @@ public class User implements Serializable, SetPointSource, JsonSerializable {
     private AlarmLevel receiveAlarmEmails;
     @JsonRemoteProperty
     private boolean receiveOwnAuditEvents;
+    @Autowired
+    private DataPointDao dataPointDao;
+    @Autowired
+    private DataSourceDao dataSourceDao;
 
     //
     // Session data. The user object is stored in session, and some other
@@ -398,7 +405,6 @@ public class User implements Serializable, SetPointSource, JsonSerializable {
                     .getJsonArray("dataSourcePermissions");
             if (jsonDataSources != null) {
                 dataSourcePermissions.clear();
-                DataSourceDao dataSourceDao = DataSourceDao.getInstance();
 
                 for (JsonValue jv : jsonDataSources.getElements()) {
                     String xid = jv.toJsonString().getValue();
@@ -415,7 +421,6 @@ public class User implements Serializable, SetPointSource, JsonSerializable {
             if (jsonPoints != null) {
                 // Get a list of points to which permission already exists due
                 // to data source access.
-                DataPointDao dataPointDao = DataPointDao.getInstance();
                 List<Integer> permittedPoints = new ArrayList<>();
                 for (Integer dsId : dataSourcePermissions) {
                     for (DataPointVO dp : dataPointDao
@@ -442,7 +447,6 @@ public class User implements Serializable, SetPointSource, JsonSerializable {
     public void jsonSerialize(Map<String, Object> map) {
         if (!admin) {
             List<String> dsXids = new ArrayList<>();
-            DataSourceDao dataSourceDao = DataSourceDao.getInstance();
             for (Integer dsId : dataSourcePermissions) {
                 dsXids.add(dataSourceDao.getDataSource(dsId).getXid());
             }

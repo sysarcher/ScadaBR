@@ -57,13 +57,20 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.SystemEventSource;
 import java.text.ParseException;
 import java.util.TimeZone;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  *
  */
 @Deprecated
+@Configurable
 public class VersionCheck extends SystemCronTask {
+    @Autowired
+    private DataPointDao dataPointDao;
+    @Autowired
+    private DataSourceDao dataSourceDao;
 
     private static final String INSTANCE_ID_FILE = "/WEB-INF/instance.txt";
 
@@ -114,7 +121,7 @@ public class VersionCheck extends SystemCronTask {
         }
     }
 
-    public static LocalizableMessage newVersionCheck(String notifLevel) throws Exception {
+    public LocalizableMessage newVersionCheck(String notifLevel) throws Exception {
         return newVersionCheck(System.currentTimeMillis(), notifLevel);
     }
 
@@ -123,7 +130,7 @@ public class VersionCheck extends SystemCronTask {
                 DuplicateHandling.IGNORE_SAME_MESSAGE);
     }
 
-    private static LocalizableMessage newVersionCheck(long fireTime, String notifLevel) throws Exception {
+    private LocalizableMessage newVersionCheck(long fireTime, String notifLevel) throws Exception {
         String result = newVersionCheckImpl(notifLevel);
         if (result == null) {
             // If the version matches, clear any outstanding event.
@@ -137,7 +144,7 @@ public class VersionCheck extends SystemCronTask {
         return message;
     }
 
-    private static String newVersionCheckImpl(String notifLevel) throws Exception {
+    private String newVersionCheckImpl(String notifLevel) throws Exception {
         HttpClient httpClient = Common.getHttpClient();
 
         PostMethod postMethod = new PostMethod(Common.getGroveUrl(Common.GroveServlets.VERSION_CHECK));
@@ -153,8 +160,7 @@ public class VersionCheck extends SystemCronTask {
         postMethod.addParameter("instanceVersion", Common.getVersion());
 
         StringBuilder datasourceTypes = new StringBuilder();
-        DataPointDao dataPointDao = DataPointDao.getInstance();
-        for (DataSourceVO<?> config : DataSourceDao.getInstance().getDataSources()) {
+        for (DataSourceVO<?> config : dataSourceDao.getDataSources()) {
             if (config.isEnabled()) {
                 int points = 0;
                 for (DataPointVO point : dataPointDao.getDataPoints(config.getId(), null)) {

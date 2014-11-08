@@ -55,12 +55,18 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.datasource.meta.UpdateEvent;
 import java.text.ParseException;
 import java.util.EnumSet;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
+@Configurable
 public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+
+    @Autowired
+    private DataPointDao dataPointDao;
 
     private List<IntValuePair> context = new ArrayList<>();
     @JsonRemoteProperty
@@ -230,7 +236,6 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     }
 
     private String contextToString() {
-        DataPointDao dataPointDao = DataPointDao.getInstance();
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (IntValuePair ivp : context) {
@@ -324,7 +329,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         String text = json.getString("updateEvent");
         if (text != null) {
             try {
-            updateEvent = UpdateEvent.valueOf(text);
+                updateEvent = UpdateEvent.valueOf(text);
             } catch (Exception e) {
                 throw new LocalizableJsonException("emport.error.invalid", "updateEvent", text,
                         UpdateEvent.values());
@@ -334,7 +339,6 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         JsonArray jsonContext = json.getJsonArray("context");
         if (jsonContext != null) {
             context.clear();
-            DataPointDao dataPointDao = DataPointDao.getInstance();
 
             for (JsonValue jv : jsonContext.getElements()) {
                 JsonObject jo = jv.toJsonObject();
@@ -364,7 +368,6 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
         map.put("updateEvent", updateEvent.name());
 
-        DataPointDao dataPointDao = DataPointDao.getInstance();
         List<Map<String, Object>> pointList = new ArrayList<>();
         for (IntValuePair p : context) {
             DataPointVO dp = dataPointDao.getDataPoint(p.getKey());

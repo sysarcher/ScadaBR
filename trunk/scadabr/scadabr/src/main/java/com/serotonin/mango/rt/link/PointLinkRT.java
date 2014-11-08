@@ -33,22 +33,27 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.meta.ResultTypeException;
 import com.serotonin.mango.rt.dataSource.meta.ScriptExecutor;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.work.SetPointWorkItem;
 import com.serotonin.mango.vo.link.PointLinkVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.SystemEventSource;
+import com.serotonin.mango.rt.RuntimeManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class PointLinkRT implements DataPointListener, SetPointSource {
 
     public static final String CONTEXT_VAR_NAME = "source";
     private final PointLinkVO vo;
     private final SystemEventType eventType;
+    @Autowired
+    private RuntimeManager runtimeManager;
 
     public PointLinkRT(PointLinkVO vo) {
         this.vo = vo;
@@ -57,12 +62,12 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
     }
 
     public void initialize() {
-        Common.ctx.getRuntimeManager().addDataPointListener(vo.getSourcePointId(), this);
+        runtimeManager.addDataPointListener(vo.getSourcePointId(), this);
         checkSource();
     }
 
     public void terminate() {
-        Common.ctx.getRuntimeManager().removeDataPointListener(vo.getSourcePointId(), this);
+        runtimeManager.removeDataPointListener(vo.getSourcePointId(), this);
         returnToNormal();
     }
 
@@ -71,7 +76,7 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
     }
 
     private void checkSource() {
-        DataPointRT source = Common.ctx.getRuntimeManager().getDataPoint(vo.getSourcePointId());
+        DataPointRT source = runtimeManager.getDataPoint(vo.getSourcePointId());
         if (source == null) // The source has been terminated, was never enabled, or not longer exists.
         {
             raiseFailureEvent(new LocalizableMessageImpl("event.pointLink.sourceUnavailable"));
@@ -95,7 +100,7 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
 
     private void execute(PointValueTime newValue) {
         // Propagate the update to the target point. Validate that the target point is available.
-        DataPointRT targetPoint = Common.ctx.getRuntimeManager().getDataPoint(vo.getTargetPointId());
+        DataPointRT targetPoint = runtimeManager.getDataPoint(vo.getTargetPointId());
         if (targetPoint == null) {
             raiseFailureEvent(newValue.getTime(), new LocalizableMessageImpl("event.pointLink.targetUnavailable"));
             return;
@@ -111,7 +116,7 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
         if (!vo.getScript().isEmpty()) {
             ScriptExecutor scriptExecutor = new ScriptExecutor();
             Map<String, IDataPoint> context = new HashMap<>();
-            DataPointRT source = Common.ctx.getRuntimeManager().getDataPoint(vo.getSourcePointId());
+            DataPointRT source = runtimeManager.getDataPoint(vo.getSourcePointId());
             context.put(CONTEXT_VAR_NAME, source);
 
             try {

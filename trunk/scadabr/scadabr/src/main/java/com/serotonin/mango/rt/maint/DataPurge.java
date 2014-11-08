@@ -40,13 +40,20 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
+@Configurable
 public class DataPurge {
 
     private final static  Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_CORE);
+    @Autowired
+    private RuntimeManager runtimeManager;
+    @Autowired
+    private DataPointDao dataPointDao;
     private long runtime;
 
-    private final RuntimeManager rm = Common.ctx.getRuntimeManager();
+    private final RuntimeManager rm = runtimeManager;
 
     synchronized public void execute(long runtime) {
         this.runtime = runtime;
@@ -57,7 +64,6 @@ public class DataPurge {
         LOG.info("Data purge started");
 
         // Get the data point information.
-        DataPointDao dataPointDao = DataPointDao.getInstance();
         List<DataPointVO> dataPoints = dataPointDao.getDataPoints(null, false);
         int deleteCount = 0;
         for (DataPointVO dataPoint : dataPoints) {

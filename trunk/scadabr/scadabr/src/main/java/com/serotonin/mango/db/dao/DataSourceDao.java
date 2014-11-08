@@ -34,20 +34,18 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.l10n.Localizer;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.type.AuditEventSource;
 import java.sql.Connection;
 import java.sql.Statement;
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -60,25 +58,18 @@ public class DataSourceDao extends BaseDao {
 
     private static final String DATA_SOURCE_SELECT = "select id, xid, name, data from dataSources ";
 
+    @Inject
+    private DataPointDao dataPointDao;
+
     public DataSourceDao() {
         super();
     }
-    
-   @Deprecated
-    private DataSourceDao(DataSource dataSource) {
-        super(dataSource);
-    }
 
-   @Deprecated
-     public static DataSourceDao getInstance() {
-        return new DataSourceDao(Common.ctx.getDatabaseAccess().getDataSource());
-    }
-    
     public List<DataSourceVO<?>> getDataSources() {
         List<DataSourceVO<?>> dss = ejt.query(DATA_SOURCE_SELECT + " order by name asc", new DataSourceRowMapper());
         return dss;
     }
-    
+
     public DataSourceVO<?> getDataSource(int id) {
         try {
             return ejt.queryForObject(DATA_SOURCE_SELECT + " where id=?", new DataSourceRowMapper(), id);
@@ -163,11 +154,11 @@ public class DataSourceDao extends BaseDao {
         });
         //if datasource's name has changed, update datapoints 
         if (!vo.getName().equals(old.getName())) {
-            List<DataPointVO> dpList = DataPointDao.getInstance().getDataPoints(vo.getId(), null);
+            List<DataPointVO> dpList = dataPointDao.getDataPoints(vo.getId(), null);
             for (DataPointVO dp : dpList) {
                 dp.setDataSourceName(vo.getName());
                 dp.setDeviceName(vo.getName());
-                DataPointDao.getInstance().updateDataPoint(dp);
+                dataPointDao.updateDataPoint(dp);
             }
 
         }
@@ -179,7 +170,7 @@ public class DataSourceDao extends BaseDao {
         DataSourceVO<?> vo = getDataSource(dataSourceId);
         final JdbcTemplate ejt2 = ejt;
 
-        DataPointDao.getInstance().deleteDataPoints(dataSourceId);
+        dataPointDao.deleteDataPoints(dataSourceId);
 
         if (vo != null) {
             getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
@@ -218,7 +209,6 @@ public class DataSourceDao extends BaseDao {
         return getTransactionTemplate().execute(new TransactionCallback<Integer>() {
             @Override
             public Integer doInTransaction(TransactionStatus status) {
-                DataPointDao dataPointDao = DataPointDao.getInstance();
 
                 DataSourceVO<?> dataSource = getDataSource(dataSourceId);
 
