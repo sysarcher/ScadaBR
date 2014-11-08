@@ -64,6 +64,8 @@ public class EventManager implements ILifecycle, Serializable {
 
     private final List<EventInstance> activeEvents = new CopyOnWriteArrayList<>();
     @Inject
+    private RuntimeManager runtimeManager;
+    @Inject
     private EventDao eventDao;
     @Inject
     private UserDao userDao;
@@ -451,12 +453,12 @@ public class EventManager implements ILifecycle, Serializable {
     private boolean isSuppressed(EventType eventType) {
         if (eventType instanceof DataSourceEventType) // Data source events can be suppressed by maintenance events.
         {
-            return Common.ctx.getRuntimeManager().isActiveMaintenanceEvent(eventType.getDataSourceId());
+            return runtimeManager.isActiveMaintenanceEvent(eventType.getDataSourceId());
         }
 
         if (eventType instanceof DataPointEventType) // Data point events can be suppressed by maintenance events on their data sources.
         {
-            return Common.ctx.getRuntimeManager().isActiveMaintenanceEvent(eventType.getDataSourceId());
+            return runtimeManager.isActiveMaintenanceEvent(eventType.getDataSourceId());
         }
 
         return false;
