@@ -11,11 +11,11 @@ public enum AlarmLevel implements LocalizableEnum<AlarmLevel> {
     CRITICAL(3, "common.alarmLevel.critical"),
     LIFE_SAFETY(4, "common.alarmLevel.lifeSafety");
     private final String i18nKey;
-    public final int mangoDbId;
-    
-    private AlarmLevel(int mangoDbId, String i18nKey) {
+    private final int id;
+
+    private AlarmLevel(int id, String i18nKey) {
         this.i18nKey = i18nKey;
-        this.mangoDbId = mangoDbId;
+        this.id = id;
     }
 
     @Deprecated //For JSON Export ...
@@ -38,8 +38,12 @@ public enum AlarmLevel implements LocalizableEnum<AlarmLevel> {
         return i18nKey;
     }
 
-    public static AlarmLevel fromMangoDbId(int ordinal) {
-        switch (ordinal) {
+    public int getId() {
+        return id;
+    }
+
+    public static AlarmLevel fromId(int id) {
+        switch (id) {
             case 0:
                 return NONE;
             case 1:

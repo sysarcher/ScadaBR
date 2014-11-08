@@ -93,7 +93,7 @@ abstract public class TimePeriodChartRenderer extends BaseChartRenderer {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(timePeriod.mangoDbId);
+        out.writeInt(timePeriod.getId());
         out.writeInt(numberOfPeriods);
     }
 
@@ -102,7 +102,7 @@ abstract public class TimePeriodChartRenderer extends BaseChartRenderer {
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            timePeriod = timePeriod.fromMangoDbId(in.readInt());
+            timePeriod = timePeriod.fromId(in.readInt());
             numberOfPeriods = in.readInt();
         }
     }

@@ -28,6 +28,7 @@ import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.DataPointDao;
+import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -41,14 +42,31 @@ public class DataPointEventType extends EventType {
     private int dataPointId;
     private int pointEventDetectorId;
     private DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
-
+    private AlarmLevel alarmLevel;
+    
     public DataPointEventType() {
         // Required for reflection.
     }
 
+    @Deprecated
     public DataPointEventType(int dataPointId, int pointEventDetectorId) {
         this.dataPointId = dataPointId;
         this.pointEventDetectorId = pointEventDetectorId;
+/*
+        this.alarmLevel = vo.getAlarmLevel();
+        if (!vo.isRtnApplicable()) {
+            duplicateHandling = DuplicateHandling.ALLOW;
+        }
+        */
+    }
+
+    public DataPointEventType(PointEventDetectorVO vo) {
+        this.dataPointId = vo.njbGetDataPoint().getId();
+        this.pointEventDetectorId = vo.getId();
+        this.alarmLevel = vo.getAlarmLevel();
+        if (!vo.isRtnApplicable()) {
+            duplicateHandling = DuplicateHandling.ALLOW;
+        }
     }
 
     @Override
@@ -139,7 +157,7 @@ public class DataPointEventType extends EventType {
 
     @Override
     public AlarmLevel getAlarmLevel() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return alarmLevel;
     }
 
 }

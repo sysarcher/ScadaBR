@@ -122,7 +122,7 @@ public class EventDao extends BaseDao {
                 switch (type.getEventSource()) {
                     case AUDIT: {
                         final AuditEventType et = (AuditEventType) type;
-                        ps.setInt(2, et.getAuditEventType().mangoDbId);
+                        ps.setInt(2, et.getAuditEventType().getId());
                         ps.setInt(3, et.getReferenceId());
                     }
                     break;
@@ -163,12 +163,12 @@ public class EventDao extends BaseDao {
                 ps.setString(5, boolToChar(event.isRtnApplicable()));
                 if (!event.isActive()) {
                     ps.setLong(6, event.getRtnTimestamp());
-                    ps.setInt(7, event.getRtnCause());
+                    ps.setInt(7, event.getRtnCause().getId());
                 } else {
                     ps.setNull(6, Types.BIGINT);
                     ps.setNull(7, Types.INTEGER);
                 }
-                ps.setInt(8, event.getAlarmLevel().mangoDbId);
+                ps.setInt(8, event.getAlarmLevel().getId());
                 ps.setString(9, I18NUtils.serialize(event.getMessage()));
                 if (!event.isAlarm()) {
                     event.setAcknowledgedTimestamp(event.getActiveTimestamp());
@@ -381,11 +381,11 @@ public class EventDao extends BaseDao {
             }
 
             EventInstance event = new EventInstance(type, rs.getLong(5),
-                    charToBool(rs.getString(6)), AlarmLevel.fromMangoDbId(rs.getInt(9)), message, null);
+                    charToBool(rs.getString(6)), AlarmLevel.fromId(rs.getInt(9)), message, null);
             event.setId(rs.getInt(1));
             long rtnTs = rs.getLong(7);
             if (!rs.wasNull()) {
-                event.returnToNormal(rtnTs, rs.getInt(8));
+                event.returnToNormal(rtnTs, EventInstance.RtnCauses.fromId(rs.getInt(8)));
             }
             long ackTs = rs.getLong(11);
             if (!rs.wasNull()) {
@@ -431,7 +431,7 @@ public class EventDao extends BaseDao {
             case PUBLISHER:
                 return new PublisherEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
             case AUDIT:
-                return new AuditEventType(AuditEventSource.fromMangoDbId(rs.getInt(offset + 1)), rs.getInt(offset + 2));
+                return new AuditEventType(AuditEventSource.fromId(rs.getInt(offset + 1)), rs.getInt(offset + 2));
             case MAINTENANCE:
                 return new MaintenanceEventType(rs.getInt(offset + 1));
             default:
@@ -682,7 +682,7 @@ public class EventDao extends BaseDao {
         switch (type.getEventSource()) {
             case AUDIT: {
                 final AuditEventType et = (AuditEventType) type;
-                return getEventHandlers(et.getEventSource(), et.getAuditEventType().mangoDbId, et.getReferenceId());
+                return getEventHandlers(et.getEventSource(), et.getAuditEventType().getId(), et.getReferenceId());
             }
             case DATA_POINT: {
                 final DataPointEventType et = (DataPointEventType) type;
@@ -773,7 +773,7 @@ public class EventDao extends BaseDao {
         switch (type.getEventSource()) {
             case AUDIT: {
                 final AuditEventType et = (AuditEventType) type;
-                return saveEventHandler(et.getEventSource(), et.getAuditEventType().mangoDbId, et.getReferenceId(), handler);
+                return saveEventHandler(et.getEventSource(), et.getAuditEventType().getId(), et.getReferenceId(), handler);
             }
             case DATA_POINT: {
                 final DataPointEventType et = (DataPointEventType) type;

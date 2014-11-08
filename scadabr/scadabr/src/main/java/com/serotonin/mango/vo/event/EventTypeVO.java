@@ -99,7 +99,7 @@ public class EventTypeVO {
             case PUBLISHER:
                 return new PublisherEventType(typeRef1, typeRef2);
             case AUDIT:
-                return new AuditEventType(AuditEventSource.fromMangoDbId(typeRef1), typeRef2);
+                return new AuditEventType(AuditEventSource.fromId(typeRef1), typeRef2);
             case MAINTENANCE:
                 return new MaintenanceEventType(typeRef1);
             default:

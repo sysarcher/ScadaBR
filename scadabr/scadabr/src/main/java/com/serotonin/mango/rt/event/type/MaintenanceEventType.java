@@ -9,17 +9,26 @@ import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.MaintenanceEventDao;
+import com.serotonin.mango.vo.event.MaintenanceEventVO;
 
 public class MaintenanceEventType extends EventType {
 
     private int maintenanceId;
+    private AlarmLevel alarmLevel;
 
     public MaintenanceEventType() {
         // Required for reflection.
     }
 
+    @Deprecated
     public MaintenanceEventType(int maintenanceId) {
         this.maintenanceId = maintenanceId;
+//        this.alarmLevel = vo.getAlarmLevel();
+    }
+
+    public MaintenanceEventType(MaintenanceEventVO vo) {
+        this.maintenanceId = vo.getId();
+        this.alarmLevel = vo.getAlarmLevel();
     }
 
     @Override
@@ -93,7 +102,7 @@ public class MaintenanceEventType extends EventType {
 
     @Override
     public AlarmLevel getAlarmLevel() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return alarmLevel;
     }
 
 }

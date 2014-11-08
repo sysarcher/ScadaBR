@@ -28,6 +28,7 @@ import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.ScheduledEventDao;
+import com.serotonin.mango.vo.event.ScheduledEventVO;
 
 /**
  * @author Matthew Lohbihler
@@ -38,13 +39,29 @@ public class ScheduledEventType extends EventType {
 
     private int scheduleId;
     private DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
+    private AlarmLevel alarmLevel;
 
     public ScheduledEventType() {
         // Required for reflection.
     }
 
+    @Deprecated
     public ScheduledEventType(int scheduleId) {
         this.scheduleId = scheduleId;
+        /*
+         this.alarmLevel = vo.getAlarmLevel();
+         if (!vo.isReturnToNormal()) {
+         duplicateHandling = DuplicateHandling.ALLOW;
+         }
+         */
+    }
+
+    public ScheduledEventType(ScheduledEventVO vo) {
+        this.scheduleId = vo.getId();
+        this.alarmLevel = vo.getAlarmLevel();
+        if (!vo.isReturnToNormal()) {
+            duplicateHandling = DuplicateHandling.ALLOW;
+        }
     }
 
     @Override
@@ -124,7 +141,7 @@ public class ScheduledEventType extends EventType {
 
     @Override
     public AlarmLevel getAlarmLevel() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return alarmLevel;
     }
 
 }

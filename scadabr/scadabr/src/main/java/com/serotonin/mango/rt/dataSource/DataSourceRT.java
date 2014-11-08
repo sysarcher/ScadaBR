@@ -28,7 +28,6 @@ import java.util.Map;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.rt.IDataPointLiveCycleListener;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -40,7 +39,7 @@ import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import com.serotonin.mango.db.dao.DataPointDao;
+import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.vo.DataPointVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -102,6 +101,8 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
     protected boolean enabledDataPointsChanged;
     @Autowired
     private DataSourceDao dataSourceDao;
+    @Autowired
+    private EventManager eventManager;
 
     /**
      *
@@ -228,19 +229,50 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
         // No op by default. Override as required.
     }
 
-    protected void raiseEvent(int eventId, long time, boolean rtn, LocalizableMessage message) {
-        message = new LocalizableMessageImpl("event.ds", vo.getName(), message);
-        DataSourceEventType type = getEventType(eventId);
-
-        Map<String, Object> context = new HashMap<>();
+    protected void raiseAlarm(int eventId, LocalizableMessage message) {
+        final DataSourceEventType type = getEventType(eventId);
+        final Map<String, Object> context = new HashMap<>();
         context.put("dataSource", vo);
 
-        Common.ctx.getEventManager().raiseEvent(type, time, rtn, type.getAlarmLevel(), message, context);
+        type.raiseAlarm(context, "event.ds", vo.getName(), message);
+    }
+    
+    protected void raiseAlarm(int eventId, String i18nKey, Object ... i18nArgs) {
+        raiseAlarm(eventId, new LocalizableMessageImpl(i18nKey, i18nArgs));
+    }
+    
+    protected void raiseAlarm(int eventId, long timestamp, LocalizableMessage message) {
+        final DataSourceEventType type = getEventType(eventId);
+        final Map<String, Object> context = new HashMap<>();
+        context.put("dataSource", vo);
+
+        type.raiseAlarm(context, timestamp, "event.ds", vo.getName(), message);
+    }
+    
+    protected void fireEvent(int eventId, LocalizableMessage message) {
+        fireEvent(eventId, System.currentTimeMillis(), message);
     }
 
-    protected void returnToNormal(int eventId, long time) {
-        DataSourceEventType type = getEventType(eventId);
-        Common.ctx.getEventManager().returnToNormal(type, time);
+    protected void fireEvent(int eventId, long timestamp, LocalizableMessage message) {
+        final DataSourceEventType type = getEventType(eventId);
+        final Map<String, Object> context = new HashMap<>();
+        context.put("dataSource", vo);
+
+        type.fire(context, timestamp, new LocalizableMessageImpl("event.ds", vo.getName(), message));
+    }
+
+    protected void fireEvent(int eventId, long timestamp, String i18nKey, Object ... i18nArgs) {
+        fireEvent(eventId, timestamp, new LocalizableMessageImpl(i18nKey, i18nArgs));
+    }
+
+    protected void clearAlarm(int eventId) {
+        final DataSourceEventType type = getEventType(eventId);
+        type.clearAlarm();
+    }
+
+    protected void clearAlarm(int eventId, long timestamp) {
+        final DataSourceEventType type = getEventType(eventId);
+        type.clearAlarm(timestamp);
     }
 
     private DataSourceEventType getEventType(int eventId) {
@@ -279,7 +311,8 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
     @Override
     public void terminate() {
         // Remove any outstanding events.
-        Common.ctx.getEventManager().cancelEventsForDataSource(vo.getId());
+        //TODO move this to runtimeManger ??? 
+        eventManager.cancelEventsForDataSource(vo.getId());
     }
 
     @Override

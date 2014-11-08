@@ -18,11 +18,11 @@ public enum IntervalLoggingTypes implements LocalizableEnum<IntervalLoggingTypes
         MINIMUM(3, "pointEdit.logging.valueType.minimum"),
         AVERAGE(4, "pointEdit.logging.valueType.average");
 
-    public final int mangoDbId;
-    public final String i18nKey;
+    private final int id;
+    private final String i18nKey;
 
-    private IntervalLoggingTypes(int mangoDbId, String i18nKey) {
-        this.mangoDbId = mangoDbId;
+    private IntervalLoggingTypes(int id, String i18nKey) {
+        this.id = id;
         this.i18nKey = i18nKey;
     }
 
@@ -36,8 +36,12 @@ public enum IntervalLoggingTypes implements LocalizableEnum<IntervalLoggingTypes
         return null;
     }
 
-    public static IntervalLoggingTypes fromMangoDbId(int mangoDbId) {
-        switch (mangoDbId) {
+    public int getId() {
+        return id;
+    }
+    
+    public static IntervalLoggingTypes fromId(int id) {
+        switch (id) {
             case 1:
                 return IntervalLoggingTypes.INSTANT;
             case 2:
@@ -47,7 +51,7 @@ public enum IntervalLoggingTypes implements LocalizableEnum<IntervalLoggingTypes
             case 4:
                 return IntervalLoggingTypes.AVERAGE;
             default:
-                throw new RuntimeException("Cant get LoggingTypes from mangoDbId: " + mangoDbId);
+                throw new RuntimeException("Cant get LoggingTypes from mangoDbId: " + id);
         }
     }
 }

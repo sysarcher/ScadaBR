@@ -75,12 +75,12 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
             } else {
                 lm = new LocalizableMessageImpl("event.httpRetriever.retrievalError", vo.getUrl(), e.getMessage());
             }
-            raiseEvent(DATA_RETRIEVAL_FAILURE_EVENT, time, true, lm);
+            raiseAlarm(DATA_RETRIEVAL_FAILURE_EVENT, time, lm);
             return;
         }
 
         // If we made it this far, everything is good.
-        returnToNormal(DATA_RETRIEVAL_FAILURE_EVENT, time);
+        clearAlarm(DATA_RETRIEVAL_FAILURE_EVENT, time);
 
         // We have the data. Now run the regex.
         LocalizableMessage parseErrorMessage = null;
@@ -112,9 +112,9 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
         }
 
         if (parseErrorMessage != null) {
-            raiseEvent(PARSE_EXCEPTION_EVENT, time, false, parseErrorMessage);
+            fireEvent(PARSE_EXCEPTION_EVENT, time, parseErrorMessage);
         } else {
-            returnToNormal(PARSE_EXCEPTION_EVENT, time);
+            //TODO returnToNormal was not set so there is no need to do this ???  returnToNormal(PARSE_EXCEPTION_EVENT, time);
         }
     }
 

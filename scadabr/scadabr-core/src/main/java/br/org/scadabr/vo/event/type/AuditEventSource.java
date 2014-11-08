@@ -6,6 +6,7 @@
 package br.org.scadabr.vo.event.type;
 
 import br.org.scadabr.utils.i18n.LocalizableEnum;
+import br.org.scadabr.vo.event.AlarmLevel;
 
 /**
  *
@@ -22,20 +23,25 @@ public enum AuditEventSource implements LocalizableEnum<AuditEventSource> {
     POINT_LINK(7, "event.audit.pointLink"),
     MAINTENANCE_EVENT(8, "event.audit.maintenanceEvent");
     private final String i18nKey;
-    public final int mangoDbId;
+    private final int id;
+    private AlarmLevel alarmLevel;
 
-    private AuditEventSource(int mangoDbId, String i18nKey) {
+    private AuditEventSource(int id, String i18nKey) {
         this.i18nKey = i18nKey;
-        this.mangoDbId = mangoDbId;
+        this.id = id;
     }
 
     @Override
     public String getI18nKey() {
         return i18nKey;
     }
+    
+    public int getId() {
+        return id;
+    }
 
-    public static AuditEventSource fromMangoDbId(int ordinal) {
-        switch (ordinal) {
+    public static AuditEventSource fromId(int id) {
+        switch (id) {
             case 1:
                 return DATA_SOURCE;
             case 2:
@@ -61,5 +67,31 @@ public enum AuditEventSource implements LocalizableEnum<AuditEventSource> {
     public Object[] getArgs() {
         return null;
     }
+    
+    /**
+     * @return the defaultAlarmLevel
+     */
+    public AlarmLevel getDefaultAlarmLevel() {
+        return AlarmLevel.INFORMATION;
+    }
+
+    /**
+     * @return the alarmLevel
+     */
+    public AlarmLevel getAlarmLevel() {
+        return alarmLevel;
+    }
+
+    /**
+     * @param alarmLevel the alarmLevel to set
+     */
+    public void setAlarmLevel(AlarmLevel alarmLevel) {
+        this.alarmLevel = alarmLevel;
+    }
+    
+    public boolean isDefaultAlarmlevel() {
+        return getDefaultAlarmLevel() == alarmLevel;
+    }
+
 
 }

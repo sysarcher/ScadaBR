@@ -101,13 +101,13 @@ public class ScriptExecutor {
         WrapperContext wrapperContext = new WrapperContext(runtime);
 
         // Add constants to the context.
-        engine.put("SECOND", TimePeriods.SECONDS.mangoDbId);
-        engine.put("MINUTE", TimePeriods.MINUTES.mangoDbId);
-        engine.put("HOUR", TimePeriods.HOURS.mangoDbId);
-        engine.put("DAY", TimePeriods.DAYS.mangoDbId);
-        engine.put("WEEK", TimePeriods.WEEKS.mangoDbId);
-        engine.put("MONTH", TimePeriods.MONTHS.mangoDbId);
-        engine.put("YEAR", TimePeriods.YEARS.mangoDbId);
+        engine.put("SECOND", TimePeriods.SECONDS.getId());
+        engine.put("MINUTE", TimePeriods.MINUTES.getId());
+        engine.put("HOUR", TimePeriods.HOURS.getId());
+        engine.put("DAY", TimePeriods.DAYS.getId());
+        engine.put("WEEK", TimePeriods.WEEKS.getId());
+        engine.put("MONTH", TimePeriods.MONTHS.getId());
+        engine.put("YEAR", TimePeriods.YEARS.getId());
         engine.put("CONTEXT", wrapperContext);
 
         // Put the context variables into the engine with engine scope.

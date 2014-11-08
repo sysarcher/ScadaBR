@@ -304,7 +304,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
         out.writeBoolean(changesOnly);
         out.writeInt(cacheWarningSize);
         out.writeBoolean(sendSnapshot);
-        out.writeInt(snapshotSendPeriodType.mangoDbId);
+        out.writeInt(snapshotSendPeriodType.getId());
         out.writeInt(snapshotSendPeriods);
     }
 
@@ -329,7 +329,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
             changesOnly = in.readBoolean();
             cacheWarningSize = in.readInt();
             sendSnapshot = in.readBoolean();
-            snapshotSendPeriodType = TimePeriods.fromMangoDbId(in.readInt());
+            snapshotSendPeriodType = TimePeriods.fromId(in.readInt());
             snapshotSendPeriods = in.readInt();
         }
     }

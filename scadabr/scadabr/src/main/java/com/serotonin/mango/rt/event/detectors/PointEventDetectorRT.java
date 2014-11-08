@@ -18,33 +18,27 @@
  */
 package com.serotonin.mango.rt.event.detectors;
 
-import br.org.scadabr.rt.event.type.DuplicateHandling;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointListener;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.event.SimpleEventDetector;
 import com.serotonin.mango.rt.event.type.DataPointEventType;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 abstract public class PointEventDetectorRT extends SimpleEventDetector implements DataPointListener {
 
+    //TODO make this final ...
     protected PointEventDetectorVO vo;
 
-    protected EventType getEventType() {
-        DataPointEventType et = new DataPointEventType(vo.njbGetDataPoint().getId(), vo.getId());
-        if (!vo.isRtnApplicable()) {
-            et.setDuplicateHandling(DuplicateHandling.ALLOW);
-        }
-        return et;
+    protected DataPointEventType getEventType() {
+        return new DataPointEventType(vo);
     }
 
-    protected void raiseEvent(long time, Map<String, Object> context) {
+    protected void raiseAlarm(long time, Map<String, Object> context) {
         LocalizableMessage msg;
         if (!vo.getAlias().isEmpty()) {
             msg = new LocalizableMessageImpl("common.default", vo.getAlias());
@@ -52,18 +46,21 @@ abstract public class PointEventDetectorRT extends SimpleEventDetector implement
             msg = getMessage();
         }
 
-        Common.ctx.getEventManager().raiseEvent(getEventType(), time, vo.isRtnApplicable(), vo.getAlarmLevel(), msg,
-                context);
+        if (vo.isRtnApplicable()) {
+            getEventType().raiseAlarm(context, time, msg);
+        } else {
+            getEventType().fire(context, time, msg);
+        }
         fireEventDetectorStateChanged(time);
     }
 
-    protected void returnToNormal(long time) {
-        Common.ctx.getEventManager().returnToNormal(getEventType(), time);
+    protected void clearAlarm(long time) {
+        getEventType().clearAlarm(time);
         fireEventDetectorStateChanged(time);
     }
 
     protected Map<String, Object> createEventContext() {
-        Map<String, Object> context = new HashMap<String, Object>();
+        Map<String, Object> context = new HashMap<>();
         context.put("pointEventDetector", vo);
         context.put("point", vo.njbGetDataPoint());
         return context;
@@ -79,6 +76,7 @@ abstract public class PointEventDetectorRT extends SimpleEventDetector implement
     //
     // Lifecycle interface
     //
+    @Override
     public void initialize() {
         // no op
     }
@@ -88,6 +86,7 @@ abstract public class PointEventDetectorRT extends SimpleEventDetector implement
         fireEventDetectorTerminated();
     }
 
+    @Override
     public void joinTermination() {
         // no op
     }
@@ -96,26 +95,32 @@ abstract public class PointEventDetectorRT extends SimpleEventDetector implement
     //
     // Point listener interface
     //
+    @Override
     public void pointChanged(PointValueTime oldValue, PointValueTime newValue) {
         // no op
     }
 
+    @Override
     public void pointSet(PointValueTime oldValue, PointValueTime newValue) {
         // no op
     }
 
+    @Override
     public void pointUpdated(PointValueTime newValue) {
         // no op
     }
 
+    @Override
     public void pointBackdated(PointValueTime value) {
         // no op
     }
 
+    @Override
     public void pointInitialized() {
         // no op
     }
 
+    @Override
     public void pointTerminated() {
         // no op
     }

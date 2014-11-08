@@ -33,10 +33,31 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 public class EventInstance {
 
-    public interface RtnCauses {
+    //TODO make this the state ie. STATELESS, STATEFUL_ACTIVE, STATEFUL_GONE, STATEFUL_SRC_DISABLED ... 
+    // this would affect rtnApplicable as well.
+    public enum RtnCauses {
+        NO_RTN(0),
+        RETURN_TO_NORMAL(1),
+        SOURCE_DISABLED(4);
 
-        int RETURN_TO_NORMAL = 1;
-        int SOURCE_DISABLED = 4;
+        public static RtnCauses fromId(int id) {
+            switch (id) {
+                case 0: return NO_RTN;
+                case 1: return RETURN_TO_NORMAL;
+                case 4: return SOURCE_DISABLED;
+                    default: throw new IndexOutOfBoundsException("Unknown id: " + id);
+            }
+        }
+        private final int id;
+
+        private RtnCauses(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
+        
     }
 
     public interface AlternateAcknowledgementSources {
@@ -76,7 +97,7 @@ public class EventInstance {
      * State field. The action that caused the event to RTN. One of
      * {@link RtnCauses}
      */
-    private int rtnCause;
+    private RtnCauses rtnCause = RtnCauses.NO_RTN;
 
     /**
      * Configuration field. The alarm level assigned to the event.
@@ -213,7 +234,7 @@ public class EventInstance {
         return rtnApplicable && rtnTimestamp == 0;
     }
 
-    public void returnToNormal(long time, int rtnCause) {
+    public void returnToNormal(long time, EventInstance.RtnCauses rtnCause) {
         if (isActive()) {
             rtnTimestamp = time;
             this.rtnCause = rtnCause;
@@ -268,7 +289,7 @@ public class EventInstance {
         return eventComments;
     }
 
-    public int getRtnCause() {
+    public EventInstance.RtnCauses getRtnCause() {
         return rtnCause;
     }
 

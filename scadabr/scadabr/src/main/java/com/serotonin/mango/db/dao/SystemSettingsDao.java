@@ -31,6 +31,7 @@ import com.serotonin.mango.Common;
 import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.type.AuditEventSource;
 import br.org.scadabr.vo.event.type.SystemEventSource;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -107,6 +108,7 @@ public class SystemSettingsDao extends BaseDao {
     // /
     //
     private static final String SYSTEM_EVENT_ALARMLEVEL_PREFIX = "systemEventAlarmLevel";
+    private static final String AUDIT_EVENT_ALARMLEVEL_PREFIX = "auditEventAlarmLevel";
 
     // Value cache 
     //TODO cache real objects???
@@ -189,7 +191,7 @@ public class SystemSettingsDao extends BaseDao {
         if (defaultValue == null) {
             throw  new ShouldNeverHappenException("No default for: " + key);
         }
-        return TimePeriods.fromMangoDbId(getIntValue(key, defaultValue.mangoDbId));
+        return TimePeriods.fromId(getIntValue(key, defaultValue.getId()));
     }
 
     public static int getIntValue(String key, int defaultValue) {
@@ -378,10 +380,10 @@ public class SystemSettingsDao extends BaseDao {
     }
 
     public void saveAlarmLevel(SystemEventSource key) {
-        setValue(SYSTEM_EVENT_ALARMLEVEL_PREFIX + key.name(), Integer.toString(key.getAlarmLevel().mangoDbId));
+        setValue(SYSTEM_EVENT_ALARMLEVEL_PREFIX + key.name(), Integer.toString(key.getAlarmLevel().getId()));
     }
 
-    public void setAuditAlarmLevel(String string, AlarmLevel alarmLevel) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void saveAlarmlevel(AuditEventSource key) {
+        setValue(AUDIT_EVENT_ALARMLEVEL_PREFIX + key.name(), Integer.toString(key.getAlarmLevel().getId()));
     }
 }

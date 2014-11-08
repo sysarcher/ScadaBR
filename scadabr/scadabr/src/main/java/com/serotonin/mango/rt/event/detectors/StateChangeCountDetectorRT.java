@@ -108,7 +108,7 @@ public class StateChangeCountDetectorRT extends TimeoutDetectorRT {
                     eventActiveTime = value.getTime();
 
                     // Raise the event.
-                    raiseEvent(eventActiveTime, createEventContext());
+                    raiseAlarm(eventActiveTime, createEventContext());
                 } else // We have already scheduled a timeout, so remove it
                 {
                     unscheduleJob();
@@ -147,7 +147,7 @@ public class StateChangeCountDetectorRT extends TimeoutDetectorRT {
 
         // Deactive the event.
         eventActive = false;
-        returnToNormal(fireTime);
+        clearAlarm(fireTime);
     }
 
     private void removeOldPointValues(long time) {

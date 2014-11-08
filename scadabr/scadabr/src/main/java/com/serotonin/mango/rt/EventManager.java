@@ -228,6 +228,10 @@ public class EventManager implements ILifecycle, Serializable {
         returnToNormal(type, time, EventInstance.RtnCauses.RETURN_TO_NORMAL);
     }
 
+    public void handleAlarmDisabled(EventType type) {
+        returnToNormal(type, System.currentTimeMillis(), EventInstance.RtnCauses.SOURCE_DISABLED);
+    }
+
     /**
      * Use clearAlarm
      * @param type
@@ -247,7 +251,7 @@ public class EventManager implements ILifecycle, Serializable {
      * @deprecated
      */
     @Deprecated
-    public void returnToNormal(EventType type, long time, int cause) {
+    public void returnToNormal(EventType type, long time, EventInstance.RtnCauses cause) {
         EventInstance evt = remove(type);
 
         // Loop in case of multiples
@@ -269,7 +273,7 @@ public class EventManager implements ILifecycle, Serializable {
         }
     }
 
-    private void deactivateEvent(EventInstance evt, long time, int inactiveCause) {
+    private void deactivateEvent(EventInstance evt, long time, EventInstance.RtnCauses inactiveCause) {
         activeEvents.remove(evt);
         resetHighestAlarmLevel(time, false);
         evt.returnToNormal(time, inactiveCause);

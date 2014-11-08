@@ -25,15 +25,15 @@ public enum TimePeriods implements LocalizableMessage {
     MONTHS(6, "common.tp.months"),
     YEARS(7, "common.tp.years");
     private final String i18nKey;
-    public final int mangoDbId;
+    private final int id;
 
-    private TimePeriods(int mangoDbId, String i18nKey) {
-        this.mangoDbId = mangoDbId;
+    private TimePeriods(int id, String i18nKey) {
+        this.id = id;
         this.i18nKey = i18nKey;
     }
 
-    public static TimePeriods fromMangoDbId(int mangoDbId) {
-        switch (mangoDbId) {
+    public static TimePeriods fromId(int id) {
+        switch (id) {
             case 8:
                 return TimePeriods.MILLISECONDS;
             case 1:
@@ -51,8 +51,12 @@ public enum TimePeriods implements LocalizableMessage {
             case 7:
                 return TimePeriods.YEARS;
             default:
-                throw new RuntimeException("Unknown TimePeriod: " + mangoDbId);
+                throw new RuntimeException("Unknown TimePeriod: " + id);
         }
+    }
+
+    public int getId() {
+        return id;
     }
 
     /**

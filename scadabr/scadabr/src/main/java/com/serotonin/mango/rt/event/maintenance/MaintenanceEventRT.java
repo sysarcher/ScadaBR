@@ -33,14 +33,14 @@ public class MaintenanceEventRT implements RunWithArgClient<Boolean> {
 
     private void raiseEvent(long time) {
         if (!eventActive) {
-            Common.ctx.getEventManager().raiseEvent(eventType, time, true, vo.getAlarmLevel(), getMessage(), null);
+            eventType.raiseAlarm(time, getMessage());
             eventActive = true;
         }
     }
 
     private void returnToNormal(long time) {
         if (eventActive) {
-            Common.ctx.getEventManager().returnToNormal(eventType, time);
+            eventType.clearAlarm(time);
             eventActive = false;
         }
     }
@@ -72,7 +72,7 @@ public class MaintenanceEventRT implements RunWithArgClient<Boolean> {
     // Lifecycle interface
     //
     public void initialize() {
-        eventType = new MaintenanceEventType(vo.getId());
+        eventType = new MaintenanceEventType(vo);
 
         if (vo.getScheduleType() != MaintenanceEventVO.TYPE_MANUAL) {
             // Schedule the active event.
@@ -103,8 +103,7 @@ public class MaintenanceEventRT implements RunWithArgClient<Boolean> {
         }
 
         if (eventActive) {
-            Common.ctx.getEventManager().returnToNormal(eventType, System.currentTimeMillis(),
-                    EventInstance.RtnCauses.SOURCE_DISABLED);
+            eventType.disableAlarm();
         }
     }
 

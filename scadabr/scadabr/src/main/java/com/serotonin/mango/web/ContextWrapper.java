@@ -112,7 +112,7 @@ public class ContextWrapper {
     }
 
     @Deprecated // use Bean
-    public EventManager getEventManager() {
+    private EventManager getEventManager() {
         return (EventManager) ctx
                 .getAttribute(Common.ContextKeys.EVENT_MANAGER);
     }

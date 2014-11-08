@@ -133,13 +133,13 @@ public class AnalogHighLimitDetectorRT extends TimeDelayedEventDetectorRT {
             if (highLimitActive) // Ok, things are good. Carry on...
             // Raise the event.
             {
-                raiseEvent(highLimitActiveTime + getDurationMS(), createEventContext());
+                raiseAlarm(highLimitActiveTime + getDurationMS(), createEventContext());
             } else {
                 eventActive = false;
             }
         } else // Deactive the event.
         {
-            returnToNormal(highLimitInactiveTime);
+            clearAlarm(highLimitInactiveTime);
         }
     }
 }

@@ -86,10 +86,10 @@ abstract public class DifferenceDetectorRT extends TimeDelayedEventDetectorRT {
         eventActive = b;
         if (eventActive) // Raise the event.
         {
-            raiseEvent(lastChange + getDurationMS(), createEventContext());
+            raiseAlarm(lastChange + getDurationMS(), createEventContext());
         } else // Deactivate the event.
         {
-            returnToNormal(lastChange);
+            clearAlarm(lastChange);
         }
     }
 }
