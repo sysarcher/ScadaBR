@@ -96,7 +96,7 @@ abstract public class StateDetectorRT extends TimeDelayedEventDetectorRT {
             if (stateActive) // Ok, things are good. Carry on...
             // Raise the event.
             {
-                raiseEvent(stateActiveTime + getDurationMS(), createEventContext());
+                raiseAlarm(stateActiveTime + getDurationMS(), createEventContext());
             } else {
                 // Perhaps the job wasn't successfully unscheduled. Write a log entry and ignore.
                 log.warn("Call to set event active when state is not active. Ignoring.");
@@ -104,7 +104,7 @@ abstract public class StateDetectorRT extends TimeDelayedEventDetectorRT {
             }
         } else // Deactive the event.
         {
-            returnToNormal(stateInactiveTime);
+            clearAlarm(stateInactiveTime);
         }
     }
 }

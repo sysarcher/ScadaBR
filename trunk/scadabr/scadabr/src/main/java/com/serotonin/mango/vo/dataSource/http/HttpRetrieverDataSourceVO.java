@@ -199,7 +199,7 @@ public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSou
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
         SerializationHelper.writeSafeUTF(out, url);
-        out.writeInt(updatePeriodType.mangoDbId);
+        out.writeInt(updatePeriodType.getId());
         out.writeInt(updatePeriods);
         out.writeInt(timeoutSeconds);
         out.writeInt(retries);
@@ -211,7 +211,7 @@ public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSou
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
             url = SerializationHelper.readSafeUTF(in);
-            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
+            updatePeriodType = TimePeriods.fromId(in.readInt());
             updatePeriods = in.readInt();
             timeoutSeconds = in.readInt();
             ;

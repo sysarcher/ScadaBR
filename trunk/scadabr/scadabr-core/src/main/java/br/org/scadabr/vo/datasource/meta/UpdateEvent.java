@@ -23,18 +23,18 @@ public enum UpdateEvent implements LocalizableMessage {
     YEARS(TimePeriods.YEARS, "dsEdit.meta.event.year"),
     CRON(100, "dsEdit.meta.event.cron");
 
-    public final int mangoDbId;
+    private final int id;
     private final String i18nKey;
     private final TimePeriods timePeriods;
 
-    private UpdateEvent(int mangoDbId, String i18nKey) {
-        this.mangoDbId = mangoDbId;
+    private UpdateEvent(int id, String i18nKey) {
+        this.id = id;
         this.timePeriods = null;
         this.i18nKey = i18nKey;
     }
 
     private UpdateEvent(TimePeriods timePeriods, String i18nKey) {
-        this.mangoDbId = timePeriods.mangoDbId;
+        this.id = timePeriods.getId();
         this.timePeriods = timePeriods;
         this.i18nKey = i18nKey;
     }
@@ -48,9 +48,13 @@ public enum UpdateEvent implements LocalizableMessage {
     public Object[] getArgs() {
         return null;
     }
+    
+    public int getId() {
+        return id;
+    }
 
-    public static UpdateEvent fromMangoDbId(int mangoDbId) {
-        switch (mangoDbId) {
+    public static UpdateEvent fromId(int id) {
+        switch (id) {
             case 0:
                 return CONTEXT_UPDATE;
             case 1:
@@ -68,7 +72,7 @@ public enum UpdateEvent implements LocalizableMessage {
             case 100:
                 return CRON;
             default:
-                throw new RuntimeException("Cant get UpdateEvents from mangoDbId: " + mangoDbId);
+                throw new RuntimeException("Cant get UpdateEvents from mangoDbId: " + id);
 
         }
     }

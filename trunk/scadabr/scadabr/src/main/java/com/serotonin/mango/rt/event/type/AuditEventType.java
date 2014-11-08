@@ -31,55 +31,17 @@ import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.User;
-import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.web.i18n.LocalizableI18nKey;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.AuditEventSource;
-import java.util.EnumMap;
 import java.util.Objects;
 
 @JsonRemoteEntity
 public class AuditEventType extends EventType {
-
-    //
-    // /
-    // / Static stuff
-    // /
-    //
-    private static final String AUDIT_SETTINGS_PREFIX = "auditEventAlarmLevel";
-
-    public static final Map<AuditEventSource, EventTypeVO> AUDIT_EVENT_TYPES = new EnumMap<>(AuditEventSource.class);
-
-    //TODO fix Alarmlevel from SystemSettingsDao for now only default 
-    static {
-        for (AuditEventSource s : AuditEventSource.values()) {
-            AUDIT_EVENT_TYPES.put(s, new EventTypeVO(EventSources.AUDIT, s.mangoDbId, 0, s, AlarmLevel.INFORMATION));
-        }
-        
-    }
-/*    
-    private static void addEventTypeVO(AuditEventSource type, String key) {
-        auditEventTypes.add(new EventTypeVO(EventSources.AUDIT, type, 0, new LocalizableMessageImpl(key),
-                SystemSettingsDao.getAlarmLevel(AUDIT_SETTINGS_PREFIX + type, AlarmLevel.INFORMATION)));
-    }
-*/
-    
-    public static EventTypeVO getEventType(AuditEventSource type) {
-        return AUDIT_EVENT_TYPES.get(type);
-    }
-
-    public static void setEventTypeAlarmLevel(AuditEventSource type, AlarmLevel alarmLevel) {
-        EventTypeVO et = getEventType(type);
-        et.setAlarmLevel(alarmLevel);
-
-        SystemSettingsDao dao = SystemSettingsDao.getInstance();
-        dao.setAuditAlarmLevel(AUDIT_SETTINGS_PREFIX + type, alarmLevel);
-    }
 
     public static void raiseAddedEvent(AuditEventSource auditEventType, ChangeComparable<?> o) {
         List<LocalizableMessage> list = new ArrayList<>();
@@ -123,8 +85,7 @@ public class AuditEventType extends EventType {
         AuditEventType type = new AuditEventType(auditEventType, o.getId());
         type.setRaisingUser(user);
 
-        Common.ctx.getEventManager().raiseEvent(type, System.currentTimeMillis(), false,
-                getEventType(type.getAuditEventType()).getAlarmLevel(), message, null);
+        type.fire(message);
     }
 
     //
@@ -272,7 +233,7 @@ throw new ImplementMeException(); //"MessageFormat");
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + auditEventType.mangoDbId;
+        result = prime * result + auditEventType.getId();
         result = prime * result + referenceId;
         return result;
     }
@@ -314,7 +275,7 @@ throw new ImplementMeException(); //"MessageFormat");
 
     @Override
     public AlarmLevel getAlarmLevel() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return auditEventType.getAlarmLevel();
     }
 
 }

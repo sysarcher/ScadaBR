@@ -65,6 +65,19 @@ abstract public class EventType implements JsonSerializable {
     @Autowired
     private DataSourceDao dataSourceDao;
 
+    //TODO do we need the context or can this data be retieved later???
+    @Deprecated
+    public void fire(Map<String, Object> context, String i18nKey, Object... i18nArgs) {
+        eventManager.handleFiredEvent(this, i18nKey, i18nArgs);
+    }
+
+    //TODO do we need the context or can this data be retieved later???
+    @Deprecated
+    public void fire(Map<String, Object> context, long timestamp, LocalizableMessage msg) {
+        eventManager.handleFiredEvent(this, timestamp, msg);
+    }
+
+
     public void fire(String i18nKey, Object... i18nArgs) {
         eventManager.handleFiredEvent(this, i18nKey, i18nArgs);
     }
@@ -79,6 +92,24 @@ abstract public class EventType implements JsonSerializable {
 
     public void fire(long timestamp, LocalizableMessage msg) {
         eventManager.handleFiredEvent(this, timestamp, msg);
+    }
+
+    //TODO do we need the context or can this data be retieved later???
+    @Deprecated
+    public void raiseAlarm(Map<String, Object> context, String i18nKey, Object... i18nArgs) {
+        eventManager.handleRaisedAlarm(this, i18nKey, i18nArgs);
+    }
+
+    //TODO do we need the context or can this data be retieved later???
+    @Deprecated
+    public void raiseAlarm(Map<String, Object> context, long timestamp, String i18nKey, Object... i18nArgs) {
+        eventManager.handleRaisedAlarm(this, timestamp, i18nKey, i18nArgs);
+    }
+
+    //TODO do we need the context or can this data be retieved later???
+    @Deprecated
+    public void raiseAlarm(Map<String, Object> context, long timestamp, LocalizableMessage msg) {
+        eventManager.handleRaisedAlarm(this, timestamp, msg);
     }
 
     public void raiseAlarm(String i18nKey, Object... i18nArgs) {
@@ -109,6 +140,11 @@ abstract public class EventType implements JsonSerializable {
     public void clearAlarm(long timestamp) {
         eventManager.handleAlarmCleared(this, timestamp);
     }
+
+    public void disableAlarm() {
+        eventManager.handleAlarmDisabled(this);
+    }
+
 
     abstract public EventSources getEventSource();
 

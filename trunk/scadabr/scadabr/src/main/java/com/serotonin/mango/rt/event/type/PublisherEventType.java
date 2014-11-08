@@ -38,14 +38,23 @@ public class PublisherEventType extends EventType {
 
     private int publisherId;
     private int publisherEventTypeId;
+    private AlarmLevel alarmLevel;
 
     public PublisherEventType() {
         // Required for reflection.
     }
 
+    @Deprecated
     public PublisherEventType(int publisherId, int publisherEventTypeId) {
         this.publisherId = publisherId;
         this.publisherEventTypeId = publisherEventTypeId;
+//        this.alarmLevel = alarmLevel;
+    }
+
+    public PublisherEventType(PublisherVO vo, int publisherEventTypeId) {
+        this.publisherId = vo.getId();
+        this.publisherEventTypeId = publisherEventTypeId;
+        this.alarmLevel = AlarmLevel.URGENT;
     }
 
     @Override
@@ -133,7 +142,7 @@ public class PublisherEventType extends EventType {
 
     @Override
     public AlarmLevel getAlarmLevel() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return alarmLevel;
     }
 
 }

@@ -138,13 +138,13 @@ public class NegativeCusumDetectorRT extends TimeDelayedEventDetectorRT {
             if (negativeCusumActive) // Ok, things are good. Carry on...
             // Raise the event.
             {
-                raiseEvent(negativeCusumActiveTime + getDurationMS(), createEventContext());
+                raiseAlarm(negativeCusumActiveTime + getDurationMS(), createEventContext());
             } else {
                 eventActive = false;
             }
         } else // Deactive the event.
         {
-            returnToNormal(negativeCusumInactiveTime);
+            clearAlarm(negativeCusumInactiveTime);
         }
     }
 }

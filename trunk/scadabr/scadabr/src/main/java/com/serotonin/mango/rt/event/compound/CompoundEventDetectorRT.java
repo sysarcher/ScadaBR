@@ -60,12 +60,19 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
     }
 
     private void raiseEvent(long time) {
-        Common.ctx.getEventManager().raiseEvent(eventType, time, vo.isReturnToNormal(), vo.getAlarmLevel(),
-                new LocalizableMessageImpl("event.compound.activated", vo.getName()), null);
+        if (vo.isReturnToNormal()) {
+            eventType.fire(time, "event.compound.activated", vo.getName());
+        } else {
+            eventType.raiseAlarm(time, "event.compound.activated", vo.getName());
+        }
     }
 
     private void returnToNormal(long time) {
-        Common.ctx.getEventManager().returnToNormal(eventType, time);
+        if (vo.isReturnToNormal()) {
+            // no Alarm was raised . so no clearing ...
+        } else {
+            eventType.clearAlarm(time);
+        }
     }
 
     public static LogicalOperator parseConditionStatement(String condition) throws ConditionParseException {
@@ -222,8 +229,8 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
     // }
     // }
     public void raiseFailureEvent(LocalizableMessage message) {
-        final SystemEventType eventType = new SystemEventType(SystemEventSource.COMPOUND_DETECTOR_FAILURE, vo.getId());
-        eventType.fire(message);
+        final SystemEventType failureEventType = new SystemEventType(SystemEventSource.COMPOUND_DETECTOR_FAILURE, vo.getId());
+        failureEventType.fire(message);
         vo.setDisabled(true);
         CompoundEventDetectorDao.getInstance().saveCompoundEventDetector(vo);
     }
@@ -280,10 +287,7 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
         condition.initSource(this);
 
         // Create a convenience reference to the event type.
-        eventType = new CompoundDetectorEventType(vo.getId());
-        if (!vo.isReturnToNormal()) {
-            eventType.setDuplicateHandling(DuplicateHandling.ALLOW);
-        }
+        eventType = new CompoundDetectorEventType(vo);
 
         // Evaluate the current state.
         currentState = condition.evaluate();

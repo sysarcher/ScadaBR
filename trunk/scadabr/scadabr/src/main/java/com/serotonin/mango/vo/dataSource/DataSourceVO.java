@@ -331,7 +331,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         out.writeBoolean(enabled);
         final Map<Integer, Integer> _alarmLevels = new HashMap<>();
         for (Map.Entry<Integer, AlarmLevel> e : alarmLevels.entrySet()) {
-            _alarmLevels.put(e.getKey(), e.getValue().mangoDbId);
+            _alarmLevels.put(e.getKey(), e.getValue().getId());
         }
         out.writeObject(alarmLevels);
     }
@@ -351,7 +351,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
             final Map<Integer, Integer> _alarmLevels = (HashMap<Integer, Integer>) in.readObject();
             alarmLevels = new HashMap<>();
             for (Map.Entry<Integer, Integer> e : _alarmLevels.entrySet()) {
-                alarmLevels.put(e.getKey(), AlarmLevel.fromMangoDbId(e.getValue()));
+                alarmLevels.put(e.getKey(), AlarmLevel.fromId(e.getValue()));
             }
 
         }

@@ -682,7 +682,7 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
         } else if (handlerType == TYPE_EMAIL) {
             out.writeObject(activeRecipients);
             out.writeBoolean(sendEscalation);
-            out.writeInt(escalationDelayType.mangoDbId);
+            out.writeInt(escalationDelayType.getId());
             out.writeInt(escalationDelay);
             out.writeObject(escalationRecipients);
             out.writeBoolean(sendInactive);
@@ -719,7 +719,7 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
                 activeRecipients = (List<RecipientListEntryBean>) in
                         .readObject();
                 sendEscalation = in.readBoolean();
-                escalationDelayType = TimePeriods.fromMangoDbId(in.readInt());
+                escalationDelayType = TimePeriods.fromId(in.readInt());
                 escalationDelay = in.readInt();
                 escalationRecipients = (List<RecipientListEntryBean>) in
                         .readObject();
@@ -745,7 +745,7 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
                 activeRecipients = (List<RecipientListEntryBean>) in
                         .readObject();
                 sendEscalation = in.readBoolean();
-                escalationDelayType = TimePeriods.fromMangoDbId(in.readInt());
+                escalationDelayType = TimePeriods.fromId(in.readInt());
                 escalationDelay = in.readInt();
                 escalationRecipients = (List<RecipientListEntryBean>) in
                         .readObject();
@@ -772,7 +772,7 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
                 activeRecipients = (List<RecipientListEntryBean>) in
                         .readObject();
                 sendEscalation = in.readBoolean();
-                escalationDelayType = TimePeriods.fromMangoDbId(in.readInt());
+                escalationDelayType = TimePeriods.fromId(in.readInt());
                 escalationDelay = in.readInt();
                 escalationRecipients = (List<RecipientListEntryBean>) in
                         .readObject();

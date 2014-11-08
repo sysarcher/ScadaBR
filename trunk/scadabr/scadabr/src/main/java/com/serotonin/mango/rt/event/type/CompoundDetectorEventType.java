@@ -28,6 +28,7 @@ import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
+import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
 
 /**
  * @author Matthew Lohbihler
@@ -37,13 +38,29 @@ public class CompoundDetectorEventType extends EventType {
 
     private int compoundDetectorId;
     private DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
+    private AlarmLevel alarmLevel;
 
     public CompoundDetectorEventType() {
         // Required for reflection.
     }
 
+    @Deprecated
     public CompoundDetectorEventType(int compoundDetectorId) {
         this.compoundDetectorId = compoundDetectorId;
+/*        
+        this.alarmLevel = vo.getAlarmLevel();
+        if (!vo.isReturnToNormal()) {
+            duplicateHandling = DuplicateHandling.ALLOW;
+        }
+        */
+    }
+
+    public CompoundDetectorEventType(CompoundEventDetectorVO vo) {
+        this.compoundDetectorId = vo.getId();
+        this.alarmLevel = vo.getAlarmLevel();
+        if (!vo.isReturnToNormal()) {
+            duplicateHandling = DuplicateHandling.ALLOW;
+        }
     }
 
     @Override
@@ -127,7 +144,7 @@ public class CompoundDetectorEventType extends EventType {
 
     @Override
     public AlarmLevel getAlarmLevel() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return alarmLevel;
     }
 
 }

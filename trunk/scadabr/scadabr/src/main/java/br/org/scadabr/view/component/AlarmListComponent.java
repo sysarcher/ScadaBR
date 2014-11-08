@@ -166,7 +166,7 @@ public class AlarmListComponent extends CustomComponent {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(minAlarmLevel.mangoDbId);
+        out.writeInt(minAlarmLevel.getId());
         out.writeInt(maxListSize);
         out.writeInt(width);
         out.writeBoolean(hideIdColumn);
@@ -182,7 +182,7 @@ public class AlarmListComponent extends CustomComponent {
         // Switch on the version of the class so that version changes can be
         // elegantly handled.
         if (ver == 1) {
-            minAlarmLevel = AlarmLevel.fromMangoDbId(in.readInt());
+            minAlarmLevel = AlarmLevel.fromId(in.readInt());
             maxListSize = in.readInt();
             width = in.readInt();
             hideIdColumn = in.readBoolean();

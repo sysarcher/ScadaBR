@@ -269,7 +269,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         SerializationHelper.writeSafeUTF(out, script);
         out.writeInt(dataType.mangoDbId);
         out.writeBoolean(settable);
-        out.writeInt(updateEvent.mangoDbId);
+        out.writeInt(updateEvent.getId());
         SerializationHelper.writeSafeUTF(out, updateCronPattern);
         out.writeInt(executionDelaySeconds);
     }
@@ -289,7 +289,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             script = SerializationHelper.readSafeUTF(in);
             dataType = DataType.fromMangoDbId(in.readInt());
             settable = false;
-            updateEvent = UpdateEvent.fromMangoDbId(in.readInt());
+            updateEvent = UpdateEvent.fromId(in.readInt());
             updateCronPattern = "";
             executionDelaySeconds = in.readInt();
         } else if (ver == 2) {
@@ -297,7 +297,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             script = SerializationHelper.readSafeUTF(in);
             dataType = DataType.fromMangoDbId(in.readInt());
             settable = false;
-            updateEvent = UpdateEvent.fromMangoDbId(in.readInt());
+            updateEvent = UpdateEvent.fromId(in.readInt());
             updateCronPattern = "";
             executionDelaySeconds = in.readInt();
         } else if (ver == 3) {
@@ -305,7 +305,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             script = SerializationHelper.readSafeUTF(in);
             dataType = DataType.fromMangoDbId(in.readInt());
             settable = false;
-            updateEvent = UpdateEvent.fromMangoDbId(in.readInt());
+            updateEvent = UpdateEvent.fromId(in.readInt());
             updateCronPattern = SerializationHelper.readSafeUTF(in);
             executionDelaySeconds = in.readInt();
         } else if (ver == 4) {
@@ -313,7 +313,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             script = SerializationHelper.readSafeUTF(in);
             dataType = DataType.fromMangoDbId(in.readInt());
             settable = in.readBoolean();
-            updateEvent = UpdateEvent.fromMangoDbId(in.readInt());
+            updateEvent = UpdateEvent.fromId(in.readInt());
             updateCronPattern = SerializationHelper.readSafeUTF(in);
             executionDelaySeconds = in.readInt();
         }

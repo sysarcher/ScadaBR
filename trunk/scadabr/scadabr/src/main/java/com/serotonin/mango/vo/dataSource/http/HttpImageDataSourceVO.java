@@ -149,7 +149,7 @@ public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeInt(updatePeriodType.mangoDbId);
+        out.writeInt(updatePeriodType.getId());
         out.writeInt(updatePeriods);
     }
 
@@ -158,7 +158,7 @@ public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            updatePeriodType = TimePeriods.fromMangoDbId(in.readInt());
+            updatePeriodType = TimePeriods.fromId(in.readInt());
             updatePeriods = in.readInt();
         }
     }

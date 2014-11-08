@@ -48,6 +48,7 @@ import br.org.scadabr.timer.cron.DataSourceCronTask;
 import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.vo.IntervalLoggingTypes;
 import br.org.scadabr.vo.LoggingTypes;
+import com.serotonin.mango.rt.EventManager;
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -67,6 +68,8 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     private final PointValueCache valueCache;
     @Autowired
     private RuntimeManager runtimeManager;
+    @Autowired
+    private EventManager eventManager;
     private List<PointEventDetectorRT> detectors;
     private final Map<String, Object> attributes = new HashMap<>();
 
@@ -556,13 +559,15 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     public void terminate() {
         terminateIntervalLogging();
 
+        //TODO notify runtimeManger and lat them handle this???
         if (detectors != null) {
             for (PointEventDetectorRT pedRT : detectors) {
                 runtimeManager.removeDataPointListener(vo.getId(), pedRT);
                 runtimeManager.removePointEventDetector(pedRT.getEventDetectorKey());
             }
         }
-        Common.ctx.getEventManager().cancelEventsForDataPoint(vo.getId());
+        //TODO notify runtimeManger and lat them handle this???
+        eventManager.cancelEventsForDataPoint(vo.getId());
     }
 
     @Override

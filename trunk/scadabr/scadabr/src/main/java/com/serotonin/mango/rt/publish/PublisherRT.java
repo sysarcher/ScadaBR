@@ -38,6 +38,7 @@ import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.timer.TimerTask;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.rt.EventManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -60,6 +61,8 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
     protected final PublishQueue<T> queue;
     @Autowired
     private RuntimeManager runtimeManager;
+    @Autowired
+    private EventManager eventManager;
     private boolean pointDisabledEventActive;
     private volatile Thread jobThread;
     private SendThread sendThread;
@@ -69,8 +72,8 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
         this.vo = vo;
         queue = createPublishQueue(vo);
 
-        pointDisabledEventType = new PublisherEventType(getId(), POINT_DISABLED_EVENT);
-        queueSizeWarningEventType = new PublisherEventType(getId(), QUEUE_SIZE_WARNING_EVENT);
+        pointDisabledEventType = new PublisherEventType(vo, POINT_DISABLED_EVENT);
+        queueSizeWarningEventType = new PublisherEventType(vo, QUEUE_SIZE_WARNING_EVENT);
     }
 
     public int getId() {
@@ -161,23 +164,20 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
             pointDisabledEventActive = foundDisabledPoint;
             if (pointDisabledEventActive) // A published point has been terminated, was never enabled, or no longer exists.
             {
-                Common.ctx.getEventManager().raiseEvent(pointDisabledEventType, System.currentTimeMillis(), true,
-                        AlarmLevel.URGENT, new LocalizableMessageImpl("event.publish.pointMissing"), createEventContext());
+                pointDisabledEventType.raiseAlarm(createEventContext(), "event.publish.pointMissing");
             } else // Everything is good
             {
-                Common.ctx.getEventManager().returnToNormal(pointDisabledEventType, System.currentTimeMillis());
+                pointDisabledEventType.clearAlarm();
             }
         }
     }
 
     void fireQueueSizeWarningEvent() {
-        Common.ctx.getEventManager().raiseEvent(queueSizeWarningEventType, System.currentTimeMillis(), true,
-                AlarmLevel.URGENT, new LocalizableMessageImpl("event.publish.queueSize", vo.getCacheWarningSize()),
-                createEventContext());
+        queueSizeWarningEventType.raiseAlarm(createEventContext(), "event.publish.queueSize", vo.getCacheWarningSize());
     }
 
     void deactivateQueueSizeWarningEvent() {
-        Common.ctx.getEventManager().returnToNormal(queueSizeWarningEventType, System.currentTimeMillis());
+        queueSizeWarningEventType.clearAlarm();
     }
 
     protected Map<String, Object> createEventContext() {
@@ -223,8 +223,9 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
             rt.terminate();
         }
 
+        //TODO notify runtime???
         // Remove any outstanding events.
-        Common.ctx.getEventManager().cancelEventsForPublisher(getId());
+        eventManager.cancelEventsForPublisher(getId());
     }
 
     public void joinTermination() {

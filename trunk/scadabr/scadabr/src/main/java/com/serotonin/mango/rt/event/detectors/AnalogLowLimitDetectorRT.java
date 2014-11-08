@@ -139,7 +139,7 @@ public class AnalogLowLimitDetectorRT extends TimeDelayedEventDetectorRT {
             if (lowLimitActive) // Ok, things are good. Carry on...
             // Raise the event.
             {
-                raiseEvent(lowLimitActiveTime + getDurationMS(), createEventContext());
+                raiseAlarm(lowLimitActiveTime + getDurationMS(), createEventContext());
             } else {
                 // Perhaps the job wasn't successfully unscheduled. Write a log entry and ignore.
                 log.warn("Call to set event active when low limit is not active. Ignoring.");
@@ -147,7 +147,7 @@ public class AnalogLowLimitDetectorRT extends TimeDelayedEventDetectorRT {
             }
         } else // Deactivate the event.
         {
-            returnToNormal(lowLimitInactiveTime);
+            clearAlarm(lowLimitInactiveTime);
         }
     }
 }

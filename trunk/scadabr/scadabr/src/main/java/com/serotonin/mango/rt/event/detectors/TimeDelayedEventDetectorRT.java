@@ -59,9 +59,9 @@ abstract public class TimeDelayedEventDetectorRT extends TimeoutDetectorRT {
 
                 if (eventActiveTime < conditionInactiveTime) {
                     // The event should go active.
-                    raiseEvent(eventActiveTime, createEventContext());
+                    raiseAlarm(eventActiveTime, createEventContext());
                     // And then go inactive
-                    returnToNormal(conditionInactiveTime);
+                    clearAlarm(conditionInactiveTime);
                 }
             }
         }

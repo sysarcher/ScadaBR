@@ -498,10 +498,10 @@ public class DataPointDao extends BaseDao {
             detector.setXid(rs.getString(++i));
             detector.setAlias(rs.getString(++i));
             detector.setDetectorType(rs.getInt(++i));
-            detector.setAlarmLevel(AlarmLevel.fromMangoDbId(rs.getInt(++i)));
+            detector.setAlarmLevel(AlarmLevel.fromId(rs.getInt(++i)));
             detector.setLimit(rs.getDouble(++i));
             detector.setDuration(rs.getInt(++i));
-            detector.setDurationType(TimePeriods.fromMangoDbId(rs.getInt(++i)));
+            detector.setDurationType(TimePeriods.fromId(rs.getInt(++i)));
             detector.setBinaryState(charToBool(rs.getString(++i)));
             detector.setMultistateState(rs.getInt(++i));
             detector.setChangeCount(rs.getInt(++i));
@@ -534,10 +534,10 @@ public class DataPointDao extends BaseDao {
                         ps.setString(2, ped.getAlias());
                         ps.setInt(3, dp.getId());
                         ps.setInt(4, ped.getDetectorType());
-                        ps.setInt(5, ped.getAlarmLevel().mangoDbId);
+                        ps.setInt(5, ped.getAlarmLevel().getId());
                         ps.setDouble(6, ped.getLimit());
                         ps.setInt(7, ped.getDuration());
-                        ps.setInt(8, ped.getDurationType().mangoDbId);
+                        ps.setInt(8, ped.getDurationType().getId());
                         ps.setString(9, boolToChar(ped.isBinaryState()));
                         ps.setInt(10, ped.getMultistateState());
                         ps.setInt(11, ped.getChangeCount());

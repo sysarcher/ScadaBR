@@ -93,15 +93,15 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
 
         // Check the results.
         if (monitor.getRetrievalFailure() != null) {
-            raiseEvent(DATA_RETRIEVAL_FAILURE_EVENT, time, true, monitor.getRetrievalFailure());
+            raiseAlarm(DATA_RETRIEVAL_FAILURE_EVENT, time, monitor.getRetrievalFailure());
         } else {
-            returnToNormal(DATA_RETRIEVAL_FAILURE_EVENT, time);
+             clearAlarm(DATA_RETRIEVAL_FAILURE_EVENT, time);
         }
 
         if (monitor.getSaveFailure() != null) {
-            raiseEvent(FILE_SAVE_EXCEPTION_EVENT, time, true, monitor.getSaveFailure());
+            raiseAlarm(FILE_SAVE_EXCEPTION_EVENT, time, monitor.getSaveFailure());
         } else {
-            returnToNormal(FILE_SAVE_EXCEPTION_EVENT, time);
+            clearAlarm(FILE_SAVE_EXCEPTION_EVENT, time);
         }
     }
 

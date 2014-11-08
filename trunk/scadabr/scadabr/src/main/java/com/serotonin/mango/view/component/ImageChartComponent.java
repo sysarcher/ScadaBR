@@ -150,7 +150,7 @@ public class ImageChartComponent extends CompoundComponent {
         out.writeInt(version);
         out.writeInt(width);
         out.writeInt(height);
-        out.writeInt(durationType.mangoDbId);
+        out.writeInt(durationType.getId());
         out.writeInt(durationPeriods);
     }
 
@@ -161,7 +161,7 @@ public class ImageChartComponent extends CompoundComponent {
         if (ver == 1) {
             width = in.readInt();
             height = in.readInt();
-            durationType = TimePeriods.fromMangoDbId(in.readInt());
+            durationType = TimePeriods.fromId(in.readInt());
             durationPeriods = in.readInt();
         }
     }

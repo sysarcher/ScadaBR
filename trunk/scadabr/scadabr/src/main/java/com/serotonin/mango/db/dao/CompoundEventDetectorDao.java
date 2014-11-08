@@ -99,7 +99,7 @@ public class CompoundEventDetectorDao extends BaseDao {
             ced.setId(rs.getInt(++i));
             ced.setXid(rs.getString(++i));
             ced.setName(rs.getString(++i));
-            ced.setAlarmLevel(AlarmLevel.fromMangoDbId(rs.getInt(++i)));
+            ced.setAlarmLevel(AlarmLevel.fromId(rs.getInt(++i)));
             ced.setReturnToNormal(charToBool(rs.getString(++i)));
             ced.setDisabled(charToBool(rs.getString(++i)));
             ced.setCondition(rs.getString(++i));
@@ -126,7 +126,7 @@ public class CompoundEventDetectorDao extends BaseDao {
                 PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, ced.getXid());
                 ps.setString(2, ced.getName());
-                ps.setInt(3, ced.getAlarmLevel().mangoDbId);
+                ps.setInt(3, ced.getAlarmLevel().getId());
                 ps.setString(4, boolToChar(ced.isReturnToNormal()));
                 ps.setString(5, boolToChar(ced.isDisabled()));
                 ps.setString(6, ced.getCondition());
