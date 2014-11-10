@@ -39,12 +39,18 @@ import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDataSourceVO> {
 
+    @Autowired
+    private Common common;
+    
     private static final int READ_LIMIT = 1024 * 1024; // One MB
 
     public static final int DATA_RETRIEVAL_FAILURE_EVENT = 1;
@@ -118,11 +124,11 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
         }
     }
 
-    public static String getData(String url, int timeoutSeconds, int retries) throws LocalizableException {
+    public String getData(String url, int timeoutSeconds, int retries) throws LocalizableException {
         // Try to get the data.
         String data;
         while (true) {
-            HttpClient client = Common.getHttpClient(timeoutSeconds * 1000);
+            HttpClient client = common.getHttpClient(timeoutSeconds * 1000);
             GetMethod method = null;
             LocalizableException localizableException;
 

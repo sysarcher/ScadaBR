@@ -49,10 +49,13 @@ import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.text.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSourceVO> {
 
     static final Log LOG = LogFactory.getLog(HttpImageDataSourceRT.class);
@@ -60,6 +63,9 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
     public static final int DATA_RETRIEVAL_FAILURE_EVENT = 1;
     public static final int FILE_SAVE_EXCEPTION_EVENT = 2;
 
+    @Autowired
+    private Common common;
+    
     public HttpImageDataSourceRT(HttpImageDataSourceVO vo) {
         super(vo, true);
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
@@ -228,7 +234,7 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
             throws LocalizableException {
         byte[] data;
         while (true) {
-            HttpClient client = Common.getHttpClient(timeoutSeconds * 1000);
+            HttpClient client = common.getHttpClient(timeoutSeconds * 1000);
             GetMethod method = null;
             LocalizableException lEx;
 

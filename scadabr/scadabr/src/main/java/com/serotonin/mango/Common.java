@@ -63,10 +63,17 @@ import br.org.scadabr.timer.cron.EventRunnable;
 import br.org.scadabr.timer.cron.SystemCronTask;
 import br.org.scadabr.timer.cron.SystemRunnable;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.MissingResourceException;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 @Deprecated // Convert to singleton bean
+@Named
 public class Common {
+    
+    @Inject
+    private SystemSettingsDao systemSettingsDao;
 
     @Deprecated
     private static final String SESSION_USER = "sessionUser";
@@ -88,6 +95,7 @@ public class Common {
     public static CronTimerPool<SystemCronTask, SystemRunnable> systemCronPool;
     public static CronTimerPool<EventCronTask, EventRunnable> eventCronPool;
 
+    @Deprecated // move to own bean ??? And what is monitored ???
     public static final MonitoredValues MONITORED_VALUES = new MonitoredValues();
 
     /*
@@ -105,15 +113,11 @@ public class Common {
     public interface ContextKeys {
 
         @Deprecated
-        String DATABASE_ACCESS = "DATABASE_ACCESS";
-        @Deprecated
         String IMAGE_SETS = "IMAGE_SETS";
         @Deprecated
         String DYNAMIC_IMAGES = "DYNAMIC_IMAGES";
         @Deprecated
         String SCHEDULER = "SCHEDULER";
-        @Deprecated
-        String EVENT_MANAGER = "EVENT_MANAGER";
         String FREEMARKER_CONFIG = "FREEMARKER_CONFIG";
         String BACKGROUND_PROCESSING = "BACKGROUND_PROCESSING";
         String HTTP_RECEIVER_MULTICASTER = "HTTP_RECEIVER_MULTICASTER";
@@ -284,10 +288,9 @@ public class Common {
 
     private static String lazyFiledataPath = null;
 
-    public static String getFiledataPath() {
+    public String getFiledataPath() {
         if (lazyFiledataPath == null) {
-            String name = SystemSettingsDao
-                    .getValue(SystemSettingsDao.FILEDATA_PATH);
+            String name = systemSettingsDao.getValue(SystemSettingsDao.FILEDATA_PATH);
             if (name.startsWith("~")) {
                 name = ctx.getServletContext().getRealPath(name.substring(1));
             }
@@ -354,11 +357,11 @@ public class Common {
 
     //
     // HttpClient
-    public static HttpClient getHttpClient() {
+    public HttpClient getHttpClient() {
         return getHttpClient(30000); // 30 seconds.
     }
 
-    public static HttpClient getHttpClient(int timeout) {
+    public HttpClient getHttpClient(int timeout) {
         HttpConnectionManagerParams managerParams = new HttpConnectionManagerParams();
         managerParams.setConnectionTimeout(timeout);
         managerParams.setSoTimeout(timeout);
@@ -370,11 +373,11 @@ public class Common {
         client.getHttpConnectionManager().setParams(managerParams);
         client.setParams(params);
 
-        if (SystemSettingsDao
+        if (systemSettingsDao
                 .getBooleanValue(SystemSettingsDao.HTTP_CLIENT_USE_PROXY)) {
-            String proxyHost = SystemSettingsDao
+            String proxyHost = systemSettingsDao
                     .getValue(SystemSettingsDao.HTTP_CLIENT_PROXY_SERVER);
-            int proxyPort = SystemSettingsDao
+            int proxyPort = systemSettingsDao
                     .getIntValue(SystemSettingsDao.HTTP_CLIENT_PROXY_PORT);
 
             // Set up the proxy configuration.
@@ -385,11 +388,11 @@ public class Common {
                     .setProxyCredentials(
                             AuthScope.ANY,
                             new UsernamePasswordCredentials(
-                                    SystemSettingsDao
+                                    systemSettingsDao
                                     .getValue(
                                             SystemSettingsDao.HTTP_CLIENT_PROXY_USERNAME,
                                             ""),
-                                    SystemSettingsDao
+                                    systemSettingsDao
                                     .getValue(
                                             SystemSettingsDao.HTTP_CLIENT_PROXY_PASSWORD,
                                             "")));
@@ -398,62 +401,27 @@ public class Common {
         return client;
     }
 
-    //
-    //
-    // i18n
-    //
-    private final static Object i18nLock = new Object();
-    @Deprecated // Use per user settings ...
-    private static String systemLanguage;
-    @Deprecated // Use per user settings ...
-    private static ResourceBundle systemBundle;
-
+    @Deprecated
     public static String getMessage(String key) {
-        ensureI18n();
-        return AbstractLocalizer.localizeI18nKey(key, systemBundle);
+throw new ImplementMeException();
+// ensureI18n();
+//        return AbstractLocalizer.localizeI18nKey(key, systemBundle);
     }
 
     @Deprecated // Use per user settings ...
     public static ResourceBundle getBundle() {
-        ensureI18n();
-        return systemBundle;
+throw new ImplementMeException();
+    //    ensureI18n();
+//        return systemBundle;
     }
 
-    //TODO remove static and implement in init ...
-    private static void ensureI18n() {
-        if (systemLanguage == null) {
-            synchronized (i18nLock) {
-                if (systemLanguage == null) {
-                    systemLanguage = SystemSettingsDao
-                            .getValue(SystemSettingsDao.LANGUAGE);
-                    Locale locale = findLocale(systemLanguage);
-                    if (locale == null) {
-                        throw new IllegalArgumentException(
-                                "Locale for given language not found: "
-                                + systemLanguage);
-                    }
-                    systemBundle = ResourceBundle.getBundle("messages",
-                            locale);
-                }
-            }
-        }
-    }
-
+    @Deprecated
     public static String getMessage(String key, Object... args) {
         String pattern = getMessage(key);
         return MessageFormat.format(pattern, args);
     }
 
-    public static void setSystemLanguage(String language) {
-        if (findLocale(language) == null) {
-            throw new IllegalArgumentException(
-                    "Locale for given language not found: " + language);
-        }
-        SystemSettingsDao.getInstance().setValue(SystemSettingsDao.LANGUAGE, language);
-        systemLanguage = null;
-        systemBundle = null;
-    }
-
+    @Deprecated
     private static Locale findLocale(String language) {
         for (Locale locale : Locale.getAvailableLocales()) {
             if (locale.getLanguage().equals(language)) {

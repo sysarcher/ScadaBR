@@ -39,6 +39,7 @@ import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.db.dao.UserDao;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+
 abstract public class DatabaseAccess {
 
     public enum DatabaseType {
@@ -74,10 +75,6 @@ abstract public class DatabaseAccess {
         }
 
         return dt.getImpl(ctx);
-    }
-
-    public static DatabaseAccess getDatabaseAccess() {
-        return Common.ctx.getDatabaseAccess();
     }
 
     private final Log log = LogFactory.getLog(DatabaseAccess.class);

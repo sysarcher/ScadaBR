@@ -54,16 +54,6 @@ public class WatchListDao extends BaseDao {
         super();
     }
     
-   @Deprecated
-    private WatchListDao(DataSource dataSource) {
-        super(dataSource);
-    }
-
-   @Deprecated
-     public static WatchListDao getInstance() {
-        return new WatchListDao(Common.ctx.getDatabaseAccess().getDataSource());
-    }
-    
     public String generateUniqueXid() {
         return generateUniqueXid(WatchList.XID_PREFIX, "watchLists");
     }

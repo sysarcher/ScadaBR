@@ -37,15 +37,18 @@ import br.org.scadabr.sync.Synchronizer;
 import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 @Deprecated //TODO APL Use rest to fetch image
+@Controller
 public class AsyncImageChartServlet extends BaseInfoServlet {
 
     private static final long serialVersionUID = -1;
 
     @Autowired
     private DataPointDao dataPointDao;
-    final PointValueDao pointValueDao = PointValueDao.getInstance();
+    @Autowired
+    private PointValueDao pointValueDao;
 
     /**
      * @TODO(security): Validate the point access against the user. If
@@ -157,7 +160,7 @@ public class AsyncImageChartServlet extends BaseInfoServlet {
                 pdr.addToCollection(ptsc);
             }
 
-            return ImageChartUtils.getChartData(ptsc, width, height);
+            return new ImageChartUtils().getChartData(ptsc, width, height);
         } catch (StringIndexOutOfBoundsException e) {
             // no op
         } catch (NumberFormatException e) {

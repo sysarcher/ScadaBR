@@ -57,16 +57,6 @@ public class ViewDao extends BaseDao {
         super();
     }
     
-   @Deprecated
-    private ViewDao(DataSource dataSource) {
-        super(dataSource);
-    }
-
-   @Deprecated
-     public static ViewDao getInstance() {
-        return new ViewDao(Common.ctx.getDatabaseAccess().getDataSource());
-    }
-    
     public List<View> getViews() {
         List<View> views = ejt.query(VIEW_SELECT, new ViewRowMapper());
         setViewUsers(views);

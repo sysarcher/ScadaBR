@@ -47,8 +47,16 @@ import javax.mail.internet.AddressException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
+@Configurable
 public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<EventInstance> {
+
+    @Autowired
+    private MailingListDao mailingListDao;
+    @Autowired
+    private SystemSettingsDao systemSettingsDao;
 
     private static final Log LOG = LogFactory.getLog(EmailHandlerRT.class);
 
@@ -96,7 +104,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
     @Override
     public void eventRaised(EventInstance evt) {
         // Get the email addresses to send to
-        activeRecipients = MailingListDao.getInstance().getRecipientAddresses(vo.getActiveRecipients(),
+        activeRecipients = mailingListDao.getRecipientAddresses(vo.getActiveRecipients(),
                 new DateTime(evt.getFireTimestamp()));
 
         // Send an email to the active recipients.
@@ -105,7 +113,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
         // If an inactive notification is to be sent, save the active recipients.
         if (vo.isSendInactive()) {
             if (vo.isInactiveOverride()) {
-                inactiveRecipients = MailingListDao.getInstance().getRecipientAddresses(vo.getInactiveRecipients(),
+                inactiveRecipients = mailingListDao.getRecipientAddresses(vo.getInactiveRecipients(),
                         new DateTime(evt.getFireTimestamp()));
             } else {
                 inactiveRecipients = activeRecipients;
@@ -127,7 +135,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
     @Override
     synchronized public void run(EventInstance evt, long fireTime) {
         // Get the email addresses to send to
-        Set<String> addresses = MailingListDao.getInstance().getRecipientAddresses(vo.getEscalationRecipients(), new DateTime(
+        Set<String> addresses = mailingListDao.getRecipientAddresses(vo.getEscalationRecipients(), new DateTime(
                 fireTime));
 
         // Send the escalation.
@@ -153,7 +161,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
         }
     }
 
-    public static void sendActiveEmail(EventInstance evt, Set<String> addresses) {
+    public void sendActiveEmail(EventInstance evt, Set<String> addresses) {
         sendEmail(evt, NotificationType.ACTIVE, addresses, null);
     }
 
@@ -161,7 +169,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
         sendEmail(evt, notificationType, addresses, vo.getAlias());
     }
 
-    private static void sendEmail(EventInstance evt, NotificationType notificationType, Set<String> addresses,
+    private void sendEmail(EventInstance evt, NotificationType notificationType, Set<String> addresses,
             String alias) {
         if (evt.getEventType().isSystemMessage()) {
             if (((SystemEventType) evt.getEventType()).getSystemEventType() == SystemEventSource.EMAIL_SEND_FAILURE) {
@@ -203,7 +211,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
                 model.putAll(evt.getContext());
             }
             model.put("img", inlineImages);
-            model.put("instanceDescription", SystemSettingsDao.getValue(SystemSettingsDao.INSTANCE_DESCRIPTION));
+            model.put("instanceDescription", systemSettingsDao.getValue(SystemSettingsDao.INSTANCE_DESCRIPTION));
             MangoEmailContent content = new MangoEmailContent(notificationType.getFile(), model, bundle, subject,
                     Common.UTF8);
 

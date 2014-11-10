@@ -10,10 +10,16 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @JsonRemoteEntity
+@Configurable
 public class SystemSettingsJSONWrapper implements JsonSerializable {
 
+    @Autowired
+    private SystemSettingsDao systemSettingsDao;
+    
     public SystemSettingsJSONWrapper() {
     }
 
@@ -22,15 +28,14 @@ public class SystemSettingsJSONWrapper implements JsonSerializable {
 
         Set<Entry<String, Object>> defaultValues = SystemSettingsDao.DEFAULT_VALUES
                 .entrySet();
-        SystemSettingsDao dao = SystemSettingsDao.getInstance();
 
         for (Entry<String, Object> entry : defaultValues) {
             if (entry.getValue() instanceof Integer) {
-                map.put(entry.getKey(), dao.getIntValue(entry.getKey()));
+                map.put(entry.getKey(), systemSettingsDao.getIntValue(entry.getKey()));
             } else if (entry.getValue() instanceof Boolean) {
-                map.put(entry.getKey(), dao.getBooleanValue(entry.getKey()));
+                map.put(entry.getKey(), systemSettingsDao.getBooleanValue(entry.getKey()));
             } else if (entry.getValue() instanceof String) {
-                map.put(entry.getKey(), dao.getValue(entry.getKey()));
+                map.put(entry.getKey(), systemSettingsDao.getValue(entry.getKey()));
             }
         }
 
@@ -42,17 +47,16 @@ public class SystemSettingsJSONWrapper implements JsonSerializable {
 
         Set<Entry<String, Object>> defaultValues = SystemSettingsDao.DEFAULT_VALUES
                 .entrySet();
-        SystemSettingsDao dao = SystemSettingsDao.getInstance();
 
         for (Entry<String, Object> entry : defaultValues) {
             String key = entry.getKey();
 
             if (entry.getValue() instanceof Integer) {
-                dao.setIntValue(key, json.getInt(key));
+                systemSettingsDao.setIntValue(key, json.getInt(key));
             } else if (entry.getValue() instanceof Boolean) {
-                dao.setBooleanValue(key, json.getBoolean(key));
+                systemSettingsDao.setBooleanValue(key, json.getBoolean(key));
             } else if (entry.getValue() instanceof String) {
-                dao.setValue(key, json.getString(key));
+                systemSettingsDao.setValue(key, json.getString(key));
             }
         }
     }

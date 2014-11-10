@@ -19,7 +19,6 @@
 package com.serotonin.mango.db;
 
 import br.org.scadabr.logger.LogUtils;
-import com.serotonin.mango.Common;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -46,7 +45,6 @@ public class DatabaseAccessFactory {
         log.severe("Start DB called");
         if (databaseAccess == null) {
             databaseAccess = DatabaseAccess.createDatabaseAccess(ctx);
-            ctx.setAttribute(Common.ContextKeys.DATABASE_ACCESS, databaseAccess);
             databaseAccess.initialize();
         }
     }

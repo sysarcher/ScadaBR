@@ -54,7 +54,12 @@ public class PublisherEditController extends ParameterizableViewController {
 
     @Autowired
     private RuntimeManager runtimeManager;
-
+    @Autowired
+    private EventDao eventDao;
+    @Autowired
+    private PublisherDao publisherDao;
+            
+    
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
@@ -71,7 +76,7 @@ public class PublisherEditController extends ParameterizableViewController {
 
             // A new publisher
             publisherVO = PublisherVO.createPublisherVO(typeId);
-            publisherVO.setXid(PublisherDao.getInstance().generateUniqueXid());
+            publisherVO.setXid(publisherDao.generateUniqueXid());
         } else {
             // An existing configuration.
             int id = Integer.parseInt(idStr);
@@ -89,7 +94,7 @@ public class PublisherEditController extends ParameterizableViewController {
         Map<String, Object> model = new HashMap<>();
         model.put("publisher", publisherVO);
         if (publisherVO.getId() != Common.NEW_ID) {
-            List<EventInstance> events = EventDao.getInstance().getPendingEventsForPublisher(publisherVO.getId(), user.getId());
+            List<EventInstance> events = eventDao.getPendingEventsForPublisher(publisherVO.getId(), user.getId());
             List<EventInstanceBean> beans = new ArrayList<>();
             if (events != null) {
                 ResourceBundle bundle = ControllerUtils.getResourceBundle(request);

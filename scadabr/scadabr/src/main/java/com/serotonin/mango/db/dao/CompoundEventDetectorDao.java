@@ -55,16 +55,6 @@ public class CompoundEventDetectorDao extends BaseDao {
         super();
     }
 
-    @Deprecated
-    private CompoundEventDetectorDao(DataSource dataSource) {
-        super(dataSource);
-    }
-
-    @Deprecated
-    public static CompoundEventDetectorDao getInstance() {
-        return new CompoundEventDetectorDao(Common.ctx.getDatabaseAccess().getDataSource());
-    }
-
     public String generateUniqueXid() {
         return generateUniqueXid(CompoundEventDetectorVO.XID_PREFIX, "compoundEventDetectors");
     }

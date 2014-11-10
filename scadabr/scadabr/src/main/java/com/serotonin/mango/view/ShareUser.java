@@ -29,14 +29,19 @@ import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.User;
-import br.org.scadabr.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
+@Configurable
 public class ShareUser implements JsonSerializable {
 
+    @Autowired
+    private UserDao userDao;
+    
     public static final int ACCESS_NONE = 0;
     public static final int ACCESS_READ = 1;
     public static final int ACCESS_SET = 2;
@@ -75,7 +80,7 @@ public class ShareUser implements JsonSerializable {
         if (text == null) {
             throw new LocalizableJsonException("emport.error.viewShare.missing", "user");
         }
-        User user = UserDao.getInstance().getUser(text);
+        User user = userDao.getUser(text);
         if (user == null) {
             throw new LocalizableJsonException("emport.error.missingUser", text);
         }
@@ -95,7 +100,7 @@ public class ShareUser implements JsonSerializable {
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        map.put("user", UserDao.getInstance().getUser(userId).getUsername());
+        map.put("user", userDao.getUser(userId).getUsername());
         map.put("accessType", ACCESS_CODES.getCode(accessType));
     }
 }

@@ -158,7 +158,7 @@ public class DerbyAccess extends DatabaseAccess {
         }
         final InputStream in = new ByteArrayInputStream(sb.toString().getBytes("ASCII"));
 
-        Common.ctx.getDatabaseAccess().doInConnection(new ConnectionCallbackVoid() {
+        doInConnection(new ConnectionCallbackVoid() {
             @Override
             public void doInConnection(Connection conn) {
                 try {

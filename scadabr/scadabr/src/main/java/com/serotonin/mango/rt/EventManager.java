@@ -44,6 +44,7 @@ import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.event.EventHandlerVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.util.ILifecycle;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.AlarmLevel;
@@ -388,7 +389,7 @@ public class EventManager implements ILifecycle, Serializable {
 
         if (!defaultAddresses.isEmpty()) {
             // If there are still any addresses left in the list, send them the notification.
-            EmailHandlerRT.sendActiveEmail(evt, defaultAddresses);
+            throw new ImplementMeException(); //TODO WAS  EmailHandlerRT.sendActiveEmail(evt, defaultAddresses);
         }
     }
 

@@ -35,14 +35,19 @@ import com.serotonin.mango.view.ShareUser;
 import com.serotonin.mango.view.View;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
+import javax.inject.Inject;
+import org.springframework.stereotype.Controller;
 
+@Controller
 public class ViewsController extends ParameterizableViewController {
 
+    @Inject
+    private ViewDao viewDao;
+    
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         Map<String, Object> model = new HashMap<>();
-        ViewDao viewDao = ViewDao.getInstance();
         User user = Common.getUser(request);
 
         List<IntValuePair> views = viewDao.getViewNames(user.getId());

@@ -31,16 +31,21 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.ViewDao;
 import com.serotonin.mango.view.ShareUser;
 import com.serotonin.mango.view.View;
+import javax.inject.Inject;
+import org.springframework.stereotype.Controller;
 
 /**
  * @author Matthew Lohbihler
  */
+@Controller
 public class PublicViewController extends ParameterizableViewController {
 
+    @Inject
+    private ViewDao viewDao;
+    
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) {
-        ViewDao viewDao = ViewDao.getInstance();
-
+    
         // Get the view by id.
         String vid = request.getParameter("viewId");
         View view = null;

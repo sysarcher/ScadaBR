@@ -31,13 +31,20 @@ import org.apache.log4j.spi.LoggingEvent;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
-import com.serotonin.mango.rt.maint.VersionCheck;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class MangoGroveLogAppender extends AppenderSkeleton {
 
+    @Autowired
+    private SystemSettingsDao systemSettingsDao;
+    @Autowired
+    private Common common;
+    
     @Override
     protected void append(LoggingEvent event) {
         // In spite of what the configuration file says, we don't care about anything less than an error.
@@ -47,7 +54,7 @@ public class MangoGroveLogAppender extends AppenderSkeleton {
 
         // Check the logging property setting.
         try {
-            if (!SystemSettingsDao.getBooleanValue(SystemSettingsDao.GROVE_LOGGING, false)) {
+            if (!systemSettingsDao.getBooleanValue(SystemSettingsDao.GROVE_LOGGING, false)) {
                 return;
             }
         } catch (Throwable t) {
@@ -55,7 +62,7 @@ public class MangoGroveLogAppender extends AppenderSkeleton {
             return;
         }
 
-        HttpClient client = Common.getHttpClient();
+        HttpClient client = common.getHttpClient();
         PostMethod method = new PostMethod(Common.getGroveUrl(Common.GroveServlets.MANGO_LOG));
         method.addParameter("productId", "ScadaBR");
         method.addParameter("productVersion", Common.getVersion());

@@ -66,7 +66,13 @@ import org.springframework.beans.factory.annotation.Configurable;
 public class EventHandlerVO implements Serializable, ChangeComparable<EventHandlerVO>, JsonSerializable {
     @Autowired
     private DataPointDao dataPointDao;
-
+    @Autowired
+    private EventDao eventDao;
+    @Autowired 
+    private UserDao userDao;
+    @Autowired
+    private MailingListDao mailingListDao;
+    
     public static final String XID_PREFIX = "EH_";
 
     public static final int TYPE_SET_POINT = 1;
@@ -635,10 +641,8 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
         }
     }
 
-    private static LocalizableMessage createRecipientMessage(
+    private LocalizableMessage createRecipientMessage(
             List<RecipientListEntryBean> recipients) {
-        MailingListDao mailingListDao = MailingListDao.getInstance();
-        UserDao userDao = UserDao.getInstance();
         ArrayList<LocalizableMessage> params = new ArrayList<>();
         for (RecipientListEntryBean recip : recipients) {
             LocalizableMessage msg;
@@ -792,7 +796,7 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        map.put("eventType", EventDao.getInstance().getEventHandlerType(id));
+        map.put("eventType", eventDao.getEventHandlerType(id));
 
         map.put("xid", xid);
         map.put("handlerType", TYPE_CODES.getCode(handlerType));

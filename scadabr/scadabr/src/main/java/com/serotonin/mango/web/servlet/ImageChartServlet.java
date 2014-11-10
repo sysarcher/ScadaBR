@@ -176,7 +176,7 @@ public class ImageChartServlet extends BaseInfoServlet {
                 }
             }
 
-            return ImageChartUtils.getChartData(ptsc, width, height);
+            return new ImageChartUtils().getChartData(ptsc, width, height);
         } catch (StringIndexOutOfBoundsException | NumberFormatException | ArrayIndexOutOfBoundsException e) {
             // no op
         }

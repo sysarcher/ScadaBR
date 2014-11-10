@@ -34,19 +34,23 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.validation.BindException;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.WebUtils;
 
 import br.org.scadabr.db.spring.ConnectionCallbackVoid;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.mvc.form.SqlForm;
 import br.org.scadabr.util.SerializationHelper;
+import javax.inject.Inject;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Controller;
 
+//@Controller
 public class SqlController {
 
+    @Inject
+    private DatabaseAccess databaseAccess;
+    
     private static final Log LOG = LogFactory.getLog(SqlController.class);
     private String formView;
 
@@ -65,7 +69,6 @@ public class SqlController {
         Permissions.ensureAdmin(request);
 
         final SqlForm form = (SqlForm) command;
-        DatabaseAccess databaseAccess = Common.ctx.getDatabaseAccess();
         try {
             if (WebUtils.hasSubmitParameter(request, "query")) {
                 databaseAccess.doInConnection(new ConnectionCallbackVoid() {

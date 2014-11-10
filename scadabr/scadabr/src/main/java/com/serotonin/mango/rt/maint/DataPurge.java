@@ -51,6 +51,17 @@ public class DataPurge {
     private RuntimeManager runtimeManager;
     @Autowired
     private DataPointDao dataPointDao;
+    @Autowired
+    private EventDao eventDao;
+    @Autowired
+    private ReportDao reportDao;
+    @Autowired
+    private SystemSettingsDao systemSettingsDao;
+    @Autowired
+    private PointValueDao pointValueDao;
+    @Autowired
+    private Common common;
+    
     private long runtime;
 
     private final RuntimeManager rm = runtimeManager;
@@ -103,10 +114,10 @@ public class DataPurge {
         int deleteCount = 0;
 
         // Find all ids for which there should be a corresponding file
-        List<Long> validIds = PointValueDao.getInstance().getFiledataIds();
+        List<Long> validIds = pointValueDao.getFiledataIds();
 
         // Get all of the existing filenames.
-        File dir = new File(Common.getFiledataPath());
+        File dir = new File(common.getFiledataPath());
         String[] files = dir.list();
         if (files != null) {
             for (String filename : files) {
@@ -126,9 +137,9 @@ public class DataPurge {
 
     private void eventPurge() {
         DateTime cutoff = TimePeriods.DAYS.truncateDateTime(new DateTime(runtime));
-        cutoff = SystemSettingsDao.getTimePeriodsValue(SystemSettingsDao.EVENT_PURGE_PERIOD_TYPE).minus(cutoff, SystemSettingsDao.getIntValue(SystemSettingsDao.EVENT_PURGE_PERIODS));
+        cutoff = systemSettingsDao.getTimePeriodsValue(SystemSettingsDao.EVENT_PURGE_PERIOD_TYPE).minus(cutoff, systemSettingsDao.getIntValue(SystemSettingsDao.EVENT_PURGE_PERIODS));
 
-        int deleteCount = EventDao.getInstance().purgeEventsBefore(cutoff.getMillis());
+        int deleteCount = eventDao.purgeEventsBefore(cutoff.getMillis());
         if (deleteCount > 0) {
             LOG.log(Level.INFO, "Event purge ended, {0} events deleted", deleteCount);
         }
@@ -136,9 +147,9 @@ public class DataPurge {
 
     private void reportPurge() {
         DateTime cutoff = TimePeriods.DAYS.truncateDateTime(new DateTime(runtime));
-        cutoff = SystemSettingsDao.getTimePeriodsValue(SystemSettingsDao.REPORT_PURGE_PERIOD_TYPE).minus(cutoff, SystemSettingsDao.getIntValue(SystemSettingsDao.REPORT_PURGE_PERIODS));
+        cutoff = systemSettingsDao.getTimePeriodsValue(SystemSettingsDao.REPORT_PURGE_PERIOD_TYPE).minus(cutoff, systemSettingsDao.getIntValue(SystemSettingsDao.REPORT_PURGE_PERIODS));
 
-        int deleteCount = ReportDao.getInstance().purgeReportsBefore(cutoff.getMillis());
+        int deleteCount = reportDao.purgeReportsBefore(cutoff.getMillis());
         if (deleteCount > 0) {
             LOG.log(Level.INFO, "Report purge ended, {0} report instances deleted", deleteCount);
         }

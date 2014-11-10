@@ -44,12 +44,20 @@ import com.serotonin.mango.view.component.ViewComponent;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @JsonRemoteEntity
+@Configurable
 public class View implements Serializable, JsonSerializable {
 
     public static final String XID_PREFIX = "GV_";
 
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private ViewDao viewDao;
+    
     private int id = Common.NEW_ID;
     @JsonRemoteProperty
     private String xid;
@@ -144,7 +152,7 @@ public class View implements Serializable, JsonSerializable {
      * the components that render them
      */
     public void validateViewComponents(boolean makeReadOnly) {
-        User owner = UserDao.getInstance().getUser(userId);
+        User owner = userDao.getUser(userId);
         for (ViewComponent viewComponent : viewComponents) {
             viewComponent.validateDataPoint(owner, makeReadOnly);
         }
@@ -221,7 +229,7 @@ public class View implements Serializable, JsonSerializable {
             response.addContextual("xid", "validate.required");
         } else if (xid.length() >  50) {
             response.addContextual("xid", "validate.notLongerThan", 50);
-        } else if (!ViewDao.getInstance().isXidUnique(xid, id)) {
+        } else if (!viewDao.isXidUnique(xid, id)) {
             response.addContextual("xid", "validate.xidUsed");
         }
 
@@ -265,7 +273,7 @@ public class View implements Serializable, JsonSerializable {
                 throw new LocalizableJsonException("emport.error.missingValue",
                         "user");
             }
-            User user = UserDao.getInstance().getUser(username);
+            User user = userDao.getUser(username);
             if (user == null) {
                 throw new LocalizableJsonException("emport.error.missingUser",
                         username);
@@ -309,7 +317,7 @@ public class View implements Serializable, JsonSerializable {
 
     @Override
     public void jsonSerialize(Map<String, Object> map) {
-        map.put("user", UserDao.getInstance().getUser(userId).getUsername());
+        map.put("user", userDao.getUser(userId).getUsername());
         map.put("anonymousAccess", ShareUser.ACCESS_CODES
                 .getCode(anonymousAccess));
         map.put("viewComponents", viewComponents);

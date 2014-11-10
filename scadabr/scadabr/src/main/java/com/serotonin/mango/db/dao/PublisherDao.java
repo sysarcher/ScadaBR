@@ -57,16 +57,6 @@ public class PublisherDao extends BaseDao {
         super();
     }
     
-   @Deprecated
-    private PublisherDao(DataSource dataSource) {
-        super(dataSource);
-    }
-
-   @Deprecated
-     public static PublisherDao getInstance() {
-        return new PublisherDao(Common.ctx.getDatabaseAccess().getDataSource());
-    }
-    
     public String generateUniqueXid() {
         return generateUniqueXid(PublisherVO.XID_PREFIX, "publishers");
     }
