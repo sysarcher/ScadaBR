@@ -8,6 +8,7 @@ package com.serotonin.mango.web;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.SystemEventSource;
 import com.serotonin.mango.rt.EventManager;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.vo.User;
 import java.io.Serializable;
@@ -28,13 +29,15 @@ import org.springframework.context.annotation.Scope;
 @Scope("session")
 public class UserSessionContextBean implements Serializable {
 
+    @Inject
+    private RuntimeManager runtimeManager;
+            
     private User user;
     private Locale locale = Locale.getDefault();
     private TimeZone timeZone = TimeZone.getDefault();
     private transient DateFormat dateFormat;
     private transient DateFormat timeFormat;
     private transient DateFormat dateTimeFormat;
-    private transient ResourceBundle bundle;
 
     /**
      * @return the user
@@ -49,15 +52,17 @@ public class UserSessionContextBean implements Serializable {
     public void loginUser(User user) {
         this.user = user;
         new SystemEventType(SystemEventSource.USER_LOGIN, user.getId()).fire("event.login", user.getUsername());
+        runtimeManager.UserSessionStarts(this);
     }
 
     /**
      * @param user the user to set
      */
-    public void logoutUser(User user) {
-        this.user = null;
+    public void logoutUser() {
         new SystemEventType(SystemEventSource.USER_LOGIN, user.getId()).clearAlarm();
         user.cancelTestingUtility();
+        runtimeManager.UserSessionEnds(this);
+        this.user = null;
     }
 
     
@@ -160,14 +165,10 @@ public class UserSessionContextBean implements Serializable {
         this.dateTimeFormat = dateTimeFormat;
     }
 
-    /**
-     * @return the bundle
-     */
-    public ResourceBundle getBundle() {
-        if (bundle == null) {
-            bundle = ResourceBundle.getBundle("messages", locale);
-        }
-        return bundle;
+    public void systemShutdown() {
+        new SystemEventType(SystemEventSource.USER_LOGIN, user.getId()).disableAlarm();
+        user.cancelTestingUtility();
+        this.user = null;
     }
 
 }

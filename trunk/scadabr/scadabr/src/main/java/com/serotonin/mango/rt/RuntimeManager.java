@@ -68,6 +68,9 @@ import br.org.scadabr.util.LifecycleException;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.web.UserSessionContextBean;
+import java.util.HashSet;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -77,6 +80,7 @@ public class RuntimeManager {
     private static final Log LOG = LogFactory.getLog(RuntimeManager.class);
 
     private final List<DataSourceRT> runningDataSources = new CopyOnWriteArrayList<>();
+    private final Set<UserSessionContextBean> userSessions = new HashSet<>();
 
     /**
      * Provides a quick lookup map of the running data points.
@@ -970,4 +974,17 @@ public class RuntimeManager {
     public void addPointToHierarchy(DataPointVO dp, String... pathToPoint) {
         dataPointDao.addPointToHierarchy(dp, pathToPoint);
     }
+    
+    public void UserSessionStarts(UserSessionContextBean us) {
+        userSessions.add(us);
+    }
+    
+    public void UserSessionEnds(UserSessionContextBean us) {
+        userSessions.remove(us);
+    }
+    
+    public Set<UserSessionContextBean> getUserSessionContextBeans() {
+        return userSessions;
+    }
+    
 }

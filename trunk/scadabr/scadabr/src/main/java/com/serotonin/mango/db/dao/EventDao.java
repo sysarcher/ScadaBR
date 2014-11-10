@@ -234,8 +234,8 @@ public class EventDao extends BaseDao {
 
     public List<EventInstance> getActiveEvents() {
         List<EventInstance> results = ejt.query(BASIC_EVENT_SELECT
-                + "where e.rtnApplicable=? and e.rtnTs is null",
-                new EventInstanceRowMapper(), boolToChar(true));
+                + "where e.rtnCause=?",
+                new EventInstanceRowMapper(), EventStatus.ACTIVE.getId());
         attachRelationalInfo(results);
         return results;
     }
