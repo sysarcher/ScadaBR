@@ -73,6 +73,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
         return id == Common.NEW_ID;
     }
 
+    @Deprecated // use EfventType
     public EventTypeVO getEventType() {
         return new EventTypeVO(EventSources.COMPOUND, id, 0, new LocalizableMessageImpl("common.default", name),
                 alarmLevel);
@@ -114,7 +115,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
                     }
 
                     for (PointEventDetectorVO ped : dp.getEventDetectors()) {
-                        if (ped.getEventDetectorKey().equals(key) && ped.isRtnApplicable()) {
+                        if (ped.getEventDetectorKey().equals(key) && ped.isStateful()) {
                             found = true;
                             break;
                         }

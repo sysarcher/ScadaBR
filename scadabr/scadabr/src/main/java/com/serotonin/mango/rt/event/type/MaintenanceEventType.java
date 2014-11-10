@@ -105,4 +105,9 @@ public class MaintenanceEventType extends EventType {
         return alarmLevel;
     }
 
+    @Override
+    public boolean isStateful() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

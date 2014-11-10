@@ -93,7 +93,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
     private AlarmLevel alarmLevel = AlarmLevel.NONE;
     private int scheduleType = TYPE_DAILY;
     @JsonRemoteProperty
-    private boolean returnToNormal = true;
+    private boolean stateful = true;
     @JsonRemoteProperty
     private boolean disabled = false;
     @JsonRemoteProperty
@@ -145,7 +145,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         if (!alias.isEmpty()) {
             message = new LocalizableMessageImpl("common.default", alias);
         } else if (scheduleType == TYPE_ONCE) {
-            if (returnToNormal) {
+            if (stateful) {
                 message = new LocalizableMessageImpl("event.schedule.onceUntil", new DateTime(activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0).toDate(),
                         new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute, inactiveSecond, 0).toDate());
             } else {
@@ -154,7 +154,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         } else if (scheduleType == TYPE_HOURLY) {
             String activeTime = StringUtils.pad(Integer.toString(activeMinute), '0', 2) + ":"
                     + StringUtils.pad(Integer.toString(activeSecond), '0', 2);
-            if (returnToNormal) {
+            if (stateful) {
                 message = new LocalizableMessageImpl("event.schedule.hoursUntil", activeTime, StringUtils.pad(
                         Integer.toString(inactiveMinute), '0', 2)
                         + ":" + StringUtils.pad(Integer.toString(inactiveSecond), '0', 2));
@@ -162,34 +162,34 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
                 message = new LocalizableMessageImpl("event.schedule.hoursAt", activeTime);
             }
         } else if (scheduleType == TYPE_DAILY) {
-            if (returnToNormal) {
+            if (stateful) {
                 message = new LocalizableMessageImpl("event.schedule.dailyUntil", activeTime(), inactiveTime());
             } else {
                 message = new LocalizableMessageImpl("event.schedule.dailyAt", activeTime());
             }
         } else if (scheduleType == TYPE_WEEKLY) {
-            if (returnToNormal) {
+            if (stateful) {
                 message = new LocalizableMessageImpl("event.schedule.weeklyUntil", weekday(true), activeTime(),
                         weekday(false), inactiveTime());
             } else {
                 message = new LocalizableMessageImpl("event.schedule.weeklyAt", weekday(true), activeTime());
             }
         } else if (scheduleType == TYPE_MONTHLY) {
-            if (returnToNormal) {
+            if (stateful) {
                 message = new LocalizableMessageImpl("event.schedule.monthlyUntil", monthday(true), activeTime(),
                         monthday(false), inactiveTime());
             } else {
                 message = new LocalizableMessageImpl("event.schedule.monthlyAt", monthday(true), activeTime());
             }
         } else if (scheduleType == TYPE_YEARLY) {
-            if (returnToNormal) {
+            if (stateful) {
                 message = new LocalizableMessageImpl("event.schedule.yearlyUntil", monthday(true), month(true),
                         activeTime(), monthday(false), month(false), inactiveTime());
             } else {
                 message = new LocalizableMessageImpl("event.schedule.yearlyAt", monthday(true), month(true), activeTime());
             }
         } else if (scheduleType == TYPE_CRON) {
-            if (returnToNormal) {
+            if (stateful) {
                 message = new LocalizableMessageImpl("event.schedule.cronUntil", activeCron, inactiveCron);
             } else {
                 message = new LocalizableMessageImpl("event.schedule.cronAt", activeCron);
@@ -302,7 +302,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
                 response.addContextual("activeCron", "scheduledEvents.validate.activeCron", e);
             }
 
-            if (returnToNormal) {
+            if (stateful) {
                 try {
                     new CronParser().parse(inactiveCron, CronExpression.TIMEZONE_UTC);
                 } catch (ParseException e) {
@@ -319,7 +319,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
             response.addContextual("activeCron", "scheduledEvents.validate.activeTrigger", e.getMessage());
         }
 
-        if (returnToNormal) {
+        if (stateful) {
             try {
                 rt.createTrigger(false);
             } catch (RuntimeException e) {
@@ -329,7 +329,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         }
 
         // If the event is once, make sure the active time is earlier than the inactive time.
-        if (scheduleType == TYPE_ONCE && returnToNormal) {
+        if (scheduleType == TYPE_ONCE && stateful) {
             DateTime adt = new DateTime(activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0);
             DateTime idt = new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute,
                     inactiveSecond, 0);
@@ -345,7 +345,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         AuditEventType.addPropertyMessage(list, "scheduledEvents.alias", alias);
         AuditEventType.addPropertyMessage(list, "common.alarmLevel", alarmLevel.getI18nKey());
         AuditEventType.addPropertyMessage(list, "scheduledEvents.type", getTypeMessage());
-        AuditEventType.addPropertyMessage(list, "common.rtn", returnToNormal);
+        AuditEventType.addPropertyMessage(list, "common.rtn", stateful);
         AuditEventType.addPropertyMessage(list, "common.disabled", disabled);
         AuditEventType.addPropertyMessage(list, "common.configuration", getDescription());
     }
@@ -359,7 +359,7 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
             AuditEventType.addPropertyChangeMessage(list, "scheduledEvents.type", from.getTypeMessage(),
                     getTypeMessage());
         }
-        AuditEventType.maybeAddPropertyChangeMessage(list, "common.rtn", from.returnToNormal, returnToNormal);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "common.rtn", from.stateful, stateful);
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.disabled", from.disabled, disabled);
         if (from.activeYear != activeYear || from.activeMonth != activeMonth || from.activeDay != activeDay
                 || from.activeHour != activeHour || from.activeMinute != activeMinute
@@ -502,12 +502,12 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         this.inactiveYear = inactiveYear;
     }
 
-    public boolean isReturnToNormal() {
-        return returnToNormal;
+    public boolean isStateful() {
+        return stateful;
     }
 
-    public void setReturnToNormal(boolean returnToNormal) {
-        this.returnToNormal = returnToNormal;
+    public void setStateful(boolean stateful) {
+        this.stateful = stateful;
     }
 
     public int getScheduleType() {

@@ -104,7 +104,7 @@ public class ScheduledEventDao extends BaseDao {
             se.setAlias(rs.getString(++i));
             se.setAlarmLevel(AlarmLevel.fromId(rs.getInt(++i)));
             se.setScheduleType(rs.getInt(++i));
-            se.setReturnToNormal(charToBool(rs.getString(++i)));
+            se.setStateful(charToBool(rs.getString(++i)));
             se.setDisabled(charToBool(rs.getString(++i)));
             se.setActiveYear(rs.getInt(++i));
             se.setActiveMonth(rs.getInt(++i));
@@ -148,7 +148,7 @@ public class ScheduledEventDao extends BaseDao {
                 ps.setInt(2, se.getAlarmLevel().getId());
                 ps.setString(3, se.getAlias());
                 ps.setInt(4, se.getScheduleType());
-                ps.setString(5, boolToChar(se.isReturnToNormal()));
+                ps.setString(5, boolToChar(se.isStateful()));
                 ps.setString(6, boolToChar(se.isDisabled()));
                 ps.setInt(7, se.getActiveYear());
                 ps.setInt(8, se.getActiveMonth());
@@ -181,7 +181,7 @@ public class ScheduledEventDao extends BaseDao {
                         + "  activeYear=?, activeMonth=?, activeDay=?, activeHour=?, activeMinute=?, activeSecond=?, activeCron=?, "
                         + "  inactiveYear=?, inactiveMonth=?, inactiveDay=?, inactiveHour=?, inactiveMinute=?, inactiveSecond=?, "
                         + "  inactiveCron=? " + "where id=?", new Object[]{se.getXid(), se.getAlarmLevel(),
-                            se.getAlias(), se.getScheduleType(), boolToChar(se.isReturnToNormal()),
+                            se.getAlias(), se.getScheduleType(), boolToChar(se.isStateful()),
                             boolToChar(se.isDisabled()), se.getActiveYear(), se.getActiveMonth(),
                             se.getActiveDay(), se.getActiveHour(), se.getActiveMinute(), se.getActiveSecond(),
                             se.getActiveCron(), se.getInactiveYear(), se.getInactiveMonth(), se.getInactiveDay(),

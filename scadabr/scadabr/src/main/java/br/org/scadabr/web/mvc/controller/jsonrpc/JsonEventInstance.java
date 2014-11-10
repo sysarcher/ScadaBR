@@ -15,14 +15,12 @@ import java.util.List;
 public class JsonEventInstance {
 
     private int id;
-    private EventStatus eventStatus;
     private AlarmLevel alarmLevel;
-    private boolean active;
-    private long activeTimestamp;
-    private Long rtnTimestamp;
+    private long fireTimestamp;
+    private Long inactiveTimestamp;
     private String message;
-    private boolean rtnApplicable;
-    private String rtnMessage;
+    private EventStatus eventState;
+    private String stateMessage;
     private boolean acknowledged;
 
     /**
@@ -54,34 +52,6 @@ public class JsonEventInstance {
     }
 
     /**
-     * @return the activeTimestamp
-     */
-    public long getActiveTimestamp() {
-        return activeTimestamp;
-    }
-
-    /**
-     * @param activeTimestamp the activeTimestamp to set
-     */
-    public void setActiveTimestamp(long activeTimestamp) {
-        this.activeTimestamp = activeTimestamp;
-    }
-
-    /**
-     * @return the rtnTimestamp
-     */
-    public Long getRtnTimestamp() {
-        return rtnTimestamp;
-    }
-
-    /**
-     * @param rtnTimestamp the rtnTimestamp to set
-     */
-    public void setRtnTimestamp(Long rtnTimestamp) {
-        this.rtnTimestamp = rtnTimestamp;
-    }
-
-    /**
      * @return the message
      */
     public String getMessage() {
@@ -96,45 +66,17 @@ public class JsonEventInstance {
     }
 
     /**
-     * @return the active
+     * @return the stateMessage
      */
-    public boolean isActive() {
-        return active;
+    public String getStateMessage() {
+        return stateMessage;
     }
 
     /**
-     * @param active the active to set
+     * @param stateMessage the stateMessage to set
      */
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    /**
-     * @return the rtnApplicable
-     */
-    public boolean isRtnApplicable() {
-        return rtnApplicable;
-    }
-
-    /**
-     * @param rtnApplicable the rtnApplicable to set
-     */
-    public void setRtnApplicable(boolean rtnApplicable) {
-        this.rtnApplicable = rtnApplicable;
-    }
-
-    /**
-     * @return the rtnMessage
-     */
-    public String getRtnMessage() {
-        return rtnMessage;
-    }
-
-    /**
-     * @param rtnMessage the rtnMessage to set
-     */
-    public void setRtnMessage(String rtnMessage) {
-        this.rtnMessage = rtnMessage;
+    public void setStateMessage(String stateMessage) {
+        this.stateMessage = stateMessage;
     }
 
     /**
@@ -154,16 +96,12 @@ public class JsonEventInstance {
     public static JsonEventInstance wrap(EventInstance eventInstance, Localizer localizer) {
         final JsonEventInstance result = new JsonEventInstance();
         result.setId(eventInstance.getId());
-        result.setActive(eventInstance.isActive());
+        result.setEventState(eventInstance.getEventState());
         result.setAlarmLevel(eventInstance.getAlarmLevel());
-        result.setEventStatus(eventInstance.getEventState());
-        result.setActiveTimestamp(eventInstance.getActiveTimestamp());
-        result.setRtnApplicable(eventInstance.isRtnApplicable());
-        if (eventInstance.getRtnMessage() != null) {
-            result.setRtnMessage(localizer.getMessage(eventInstance.getRtnMessage()));
-        }
-        if (eventInstance.getRtnTimestamp() > 0) {
-            result.setRtnTimestamp(eventInstance.getRtnTimestamp());
+        result.setFireTimestamp(eventInstance.getFireTimestamp());
+        result.setStateMessage(localizer.getMessage(eventInstance.getStateMessage()));
+        if (eventInstance.getInactiveTimestamp() > 0) {
+            result.setInactiveTimestamp(eventInstance.getInactiveTimestamp());
         }
         result.setAcknowledged(eventInstance.isAcknowledged());
         result.setMessage(localizer.getMessage(eventInstance.getMessage()));
@@ -179,17 +117,45 @@ public class JsonEventInstance {
     }
 
     /**
-     * @return the eventStatus
+     * @return the fireTimestamp
      */
-    public EventStatus getEventStatus() {
-        return eventStatus;
+    public long getFireTimestamp() {
+        return fireTimestamp;
     }
 
     /**
-     * @param eventStatus the eventStatus to set
+     * @param fireTimestamp the fireTimestamp to set
      */
-    public void setEventStatus(EventStatus eventStatus) {
-        this.eventStatus = eventStatus;
+    public void setFireTimestamp(long fireTimestamp) {
+        this.fireTimestamp = fireTimestamp;
+    }
+
+    /**
+     * @return the inactiveTimestamp
+     */
+    public Long getInactiveTimestamp() {
+        return inactiveTimestamp;
+    }
+
+    /**
+     * @param inactiveTimestamp the inactiveTimestamp to set
+     */
+    public void setInactiveTimestamp(Long inactiveTimestamp) {
+        this.inactiveTimestamp = inactiveTimestamp;
+    }
+
+    /**
+     * @return the eventState
+     */
+    public EventStatus getEventState() {
+        return eventState;
+    }
+
+    /**
+     * @param eventState the eventState to set
+     */
+    public void setEventState(EventStatus eventState) {
+        this.eventState = eventState;
     }
 
 }

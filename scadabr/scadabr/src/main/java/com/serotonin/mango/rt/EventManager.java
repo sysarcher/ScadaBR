@@ -85,52 +85,7 @@ public class EventManager implements ILifecycle, Serializable {
      * @param i18nKey
      * @param i18nArgs 
      */
-    public void handleFiredEvent(EventType type, String i18nKey, Object ... i18nArgs) {
-        raiseEvent(type, System.currentTimeMillis(), false, type.getAlarmLevel(), new LocalizableMessageImpl(i18nKey, i18nArgs), null);
-    }
-    
-    public void handleFiredEvent(EventType type, long timestamp, String i18nKey, Object ... i18nArgs) {
-        raiseEvent(type, timestamp, false, type.getAlarmLevel(), new LocalizableMessageImpl(i18nKey, i18nArgs), null);
-    }
-    
-    public void handleFiredEvent(EventType type, LocalizableMessage msg) {
-        raiseEvent(type, System.currentTimeMillis(), false, type.getAlarmLevel(), msg, null);
-    }
-    
-    public void handleFiredEvent(EventType type, long timestamp, LocalizableMessage msg) {
-        raiseEvent(type, timestamp, false, type.getAlarmLevel(), msg, null);
-    }
-    
-    public void handleRaisedAlarm(EventType type, String i18nKey, Object ... i18nArgs) {
-        raiseEvent(type, System.currentTimeMillis(), true, type.getAlarmLevel(), new LocalizableMessageImpl(i18nKey, i18nArgs), null);
-    }
-    
-    public void handleRaisedAlarm(EventType type, long timestamp, String i18nKey, Object ... i18nArgs) {
-        raiseEvent(type, timestamp, true, type.getAlarmLevel(), new LocalizableMessageImpl(i18nKey, i18nArgs), null);
-    }
-    
-    public void handleRaisedAlarm(EventType type, LocalizableMessage msg) {
-        raiseEvent(type, System.currentTimeMillis(), true, type.getAlarmLevel(), msg, null);
-    }
-    
-    public void handleRaisedAlarm(EventType type, long timestamp, LocalizableMessage msg) {
-        raiseEvent(type, timestamp, true, type.getAlarmLevel(), msg, null);
-    }
-    
-    /**
-     * Deprecated Use {link #handleFiredEvent}
-     * 
-     * @param type
-     * @param time
-     * @param rtnApplicable
-     * @param alarmLevel
-     * @param message
-     * @param context
-     * @deprecated
-     */
-    @Deprecated
-    public void raiseEvent(EventType type, long time, boolean rtnApplicable, AlarmLevel alarmLevel,
-            LocalizableMessage message, Map<String, Object> context) {
+    public void handleFiredEvent(EventType type, long timestamp, LocalizableMessage message, Map<String, Object> context) {
         // Check if there is an event for this type already active.
         EventInstance dup = get(type);
         if (dup != null) {
@@ -162,7 +117,7 @@ public class EventManager implements ILifecycle, Serializable {
         // Determine if the event should be suppressed.
         boolean suppressed = isSuppressed(type);
 
-        EventInstance evt = new EventInstance(type, time, rtnApplicable, alarmLevel, message, context);
+        EventInstance evt = new EventInstance(type, timestamp, message, context);
 
         if (!suppressed) {
             setHandlers(evt);
@@ -183,7 +138,7 @@ public class EventManager implements ILifecycle, Serializable {
 
             if (Permissions.hasEventTypePermission(user, type)) {
                 eventUserIds.add(user.getId());
-                if (evt.isAlarm() && user.isReceiveAlarmEmails() && alarmLevel.otherIsLower(user.getReceiveAlarmEmails())) {
+                if (evt.isAlarm() && user.isReceiveAlarmEmails() && type.getAlarmLevel().otherIsLower(user.getReceiveAlarmEmails())) {
                     emailUsers.add(user.getEmail());
                 }
             }
@@ -196,18 +151,18 @@ public class EventManager implements ILifecycle, Serializable {
             }
         }
 
-        if (evt.isRtnApplicable()) {
+        if (evt.isActive()) {
             activeEvents.add(evt);
         }
 
         if (suppressed) {
-            eventDao.ackEvent(evt.getId(), time, 0, EventInstance.AlternateAcknowledgementSources.MAINTENANCE_MODE);
+            eventDao.ackEvent(evt.getId(), timestamp, 0, EventInstance.AlternateAcknowledgementSources.MAINTENANCE_MODE);
         } else {
-            if (evt.isRtnApplicable()) {
-                if (alarmLevel.meIsHigher(highestActiveAlarmLevel)) {
+            if (evt.isActive()) {
+                if (type.getAlarmLevel().meIsHigher(highestActiveAlarmLevel)) {
                     AlarmLevel oldValue = highestActiveAlarmLevel;
-                    highestActiveAlarmLevel = alarmLevel;
-                    new SystemEventType(SystemEventSource.MAX_ALARM_LEVEL_CHANGED).fire(time, "event.alarmMaxIncreased", oldValue, highestActiveAlarmLevel);
+                    highestActiveAlarmLevel = type.getAlarmLevel();
+                    new SystemEventType(SystemEventSource.MAX_ALARM_LEVEL_CHANGED).fire(timestamp, "event.alarmMaxIncreased", oldValue, highestActiveAlarmLevel);
                 }
             }
 
@@ -220,45 +175,36 @@ public class EventManager implements ILifecycle, Serializable {
         }
     }
 
-    public void handleAlarmCleared(EventType type) {
-        returnToNormal(type, System.currentTimeMillis(), EventInstance.RtnCauses.RETURN_TO_NORMAL);
-    }
-
-    public void handleAlarmCleared(EventType type, long time) {
-        returnToNormal(type, time, EventInstance.RtnCauses.RETURN_TO_NORMAL);
-    }
-
-    public void handleAlarmDisabled(EventType type) {
-        returnToNormal(type, System.currentTimeMillis(), EventInstance.RtnCauses.SOURCE_DISABLED);
-    }
-
-    /**
-     * Use clearAlarm
-     * @param type
-     * @param time
-     * @deprecated
-     */
-    @Deprecated
-    public void returnToNormal(EventType type, long time) {
-        returnToNormal(type, time, EventInstance.RtnCauses.RETURN_TO_NORMAL);
-    }
-
-    /**
-     * Use clearAlarm
-     * @param type
-     * @param time
-     * @param cause
-     * @deprecated
-     */
-    @Deprecated
-    public void returnToNormal(EventType type, long time, EventInstance.RtnCauses cause) {
+    public void handleAlarmCleared(EventType type, long timestamp) {
         EventInstance evt = remove(type);
 
         // Loop in case of multiples
         while (evt != null) {
-            resetHighestAlarmLevel(time, false);
+            resetHighestAlarmLevel(timestamp, false);
 
-            evt.returnToNormal(time, cause);
+            evt.setAlarmGone(timestamp);
+            eventDao.saveEvent(evt);
+
+            // Call inactiveEvent handlers.
+            handleInactiveEvent(evt);
+
+            // Check for another
+            evt = remove(type);
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Event returned to normal: type=" + type);
+        }
+    }
+    
+    public void handleAlarmDisabled(EventType type, long timestamp) {
+        EventInstance evt = remove(type);
+
+        // Loop in case of multiples
+        while (evt != null) {
+            resetHighestAlarmLevel(timestamp, false);
+
+            evt.setAlarmDisabled(timestamp);
             eventDao.saveEvent(evt);
 
             // Call inactiveEvent handlers.
@@ -273,10 +219,10 @@ public class EventManager implements ILifecycle, Serializable {
         }
     }
 
-    private void deactivateEvent(EventInstance evt, long time, EventInstance.RtnCauses inactiveCause) {
+    private void disableAlarm(EventInstance evt, long time) {
         activeEvents.remove(evt);
         resetHighestAlarmLevel(time, false);
-        evt.returnToNormal(time, inactiveCause);
+        evt.setAlarmDisabled(time);
         eventDao.saveEvent(evt);
 
         // Call inactiveEvent handlers.
@@ -295,7 +241,7 @@ public class EventManager implements ILifecycle, Serializable {
         for (EventInstance e : activeEvents) {
             final EventType et = e.getEventType();
             if (et.getEventSource() == EventSources.DATA_POINT && et.getDataPointId() == dataPointId) {
-                deactivateEvent(e, System.currentTimeMillis(), EventInstance.RtnCauses.SOURCE_DISABLED);
+                disableAlarm(e, System.currentTimeMillis());
             }
         }
     }
@@ -304,7 +250,7 @@ public class EventManager implements ILifecycle, Serializable {
         for (EventInstance e : activeEvents) {
             final EventType et = e.getEventType();
             if (et.getEventSource() == EventSources.DATA_SOURCE && et.getDataSourceId() == dataSourceId) {
-                deactivateEvent(e, System.currentTimeMillis(), EventInstance.RtnCauses.SOURCE_DISABLED);
+                disableAlarm(e, System.currentTimeMillis());
             }
         }
     }
@@ -313,7 +259,7 @@ public class EventManager implements ILifecycle, Serializable {
         for (EventInstance e : activeEvents) {
             final EventType et = e.getEventType();
             if (et.getEventSource() == EventSources.PUBLISHER && et.getPublisherId() == publisherId) {
-                deactivateEvent(e, System.currentTimeMillis(), EventInstance.RtnCauses.SOURCE_DISABLED);
+                disableAlarm(e, System.currentTimeMillis());
             }
         }
     }

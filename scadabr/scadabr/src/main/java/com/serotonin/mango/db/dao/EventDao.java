@@ -66,6 +66,7 @@ import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.type.AuditEventSource;
 import br.org.scadabr.vo.event.type.SystemEventSource;
+import static com.serotonin.mango.db.dao.BaseDao.charToBool;
 import com.serotonin.mango.vo.User;
 import java.sql.Connection;
 import java.sql.Statement;
@@ -159,11 +160,11 @@ public class EventDao extends BaseDao {
                     default:
                         throw new ImplementMeException();
                 }
-                ps.setLong(4, event.getActiveTimestamp());
-                ps.setString(5, boolToChar(event.isRtnApplicable()));
+                ps.setLong(4, event.getFireTimestamp());
+                ps.setString(5, boolToChar(event.isStateful()));
                 if (!event.isActive()) {
-                    ps.setLong(6, event.getRtnTimestamp());
-                    ps.setInt(7, event.getRtnCause().getId());
+                    ps.setLong(6, event.getInactiveTimestamp());
+                    ps.setInt(7, event.getEventState().getId());
                 } else {
                     ps.setNull(6, Types.BIGINT);
                     ps.setNull(7, Types.INTEGER);
@@ -171,7 +172,7 @@ public class EventDao extends BaseDao {
                 ps.setInt(8, event.getAlarmLevel().getId());
                 ps.setString(9, I18NUtils.serialize(event.getMessage()));
                 if (!event.isAlarm()) {
-                    event.setAcknowledgedTimestamp(event.getActiveTimestamp());
+                    event.setAcknowledgedTimestamp(event.getFireTimestamp());
                     ps.setLong(10, event.getAcknowledgedTimestamp());
                 } else {
                     ps.setNull(10, Types.BIGINT);
@@ -187,7 +188,7 @@ public class EventDao extends BaseDao {
 
     private void updateEvent(EventInstance event) {
         ejt.update(EVENT_UPDATE,
-                new Object[]{event.getRtnTimestamp(), event.getRtnCause(),
+                new Object[]{event.getInactiveTimestamp(), event.getEventState().getId(),
                     event.getId()});
         updateCache(event);
     }
@@ -380,13 +381,17 @@ public class EventDao extends BaseDao {
                         rs.getString(10));
             }
 
-            EventInstance event = new EventInstance(type, rs.getLong(5),
-                    charToBool(rs.getString(6)), AlarmLevel.fromId(rs.getInt(9)), message, null);
-            event.setId(rs.getInt(1));
-            long rtnTs = rs.getLong(7);
-            if (!rs.wasNull()) {
-                event.returnToNormal(rtnTs, EventInstance.RtnCauses.fromId(rs.getInt(8)));
+            EventStatus state;
+            if (charToBool(rs.getString(6))) {
+                //rtnApplicable == true, so we are stateful;
+                state = EventStatus.fromId(rs.getInt(8));
+            } else {
+                // We do not cate of rs.getInt(8) we assume we are stateless.
+                state = EventStatus.STATELESS;
             }
+
+            EventInstance event = new EventInstance(type, rs.getLong(5), AlarmLevel.fromId(rs.getInt(9)), state, rs.getLong(7), message);
+            event.setId(rs.getInt(1));
             long ackTs = rs.getLong(11);
             if (!rs.wasNull()) {
                 event.setAcknowledgedTimestamp(ackTs);
@@ -532,11 +537,11 @@ public class EventDao extends BaseDao {
                     where.add("e.rtnApplicable=? and e.rtnTs is null");
                     params.add(boolToChar(true));
                     break;
-                case RTN:
+/*                case INACTIVE:
                     where.add("e.rtnApplicable=? and e.rtnTs is not null");
                     params.add(boolToChar(true));
                     break;
-                case NORTN:
+*/                case STATELESS:
                     where.add("e.rtnApplicable=?");
                     params.add(boolToChar(false));
                     break;
@@ -614,7 +619,7 @@ public class EventDao extends BaseDao {
 
                     if (add) {
                         if (date != null) {
-                            if (e.getActiveTimestamp() <= dateTs
+                            if (e.getFireTimestamp() <= dateTs
                                     && results.size() < to - from) {
                                 if (startRow == -1) {
                                     startRow = row;
@@ -971,4 +976,5 @@ public class EventDao extends BaseDao {
     public static void clearCache() {
         pendingEventCache.clear();
     }
+
 }

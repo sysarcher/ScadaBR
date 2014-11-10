@@ -29,6 +29,7 @@ import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -66,70 +67,43 @@ abstract public class EventType implements JsonSerializable {
     private DataSourceDao dataSourceDao;
 
     //TODO do we need the context or can this data be retieved later???
-    @Deprecated
     public void fire(Map<String, Object> context, String i18nKey, Object... i18nArgs) {
-        eventManager.handleFiredEvent(this, i18nKey, i18nArgs);
+        eventManager.handleFiredEvent(this, System.currentTimeMillis(), new LocalizableMessageImpl(i18nKey, i18nArgs), context);
     }
 
     //TODO do we need the context or can this data be retieved later???
-    @Deprecated
     public void fire(Map<String, Object> context, long timestamp, LocalizableMessage msg) {
-        eventManager.handleFiredEvent(this, timestamp, msg);
+        eventManager.handleFiredEvent(this, timestamp, msg, context);
+    }
+
+    //TODO do we need the context or can this data be retieved later???
+    public void fire(Map<String, Object> context, long timestamp, String i18nKey, Object... i18nArgs) {
+        eventManager.handleFiredEvent(this, timestamp, new LocalizableMessageImpl(i18nKey, i18nArgs), context);
     }
 
 
     public void fire(String i18nKey, Object... i18nArgs) {
-        eventManager.handleFiredEvent(this, i18nKey, i18nArgs);
+        eventManager.handleFiredEvent(this, System.currentTimeMillis(), new LocalizableMessageImpl(i18nKey, i18nArgs), null);
     }
 
     public void fire(long timestamp, String i18nKey, Object... i18nArgs) {
-        eventManager.handleFiredEvent(this, timestamp, i18nKey, i18nArgs);
+        eventManager.handleFiredEvent(this, timestamp, new LocalizableMessageImpl(i18nKey, i18nArgs), null);
     }
 
     public void fire(LocalizableMessage msg) {
-        eventManager.handleFiredEvent(this, msg);
+        eventManager.handleFiredEvent(this, System.currentTimeMillis(), msg, null);
     }
 
     public void fire(long timestamp, LocalizableMessage msg) {
-        eventManager.handleFiredEvent(this, timestamp, msg);
+        eventManager.handleFiredEvent(this, timestamp, msg, null);
     }
 
-    //TODO do we need the context or can this data be retieved later???
-    @Deprecated
-    public void raiseAlarm(Map<String, Object> context, String i18nKey, Object... i18nArgs) {
-        eventManager.handleRaisedAlarm(this, i18nKey, i18nArgs);
-    }
-
-    //TODO do we need the context or can this data be retieved later???
-    @Deprecated
-    public void raiseAlarm(Map<String, Object> context, long timestamp, String i18nKey, Object... i18nArgs) {
-        eventManager.handleRaisedAlarm(this, timestamp, i18nKey, i18nArgs);
-    }
-
-    //TODO do we need the context or can this data be retieved later???
-    @Deprecated
-    public void raiseAlarm(Map<String, Object> context, long timestamp, LocalizableMessage msg) {
-        eventManager.handleRaisedAlarm(this, timestamp, msg);
-    }
-
-    public void raiseAlarm(String i18nKey, Object... i18nArgs) {
-        eventManager.handleRaisedAlarm(this, i18nKey, i18nArgs);
-    }
-
-    public void raiseAlarm(long timestamp, String i18nKey, Object... i18nArgs) {
-        eventManager.handleRaisedAlarm(this, timestamp, i18nKey, i18nArgs);
-    }
-
-    public void raiseAlarm(LocalizableMessage msg) {
-        eventManager.handleRaisedAlarm(this, msg);
-    }
-
-    public void raiseAlarm(long timestamp, LocalizableMessage msg) {
-        eventManager.handleRaisedAlarm(this, timestamp, msg);
-    }
-
+    /**
+     * Alarm is gone, so clear it
+     *
+     */
     public void clearAlarm() {
-        eventManager.handleAlarmCleared(this);
+        eventManager.handleAlarmCleared(this, System.currentTimeMillis());
     }
 
     /**
@@ -142,9 +116,8 @@ abstract public class EventType implements JsonSerializable {
     }
 
     public void disableAlarm() {
-        eventManager.handleAlarmDisabled(this);
+        eventManager.handleAlarmDisabled(this, System.currentTimeMillis());
     }
-
 
     abstract public EventSources getEventSource();
 
@@ -388,5 +361,7 @@ abstract public class EventType implements JsonSerializable {
      * @return the alarmLevel
      */
     public abstract AlarmLevel getAlarmLevel();
+
+    public abstract boolean isStateful();
 
 }

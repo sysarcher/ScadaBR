@@ -278,4 +278,9 @@ throw new ImplementMeException(); //"MessageFormat");
         return auditEventType.getAlarmLevel();
     }
 
+    @Override
+    public boolean isStateful() {
+        return false;
+    }
+
 }

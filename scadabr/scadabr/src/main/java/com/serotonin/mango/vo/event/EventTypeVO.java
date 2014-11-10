@@ -36,6 +36,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.vo.event.type.AuditEventSource;
 import br.org.scadabr.vo.event.type.SystemEventSource;
 
+@Deprecated //TODO Whats this for anyway currently stateful is not handled at all...
 public class EventTypeVO {
 
     /**
@@ -57,6 +58,7 @@ public class EventTypeVO {
     private AlarmLevel alarmLevel;
     private String eventDetectorKey;
     private DuplicateHandling duplicateHandling;
+    private boolean stateful;
 
     public EventTypeVO(EventSources eventSource, int typeRef1, int typeRef2) {
         this.eventSource = eventSource;
@@ -89,7 +91,7 @@ public class EventTypeVO {
             case DATA_POINT:
                 return new DataPointEventType(typeRef1, typeRef2);
             case DATA_SOURCE:
-                return new DataSourceEventType(typeRef1, typeRef2, alarmLevel, duplicateHandling);
+                return new DataSourceEventType(typeRef1, typeRef2, alarmLevel, duplicateHandling, stateful);
             case SYSTEM:
                 return new SystemEventType(SystemEventSource.fromId(typeRef1), typeRef2);
             case COMPOUND:

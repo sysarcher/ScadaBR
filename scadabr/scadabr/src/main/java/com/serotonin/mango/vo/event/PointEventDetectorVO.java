@@ -178,7 +178,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
         throw new ShouldNeverHappenException("Unknown detector type: " + detectorType);
     }
 
-    public boolean isRtnApplicable() {
+    public boolean isStateful() {
         return detectorType != TYPE_POINT_CHANGE;
     }
 

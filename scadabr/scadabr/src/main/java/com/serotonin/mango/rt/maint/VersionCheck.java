@@ -117,7 +117,7 @@ public class VersionCheck extends SystemCronTask {
         } catch (SocketTimeoutException e) {
             // Ignore
         } catch (Exception e) {
-            getEventType().raiseAlarm(scheduledExecutionTime, "event.version.error", e.getClass().getName(), e.getMessage());
+            getEventType().fire(scheduledExecutionTime, "event.version.error", e.getClass().getName(), e.getMessage());
         }
     }
 
@@ -140,7 +140,7 @@ public class VersionCheck extends SystemCronTask {
 
         // If the version doesn't match this version, raise an event.
         final LocalizableMessage message = new LocalizableMessageImpl("event.version.available", result);
-        getEventType().raiseAlarm(fireTime, message);
+        getEventType().fire(fireTime, message);
         return message;
     }
 

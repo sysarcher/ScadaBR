@@ -40,6 +40,7 @@ public class ScheduledEventType extends EventType {
     private int scheduleId;
     private DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
     private AlarmLevel alarmLevel;
+    private boolean stateful;
 
     public ScheduledEventType() {
         // Required for reflection.
@@ -59,7 +60,8 @@ public class ScheduledEventType extends EventType {
     public ScheduledEventType(ScheduledEventVO vo) {
         this.scheduleId = vo.getId();
         this.alarmLevel = vo.getAlarmLevel();
-        if (!vo.isReturnToNormal()) {
+        this.stateful = vo.isStateful();
+        if (!vo.isStateful()) {
             duplicateHandling = DuplicateHandling.ALLOW;
         }
     }
@@ -142,6 +144,14 @@ public class ScheduledEventType extends EventType {
     @Override
     public AlarmLevel getAlarmLevel() {
         return alarmLevel;
+    }
+
+    /**
+     * @return the stateful
+     */
+    @Override
+    public boolean isStateful() {
+        return stateful;
     }
 
 }

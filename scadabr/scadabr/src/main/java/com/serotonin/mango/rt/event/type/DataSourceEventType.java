@@ -42,20 +42,22 @@ public class DataSourceEventType extends EventType {
     private int dataSourceEventTypeId;
     private AlarmLevel alarmLevel;
     private DuplicateHandling duplicateHandling;
+    private boolean stateful;
 
     public DataSourceEventType() {
         // Required for reflection.
     }
 
     public DataSourceEventType(int dataSourceId, int dataSourceEventTypeId) {
-        this(dataSourceId, dataSourceEventTypeId, AlarmLevel.URGENT, DuplicateHandling.IGNORE);
+        this(dataSourceId, dataSourceEventTypeId, AlarmLevel.URGENT, DuplicateHandling.IGNORE, true);
     }
 
-    public DataSourceEventType(int dataSourceId, int dataSourceEventTypeId, AlarmLevel alarmLevel, DuplicateHandling duplicateHandling) {
+    public DataSourceEventType(int dataSourceId, int dataSourceEventTypeId, AlarmLevel alarmLevel, DuplicateHandling duplicateHandling, boolean stateful) {
         this.dataSourceId = dataSourceId;
         this.dataSourceEventTypeId = dataSourceEventTypeId;
         this.alarmLevel = alarmLevel;
         this.duplicateHandling = duplicateHandling;
+        this.stateful = stateful;
     }
 
     @Override
@@ -67,6 +69,7 @@ public class DataSourceEventType extends EventType {
         return dataSourceEventTypeId;
     }
 
+    @Override
     public AlarmLevel getAlarmLevel() {
         return alarmLevel;
     }
@@ -140,6 +143,11 @@ public class DataSourceEventType extends EventType {
         DataSourceVO<?> ds = getDataSource(json, "XID");
         dataSourceId = ds.getId();
         dataSourceEventTypeId = getInt(json, "dataSourceEventType", ds.getEventCodes());
+    }
+
+    @Override
+    public boolean isStateful() {
+        return stateful;
     }
 
 }

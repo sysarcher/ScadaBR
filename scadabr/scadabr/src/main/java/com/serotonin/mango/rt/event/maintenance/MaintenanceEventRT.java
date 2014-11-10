@@ -5,7 +5,6 @@ import java.text.ParseException;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.MaintenanceEventType;
 import com.serotonin.mango.util.timeout.RunWithArgClient;
 import com.serotonin.mango.util.timeout.SystemRunWithArgTask;
@@ -33,7 +32,7 @@ public class MaintenanceEventRT implements RunWithArgClient<Boolean> {
 
     private void raiseEvent(long time) {
         if (!eventActive) {
-            eventType.raiseAlarm(time, getMessage());
+            eventType.fire(time, getMessage());
             eventActive = true;
         }
     }

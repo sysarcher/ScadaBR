@@ -97,7 +97,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
     public void eventRaised(EventInstance evt) {
         // Get the email addresses to send to
         activeRecipients = MailingListDao.getInstance().getRecipientAddresses(vo.getActiveRecipients(),
-                new DateTime(evt.getActiveTimestamp()));
+                new DateTime(evt.getFireTimestamp()));
 
         // Send an email to the active recipients.
         sendEmail(evt, NotificationType.ACTIVE, activeRecipients);
@@ -106,7 +106,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
         if (vo.isSendInactive()) {
             if (vo.isInactiveOverride()) {
                 inactiveRecipients = MailingListDao.getInstance().getRecipientAddresses(vo.getInactiveRecipients(),
-                        new DateTime(evt.getActiveTimestamp()));
+                        new DateTime(evt.getFireTimestamp()));
             } else {
                 inactiveRecipients = activeRecipients;
             }
