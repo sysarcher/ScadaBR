@@ -66,6 +66,7 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import com.serotonin.mango.db.DatabaseAccessFactory;
+import com.serotonin.mango.web.UserSessionContextBean;
 
 public class MangoContextListener implements ServletContextListener {
 
@@ -133,6 +134,9 @@ public class MangoContextListener implements ServletContextListener {
         if (eventManager != null) {
             // Notify the event manager of the shutdown.
             new SystemEventType(SystemEventSource.SYSTEM_SHUTDOWN).fire("event.system.shutdown");
+        }
+        for (UserSessionContextBean us : runtimeManager.getUserSessionContextBeans()) {
+            us.systemShutdown();
         }
         Logger.getLogger(MangoContextListener.class.getName()).log(Level.INFO, "Shutdown Event created");
 

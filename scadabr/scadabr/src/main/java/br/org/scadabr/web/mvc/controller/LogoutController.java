@@ -50,7 +50,7 @@ public class LogoutController {
             User user = userSessionContextBean.getUser();
             if (user != null) {
                 // The user is in fact logged in. Invalidate the session.
-                userSessionContextBean.logoutUser(user);
+                userSessionContextBean.logoutUser();
 
                 if (CrowdUtils.isCrowdEnabled()) {
                     CrowdUtils.logout(request, response);
