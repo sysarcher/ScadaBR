@@ -16,14 +16,19 @@ import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
+import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 import org.springframework.context.annotation.Scope;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,8 +50,6 @@ public class RestDataSourcesController {
     @Inject
     private RuntimeManager runtimeManager;
     @Inject
-    private DataPointDao dataPointDao;
-    @Inject
     private DataSourceDao dataSourceDao;
     
     @Inject 
@@ -67,4 +70,29 @@ public class RestDataSourcesController {
         return result;
     }
 
+    
+    /**
+     * Get folder node by its id
+     * @param id of the node
+     * @return the folder
+     */
+    @RequestMapping(value = "lazyTree/{id}", method = RequestMethod.GET)
+    public DataSourceVO<?> getFolder(@PathVariable("id") int id) {
+        return dataSourceDao.getDataSource(id);
+    }
+
+    @RequestMapping(value = "lazyTree/{id}", method = RequestMethod.PUT)
+    public DataSourceVO<?> putFolder(@PathVariable("id") int id, @RequestBody DataSourceVO<?> vo) {
+        dataSourceDao.saveDataSource(vo);
+        return vo;
+    }
+
+    @RequestMapping(value = "lazyTree/", method = RequestMethod.POST)
+    public DataSourceVO<?> postFolder(@RequestBody Map<String, String> newDsType) {
+        LOG.severe("DSTYPE : " + newDsType.get("dsType") );
+        DataSourceVO result = new MetaDataSourceVO();
+        dataSourceDao.saveDataSource(result);
+        return result;
+    }
+    
 }

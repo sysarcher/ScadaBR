@@ -5,7 +5,6 @@
  */
 package br.org.scadabr.web.mvc.controller.rest;
 
-import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.l10n.Localizer;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.io.Serializable;

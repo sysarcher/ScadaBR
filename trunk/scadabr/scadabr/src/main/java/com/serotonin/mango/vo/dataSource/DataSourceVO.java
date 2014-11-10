@@ -176,10 +176,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         return Type.valueOf(typeId).createDataSourceVO();
     }
 
-    public static String generateXid() {
-        return Common.generateXid("DS_");
-    }
-
     abstract public Type getType();
 
     abstract public LocalizableMessage getConnectionDescription();
@@ -205,7 +201,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
     private int id = Common.NEW_ID;
     private String xid;
     @JsonRemoteProperty
-    private String name;
+    private String name = this.getClass().getSimpleName();
     @JsonRemoteProperty
     private boolean enabled;
     private Map<Integer, AlarmLevel> alarmLevels = new HashMap<>();

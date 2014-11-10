@@ -29,6 +29,7 @@ public enum AuditEventSource implements LocalizableEnum<AuditEventSource> {
     private AuditEventSource(int id, String i18nKey) {
         this.i18nKey = i18nKey;
         this.id = id;
+        this.alarmLevel = getDefaultAlarmLevel();
     }
 
     @Override
