@@ -48,8 +48,13 @@ import org.springframework.beans.factory.annotation.Configurable;
 @JsonRemoteEntity
 @Configurable
 public class WatchList implements JsonSerializable, Iterable<DataPointVO> {
+    
     @Autowired
     private DataPointDao dataPointDao;
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private WatchListDao watchListDao;
 
     public static final String XID_PREFIX = "WL_";
 
@@ -133,7 +138,7 @@ public class WatchList implements JsonSerializable, Iterable<DataPointVO> {
             response.addContextual("xid", "validate.required");
         } else if (xid.length() >  50) {
             response.addContextual("xid", "validate.notLongerThan", 50);
-        } else if (!WatchListDao.getInstance().isXidUnique(xid, id)) {
+        } else if (!watchListDao.isXidUnique(xid, id)) {
             response.addContextual("xid", "validate.xidUsed");
         }
 
@@ -150,7 +155,7 @@ public class WatchList implements JsonSerializable, Iterable<DataPointVO> {
     public void jsonSerialize(Map<String, Object> map) {
         map.put("xid", xid);
 
-        map.put("user", UserDao.getInstance().getUser(userId).getUsername());
+        map.put("user", userDao.getUser(userId).getUsername());
 
         List<String> dpXids = new ArrayList<>();
         for (DataPointVO dpVO : pointList) {
@@ -167,7 +172,7 @@ public class WatchList implements JsonSerializable, Iterable<DataPointVO> {
         if (username.isEmpty()) {
             throw new LocalizableJsonException("emport.error.missingValue", "user");
         }
-        User user = UserDao.getInstance().getUser(username);
+        User user = userDao.getUser(username);
         if (user == null) {
             throw new LocalizableJsonException("emport.error.missingUser", username);
         }

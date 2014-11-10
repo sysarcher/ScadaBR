@@ -81,7 +81,7 @@ public class ReportTask extends SystemCronTask {
 
     @Override
     protected void run(long scheduledExecutionTime) {
-        ReportWorkItem.queueReport(report);
+        new ReportWorkItem().queueReport(report);
     }
 
     @Override

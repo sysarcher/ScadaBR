@@ -79,6 +79,8 @@ public class MangoContextListener implements ServletContextListener {
     private RuntimeManager runtimeManager;
     @Inject
     private EventManager eventManager;
+    @Inject
+    private ReportDao reportDao;
 
     @Override
     public void contextInitialized(ServletContextEvent evt) {
@@ -114,7 +116,7 @@ public class MangoContextListener implements ServletContextListener {
         systemSettingsDao.setValue(SystemSettingsDao.SERVLET_CONTEXT_PATH, ctx.getContextPath());
 
         utilitiesInitialize(ctx);
-        eventManagerInitialize(ctx);
+        eventManager.initialize();
         runtimeManagerInitialize(ctx);
         reportsInitialize();
         maintenanceInitialize();
@@ -222,16 +224,6 @@ public class MangoContextListener implements ServletContextListener {
             bp.terminate();
             bp.joinTermination();
         }
-    }
-
-    //
-    //
-    // Event manager
-    //
-    @Deprecated
-    private void eventManagerInitialize(ServletContext ctx) {
-        ctx.setAttribute(Common.ContextKeys.EVENT_MANAGER, eventManager);
-        eventManager.initialize();
     }
 
     private void terminateEventManager() {
@@ -359,7 +351,7 @@ public class MangoContextListener implements ServletContextListener {
     // Reports
     //
     private void reportsInitialize() {
-        List<ReportVO> reports = ReportDao.getInstance().getReports();
+        List<ReportVO> reports = reportDao.getReports();
         for (ReportVO report : reports) {
             try {
                 ReportTask.scheduleReportJob(report);

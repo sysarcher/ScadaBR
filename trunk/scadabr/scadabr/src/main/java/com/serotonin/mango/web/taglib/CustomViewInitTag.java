@@ -26,11 +26,17 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.view.custom.CustomView;
 import com.serotonin.mango.vo.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class CustomViewInitTag extends TagSupport {
+
+    @Autowired
+    private UserDao userDao;
 
     private static final long serialVersionUID = -1;
 
@@ -43,7 +49,7 @@ public class CustomViewInitTag extends TagSupport {
     @Override
     public int doStartTag() throws JspException {
         // Check the user id.
-        User user = UserDao.getInstance().getUser(username);
+        User user = userDao.getUser(username);
         if (user == null) {
             throw new JspException("Username '" + username + "' not found");
         }

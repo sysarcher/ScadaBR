@@ -23,13 +23,18 @@ import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.web.dwr.BaseDwr;
 import java.util.EnumSet;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @JsonRemoteEntity
+@Configurable
 public class AlarmListComponent extends CustomComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("alarmlist",
             "ALARMLIST", "graphic.alarmlist", EnumSet.noneOf(DataType.class));
 
+    @Autowired
+    private EventDao eventDao;
     @JsonRemoteProperty
     private AlarmLevel minAlarmLevel = AlarmLevel.INFORMATION;
     @JsonRemoteProperty
@@ -48,7 +53,7 @@ public class AlarmListComponent extends CustomComponent {
         Map<String, Object> model = new HashMap<>();
         WebContext webContext = WebContextFactory.get();
         HttpServletRequest request = webContext.getHttpServletRequest();
-        List<EventInstance> events = EventDao.getInstance().getPendingEvents(Common
+        List<EventInstance> events = eventDao.getPendingEvents(Common
                 .getUser());
 
         filter(events, minAlarmLevel);
@@ -71,7 +76,7 @@ public class AlarmListComponent extends CustomComponent {
 
     private void filter(List<EventInstance> list, AlarmLevel alarmLevel) {
 
-        if (alarmLevel.URGENT == alarmLevel) {
+        if (AlarmLevel.URGENT == alarmLevel) {
             removeAlarmLevel(list, AlarmLevel.INFORMATION);
         }
         if (AlarmLevel.CRITICAL == alarmLevel) {

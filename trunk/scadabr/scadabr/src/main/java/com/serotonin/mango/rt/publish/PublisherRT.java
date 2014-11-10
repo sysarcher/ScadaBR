@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.PublisherDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -36,8 +35,6 @@ import com.serotonin.mango.util.timeout.RunClient;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.timer.TimerTask;
-import br.org.scadabr.vo.event.AlarmLevel;
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.rt.EventManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -63,6 +60,8 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
     private RuntimeManager runtimeManager;
     @Autowired
     private EventManager eventManager;
+    @Autowired
+    private PublisherDao publisherDao;
     private boolean pointDisabledEventActive;
     private volatile Thread jobThread;
     private SendThread sendThread;
@@ -95,7 +94,7 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
     public Object getPersistentData(String key) {
         synchronized (persistentDataLock) {
             @SuppressWarnings("unchecked")
-            Map<String, Object> map = (Map<String, Object>) PublisherDao.getInstance().getPersistentData(vo.getId());
+            Map<String, Object> map = (Map<String, Object>) publisherDao.getPersistentData(vo.getId());
             if (map != null) {
                 return map.get(key);
             }
@@ -113,17 +112,16 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
      * @param key
      */
     public void setPersistentData(String key, Object persistentData) {
-        PublisherDao dao = PublisherDao.getInstance();
         synchronized (persistentDataLock) {
             @SuppressWarnings("unchecked")
-            Map<String, Object> map = (Map<String, Object>) dao.getPersistentData(vo.getId());
+            Map<String, Object> map = (Map<String, Object>) publisherDao.getPersistentData(vo.getId());
             if (map == null) {
                 map = new HashMap<>();
             }
 
             map.put(key, persistentData);
 
-            dao.savePersistentData(vo.getId(), map);
+            publisherDao.savePersistentData(vo.getId(), map);
         }
     }
 

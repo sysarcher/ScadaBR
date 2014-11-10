@@ -27,8 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.DatabaseAccess;
-import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverMulticaster;
 import com.serotonin.mango.rt.maint.BackgroundProcessing;
 import com.serotonin.mango.util.DocumentationManifest;
@@ -50,12 +48,6 @@ public class ContextWrapper {
     @Deprecated // use Bean
     public ContextWrapper(HttpServletRequest request) {
         ctx = request.getSession().getServletContext();
-    }
-
-    @Deprecated
-    public DatabaseAccess getDatabaseAccess() {
-        return (DatabaseAccess) ctx
-                .getAttribute(Common.ContextKeys.DATABASE_ACCESS);
     }
 
     @Deprecated // use Bean
@@ -109,12 +101,6 @@ public class ContextWrapper {
             }
         }
         return null;
-    }
-
-    @Deprecated // use Bean
-    private EventManager getEventManager() {
-        return (EventManager) ctx
-                .getAttribute(Common.ContextKeys.EVENT_MANAGER);
     }
 
     @Deprecated // use Bean

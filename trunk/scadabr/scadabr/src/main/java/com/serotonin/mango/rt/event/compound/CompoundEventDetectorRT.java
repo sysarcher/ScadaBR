@@ -18,11 +18,9 @@
  */
 package com.serotonin.mango.rt.event.compound;
 
-import br.org.scadabr.rt.event.type.DuplicateHandling;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.rt.event.EventDetectorListener;
 import com.serotonin.mango.rt.event.SimpleEventDetector;
@@ -51,6 +49,9 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
     private final CompoundEventDetectorVO vo;
     @Autowired
     private RuntimeManager runtimeManager;
+    @Autowired
+    private CompoundEventDetectorDao compoundEventDetectorDao;
+    
     private CompoundDetectorEventType eventType;
     private LogicalOperator condition;
     private boolean currentState;
@@ -232,7 +233,7 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
         final SystemEventType failureEventType = new SystemEventType(SystemEventSource.COMPOUND_DETECTOR_FAILURE, vo.getId());
         failureEventType.fire(message);
         vo.setDisabled(true);
-        CompoundEventDetectorDao.getInstance().saveCompoundEventDetector(vo);
+        compoundEventDetectorDao.saveCompoundEventDetector(vo);
     }
 
     //

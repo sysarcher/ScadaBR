@@ -70,8 +70,8 @@ import static com.serotonin.mango.db.dao.BaseDao.charToBool;
 import com.serotonin.mango.vo.User;
 import java.sql.Connection;
 import java.sql.Statement;
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -83,18 +83,11 @@ public class EventDao extends BaseDao {
 
     private static final int MAX_PENDING_EVENTS = 100;
 
+    @Inject
+    private UserDao userDao;
+    
     public EventDao() {
         super();
-    }
-
-    @Deprecated
-    private EventDao(DataSource dataSource) {
-        super(dataSource);
-    }
-
-    @Deprecated
-    public static EventDao getInstance() {
-        return new EventDao(Common.ctx.getDatabaseAccess().getDataSource());
     }
 
     public void saveEvent(EventInstance event) {
@@ -462,7 +455,7 @@ public class EventDao extends BaseDao {
     }
 
     public EventInstance insertEventComment(int eventId, UserComment comment) {
-        UserDao.getInstance().insertUserComment(UserComment.TYPE_EVENT, eventId,
+        userDao.insertUserComment(UserComment.TYPE_EVENT, eventId,
                 comment);
         return getEventInstance(eventId);
     }

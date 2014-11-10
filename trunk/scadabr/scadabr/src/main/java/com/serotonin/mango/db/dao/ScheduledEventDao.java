@@ -59,16 +59,6 @@ public class ScheduledEventDao extends BaseDao {
         super();
     }
 
-    @Deprecated
-    private ScheduledEventDao(DataSource dataSource) {
-        super(dataSource);
-    }
-
-    @Deprecated
-    public static ScheduledEventDao getInstance() {
-        return new ScheduledEventDao(Common.ctx.getDatabaseAccess().getDataSource());
-    }
-
     public String generateUniqueXid() {
         return generateUniqueXid(ScheduledEventVO.XID_PREFIX, "scheduledEvents");
     }

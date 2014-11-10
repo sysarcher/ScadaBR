@@ -32,11 +32,17 @@ import com.serotonin.mango.vo.report.EventCsvStreamer;
 import com.serotonin.mango.vo.report.ReportCsvStreamer;
 import com.serotonin.mango.vo.report.ReportInstance;
 import com.serotonin.mango.vo.report.UserCommentCsvStreamer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 abstract public class ReportExportBase extends HttpServlet {
+
+    @Autowired
+    private ReportDao reportDao;
 
     private static final long serialVersionUID = 1L;
 
@@ -49,7 +55,6 @@ abstract public class ReportExportBase extends HttpServlet {
         int instanceId = Integer.parseInt(request.getParameter("instanceId"));
 
         // Get the report instance
-        ReportDao reportDao = ReportDao.getInstance();
         ReportInstance instance = reportDao.getReportInstance(instanceId);
 
         // Ensure the user is allowed access.

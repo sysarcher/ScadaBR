@@ -10,9 +10,14 @@ import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.MaintenanceEventDao;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
+@Configurable
 public class MaintenanceEventType extends EventType {
 
+    @Autowired
+    private MaintenanceEventDao maintenanceEventDao;
     private int maintenanceId;
     private AlarmLevel alarmLevel;
 
@@ -91,7 +96,7 @@ public class MaintenanceEventType extends EventType {
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        map.put("XID", MaintenanceEventDao.getInstance().getMaintenanceEvent(maintenanceId).getXid());
+        map.put("XID", maintenanceEventDao.getMaintenanceEvent(maintenanceId).getXid());
     }
 
     @Override

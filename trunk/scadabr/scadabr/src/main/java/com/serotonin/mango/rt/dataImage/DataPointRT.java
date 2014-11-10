@@ -70,6 +70,10 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     private RuntimeManager runtimeManager;
     @Autowired
     private EventManager eventManager;
+    @Autowired
+    private PointValueDao pointValueDao;
+    @Autowired
+    private SystemSettingsDao systemSettingsDao;
     private List<PointEventDetectorRT> detectors;
     private final Map<String, Object> attributes = new HashMap<>();
 
@@ -105,7 +109,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
             }
         }
 
-        return PointValueDao.getInstance().getPointValueBefore(vo.getId(), time);
+        return pointValueDao.getPointValueBefore(vo.getId(), time);
     }
 
     public PointValueTime getPointValueAt(long time) {
@@ -115,12 +119,12 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
             }
         }
 
-        return PointValueDao.getInstance().getPointValueAt(vo.getId(), time);
+        return pointValueDao.getPointValueAt(vo.getId(), time);
     }
 
     @Override
     public List<PointValueTime> getPointValues(long since) {
-        List<PointValueTime> result = PointValueDao.getInstance().getPointValues(vo.getId(), since);
+        List<PointValueTime> result = pointValueDao.getPointValues(vo.getId(), since);
 
         for (PointValueTime pvt : valueCache.getCacheContents()) {
             if (pvt.getTime() >= since) {
@@ -136,7 +140,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
 
     @Override
     public List<PointValueTime> getPointValuesBetween(long from, long to) {
-        List<PointValueTime> result = PointValueDao.getInstance().getPointValuesBetween(vo.getId(), from, to);
+        List<PointValueTime> result = pointValueDao.getPointValuesBetween(vo.getId(), from, to);
 
         for (PointValueTime pvt : valueCache.getCacheContents()) {
             if (pvt.getTime() >= from && pvt.getTime() < to) {
@@ -209,7 +213,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
             }
         }
 
-        if (newValue.getTime() > System.currentTimeMillis() + SystemSettingsDao.getFutureDateLimit()) {
+        if (newValue.getTime() > System.currentTimeMillis() + systemSettingsDao.getFutureDateLimit()) {
             // Too far future dated. Toss it. But log a message first.
             LOG.warn("Future dated value detected: pointId=" + vo.getId() + ", value=" + newValue.getStringValue()
                     + ", type=" + vo.getDataType() + ", ts=" + newValue.getTime(), new Exception());

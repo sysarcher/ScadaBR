@@ -33,14 +33,15 @@ public class PointValueFacade {
 
     private final int dataPointId;
     private final DataPointRT point;
-    private final PointValueDao pointValueDao;
+    
+    @Autowired
+    private PointValueDao pointValueDao;
     @Autowired
     private RuntimeManager runtimeManager;
 
     public PointValueFacade(int dataPointId) {
         this.dataPointId = dataPointId;
         point = runtimeManager.getDataPoint(dataPointId);
-        pointValueDao = PointValueDao.getInstance();
     }
 
     public List<PointValueTime> getPointValues(long since) {

@@ -10,9 +10,15 @@ import com.serotonin.mango.db.dao.SystemSettingsDao;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
+@Configurable
 public class MangoEmailContent extends EmailContent {
 
+    @Autowired
+    private SystemSettingsDao systemSettingsDao;
+    
     public static final int CONTENT_TYPE_BOTH = 0;
     public static final int CONTENT_TYPE_HTML = 1;
     public static final int CONTENT_TYPE_TEXT = 2;
@@ -24,7 +30,8 @@ public class MangoEmailContent extends EmailContent {
             String defaultSubject, String encoding) throws TemplateException, IOException {
         super(null, null, encoding);
 
-        int type = SystemSettingsDao.getIntValue(SystemSettingsDao.EMAIL_CONTENT_TYPE);
+        // This will raise a NÜE but compiles :)
+        int type = systemSettingsDao.getIntValue(SystemSettingsDao.EMAIL_CONTENT_TYPE);
 
         this.defaultSubject = defaultSubject;
         this.subjectDirective = new SubjectDirective(bundle);

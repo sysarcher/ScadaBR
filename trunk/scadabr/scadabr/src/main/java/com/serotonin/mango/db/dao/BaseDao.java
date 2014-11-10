@@ -20,8 +20,6 @@ package com.serotonin.mango.db.dao;
 
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import br.org.scadabr.db.DaoUtils;
 import com.serotonin.mango.Common;
 
@@ -32,11 +30,6 @@ public class BaseDao extends DaoUtils {
      */
     public BaseDao() {
         super();
-    }
-
-    @Deprecated
-    protected BaseDao(DataSource dataSource) {
-        super(dataSource);
     }
 
     //

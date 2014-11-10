@@ -71,6 +71,12 @@ public class VersionCheck extends SystemCronTask {
     private DataPointDao dataPointDao;
     @Autowired
     private DataSourceDao dataSourceDao;
+    @Autowired
+    private SystemSettingsDao systemSettingsDao;
+    @Autowired
+    private PublisherDao publisherDao;
+    @Autowired
+    private Common common;
 
     private static final String INSTANCE_ID_FILE = "/WEB-INF/instance.txt";
 
@@ -112,7 +118,7 @@ public class VersionCheck extends SystemCronTask {
     @Override
     protected void run(long scheduledExecutionTime) {
         try {
-            String notifLevel = SystemSettingsDao.getValue(SystemSettingsDao.NEW_VERSION_NOTIFICATION_LEVEL);
+            String notifLevel = systemSettingsDao.getValue(SystemSettingsDao.NEW_VERSION_NOTIFICATION_LEVEL);
             newVersionCheck(scheduledExecutionTime, notifLevel);
         } catch (SocketTimeoutException e) {
             // Ignore
@@ -145,12 +151,12 @@ public class VersionCheck extends SystemCronTask {
     }
 
     private String newVersionCheckImpl(String notifLevel) throws Exception {
-        HttpClient httpClient = Common.getHttpClient();
+        HttpClient httpClient = common.getHttpClient();
 
         PostMethod postMethod = new PostMethod(Common.getGroveUrl(Common.GroveServlets.VERSION_CHECK));
 
         postMethod.addParameter("instanceId", getInstanceId());
-        postMethod.addParameter("instanceName", SystemSettingsDao.getValue(SystemSettingsDao.INSTANCE_DESCRIPTION));
+        postMethod.addParameter("instanceName", systemSettingsDao.getValue(SystemSettingsDao.INSTANCE_DESCRIPTION));
         try {
             postMethod.addParameter("instanceIp", InetAddress.getLocalHost().getHostAddress());
         } catch (UnknownHostException e) {
@@ -178,7 +184,7 @@ public class VersionCheck extends SystemCronTask {
         postMethod.addParameter("datasourceTypes", datasourceTypes.toString());
 
         StringBuilder publisherTypes = new StringBuilder();
-        for (PublisherVO<?> config : PublisherDao.getInstance().getPublishers()) {
+        for (PublisherVO<?> config : publisherDao.getPublishers()) {
             if (config.isEnabled()) {
                 if (publisherTypes.length() > 0) {
                     publisherTypes.append(',');

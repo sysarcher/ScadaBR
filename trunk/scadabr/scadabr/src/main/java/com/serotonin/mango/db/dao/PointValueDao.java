@@ -30,24 +30,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.RejectedExecutionException;
-
-import javax.sql.DataSource;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.transaction.TransactionStatus;
 
-import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.db.RowCallback;
 import br.org.scadabr.db.spring.IntValuePairRowMapper;
 import br.org.scadabr.io.StreamUtils;
+import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.ImageSaveException;
-import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.rt.dataImage.AnnotatedPointValueTime;
 import com.serotonin.mango.rt.dataImage.IdPointValueTime;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -58,19 +50,15 @@ import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
-import com.serotonin.mango.rt.maint.work.WorkItem;
 import com.serotonin.mango.vo.AnonymousUser;
 import com.serotonin.mango.vo.bean.LongPair;
-import br.org.scadabr.monitor.IntegerMonitor;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.ArrayDeque;
-import java.util.Queue;
+import javax.inject.Inject;
 import javax.inject.Named;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.support.TransactionCallback;
@@ -78,33 +66,26 @@ import org.springframework.transaction.support.TransactionCallback;
 @Named
 public class PointValueDao extends BaseDao {
     
+    @Inject
+    private Common common;
+    
     private final static List<UnsavedPointValue> UNSAVED_POINT_VALUES = new ArrayList<>();
     
-    private static final String POINT_VALUE_INSERT_START = "insert into pointValues (dataPointId, dataType, pointValue, ts) values ";
-    private static final String POINT_VALUE_INSERT_VALUES = "(?,?,?,?)";
-    private static final int POINT_VALUE_INSERT_VALUES_COUNT = 4;
-    private static final String POINT_VALUE_INSERT = POINT_VALUE_INSERT_START
+    static final String POINT_VALUE_INSERT_START = "insert into pointValues (dataPointId, dataType, pointValue, ts) values ";
+    static final String POINT_VALUE_INSERT_VALUES = "(?,?,?,?)";
+    static final String POINT_VALUE_INSERT = POINT_VALUE_INSERT_START
             + POINT_VALUE_INSERT_VALUES;
-    private static final String POINT_VALUE_ANNOTATION_INSERT = "insert into pointValueAnnotations "
+    static final String POINT_VALUE_ANNOTATION_INSERT = "insert into pointValueAnnotations "
             + "(pointValueId, textPointValueShort, textPointValueLong, sourceType, sourceId) values (?,?,?,?,?)";
     
     public PointValueDao() {
         super();
     }
     
-    @Deprecated
-    private PointValueDao(DataSource dataSource) {
-        super(dataSource);
-    }
-    
-    @Deprecated
-    public static PointValueDao getInstance() {
-        return new PointValueDao(Common.ctx.getDatabaseAccess().getDataSource());
-    }
-
     /**
      * Only the PointValueCache should call this method during runtime. Do not
      * use.
+     * @param pointId
      */
     public PointValueTime savePointValueSync(int pointId, PointValueTime pointValue, SetPointSource source) {
         long id = savePointValueImpl(pointId, pointValue, source, false);
@@ -193,7 +174,7 @@ public class PointValueDao extends BaseDao {
             if (!imageValue.isSaved()) {
                 imageValue.setId(id);
                 
-                File file = new File(Common.getFiledataPath(),
+                File file = new File(common.getFiledataPath(),
                         imageValue.getFilename());
 
                 // Write the file.
@@ -245,11 +226,11 @@ public class PointValueDao extends BaseDao {
             final long time, final String svalue, final SetPointSource source,
             boolean async) {
         // Apply database specific bounds on double values.
-        dvalue = DatabaseAccess.getDatabaseAccess().applyBounds(dvalue);
+        dvalue = daf.getDatabaseAccess().applyBounds(dvalue);
         
         if (async) {
-            BatchWriteBehind.add(new BatchWriteBehindEntry(pointId, dataType,
-                    dvalue, time), ejt);
+if (true) throw new ImplementMeException(); //TODO Just to make this compile ...
+//BatchWriteBehind.add(new BatchWriteBehindEntry(pointId, dataType, dvalue, time, this), ejt);
             return -1;
         }
         
@@ -643,10 +624,6 @@ public class PointValueDao extends BaseDao {
                 new Object[]{dataPointId, dataType.mangoDbId});
     }
     
-    public void compressTables() {
-        Common.ctx.getDatabaseAccess().executeCompress(ejt);
-    }
-    
     private long deletePointValues(String sql, Object[] params) {
         int cnt;
         if (params == null) {
@@ -763,163 +740,5 @@ public class PointValueDao extends BaseDao {
         }
     }
     
-    class BatchWriteBehindEntry {
-        
-        private final int pointId;
-        private final DataType dataType;
-        private final double dvalue;
-        private final long time;
-        
-        public BatchWriteBehindEntry(int pointId, DataType dataType, double dvalue,
-                long time) {
-            this.pointId = pointId;
-            this.dataType = dataType;
-            this.dvalue = dvalue;
-            this.time = time;
-        }
-        
-        public void writeInto(Object[] params, int index) {
-            index *= POINT_VALUE_INSERT_VALUES_COUNT;
-            params[index++] = pointId;
-            params[index++] = dataType.mangoDbId;
-            params[index++] = dvalue;
-            params[index++] = time;
-        }
-    }
     
-    static class BatchWriteBehind implements WorkItem {
-        
-        private static final Queue<BatchWriteBehindEntry> ENTRIES = new ArrayDeque<>();
-        private static final CopyOnWriteArrayList<BatchWriteBehind> instances = new CopyOnWriteArrayList<>();
-        private static final Log LOG = LogFactory.getLog(BatchWriteBehind.class);
-        private static final int SPAWN_THRESHOLD = 10000;
-        private static final int MAX_INSTANCES = 5;
-        private static int MAX_ROWS = 1000;
-        private static final IntegerMonitor ENTRIES_MONITOR = new IntegerMonitor(
-                "BatchWriteBehind.ENTRIES_MONITOR", null);
-        private static final IntegerMonitor INSTANCES_MONITOR = new IntegerMonitor(
-                "BatchWriteBehind.INSTANCES_MONITOR", null);
-        
-        static {
-            if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.DERBY) // This has not bee tested to be optimal
-            {
-                MAX_ROWS = 1000;
-            } else if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.MSSQL) // MSSQL has max rows of 1000, and max parameters of 2100. In
-            // this case that works out to...
-            {
-                MAX_ROWS = 524;
-            } else if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.MYSQL) // This appears to be an optimal value
-            {
-                MAX_ROWS = 2000;
-            } else {
-                throw new ShouldNeverHappenException("Unknown database type: "
-                        + Common.ctx.getDatabaseAccess().getType());
-            }
-            
-            Common.MONITORED_VALUES.addIfMissingStatMonitor(ENTRIES_MONITOR);
-            Common.MONITORED_VALUES.addIfMissingStatMonitor(INSTANCES_MONITOR);
-        }
-        
-        static void add(BatchWriteBehindEntry e, JdbcTemplate ejt) {
-            synchronized (ENTRIES) {
-                ENTRIES.add(e);
-                ENTRIES_MONITOR.setValue(ENTRIES.size());
-                if (ENTRIES.size() > instances.size() * SPAWN_THRESHOLD) {
-                    if (instances.size() < MAX_INSTANCES) {
-                        BatchWriteBehind bwb = new BatchWriteBehind(ejt);
-                        instances.add(bwb);
-                        INSTANCES_MONITOR.setValue(instances.size());
-                        try {
-                            Common.ctx.getBackgroundProcessing().addWorkItem(
-                                    bwb);
-                        } catch (RejectedExecutionException ree) {
-                            instances.remove(bwb);
-                            INSTANCES_MONITOR.setValue(instances.size());
-                            throw ree;
-                        }
-                    }
-                }
-            }
-        }
-        
-        private final JdbcTemplate ejt;
-        
-        public BatchWriteBehind(JdbcTemplate ejt) {
-            this.ejt = ejt;
-        }
-        
-        @Override
-        public void execute() {
-            try {
-                BatchWriteBehindEntry[] inserts;
-                while (true) {
-                    synchronized (ENTRIES) {
-                        if (ENTRIES.size() == 0) {
-                            break;
-                        }
-                        
-                        inserts = new BatchWriteBehindEntry[ENTRIES.size() < MAX_ROWS ? ENTRIES.size() : MAX_ROWS];
-                        for (int i = 0; i < inserts.length; i++) {
-                            inserts[i] = ENTRIES.remove();
-                        }
-                        ENTRIES_MONITOR.setValue(ENTRIES.size());
-                    }
-
-                    // Create the sql and parameters
-                    Object[] params = new Object[inserts.length
-                            * POINT_VALUE_INSERT_VALUES_COUNT];
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(POINT_VALUE_INSERT_START);
-                    for (int i = 0; i < inserts.length; i++) {
-                        if (i > 0) {
-                            sb.append(',');
-                        }
-                        sb.append(POINT_VALUE_INSERT_VALUES);
-                        inserts[i].writeInto(params, i);
-                    }
-
-                    // Insert the data
-                    int retries = 10;
-                    while (true) {
-                        try {
-                            ejt.update(sb.toString(), params);
-                            break;
-                        } catch (ConcurrencyFailureException e) {
-                            if (retries <= 0) {
-                                LOG.error("Concurrency failure saving "
-                                        + inserts.length
-                                        + " batch inserts after 10 tries. Data lost.");
-                                break;
-                            }
-                            
-                            int wait = (10 - retries) * 100;
-                            try {
-                                if (wait > 0) {
-                                    synchronized (this) {
-                                        wait(wait);
-                                    }
-                                }
-                            } catch (InterruptedException ie) {
-                                // no op
-                            }
-                            
-                            retries--;
-                        } catch (DataAccessException e) {
-                            LOG.error("Error saving " + inserts.length
-                                    + " batch inserts. Data lost.", e);
-                            break;
-                        }
-                    }
-                }
-            } finally {
-                instances.remove(this);
-                INSTANCES_MONITOR.setValue(instances.size());
-            }
-        }
-        
-        @Override
-        public int getPriority() {
-            return WorkItem.PRIORITY_HIGH;
-        }
-    }
 }

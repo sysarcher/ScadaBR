@@ -30,7 +30,6 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.DatabaseAccess;
 import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
@@ -40,7 +39,6 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.rt.event.EventInstance;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.UserComment;
@@ -52,14 +50,13 @@ import com.serotonin.mango.vo.report.ReportUserComment;
 import com.serotonin.mango.vo.report.ReportVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.l10n.Localizer;
 import br.org.scadabr.rt.event.type.EventSources;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Objects;
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -70,6 +67,8 @@ import org.springframework.jdbc.core.RowMapper;
 @Named
 public class ReportDao extends BaseDao {
 
+    @Inject
+    private PointValueDao pointValueDao;
     //
     //
     // Report Templates
@@ -78,16 +77,6 @@ public class ReportDao extends BaseDao {
 
     public ReportDao() {
         super();
-    }
-
-    @Deprecated
-    private ReportDao(DataSource dataSource) {
-        super(dataSource);
-    }
-
-    @Deprecated
-    public static ReportDao getInstance() {
-        return new ReportDao(Common.ctx.getDatabaseAccess().getDataSource());
     }
 
     public List<ReportVO> getReports() {
@@ -283,7 +272,6 @@ public class ReportDao extends BaseDao {
     }
 
     public int runReport(final ReportInstance instance, List<PointInfo> points, ResourceBundle bundle) {
-        PointValueDao pointValueDao = PointValueDao.getInstance();
         int count = 0;
         String userLabel = AbstractLocalizer.localizeI18nKey("common.user", bundle);
         String setPointLabel = AbstractLocalizer.localizeI18nKey("annotation.eventHandler", bundle);
@@ -358,30 +346,34 @@ public class ReportDao extends BaseDao {
             count += ejt.update(insertSQL, appendParameters(timestampParams, point.getId(), dataType));
 
             String annoCase;
-            if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.DERBY) {
-                annoCase = "    case when pva.sourceType=1 then '" + userLabel //
-                        + ": ' || (case when u.username is null then '" + deletedLabel + "' else u.username end) " //
-                        + "         when pva.sourceType=2 then '" + setPointLabel + "' " //
-                        + "         when pva.sourceType=3 then '" + anonymousLabel + "' " //
-                        + "         else 'Unknown source type: ' || cast(pva.sourceType as char(3)) " //
-                        + "    end ";
-            } else if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.MSSQL) {
-                annoCase = "    case pva.sourceType" //
-                        + "        when 1 then '" + userLabel + ": ' + isnull(u.username, '" + deletedLabel + "') " //
-                        + "        when 2 then '" + setPointLabel + "'" //
-                        + "        when 3 then '" + anonymousLabel + "'" //
-                        + "        else 'Unknown source type: ' + cast(pva.sourceType as nvarchar)" //
-                        + "    end ";
-            } else if (Common.ctx.getDatabaseAccess().getType() == DatabaseAccess.DatabaseType.MYSQL) {
-                annoCase = "    case pva.sourceType" //
-                        + "      when 1 then concat('" + userLabel + ": ',ifnull(u.username,'" + deletedLabel + "')) " //
-                        + "      when 2 then '" + setPointLabel + "'" //
-                        + "      when 3 then '" + anonymousLabel + "'" //
-                        + "      else concat('Unknown source type: ', pva.sourceType)" //
-                        + "    end ";
-            } else {
-                throw new ShouldNeverHappenException("unhandled database type: "
-                        + Common.ctx.getDatabaseAccess().getType());
+            switch (getDataBaseType()) {
+                case DERBY:
+                    annoCase = "    case when pva.sourceType=1 then '" + userLabel //
+                            + ": ' || (case when u.username is null then '" + deletedLabel + "' else u.username end) " //
+                            + "         when pva.sourceType=2 then '" + setPointLabel + "' " //
+                            + "         when pva.sourceType=3 then '" + anonymousLabel + "' " //
+                            + "         else 'Unknown source type: ' || cast(pva.sourceType as char(3)) " //
+                            + "    end ";
+                    break;
+                case MSSQL:
+                    annoCase = "    case pva.sourceType" //
+                            + "        when 1 then '" + userLabel + ": ' + isnull(u.username, '" + deletedLabel + "') " //
+                            + "        when 2 then '" + setPointLabel + "'" //
+                            + "        when 3 then '" + anonymousLabel + "'" //
+                            + "        else 'Unknown source type: ' + cast(pva.sourceType as nvarchar)" //
+                            + "    end ";
+                    break;
+                case MYSQL:
+                    annoCase = "    case pva.sourceType" //
+                            + "      when 1 then concat('" + userLabel + ": ',ifnull(u.username,'" + deletedLabel + "')) " //
+                            + "      when 2 then '" + setPointLabel + "'" //
+                            + "      when 3 then '" + anonymousLabel + "'" //
+                            + "      else concat('Unknown source type: ', pva.sourceType)" //
+                            + "    end ";
+                    break;
+                default:
+                    throw new ShouldNeverHappenException("unhandled database type: "
+                            + getDataBaseType());
             }
 
             // Insert the reportInstanceDataAnnotations records
@@ -406,7 +398,7 @@ public class ReportDao extends BaseDao {
                         + "    left join users u on e.ackUserId=u.id " //
                         + "  where ue.userId=? " //
                         + "    and e.typeId=" //
-                        +  EventSources.DATA_POINT.mangoDbId //
+                        + EventSources.DATA_POINT.mangoDbId //
                         + "    and e.typeRef1=? ";
 
                 if (instance.getIncludeEvents() == ReportVO.EVENTS_ALARMS) {

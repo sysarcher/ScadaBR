@@ -29,14 +29,20 @@ import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.ScheduledEventDao;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  *
  */
 @JsonRemoteEntity
+@Configurable
 public class ScheduledEventType extends EventType {
 
+    @Autowired
+    private ScheduledEventDao scheduledEventDao;
+    
     private int scheduleId;
     private DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
     private AlarmLevel alarmLevel;
@@ -132,7 +138,7 @@ public class ScheduledEventType extends EventType {
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        map.put("XID", ScheduledEventDao.getInstance().getScheduledEvent(scheduleId).getXid());
+        map.put("XID", scheduledEventDao.getScheduledEvent(scheduleId).getXid());
     }
 
     @Override

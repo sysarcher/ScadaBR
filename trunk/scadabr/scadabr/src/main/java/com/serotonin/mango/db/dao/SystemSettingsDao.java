@@ -143,27 +143,17 @@ public class SystemSettingsDao extends BaseDao {
         super();
     }
 
-    @Deprecated
-    public SystemSettingsDao(DataSource dataSource) {
-        super(dataSource);
-    }
-
-    @Deprecated
-    public static SystemSettingsDao getInstance() {
-        return new SystemSettingsDao(Common.ctx.getDatabaseAccess().getDataSource());
-    }
-
-    public static String getValue(String key) {
+    public String getValue(String key) {
         return getValue(key, (String) DEFAULT_VALUES.get(key));
     }
 
-    public static String getValue(String key, String defaultValue) {
+    public String getValue(String key, String defaultValue) {
         String result = cache.get(key);
         if (result == null) {
             if (!cache.containsKey(key)) {
                 try {
                     //TODOD was BaseDao
-                    result = SystemSettingsDao.getInstance().ejt.queryForObject("select settingValue from systemSettings where settingName=?", String.class, key);
+                    result = ejt.queryForObject("select settingValue from systemSettings where settingName=?", String.class, key);
                 } catch (EmptyResultDataAccessException e) {
                     result = null;
                 }
@@ -178,7 +168,7 @@ public class SystemSettingsDao extends BaseDao {
         return result;
     }
 
-    public static int getIntValue(String key) {
+    public int getIntValue(String key) {
         Integer defaultValue = (Integer) DEFAULT_VALUES.get(key);
         if (defaultValue == null) {
             return getIntValue(key, 0);
@@ -186,7 +176,7 @@ public class SystemSettingsDao extends BaseDao {
         return getIntValue(key, defaultValue);
     }
 
-    public static TimePeriods getTimePeriodsValue(String key) {
+    public TimePeriods getTimePeriodsValue(String key) {
         TimePeriods defaultValue = (TimePeriods) DEFAULT_VALUES.get(key);
         if (defaultValue == null) {
             throw  new ShouldNeverHappenException("No default for: " + key);
@@ -194,7 +184,7 @@ public class SystemSettingsDao extends BaseDao {
         return TimePeriods.fromId(getIntValue(key, defaultValue.getId()));
     }
 
-    public static int getIntValue(String key, int defaultValue) {
+    public int getIntValue(String key, int defaultValue) {
         String value = getValue(key, null);
         if (value == null) {
             return defaultValue;
@@ -206,11 +196,11 @@ public class SystemSettingsDao extends BaseDao {
         }
     }
 
-    public static boolean getBooleanValue(String key) {
+    public boolean getBooleanValue(String key) {
         return getBooleanValue(key, false);
     }
 
-    public static boolean getBooleanValue(String key, boolean defaultValue) {
+    public boolean getBooleanValue(String key, boolean defaultValue) {
         String value = getValue(key, null);
         if (value == null) {
             return defaultValue;
@@ -261,14 +251,14 @@ public class SystemSettingsDao extends BaseDao {
                 new Object[]{key});
     }
 
-    public static long getFutureDateLimit() {
+    public long getFutureDateLimit() {
         if (FUTURE_DATE_LIMIT == -1) {
             FUTURE_DATE_LIMIT = getTimePeriodsValue(FUTURE_DATE_LIMIT_PERIOD_TYPE).getMillis(getIntValue(FUTURE_DATE_LIMIT_PERIODS));
         }
         return FUTURE_DATE_LIMIT;
     }
 
-    public static Color getColour(String key) {
+    public Color getColour(String key) {
         try {
             return ColorUtils.toColor(getValue(key));
         } catch (InvalidArgumentException e) {

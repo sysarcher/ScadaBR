@@ -23,10 +23,13 @@ import com.serotonin.mango.web.dwr.beans.DataExportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Deprecated //TODO APL Use rest to fetch image
+
 public class ChartExportServlet extends HttpServlet {
     @Autowired
     private DataPointDao dataPointDao;
-
+    @Autowired
+    private PointValueDao pointValueDao;
+        
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -40,8 +43,6 @@ public class ChartExportServlet extends HttpServlet {
         if (def == null) {
             return;
         }
-
-        PointValueDao pointValueDao = PointValueDao.getInstance();
 
         long from = def.getFrom() == null ? -1 : def.getFrom().getMillis();
         long to = def.getTo() == null ? System.currentTimeMillis() : def.getTo().getMillis();

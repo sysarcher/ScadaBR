@@ -26,17 +26,22 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
-import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
+@Configurable
 public class CompoundDetectorEventType extends EventType {
 
+    @Autowired
+    private CompoundEventDetectorDao compoundEventDetectorDao;
+    
     private int compoundDetectorId;
     private DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
     private AlarmLevel alarmLevel;
@@ -136,7 +141,7 @@ public class CompoundDetectorEventType extends EventType {
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        map.put("XID", CompoundEventDetectorDao.getInstance().getCompoundEventDetector(compoundDetectorId).getXid());
+        map.put("XID", compoundEventDetectorDao.getCompoundEventDetector(compoundDetectorId).getXid());
     }
 
     @Override

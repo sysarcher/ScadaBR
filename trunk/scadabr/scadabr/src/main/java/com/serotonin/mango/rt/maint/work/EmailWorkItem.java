@@ -30,13 +30,19 @@ import br.org.scadabr.web.email.EmailSender;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.SystemEventSource;
 import java.io.UnsupportedEncodingException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  *
  */
+@Configurable
 public class EmailWorkItem implements WorkItem {
 
+    @Autowired
+    private SystemSettingsDao  systemSettingsDao;
+    
     @Override
     public int getPriority() {
         return WorkItem.PRIORITY_MEDIUM;
@@ -81,17 +87,17 @@ public class EmailWorkItem implements WorkItem {
     public void execute() {
         try {
             if (fromAddress == null) {
-                String addr = SystemSettingsDao.getValue(SystemSettingsDao.EMAIL_FROM_ADDRESS);
-                String pretty = SystemSettingsDao.getValue(SystemSettingsDao.EMAIL_FROM_NAME);
+                String addr = systemSettingsDao.getValue(SystemSettingsDao.EMAIL_FROM_ADDRESS);
+                String pretty = systemSettingsDao.getValue(SystemSettingsDao.EMAIL_FROM_NAME);
                 fromAddress = new InternetAddress(addr, pretty);
             }
 
-            EmailSender emailSender = new EmailSender(SystemSettingsDao.getValue(SystemSettingsDao.EMAIL_SMTP_HOST),
-                    SystemSettingsDao.getIntValue(SystemSettingsDao.EMAIL_SMTP_PORT),
-                    SystemSettingsDao.getBooleanValue(SystemSettingsDao.EMAIL_AUTHORIZATION),
-                    SystemSettingsDao.getValue(SystemSettingsDao.EMAIL_SMTP_USERNAME),
-                    SystemSettingsDao.getValue(SystemSettingsDao.EMAIL_SMTP_PASSWORD),
-                    SystemSettingsDao.getBooleanValue(SystemSettingsDao.EMAIL_TLS));
+            EmailSender emailSender = new EmailSender(systemSettingsDao.getValue(SystemSettingsDao.EMAIL_SMTP_HOST),
+                    systemSettingsDao.getIntValue(SystemSettingsDao.EMAIL_SMTP_PORT),
+                    systemSettingsDao.getBooleanValue(SystemSettingsDao.EMAIL_AUTHORIZATION),
+                    systemSettingsDao.getValue(SystemSettingsDao.EMAIL_SMTP_USERNAME),
+                    systemSettingsDao.getValue(SystemSettingsDao.EMAIL_SMTP_PASSWORD),
+                    systemSettingsDao.getBooleanValue(SystemSettingsDao.EMAIL_TLS));
 
             emailSender.send(fromAddress, toAddresses, subject, content);
         } catch (UnsupportedEncodingException e) {

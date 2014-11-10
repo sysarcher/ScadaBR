@@ -66,6 +66,12 @@ import org.springframework.beans.factory.annotation.Configurable;
 public class ReportWorkItem implements WorkItem {
     @Autowired
     private DataPointDao dataPointDao;
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private ReportDao reportDao;
+    @Autowired 
+    private MailingListDao mailingListDao;
 
     static final Log LOG = LogFactory.getLog(ReportWorkItem.class);
 
@@ -74,11 +80,11 @@ public class ReportWorkItem implements WorkItem {
         return WorkItem.PRIORITY_LOW;
     }
 
-    public static void queueReport(ReportVO report) {
+    public void queueReport(ReportVO report) {
         LOG.info("Queuing report with id " + report.getId());
 
         // Verify that the user is not disabled.
-        User user = UserDao.getInstance().getUser(report.getUserId());
+        User user = userDao.getUser(report.getUserId());
         if (user.isDisabled()) {
             return;
         }
@@ -91,7 +97,6 @@ public class ReportWorkItem implements WorkItem {
         ReportInstance reportInstance = new ReportInstance(report);
 
         item.user = user;
-        item.reportDao = ReportDao.getInstance();
         item.reportDao.saveReportInstance(reportInstance);
 
         // Start the report work item out of process.
@@ -103,7 +108,6 @@ public class ReportWorkItem implements WorkItem {
 
     ReportVO reportConfig;
     private User user;
-    private ReportDao reportDao;
     private ReportInstance reportInstance;
     List<File> filesToDelete = new ArrayList<>();
 
@@ -158,7 +162,7 @@ public class ReportWorkItem implements WorkItem {
             creator.createContent(reportInstance, reportDao, inlinePrefix, reportConfig.isIncludeData());
 
             // Create the to list
-            Set<String> addresses = MailingListDao.getInstance().getRecipientAddresses(reportConfig.getRecipients(),
+            Set<String> addresses = mailingListDao.getRecipientAddresses(reportConfig.getRecipients(),
                     new DateTime(reportInstance.getReportStartTime()));
             String[] toAddrs = addresses.toArray(new String[0]);
 

@@ -29,13 +29,19 @@ import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.PublisherDao;
 import com.serotonin.mango.vo.publish.PublisherVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
 @JsonRemoteEntity
+@Configurable
 public class PublisherEventType extends EventType {
 
+    @Autowired
+    private PublisherDao publisherDao;
+    
     private int publisherId;
     private int publisherEventTypeId;
     private AlarmLevel alarmLevel;
@@ -127,7 +133,7 @@ public class PublisherEventType extends EventType {
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
-        PublisherVO<?> pub = PublisherDao.getInstance().getPublisher(publisherId);
+        PublisherVO<?> pub = publisherDao.getPublisher(publisherId);
         map.put("XID", pub.getXid());
         map.put("publisherEventTypeId", pub.getEventCodes().getCode(publisherEventTypeId));
     }

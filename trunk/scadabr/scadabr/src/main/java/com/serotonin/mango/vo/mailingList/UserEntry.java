@@ -30,10 +30,15 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @JsonRemoteEntity
+@Configurable
 public class UserEntry extends EmailRecipient {
-
+    @Autowired
+    private UserDao userDao;
+    
     private int userId;
     private User user;
 
@@ -95,7 +100,7 @@ public class UserEntry extends EmailRecipient {
     public void jsonSerialize(Map<String, Object> map) {
         super.jsonSerialize(map);
         if (user == null) {
-            user = UserDao.getInstance().getUser(userId);
+            user = userDao.getUser(userId);
         }
         map.put("username", user.getUsername());
     }
@@ -109,7 +114,7 @@ public class UserEntry extends EmailRecipient {
             throw new LocalizableJsonException("emport.error.recipient.missing.reference", "username");
         }
 
-        user = UserDao.getInstance().getUser(username);
+        user = userDao.getUser(username);
         if (user == null) {
             throw new LocalizableJsonException("emport.error.recipient.invalid.reference", "username", username);
         }

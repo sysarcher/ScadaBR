@@ -31,12 +31,18 @@ import br.org.scadabr.io.StreamUtils;
 import com.serotonin.mango.Common;
 import br.org.scadabr.util.ArrayUtils;
 import br.org.scadabr.util.image.ImageUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
+@Configurable
 public class ImageValue extends MangoValue implements Comparable<ImageValue> {
 
+    @Autowired
+    private Common common;
+    
     private static final String FILENAME_PREFIX = "img";
 
     public static final int TYPE_JPG = 1;
@@ -114,7 +120,7 @@ public class ImageValue extends MangoValue implements Comparable<ImageValue> {
             if (data != null) {
                 return ImageUtils.createImage(data);
             }
-            return ImageUtils.loadImage(new File(Common.getFiledataPath(), getFilename()).getPath());
+            return ImageUtils.loadImage(new File(common.getFiledataPath(), getFilename()).getPath());
         } catch (InterruptedException e) {
             // no op
         }
@@ -129,7 +135,7 @@ public class ImageValue extends MangoValue implements Comparable<ImageValue> {
         FileInputStream in = null;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
-            in = new FileInputStream(new File(Common.getFiledataPath(), getFilename()).getPath());
+            in = new FileInputStream(new File(common.getFiledataPath(), getFilename()).getPath());
             StreamUtils.transfer(in, out);
         } finally {
             if (in != null) {

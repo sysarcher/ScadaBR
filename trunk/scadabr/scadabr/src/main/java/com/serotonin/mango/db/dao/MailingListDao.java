@@ -40,8 +40,8 @@ import com.serotonin.mango.vo.mailingList.UserEntry;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import java.sql.Connection;
 import java.sql.Statement;
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -53,18 +53,11 @@ import org.springframework.jdbc.core.RowMapper;
 @Named
 public class MailingListDao extends BaseDao {
 
+    @Inject
+    private UserDao userDao;
+    
     public MailingListDao() {
         super();
-    }
-    
-   @Deprecated
-    private MailingListDao(DataSource dataSource) {
-        super(dataSource);
-    }
-
-   @Deprecated
-     public static MailingListDao getInstance() {
-        return new MailingListDao(Common.ctx.getDatabaseAccess().getDataSource());
     }
     
     public String generateUniqueXid() {
@@ -177,7 +170,6 @@ public class MailingListDao extends BaseDao {
 
     public void populateEntrySubclasses(List<EmailRecipient> entries) {
         // Update the user type entries with their respective user objects.
-        UserDao userDao = UserDao.getInstance();
         for (EmailRecipient e : entries) {
             if (e instanceof MailingList) // NOTE: this does not set the mailing list name.
             {

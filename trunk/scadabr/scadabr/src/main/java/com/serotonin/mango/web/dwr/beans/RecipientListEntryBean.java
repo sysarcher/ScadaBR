@@ -35,10 +35,18 @@ import com.serotonin.mango.vo.mailingList.AddressEntry;
 import com.serotonin.mango.vo.mailingList.EmailRecipient;
 import com.serotonin.mango.vo.mailingList.MailingList;
 import com.serotonin.mango.vo.mailingList.UserEntry;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @JsonRemoteEntity
+@Configurable
 public class RecipientListEntryBean implements Serializable, JsonSerializable {
 
+    @Autowired
+    private MailingListDao mailingListDao;
+    @Autowired
+    private UserDao userDao;
+            
     private static final long serialVersionUID = -1;
 
     private int recipientType;
@@ -91,9 +99,9 @@ public class RecipientListEntryBean implements Serializable, JsonSerializable {
     public void jsonSerialize(Map<String, Object> map) {
         map.put("recipientType", EmailRecipient.TYPE_CODES.getCode(recipientType));
         if (recipientType == EmailRecipient.TYPE_MAILING_LIST) {
-            map.put("mailingList", MailingListDao.getInstance().getMailingList(referenceId).getXid());
+            map.put("mailingList", mailingListDao.getMailingList(referenceId).getXid());
         } else if (recipientType == EmailRecipient.TYPE_USER) {
-            map.put("username", UserDao.getInstance().getUser(referenceId).getUsername());
+            map.put("username", userDao.getUser(referenceId).getUsername());
         } else if (recipientType == EmailRecipient.TYPE_ADDRESS) {
             map.put("address", referenceAddress);
         }
@@ -119,7 +127,7 @@ public class RecipientListEntryBean implements Serializable, JsonSerializable {
                 throw new LocalizableJsonException("emport.error.recipient.missing.reference", "mailingList");
             }
 
-            MailingList ml = MailingListDao.getInstance().getMailingList(text);
+            MailingList ml = mailingListDao.getMailingList(text);
             if (ml == null) {
                 throw new LocalizableJsonException("emport.error.recipient.invalid.reference", "mailingList", text);
             }
@@ -131,7 +139,7 @@ public class RecipientListEntryBean implements Serializable, JsonSerializable {
                 throw new LocalizableJsonException("emport.error.recipient.missing.reference", "username");
             }
 
-            User user = UserDao.getInstance().getUser(text);
+            User user = userDao.getUser(text);
             if (user == null) {
                 throw new LocalizableJsonException("emport.error.recipient.invalid.reference", "user", text);
             }

@@ -47,13 +47,19 @@ import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  * @param <T>
  */
+@Configurable
 abstract public class PublisherVO<T extends PublishedPointVO> implements Serializable, JsonSerializable {
 
+    @Autowired
+    private PublisherDao publisherDao;
+    
     public enum Type {
 
         HTTP_SENDER(1, "publisherEdit.httpSender") {
@@ -270,7 +276,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
 
         if (xid.isEmpty()) {
             response.addContextual("xid", "validate.required");
-        } else if (!PublisherDao.getInstance().isXidUnique(xid, id)) {
+        } else if (!publisherDao.isXidUnique(xid, id)) {
             response.addContextual("xid", "validate.xidUsed");
         } else if (xid.length() > 50) {
             response.addContextual("xid", "validate.notLongerThan", 50);

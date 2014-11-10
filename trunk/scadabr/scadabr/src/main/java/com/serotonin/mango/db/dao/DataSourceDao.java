@@ -60,6 +60,8 @@ public class DataSourceDao extends BaseDao {
 
     @Inject
     private DataPointDao dataPointDao;
+    @Inject
+    private MaintenanceEventDao maintenanceEventDao;
 
     public DataSourceDao() {
         super();
@@ -176,7 +178,7 @@ public class DataSourceDao extends BaseDao {
             getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
                 @Override
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    MaintenanceEventDao.getInstance().deleteMaintenanceEventsForDataSource(dataSourceId);
+                    maintenanceEventDao.deleteMaintenanceEventsForDataSource(dataSourceId);
                     ejt2.update("delete from eventHandlers where eventTypeId=" + EventSources.DATA_SOURCE.mangoDbId
                             + " and eventTypeRef1=?", new Object[]{dataSourceId});
                     ejt2.update("delete from dataSourceUsers where dataSourceId=?", new Object[]{dataSourceId});

@@ -35,18 +35,25 @@ import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.vo.report.ReportChartCreator;
 import com.serotonin.mango.vo.report.ReportChartCreator.PointStatistics;
 import com.serotonin.mango.vo.report.ReportInstance;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.stereotype.Controller;
 
 /**
  * @author Matthew Lohbihler
  */
+@Controller
+@Deprecated
 public class ReportChartController extends AbstractController {
 
+    @Autowired
+    private ReportDao reportDao;
+    
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
 
         int instanceId = Integer.parseInt(request.getParameter("instanceId"));
-        ReportDao reportDao = ReportDao.getInstance();
         ReportInstance instance = reportDao.getReportInstance(instanceId);
 
         User user = Common.getUser(request);
@@ -73,10 +80,12 @@ public class ReportChartController extends AbstractController {
             this.content = content;
         }
 
+        @Override
         public String getContentType() {
             return null;
         }
 
+        @Override
         public void render(Map model, HttpServletRequest request, HttpServletResponse response) throws Exception {
             response.getWriter().write(content);
         }

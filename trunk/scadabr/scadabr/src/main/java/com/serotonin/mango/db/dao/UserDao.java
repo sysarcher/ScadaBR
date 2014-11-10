@@ -59,16 +59,6 @@ public class UserDao extends BaseDao {
         super();
     }
 
-    @Deprecated
-    public UserDao(DataSource dataSource) {
-        super(dataSource);
-    }
-
-    @Deprecated
-    public static UserDao getInstance() {
-        return new UserDao(Common.ctx.getDatabaseAccess().getDataSource());
-    }
-
     public User getUser(int id) {
         try {
             User user = ejt.queryForObject(USER_SELECT + "where id=?", new UserRowMapper(), id);

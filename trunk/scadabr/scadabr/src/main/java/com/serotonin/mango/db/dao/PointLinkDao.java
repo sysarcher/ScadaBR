@@ -46,16 +46,6 @@ public class PointLinkDao extends BaseDao {
         super();
     }
 
-    @Deprecated
-    private PointLinkDao(DataSource dataSource) {
-        super(dataSource);
-    }
-
-    @Deprecated
-    public static PointLinkDao getInstance() {
-        return new PointLinkDao(Common.ctx.getDatabaseAccess().getDataSource());
-    }
-
     public String generateUniqueXid() {
         return generateUniqueXid(PointLinkVO.XID_PREFIX, "pointLinks");
     }

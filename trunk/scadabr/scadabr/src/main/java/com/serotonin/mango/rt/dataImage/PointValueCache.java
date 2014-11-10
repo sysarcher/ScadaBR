@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.serotonin.mango.db.dao.PointValueDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * This class maintains an ordered list of the most recent values for a data
@@ -34,11 +36,13 @@ import com.serotonin.mango.db.dao.PointValueDao;
  *
  * @author Matthew Lohbihler
  */
+@Configurable
 public class PointValueCache {
 
     private final int dataPointId;
     private final int defaultSize;
-    private final PointValueDao dao;
+    @Autowired
+    private PointValueDao pointValueDao;
 
     /**
      * IMPORTANT: The list object should never be written to! The implementation
@@ -51,7 +55,6 @@ public class PointValueCache {
     public PointValueCache(int dataPointId, int defaultSize) {
         this.dataPointId = dataPointId;
         this.defaultSize = defaultSize;
-        dao = PointValueDao.getInstance();
 
         if (defaultSize > 0) {
             refreshCache(defaultSize);
@@ -63,9 +66,9 @@ public class PointValueCache {
     public void savePointValue(PointValueTime pvt, SetPointSource source, boolean logValue, boolean async) {
         if (logValue) {
             if (async) {
-                dao.savePointValueAsync(dataPointId, pvt, source);
+                pointValueDao.savePointValueAsync(dataPointId, pvt, source);
             } else {
-                pvt = dao.savePointValueSync(dataPointId, pvt, source);
+                pvt = pointValueDao.savePointValueSync(dataPointId, pvt, source);
             }
         }
 
@@ -101,7 +104,7 @@ public class PointValueCache {
      */
     void logPointValueAsync(PointValueTime pointValue, SetPointSource source) {
         // Save the new value and get a point value time back that has the id and annotations set, as appropriate.
-        dao.savePointValueAsync(dataPointId, pointValue, source);
+        pointValueDao.savePointValueAsync(dataPointId, pointValue, source);
     }
 
     public PointValueTime getLatestPointValue() {
@@ -130,7 +133,7 @@ public class PointValueCache {
         if (limit > c.size()) {
             limit = c.size();
         }
-        return new ArrayList<PointValueTime>(c.subList(0, limit));
+        return new ArrayList<>(c.subList(0, limit));
     }
 
     private void refreshCache(int size) {
@@ -138,20 +141,21 @@ public class PointValueCache {
             maxSize = size;
             if (size == 1) {
                 // Performance thingy
-                PointValueTime pvt = dao.getLatestPointValue(dataPointId);
+                PointValueTime pvt = pointValueDao.getLatestPointValue(dataPointId);
                 if (pvt != null) {
-                    List<PointValueTime> c = new ArrayList<PointValueTime>();
+                    List<PointValueTime> c = new ArrayList<>();
                     c.add(pvt);
                     cache = c;
                 }
             } else {
-                cache = dao.getLatestPointValues(dataPointId, size);
+                cache = pointValueDao.getLatestPointValues(dataPointId, size);
             }
         }
     }
 
     /**
      * Never manipulate the contents of this list!
+     * @return 
      */
     public List<PointValueTime> getCacheContents() {
         return cache;
@@ -165,7 +169,7 @@ public class PointValueCache {
             size = c.size();
         }
 
-        List<PointValueTime> nc = new ArrayList<PointValueTime>(size);
+        List<PointValueTime> nc = new ArrayList<>(size);
         nc.addAll(c.subList(0, size));
 
         maxSize = size;

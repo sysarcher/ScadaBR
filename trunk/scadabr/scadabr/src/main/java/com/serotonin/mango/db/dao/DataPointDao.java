@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
 
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -43,7 +42,6 @@ import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.Common;
 import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.UserComment;
@@ -79,6 +77,10 @@ public class DataPointDao extends BaseDao {
     private RuntimeManager runtimeManager;
     @Inject
     private DataSourceDao dataSourceDao;
+    @Inject
+    private PointLinkDao pointLinkDao;
+    @Inject
+    private PointValueDao pointValueDao;
     
     public DataPointDao() {
         super();
@@ -321,7 +323,7 @@ public class DataPointDao extends BaseDao {
             // Delete any point values where data type doesn't match the vo, just in case the data type was changed.
             // Only do this if the data type has actually changed because it is just really slow if the database is
             // big or busy.
-            PointValueDao.getInstance().deletePointValuesWithMismatchedType(dp.getId(), dp.getDataType());
+            pointValueDao.deletePointValuesWithMismatchedType(dp.getId(), dp.getDataType());
         }
 
         // Save the VO information.
@@ -390,7 +392,7 @@ public class DataPointDao extends BaseDao {
     }
 
     private void beforePointDelete(int dataPointId) {
-        for (PointLinkVO link : PointLinkDao.getInstance().getPointLinksForPoint(dataPointId)) {
+        for (PointLinkVO link : pointLinkDao.getPointLinksForPoint(dataPointId)) {
             runtimeManager.deletePointLink(link.getId());
         }
     }

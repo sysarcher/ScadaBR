@@ -39,16 +39,6 @@ public class MaintenanceEventDao extends BaseDao {
         super();
     }
 
-    @Deprecated
-    private MaintenanceEventDao(DataSource dataSource) {
-        super(dataSource);
-    }
-
-    @Deprecated
-    public static MaintenanceEventDao getInstance() {
-        return new MaintenanceEventDao(Common.ctx.getDatabaseAccess().getDataSource());
-    }
-
     public String generateUniqueXid() {
         return generateUniqueXid(MaintenanceEventVO.XID_PREFIX, "maintenanceEvents");
     }
