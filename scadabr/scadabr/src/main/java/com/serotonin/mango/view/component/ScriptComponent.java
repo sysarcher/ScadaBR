@@ -34,9 +34,9 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataSource.meta.ScriptExecutor;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.web.dwr.BaseDwr;
 import com.serotonin.mango.web.taglib.Functions;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.EnumSet;
 
 /**
@@ -87,11 +87,13 @@ public class ScriptComponent extends PointComponent {
             engine.put("time", value.getTime());
             engine.put("pointComponent", this);
             engine.put("point", point);
+            if (true) throw new ImplementMeException();
+            /* TODO
             // Copy properties from the model into the engine scope.
             engine.put(BaseDwr.MODEL_ATTR_EVENTS, model.get(BaseDwr.MODEL_ATTR_EVENTS));
             engine.put(BaseDwr.MODEL_ATTR_HAS_UNACKED_EVENT, model.get(BaseDwr.MODEL_ATTR_HAS_UNACKED_EVENT));
             engine.put(BaseDwr.MODEL_ATTR_RESOURCE_BUNDLE, model.get(BaseDwr.MODEL_ATTR_RESOURCE_BUNDLE));
-
+*/
             // Create the script.
             String evalScript = SCRIPT_PREFIX + script + SCRIPT_SUFFIX;
 

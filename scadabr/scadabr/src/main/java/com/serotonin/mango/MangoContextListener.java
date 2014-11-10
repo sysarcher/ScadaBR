@@ -135,6 +135,7 @@ public class MangoContextListener implements ServletContextListener {
             // Notify the event manager of the shutdown.
             new SystemEventType(SystemEventSource.SYSTEM_SHUTDOWN).fire("event.system.shutdown");
         }
+        //Logout the User 
         for (UserSessionContextBean us : runtimeManager.getUserSessionContextBeans()) {
             us.systemShutdown();
         }

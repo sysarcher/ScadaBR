@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view.custom;
 
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +30,6 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.web.dwr.BaseDwr;
 import com.serotonin.mango.web.dwr.beans.CustomComponentState;
 
 /**
@@ -83,7 +83,8 @@ public class CustomViewPoint extends CustomViewComponent {
                 Map<String, Object> model = new HashMap<>();
                 model.put("point", dataPointVO);
                 model.put("pointValue", pvt);
-                value = BaseDwr.generateContent(request, "imageValueThumbnail.jsp", model);
+                throw new ImplementMeException();
+                //TODO value = BaseDwr.generateContent(request, "imageValueThumbnail.jsp", model);
             } else {
                 int hint = raw ? TextRenderer.HINT_RAW : TextRenderer.HINT_FULL;
                 value = dataPointVO.getTextRenderer().getText(pvt, hint);

@@ -16,12 +16,12 @@ import org.directwebremoting.WebContextFactory;
 
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.view.ImplDefinition;
-import com.serotonin.mango.web.dwr.BaseDwr;
 import java.util.EnumSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -69,9 +69,9 @@ public class AlarmListComponent extends CustomComponent {
         model.put("hideInactivityColumn", hideInactivityColumn);
         model.put("hideAckColumn", hideAckColumn);
 
-        String content = BaseDwr.generateContent(request, "alarmList.jsp",
-                model);
-        return content;
+        throw new ImplementMeException();
+        //TODO String content = BaseDwr.generateContent(request, "alarmList.jsp", model);
+        // return content;
     }
 
     private void filter(List<EventInstance> list, AlarmLevel alarmLevel) {

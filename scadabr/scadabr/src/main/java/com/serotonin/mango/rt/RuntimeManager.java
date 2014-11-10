@@ -31,7 +31,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
@@ -156,9 +155,8 @@ public class RuntimeManager {
         started = true;
 
         // Initialize data sources that are enabled.
-        List<DataSourceVO<?>> configs = dataSourceDao.getDataSources();
         List<DataSourceVO<?>> pollingRound = new ArrayList<>();
-        for (DataSourceVO<?> config : configs) {
+        for (DataSourceVO<?> config : dataSourceDao.getDataSources()) {
             if (config.isEnabled()) {
                 if (safe) {
                     config.setEnabled(false);
@@ -190,9 +188,7 @@ public class RuntimeManager {
         }
 
         // Initialize the scheduled events.
-        List<ScheduledEventVO> scheduledEvents = scheduledEventDao
-                .getScheduledEvents();
-        for (ScheduledEventVO se : scheduledEvents) {
+        for (ScheduledEventVO se : scheduledEventDao.getScheduledEvents()) {
             if (!se.isDisabled()) {
                 if (safe) {
                     se.setDisabled(true);
@@ -204,9 +200,7 @@ public class RuntimeManager {
         }
 
         // Initialize the compound events.
-        List<CompoundEventDetectorVO> compoundDetectors = compoundEventDetectorDao
-                .getCompoundEventDetectors();
-        for (CompoundEventDetectorVO ced : compoundDetectors) {
+        for (CompoundEventDetectorVO ced : compoundEventDetectorDao.getCompoundEventDetectors()) {
             if (!ced.isDisabled()) {
                 if (safe) {
                     ced.setDisabled(true);
@@ -218,9 +212,7 @@ public class RuntimeManager {
         }
 
         // Start the publishers that are enabled
-        List<PublisherVO<? extends PublishedPointVO>> publishers = publisherDao
-                .getPublishers();
-        for (PublisherVO<? extends PublishedPointVO> vo : publishers) {
+        for (PublisherVO<? extends PublishedPointVO> vo : publisherDao.getPublishers()) {
             if (vo.isEnabled()) {
                 if (safe) {
                     vo.setEnabled(false);
@@ -357,8 +349,7 @@ public class RuntimeManager {
             runningDataSources.add(dataSource);
 
             // Add the enabled points to the data source.
-            final List<DataPointVO> dataSourcePoints = dataPointDao.getDataPoints(vo.getId(), null);
-            for (DataPointVO dataPoint : dataSourcePoints) {
+            for (DataPointVO dataPoint : dataPointDao.getDataPoints(vo.getId(), null)) {
                 if (dataPoint.isEnabled()) {
                     startDataPoint(dataPoint);
                 } else {
