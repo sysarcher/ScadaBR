@@ -78,7 +78,7 @@ public class ScheduledEventsDwr extends BaseDwr {
         se.setAlias(alias);
         se.setAlarmLevel(alarmLevel);
         se.setScheduleType(scheduleType);
-        se.setReturnToNormal(returnToNormal);
+        se.setStateful(returnToNormal);
         se.setDisabled(disabled);
         se.setActiveYear(activeYear);
         se.setActiveMonth(activeMonth);

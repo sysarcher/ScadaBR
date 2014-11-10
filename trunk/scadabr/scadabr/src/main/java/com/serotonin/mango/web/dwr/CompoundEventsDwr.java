@@ -76,7 +76,7 @@ public class CompoundEventsDwr extends BaseDwr {
             source.setId(dp.getId());
             source.setName(dp.getExtendedName());
             for (PointEventDetectorVO ped : dp.getEventDetectors()) {
-                if (ped.isRtnApplicable()) {
+                if (ped.isStateful()) {
                     source.getEventTypes().add(ped.getEventType());
                 }
             }

@@ -46,11 +46,7 @@ abstract public class PointEventDetectorRT extends SimpleEventDetector implement
             msg = getMessage();
         }
 
-        if (vo.isRtnApplicable()) {
-            getEventType().raiseAlarm(context, time, msg);
-        } else {
-            getEventType().fire(context, time, msg);
-        }
+        getEventType().fire(context, time, msg);
         fireEventDetectorStateChanged(time);
     }
 

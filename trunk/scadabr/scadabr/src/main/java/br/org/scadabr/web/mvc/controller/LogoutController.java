@@ -21,7 +21,6 @@ package br.org.scadabr.web.mvc.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.UserSessionContextBean;
 import com.serotonin.mango.web.integration.CrowdUtils;
@@ -33,11 +32,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller()
 @RequestMapping("/logout")
 @Scope("request")
-public class LogoutController  {
+public class LogoutController {
 
     @Inject
     private UserSessionContextBean userSessionContextBean;
-    
+
     private String redirectUrl;
 
     public void setRedirectUrl(String redirectUrl) {
@@ -46,18 +45,20 @@ public class LogoutController  {
 
     @RequestMapping()
     protected String handleRequestInternal(HttpServletRequest request, HttpServletResponse response) {
-        // Check if the user is logged in.
-        User user = userSessionContextBean.getUser();
-        if (user != null) {
-            // The user is in fact logged in. Invalidate the session.
-            request.getSession().invalidate();
-            userSessionContextBean.logoutUser(user);
-            
-            if (CrowdUtils.isCrowdEnabled()) {
-                CrowdUtils.logout(request, response);
+        try {
+// Check if the user is logged in.
+            User user = userSessionContextBean.getUser();
+            if (user != null) {
+                // The user is in fact logged in. Invalidate the session.
+                userSessionContextBean.logoutUser(user);
+
+                if (CrowdUtils.isCrowdEnabled()) {
+                    CrowdUtils.logout(request, response);
+                }
             }
+        } finally {
+            request.getSession().invalidate();
         }
-        
         // Regardless of what happened above, forward to the configured view.
         return "redirect:login";
     }

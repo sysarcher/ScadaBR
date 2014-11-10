@@ -234,7 +234,7 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
         final Map<String, Object> context = new HashMap<>();
         context.put("dataSource", vo);
 
-        type.raiseAlarm(context, "event.ds", vo.getName(), message);
+        type.fire(context, "event.ds", vo.getName(), message);
     }
     
     protected void raiseAlarm(int eventId, String i18nKey, Object ... i18nArgs) {
@@ -246,7 +246,7 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
         final Map<String, Object> context = new HashMap<>();
         context.put("dataSource", vo);
 
-        type.raiseAlarm(context, timestamp, "event.ds", vo.getName(), message);
+        type.fire(context, timestamp, "event.ds", vo.getName(), message);
     }
     
     protected void fireEvent(int eventId, LocalizableMessage message) {

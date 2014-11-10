@@ -50,15 +50,15 @@ public class EventCsvStreamer {
         for (EventInstance event : events) {
             data[0] = Integer.toString(event.getId());
             data[1] = AbstractLocalizer.localizeI18nKey(event.getAlarmLevel().getI18nKey(), bundle);
-            data[2] = AbstractLocalizer.localizeTimeStamp(event.getActiveTimestamp(), false, bundle.getLocale());
+            data[2] = AbstractLocalizer.localizeTimeStamp(event.getFireTimestamp(), false, bundle.getLocale());
             data[3] = AbstractLocalizer.localizeMessage(event.getMessage(), bundle);
 
             if (event.isActive()) {
                 data[4] = AbstractLocalizer.localizeI18nKey("common.active", bundle);
-            } else if (!event.isRtnApplicable()) {
+            } else if (!event.isStateful()) {
                 data[4] = "";
             } else {
-                data[4] = String.format("%s - %s", AbstractLocalizer.localizeTimeStamp(event.getRtnTimestamp(), false, bundle.getLocale()), AbstractLocalizer.localizeMessage(event.getRtnMessage(), bundle));
+                data[4] = String.format("%s - %s", AbstractLocalizer.localizeTimeStamp(event.getInactiveTimestamp(), false, bundle.getLocale()), AbstractLocalizer.localizeMessage(event.getStateMessage(), bundle));
             }
 
             if (event.isAcknowledged()) {

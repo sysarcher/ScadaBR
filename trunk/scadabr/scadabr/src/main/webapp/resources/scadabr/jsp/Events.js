@@ -107,7 +107,7 @@ define(["dojo/_base/declare",
                             return node;
                         }
                     },
-                    activeTimestamp: {
+                    fireTimestamp: {
                         label: localizedMap["common.time"],
                         resizable: true,
                         formatter: function (timestamp) {
@@ -121,21 +121,28 @@ define(["dojo/_base/declare",
                             return msg;
                         }
                     },
-                    rtnTimestamp: {
+                    inactiveTimestamp: {
                         label: localizedMap["common.inactiveTime"],
                         renderCell: function (event, timestamp, default_node, options) {
                             var node = domConstruct.create("div");
-                            if (event.active) {
-                                node.innerHTML = localizedMap["common.active"];
-                                var img = domConstruct.create("img", null, node);
-                                img.src = "images/flag_white.png";
-                                img.title = localizedMap["common.active"];
-                            } else {
-                                if (!event.rtnApplicable) {
-                                    node.innerHTML = localizedMap["common.nortn"];
-                                } else {
-                                    node.innerHTML = _formatTimeStamp(timestamp) + ' - ' + event.rtnMessage;
-                                }
+                            switch (event.eventState) {
+                                case "ACTIVE":
+                                    node.innerHTML = localizedMap["common.active"];
+                                    var img = domConstruct.create("img", null, node);
+                                    img.src = "images/flag_white.png";
+                                    img.title = localizedMap["common.active"];
+                                    break;
+                                case "GONE":
+                                    node.innerHTML = _formatTimeStamp(timestamp) + ' - ' + event.stateMessage;
+                                    break;
+                                case "SOURCE_DISABLED":
+                                    node.innerHTML = _formatTimeStamp(timestamp) + ' - ' + event.stateMessage;
+                                    break;
+                                case "STATELESS":
+                                    node.innerHTML = event.stateMessage;
+                                    break;
+                                default:
+                                    console.log("eventstate unknown " + event);
                             }
                             return node;
                         }

@@ -164,7 +164,7 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
             pointDisabledEventActive = foundDisabledPoint;
             if (pointDisabledEventActive) // A published point has been terminated, was never enabled, or no longer exists.
             {
-                pointDisabledEventType.raiseAlarm(createEventContext(), "event.publish.pointMissing");
+                pointDisabledEventType.fire(createEventContext(), "event.publish.pointMissing");
             } else // Everything is good
             {
                 pointDisabledEventType.clearAlarm();
@@ -173,7 +173,7 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
     }
 
     void fireQueueSizeWarningEvent() {
-        queueSizeWarningEventType.raiseAlarm(createEventContext(), "event.publish.queueSize", vo.getCacheWarningSize());
+        queueSizeWarningEventType.fire(createEventContext(), "event.publish.queueSize", vo.getCacheWarningSize());
     }
 
     void deactivateQueueSizeWarningEvent() {

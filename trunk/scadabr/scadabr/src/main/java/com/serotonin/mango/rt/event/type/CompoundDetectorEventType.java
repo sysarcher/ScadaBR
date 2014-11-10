@@ -26,6 +26,7 @@ import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
@@ -39,6 +40,7 @@ public class CompoundDetectorEventType extends EventType {
     private int compoundDetectorId;
     private DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
     private AlarmLevel alarmLevel;
+    private boolean stateful;
 
     public CompoundDetectorEventType() {
         // Required for reflection.
@@ -58,6 +60,7 @@ public class CompoundDetectorEventType extends EventType {
     public CompoundDetectorEventType(CompoundEventDetectorVO vo) {
         this.compoundDetectorId = vo.getId();
         this.alarmLevel = vo.getAlarmLevel();
+        this.stateful = vo.isReturnToNormal();
         if (!vo.isReturnToNormal()) {
             duplicateHandling = DuplicateHandling.ALLOW;
         }
@@ -145,6 +148,11 @@ public class CompoundDetectorEventType extends EventType {
     @Override
     public AlarmLevel getAlarmLevel() {
         return alarmLevel;
+    }
+
+    @Override
+    public boolean isStateful() {
+        return stateful;
     }
 
 }

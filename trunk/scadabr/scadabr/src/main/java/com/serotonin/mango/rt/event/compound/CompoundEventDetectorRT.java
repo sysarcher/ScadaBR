@@ -63,7 +63,7 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
         if (vo.isReturnToNormal()) {
             eventType.fire(time, "event.compound.activated", vo.getName());
         } else {
-            eventType.raiseAlarm(time, "event.compound.activated", vo.getName());
+            eventType.fire(time, "event.compound.activated", vo.getName());
         }
     }
 

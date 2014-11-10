@@ -102,12 +102,12 @@
                         <option value="-1"><fmt:message key="common.all"/></option>
                     </select>
                     <!-- TODO use checkboxes for this ???-->
-                    <select id="eventStatus" data-dojo-type="dijit/form/Select" title="<fmt:message key="common.status"/>">
+                    <%--select id="eventStatus" data-dojo-type="dijit/form/Select" title="<fmt:message key="common.status"/>">
                         <option value="<c:out value="<%= EventStatus.ANY%>"/>"><fmt:message key="common.all"/></option>
                         <option value="<c:out value="<%= EventStatus.ACTIVE.getName()%>"/>"><fmt:message key="common.active"/></option>
                         <option value="<c:out value="<%= EventStatus.RTN.getName()%>"/>"><fmt:message key="event.rtn.rtn"/></option>
                         <option value="<c:out value="<%= EventStatus.NORTN.getName()%>"/>"><fmt:message key="common.nortn"/></option>
-                    </select>
+</select--%>>
                         <%--select id="alarmLevel"data-dojo-type="dijit/form/Select" title="<fmt:message key="common.alarmLevel"/>"><tag:alarmLevelOptions allOption="true"/></select--%>
                     <dijit:textBox id="keywords" i18nLabel="events.search.keywords"/>
                     <dijit:button i18nLabel="events.search.search"/>

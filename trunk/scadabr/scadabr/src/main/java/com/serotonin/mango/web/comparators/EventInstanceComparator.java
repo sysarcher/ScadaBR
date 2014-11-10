@@ -66,7 +66,7 @@ public class EventInstanceComparator extends BaseComparator<EventInstance> {
         if (sortType == SORT_ALARM_LEVEL) {
             result = e1.getAlarmLevel().compareTo(e2.getAlarmLevel());
         } else if (sortType == SORT_ACTIVE_TIME) {
-            long diff = e1.getActiveTimestamp() - e2.getActiveTimestamp();
+            long diff = e1.getFireTimestamp() - e2.getFireTimestamp();
             if (diff < 0) {
                 result = -1;
             } else if (diff > 0) {
@@ -79,7 +79,7 @@ public class EventInstanceComparator extends BaseComparator<EventInstance> {
         } else if (sortType == SORT_ID) {
             result = e1.getId() - e2.getId();
         } else if (sortType == SORT_RTN_TIME) {
-            long diff = e1.getRtnTimestamp() - e2.getRtnTimestamp();
+            long diff = e1.getInactiveTimestamp() - e2.getInactiveTimestamp();
             if (diff < 0) {
                 result = -1;
             } else if (diff > 0) {

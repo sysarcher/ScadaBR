@@ -43,6 +43,7 @@ public class DataPointEventType extends EventType {
     private int pointEventDetectorId;
     private DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
     private AlarmLevel alarmLevel;
+    private boolean stateful;
     
     public DataPointEventType() {
         // Required for reflection.
@@ -64,7 +65,8 @@ public class DataPointEventType extends EventType {
         this.dataPointId = vo.njbGetDataPoint().getId();
         this.pointEventDetectorId = vo.getId();
         this.alarmLevel = vo.getAlarmLevel();
-        if (!vo.isRtnApplicable()) {
+        this.stateful = vo.isStateful();
+        if (!vo.isStateful()) {
             duplicateHandling = DuplicateHandling.ALLOW;
         }
     }
@@ -158,6 +160,14 @@ public class DataPointEventType extends EventType {
     @Override
     public AlarmLevel getAlarmLevel() {
         return alarmLevel;
+    }
+
+    /**
+     * @return the stateful
+     */
+    @Override
+    public boolean isStateful() {
+        return stateful;
     }
 
 }

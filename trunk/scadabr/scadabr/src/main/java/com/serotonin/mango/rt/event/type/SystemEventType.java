@@ -136,4 +136,9 @@ public class SystemEventType extends EventType {
     public AlarmLevel getAlarmLevel() {
         return systemEventType.getAlarmLevel();
     }
+
+    @Override
+    public boolean isStateful() {
+        return systemEventType.isStateful();
+    }
 }

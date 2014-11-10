@@ -59,11 +59,7 @@ public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgC
     }
     
     private void raiseAlarm(long time) {
-        if (vo.isReturnToNormal()) {
-            eventType.raiseAlarm(time, getMessage());
-        } else {
-            eventType.fire(time, getMessage());
-        }
+        eventType.fire(time, getMessage());
         eventActive = true;
         fireEventDetectorStateChanged(time);
     }
@@ -112,7 +108,7 @@ public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgC
         activeTask = new EventRunWithArgTask<>(activeTrigger, this, true);
         Common.eventCronPool.schedule(activeTask);
         
-        if (vo.isReturnToNormal()) {
+        if (vo.isStateful()) {
             CronExpression inactiveTrigger = createTrigger(false);
             inactiveTask = new EventRunWithArgTask<>(inactiveTrigger, this, false);
             Common.eventCronPool.schedule(inactiveTask);
@@ -144,7 +140,7 @@ public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgC
     }
     
     public CronExpression createTrigger(boolean activeTrigger) {
-        if (!activeTrigger && !vo.isReturnToNormal()) {
+        if (!activeTrigger && !vo.isStateful()) {
             return null;
         }
         

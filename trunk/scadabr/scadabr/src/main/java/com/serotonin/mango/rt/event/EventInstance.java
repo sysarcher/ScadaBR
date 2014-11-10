@@ -33,31 +33,11 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 public class EventInstance {
 
-    //TODO make this the state ie. STATELESS, STATEFUL_ACTIVE, STATEFUL_GONE, STATEFUL_SRC_DISABLED ... 
-    // this would affect rtnApplicable as well.
-    public enum RtnCauses {
-        NO_RTN(0),
-        RETURN_TO_NORMAL(1),
-        SOURCE_DISABLED(4);
-
-        public static RtnCauses fromId(int id) {
-            switch (id) {
-                case 0: return NO_RTN;
-                case 1: return RETURN_TO_NORMAL;
-                case 4: return SOURCE_DISABLED;
-                    default: throw new IndexOutOfBoundsException("Unknown id: " + id);
-            }
-        }
-        private final int id;
-
-        private RtnCauses(int id) {
-            this.id = id;
-        }
-
-        public int getId() {
-            return id;
-        }
-        
+    /**
+     * @return the stateful
+     */
+    public boolean isStateful() {
+        return eventState != EventStatus.STATELESS;
     }
 
     public interface AlternateAcknowledgementSources {
@@ -78,26 +58,20 @@ public class EventInstance {
     private final EventType eventType;
 
     /**
-     * State field. The time that the event became active (i.e. was raised).
+     * State field. The time that the event was fired.
      */
-    private final long activeTimestamp;
-
-    /**
-     * Configuration field. Is this type of event capable of returning to normal
-     * (true), or is it stateless (false).
-     */
-    private final boolean rtnApplicable;
+    private final long fireTimestamp;
 
     /**
      * State field. The time that the event returned to normal.
      */
-    private long rtnTimestamp;
+    private long inactiveTimestamp;
 
     /**
-     * State field. The action that caused the event to RTN. One of
-     * {@link RtnCauses}
+     * State field. The action that caused the event to INACTIVE. One of
+     * {@link StatefulState}
      */
-    private RtnCauses rtnCause = RtnCauses.NO_RTN;
+    private EventStatus eventState;
 
     /**
      * Configuration field. The alarm level assigned to the event.
@@ -135,12 +109,39 @@ public class EventInstance {
     // Contextual data from the source that raised the event.
     private final Map<String, Object> context;
 
-    public EventInstance(EventType eventType, long activeTimestamp, boolean rtnApplicable, AlarmLevel alarmLevel,
-            LocalizableMessage message, Map<String, Object> context) {
-        this.eventType = eventType;
-        this.activeTimestamp = activeTimestamp;
-        this.rtnApplicable = rtnApplicable;
+    /**
+     * init from dao
+     *
+     * @param type
+     * @param activeTimestamp
+     * @param alarmLevel
+     * @param state
+     * @param inactiveTimestamp
+     * @param message
+     */
+    public EventInstance(EventType type, long activeTimestamp, AlarmLevel alarmLevel, EventStatus state, long inactiveTimestamp, LocalizableMessage message) {
+        this.eventType = type;
+        this.fireTimestamp = activeTimestamp;
+        this.eventState = state;
         this.alarmLevel = alarmLevel;
+        this.message = message;
+        this.inactiveTimestamp = inactiveTimestamp;
+        this.context = null;
+    }
+
+    /**
+     * Create a new if staeful active or stateless event.
+     * 
+     * @param eventType
+     * @param activeTimestamp
+     * @param message
+     * @param context 
+     */
+    public EventInstance(EventType eventType, long activeTimestamp, LocalizableMessage message, Map<String, Object> context) {
+        this.eventType = eventType;
+        this.fireTimestamp = activeTimestamp;
+        this.eventState = eventType.isStateful() ? EventStatus.ACTIVE : EventStatus.STATELESS;
+        this.alarmLevel = eventType.getAlarmLevel();
         if (message == null) {
             this.message = new LocalizableMessageImpl("common.noMessage");
         } else {
@@ -149,28 +150,29 @@ public class EventInstance {
         this.context = context;
     }
 
-    public LocalizableMessage getRtnMessage() {
-        if (isActive()) {
-            if (rtnCause == RtnCauses.RETURN_TO_NORMAL) {
-                return new LocalizableMessageImpl("event.rtn.rtn");
-            } else if (rtnCause == RtnCauses.SOURCE_DISABLED) {
+    public LocalizableMessage getStateMessage() {
+        switch (eventState) {
+            case STATELESS:
+                return new LocalizableMessageImpl("event.state.stateless");
+            case ACTIVE:
+                return new LocalizableMessageImpl("event.state.active");
+            case GONE:
+                return new LocalizableMessageImpl("event.state.gone");
+            case SOURCE_DISABLED:
                 switch (eventType.getEventSource()) {
                     case DATA_POINT:
-                        return new LocalizableMessageImpl("event.rtn.pointDisabled");
+                        return new LocalizableMessageImpl("event.state.pointDisabled");
                     case DATA_SOURCE:
-                        return new LocalizableMessageImpl("event.rtn.dsDisabled");
+                        return new LocalizableMessageImpl("event.state.dsDisabled");
                     case PUBLISHER:
-                        return new LocalizableMessageImpl("event.rtn.pubDisabled");
+                        return new LocalizableMessageImpl("event.state.pubDisabled");
                     case MAINTENANCE:
-                        return new LocalizableMessageImpl("event.rtn.maintDisabled");
+                        return new LocalizableMessageImpl("event.state.maintDisabled");
                     default:
-                        return new LocalizableMessageImpl("event.rtn.shutdown");
+                        return new LocalizableMessageImpl("event.state.shutdown");
                 }
-            } else {
-                return new LocalizableMessageImpl("event.rtn.unknown");
-            }
-        } else {
-            return null;
+            default:
+                throw new RuntimeException("Unknown eventState: " + eventState);
         }
     }
 
@@ -221,32 +223,29 @@ public class EventInstance {
     }
 
     public EventStatus getEventState() {
-        if (isActive()) {
-            return EventStatus.ACTIVE;
-        } else if (isRtnApplicable()) {
-            return EventStatus.RTN;
-        } else {
-            return EventStatus.NORTN;
-        }
+        return eventState;
     }
 
     public boolean isActive() {
-        return rtnApplicable && rtnTimestamp == 0;
+        return eventState == EventStatus.ACTIVE;
     }
 
-    public void returnToNormal(long time, EventInstance.RtnCauses rtnCause) {
-        if (isActive()) {
-            rtnTimestamp = time;
-            this.rtnCause = rtnCause;
-        }
+    public void setAlarmGone(long time) {
+        inactiveTimestamp = time;
+        this.eventState = EventStatus.GONE;
+    }
+
+    public void setAlarmDisabled(long time) {
+        inactiveTimestamp = time;
+        this.eventState = EventStatus.SOURCE_DISABLED;
     }
 
     public boolean isAcknowledged() {
         return acknowledgedTimestamp > 0;
     }
 
-    public long getActiveTimestamp() {
-        return activeTimestamp;
+    public long getFireTimestamp() {
+        return fireTimestamp;
     }
 
     public AlarmLevel getAlarmLevel() {
@@ -260,21 +259,17 @@ public class EventInstance {
     public EventSources getEventSource() {
         return eventType.getEventSource();
     }
-    
+
     public int getId() {
         return id;
     }
 
-    public long getRtnTimestamp() {
-        return rtnTimestamp;
+    public long getInactiveTimestamp() {
+        return inactiveTimestamp;
     }
 
     public LocalizableMessage getMessage() {
         return message;
-    }
-
-    public boolean isRtnApplicable() {
-        return rtnApplicable;
     }
 
     public void addEventComment(UserComment comment) {
@@ -287,10 +282,6 @@ public class EventInstance {
 
     public List<UserComment> getEventComments() {
         return eventComments;
-    }
-
-    public EventInstance.RtnCauses getRtnCause() {
-        return rtnCause;
     }
 
     public List<EventHandlerRT> getHandlers() {

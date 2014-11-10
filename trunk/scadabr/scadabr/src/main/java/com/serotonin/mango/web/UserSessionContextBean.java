@@ -48,7 +48,7 @@ public class UserSessionContextBean implements Serializable {
      */
     public void loginUser(User user) {
         this.user = user;
-        new SystemEventType(SystemEventSource.USER_LOGIN, user.getId()).raiseAlarm("event.login", user.getUsername());
+        new SystemEventType(SystemEventSource.USER_LOGIN, user.getId()).fire("event.login", user.getUsername());
     }
 
     /**
