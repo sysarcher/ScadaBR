@@ -118,6 +118,9 @@ public class DataSourceDao extends BaseDao {
     }
 
     private void insertDataSource(final DataSourceVO<?> vo) {
+        if (vo.getXid() == null || vo.getXid().isEmpty()) {
+            vo.setXid(generateUniqueXid());
+        }
         final int id = doInsert(new PreparedStatementCreator() {
 
             final static String SQL_INSERT = "insert into dataSources (xid, name, dataSourceType, data) values (?,?,?,?)";
