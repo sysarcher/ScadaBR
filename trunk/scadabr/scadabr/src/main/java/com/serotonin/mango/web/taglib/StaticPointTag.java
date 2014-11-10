@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.web.taglib;
 
+import br.org.scadabr.utils.ImplementMeException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +34,6 @@ import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.view.custom.CustomView;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.web.dwr.BaseDwr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -86,7 +86,8 @@ public class StaticPointTag extends ViewTagSupport {
                 Map<String, Object> model = new HashMap<>();
                 model.put("point", dataPointVO);
                 model.put("pointValue", pvt);
-                write(out, BaseDwr.generateContent(request, "imageValueThumbnail.jsp", model));
+                if (true) throw new ImplementMeException();
+//                write(out, BaseDwr.generateContent(request, "imageValueThumbnail.jsp", model));
             } else {
                 int hint = raw ? TextRenderer.HINT_RAW : TextRenderer.HINT_FULL;
                 write(out, dataPointVO.getTextRenderer().getText(pvt, hint));
