@@ -7,7 +7,7 @@
                 "scadabr/jsp/DataSources",
                 "dojo/domReady!"
             ], function (DataSources) {
-                _dataSources = new DataSources("dataSourcesTree", "dataSourcesContent");
+                _dataSources = new DataSources("dataSourcesTree", "treeNodeDetailsWidget");
             });
 
         </script>
@@ -16,8 +16,9 @@
             <dijit:leftContentPane>
                 <div id="dataSourcesTree"></div>
             </dijit:leftContentPane>
-            <dijit:centerContentPane id="dataSourcesContent">
-
+            <dijit:centerContentPane >
+                    <div id="treeNodeDetailsWidget" data-dojo-type="dojox/layout/ContentPane" title="Show data (chart)" data-dojo-props="selected:true, parseOnLoad: false, contentUrl: 'dataPointDetails/renderChart'">
+                    </div>
             </dijit:centerContentPane>
 
         </dijit:sidebarBorderContainer>

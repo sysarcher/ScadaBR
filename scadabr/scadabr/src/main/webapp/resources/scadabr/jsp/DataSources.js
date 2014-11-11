@@ -1,5 +1,6 @@
 define(["dojo/_base/declare",
     "dojo/_base/lang",
+    "dijit/registry",
     "dijit/Tree",
     "dojo/on",
     "dijit/registry",
@@ -7,26 +8,45 @@ define(["dojo/_base/declare",
     "dojo/store/Observable",
     "dijit/Menu",
     "dijit/MenuItem",
-    "dojo/rpc/JsonService"
-], function (declare, lang, Tree, on, registry, JsonRest, Observable, Menu, MenuItem, JsonService) {
+    "dojo/rpc/JsonService",
+    "dojo/ready"
+], function (declare, lang, registry, Tree, on, registry, JsonRest, Observable, Menu, MenuItem, JsonService, ready) {
 
     return declare(null, {
         store: null,
         tree: null,
         treeMenu: null,
-        constructor: function (dataSourcesTreeNode) {
+        svc: null,
+        treeNodeDetailsWidget: null,
+        constructor: function (dataSourcesTreeNode, treeNodeDetailsWidgetId) {
+            this._initSvc();
             this._initStore();
             this._initDataSourceTree(dataSourcesTreeNode);
             this._initMenu(dataSourcesTreeNode);
+            var _this = this;
+            ready(function(){
+            _this.treeNodeDetailsWidget = registry.byId(treeNodeDetailsWidgetId);
+            });
         },
         _initStore: function () {
             this.store = new Observable(new JsonRest({
-                target: "rest/dataSources/lazyTree/",
+                target: "dataSources/dsTree/",
                 getChildren: function (object, onComplete, onError) {
-                    this.query({parentId: object.id}).then(onComplete, onError);
+                    switch (object.nodeType) {
+                        case "ROOT" :
+                            this.query({}).then(onComplete, onError);
+                            break;
+                        default :
+                            alert("Unknown Type: " + object.nodeType);
+                    }
                 },
                 mayHaveChildren: function (object) {
-                    return object.nodeType === "PF";
+                    switch (object.nodeType) {
+                        case "ROOT":
+                            return true;
+                        default:
+                            return false;
+                    }
                 },
                 getRoot: function (onItem, onError) {
                     onItem({id: "root",
@@ -52,12 +72,13 @@ define(["dojo/_base/declare",
                 model: this.store,
                 detailController: this,
                 onClick: function (node) {
-                    if (node.nodeType === "DP") {
-                        this.detailController.setPointId(node.id)
-                    } else if (node.nodeType === "PF") {
-                        this.detailController.setFolderId(node.id)
-                    } else {
-                        this.detailController.clearDetailViewId();
+                    switch (node.nodeType) {
+                        case "ROOT": break;
+                        case "DataSource": 
+                            this.detailController.treeNodeDetailsWidget.set("href", "dataSources/dataSource?id=" + node.id);
+                            break;
+                        default: 
+                            this.detailController.clearDetailViewId();
                     }
                 }
             }, dataSourcesTreeNode);
@@ -68,11 +89,12 @@ define(["dojo/_base/declare",
             });
             var _store = this.store;
             var _tree = this.tree;
+            var _svc = this.svc;
             this.treeMenu.addChild(new MenuItem({
                 iconClass: "dijitIconAdd",
                 label: "add",
                 onClick: function () {
-                    _store.put({dsType: "META"}).then(function (object) {
+                    _svc.addDataSource("META").then(function (result) {
                         _store.getChildren(_tree.lastFocused.item, function (children) {
                             _store.onChildrenChange(_tree.lastFocused.item, children);
                         }, function (error) {
@@ -81,7 +103,6 @@ define(["dojo/_base/declare",
                     }, function (error) {
                         alert(error);
                     });
-
                 }
             }));
             this.treeMenu.addChild(new MenuItem({
@@ -89,6 +110,32 @@ define(["dojo/_base/declare",
                 disabled: true
             }));
             this.treeMenu.startup();
+        },
+        _initSvc: function () {
+            this.svc = new JsonService({
+                serviceUrl: 'dataSources/rpc/', // Adress of the RPC service end point
+                timeout: 1000,
+                strictArgChecks: true,
+                methods: [{
+                        name: 'addDataSource',
+                        parameters: [
+                            {
+                                name: 'type',
+                                type: 'STRING'
+                            }
+                        ]
+                    },
+                    {
+                        name: 'startDataSource',
+                        parameters: []
+                    },
+                    {
+                        name: 'stopDataSource',
+                        parameters: []
+                    }
+
+                ]
+            });
         },
         setPointId: function (id) {
 
