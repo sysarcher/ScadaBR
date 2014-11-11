@@ -16,25 +16,30 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package br.org.scadabr.web.mvc.controller;
+package br.org.scadabr.web.mvc.controller.datasources;
 
 
 
 
+import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.util.HashMap;
 import java.util.Map;
+import javax.inject.Inject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @Scope("request")
 @RequestMapping("/dataSources")
 public class DataSourcesController {
+    @Inject
+    private DataSourceDao dataSourceDao;
 
     @RequestMapping(method = RequestMethod.GET)
     public String initializeForm() {
@@ -55,4 +60,13 @@ public class DataSourcesController {
                 
         
     }
+    
+    @RequestMapping(value="dataSource", params = "id", method = RequestMethod.GET)
+    public ModelAndView getDataSource(int id) {
+        ModelAndView result = new ModelAndView("dataSources/dataSource");
+        result.addObject("dataSource", dataSourceDao.getDataSource(id));
+        return result;
+    }
+    
+    
 }

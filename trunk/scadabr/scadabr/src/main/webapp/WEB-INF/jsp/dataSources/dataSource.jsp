@@ -1,0 +1,18 @@
+<%@ include file="/WEB-INF/jsp/include/tech.jsp" %>
+<script>
+    require([
+        "dojo/dom",
+        "dojo/parser"
+    ], function (dom, parser) {
+        var editCommonProperties = dom.byId("editCommonPropertiesId");
+        parser.parse(editCommonProperties).then(function () {
+            //setup    
+        });
+    });
+</script>
+<div id="editCommonPropertiesId">
+    <dojox:tableContainer cols="1">
+        <dijit:validationTextBox i18nLabel="pointEdit.props.name"  path="dataSource.name"/>
+        <dijit:validationTextBox i18nLabel="common.xid"  path="dataSource.xid"/>
+    </dojox:tableContainer>
+</div>
