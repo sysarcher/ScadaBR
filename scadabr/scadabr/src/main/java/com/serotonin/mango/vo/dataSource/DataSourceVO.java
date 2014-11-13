@@ -36,7 +36,6 @@ import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
@@ -51,45 +50,13 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.vo.event.AlarmLevel;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         Serializable, Cloneable, JsonSerializable, ChangeComparable<T> {
 
-    @Configurable
-    public static class DataSourceValidator<T extends DataSourceVO<T>> implements Validator {
+    public abstract Validator createValidator();
 
-        @Autowired
-        private DataSourceDao dataSourceDao;
-
-        @Override
-        public boolean supports(Class<?> clazz) {
-            return DataSourceVO.class.isAssignableFrom(clazz);
-        }
-
-        @Override
-        public void validate(Object target, Errors errors) {
-            final DataSourceVO<T> vo = (DataSourceVO<T>) target;
-
-            if (vo.xid.isEmpty()) {
-                errors.rejectValue("xid", "validate.required");
-            } else if (!dataSourceDao.isXidUnique(vo.xid, vo.id)) {
-                errors.rejectValue("xid", "validate.xidUsed");
-            } else if (vo.xid.length() > 50) {
-                errors.rejectValue("xid", "validate.notLongerThan", new Object[]{50}, "validate.notLongerThan");
-            }
-            if (vo.name.isEmpty()) {
-                errors.reject("name", "validate.nameRequired");
-            }
-            if (vo.name.length() > 40) {
-                errors.reject("name", "validate.nameTooLong");
-            }
-        }
-
-    }
 
     public enum Type {
 

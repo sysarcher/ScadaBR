@@ -1,16 +1,13 @@
 define(["dojo/_base/declare",
-    "dojo/_base/lang",
     "dijit/registry",
     "dijit/Tree",
-    "dojo/on",
-    "dijit/registry",
     "dojo/store/JsonRest",
     "dojo/store/Observable",
     "dijit/Menu",
     "dijit/MenuItem",
     "dojo/rpc/JsonService",
     "dojo/ready"
-], function (declare, lang, registry, Tree, on, registry, JsonRest, Observable, Menu, MenuItem, JsonService, ready) {
+], function (declare, registry, Tree, JsonRest, Observable, Menu, MenuItem, JsonService, ready) {
 
     return declare(null, {
         store: null,
@@ -24,8 +21,8 @@ define(["dojo/_base/declare",
             this._initDataSourceTree(dataSourcesTreeNode);
             this._initMenu(dataSourcesTreeNode);
             var _this = this;
-            ready(function(){
-            _this.treeNodeDetailsWidget = registry.byId(treeNodeDetailsWidgetId);
+            ready(function () {
+                _this.treeNodeDetailsWidget = registry.byId(treeNodeDetailsWidgetId);
             });
         },
         _initStore: function () {
@@ -73,11 +70,12 @@ define(["dojo/_base/declare",
                 detailController: this,
                 onClick: function (node) {
                     switch (node.nodeType) {
-                        case "ROOT": break;
-                        case "DataSource": 
+                        case "ROOT":
+                            break;
+                        case "DataSource":
                             this.detailController.treeNodeDetailsWidget.set("href", "dataSources/dataSource?id=" + node.id);
                             break;
-                        default: 
+                        default:
                             this.detailController.clearDetailViewId();
                     }
                 }
@@ -145,6 +143,6 @@ define(["dojo/_base/declare",
         },
         clearDetailViewId: function () {
 
-        },
+        }
     });
 });

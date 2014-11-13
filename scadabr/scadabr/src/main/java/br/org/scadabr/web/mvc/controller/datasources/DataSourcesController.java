@@ -32,14 +32,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @Scope("request")
 @RequestMapping("/dataSources")
 public class DataSourcesController {
-    @Inject
-    private DataSourceDao dataSourceDao;
 
     @RequestMapping(method = RequestMethod.GET)
     public String initializeForm() {
@@ -57,15 +54,6 @@ public class DataSourcesController {
         
         model.addAttribute("dataSourceTypes", typeMap);
 //        model.addAttribute("defaultDataSourceType", DataSourceVO.Type.M_BUS.name());
-                
-        
-    }
-    
-    @RequestMapping(value="dataSource", params = "id", method = RequestMethod.GET)
-    public ModelAndView getDataSource(int id) {
-        ModelAndView result = new ModelAndView("dataSources/dataSource");
-        result.addObject("dataSource", dataSourceDao.getDataSource(id));
-        return result;
     }
     
     
