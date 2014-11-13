@@ -29,7 +29,6 @@ import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.http.HttpRetrieverDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -39,9 +38,9 @@ import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.utils.TimePeriods;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.vo.dataSource.DataSourceValidator;
 import org.springframework.validation.Errors;
 
 /**
@@ -50,7 +49,12 @@ import org.springframework.validation.Errors;
 @JsonRemoteEntity
 public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSourceVO> {
 
-    public static class HttpRetrieverDataSourceVOValidator extends DataSourceVO.DataSourceValidator<HttpRetrieverDataSourceVO> {
+    @Override
+    public HttpRetrieverDataSourceVOValidator createValidator() {
+        return new HttpRetrieverDataSourceVOValidator();
+    }
+
+    public static class HttpRetrieverDataSourceVOValidator extends DataSourceValidator {
 
         @Override
         public boolean supports(Class<?> clazz) {

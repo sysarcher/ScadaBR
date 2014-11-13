@@ -6,12 +6,7 @@
 package br.org.scadabr.web.mvc.controller.rest;
 
 import br.org.scadabr.logger.LogUtils;
-import br.org.scadabr.web.LazyTreeNode;
-import br.org.scadabr.l10n.Localizer;
-import br.org.scadabr.web.i18n.LocaleResolver;
-import br.org.scadabr.i18n.MessageSource;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.User;
@@ -24,15 +19,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.RequestContext;
 
 /**
  *
@@ -53,7 +45,7 @@ public class RestDataSourcesController {
     private DataSourceDao dataSourceDao;
     
     @Inject 
-    private RequestContextAwareLocalizer localizer;
+    private transient RequestContextAwareLocalizer localizer;
 
 
     @RequestMapping(value = "lazyTree/", method = RequestMethod.GET)

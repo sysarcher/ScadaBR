@@ -1,7 +1,5 @@
 package br.org.scadabr.web.mvc.controller.jsonrpc;
 import br.org.scadabr.logger.LogUtils;
-import br.org.scadabr.web.i18n.LocaleResolver;
-import br.org.scadabr.i18n.MessageSource;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.googlecode.jsonrpc4j.JsonRpcService;
 import com.serotonin.mango.db.dao.DataPointDao;

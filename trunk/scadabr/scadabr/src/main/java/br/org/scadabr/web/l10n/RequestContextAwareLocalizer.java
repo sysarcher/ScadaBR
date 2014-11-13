@@ -28,11 +28,11 @@ import org.springframework.context.annotation.Scope;
 public class RequestContextAwareLocalizer extends AbstractLocalizer {
 
     @Inject
-    private HttpServletRequest request;
+    private transient HttpServletRequest request;
     @Inject
-    private MessageSource messageSource;
+    private transient MessageSource messageSource;
     @Inject
-    transient private LocaleResolver localeResolver;
+    private transient LocaleResolver localeResolver;
 
 
     public RequestContextAwareLocalizer() {

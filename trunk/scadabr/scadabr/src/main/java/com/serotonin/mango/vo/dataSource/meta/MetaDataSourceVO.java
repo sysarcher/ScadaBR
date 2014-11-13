@@ -31,6 +31,8 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.vo.dataSource.DataSourceValidator;
+import org.springframework.validation.Validator;
 
 /**
  * @author Matthew Lohbihler
@@ -117,5 +119,10 @@ public class MetaDataSourceVO extends DataSourceVO<MetaDataSourceVO> {
         if (ver == 1) {
             // nothing to do here.
         }
+    }
+
+    @Override
+    public Validator createValidator() {
+        return new DataSourceValidator();
     }
 }
