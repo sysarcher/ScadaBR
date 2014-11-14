@@ -39,6 +39,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.rt.event.type.EventSources;
+import br.org.scadabr.rt.link.PointLinkManager;
 import com.serotonin.mango.Common;
 import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -57,7 +58,6 @@ import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.AuditEventSource;
 import br.org.scadabr.web.LazyTreeNode;
-import com.serotonin.mango.rt.RuntimeManager;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Collection;
@@ -74,7 +74,7 @@ public class DataPointDao extends BaseDao {
     public final static int ROOT_ID = 0;
 
     @Inject
-    private RuntimeManager runtimeManager;
+    private PointLinkManager pointLinkManager;
     @Inject
     private DataSourceDao dataSourceDao;
     @Inject
@@ -393,7 +393,7 @@ public class DataPointDao extends BaseDao {
 
     private void beforePointDelete(int dataPointId) {
         for (PointLinkVO link : pointLinkDao.getPointLinksForPoint(dataPointId)) {
-            runtimeManager.deletePointLink(link.getId());
+            pointLinkManager.deletePointLink(link.getId());
         }
     }
 

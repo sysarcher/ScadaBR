@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.event.compound;
 
+import br.org.scadabr.rt.event.compound.CompoundEventManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +34,6 @@ import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.SystemEventSource;
-import com.serotonin.mango.rt.RuntimeManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -48,7 +48,7 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
 
     private final CompoundEventDetectorVO vo;
     @Autowired
-    private RuntimeManager runtimeManager;
+    private CompoundEventManager compoundEventManager;
     @Autowired
     private CompoundEventDetectorDao compoundEventDetectorDao;
     
@@ -259,7 +259,7 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
 
     @Override
     public void eventDetectorTerminated(SimpleEventDetector source) {
-        runtimeManager.stopCompoundEventDetector(vo.getId());
+        compoundEventManager.stopCompoundEventDetector(vo.getId());
         raiseFailureEvent(new LocalizableMessageImpl("event.compound.sourceFailure", vo.getName()));
     }
 
