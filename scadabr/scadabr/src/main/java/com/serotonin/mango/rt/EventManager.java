@@ -19,6 +19,7 @@
 package com.serotonin.mango.rt;
 
 import br.org.scadabr.l10n.AbstractLocalizer;
+import br.org.scadabr.rt.event.maintenance.MaintenanceEventManager;
 import br.org.scadabr.rt.event.type.EventSources;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -65,7 +66,7 @@ public class EventManager implements ILifecycle, Serializable {
 
     private final List<EventInstance> activeEvents = new CopyOnWriteArrayList<>();
     @Inject
-    private RuntimeManager runtimeManager;
+    private MaintenanceEventManager maintenanceEventManager;
     @Inject
     private EventDao eventDao;
     @Inject
@@ -404,12 +405,12 @@ public class EventManager implements ILifecycle, Serializable {
     private boolean isSuppressed(EventType eventType) {
         if (eventType instanceof DataSourceEventType) // Data source events can be suppressed by maintenance events.
         {
-            return runtimeManager.isActiveMaintenanceEvent(eventType.getDataSourceId());
+            return maintenanceEventManager.isActiveMaintenanceEvent(eventType.getDataSourceId());
         }
 
         if (eventType instanceof DataPointEventType) // Data point events can be suppressed by maintenance events on their data sources.
         {
-            return runtimeManager.isActiveMaintenanceEvent(eventType.getDataSourceId());
+            return maintenanceEventManager.isActiveMaintenanceEvent(eventType.getDataSourceId());
         }
 
         return false;

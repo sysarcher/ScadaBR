@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.rt.event.schedule.ScheduledEventManager;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
@@ -68,6 +69,8 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     private final PointValueCache valueCache;
     @Autowired
     private RuntimeManager runtimeManager;
+    @Autowired
+    private ScheduledEventManager scheduledEventManager;
     @Autowired
     private EventManager eventManager;
     @Autowired
@@ -552,7 +555,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
 
             PointEventDetectorRT pedRT = ped.createRuntime();
             detectors.add(pedRT);
-            runtimeManager.addPointEventDetector(pedRT);
+            scheduledEventManager.addPointEventDetector(pedRT);
             runtimeManager.addDataPointListener(vo.getId(), pedRT);
         }
 
@@ -567,7 +570,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
         if (detectors != null) {
             for (PointEventDetectorRT pedRT : detectors) {
                 runtimeManager.removeDataPointListener(vo.getId(), pedRT);
-                runtimeManager.removePointEventDetector(pedRT.getEventDetectorKey());
+                scheduledEventManager.removePointEventDetector(pedRT.getEventDetectorKey());
             }
         }
         //TODO notify runtimeManger and lat them handle this???

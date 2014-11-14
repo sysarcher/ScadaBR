@@ -21,9 +21,9 @@ package com.serotonin.mango.rt.event.compound;
 import java.util.List;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.rt.event.schedule.ScheduledEventManager;
 import com.serotonin.mango.rt.event.SimpleEventDetector;
 import br.org.scadabr.utils.i18n.LocalizableException;
-import com.serotonin.mango.rt.RuntimeManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -35,7 +35,7 @@ public class EventDetectorWrapper extends LogicalOperator {
 
     private final String detectorKey;
     @Autowired
-    private RuntimeManager runtimeManager;
+    private ScheduledEventManager scheduledEventManager;
     private SimpleEventDetector source;
 
     public EventDetectorWrapper(String detectorKey) {
@@ -57,7 +57,7 @@ public class EventDetectorWrapper extends LogicalOperator {
 
     @Override
     public void initialize() throws LocalizableException {
-        source = runtimeManager.getSimpleEventDetector(detectorKey);
+        source = scheduledEventManager.getSimpleEventDetector(detectorKey);
         if (source == null) {
             throw new LocalizableException("compoundDetectors.initError.wrapper", detectorKey);
         }

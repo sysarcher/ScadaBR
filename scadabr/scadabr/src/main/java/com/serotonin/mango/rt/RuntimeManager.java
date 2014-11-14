@@ -31,14 +31,10 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.db.dao.MaintenanceEventDao;
-import com.serotonin.mango.db.dao.PointLinkDao;
 import com.serotonin.mango.db.dao.PointValueDao;
-import com.serotonin.mango.db.dao.PublisherDao;
-import com.serotonin.mango.db.dao.ScheduledEventDao;
 import com.serotonin.mango.rt.dataImage.DataPointEventMulticaster;
 import com.serotonin.mango.rt.dataImage.DataPointListener;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -47,26 +43,12 @@ import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
-import com.serotonin.mango.rt.event.SimpleEventDetector;
-import com.serotonin.mango.rt.event.compound.CompoundEventDetectorRT;
-import com.serotonin.mango.rt.event.detectors.PointEventDetectorRT;
 import com.serotonin.mango.rt.event.maintenance.MaintenanceEventRT;
-import com.serotonin.mango.rt.event.schedule.ScheduledEventRT;
-import com.serotonin.mango.rt.link.PointLinkRT;
-import com.serotonin.mango.rt.publish.PublisherRT;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
-import com.serotonin.mango.vo.event.ScheduledEventVO;
-import com.serotonin.mango.vo.link.PointLinkVO;
-import com.serotonin.mango.vo.publish.PublishedPointVO;
-import com.serotonin.mango.vo.publish.PublisherVO;
-import br.org.scadabr.util.LifecycleException;
 import br.org.scadabr.utils.TimePeriods;
-import br.org.scadabr.utils.i18n.LocalizableException;
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.util.HashSet;
 import java.util.Set;
@@ -93,45 +75,12 @@ public class RuntimeManager {
      */
     private final Map<Integer, DataPointListener> dataPointListeners = new ConcurrentHashMap<>();
 
-    /**
-     * Store of enabled event detectors.
-     */
-    private final Map<String, SimpleEventDetector> simpleEventDetectors = new ConcurrentHashMap<>();
 
-    /**
-     * Store of enabled compound event detectors.
-     */
-    private final Map<Integer, CompoundEventDetectorRT> compoundEventDetectors = new ConcurrentHashMap<>();
-
-    /**
-     * Store of enabled publishers
-     */
-    private final List<PublisherRT<?>> runningPublishers = new CopyOnWriteArrayList<>();
-
-    /**
-     * Store of enabled point links
-     */
-    private final List<PointLinkRT> pointLinks = new CopyOnWriteArrayList<>();
-
-    /**
-     * Store of maintenance events
-     */
-    private final List<MaintenanceEventRT> maintenanceEvents = new CopyOnWriteArrayList<>();
 
     private boolean started = false;
 
     @Inject
     private DataSourceDao dataSourceDao;
-    @Inject
-    private PointLinkDao pointLinkDao;
-    @Inject
-    private ScheduledEventDao scheduledEventDao;
-    @Inject
-    private CompoundEventDetectorDao compoundEventDetectorDao;
-    @Inject
-    private PublisherDao publisherDao;
-    @Inject
-    private MaintenanceEventDao maintenanceEventDao;
     @Inject
     private DataPointDao dataPointDao;
     @Inject
@@ -167,72 +116,12 @@ public class RuntimeManager {
             }
         }
 
-        // Set up point links.
-        for (PointLinkVO vo : pointLinkDao.getPointLinks()) {
-            if (!vo.isDisabled()) {
-                if (safe) {
-                    vo.setDisabled(true);
-                    pointLinkDao.savePointLink(vo);
-                } else {
-                    startPointLink(vo);
-                }
-            }
-        }
-
         // Tell the data sources to start polling. Delaying the polling start
         // gives the data points a chance to
         // initialize such that point listeners in meta points and set point
         // handlers can run properly.
         for (DataSourceVO<?> config : pollingRound) {
             startDataSourcePolling(config);
-        }
-
-        // Initialize the scheduled events.
-        for (ScheduledEventVO se : scheduledEventDao.getScheduledEvents()) {
-            if (!se.isDisabled()) {
-                if (safe) {
-                    se.setDisabled(true);
-                    scheduledEventDao.saveScheduledEvent(se);
-                } else {
-                    startScheduledEvent(se);
-                }
-            }
-        }
-
-        // Initialize the compound events.
-        for (CompoundEventDetectorVO ced : compoundEventDetectorDao.getCompoundEventDetectors()) {
-            if (!ced.isDisabled()) {
-                if (safe) {
-                    ced.setDisabled(true);
-                    compoundEventDetectorDao.saveCompoundEventDetector(ced);
-                } else {
-                    startCompoundEventDetector(ced);
-                }
-            }
-        }
-
-        // Start the publishers that are enabled
-        for (PublisherVO<? extends PublishedPointVO> vo : publisherDao.getPublishers()) {
-            if (vo.isEnabled()) {
-                if (safe) {
-                    vo.setEnabled(false);
-                    publisherDao.savePublisher(vo);
-                } else {
-                    startPublisher(vo);
-                }
-            }
-        }
-
-        // Start the maintenance events that are enabled
-        for (MaintenanceEventVO vo : maintenanceEventDao.getMaintenanceEvents()) {
-            if (!vo.isDisabled()) {
-                if (safe) {
-                    vo.setDisabled(true);
-                    maintenanceEventDao.saveMaintenanceEvent(vo);
-                } else {
-                    startMaintenanceEvent(vo);
-                }
-            }
         }
     }
 
@@ -243,22 +132,6 @@ public class RuntimeManager {
         }
 
         started = false;
-        for (MaintenanceEventRT me : maintenanceEvents) {
-            stopMaintenanceEvent(me.getVo().getId());
-        }
-
-        for (PublisherRT<? extends PublishedPointVO> publisher : runningPublishers) {
-            stopPublisher(publisher.getId());
-        }
-
-        for (Integer id : compoundEventDetectors.keySet()) {
-            stopCompoundEventDetector(id);
-        }
-
-        for (PointLinkRT pointLink : pointLinks) {
-            stopPointLink(pointLink.getId());
-        }
-
         // First stop meta data sources.
         for (DataSourceRT dataSource : runningDataSources) {
             if (dataSource instanceof MetaDataSourceRT) {
@@ -270,9 +143,6 @@ public class RuntimeManager {
             stopDataSource(dataSource.getId());
         }
 
-        for (String key : simpleEventDetectors.keySet()) {
-            stopSimpleEventDetector(key);
-        }
     }
 
     public void joinTermination() {
@@ -642,323 +512,6 @@ public class RuntimeManager {
         if (dataPoint != null) // Enabled. Reset the point's cache.
         {
             dataPoint.resetValues();
-        }
-    }
-
-    //
-    //
-    // Scheduled events
-    //
-    public void saveScheduledEvent(ScheduledEventVO vo) {
-        // If the scheduled event is running, stop it.
-        stopSimpleEventDetector(vo.getEventDetectorKey());
-
-        scheduledEventDao.saveScheduledEvent(vo);
-
-        // If the scheduled event is enabled, start it.
-        if (!vo.isDisabled()) {
-            startScheduledEvent(vo);
-        }
-    }
-
-    private void startScheduledEvent(ScheduledEventVO vo) {
-        synchronized (simpleEventDetectors) {
-            stopSimpleEventDetector(vo.getEventDetectorKey());
-            ScheduledEventRT rt = vo.createRuntime();
-            simpleEventDetectors.put(vo.getEventDetectorKey(), rt);
-            rt.initialize();
-        }
-    }
-
-    public void stopSimpleEventDetector(String key) {
-        synchronized (simpleEventDetectors) {
-            SimpleEventDetector rt = simpleEventDetectors.remove(key);
-            if (rt != null) {
-                rt.terminate();
-            }
-        }
-    }
-
-    //
-    //
-    // Point event detectors
-    //
-    public void addPointEventDetector(PointEventDetectorRT ped) {
-        synchronized (simpleEventDetectors) {
-            ped.initialize();
-            simpleEventDetectors.put(ped.getEventDetectorKey(), ped);
-        }
-    }
-
-    public void removePointEventDetector(String pointEventDetectorKey) {
-        synchronized (simpleEventDetectors) {
-            SimpleEventDetector sed = simpleEventDetectors
-                    .remove(pointEventDetectorKey);
-            if (sed != null) {
-                sed.terminate();
-            }
-        }
-    }
-
-    public SimpleEventDetector getSimpleEventDetector(String key) {
-        return simpleEventDetectors.get(key);
-    }
-
-    //
-    //
-    // Compound event detectors
-    //
-    public boolean saveCompoundEventDetector(CompoundEventDetectorVO vo) {
-        // If the CED is running, stop it.
-        stopCompoundEventDetector(vo.getId());
-
-        compoundEventDetectorDao.saveCompoundEventDetector(vo);
-
-        // If the scheduled event is enabled, start it.
-        if (!vo.isDisabled()) {
-            return startCompoundEventDetector(vo);
-        }
-
-        return true;
-    }
-
-    public boolean startCompoundEventDetector(CompoundEventDetectorVO ced) {
-        stopCompoundEventDetector(ced.getId());
-        CompoundEventDetectorRT rt = ced.createRuntime();
-        try {
-            rt.initialize();
-            compoundEventDetectors.put(ced.getId(), rt);
-            return true;
-        } catch (LifecycleException e) {
-            rt.raiseFailureEvent(new LocalizableMessageImpl(
-                    "event.compound.exceptionFailure", ced.getName(),
-                    ((LocalizableException) e.getCause())));
-        } catch (Exception e) {
-            rt.raiseFailureEvent(new LocalizableMessageImpl(
-                    "event.compound.exceptionFailure", ced.getName(), e
-                    .getMessage()));
-        }
-        return false;
-    }
-
-    public void stopCompoundEventDetector(int compoundEventDetectorId) {
-        CompoundEventDetectorRT rt = compoundEventDetectors
-                .remove(compoundEventDetectorId);
-        if (rt != null) {
-            rt.terminate();
-        }
-    }
-
-    //
-    //
-    // Publishers
-    //
-    public PublisherRT<?> getRunningPublisher(int publisherId) {
-        for (PublisherRT<?> publisher : runningPublishers) {
-            if (publisher.getId() == publisherId) {
-                return publisher;
-            }
-        }
-        return null;
-    }
-
-    public boolean isPublisherRunning(int publisherId) {
-        return getRunningPublisher(publisherId) != null;
-    }
-
-    public PublisherVO<? extends PublishedPointVO> getPublisher(int publisherId) {
-        return publisherDao.getPublisher(publisherId);
-    }
-
-    public void deletePublisher(int publisherId) {
-        stopPublisher(publisherId);
-        publisherDao.deletePublisher(publisherId);
-        eventManager.cancelEventsForPublisher(publisherId);
-    }
-
-    public void savePublisher(PublisherVO<? extends PublishedPointVO> vo) {
-        // If the data source is running, stop it.
-        stopPublisher(vo.getId());
-
-        // In case this is a new publisher, we need to save to the database
-        // first so that it has a proper id.
-        publisherDao.savePublisher(vo);
-
-        // If the publisher is enabled, start it.
-        if (vo.isEnabled()) {
-            startPublisher(vo);
-        }
-    }
-
-    private void startPublisher(PublisherVO<? extends PublishedPointVO> vo) {
-        synchronized (runningPublishers) {
-            // If the publisher is already running, just quit.
-            if (isPublisherRunning(vo.getId())) {
-                return;
-            }
-
-            // Ensure that the data source is enabled.
-            Assert.isTrue(vo.isEnabled());
-
-            // Create and start the runtime version of the publisher.
-            PublisherRT<?> publisher = vo.createPublisherRT();
-            publisher.initialize();
-
-            // Add it to the list of running publishers.
-            runningPublishers.add(publisher);
-        }
-    }
-
-    private void stopPublisher(int id) {
-        synchronized (runningPublishers) {
-            PublisherRT<?> publisher = getRunningPublisher(id);
-            if (publisher == null) {
-                return;
-            }
-
-            runningPublishers.remove(publisher);
-            publisher.terminate();
-            publisher.joinTermination();
-        }
-    }
-
-    //
-    //
-    // Point links
-    //
-    private PointLinkRT getRunningPointLink(int pointLinkId) {
-        for (PointLinkRT pointLink : pointLinks) {
-            if (pointLink.getId() == pointLinkId) {
-                return pointLink;
-            }
-        }
-        return null;
-    }
-
-    public boolean isPointLinkRunning(int pointLinkId) {
-        return getRunningPointLink(pointLinkId) != null;
-    }
-
-    public void deletePointLink(int pointLinkId) {
-        stopPointLink(pointLinkId);
-        pointLinkDao.deletePointLink(pointLinkId);
-    }
-
-    public void savePointLink(PointLinkVO vo) {
-        // If the point link is running, stop it.
-        stopPointLink(vo.getId());
-
-        pointLinkDao.savePointLink(vo);
-
-        // If the point link is enabled, start it.
-        if (!vo.isDisabled()) {
-            startPointLink(vo);
-        }
-    }
-
-    private void startPointLink(PointLinkVO vo) {
-        synchronized (pointLinks) {
-            // If the point link is already running, just quit.
-            if (isPointLinkRunning(vo.getId())) {
-                return;
-            }
-
-            // Ensure that the point link is enabled.
-            Assert.isTrue(!vo.isDisabled());
-
-            // Create and start the runtime version of the point link.
-            PointLinkRT pointLink = new PointLinkRT(vo);
-            pointLink.initialize();
-
-            // Add it to the list of running point links.
-            pointLinks.add(pointLink);
-        }
-    }
-
-    private void stopPointLink(int id) {
-        synchronized (pointLinks) {
-            PointLinkRT pointLink = getRunningPointLink(id);
-            if (pointLink == null) {
-                return;
-            }
-
-            pointLinks.remove(pointLink);
-            pointLink.terminate();
-        }
-    }
-
-    //
-    //
-    // Maintenance events
-    //
-    public MaintenanceEventRT getRunningMaintenanceEvent(int id) {
-        for (MaintenanceEventRT rt : maintenanceEvents) {
-            if (rt.getVo().getId() == id) {
-                return rt;
-            }
-        }
-        return null;
-    }
-
-    public boolean isActiveMaintenanceEvent(int dataSourceId) {
-        for (MaintenanceEventRT rt : maintenanceEvents) {
-            if (rt.getVo().getDataSourceId() == dataSourceId
-                    && rt.isEventActive()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean isMaintenanceEventRunning(int id) {
-        return getRunningMaintenanceEvent(id) != null;
-    }
-
-    public void deleteMaintenanceEvent(int id) {
-        stopMaintenanceEvent(id);
-        maintenanceEventDao.deleteMaintenanceEvent(id);
-    }
-
-    public void saveMaintenanceEvent(MaintenanceEventVO vo) {
-        // If the maintenance event is running, stop it.
-        stopMaintenanceEvent(vo.getId());
-
-        maintenanceEventDao.saveMaintenanceEvent(vo);
-
-        // If the maintenance event is enabled, start it.
-        if (!vo.isDisabled()) {
-            startMaintenanceEvent(vo);
-        }
-    }
-
-    private void startMaintenanceEvent(MaintenanceEventVO vo) {
-        synchronized (maintenanceEvents) {
-            // If the maintenance event is already running, just quit.
-            if (isMaintenanceEventRunning(vo.getId())) {
-                return;
-            }
-
-            // Ensure that the maintenance event is enabled.
-            Assert.isTrue(!vo.isDisabled());
-
-            // Create and start the runtime version of the maintenance event.
-            MaintenanceEventRT rt = new MaintenanceEventRT(vo);
-            rt.initialize();
-
-            // Add it to the list of running maintenance events.
-            maintenanceEvents.add(rt);
-        }
-    }
-
-    private void stopMaintenanceEvent(int id) {
-        synchronized (maintenanceEvents) {
-            MaintenanceEventRT rt = getRunningMaintenanceEvent(id);
-            if (rt == null) {
-                return;
-            }
-
-            maintenanceEvents.remove(rt);
-            rt.terminate();
         }
     }
 
