@@ -27,8 +27,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import com.serotonin.mango.Common;
 import com.serotonin.mango.util.LocalizableJsonException;
-import br.org.scadabr.utils.i18n.LocalizableMessage;
 import java.util.Set;
 
 abstract public class AbstractPointLocatorVO implements PointLocatorVO {
@@ -40,6 +40,7 @@ abstract public class AbstractPointLocatorVO implements PointLocatorVO {
     //
     private static final long serialVersionUID = -1;
     private static final int version = 1;
+    private int id = Common.NEW_ID;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
@@ -82,5 +83,19 @@ abstract public class AbstractPointLocatorVO implements PointLocatorVO {
     @Override
     public boolean isRelinquishable() {
         return false;
+    }
+
+    /**
+     * @return the id
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(int id) {
+        this.id = id;
     }
 }

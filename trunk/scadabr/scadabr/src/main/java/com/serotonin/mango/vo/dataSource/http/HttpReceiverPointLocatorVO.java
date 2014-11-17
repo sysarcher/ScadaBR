@@ -93,7 +93,7 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
         this.binary0Value = binary0Value;
     }
 
-    @Override
+//TODO refactor to own validator class    @Override
     public void validate(DwrResponseI18n response) {
         if (parameterName.isEmpty()) {
             response.addContextual("parameterName", "validate.required");
@@ -154,5 +154,10 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO implement
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         serializeDataType(map);
+    }
+
+    @Override
+    public String getName() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

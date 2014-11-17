@@ -170,7 +170,7 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO implements J
         return DataType.IMAGE;
     }
 
-    @Override
+//TODO refactor to own validator class    @Override
     public void validate(DwrResponseI18n response) {
         if (url.isEmpty()) {
             response.addContextual("url", "validate.required");
@@ -287,5 +287,10 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO implements J
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         map.put("scaleType", SCALE_TYPE_CODES.getCode(scaleType));
+    }
+
+    @Override
+    public String getName() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

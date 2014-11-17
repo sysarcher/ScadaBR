@@ -38,9 +38,8 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import com.serotonin.mango.vo.dataSource.DataSourceValidator;
+import br.org.scadabr.vo.dataSource.DataSourceValidator;
 import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
 
 /**
  * @author Craig McFetridge
