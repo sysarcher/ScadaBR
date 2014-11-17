@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.serotonin.mango.vo.dataSource;
+package br.org.scadabr.vo.dataSource;
 
 import com.serotonin.mango.db.dao.DataSourceDao;
+import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +46,10 @@ public class DataSourceValidator implements Validator {
             errors.rejectValue("xid", "validate.notLongerThan", new Object[]{50}, "validate.notLongerThan");
         }
         if (vo.getName().isEmpty()) {
-            errors.reject("name", "validate.nameRequired");
+            errors.rejectValue("name", "validate.nameRequired");
         }
         if (vo.getName().length() > 40) {
-            errors.reject("name", "validate.nameTooLong");
+            errors.rejectValue("name", "validate.nameTooLong");
         }
     }
     

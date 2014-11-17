@@ -6,16 +6,21 @@
 package br.org.scadabr.web.mvc.controller.datasources;
 
 import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
+import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.RuntimeManager;
+import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.springframework.context.annotation.Scope;
@@ -43,6 +48,8 @@ public class DsTreeController {
     private RuntimeManager runtimeManager;
     @Inject
     private DataSourceDao dataSourceDao;
+    @Inject
+    private DataPointDao dataPointDao;
     
     @Inject 
     private RequestContextAwareLocalizer localizer;
@@ -74,12 +81,16 @@ public class DsTreeController {
 
     /**
      * get all child nodes (folders and datapoints) of the folder
-     * @param parentId the folderId
      * @return All childnodes
      */
-    @RequestMapping(params = "parentId", method = RequestMethod.GET)
-    public Collection<JsonDataSource> getChildNodesById(@RequestParam(value = "parentId", required = true) int parentId) {
-        return getDataSources();
+    @RequestMapping(params = {"dsId", "parentFolderId"}, method = RequestMethod.GET)
+    public List<JsonPointLocator> getPointLocators(int dsId, int parentFolderId) {
+        List<DataPointVO> dps = dataPointDao.getDataPoints(dsId, null);
+        List<JsonPointLocator> result = new LinkedList<>();
+        for (DataPointVO dp : dps) {
+            result.add(new JsonPointLocator(dp.getPointLocator(), localizer));
+        }
+        return result;
     }
 
 }

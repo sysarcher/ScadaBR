@@ -9,7 +9,7 @@ define(["dojo/_base/declare",
 
     return declare(null, {
         form: null,
-        constructor: function (formId, dsId) {
+        constructor: function (formId, id) {
             var form = dom.byId(formId);
             // Attach the onsubmit event handler of the form
 
@@ -18,9 +18,9 @@ define(["dojo/_base/declare",
                 evt.stopPropagation();
                 evt.preventDefault();
                 // Post the data to the server
-                request.post("dataSources/dataSource", {
+                request.post("dataSources/pointLocator", {
                     query: {
-                        id: dsId
+                        id: id
                     },
                     // Send the username and password
                     data: domForm.toObject(formId)

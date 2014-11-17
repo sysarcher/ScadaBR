@@ -5,11 +5,20 @@
  */
 package br.org.scadabr.web.mvc.controller.datasources;
 
+import br.org.scadabr.utils.TimePeriods;
+import br.org.scadabr.vo.LoggingTypes;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.googlecode.jsonrpc4j.JsonRpcService;
+import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
+import com.serotonin.mango.view.chart.ImageChartRenderer;
+import com.serotonin.mango.view.text.AnalogRenderer;
+import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
+import com.serotonin.mango.vo.event.PointEventDetectorVO;
+import java.util.ArrayList;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.springframework.context.annotation.Scope;
@@ -23,15 +32,33 @@ import org.springframework.context.annotation.ScopedProxyMode;
 @JsonRpcService("/dataSources/rpc/")
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class RpcController {
+    
     @Inject
     private DataSourceDao dataSourceDao;
-    @Inject 
+    @Inject
     private RequestContextAwareLocalizer localizer;
+    @Inject
+    private DataPointDao dataPointDao;
     
     public JsonDataSource addDataSource(String type) {
         DataSourceVO result = new MetaDataSourceVO();
         dataSourceDao.saveDataSource(result);
         return new JsonDataSource(result, localizer);
+    }
+    
+    public PointLocatorVO addPointLocator(int dataSourceId, int pointlOcatorId) {
+        PointLocatorVO result = dataSourceDao.getDataSource(dataSourceId).createPointLocator();
+        DataPointVO dp = new DataPointVO();
+        dp.setName(result.getClass().getSimpleName());
+        dp.setDataSourceId(dataSourceId);
+        dp.setPointLocator(result);
+        dp.setEnabled(false);
+        dp.setLoggingType(LoggingTypes.ALL);
+        dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
+        dp.setTextRenderer(new AnalogRenderer("#,##0.0", ""));
+        dp.setChartRenderer(new ImageChartRenderer(TimePeriods.DAYS, 1));
+        dataPointDao.saveDataPoint(dp);
+        return result;
     }
     
 }

@@ -36,7 +36,7 @@ import br.org.scadabr.util.ArrayUtils;
 import br.org.scadabr.util.IpAddressUtils;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import com.serotonin.mango.vo.dataSource.DataSourceValidator;
+import br.org.scadabr.vo.dataSource.DataSourceValidator;
 import org.springframework.validation.Errors;
 
 /**

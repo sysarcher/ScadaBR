@@ -17,7 +17,7 @@ define(["dojo/_base/declare",
         treeNodeDetailsWidget: null,
         constructor: function (dataSourcesTreeNode, treeNodeDetailsWidgetId) {
             this._initSvc();
-            this._initStore();
+            this._initTreeStore();
             this._initDataSourceTree(dataSourcesTreeNode);
             this._initMenu(dataSourcesTreeNode);
             var _this = this;
@@ -25,13 +25,19 @@ define(["dojo/_base/declare",
                 _this.treeNodeDetailsWidget = registry.byId(treeNodeDetailsWidgetId);
             });
         },
-        _initStore: function () {
+        _initTreeStore: function () {
             this.store = new Observable(new JsonRest({
                 target: "dataSources/dsTree/",
                 getChildren: function (object, onComplete, onError) {
                     switch (object.nodeType) {
                         case "ROOT" :
                             this.query({}).then(onComplete, onError);
+                            break;
+                        case "DataSource":
+                            onComplete([{id: object.id + "/pointLocators", dsId:object.id, folderId: 0, name: "pointLocators", nodeType: "PointLocatorFolder"}]);
+                            break;
+                        case "PointLocatorFolder":    
+                            this.query({dsId:object.dsId, parentFolderId: object.folderId}).then(onComplete, onError);
                             break;
                         default :
                             alert("Unknown Type: " + object.nodeType);
@@ -40,6 +46,10 @@ define(["dojo/_base/declare",
                 mayHaveChildren: function (object) {
                     switch (object.nodeType) {
                         case "ROOT":
+                            return true;
+                        case "DataSource":
+                            return true;
+                        case "PointLocatorFolder":    
                             return true;
                         default:
                             return false;
@@ -75,6 +85,9 @@ define(["dojo/_base/declare",
                         case "DataSource":
                             this.detailController.treeNodeDetailsWidget.set("href", "dataSources/dataSource?id=" + node.id);
                             break;
+                        case "PointLocator":    
+                            this.detailController.treeNodeDetailsWidget.set("href", "dataSources/pointLocator?id=" + node.id);
+                             break;
                         default:
                             this.detailController.clearDetailViewId();
                     }
@@ -90,9 +103,24 @@ define(["dojo/_base/declare",
             var _svc = this.svc;
             this.treeMenu.addChild(new MenuItem({
                 iconClass: "dijitIconAdd",
-                label: "add",
+                label: "Add DataSource",
                 onClick: function () {
                     _svc.addDataSource("META").then(function (result) {
+                        _store.getChildren(_tree.lastFocused.item, function (children) {
+                            _store.onChildrenChange(_tree.lastFocused.item, children);
+                        }, function (error) {
+                            alert(error);
+                        });
+                    }, function (error) {
+                        alert(error);
+                    });
+                }
+            }));
+            this.treeMenu.addChild(new MenuItem({
+                iconClass: "dijitIconAdd",
+                label: "Add PointLocator",
+                onClick: function () {
+                    _svc.addPointLocator(_tree.lastFocused.item.dsId, _tree.lastFocused.folderId).then(function (result) {
                         _store.getChildren(_tree.lastFocused.item, function (children) {
                             _store.onChildrenChange(_tree.lastFocused.item, children);
                         }, function (error) {
@@ -120,6 +148,19 @@ define(["dojo/_base/declare",
                             {
                                 name: 'type',
                                 type: 'STRING'
+                            }
+                        ]
+                    },
+                    {
+                        name: 'addPointLocator',
+                        parameters: [
+                            {
+                                name: 'dataSourceId',
+                                type: 'INT'
+                            },
+                            {
+                                name: 'parentFolderId',
+                                type: 'INT'
                             }
                         ]
                     },

@@ -23,7 +23,6 @@ import java.io.Serializable;
 
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.util.ChangeComparableObject;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import com.serotonin.mango.vo.dataSource.DataPointSaveHandler;
 
@@ -65,12 +64,12 @@ public interface PointLocatorVO extends Serializable, ChangeComparableObject {
      */
     PointLocatorRT createRuntime();
 
-    /**
-     * Validate. What else?
-     *
-     * @param response
-     */
-    void validate(DwrResponseI18n response);
-
     DataPointSaveHandler getDataPointSaveHandler();
+
+    String getName();
+    
+    int getId();
+    
+    void setId(int id);
+    
 }

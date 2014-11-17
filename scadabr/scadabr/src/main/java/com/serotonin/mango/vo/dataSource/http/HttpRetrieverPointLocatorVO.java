@@ -128,7 +128,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
         this.timeFormat = timeFormat;
     }
 
-    @Override
+//TODO refactor to own validator class    @Override
     public void validate(DwrResponseI18n response) {
         if (valueRegex.isEmpty()) {
             response.addContextual("valueRegex", "validate.required");
@@ -242,5 +242,10 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
     @Override
     public void jsonSerialize(Map<String, Object> map) {
         serializeDataType(map);
+    }
+
+    @Override
+    public String getName() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

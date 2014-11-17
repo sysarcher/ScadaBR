@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource.meta;
 
+import br.org.scadabr.DataType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -31,7 +32,7 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import com.serotonin.mango.vo.dataSource.DataSourceValidator;
+import br.org.scadabr.vo.dataSource.DataSourceValidator;
 import org.springframework.validation.Validator;
 
 /**
@@ -87,7 +88,7 @@ public class MetaDataSourceVO extends DataSourceVO<MetaDataSourceVO> {
 
     @Override
     public MetaPointLocatorVO createPointLocator() {
-        return new MetaPointLocatorVO();
+        return new MetaPointLocatorVO(DataType.NUMERIC);
     }
 
     @Override

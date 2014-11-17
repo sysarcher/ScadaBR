@@ -241,6 +241,7 @@ public class DataPointDao extends BaseDao {
                 dp.defaultTextRenderer();
             }
             dp.setId(rs.getInt(1));
+            dp.getPointLocator().setId(dp.getId());
             dp.setXid(rs.getString(2));
             dp.setDataSourceId(rs.getInt(3));
 
@@ -248,12 +249,6 @@ public class DataPointDao extends BaseDao {
             dp.setDataSourceName(rs.getString(5));
             dp.setDataSourceXid(rs.getString(6));
             dp.setDataSourceTypeId(rs.getInt(7));
-
-            // The spinwave changes were not correctly implemented, so we need to handle potential errors here.
-            if (dp.getPointLocator() == null) {
-                // Use the data source tpe id to determine what type of locator is needed.
-                dp.setPointLocator(dataSourceDao.getDataSource(dp.getDataSourceId()).createPointLocator());
-            }
 
             return dp;
         }
@@ -290,6 +285,9 @@ public class DataPointDao extends BaseDao {
     }
 
     void insertDataPoint(final DataPointVO dp) {
+        if (dp.getXid() == null || dp.getXid().isEmpty()) {
+            dp.setXid(generateUniqueXid());
+        }
         // Create a default text renderer
         if (dp.getTextRenderer() == null) {
             dp.defaultTextRenderer();
@@ -310,6 +308,7 @@ public class DataPointDao extends BaseDao {
             }
         });
         dp.setId(id);
+        dp.getPointLocator().setId(id);
         // Save the relational information.
         saveEventDetectors(dp);
 

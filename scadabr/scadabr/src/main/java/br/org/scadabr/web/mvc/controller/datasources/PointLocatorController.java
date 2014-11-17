@@ -18,11 +18,13 @@
  */
 package br.org.scadabr.web.mvc.controller.datasources;
 
-import br.org.scadabr.vo.dataSource.DataSourceValidator;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import br.org.scadabr.vo.dataSource.PointLocatorValidator;
+import br.org.scadabr.vo.dataSource.meta.MetaPointLocatorValidator;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import br.org.scadabr.web.mvc.AjaxFormPostResponse;
-import com.serotonin.mango.db.dao.DataSourceDao;
-import com.serotonin.mango.vo.dataSource.DataSourceVO;
+import com.serotonin.mango.db.dao.DataPointDao;
+import com.serotonin.mango.vo.DataPointVO;
 import javax.inject.Inject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -34,34 +36,36 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @Scope("request")
-@RequestMapping("/dataSources/dataSource")
-public class DataSourceController {
+@RequestMapping("/dataSources/pointLocator")
+public class PointLocatorController {
 
     @Inject
-    private DataSourceDao dataSourceDao;
+    private DataPointDao dataPointDao;
     @Inject
     private transient RequestContextAwareLocalizer localizer;
 
-    @ModelAttribute("dataSource")
-    protected DataSourceVO getModel(int id) {
-        return dataSourceDao.getDataSource(id);
+    @ModelAttribute("pointLocator")
+    protected PointLocatorVO getModel(int id) {
+        return dataPointDao.getDataPoint(id).getPointLocator();
     }
 
     @RequestMapping(params = "id", method = RequestMethod.GET)
-    public String getDataSourceView(int id) {
-        return "dataSources/dataSource";
+    public String getPointLocatorView(int id) {
+        return "dataSources/pointLocator";
     }
 
     @RequestMapping(params = "id", method = RequestMethod.POST)
-    public @ResponseBody AjaxFormPostResponse postDataSource(@ModelAttribute("dataSource") DataSourceVO dataSource) {
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(dataSource, "dataSource");
+    public @ResponseBody AjaxFormPostResponse postPointLocator(@ModelAttribute("pointLocator") PointLocatorVO pointLocator) {
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(pointLocator, "pointLocator");
         //TODO no autowire ??? why????
-        DataSourceValidator validator = new DataSourceValidator(dataSourceDao);
-        validator.validate(dataSource, bindingResult);
+        PointLocatorValidator validator = new MetaPointLocatorValidator(dataPointDao); // TOdo replace with factory ...
+        validator.validate(pointLocator, bindingResult);
 //        dataSource.createValidator().validate(dataSource, bindingResult);
         final AjaxFormPostResponse result = new AjaxFormPostResponse(bindingResult, localizer);
         if (!bindingResult.hasErrors()) {
-            dataSourceDao.saveDataSource(dataSource);
+            DataPointVO dp =  dataPointDao.getDataPoint(pointLocator.getId());
+            dp.setPointLocator(pointLocator);
+            dataPointDao.saveDataPoint(dp);
         }
         return result;
     }

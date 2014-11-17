@@ -562,8 +562,6 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
             }
         }
 
-        pointLocator.validate(response);
-
         // Check text renderer type
         if (textRenderer != null && !textRenderer.getDef().supports(pointLocator.getDataType())) {
             response.addGeneric("validate.text.incompatible");
