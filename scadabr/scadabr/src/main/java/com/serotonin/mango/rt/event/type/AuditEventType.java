@@ -146,7 +146,7 @@ public class AuditEventType extends EventType {
         if (fromValue != toValue) {
             list.add(new LocalizableMessageImpl("event.audit.changedPropertyDoubleScientific", propertyNameKey, fromValue, toValue));
         }
-throw new ImplementMeException(); //"MessageFormat");
+//throw new ImplementMeException(); //"MessageFormat");
     }
 
     public static void maybeAddExportCodeChangeMessage(List<LocalizableMessage> list, String propertyNameKey,

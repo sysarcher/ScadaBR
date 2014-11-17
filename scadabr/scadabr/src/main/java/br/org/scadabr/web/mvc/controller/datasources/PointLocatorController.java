@@ -50,8 +50,8 @@ public class PointLocatorController {
     }
 
     @RequestMapping(params = "id", method = RequestMethod.GET)
-    public String getPointLocatorView(int id) {
-        return "dataSources/pointLocator";
+    public String getPointLocatorView(@ModelAttribute("pointLocator") PointLocatorVO pointLocator) {
+        return "dataSources/" + pointLocator.getClass().getSimpleName();
     }
 
     @RequestMapping(params = "id", method = RequestMethod.POST)

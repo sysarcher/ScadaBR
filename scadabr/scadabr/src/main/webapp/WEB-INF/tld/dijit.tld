@@ -12,20 +12,22 @@
     <short-name>dijit</short-name>
   
     <tag>
-        <name>textBox</name>
-        <tag-class>br.org.scadabr.web.taglib.dijit.TextBoxTag</tag-class>
+        <name>textarea</name>
+        <tag-class>br.org.scadabr.web.taglib.dijit.TextareaTag</tag-class>
         <description>
-            Writes a input tag for dijit/form/TextBox.
+            Writes a input tag for dijit/form/Textarea.
         </description>
         <body-content>empty</body-content>
         <attribute>
+            <description>Path to property for data binding</description>
+            <name>path</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>HTML Standard Attribute</description>
             <name>id</name>
-        </attribute>
-        <attribute>
-            <name>type</name>
-        </attribute>
-        <attribute>
-            <name>name</name>
+            <required>false</required>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
         <attribute>
@@ -41,11 +43,74 @@
         </attribute>
     </tag>
     <tag>
+        <name>textBox</name>
+        <tag-class>br.org.scadabr.web.taglib.dijit.TextBoxTag</tag-class>
+        <description>
+            Writes a input tag for dijit/form/TextBox.
+        </description>
+        <body-content>empty</body-content>
+        <attribute>
+            <description>Path to property for data binding</description>
+            <name>path</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>HTML Standard Attribute</description>
+            <name>id</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>type</name>
+        </attribute>
+        <attribute>
+            <name>i18nLabel</name>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>i18nTitle</name>
+        </attribute>
+    </tag>
+    <tag>
         <name>validationTextBox</name>
         <description>
             Writes a input tag for dijit/form/ValidatingTextBox.
         </description>
         <tag-class>br.org.scadabr.web.taglib.dijit.ValidationTextBoxTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <description>Path to property for data binding</description>
+            <name>path</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>HTML Standard Attribute</description>
+            <name>id</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>type</name>
+        </attribute>
+        <attribute>
+            <name>i18nLabel</name>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>i18nTitle</name>
+        </attribute>
+        <body-content>empty</body-content>
+        <dynamic-attributes>true</dynamic-attributes>
+    </tag>
+    <tag>
+        <name>loginTextBox</name>
+        <description>
+            Writes initially a input tag for dijit/form/TextBox or if binding errors exists a dijit/form/ValidatingTextBox. 
+            To assist the browser filling in the username ad password.
+        </description>
+        <tag-class>br.org.scadabr.web.taglib.dijit.LoginTextBoxTag</tag-class>
         <body-content>empty</body-content>
         <attribute>
             <description>Path to property for data binding</description>

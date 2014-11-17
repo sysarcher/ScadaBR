@@ -27,5 +27,37 @@
             <required>true</required>
         </attribute>
     </tag>
-  
+      <tag>
+        <name>contentPane</name>
+        <tag-class>br.org.scadabr.web.taglib.dojox.ContentPaneTag</tag-class>
+        <description>
+            ParseOnLoad is disabled.
+            This can execute scripts whenn set("href", ) is called.
+            Writes a div tag for dojox/layout/ContentPane.
+        </description>
+        <body-content>JSP</body-content>
+        <attribute>
+            <name>id</name>
+        </attribute>
+        <attribute>
+            <name>splitter</name>
+        </attribute>
+    </tag>
+      <tag>
+        <name>centerContentPane</name>
+        <tag-class>br.org.scadabr.web.taglib.dojox.CenterContentPaneTag</tag-class>
+        <description>
+            ParseOnLoad is disabled.
+            This can execute scripts whenn set("href", ) is called.
+            Writes a div tag for dojox/layout/ContentPane region: 'center'.
+        </description>
+        <body-content>JSP</body-content>
+        <attribute>
+            <name>id</name>
+        </attribute>
+        <attribute>
+            <name>splitter</name>
+        </attribute>
+    </tag>
+
 </taglib>
