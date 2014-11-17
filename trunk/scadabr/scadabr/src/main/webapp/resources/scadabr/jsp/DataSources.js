@@ -34,10 +34,10 @@ define(["dojo/_base/declare",
                             this.query({}).then(onComplete, onError);
                             break;
                         case "DataSource":
-                            onComplete([{id: object.id + "/pointLocators", dsId:object.id, folderId: 0, name: "pointLocators", nodeType: "PointLocatorFolder"}]);
+                            onComplete([{id: object.id + "/pointLocators", dsId: object.id, folderId: 0, name: "pointLocators", nodeType: "PointLocatorFolder"}]);
                             break;
-                        case "PointLocatorFolder":    
-                            this.query({dsId:object.dsId, parentFolderId: object.folderId}).then(onComplete, onError);
+                        case "PointLocatorFolder":
+                            this.query({dsId: object.dsId, parentFolderId: object.folderId}).then(onComplete, onError);
                             break;
                         default :
                             alert("Unknown Type: " + object.nodeType);
@@ -49,7 +49,7 @@ define(["dojo/_base/declare",
                             return true;
                         case "DataSource":
                             return true;
-                        case "PointLocatorFolder":    
+                        case "PointLocatorFolder":
                             return true;
                         default:
                             return false;
@@ -61,7 +61,13 @@ define(["dojo/_base/declare",
                         nodeType: "ROOT"});
                 },
                 getLabel: function (object) {
-                    return object.name;
+                    switch (object.nodeType) {
+                        case "DataSource":
+                            var label = "<b>" + object.name + "</b>";
+                            return label;
+                        default:
+                            return object.name;
+                    }
                 },
                 //inserted manually to catch the aspect of Tree to get this working -- Observable looks wired to me ... at least JSONRest does not woirk out of the box ...
                 onChange: function (/*dojo/data/Item*/ /*===== item =====*/) {
@@ -75,8 +81,25 @@ define(["dojo/_base/declare",
 
         },
         _initDataSourceTree: function (dataSourcesTreeNode) {
+            var MyTreeNode = declare(Tree._TreeNode, {
+                _setLabelAttr: {node: "labelNode", type: "innerHTML"}
+            });
+
             this.tree = new Tree({
                 model: this.store,
+                _createTreeNode: function (args) {
+                    return new MyTreeNode(args);
+                },
+                getIconClass: function(item, opened) {
+                    switch (item.nodeType) {
+                        case "ROOT":
+                            return "dsIcon";
+                        case "DataSource":
+                            return item.enabled ? "dsRunningIcon" : "dsStoppedIcon";
+                        default:
+			return (!item || this.model.mayHaveChildren(item)) ? (opened ? "dijitFolderOpened" : "dijitFolderClosed") : "dijitLeaf"
+                    }
+                },
                 detailController: this,
                 onClick: function (node) {
                     switch (node.nodeType) {
@@ -85,9 +108,9 @@ define(["dojo/_base/declare",
                         case "DataSource":
                             this.detailController.treeNodeDetailsWidget.set("href", "dataSources/dataSource?id=" + node.id);
                             break;
-                        case "PointLocator":    
+                        case "PointLocator":
                             this.detailController.treeNodeDetailsWidget.set("href", "dataSources/pointLocator?id=" + node.id);
-                             break;
+                            break;
                         default:
                             this.detailController.clearDetailViewId();
                     }
@@ -102,15 +125,37 @@ define(["dojo/_base/declare",
             var _tree = this.tree;
             var _svc = this.svc;
             this.treeMenu.addChild(new MenuItem({
-                iconClass: "dijitIconAdd",
-                label: "Add DataSource",
+                iconClass: "dsStartIcon",
+                label: "Start DataSource",
                 onClick: function () {
-                    _svc.addDataSource("META").then(function (result) {
+                    _svc.startDataSource(_tree.lastFocused.item.id).then(function (result) {
                         _store.getChildren(_tree.lastFocused.item, function (children) {
                             _store.onChildrenChange(_tree.lastFocused.item, children);
                         }, function (error) {
                             alert(error);
                         });
+                    }, function (error) {
+                        alert(error);
+                    });
+                }
+            }));
+            this.treeMenu.addChild(new MenuItem({
+                iconClass: "dsStopIcon",
+                label: "Stop DataSource",
+                onClick: function () {
+                    _svc.stopDataSource(_tree.lastFocused.item.id).then(function (result) {
+                        _store.onchange(result);
+                    }, function (error) {
+                        alert(error);
+                    });
+                }
+            }));
+            this.treeMenu.addChild(new MenuItem({
+                iconClass: "dsAddIcon",
+                label: "Add DataSource",
+                onClick: function () {
+                    _svc.addDataSource("META").then(function (result) {
+                        _store.onChange(result);
                     }, function (error) {
                         alert(error);
                     });
@@ -166,11 +211,17 @@ define(["dojo/_base/declare",
                     },
                     {
                         name: 'startDataSource',
-                        parameters: []
+                        parameters: [{
+                                name: 'id',
+                                type: 'INT'
+                            }]
                     },
                     {
                         name: 'stopDataSource',
-                        parameters: []
+                        parameters: [{
+                                name: 'id',
+                                type: 'INT'
+                            }]
                     }
 
                 ]

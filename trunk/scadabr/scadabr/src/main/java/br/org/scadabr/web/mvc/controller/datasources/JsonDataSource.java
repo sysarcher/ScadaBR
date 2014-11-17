@@ -18,11 +18,13 @@ public class JsonDataSource implements Serializable {
     private String name;
     private String typeKey;
     private int id;
+    private boolean enabled;
 
     public JsonDataSource(DataSourceVO<?> dsVo, Localizer localizer) {
         this.name = dsVo.getName();
         this.id = dsVo.getId();
         this.typeKey = localizer.getMessage(dsVo.getType().getKey());
+        this.enabled = dsVo.isEnabled();
     }
 
     JsonDataSource(DataSourceVO result) {
@@ -73,5 +75,19 @@ public class JsonDataSource implements Serializable {
      */
     public void setId(int id) {
         this.id = id;
+    }
+
+    /**
+     * @return the enabled
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * @param enabled the enabled to set
+     */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

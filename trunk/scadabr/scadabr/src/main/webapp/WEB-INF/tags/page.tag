@@ -82,7 +82,7 @@
                             <dijit:button iconClass="scadaBrEventsIcon" i18nTitle="header.alarms">
                                 <script type="dojo/connect" data-dojo-event="onClick">window.location = "events";</script>
                             </dijit:button>
-                            <dijit:button iconClass="scadaBrDataSourcesIcon" i18nTitle="header.dataSources">
+                            <dijit:button iconClass="dsIcon" i18nTitle="header.dataSources">
                                 <script type="dojo/connect" data-dojo-event="onClick">window.location = "dataSources";</script>
                             </dijit:button>
                             <dijit:button iconClass="scadaBrPointHierarchyIcon" i18nTitle="header.pointHierarchy" >

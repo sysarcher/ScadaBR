@@ -12,6 +12,7 @@ import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.googlecode.jsonrpc4j.JsonRpcService;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.view.chart.ImageChartRenderer;
 import com.serotonin.mango.view.text.AnalogRenderer;
 import com.serotonin.mango.vo.DataPointVO;
@@ -32,20 +33,22 @@ import org.springframework.context.annotation.ScopedProxyMode;
 @JsonRpcService("/dataSources/rpc/")
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class RpcController {
-    
+
     @Inject
     private DataSourceDao dataSourceDao;
     @Inject
     private RequestContextAwareLocalizer localizer;
     @Inject
     private DataPointDao dataPointDao;
-    
+    @Inject
+    private RuntimeManager runtimeManager;
+
     public JsonDataSource addDataSource(String type) {
         DataSourceVO result = new MetaDataSourceVO();
         dataSourceDao.saveDataSource(result);
         return new JsonDataSource(result, localizer);
     }
-    
+
     public PointLocatorVO addPointLocator(int dataSourceId, int pointlOcatorId) {
         PointLocatorVO result = dataSourceDao.getDataSource(dataSourceId).createPointLocator();
         DataPointVO dp = new DataPointVO();
@@ -60,5 +63,19 @@ public class RpcController {
         dataPointDao.saveDataPoint(dp);
         return result;
     }
+
+    public JsonDataSource startDataSource(int id) {
+        DataSourceVO dsVo = dataSourceDao.getDataSource(id);
+        dsVo.setEnabled(true);
+        runtimeManager.saveDataSource(dsVo);
+        return new JsonDataSource(dsVo, localizer);
+    }
     
+    public JsonDataSource stopDataSource(int id) {
+        DataSourceVO dsVo = dataSourceDao.getDataSource(id);
+        dsVo.setEnabled(false);
+        runtimeManager.saveDataSource(dsVo);
+        return new JsonDataSource(dsVo, localizer);
+    }
+
 }

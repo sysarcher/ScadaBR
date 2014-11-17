@@ -39,6 +39,7 @@
     @ http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/mvc.html#mvc-annotation-driven-->
     <mvc:annotation-driven /> 
     <mvc:resources mapping="/resources/**" location="/resources/*" />
+    <mvc:resources mapping="/icons/**" location="/icons/*" />
     <mvc:resources mapping="/images/**" location="/images/*" />
     <mvc:resources mapping="/soundmanager2.swf" location="/soundmanager2.swf" />
     <mvc:resources mapping="/favicon_small.ico" location="/favicon_small.ico" />
