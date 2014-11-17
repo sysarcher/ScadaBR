@@ -16,11 +16,7 @@
             <dijit:leftContentPane>
                 <div id="dataSourcesTree"></div>
             </dijit:leftContentPane>
-            <dijit:centerContentPane >
-                    <div id="treeNodeDetailsWidget" data-dojo-type="dojox/layout/ContentPane" title="Show data (chart)" data-dojo-props="selected:true, parseOnLoad: false, contentUrl: 'dataPointDetails/renderChart'">
-                    </div>
-            </dijit:centerContentPane>
-
+            <dojox:centerContentPane id="treeNodeDetailsWidget"/>
         </dijit:sidebarBorderContainer>
     </jsp:body>
 </tag:page>

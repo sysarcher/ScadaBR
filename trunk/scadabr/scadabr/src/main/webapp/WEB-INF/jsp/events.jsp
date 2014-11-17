@@ -96,7 +96,7 @@
             <div class="smallTitle titlePadding"><fmt:message key="events.search"/></div>
             <dijit:form >
                 <dojox:tableContainer cols="1" >
-                    <dijit:textBox name="eventId" i18nLabel="events.id"/>
+                    <%-- dijit:textBox name="eventId" i18nLabel="events.id"/--%>
 
                     <select id="eventSourceType" data-dojo-type="dijit/form/Select" title="<fmt:message key="events.search.type"/>">
                         <option value="-1"><fmt:message key="common.all"/></option>
@@ -109,7 +109,7 @@
                         <option value="<c:out value="<%= EventStatus.NORTN.getName()%>"/>"><fmt:message key="common.nortn"/></option>
 </select--%>>
                         <%--select id="alarmLevel"data-dojo-type="dijit/form/Select" title="<fmt:message key="common.alarmLevel"/>"><tag:alarmLevelOptions allOption="true"/></select--%>
-                    <dijit:textBox id="keywords" i18nLabel="events.search.keywords"/>
+                        <%--dijit:textBox id="keywords" i18nLabel="events.search.keywords"/--%>
                     <dijit:button i18nLabel="events.search.search"/>
                     <span id="searchMessage" class="formError"></span>
                 </dojox:tableContainer>
