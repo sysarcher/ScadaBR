@@ -31,24 +31,8 @@ TODO put all images in one file like scadabr/src/main/webapp/resources/dijit/ico
     text-align: center;
 }
 
-.scadaBrDataSourcesIcon{
-    background-image: url('icon_ds.png');
-    background-repeat: no-repeat;
-    width: 18px;
-    height: 18px;
-    text-align: center;
-}
-
 .scadaBrPointHierarchyIcon {
     background-image: url('folder_brick.png');
-    background-repeat: no-repeat;
-    width: 18px;
-    height: 18px;
-    text-align: center;
-}
-
-.scadaBrAddDataSourceIcon {
-    background-image: url('icon_ds_add.png');
     background-repeat: no-repeat;
     width: 18px;
     height: 18px;

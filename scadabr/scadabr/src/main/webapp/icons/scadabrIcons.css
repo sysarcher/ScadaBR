@@ -1,0 +1,36 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 17.11.2014, 22:39:59
+    Author     : aploese
+*/
+
+
+.dsIcon,
+.dsAddIcon,
+.dsEditIcon,
+.dsCopyIcon,
+.dsDeleteIcon,
+.dsStartIcon,
+.dsStopIcon,
+.dsRunningIcon,
+.dsErrorIcon,
+.dsStoppedIcon{
+    background-image: url('dataSourceIcons.png');
+    width: 16px;
+    height: 16px;
+}
+
+.dsIcon{ background-position: 0; }
+.dsAddIcon{ background-position: -16px; }
+.dsEditIcon{ background-position: -32px; }
+.dsCopyIcon{ background-position: -48px; }
+.dsDeleteIcon{ background-position: -64px; }
+.dsStartIcon{ background-position: -80px; }
+.dsStopIcon{ background-position: -96px; }
+.dsRunningIcon{ background-position: -112px; }
+.dsErrorIcon{ background-position: -128px; }
+.dsStoppedIcon{ background-position: -144px; }
