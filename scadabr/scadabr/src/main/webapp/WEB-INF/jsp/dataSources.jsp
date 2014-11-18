@@ -13,7 +13,7 @@
         </script>
 
         <dijit:sidebarBorderContainer gutters="true" liveSplitters="true">
-            <dijit:leftContentPane>
+            <dijit:leftContentPane splitter="true" >
                 <div id="dataSourcesTree"></div>
             </dijit:leftContentPane>
             <dojox:centerContentPane id="treeNodeDetailsWidget"/>

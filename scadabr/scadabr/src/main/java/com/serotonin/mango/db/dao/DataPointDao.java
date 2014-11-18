@@ -242,6 +242,7 @@ public class DataPointDao extends BaseDao {
             }
             dp.setId(rs.getInt(1));
             dp.getPointLocator().setId(dp.getId());
+            dp.getPointLocator().setEnabled(dp.isEnabled());
             dp.setXid(rs.getString(2));
             dp.setDataSourceId(rs.getInt(3));
 

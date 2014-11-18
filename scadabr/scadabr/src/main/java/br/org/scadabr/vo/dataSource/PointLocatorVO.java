@@ -72,4 +72,8 @@ public interface PointLocatorVO extends Serializable, ChangeComparableObject {
     
     void setId(int id);
     
+    boolean isEnabled();
+    
+    void setEnabled(boolean value);
+    
 }

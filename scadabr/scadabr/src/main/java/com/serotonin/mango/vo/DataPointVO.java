@@ -281,8 +281,9 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         return enabled;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public void setEnabled(boolean value) {
+        this.pointLocator.setEnabled(value);
+        this.enabled = value;
     }
 
     public int getPointFolderId() {
