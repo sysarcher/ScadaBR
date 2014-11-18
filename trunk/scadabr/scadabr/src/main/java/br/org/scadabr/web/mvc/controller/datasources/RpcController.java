@@ -78,4 +78,18 @@ public class RpcController {
         return new JsonDataSource(dsVo, localizer);
     }
 
+    public JsonPointLocator startPointLocator(int id) {
+        DataPointVO dpVo = dataPointDao.getDataPoint(id);
+        dpVo.setEnabled(true);
+        runtimeManager.saveDataPoint(dpVo);
+        return new JsonPointLocator(dpVo.getPointLocator(), localizer);
+    }
+    
+    public JsonPointLocator stopPointLocator(int id) {
+        DataPointVO dpVo = dataPointDao.getDataPoint(id);
+        dpVo.setEnabled(false);
+        runtimeManager.saveDataPoint(dpVo);
+        return new JsonPointLocator(dpVo.getPointLocator(), localizer);
+    }
+
 }

@@ -17,12 +17,14 @@ public class JsonPointLocator implements Serializable {
 
     private String name;
     private String typeKey;
-    private int id;
+    private int plId;
+    private boolean enabled;
 
     public JsonPointLocator(PointLocatorVO dsVo, Localizer localizer) {
         this.name = dsVo.getName();
-        this.id = dsVo.getId();
+        this.plId = dsVo.getId();
         this.typeKey = localizer.getMessage(dsVo.getConfigurationDescription());
+        this.enabled = dsVo.isEnabled();
     }
 
     JsonPointLocator(PointLocatorVO result) {
@@ -61,17 +63,35 @@ public class JsonPointLocator implements Serializable {
         this.typeKey = typeKey;
     }
 
+    
+    
     /**
      * @return the id
      */
-    public int getId() {
-        return id;
+    public String getId() {
+        return "pointLocators/" + plId;
     }
 
     /**
      * @param id the id to set
      */
-    public void setId(int id) {
-        this.id = id;
+    public void setId(String id) {
+        this.plId = Integer.valueOf(id.substring("pointLocators/".length()));
     }
+
+    /**
+     * @return the plId
+     */
+    public int getPlId() {
+        return plId;
+    }
+
+    /**
+     * @param plId the plId to set
+     */
+    public void setPlId(int plId) {
+        this.plId = plId;
+    }
+    
+    
 }

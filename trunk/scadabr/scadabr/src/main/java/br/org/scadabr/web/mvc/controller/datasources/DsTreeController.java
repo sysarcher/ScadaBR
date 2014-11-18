@@ -6,7 +6,6 @@
 package br.org.scadabr.web.mvc.controller.datasources;
 
 import br.org.scadabr.logger.LogUtils;
-import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
@@ -17,10 +16,8 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.springframework.context.annotation.Scope;
@@ -28,7 +25,6 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -57,8 +53,6 @@ public class DsTreeController {
 
     @RequestMapping(method = RequestMethod.GET)
     public List<JsonDataSource> getDataSources() {
-        LOG.severe("CALLED: getDataSources");
-        
         final User user = userSessionContextBean.getUser();
         List<JsonDataSource> result = new ArrayList<>();
         for (DataSourceVO<?> ds : runtimeManager.getDataSources()) {

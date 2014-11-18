@@ -41,6 +41,7 @@ abstract public class AbstractPointLocatorVO implements PointLocatorVO {
     private static final long serialVersionUID = -1;
     private static final int version = 1;
     private int id = Common.NEW_ID;
+    private boolean enabled;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
@@ -85,17 +86,23 @@ abstract public class AbstractPointLocatorVO implements PointLocatorVO {
         return false;
     }
 
-    /**
-     * @return the id
-     */
+    @Override
     public int getId() {
         return id;
     }
 
-    /**
-     * @param id the id to set
-     */
+    @Override
     public void setId(int id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }
