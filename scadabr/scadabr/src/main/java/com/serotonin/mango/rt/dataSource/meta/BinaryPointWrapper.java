@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -53,11 +54,14 @@ public class BinaryPointWrapper extends DistinctPointWrapper {
     }
 
     public boolean ago(TimePeriods periodType, int count) {
-        long from = periodType.minus(context.getRuntime(), count);
-        PointValueTime pvt = point.getPointValueBefore(from);
-        if (pvt == null) {
-            return false;
-        }
-        return pvt.getBooleanValue();
+        throw new ImplementMeException();
+        /*
+         long from = periodType.minus(context.getRuntime(), count);
+         PointValueTime pvt = point.getPointValueBefore(from);
+         if (pvt == null) {
+         return false;
+         }
+         return pvt.getBooleanValue();
+         */
     }
 }

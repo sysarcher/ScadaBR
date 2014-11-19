@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import java.util.List;
 
@@ -53,12 +54,15 @@ public class AlphanumericPointWrapper extends AbstractPointWrapper {
     }
 
     public String ago(TimePeriods periodType, int count) {
-        long from = periodType.minus(context.getRuntime(), count);
-        PointValueTime pvt = point.getPointValueBefore(from);
-        if (pvt == null) {
-            return null;
-        }
-        return pvt.getValue().getStringValue();
+        throw new ImplementMeException();
+        /*
+         long from = periodType.minus(context.getRuntime(), count);
+         PointValueTime pvt = point.getPointValueBefore(from);
+         if (pvt == null) {
+         return null;
+         }
+         return pvt.getValue().getStringValue();
+         */
     }
 
     public ValueChangeCounter past(TimePeriods periodType) {
@@ -90,9 +94,12 @@ public class AlphanumericPointWrapper extends AbstractPointWrapper {
     }
 
     private ValueChangeCounter getStats(long from, long to) {
-        PointValueTime start = point.getPointValueBefore(from);
-        List<PointValueTime> values = point.getPointValuesBetween(from, to);
-        ValueChangeCounter stats = new ValueChangeCounter(start, values);
-        return stats;
+        throw new ImplementMeException();
+        /*
+         PointValueTime start = point.getPointValueBefore(from);
+         List<PointValueTime> values = point.getPointValuesBetween(from, to);
+         ValueChangeCounter stats = new ValueChangeCounter(start, values);
+         return stats;
+         */
     }
 }

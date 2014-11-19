@@ -26,11 +26,6 @@ public class HistoricalDataPoint implements IDataPoint {
     }
 
     @Override
-    public List<PointValueTime> getLatestPointValues(int limit) {
-        return pointValueDao.getLatestPointValues(id, limit, timer.currentTimeMillis());
-    }
-
-    @Override
     public void updatePointValue(PointValueTime newValue) {
         throw new NotImplementedException();
     }
@@ -48,21 +43,6 @@ public class HistoricalDataPoint implements IDataPoint {
     @Override
     public PointValueTime getPointValue() {
         return pointValueDao.getPointValueBefore(id, timer.currentTimeMillis() + 1);
-    }
-
-    @Override
-    public PointValueTime getPointValueBefore(long time) {
-        return pointValueDao.getPointValueBefore(id, time);
-    }
-
-    @Override
-    public List<PointValueTime> getPointValues(long since) {
-        return pointValueDao.getPointValuesBetween(id, since, timer.currentTimeMillis());
-    }
-
-    @Override
-    public List<PointValueTime> getPointValuesBetween(long from, long to) {
-        return pointValueDao.getPointValuesBetween(id, from, to);
     }
 
     @Override

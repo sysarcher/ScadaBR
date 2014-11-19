@@ -66,7 +66,6 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
 
     // Runtime data.
     private volatile PointValueTime pointValue;
-    private final PointValueCache valueCache;
     @Autowired
     private RuntimeManager runtimeManager;
     @Autowired
@@ -96,65 +95,6 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     public DataPointRT(DataPointVO vo, PointLocatorRT pointLocator) {
         this.vo = vo;
         this.pointLocator = pointLocator;
-        valueCache = new PointValueCache(vo.getId(), vo.getDefaultCacheSize());
-    }
-
-    @Override
-    public List<PointValueTime> getLatestPointValues(int limit) {
-        return valueCache.getLatestPointValues(limit);
-    }
-
-    @Override
-    public PointValueTime getPointValueBefore(long time) {
-        for (PointValueTime pvt : valueCache.getCacheContents()) {
-            if (pvt.getTime() < time) {
-                return pvt;
-            }
-        }
-
-        return pointValueDao.getPointValueBefore(vo.getId(), time);
-    }
-
-    public PointValueTime getPointValueAt(long time) {
-        for (PointValueTime pvt : valueCache.getCacheContents()) {
-            if (pvt.getTime() == time) {
-                return pvt;
-            }
-        }
-
-        return pointValueDao.getPointValueAt(vo.getId(), time);
-    }
-
-    @Override
-    public List<PointValueTime> getPointValues(long since) {
-        List<PointValueTime> result = pointValueDao.getPointValues(vo.getId(), since);
-
-        for (PointValueTime pvt : valueCache.getCacheContents()) {
-            if (pvt.getTime() >= since) {
-                int index = Collections.binarySearch(result, pvt, pvtTimeComparator);
-                if (index < 0) {
-                    result.add(-index - 1, pvt);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<PointValueTime> getPointValuesBetween(long from, long to) {
-        List<PointValueTime> result = pointValueDao.getPointValuesBetween(vo.getId(), from, to);
-
-        for (PointValueTime pvt : valueCache.getCacheContents()) {
-            if (pvt.getTime() >= from && pvt.getTime() < to) {
-                int index = Collections.binarySearch(result, pvt, pvtTimeComparator);
-                if (index < 0) {
-                    result.add(-index - 1, pvt);
-                }
-            }
-        }
-
-        return result;
     }
 
     /**
@@ -284,7 +224,13 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
         }
 
         if (saveValue) {
-            valueCache.savePointValue(newValue, source, logValue, async);
+            if (logValue) {
+                if (async) {
+                    pointValueDao.savePointValueAsync(vo.getId(), newValue, source);
+                } else {
+                    pointValueDao.savePointValueSync(vo.getId(), newValue, source);
+                }
+            }
         }
 
         // Ignore historical values.
@@ -386,18 +332,8 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
             }
 
             if (value != null) {
-                valueCache.logPointValueAsync(new PointValueTime(value, fireTime), null);
+                pointValueDao.savePointValueAsync(vo.getId(), new PointValueTime(value, fireTime), null);
             }
-        }
-    }
-
-    //
-    // / Purging
-    //
-    public void resetValues() {
-        valueCache.reset();
-        if (vo.getLoggingType() != LoggingTypes.NONE) {
-            pointValue = valueCache.getLatestPointValue();
         }
     }
 
@@ -540,7 +476,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     @Override
     public void initialize() {
         // Get the latest value for the point from the database.
-        pointValue = valueCache.getLatestPointValue();
+        pointValue = pointValueDao.getLatestPointValue(vo.getId());
 
         // Set the tolerance origin if this is a numeric
         if (pointValue != null && pointValue.getValue() instanceof NumericValue) {

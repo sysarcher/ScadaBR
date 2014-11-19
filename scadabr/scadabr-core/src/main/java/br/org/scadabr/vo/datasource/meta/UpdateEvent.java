@@ -6,13 +6,13 @@
 package br.org.scadabr.vo.datasource.meta;
 
 import br.org.scadabr.utils.TimePeriods;
-import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableEnum;
 
 /**
  *
  * @author aploese
  */
-public enum UpdateEvent implements LocalizableMessage {
+public enum UpdateEvent implements LocalizableEnum<UpdateEvent> {
 
     CONTEXT_UPDATE(0, "dsEdit.meta.event.context"),
     MINUTES(TimePeriods.MINUTES, "dsEdit.meta.event.minute"),
@@ -39,6 +39,11 @@ public enum UpdateEvent implements LocalizableMessage {
         this.i18nKey = i18nKey;
     }
 
+    @Override
+    public String getName() {
+        return name();
+    }
+    
     @Override
     public String getI18nKey() {
         return i18nKey;

@@ -27,6 +27,11 @@ public enum IntervalLoggingTypes implements LocalizableEnum<IntervalLoggingTypes
     }
 
     @Override
+    public String getName() {
+        return name();
+    }
+    
+    @Override
     public String getI18nKey() {
         return i18nKey;
     }

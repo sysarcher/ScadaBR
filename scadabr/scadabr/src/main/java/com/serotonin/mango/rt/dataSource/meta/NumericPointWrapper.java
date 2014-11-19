@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import java.util.List;
 
@@ -54,12 +55,15 @@ public class NumericPointWrapper extends AbstractPointWrapper {
     }
 
     public double ago(TimePeriods periodType, int count) {
-        long from = periodType.minus(context.getRuntime(), count);
-        PointValueTime pvt = point.getPointValueBefore(from);
-        if (pvt == null) {
-            return 0;
-        }
-        return pvt.getDoubleValue();
+        throw new ImplementMeException();
+        /*
+         long from = periodType.minus(context.getRuntime(), count);
+         PointValueTime pvt = point.getPointValueBefore(from);
+         if (pvt == null) {
+         return 0;
+         }
+         return pvt.getDoubleValue();
+         */
     }
 
     public AnalogStatistics past(TimePeriods periodType) {
@@ -91,9 +95,12 @@ public class NumericPointWrapper extends AbstractPointWrapper {
     }
 
     private AnalogStatistics getStats(long from, long to) {
-        PointValueTime start = point.getPointValueBefore(from);
-        List<PointValueTime> values = point.getPointValuesBetween(from, to);
-        AnalogStatistics stats = new AnalogStatistics(start, values, from, to);
-        return stats;
+        throw new ImplementMeException();
+        /*
+         PointValueTime start = point.getPointValueBefore(from);
+         List<PointValueTime> values = point.getPointValuesBetween(from, to);
+         AnalogStatistics stats = new AnalogStatistics(start, values, from, to);
+         return stats;
+         */
     }
 }

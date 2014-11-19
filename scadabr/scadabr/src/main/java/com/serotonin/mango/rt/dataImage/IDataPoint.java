@@ -19,14 +19,11 @@
 package com.serotonin.mango.rt.dataImage;
 
 import br.org.scadabr.DataType;
-import java.util.List;
 
 /**
  * @author Matthew Lohbihler
  */
 public interface IDataPoint {
-
-    List<PointValueTime> getLatestPointValues(int limit);
 
     void updatePointValue(PointValueTime newValue);
 
@@ -35,12 +32,6 @@ public interface IDataPoint {
     void setPointValue(PointValueTime newValue, SetPointSource source);
 
     PointValueTime getPointValue();
-
-    PointValueTime getPointValueBefore(long time);
-
-    List<PointValueTime> getPointValues(long since);
-
-    List<PointValueTime> getPointValuesBetween(long from, long to);
 
     DataType getDataType();
 }
