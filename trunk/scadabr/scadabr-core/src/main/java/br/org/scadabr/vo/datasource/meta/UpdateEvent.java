@@ -57,17 +57,17 @@ public enum UpdateEvent implements LocalizableMessage {
         switch (id) {
             case 0:
                 return CONTEXT_UPDATE;
-            case 1:
-                return MINUTES;
             case 2:
-                return HOURS;
+                return MINUTES;
             case 3:
-                return DAYS;
+                return HOURS;
             case 4:
-                return WEEKS;
+                return DAYS;
             case 5:
-                return MONTHS;
+                return WEEKS;
             case 6:
+                return MONTHS;
+            case 7:
                 return YEARS;
             case 100:
                 return CRON;
