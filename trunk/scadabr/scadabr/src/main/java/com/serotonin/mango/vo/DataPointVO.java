@@ -131,6 +131,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     private List<PointEventDetectorVO> eventDetectors;
     private List<UserComment> comments;
     @JsonRemoteProperty
+    @Deprecated
     private int defaultCacheSize = 1;
     @JsonRemoteProperty
     private boolean discardExtremeValues = false;

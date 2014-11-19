@@ -47,7 +47,9 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.datasource.meta.UpdateEvent;
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -142,6 +144,10 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
 
     public UpdateEvent getUpdateEvent() {
         return updateEvent;
+    }
+
+    public List<UpdateEvent> getUpdateEvents() {
+        return Arrays.asList(UpdateEvent.values());
     }
 
     public void setUpdateEvent(UpdateEvent updateEvent) {

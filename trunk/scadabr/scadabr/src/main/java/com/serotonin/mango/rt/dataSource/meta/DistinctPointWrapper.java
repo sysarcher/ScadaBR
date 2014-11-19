@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import java.util.List;
 
@@ -63,9 +64,12 @@ abstract public class DistinctPointWrapper extends AbstractPointWrapper {
     }
 
     private StartsAndRuntimeList getStats(long from, long to) {
-        PointValueTime start = point.getPointValueBefore(from);
-        List<PointValueTime> values = point.getPointValuesBetween(from, to);
-        StartsAndRuntimeList stats = new StartsAndRuntimeList(start, values, from, to);
-        return stats;
+        throw new ImplementMeException();
+        /*
+         PointValueTime start = point.getPointValueBefore(from);
+         List<PointValueTime> values = point.getPointValuesBetween(from, to);
+         StartsAndRuntimeList stats = new StartsAndRuntimeList(start, values, from, to);
+         return stats;
+         */
     }
 }

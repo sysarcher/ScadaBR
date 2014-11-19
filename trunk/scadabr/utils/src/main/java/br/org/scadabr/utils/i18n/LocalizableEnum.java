@@ -8,7 +8,13 @@ package br.org.scadabr.utils.i18n;
 /**
  *
  * @author aploese
+ * @param <E>
  */
 public interface LocalizableEnum<E extends Enum<E>> extends LocalizableMessage {
     
+    /**
+     * name() as bean property.
+     * @return 
+     */
+    String getName();
 }

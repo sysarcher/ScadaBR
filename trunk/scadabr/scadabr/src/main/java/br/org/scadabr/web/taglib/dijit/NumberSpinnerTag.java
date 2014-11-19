@@ -13,31 +13,28 @@ import org.springframework.web.servlet.tags.form.TagWriter;
  *
  * @author aploese
  */
-public class TextBoxTag extends AbstractHtmlInputElementTag {
+public class NumberSpinnerTag extends AbstractHtmlInputElementTag {
 
     private String i18nLabel;
     private String i18nTitle;
-    private String type;
 
     @Override
     public void release() {
         super.release();
         i18nLabel = null;
         i18nTitle = null;
-        type = null;
     }
 
     @Override
     protected int writeTagContent(TagWriter tagWriter) throws JspException {
         tagWriter.startTag("input");
         writeDefaultAttributes(tagWriter);
-        tagWriter.writeOptionalAttributeValue("type", type);
         final String value = getValue();
         tagWriter.writeAttribute("value", value);
         // custom optional attributes
         tagWriter.writeAttribute("label", getRequestContext().getMessage(i18nLabel) + ":");
         tagWriter.writeAttribute("title", getRequestContext().getMessage(i18nTitle != null ? i18nTitle : i18nLabel));
-        tagWriter.writeAttribute("data-dojo-type", "dijit/form/TextBox");
+        tagWriter.writeAttribute("data-dojo-type", "dijit/form/NumberSpinner");
 
         tagWriter.endTag();
         return SKIP_BODY;
@@ -68,13 +65,6 @@ public class TextBoxTag extends AbstractHtmlInputElementTag {
      */
     public void setI18nTitle(String i18nTitle) {
         this.i18nTitle = i18nTitle;
-    }
-
-    /**
-     * @param type the type to set
-     */
-    public void setType(String type) {
-        this.type = type;
     }
 
 }

@@ -33,6 +33,11 @@ public enum AuditEventSource implements LocalizableEnum<AuditEventSource> {
     }
 
     @Override
+    public String getName() {
+        return name();
+    }
+    
+    @Override
     public String getI18nKey() {
         return i18nKey;
     }

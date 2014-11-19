@@ -20,6 +20,7 @@ package com.serotonin.mango.rt.maint;
 
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.timer.cron.SystemCronTask;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.LoggingTypes;
 import com.serotonin.mango.Common;
@@ -46,7 +47,7 @@ import org.springframework.beans.factory.annotation.Configurable;
 @Configurable
 public class DataPurge {
 
-    private final static  Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_CORE);
+    private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_CORE);
     @Autowired
     private RuntimeManager runtimeManager;
     @Autowired
@@ -61,7 +62,7 @@ public class DataPurge {
     private PointValueDao pointValueDao;
     @Autowired
     private Common common;
-    
+
     private long runtime;
 
     private final RuntimeManager rm = runtimeManager;
@@ -96,18 +97,14 @@ public class DataPurge {
     }
 
     private long purgePoint(DataPointVO dataPoint) {
-        if (dataPoint.getLoggingType() == LoggingTypes.NONE) // If there is no logging, then there should be no data, unless logging was just changed to none. In either
-        // case, it's ok to delete everything.
-        {
-            return rm.purgeDataPointValues(dataPoint.getId());
-        }
 
-        // No matter when this purge actually runs, we want it to act like it's midnight.
+// No matter when this purge actually runs, we want it to act like it's midnight.
         DateTime cutoff = new DateTime(runtime);
         cutoff = TimePeriods.DAYS.truncateDateTime(cutoff);
         cutoff = dataPoint.getPurgeType().minus(cutoff, dataPoint.getPurgePeriod());
 
-        return rm.purgeDataPointValues(dataPoint.getId(), cutoff.getMillis());
+        throw new ImplementMeException();
+//        return rm.purgeDataPointValues(dataPoint.getId(), cutoff.getMillis());
     }
 
     private void filedataPurge() {

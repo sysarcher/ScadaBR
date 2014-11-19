@@ -474,44 +474,6 @@ public class RuntimeManager {
         }
     }
 
-    public long purgeDataPointValues() {
-        long count = pointValueDao.deleteAllPointData();
-        pointValueDao.compressTables();
-        for (Integer id : dataPoints.keySet()) {
-            updateDataPointValuesRT(id);
-        }
-        return count;
-    }
-
-    public long purgeDataPointValues(int dataPointId, TimePeriods periodType,
-            int periodCount) {
-        long before = periodType.minus(System.currentTimeMillis(), periodCount);
-        return purgeDataPointValues(dataPointId, before);
-    }
-
-    public long purgeDataPointValues(int dataPointId) {
-        long count = pointValueDao.deletePointValues(dataPointId);
-        updateDataPointValuesRT(dataPointId);
-        return count;
-    }
-
-    public long purgeDataPointValues(int dataPointId, long before) {
-        long count = pointValueDao.deletePointValuesBefore(dataPointId,
-                before);
-        if (count > 0) {
-            updateDataPointValuesRT(dataPointId);
-        }
-        return count;
-    }
-
-    private void updateDataPointValuesRT(int dataPointId) {
-        DataPointRT dataPoint = dataPoints.get(dataPointId);
-        if (dataPoint != null) // Enabled. Reset the point's cache.
-        {
-            dataPoint.resetValues();
-        }
-    }
-
     public void addPointToHierarchy(DataPointVO dp, String... pathToPoint) {
         dataPointDao.addPointToHierarchy(dp, pathToPoint);
     }
