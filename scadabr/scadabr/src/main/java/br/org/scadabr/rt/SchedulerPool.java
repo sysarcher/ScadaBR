@@ -7,8 +7,10 @@ package br.org.scadabr.rt;
 
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.timer.CronTimerPool;
+import br.org.scadabr.timer.cron.DataSourceCallable;
 import br.org.scadabr.timer.cron.DataSourceCronTask;
 import br.org.scadabr.timer.cron.DataSourceRunnable;
+import br.org.scadabr.timer.cron.EventCallable;
 import br.org.scadabr.timer.cron.EventCronTask;
 import br.org.scadabr.timer.cron.EventRunnable;
 import br.org.scadabr.timer.cron.SystemCallable;
@@ -92,14 +94,34 @@ public class SchedulerPool {
     public SchedulerPool() {
     }
 
-    public void execute(DataSourceRunnable runnable) {
-        dataSourcePool.execute(runnable);
+    public <T> Future<T> submit(DataSourceCallable<T> t) throws InterruptedException {
+        return dataSourcePool.submit(t);
     }
-
+    
     public <T> Future<T> submit(SystemCallable<T> t) throws InterruptedException {
         return systemPool.submit(t);
     }
     
+    public <T> Future<T> submit(EventCallable<T> t) throws InterruptedException {
+        return eventPool.submit(t);
+    }
+    
+    public Future<?> submit(DataSourceRunnable runnable) {
+        return dataSourcePool.submit(runnable);
+    }
+
+    public Future<?> submit(SystemRunnable runnable) {
+        return systemPool.submit(runnable);
+    }
+
+    public Future<?> submit(EventRunnable runnable) {
+        return eventPool.submit(runnable);
+    }
+
+    public void execute(DataSourceRunnable runnable) {
+        dataSourcePool.execute(runnable);
+    }
+
     public void execute(SystemRunnable runnable) {
         systemPool.execute(runnable);
     }
