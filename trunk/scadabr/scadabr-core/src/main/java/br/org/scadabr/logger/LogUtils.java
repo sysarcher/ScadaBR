@@ -21,6 +21,8 @@ public class LogUtils {
 
     public final static String LOGGER_SCARABR_BACNET_IP = "scadabr-bacnetip";
     
+    public final static String LOGGER_SCARABR_DS_META = "scadabr-ds-meta";  
+
     public final static String LOGGER_SCADABR_CORE = "scadabr-core";
     
     public final static String LOGGER_SCADABR_DWR = "scadabe-dwr";

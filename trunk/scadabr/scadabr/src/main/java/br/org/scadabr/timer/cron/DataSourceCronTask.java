@@ -6,7 +6,7 @@
 package br.org.scadabr.timer.cron;
 
 import br.org.scadabr.timer.CronTask;
-import com.serotonin.mango.rt.dataSource.PollingDataSource;
+import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import java.text.ParseException;
 import java.util.TimeZone;
 
@@ -14,28 +14,18 @@ import java.util.TimeZone;
  *
  * @author aploese
  */
-public class DataSourceCronTask extends CronTask {
+public abstract class DataSourceCronTask<T extends DataSourceRT> extends CronTask {
 
-    private final PollingDataSource dataSource;
+    protected final T dataSource;
     
-    public DataSourceCronTask(PollingDataSource dataSource, String cronPattern, TimeZone tz) throws ParseException {
+    public DataSourceCronTask(T dataSource, String cronPattern, TimeZone tz) throws ParseException {
         super(cronPattern, tz);
         this.dataSource = dataSource;
     }
 
-    public DataSourceCronTask(PollingDataSource dataSource, CronExpression cronExpression) {
+    public DataSourceCronTask(T dataSource, CronExpression cronExpression) {
         super(cronExpression);
         this.dataSource = dataSource;
-    }
-
-    @Override
-    protected void run(long scheduledExecutionTime) {
-        dataSource.doPoll(scheduledExecutionTime);
-    }
-
-    @Override
-    protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
-        return dataSource.overrunDetected(lastExecutionTime, thisExecutionTime);
     }
 
 }

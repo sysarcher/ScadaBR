@@ -40,7 +40,6 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.timer.cron.EventRunnable;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.CompoundDetectorEventType;
@@ -62,6 +61,7 @@ import br.org.scadabr.vo.event.EventStatus;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.i18n.LocalizableMessageParseException;
+import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.type.AuditEventSource;
@@ -85,13 +85,15 @@ public class EventDao extends BaseDao {
 
     @Inject
     private UserDao userDao;
+    @Inject
+    private SchedulerPool schedulerPool;
     
     public EventDao() {
         super();
     }
 
     public void saveEvent(EventInstance event) {
-        if (event.getId() == Common.NEW_ID) {
+        if (event.isNew()) {
             insertEvent(event);
         } else {
             updateEvent(event);
@@ -264,7 +266,7 @@ public class EventDao extends BaseDao {
             // This is a potentially long running query, so run it offline.
             userEvents = Collections.emptyList();
             addToCache(userId, userEvents);
-            Common.eventCronPool.execute(new UserPendingEventRetriever(userId));
+            schedulerPool.execute(new UserPendingEventRetriever(userId));
         }
 
         List<EventInstance> list = null;
@@ -819,7 +821,7 @@ public class EventDao extends BaseDao {
                     @Override
                     protected void doInTransactionWithoutResult(
                             TransactionStatus status) {
-                                if (handler.getId() == Common.NEW_ID) {
+                                if (handler.isNew()) {
                                     insertEventHandler(evetnSource, typeRef1, typeRef2,
                                             handler);
                                 } else {

@@ -18,31 +18,33 @@
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.script.ScriptException;
 
-import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.IntValuePair;
+import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.rt.SchedulerPool;
+import br.org.scadabr.rt.datasource.PollingPointLocatorRT;
+import br.org.scadabr.rt.datasource.meta.ScriptExecutor;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointListener;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
-import br.org.scadabr.timer.AbstractTimer;
-import br.org.scadabr.timer.cron.CronExpression;
-import br.org.scadabr.timer.OneTimeTrigger;
-import br.org.scadabr.timer.TimerTask;
-import br.org.scadabr.timer.cron.CronParser;
+import br.org.scadabr.timer.cron.DataSourceCronTask;
+import br.org.scadabr.timer.cron.PointLocatorCronTask;
+import br.org.scadabr.timer.cron.PollingDataSourceCronTask;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.datasource.meta.UpdateEvent;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -50,21 +52,22 @@ import org.springframework.beans.factory.annotation.Configurable;
  * @author Matthew Lohbihler
  */
 @Configurable
-public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> implements DataPointListener {
+public class MetaPointLocatorRT extends PollingPointLocatorRT<MetaPointLocatorVO, MetaDataSourceRT> implements DataPointListener {
+
+    private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCARABR_DS_META);
 
     private static final ThreadLocal<List<Integer>> threadLocal = new ThreadLocal<>();
     private static final int MAX_RECURSION = 10;
     @Autowired
     private RuntimeManager runtimeManager;
-
+    @Autowired
+    private SchedulerPool schedulerPool;
+    
     final Object LOCK = new Object();
 
-    AbstractTimer timer;
-    private MetaDataSourceRT dataSource;
-    protected DataPointRT dataPoint;
     protected Map<String, IDataPoint> context;
     boolean initialized;
-    TimerTask timerTask;
+    private PointLocatorCronTask pollingCronTask;
 
     public MetaPointLocatorRT(MetaPointLocatorVO vo) {
         super(vo);
@@ -79,32 +82,30 @@ public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> imple
     // the RuntimeManager. The owning data source calls these methods then the point is added and removed from the
     // data source.
     //
-    public void initialize(AbstractTimer timer, MetaDataSourceRT dataSource, DataPointRT dataPoint) {
-        this.timer = timer;
-        this.dataSource = dataSource;
-        this.dataPoint = dataPoint;
+    @Override
+    public void start(MetaDataSourceRT dsRT, DataPointRT dataPoint) {
+        super.start(dsRT, dataPoint);
 
         createContext();
 
         // Add listener registrations
-        RuntimeManager rm = runtimeManager;
         for (IntValuePair contextKey : vo.getContext()) {
             // Points shouldn't listen for their own updates.
             if (dataPoint.getId() != contextKey.getKey()) {
-                rm.addDataPointListener(contextKey.getKey(), this);
+                runtimeManager.addDataPointListener(contextKey.getKey(), this);
             }
         }
 
         initialized = true;
 
-        initializeTimerTask();
-    }
+        final UpdateEvent updateEvent = vo.getUpdateEvent();
+        if (updateEvent == UpdateEvent.CONTEXT_UPDATE) {
+        throw new ImplementMeException();
+                } else {
+            // Scheduled update. Create the timeout that will update this point.
+            pollingCronTask = new PointLocatorCronTask(dsRT, this, vo.getCronExpression());
+            schedulerPool.schedule(pollingCronTask);
 
-    protected void initializeTimerTask() {
-        UpdateEvent updateEvent = vo.getUpdateEvent();
-        if (updateEvent != UpdateEvent.CONTEXT_UPDATE) // Scheduled update. Create the timeout that will update this point.
-        {
-            timerTask = new ScheduledUpdateTimeout(calculateTimeout(timer.currentTimeMillis()));
         }
     }
 
@@ -117,8 +118,8 @@ public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> imple
             }
 
             // Cancel scheduled job
-            if (timerTask != null) {
-                timerTask.cancel();
+            if (pollingCronTask != null) {
+                pollingCronTask.cancel();
             }
 
             initialized = false;
@@ -156,10 +157,11 @@ public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> imple
             } else {
                 synchronized (LOCK) {
                     if (initialized) {
-                        if (timerTask != null) {
-                            timerTask.cancel();
+                        if (pollingCronTask != null) {
+                            pollingCronTask.cancel();
                         }
-                        timerTask = new ExecutionDelayTimeout(time, sourceIds);
+                        throw new ImplementMeException();
+                        // timerTask = new ExecutionDelayTimeout(time, sourceIds);
                     }
                 }
             }
@@ -174,74 +176,13 @@ public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> imple
     @Override
     public void pointInitialized() {
         createContext();
-        dataSource.checkForDisabledPoints();
+        dsRT.checkForDisabledPoints();
     }
 
     @Override
     public void pointTerminated() {
         createContext();
-        dataSource.checkForDisabledPoints();
-    }
-
-    //
-    //
-    // TimeoutClient
-    //
-    class ScheduledUpdateTimeout extends TimerTask {
-
-        ScheduledUpdateTimeout(long fireTime) {
-            super(new OneTimeTrigger(new Date(fireTime)));
-            timer.schedule(this);
-        }
-
-        @Override
-        public void run(long fireTime) {
-            // Execute the update
-            execute(fireTime - vo.getExecutionDelaySeconds() * 1000, new ArrayList<Integer>());
-
-            // Schedule the next timeout.
-            synchronized (LOCK) {
-                if (initialized) {
-                    timerTask = new ScheduledUpdateTimeout(calculateTimeout(fireTime));
-                }
-            }
-        }
-    }
-
-    long calculateTimeout(long time) {
-        UpdateEvent updateEvent = vo.getUpdateEvent();
-        long timeout;
-        if (updateEvent == UpdateEvent.CRON) {
-            try {
-                CronExpression ce = new CronParser().parse(vo.getUpdateCronPattern(), CronExpression.TIMEZONE_UTC);
-                timeout = ce.getNextValidTimeAfter(new Date(time)).getTime();
-            } catch (ParseException e) {
-                throw new ShouldNeverHappenException(e);
-            }
-        } else {
-            timeout = updateEvent.getTimePeriods().next(time);
-        }
-        return timeout + vo.getExecutionDelaySeconds() * 1000;
-    }
-
-    class ExecutionDelayTimeout extends TimerTask {
-
-        private final long updateTime;
-        private final List<Integer> sourceIds;
-
-        public ExecutionDelayTimeout(long updateTime, List<Integer> sourceIds) {
-            super(new OneTimeTrigger(new Date(updateTime + vo.getExecutionDelaySeconds() * 1000)));
-            this.updateTime = updateTime;
-            this.sourceIds = sourceIds;
-            timer.schedule(this);
-        }
-
-        @Override
-        public void run(long fireTime) {
-            // When this runs it is because there were no context updates within the delay period. Still, we want the
-            // reading to be published with the time of the context update, not the timeout fire time.
-            execute(updateTime, sourceIds);
-        }
+        dsRT.checkForDisabledPoints();
     }
 
     void execute(long runtime, List<Integer> sourceIds) {
@@ -252,7 +193,7 @@ public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> imple
         // Check if we've reached the maximum number of recursions for this point
         int count = 0;
         for (Integer id : sourceIds) {
-            if (id == dataPoint.getId()) {
+            if (id == dpRT.getId()) {
                 count++;
             }
         }
@@ -262,13 +203,12 @@ public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> imple
             return;
         }
 
-        sourceIds.add(dataPoint.getId());
+        sourceIds.add(dpRT.getId());
         threadLocal.set(sourceIds);
         try {
             ScriptExecutor executor = new ScriptExecutor();
             try {
-                PointValueTime pvt = executor.execute(vo.getScript(), context, timer.currentTimeMillis(),
-                        vo.getDataType(), runtime);
+                PointValueTime pvt = executor.execute(vo.getScript(), context, System.currentTimeMillis(), vo.getDataType(), runtime);
                 if (pvt.getValue() == null) {
                     handleError(runtime, new LocalizableMessageImpl("event.meta.nullResult"));
                 } else {
@@ -295,10 +235,29 @@ public class MetaPointLocatorRT extends PointLocatorRT<MetaPointLocatorVO> imple
     }
 
     protected void updatePoint(PointValueTime pvt) {
-        dataPoint.updatePointValue(pvt);
+        dpRT.updatePointValue(pvt);
     }
 
     protected void handleError(long runtime, LocalizableMessage message) {
-        dataSource.raiseScriptError(runtime, dataPoint, message);
+        ((MetaDataSourceRT)dsRT).raiseScriptError(runtime, dpRT, message);
     }
+   
+    protected List<Integer> getSourceIds() {
+         final List<Integer> result = threadLocal.get();
+         return result != null ? result : new ArrayList<Integer>();
+    }
+    
+    @Override
+    public void doPoll(long scheduledExecutionTime) {
+        execute(scheduledExecutionTime, getSourceIds());
+    }
+
+    @Override
+    public boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
+        //TODO dataSource.raiseOverrunError(runtime, dataPoint, message);
+            LOG.log(Level.WARNING, "{0}: poll at {1} aborted because a previous poll started at {2} is still running", new Object[]{vo.getName(), new Date(thisExecutionTime), new Date(lastExecutionTime)});
+            return false;
+    }
+
+
 }

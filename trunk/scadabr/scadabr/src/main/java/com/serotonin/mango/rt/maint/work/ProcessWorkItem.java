@@ -27,25 +27,29 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.io.StreamUtils;
+import br.org.scadabr.rt.SchedulerPool;
+import br.org.scadabr.timer.cron.SystemRunnable;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.BackgroundProcessing;
-import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.SystemEventSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
-public class ProcessWorkItem implements WorkItem {
+@Configurable
+public class ProcessWorkItem implements SystemRunnable {
 
+    @Autowired
+    private SchedulerPool schedulerPool; 
+    
     static final Log LOG = LogFactory.getLog(ProcessWorkItem.class);
     private static final int TIMEOUT = 15000; // 15 seconds
 
-    public static void queueProcess(String command) {
-        ProcessWorkItem item = new ProcessWorkItem(command);
-        Common.ctx.getBackgroundProcessing().addWorkItem(item);
+    public void queue() {
+        schedulerPool.execute(this);
     }
 
     final String command;
@@ -55,7 +59,7 @@ public class ProcessWorkItem implements WorkItem {
     }
 
     @Override
-    public void execute() {
+    public void run() {
         try {
             executeProcessCommand(command);
         } catch (IOException e) {
@@ -63,20 +67,19 @@ public class ProcessWorkItem implements WorkItem {
         }
     }
 
-    public static void executeProcessCommand(String command) throws IOException {
-        BackgroundProcessing bp = Common.ctx.getBackgroundProcessing();
+    public void executeProcessCommand(String command) throws IOException {
 
         Process process = Runtime.getRuntime().exec(command);
 
         InputReader out = new InputReader(process.getInputStream());
         InputReader err = new InputReader(process.getErrorStream());
 
-        bp.addWorkItem(out);
-        bp.addWorkItem(err);
+        schedulerPool.execute(out);
+        schedulerPool.execute(err);
 
         try {
             ProcessTimeout timeout = new ProcessTimeout(process, command);
-            bp.addWorkItem(timeout);
+            schedulerPool.execute(timeout);
 
             process.waitFor();
             out.join();
@@ -99,13 +102,13 @@ public class ProcessWorkItem implements WorkItem {
             throw new IOException("Timeout while running command: '" + command + "'");
         }
     }
-
+/*
     @Override
     public int getPriority() {
         return WorkItem.PRIORITY_HIGH;
     }
-
-    static class ProcessTimeout implements WorkItem {
+*/
+    static class ProcessTimeout implements SystemRunnable {
 
         private final Process process;
         private final String command;
@@ -116,11 +119,12 @@ public class ProcessWorkItem implements WorkItem {
             this.command = command;
         }
 
+        /*
         @Override
         public int getPriority() {
             return WorkItem.PRIORITY_HIGH;
         }
-
+*/
         public void interrupt() {
             synchronized (this) {
                 interrupted = true;
@@ -128,7 +132,8 @@ public class ProcessWorkItem implements WorkItem {
             }
         }
 
-        public void execute() {
+        @Override
+        public void run() {
             try {
                 synchronized (this) {
                     wait(TIMEOUT);
@@ -145,7 +150,7 @@ public class ProcessWorkItem implements WorkItem {
         }
     }
 
-    static class InputReader implements WorkItem {
+    static class InputReader implements SystemRunnable {
 
         private final InputStreamReader reader;
         private final StringWriter writer = new StringWriter();
@@ -170,14 +175,14 @@ public class ProcessWorkItem implements WorkItem {
                 }
             }
         }
-
+/*
         @Override
         public int getPriority() {
             return WorkItem.PRIORITY_HIGH;
         }
-
+*/
         @Override
-        public void execute() {
+        public void run() {
             try {
                 StreamUtils.transfer(reader, writer);
             } catch (IOException e) {

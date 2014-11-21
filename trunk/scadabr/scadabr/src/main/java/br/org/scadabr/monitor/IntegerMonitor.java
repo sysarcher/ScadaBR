@@ -11,6 +11,7 @@ import java.util.Objects;
  *
  * @author aploese
  */
+@Deprecated // Any Use 
 public class IntegerMonitor {
 
     private int value;

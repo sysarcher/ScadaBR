@@ -7,6 +7,7 @@ package br.org.scadabr.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
@@ -50,6 +51,12 @@ public class StreamUtils {
         }
 
         w.flush();
+    }
+
+    public static void transfer(InputStream is, Writer w) throws IOException {
+        try (InputStreamReader r = new InputStreamReader(is)) {
+            transfer(r, w);
+        }
     }
 
     public static int read4ByteSigned(InputStream in) throws IOException {

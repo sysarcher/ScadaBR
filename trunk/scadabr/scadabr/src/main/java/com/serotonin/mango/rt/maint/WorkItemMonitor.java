@@ -5,18 +5,25 @@ import java.util.Collection;
 
 import com.serotonin.mango.Common;
 import br.org.scadabr.monitor.IntegerMonitor;
+import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.SystemCronTask;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @Deprecated// "Whats this for?)"
+@Configurable
 public class WorkItemMonitor extends SystemCronTask {
 
+    
+    @Autowired
+    private SchedulerPool schedulerPool;
     /**
      * This method will set up the memory checking job. It assumes that the
      * corresponding system setting for running this job is true.
      */
-    public static void start() {
-        Common.systemCronPool.schedule(new WorkItemMonitor());
+    public void start() {
+        schedulerPool.schedule(this);
     }
 
     private final IntegerMonitor mediumPriorityServiceQueueSize = new IntegerMonitor(
@@ -28,7 +35,7 @@ public class WorkItemMonitor extends SystemCronTask {
     private final IntegerMonitor maxStackHeight = new IntegerMonitor("WorkItemMonitor.maxStackHeight", null);
     private final IntegerMonitor threadCount = new IntegerMonitor("WorkItemMonitor.threadCount", null);
 
-    private WorkItemMonitor() {
+    public WorkItemMonitor() {
         super(CronExpression.createPeriodBySecond(10, 0));
 
         Common.MONITORED_VALUES.addIfMissingStatMonitor(mediumPriorityServiceQueueSize);
@@ -43,8 +50,8 @@ public class WorkItemMonitor extends SystemCronTask {
         //BackgroundProcessing bp = Common.ctx.getBackgroundProcessing();
 
         mediumPriorityServiceQueueSize.setValue(0); //bp.getMediumPriorityServiceQueueSize());
-        scheduledTimerTaskCount.setValue(Common.systemCronPool.getPoolSize());
-        highPriorityServiceQueueSize.setValue(Common.systemCronPool.getActiveCount());
+        scheduledTimerTaskCount.setValue(schedulerPool.getSystemPoolSize());
+        highPriorityServiceQueueSize.setValue(schedulerPool.getSystemActiveCount());
 
         // Check the stack heights
         int max = 0;

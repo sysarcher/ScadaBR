@@ -19,6 +19,7 @@
 package com.serotonin.mango.rt.link;
 
 import br.org.scadabr.DataType;
+import br.org.scadabr.rt.datasource.meta.ScriptExecutor;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,6 @@ import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.meta.ResultTypeException;
-import com.serotonin.mango.rt.dataSource.meta.ScriptExecutor;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.work.SetPointWorkItem;
 import com.serotonin.mango.vo.link.PointLinkVO;

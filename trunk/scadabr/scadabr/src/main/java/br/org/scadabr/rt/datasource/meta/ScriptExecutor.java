@@ -16,10 +16,9 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.rt.dataSource.meta;
+package br.org.scadabr.rt.datasource.meta;
 
 import br.org.scadabr.DataType;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -35,7 +34,6 @@ import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.io.StreamUtils;
 import br.org.scadabr.utils.TimePeriods;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
@@ -45,6 +43,16 @@ import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
+import com.serotonin.mango.rt.dataSource.meta.AbstractPointWrapper;
+import com.serotonin.mango.rt.dataSource.meta.AlphanumericPointWrapper;
+import com.serotonin.mango.rt.dataSource.meta.BinaryPointWrapper;
+import com.serotonin.mango.rt.dataSource.meta.DataPointStateException;
+import com.serotonin.mango.rt.dataSource.meta.MultistatePointWrapper;
+import com.serotonin.mango.rt.dataSource.meta.NumericPointWrapper;
+import com.serotonin.mango.rt.dataSource.meta.ResultTypeException;
+import com.serotonin.mango.rt.dataSource.meta.WrapperContext;
+import java.io.InputStream;
+import java.util.Date;
 import javax.script.Invocable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -54,18 +62,18 @@ import org.springframework.beans.factory.annotation.Configurable;
  */
 @Configurable
 public class ScriptExecutor {
-
+    
     private static final String SCRIPT_PREFIX = "function __scriptExecutor__() {";
     private static final String SCRIPT_SUFFIX = "\r\n}";
-    private static String SCRIPT_FUNCTION_PATH;
-    private static String FUNCTIONS;
-
-    public static void setScriptFunctionPath(String path) {
-        SCRIPT_FUNCTION_PATH = path;
-    }
+    private String scriptFunctionPath = "scriptFunctions.js";
+    private String functions;
 
     @Autowired
     private RuntimeManager runtimeManager;
+
+    public ScriptExecutor() {
+        loadFunctions();
+    }
 
     public Map<String, IDataPoint> convertContext(List<IntValuePair> context) throws DataPointStateException {
         RuntimeManager rtm = runtimeManager;
@@ -84,7 +92,6 @@ public class ScriptExecutor {
 
     public PointValueTime execute(String script, Map<String, IDataPoint> context, long runtime,
             DataType dataType, long timestamp) throws ScriptException, ResultTypeException {
-        ensureFunctions();
 
         // Create the script engine.
         ScriptEngineManager manager;
@@ -133,7 +140,7 @@ public class ScriptExecutor {
         }
 
         // Create the script.
-        script = SCRIPT_PREFIX + script + SCRIPT_SUFFIX + FUNCTIONS;
+        script = SCRIPT_PREFIX + script + SCRIPT_SUFFIX + functions;
 
         // Execute.
         Object result = null;
@@ -217,28 +224,13 @@ public class ScriptExecutor {
         return new ScriptException(message, e.getFileName(), e.getLineNumber(), e.getColumnNumber());
     }
 
-    private static void ensureFunctions() {
-        if (FUNCTIONS == null) {
-            if (SCRIPT_FUNCTION_PATH == null) {
-                SCRIPT_FUNCTION_PATH = Common.ctx.getServletContext().getRealPath("/WEB-INF/scripts/scriptFunctions.js");
-            }
-            StringWriter sw = new StringWriter();
-            FileReader fr = null;
-            try {
-                fr = new FileReader(SCRIPT_FUNCTION_PATH);
-                StreamUtils.transfer(fr, sw);
-            } catch (IOException e) {
-                throw new ShouldNeverHappenException(e);
-            } finally {
-                try {
-                    if (fr != null) {
-                        fr.close();
-                    }
-                } catch (IOException e) {
-                    // no op
-                }
-            }
-            FUNCTIONS = sw.toString();
+    private void loadFunctions() {
+        StringWriter sw = new StringWriter();
+        try (InputStream is = ScriptExecutor.class.getResourceAsStream(scriptFunctionPath)) {
+            StreamUtils.transfer(is, sw);
+        } catch (IOException e) {
+            throw new ShouldNeverHappenException(e);
         }
+        functions = sw.toString();
     }
 }

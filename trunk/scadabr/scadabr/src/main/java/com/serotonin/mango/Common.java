@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango;
 
+import br.org.scadabr.ScadaBrConstants;
 import gnu.io.CommPortIdentifier;
 
 import java.io.File;
@@ -71,7 +72,7 @@ import javax.inject.Named;
 @Deprecated // Convert to singleton bean
 @Named
 public class Common {
-    
+
     @Inject
     private SystemSettingsDao systemSettingsDao;
 
@@ -83,17 +84,13 @@ public class Common {
     public static final String UTF8 = "UTF-8";
     public static final Charset UTF8_CS = Charset.forName(UTF8);
 
-    public static final int NEW_ID = -1;
+    @Deprecated
+    public static final int NEW_ID = ScadaBrConstants.NEW_ID;
     @Deprecated
     public static ContextWrapper ctx;
 
     //TODO inject this
     private static final ResourceBundle env = ResourceBundle.getBundle("env");
-
-    // This is initialized
-    public static CronTimerPool<DataSourceCronTask, DataSourceRunnable> dataSourcePool;
-    public static CronTimerPool<SystemCronTask, SystemRunnable> systemCronPool;
-    public static CronTimerPool<EventCronTask, EventRunnable> eventCronPool;
 
     @Deprecated // move to own bean ??? And what is monitored ???
     public static final MonitoredValues MONITORED_VALUES = new MonitoredValues();
@@ -403,15 +400,15 @@ public class Common {
 
     @Deprecated
     public static String getMessage(String key) {
-throw new ImplementMeException();
+        throw new ImplementMeException();
 // ensureI18n();
 //        return AbstractLocalizer.localizeI18nKey(key, systemBundle);
     }
 
     @Deprecated // Use per user settings ...
     public static ResourceBundle getBundle() {
-throw new ImplementMeException();
-    //    ensureI18n();
+        throw new ImplementMeException();
+        //    ensureI18n();
 //        return systemBundle;
     }
 

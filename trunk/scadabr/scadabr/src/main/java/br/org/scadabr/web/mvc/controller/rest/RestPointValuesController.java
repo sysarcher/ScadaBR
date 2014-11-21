@@ -9,6 +9,7 @@ import br.org.scadabr.logger.LogUtils;
 import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -34,7 +35,7 @@ public class RestPointValuesController {
     private transient PointValueDao pointValueDao;
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public List<JsonPointValue> getPointValues(@PathVariable int id, @RequestParam(value = "from", required = false) Long from, @RequestParam(value = "to",required = false) Long to) {
+    public List<JsonPointValue> getPointValues(@PathVariable int id, @RequestParam(value = "from", required = false) Long from, @RequestParam(value = "to", required = false) Long to) {
         if (from == null) {
             from = pointValueDao.getInceptionDate(id);
         }
@@ -45,11 +46,10 @@ public class RestPointValuesController {
             pvt = pointValueDao.getPointValuesBetween(id, from, to);
         }
         List<JsonPointValue> result = new ArrayList<>(pvt.size());
-        for (PointValueTime p: pvt) {
+        for (PointValueTime p : pvt) {
             result.add(new JsonPointValue(p.getTime(), p.getDoubleValue()));
         }
         return result;
     }
-
 
 }

@@ -19,6 +19,7 @@
 package com.serotonin.mango.vo.event;
 
 import br.org.scadabr.DataType;
+import br.org.scadabr.ScadaBrConstants;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -1033,5 +1034,9 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
 
     public int getInactiveScriptCommand() {
         return inactiveScriptCommand;
+    }
+
+    public boolean isNew() {
+        return id == ScadaBrConstants.NEW_ID;
     }
 }

@@ -55,6 +55,7 @@ import com.serotonin.mango.vo.bean.LongPair;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.springframework.dao.DataAccessException;
@@ -68,6 +69,8 @@ public class PointValueDao extends BaseDao {
     
     @Inject
     private Common common;
+    @Inject
+    private BatchWriteBehind batchWriteBehind;
     
     private final static List<UnsavedPointValue> UNSAVED_POINT_VALUES = new ArrayList<>();
     
@@ -80,6 +83,14 @@ public class PointValueDao extends BaseDao {
     
     public PointValueDao() {
         super();
+    }
+    
+    @PostConstruct
+    @Override
+    public void init() {
+        super.init();
+        // Use our ejt, so that there is no tranaction boundary... // otherwise we wont see the values written there here
+        batchWriteBehind.init(daf);
     }
     
     /**
@@ -229,8 +240,7 @@ public class PointValueDao extends BaseDao {
         dvalue = daf.getDatabaseAccess().applyBounds(dvalue);
         
         if (async) {
-if (true) throw new ImplementMeException(); //TODO Just to make this compile ...
-//BatchWriteBehind.add(new BatchWriteBehindEntry(pointId, dataType, dvalue, time, this), ejt);
+            batchWriteBehind.add(new BatchWriteBehindEntry(pointId, dataType, dvalue, time), ejt);
             return -1;
         }
         

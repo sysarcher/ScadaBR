@@ -35,7 +35,7 @@ function min() {
 }
 
 function avg() {
-    if (arguments.length == 0)
+    if (arguments.length === 0)
         return 0;
 
     var sum = 0;

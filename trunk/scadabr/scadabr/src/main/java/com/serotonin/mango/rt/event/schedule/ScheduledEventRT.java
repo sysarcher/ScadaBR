@@ -20,10 +20,8 @@ package com.serotonin.mango.rt.event.schedule;
 
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.rt.event.type.DuplicateHandling;
-import com.serotonin.mango.Common;
+import br.org.scadabr.rt.SchedulerPool;
 import com.serotonin.mango.rt.event.SimpleEventDetector;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.ScheduledEventType;
 import com.serotonin.mango.util.timeout.RunWithArgClient;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
@@ -33,11 +31,14 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.util.timeout.EventRunWithArgTask;
 import java.text.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  *
  */
+@Configurable
 public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgClient<Boolean> {
     
     private final ScheduledEventVO vo;
@@ -45,6 +46,9 @@ public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgC
     private boolean eventActive;
     private EventRunWithArgTask<Boolean> activeTask;
     private EventRunWithArgTask<Boolean> inactiveTask;
+    @Autowired
+    private SchedulerPool schedulerPool;
+    
     
     public ScheduledEventRT(ScheduledEventVO vo) {
         this.vo = vo;
@@ -106,12 +110,12 @@ public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgC
         // Schedule the active event.
         CronExpression activeTrigger = createTrigger(true);
         activeTask = new EventRunWithArgTask<>(activeTrigger, this, true);
-        Common.eventCronPool.schedule(activeTask);
+        schedulerPool.schedule(activeTask);
         
         if (vo.isStateful()) {
             CronExpression inactiveTrigger = createTrigger(false);
             inactiveTask = new EventRunWithArgTask<>(inactiveTrigger, this, false);
-            Common.eventCronPool.schedule(inactiveTask);
+            schedulerPool.schedule(inactiveTask);
             
             if (vo.getScheduleType() != ScheduledEventVO.TYPE_ONCE) {
                 // Check if we are currently active.

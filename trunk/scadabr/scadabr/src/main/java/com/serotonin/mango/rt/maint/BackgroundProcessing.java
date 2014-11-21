@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.maint;
 
+import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.SystemRunnable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,6 +32,8 @@ import org.apache.commons.logging.LogFactory;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.maint.work.WorkItem;
 import br.org.scadabr.util.ILifecycle;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * A cheesy name for a class, i know, but it pretty much says it like it is.
@@ -39,13 +42,18 @@ import br.org.scadabr.util.ILifecycle;
  *
  * @author Matthew Lohbihler
  */
+@Configurable
+@Deprecated // use a SystemRunnable ...
 public class BackgroundProcessing implements ILifecycle {
 
     public static final String JOB_NAME = BackgroundProcessing.class.getName();
     public static final String JOB_GROUP = "maintenance";
 
-    final Log log = LogFactory.getLog(BackgroundProcessing.class);
+    final static Log log = LogFactory.getLog(BackgroundProcessing.class);
 
+    @Autowired
+    private SchedulerPool schedulerPool;
+    
 //    private ThreadPoolExecutor mediumPriorityService;
 //    private ExecutorService lowPriorityService;
 
@@ -65,7 +73,7 @@ public class BackgroundProcessing implements ILifecycle {
             }
         };
 
-            Common.systemCronPool.execute(runnable);
+            schedulerPool.execute(runnable);
 /*
             if (item.getPriority() == WorkItem.PRIORITY_HIGH) {
             Common.systemCronPool.execute(runnable);

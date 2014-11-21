@@ -21,20 +21,27 @@ package com.serotonin.mango.rt.dataSource;
 import br.org.scadabr.utils.ImplementMeException;
 
 import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.DataSourceCronTask;
+import br.org.scadabr.timer.cron.PollingDataSourceCronTask;
 import br.org.scadabr.utils.TimePeriods;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
+@Configurable
 abstract public class PollingDataSource<T extends DataSourceVO<T>> extends DataSourceRT<T> {
 
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCARABR_DS_RT);
 
+    @Autowired
+    private SchedulerPool schedulerPool;
+    
     private DataSourceCronTask timerTask;
 
     public PollingDataSource(T vo, boolean doCache) {
@@ -47,12 +54,10 @@ abstract public class PollingDataSource<T extends DataSourceVO<T>> extends DataS
     //
     // Data source interface
     //
-    @Override
     public void beginPolling() {
         try {
-            timerTask = new DataSourceCronTask(this, getCronExpression());
-            super.beginPolling();
-            Common.dataSourcePool.schedule(timerTask);
+            timerTask = new PollingDataSourceCronTask(this, getCronExpression());
+            schedulerPool.schedule(timerTask);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
