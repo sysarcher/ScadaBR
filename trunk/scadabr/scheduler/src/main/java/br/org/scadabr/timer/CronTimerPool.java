@@ -112,6 +112,10 @@ public class CronTimerPool<T extends CronTask, V extends Runnable> {
         tpe.execute(r);
     }
 
+    public Future<?> submit(V r) {
+        return tpe.submit(r);
+    }
+
     public int getPoolSize() {
         return tpe.getPoolSize();
     }
