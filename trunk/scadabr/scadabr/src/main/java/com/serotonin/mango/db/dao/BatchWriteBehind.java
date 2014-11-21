@@ -12,8 +12,11 @@ import br.org.scadabr.timer.cron.SystemRunnable;
 import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.db.DatabaseAccessFactory;
 import java.util.ArrayDeque;
+import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,23 +33,23 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @Named
 class BatchWriteBehind {
 
-    class BatchWriteBehindChunk implements SystemRunnable {
+    class BatchWriteBehindCallable implements Callable<Integer> {
 
-        private final JdbcTemplate ejt;
+        private JdbcTemplate ejt;
+        private Future<Integer> future;
+        private boolean sheduledOrRunning;
+        private final Object sheduledOrRunningLock = new Object();
 
-        public BatchWriteBehindChunk(JdbcTemplate ejt) {
-            this.ejt = ejt;
+        public BatchWriteBehindCallable() {
         }
-        
+
         @Override
-        public void run() {
+        public Integer call() {
+            int entriesWritten = 0;
             try {
                 BatchWriteBehindEntry[] inserts;
-                while (true) {
+                while (!entriesToWrite.isEmpty()) {
                     synchronized (entriesToWrite) {
-                        if (entriesToWrite.size() == 0) {
-                            break;
-                        }
                         inserts = new BatchWriteBehindEntry[entriesToWrite.size() < maxRows ? entriesToWrite.size() : maxRows];
                         for (int i = 0; i < inserts.length; i++) {
                             inserts[i] = entriesToWrite.remove();
@@ -68,6 +71,7 @@ class BatchWriteBehind {
                     while (true) {
                         try {
                             final int count = ejt.update(sb.toString(), params);
+                            entriesWritten += count;
                             if (LOG.isLoggable(Level.FINEST)) {
                                 LOG.log(Level.FINEST, "Concurrency saving SUCCESS {0}", count);
                             }
@@ -94,8 +98,12 @@ class BatchWriteBehind {
                         }
                     }
                 }
+                return entriesWritten;
             } finally {
-                chunks.remove(this);
+                synchronized (sheduledOrRunningLock) {
+                    future = null;
+                    sheduledOrRunning = false;
+                }
             }
         }
 
@@ -103,21 +111,16 @@ class BatchWriteBehind {
 
     static final int POINT_VALUE_INSERT_VALUES_COUNT = 4;
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_DAO);
-    private final static int SPAWN_THRESHOLD = 10000;
-    private final static int MAX_INSTANCES = 5;
+    private final BatchWriteBehindCallable batchWriteBehindCallable;
 
     @Inject
     private SchedulerPool schedulerPool;
     /**
-     * 
+     *
      * BatchWriteBehindEntry are collected until a minimum size s reached.
      */
-    private final Queue<BatchWriteBehindEntry> entriesToWrite = new ArrayDeque<>();
+    private final Queue<BatchWriteBehindEntry> entriesToWrite = new LinkedList<>();
 
-    /**
-     * This are the cunks that are written to the database
-     */
-    private final CopyOnWriteArrayList<BatchWriteBehindChunk> chunks = new CopyOnWriteArrayList<>();
     private int maxRows;
 
     public void init(DatabaseAccessFactory daf) {
@@ -140,22 +143,44 @@ class BatchWriteBehind {
     void add(BatchWriteBehindEntry e, JdbcTemplate ejt) {
         synchronized (entriesToWrite) {
             entriesToWrite.add(e);
-            if (entriesToWrite.size() > chunks.size() * SPAWN_THRESHOLD) {
-                if (chunks.size() < MAX_INSTANCES) {
-                    BatchWriteBehindChunk bwb = new BatchWriteBehindChunk(ejt);
-                    chunks.add(bwb);
-                    try {
-                        schedulerPool.execute(bwb);
-                    } catch (RejectedExecutionException ree) {
-                        chunks.remove(bwb);
-                        throw ree;
-                    }
-                }
+            if (entriesToWrite.size() > maxRows) {
+                flush(ejt);
             }
         }
     }
 
     public BatchWriteBehind() {
+        batchWriteBehindCallable = new BatchWriteBehindCallable();
+    }
+
+    /**
+     *
+     * @param ejt
+     * @return a Future if any data to write otherwise null.
+     */
+    public Future<Integer> flush(JdbcTemplate ejt) {
+        synchronized (batchWriteBehindCallable) {
+            Future<Integer> f = batchWriteBehindCallable.future; 
+            if (f != null) {
+                return f;
+            }
+            try {
+                if (entriesToWrite.isEmpty()) {
+                    return null;
+                }
+                batchWriteBehindCallable.ejt = ejt;
+                batchWriteBehindCallable.sheduledOrRunning = true;
+                f = schedulerPool.systemPoolInvoke(batchWriteBehindCallable);
+                synchronized (batchWriteBehindCallable.sheduledOrRunningLock) {
+                    if (batchWriteBehindCallable.sheduledOrRunning) 
+                        batchWriteBehindCallable.future = f;
+                }
+            } catch (InterruptedException ex) {
+                LOG.log(Level.SEVERE, null, ex);
+                throw new RuntimeException("Cant flush", ex);
+            }
+            return batchWriteBehindCallable.future;
+        }
     }
 
 }
