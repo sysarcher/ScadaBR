@@ -37,7 +37,6 @@ import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.db.RowCallback;
 import br.org.scadabr.db.spring.IntValuePairRowMapper;
 import br.org.scadabr.io.StreamUtils;
-import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.ImageSaveException;
 import com.serotonin.mango.rt.dataImage.AnnotatedPointValueTime;
@@ -58,7 +57,6 @@ import java.sql.Statement;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -90,7 +88,7 @@ public class PointValueDao extends BaseDao {
         super();
     }
 
-    protected void waitForWriteBehind() {
+    protected void flushWriteBehind() {
         try {
             final Future<Integer> f = batchWriteBehind.flush(ejt);
             if (f == null) {
@@ -115,7 +113,7 @@ public class PointValueDao extends BaseDao {
      */
     @PreDestroy
     public void shutdown() {
-        waitForWriteBehind();
+        flushWriteBehind();
     }
 
     /**
@@ -340,7 +338,7 @@ public class PointValueDao extends BaseDao {
             + "  left join pointValueAnnotations pva on pv.id = pva.pointValueId";
 
     public List<PointValueTime> getPointValues(final int dataPointId, final long since) {
-        waitForWriteBehind();
+        flushWriteBehind();
         List<PointValueTime> result = ejt.query(new PreparedStatementCreator() {
 
             @Override
@@ -359,7 +357,7 @@ public class PointValueDao extends BaseDao {
 
     public List<PointValueTime> getPointValuesBetween(final int dataPointId,
             final long from, final long to) {
-        waitForWriteBehind();
+        flushWriteBehind();
         List<PointValueTime> result = ejt.query(new PreparedStatementCreator() {
 
             @Override
@@ -415,7 +413,7 @@ public class PointValueDao extends BaseDao {
 
     //TODO replace with queryforObject
     public PointValueTime getLatestPointValue(final int dataPointId) {
-        waitForWriteBehind();
+        flushWriteBehind();
         //TODO optimaze into one hit of the db???
         final Long maxTs = ejt.queryForObject("select max(ts) from pointValues where dataPointId=?", Long.class, dataPointId);
         if (maxTs == null) {
@@ -439,7 +437,7 @@ public class PointValueDao extends BaseDao {
     }
 
     private PointValueTime getPointValue(final long id) {
-        waitForWriteBehind();
+        flushWriteBehind();
         List<PointValueTime> result = ejt.query(new PreparedStatementCreator() {
 
             @Override
@@ -457,7 +455,7 @@ public class PointValueDao extends BaseDao {
     }
 
     public PointValueTime getPointValueBefore(int dataPointId, long time) {
-        waitForWriteBehind();
+        flushWriteBehind();
         try {
             final Long valueTime = ejt.queryForObject(
                     "select max(ts) from pointValues where dataPointId=? and ts<?",
@@ -469,7 +467,7 @@ public class PointValueDao extends BaseDao {
     }
 
     public PointValueTime getPointValueAt(final int dataPointId, final long time) {
-        waitForWriteBehind();
+        flushWriteBehind();
         List<PointValueTime> result = ejt.query(new PreparedStatementCreator() {
 
             @Override
@@ -489,7 +487,7 @@ public class PointValueDao extends BaseDao {
 
     public void getPointValuesBetween(int dataPointId, long from, long to,
             final RowCallback<PointValueTime> callback) {
-        waitForWriteBehind();
+        flushWriteBehind();
         ejt.query(POINT_VALUE_SELECT
                 + " where pv.dataPointId=? and pv.ts >= ? and pv.ts<? order by ts",
                 new Object[]{dataPointId, from, to},
@@ -613,7 +611,7 @@ public class PointValueDao extends BaseDao {
 
     public void getPointValuesBetween(List<Integer> dataPointIds, long from,
             long to, final RowCallback<IdPointValueTime> callback) {
-        waitForWriteBehind();
+        flushWriteBehind();
         String ids = createDelimitedList(dataPointIds, ",");
         ejt.query(POINT_ID_VALUE_SELECT + " where pv.dataPointId in (" + ids
                 + ") and pv.ts >= ? and pv.ts<? order by ts", new Object[]{
@@ -680,7 +678,7 @@ public class PointValueDao extends BaseDao {
     }
 
     public long dateRangeCount(int dataPointId, long from, long to) {
-        waitForWriteBehind();
+        flushWriteBehind();
         return ejt
                 .queryForLong(
                         "select count(*) from pointValues where dataPointId=? and ts>=? and ts<=?",
@@ -688,7 +686,7 @@ public class PointValueDao extends BaseDao {
     }
 
     public long getInceptionDate(int dataPointId) {
-        waitForWriteBehind();
+        flushWriteBehind();
         try {
             return ejt.queryForObject("select min(ts) from pointValues where dataPointId=?",
                     Long.class,
@@ -699,7 +697,7 @@ public class PointValueDao extends BaseDao {
     }
 
     public long getStartTime(List<Integer> dataPointIds) {
-        waitForWriteBehind();
+        flushWriteBehind();
         if (dataPointIds.isEmpty()) {
             return -1;
         }
@@ -709,7 +707,7 @@ public class PointValueDao extends BaseDao {
     }
 
     public long getEndTime(List<Integer> dataPointIds) {
-        waitForWriteBehind();
+        flushWriteBehind();
         if (dataPointIds.isEmpty()) {
             return -1;
         }
@@ -719,7 +717,7 @@ public class PointValueDao extends BaseDao {
     }
 
     public LongPair getStartAndEndTime(List<Integer> dataPointIds) {
-        waitForWriteBehind();
+        flushWriteBehind();
         if (dataPointIds.isEmpty()) {
             return null;
         }
@@ -744,7 +742,7 @@ public class PointValueDao extends BaseDao {
     }
 
     public List<Long> getFiledataIds() {
-        waitForWriteBehind();
+        flushWriteBehind();
         final StringBuilder sb = new StringBuilder();
         sb.append("select distinct id from ( ");
         sb.append("  select id as id from pointValues where dataType=");

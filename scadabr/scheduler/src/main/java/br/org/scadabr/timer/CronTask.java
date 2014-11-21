@@ -32,6 +32,8 @@ public abstract class CronTask {
     /**
      * An Overrrun has occured, should this task run again???
      *
+     * @param lastExecutionTime
+     * @param thisExecutionTime
      * @return true, if Task should scheduled, false if it should not run.
      */
     protected abstract boolean overrunDetected(long lastExecutionTime, long thisExecutionTime);
@@ -75,7 +77,9 @@ public abstract class CronTask {
         @Override
         public void run() {
             try {
+                LOG.log(Level.FINEST, "Start Task {0}", CronTask.this);
                 CronTask.this.run(executionTime);
+                LOG.log(Level.FINEST, "Task finished {0}", CronTask.this);
             } catch (Throwable t) {
                 CronTask.this.handleException(t);
             } finally {
@@ -85,10 +89,6 @@ public abstract class CronTask {
                     }
                 }
             }
-        }
-
-        private Exception OverrideDieException() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
 
