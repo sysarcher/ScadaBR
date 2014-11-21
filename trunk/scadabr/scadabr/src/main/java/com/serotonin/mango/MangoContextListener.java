@@ -40,9 +40,7 @@ import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverMulticaster;
 import com.serotonin.mango.rt.event.type.SystemEventType;
-import com.serotonin.mango.rt.maint.BackgroundProcessing;
 import com.serotonin.mango.rt.maint.DataPurge;
-import com.serotonin.mango.rt.maint.WorkItemMonitor;
 import com.serotonin.mango.util.BackgroundContext;
 import com.serotonin.mango.view.DynamicImage;
 import com.serotonin.mango.view.ImageSet;
@@ -168,24 +166,12 @@ public class MangoContextListener implements ServletContextListener {
     // Utilities.
     //
     private void utilitiesInitialize(ServletContext ctx) {
-        // Except for the BackgroundProcessing process, which is a thread of its
-        // own and manages itself by using
-        // a blocking queue.
-        BackgroundProcessing bp = new BackgroundProcessing();
-        bp.initialize();
-        ctx.setAttribute(Common.ContextKeys.BACKGROUND_PROCESSING, bp);
-
         // HTTP receiver multicaster
         ctx.setAttribute(Common.ContextKeys.HTTP_RECEIVER_MULTICASTER, new HttpReceiverMulticaster());
 
     }
 
     private void utilitiesTerminate(ContextWrapper ctx) {
-        BackgroundProcessing bp = ctx.getBackgroundProcessing();
-        if (bp != null) {
-            bp.terminate();
-            bp.joinTermination();
-        }
     }
 
     private void terminateEventManager() {
@@ -343,7 +329,7 @@ public class MangoContextListener implements ServletContextListener {
         // instances even out over time.
 
         //TODO ask serotoninsoftware for new versions ??? Not anymore ;-) VersionCheck.start("0 0 0 0 * * * *");
-        new WorkItemMonitor();
+        // new WorkItemMonitor();
 
         // MemoryCheck.start();
     }

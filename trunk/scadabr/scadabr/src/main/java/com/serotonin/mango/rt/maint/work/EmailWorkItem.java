@@ -18,16 +18,16 @@
  */
 package com.serotonin.mango.rt.maint.work;
 
+import br.org.scadabr.rt.SchedulerPool;
+import br.org.scadabr.timer.cron.SystemRunnable;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.web.email.MangoEmailContent;
 import br.org.scadabr.web.email.EmailContent;
 import br.org.scadabr.web.email.EmailSender;
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.SystemEventSource;
 import java.io.UnsupportedEncodingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,43 +38,45 @@ import org.springframework.beans.factory.annotation.Configurable;
  *
  */
 @Configurable
-public class EmailWorkItem implements WorkItem {
+public class EmailWorkItem implements SystemRunnable {
 
     @Autowired
     private SystemSettingsDao  systemSettingsDao;
+    @Autowired
+    private SchedulerPool schedulerPool;
     
+    /*
     @Override
     public int getPriority() {
         return WorkItem.PRIORITY_MEDIUM;
     }
-
-    public static void queueEmail(String toAddr, MangoEmailContent content) throws AddressException {
+*/
+    public void queueEmail(String toAddr, MangoEmailContent content) throws AddressException {
         queueEmail(new String[]{toAddr}, content);
     }
 
-    public static void queueEmail(String[] toAddrs, MangoEmailContent content) throws AddressException {
+    public void queueEmail(String[] toAddrs, MangoEmailContent content) throws AddressException {
         queueEmail(toAddrs, content, null);
     }
 
-    public static void queueEmail(String[] toAddrs, MangoEmailContent content, Runnable[] postSendExecution)
+    public void queueEmail(String[] toAddrs, MangoEmailContent content, Runnable[] postSendExecution)
             throws AddressException {
         queueEmail(toAddrs, content.getSubject(), content, postSendExecution);
     }
 
-    public static void queueEmail(String[] toAddrs, String subject, EmailContent content, Runnable[] postSendExecution)
+    public void queueEmail(String[] toAddrs, String subject, EmailContent content, Runnable[] postSendExecution)
             throws AddressException {
-        EmailWorkItem item = new EmailWorkItem();
 
-        item.toAddresses = new InternetAddress[toAddrs.length];
+        this.toAddresses = new InternetAddress[toAddrs.length];
         for (int i = 0; i < toAddrs.length; i++) {
-            item.toAddresses[i] = new InternetAddress(toAddrs[i]);
+            this.toAddresses[i] = new InternetAddress(toAddrs[i]);
         }
 
-        item.subject = subject;
-        item.content = content;
-        item.postSendExecution = postSendExecution;
+        this.subject = subject;
+        this.content = content;
+        this.postSendExecution = postSendExecution;
 
-        Common.ctx.getBackgroundProcessing().addWorkItem(item);
+        schedulerPool.execute(this);
     }
 
     private InternetAddress fromAddress;
@@ -84,7 +86,7 @@ public class EmailWorkItem implements WorkItem {
     private Runnable[] postSendExecution;
 
     @Override
-    public void execute() {
+    public void run() {
         try {
             if (fromAddress == null) {
                 String addr = systemSettingsDao.getValue(SystemSettingsDao.EMAIL_FROM_ADDRESS);

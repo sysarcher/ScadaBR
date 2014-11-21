@@ -7,10 +7,8 @@ package com.serotonin.mango.db.dao;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.logger.LogUtils;
-import br.org.scadabr.monitor.IntegerMonitor;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.SystemRunnable;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.db.DatabaseAccessFactory;
 import java.util.ArrayDeque;
@@ -53,7 +51,6 @@ class BatchWriteBehind {
                         for (int i = 0; i < inserts.length; i++) {
                             inserts[i] = entriesToWrite.remove();
                         }
-                        ENTRIES_MONITOR.setValue(entriesToWrite.size());
                     }
                     // Create the sql and parameters
                     Object[] params = new Object[inserts.length * POINT_VALUE_INSERT_VALUES_COUNT];
@@ -99,7 +96,6 @@ class BatchWriteBehind {
                 }
             } finally {
                 chunks.remove(this);
-                INSTANCES_MONITOR.setValue(chunks.size());
             }
         }
 
@@ -123,8 +119,6 @@ class BatchWriteBehind {
      */
     private final CopyOnWriteArrayList<BatchWriteBehindChunk> chunks = new CopyOnWriteArrayList<>();
     private int maxRows;
-    private final IntegerMonitor ENTRIES_MONITOR = new IntegerMonitor("BatchWriteBehind.ENTRIES_MONITOR", null);
-    private final IntegerMonitor INSTANCES_MONITOR = new IntegerMonitor("BatchWriteBehind.INSTANCES_MONITOR", null);
 
     public void init(DatabaseAccessFactory daf) {
         final DatabaseAccess databaseAccess = daf.getDatabaseAccess();
@@ -146,17 +140,14 @@ class BatchWriteBehind {
     void add(BatchWriteBehindEntry e, JdbcTemplate ejt) {
         synchronized (entriesToWrite) {
             entriesToWrite.add(e);
-            ENTRIES_MONITOR.setValue(entriesToWrite.size());
             if (entriesToWrite.size() > chunks.size() * SPAWN_THRESHOLD) {
                 if (chunks.size() < MAX_INSTANCES) {
                     BatchWriteBehindChunk bwb = new BatchWriteBehindChunk(ejt);
                     chunks.add(bwb);
-                    INSTANCES_MONITOR.setValue(chunks.size());
                     try {
                         schedulerPool.execute(bwb);
                     } catch (RejectedExecutionException ree) {
                         chunks.remove(bwb);
-                        INSTANCES_MONITOR.setValue(chunks.size());
                         throw ree;
                     }
                 }
@@ -165,8 +156,6 @@ class BatchWriteBehind {
     }
 
     public BatchWriteBehind() {
-        Common.MONITORED_VALUES.addIfMissingStatMonitor(ENTRIES_MONITOR);
-        Common.MONITORED_VALUES.addIfMissingStatMonitor(INSTANCES_MONITOR);
     }
 
 }

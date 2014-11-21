@@ -38,6 +38,8 @@ import org.joda.time.DateTime;
 import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.io.StreamUtils;
 import br.org.scadabr.l10n.AbstractLocalizer;
+import br.org.scadabr.rt.SchedulerPool;
+import br.org.scadabr.timer.cron.SystemRunnable;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.MailingListDao;
@@ -63,7 +65,7 @@ import org.springframework.beans.factory.annotation.Configurable;
  * @author Matthew Lohbihler
  */
 @Configurable
-public class ReportWorkItem implements WorkItem {
+public class ReportWorkItem implements SystemRunnable {
     @Autowired
     private DataPointDao dataPointDao;
     @Autowired
@@ -72,14 +74,17 @@ public class ReportWorkItem implements WorkItem {
     private ReportDao reportDao;
     @Autowired 
     private MailingListDao mailingListDao;
+    @Autowired
+    private SchedulerPool schedulerPool;
 
     static final Log LOG = LogFactory.getLog(ReportWorkItem.class);
 
+    /*
     @Override
     public int getPriority() {
         return WorkItem.PRIORITY_LOW;
     }
-
+*/
     public void queueReport(ReportVO report) {
         LOG.info("Queuing report with id " + report.getId());
 
@@ -101,7 +106,7 @@ public class ReportWorkItem implements WorkItem {
 
         // Start the report work item out of process.
         item.reportInstance = reportInstance;
-        Common.ctx.getBackgroundProcessing().addWorkItem(item);
+        schedulerPool.execute(item);
 
         LOG.info("Queued report with id " + report.getId() + ", instance id " + reportInstance.getId());
     }
@@ -112,7 +117,7 @@ public class ReportWorkItem implements WorkItem {
     List<File> filesToDelete = new ArrayList<>();
 
     @Override
-    public void execute() {
+    public void run() {
         LOG.info("Running report with id " + reportConfig.getId() + ", instance id " + reportInstance.getId());
 
         reportInstance.setRunStartTime(System.currentTimeMillis());
@@ -214,7 +219,7 @@ public class ReportWorkItem implements WorkItem {
             }
 
             try {
-                EmailWorkItem.queueEmail(toAddrs, AbstractLocalizer.localizeI18nKey("ftl.scheduledReport", bundle, reportConfig.getName()), emailContent, postEmail);
+                new EmailWorkItem().queueEmail(toAddrs, AbstractLocalizer.localizeI18nKey("ftl.scheduledReport", bundle, reportConfig.getName()), emailContent, postEmail);
             } catch (AddressException e) {
                 LOG.error(e);
             }

@@ -21,7 +21,6 @@ package com.serotonin.mango.rt.dataImage;
 import br.org.scadabr.DataType;
 import br.org.scadabr.utils.ImplementMeException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +29,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.rt.event.schedule.ScheduledEventManager;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.RuntimeManager;
@@ -39,13 +38,13 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.event.detectors.PointEventDetectorRT;
-import com.serotonin.mango.rt.maint.work.WorkItem;
 import com.serotonin.mango.util.timeout.RunClient;
 import com.serotonin.mango.view.stats.AnalogStatistics;
 import com.serotonin.mango.view.stats.IValueTime;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.timer.cron.DataSourceCronTask;
+import br.org.scadabr.timer.cron.EventRunnable;
 import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.vo.IntervalLoggingTypes;
 import br.org.scadabr.vo.LoggingTypes;
@@ -76,6 +75,8 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     private PointValueDao pointValueDao;
     @Autowired
     private SystemSettingsDao systemSettingsDao;
+    @Autowired
+    private SchedulerPool schedulerPool;
     private List<PointEventDetectorRT> detectors;
     private final Map<String, Object> attributes = new HashMap<>();
 
@@ -421,12 +422,11 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     private void fireEvents(PointValueTime oldValue, PointValueTime newValue, boolean set, boolean backdate) {
         DataPointListener l = runtimeManager.getDataPointListeners(vo.getId());
         if (l != null) {
-            Common.ctx.getBackgroundProcessing().addWorkItem(
-                    new EventNotifyWorkItem(l, oldValue, newValue, set, backdate));
+            schedulerPool.execute(new EventNotifyWorkItem(l, oldValue, newValue, set, backdate));
         }
     }
 
-    class EventNotifyWorkItem implements WorkItem {
+    class EventNotifyWorkItem implements EventRunnable {
 
         private final DataPointListener listener;
         private final PointValueTime oldValue;
@@ -444,7 +444,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
         }
 
         @Override
-        public void execute() {
+        public void run() {
             if (backdate) {
                 listener.pointBackdated(newValue);
             } else {
@@ -462,11 +462,12 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
                 }
             }
         }
-
+/*
         @Override
         public int getPriority() {
             return WorkItem.PRIORITY_MEDIUM;
         }
+        */
     }
 
     //
