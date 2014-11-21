@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.event;
 
+import br.org.scadabr.ScadaBrConstants;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.EventStatus;
@@ -38,6 +39,10 @@ public class EventInstance {
      */
     public boolean isStateful() {
         return eventState != EventStatus.STATELESS;
+    }
+
+    public boolean isNew() {
+        return id == ScadaBrConstants.NEW_ID;
     }
 
     public interface AlternateAcknowledgementSources {

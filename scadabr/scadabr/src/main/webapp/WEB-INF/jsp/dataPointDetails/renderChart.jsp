@@ -30,11 +30,11 @@ calculate major|minior chart ticks...
         var toDate;
         var toTime;
         function getFromTimestamp() {
-            return fromDate.get("value").getTime() + fromTime.get("value").getTime();
+            return fromDate.get("value").getTime() + fromTime.get("value").getTime() - new Date().getTimezoneOffset() * 60 * 1000;
         }
 
         function getToTimestamp() {
-            return toDate.get("value").getTime() + toTime.get("value").getTime();
+            return toDate.get("value").getTime() + toTime.get("value").getTime() - new Date().getTimezoneOffset() * 60 * 1000;
         }
 
     require([

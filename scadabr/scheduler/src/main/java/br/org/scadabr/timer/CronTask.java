@@ -8,19 +8,26 @@ package br.org.scadabr.timer;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import java.text.ParseException;
-import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author aploese
  */
 public abstract class CronTask {
+    
+    private final static Logger LOG = Logger.getLogger(CronTask.class.getName());
 
     ThreadPoolExecutor tpe;
 
     protected abstract void run(long executionTime);
+    
+    protected void handleException(Throwable t) {
+       LOG.log(Level.SEVERE, "Ex: ", t);
+    }
 
     /**
      * An Overrrun has occured, should this task run again???
@@ -69,6 +76,8 @@ public abstract class CronTask {
         public void run() {
             try {
                 CronTask.this.run(executionTime);
+            } catch (Throwable t) {
+                CronTask.this.handleException(t);
             } finally {
                 synchronized (lock) {
                     if (currentExecutedTaskRunner == this) {

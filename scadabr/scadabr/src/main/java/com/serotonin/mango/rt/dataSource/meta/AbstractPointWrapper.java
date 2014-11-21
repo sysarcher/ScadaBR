@@ -38,7 +38,7 @@ abstract public class AbstractPointWrapper {
         this.context = context;
     }
 
-    protected MangoValue getValueImpl() {
+    public MangoValue getValueImpl() {
         PointValueTime pvt = point.getPointValue();
         if (pvt == null) {
             return null;

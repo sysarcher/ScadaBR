@@ -21,7 +21,6 @@ package com.serotonin.mango.rt.event.handlers;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.maint.work.ProcessWorkItem;
 import com.serotonin.mango.vo.event.EventHandlerVO;
-import br.org.scadabr.util.StringUtils;
 
 /**
  * @author Matthew Lohbihler
@@ -46,6 +45,6 @@ public class ProcessHandlerRT extends EventHandlerRT {
         if (command.isEmpty()) {
             return;
         }
-        ProcessWorkItem.queueProcess(command);
+        new ProcessWorkItem(command).queue();
     }
 }

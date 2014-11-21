@@ -25,23 +25,51 @@ import java.util.Map;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.SystemCronTask;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.maint.work.ReportWorkItem;
 import java.util.TimeZone;
 import java.util.logging.Logger;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * @author Matthew Lohbihler
  */
-public class ReportTask extends SystemCronTask {
+@Named
+public class ReportTaskManager {
 
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_REPORTS);
 
-    private static final Map<Integer, ReportTask> JOB_REGISTRY = new HashMap<>();
+    class ReportTask extends SystemCronTask {
 
-    public static void scheduleReportJob(ReportVO report) {
-        synchronized (JOB_REGISTRY) {
+        private final ReportVO report;
+
+        private ReportTask(String pattern, TimeZone tz, ReportVO report) throws ParseException {
+            super(pattern, tz);
+            this.report = report;
+        }
+
+        @Override
+        protected void run(long scheduledExecutionTime) {
+            new ReportWorkItem().queueReport(report);
+        }
+
+        @Override
+        protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
+            LOG.severe("Report Overrun detected");
+            return true;
+        }
+
+    }
+
+    @Inject
+    private SchedulerPool schedulerPool;
+
+    private final Map<Integer, ReportTask> jobRegistry = new HashMap<>();
+
+    public void scheduleReportJob(ReportVO report) {
+        synchronized (jobRegistry) {
             // Ensure that there is no existing job.
             unscheduleReportJob(report);
 
@@ -54,40 +82,22 @@ public class ReportTask extends SystemCronTask {
                         throw new ShouldNeverHappenException(e);
                     }
                 } else {
-                    throw new ImplementMeException(); //WAS: reportJob = new ReportTask(report.getSchedulePeriod(), report.getRunDelayMinutes() * 60, report);
+                    throw new ImplementMeException(); //WAS: reportJob = new ReportTaskManager(report.getSchedulePeriod(), report.getRunDelayMinutes() * 60, report);
                 }
 
-                JOB_REGISTRY.put(report.getId(), reportJob);
-                Common.systemCronPool.schedule(reportJob);
+                jobRegistry.put(report.getId(), reportJob);
+                schedulerPool.schedule(reportJob);
             }
         }
     }
 
-    public static void unscheduleReportJob(ReportVO report) {
-        synchronized (JOB_REGISTRY) {
-            ReportTask reportJob = JOB_REGISTRY.remove(report.getId());
+    public void unscheduleReportJob(ReportVO report) {
+        synchronized (jobRegistry) {
+            final ReportTask reportJob = jobRegistry.remove(report.getId());
             if (reportJob != null) {
                 reportJob.cancel();
             }
         }
-    }
-
-    private final ReportVO report;
-
-    private ReportTask(String pattern, TimeZone tz, ReportVO report) throws ParseException {
-        super(pattern, tz);
-        this.report = report;
-    }
-
-    @Override
-    protected void run(long scheduledExecutionTime) {
-        new ReportWorkItem().queueReport(report);
-    }
-
-    @Override
-    protected boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
-        LOG.severe("Report Overrun detected");
-        return true;
     }
 
 }

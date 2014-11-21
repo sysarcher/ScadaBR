@@ -24,7 +24,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -33,7 +32,7 @@ import javax.servlet.ServletContextListener;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.logger.LogUtils;
-import br.org.scadabr.timer.CronTimerPool;
+import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.CronExpression;
 import com.serotonin.mango.db.dao.ReportDao;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
@@ -49,7 +48,7 @@ import com.serotonin.mango.view.DynamicImage;
 import com.serotonin.mango.view.ImageSet;
 import com.serotonin.mango.view.ViewGraphic;
 import com.serotonin.mango.view.ViewGraphicLoader;
-import com.serotonin.mango.vo.report.ReportTask;
+import com.serotonin.mango.vo.report.ReportTaskManager;
 import com.serotonin.mango.vo.report.ReportVO;
 import com.serotonin.mango.web.ContextWrapper;
 import br.org.scadabr.vo.event.type.SystemEventSource;
@@ -82,6 +81,11 @@ public class MangoContextListener implements ServletContextListener {
     private EventManager eventManager;
     @Inject
     private ReportDao reportDao;
+    @Inject
+    private SchedulerPool schedulerPool;
+    @Inject
+    private ReportTaskManager reportTaskManager;
+            
 
     @Override
     public void contextInitialized(ServletContextEvent evt) {
@@ -94,11 +98,6 @@ public class MangoContextListener implements ServletContextListener {
         Common.ctx = new ContextWrapper(ctx);
 
         SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
-
-        // Once the threadpool was shut down no its dead, so create them new here....
-        Common.dataSourcePool = new CronTimerPool(2, 5, 30, TimeUnit.SECONDS);
-        Common.systemCronPool = new CronTimerPool(2, 5, 30, TimeUnit.SECONDS);
-        Common.eventCronPool = new CronTimerPool(2, 5, 30, TimeUnit.SECONDS);
 
         // Create all the stuff we need.
 //TODO        freemarkerInitialize(ctx);
@@ -152,48 +151,6 @@ public class MangoContextListener implements ServletContextListener {
         utilitiesTerminate(ctx);
         Logger.getLogger(MangoContextListener.class.getName()).log(Level.INFO, "utilitues terminated");
 
-        //TODO move to Common
-        Logger.getLogger(MangoContextListener.class.getName()).log(Level.INFO, "utilitues terminated");
-        LOG.log(Level.INFO, "Shutdown dataSourcePool active: {0} queue size: {1}", new Object[]{Common.dataSourcePool.getActiveCount(), Common.dataSourcePool.getQueueSize()});
-        Common.dataSourcePool.shutdown();
-        LOG.log(Level.INFO, "Shutdown eventCronPool active: {0} queue size: {1}", new Object[]{Common.eventCronPool.getActiveCount(), Common.eventCronPool.getQueueSize()});
-        Common.eventCronPool.shutdown();
-        LOG.log(Level.INFO, "Shutdown systemCronPool active: {0} queue size: {1}", new Object[]{Common.systemCronPool.getActiveCount(), Common.systemCronPool.getQueueSize()});
-        Common.systemCronPool.shutdown();
-
-        try {
-            if (Common.dataSourcePool.awaitTermination(10, TimeUnit.SECONDS)) {
-                LOG.info("dataSourcePool terminated");
-            } else {
-                LOG.log(Level.SEVERE, "dataSourcePool termination timeout active: {0} queue size: {1}", new Object[]{Common.dataSourcePool.getActiveCount(), Common.dataSourcePool.getQueueSize()});
-            }
-        } catch (InterruptedException e) {
-            LOG.log(Level.SEVERE, "dataSourcePool termination interrupted exception active: {0} queue size: {1}", new Object[]{Common.dataSourcePool.getActiveCount(), Common.dataSourcePool.getQueueSize()});
-        }
-
-        try {
-            if (Common.eventCronPool.awaitTermination(10, TimeUnit.SECONDS)) {
-                LOG.info("eventCronPool terminated");
-            } else {
-                LOG.log(Level.SEVERE, "eventCronPool termination timeout active: {0} queue size: {1}", new Object[]{Common.eventCronPool.getActiveCount(), Common.eventCronPool.getQueueSize()});
-            }
-        } catch (InterruptedException e) {
-            LOG.log(Level.SEVERE, "eventCronPool termination interrupted exception active: {0} queue size: {1}", new Object[]{Common.eventCronPool.getActiveCount(), Common.eventCronPool.getQueueSize()});
-        }
-
-        try {
-            if (Common.systemCronPool.awaitTermination(10, TimeUnit.SECONDS)) {
-                LOG.info("systemCronPool terminated");
-            } else {
-                LOG.log(Level.SEVERE, "systemCronPool termination timeout active: {0} queue size: {1}", new Object[]{Common.systemCronPool.getActiveCount(), Common.systemCronPool.getQueueSize()});
-            }
-        } catch (InterruptedException e) {
-            LOG.log(Level.SEVERE, "systemCronPool termination interrupted exception active: {0} queue size: {1}", new Object[]{Common.systemCronPool.getActiveCount(), Common.systemCronPool.getQueueSize()});
-        }
-
-        Common.dataSourcePool = null;
-        Common.eventCronPool = null;
-        Common.systemCronPool = null;
 
         if (databaseAccessFactory != null) {
             databaseAccessFactory.stopDB();
@@ -359,7 +316,7 @@ public class MangoContextListener implements ServletContextListener {
         List<ReportVO> reports = reportDao.getReports();
         for (ReportVO report : reports) {
             try {
-                ReportTask.scheduleReportJob(report);
+                reportTaskManager.scheduleReportJob(report);
             } catch (ShouldNeverHappenException e) {
                 // Don't stop the startup if there is an error. Just log it.
                 LOG.log(Level.SEVERE, "Error starting report " + report.getName(), e);
@@ -377,7 +334,7 @@ public class MangoContextListener implements ServletContextListener {
         try {
             DataPurge.DataPurgeTask dpt = new DataPurge.DataPurgeTask("0 0 */5 * * * * *", CronExpression.TIMEZONE_UTC);
             System.err.println("CONTEXT DATA PURGE");
-            Common.systemCronPool.schedule(dpt);
+            schedulerPool.schedule(dpt);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -386,7 +343,7 @@ public class MangoContextListener implements ServletContextListener {
         // instances even out over time.
 
         //TODO ask serotoninsoftware for new versions ??? Not anymore ;-) VersionCheck.start("0 0 0 0 * * * *");
-        WorkItemMonitor.start();
+        new WorkItemMonitor();
 
         // MemoryCheck.start();
     }

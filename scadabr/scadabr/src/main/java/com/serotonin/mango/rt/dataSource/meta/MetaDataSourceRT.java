@@ -18,7 +18,6 @@
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
-import br.org.scadabr.utils.ImplementMeException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -28,8 +27,6 @@ import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import com.serotonin.mango.vo.dataSource.DataSourceVO;
 
 /**
  * @author Matthew Lohbihler
@@ -52,18 +49,18 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
         dataPoint.setPointValue(valueTime, source);
     }
 
-    /*
     @Override
-    public void addDataPoint(DataPointRT dataPoint) {
-        synchronized (pointListChangeLock) {
+    public void dataPointEnabled(DataPointRT dataPoint) {
+        super.dataPointEnabled(dataPoint);
             remove(dataPoint);
 
             MetaPointLocatorRT locator = dataPoint.getPointLocator();
             points.add(dataPoint);
-            throw  new ImplementMeException(); // this line was: locator.initialize(Common.timer, this, dataPoint); checkForDisabledPoints();
-        }
+            locator.start(this, dataPoint); 
+            checkForDisabledPoints();
     }
 
+    /*
     @Override
     public void removeDataPoint(DataPointRT dataPoint) {
         synchronized (pointListChangeLock) {

@@ -6,6 +6,10 @@
 package com.serotonin.mango.db.dao;
 
 import br.org.scadabr.DataType;
+import br.org.scadabr.logger.LogUtils;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -16,10 +20,8 @@ class BatchWriteBehindEntry {
     private final DataType dataType;
     private final double dvalue;
     private final long time;
-    private final PointValueDao outer;
 
-    public BatchWriteBehindEntry(int pointId, DataType dataType, double dvalue, long time, final PointValueDao outer) {
-        this.outer = outer;
+    public BatchWriteBehindEntry(int pointId, DataType dataType, double dvalue, long time) {
         this.pointId = pointId;
         this.dataType = dataType;
         this.dvalue = dvalue;
@@ -31,6 +33,7 @@ class BatchWriteBehindEntry {
         params[index++] = pointId;
         params[index++] = dataType.mangoDbId;
         params[index++] = dvalue;
+        Logger.getLogger(LogUtils.LOGGER_SCADABR_DAO).log(Level.SEVERE, "WRITE TO PARAM TS {0} VALUE: {1}", new Object[]{new Date(time), dvalue});
         params[index++] = time;
     }
     

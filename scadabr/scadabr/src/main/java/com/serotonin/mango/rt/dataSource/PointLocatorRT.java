@@ -26,6 +26,8 @@ import br.org.scadabr.vo.dataSource.PointLocatorVO;
  * locate the point data.
  *
  * @author mlohbihler
+ * @param <T>
+ * @param <U>
  */
 abstract public class PointLocatorRT<T extends PointLocatorVO> {
 

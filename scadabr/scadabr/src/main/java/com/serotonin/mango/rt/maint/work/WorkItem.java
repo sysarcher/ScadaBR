@@ -22,6 +22,7 @@ package com.serotonin.mango.rt.maint.work;
  * @author Matthew Lohbihler
  *
  */
+@Deprecated // Use SystemRunnable
 public interface WorkItem {
 
     /**

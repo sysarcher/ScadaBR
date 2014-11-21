@@ -19,6 +19,7 @@
 package com.serotonin.mango.vo.dataSource.meta;
 
 import br.org.scadabr.DataType;
+import br.org.scadabr.ShouldNeverHappenException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -36,6 +37,8 @@ import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.json.JsonValue;
+import br.org.scadabr.timer.cron.CronExpression;
+import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.meta.MetaPointLocatorRT;
@@ -47,9 +50,14 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.datasource.meta.UpdateEvent;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.serotonin.mango.rt.dataImage.DataPointRT;
+import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.TimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -77,7 +85,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     private String name;
 
     MetaPointLocatorVO() {
-        
+
     }
 
     MetaPointLocatorVO(DataType dataType) {
@@ -274,7 +282,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
             updateCronPattern = SerializationHelper.readSafeUTF(in);
             executionDelaySeconds = in.readInt();
         } else if (ver == 5) {
-            name = (String)in.readObject();
+            name = (String) in.readObject();
             context = (List<IntValuePair>) in.readObject();
             script = SerializationHelper.readSafeUTF(in);
             dataType = DataType.fromMangoDbId(in.readInt());
@@ -363,5 +371,21 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    @JsonIgnore
+    public CronExpression getCronExpression() {
+        try {
+        switch (updateEvent) {
+            case CONTEXT_UPDATE:
+                throw new ShouldNeverHappenException("Context update has no cron pattern");
+            case CRON:
+                return new CronParser().parse(updateCronPattern, TimeZone.getTimeZone("UTC"));
+            default:
+                return new CronParser().parse(updateEvent.getCronPattern(), TimeZone.getTimeZone("UTC"));
+        }
+        } catch (ParseException pe) {
+            throw new ShouldNeverHappenException(pe.getMessage());
+        }
     }
 }

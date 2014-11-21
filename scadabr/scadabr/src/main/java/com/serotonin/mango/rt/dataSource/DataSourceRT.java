@@ -320,10 +320,4 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
         // no op
     }
 
-    //
-    // Additional lifecycle.
-    public void beginPolling() {
-        // no op
-    }
-
 }

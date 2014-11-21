@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.maint;
 
+import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.timer.cron.CronExpression;
@@ -76,7 +77,7 @@ public class VersionCheck extends SystemCronTask {
     @Autowired
     private PublisherDao publisherDao;
     @Autowired
-    private Common common;
+    private SchedulerPool schedulerPool;
 
     private static final String INSTANCE_ID_FILE = "/WEB-INF/instance.txt";
 
@@ -88,11 +89,14 @@ public class VersionCheck extends SystemCronTask {
      * corresponding system setting for running this job is true.
      */
     public static void start(String cronPattern) throws ParseException {
+        throw  new ImplementMeException();
+        /*
         synchronized (INSTANCE_ID_FILE) {
             stop();
             instance = new VersionCheck(cronPattern, CronExpression.TIMEZONE_UTC);
-            Common.systemCronPool.schedule(instance);
+           // Common.systemCronPool.schedule(instance);
         }
+                */
     }
 
     public static void stop() {
@@ -151,6 +155,8 @@ public class VersionCheck extends SystemCronTask {
     }
 
     private String newVersionCheckImpl(String notifLevel) throws Exception {
+        throw new ImplementMeException();
+        /*
         HttpClient httpClient = common.getHttpClient();
 
         PostMethod postMethod = new PostMethod(Common.getGroveUrl(Common.GroveServlets.VERSION_CHECK));
@@ -223,6 +229,7 @@ public class VersionCheck extends SystemCronTask {
                     .equals(notifLevel))) {
                 return devVersion + " release candidate";
             }
+                
         }
 
         // Either there is no dev version available or we're not interested in it. Check the stable version
@@ -233,6 +240,7 @@ public class VersionCheck extends SystemCronTask {
         }
 
         return stableVersion;
+                */
     }
 
     private static String calcMachineId() {

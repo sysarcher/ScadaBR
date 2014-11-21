@@ -92,6 +92,20 @@ public class JsonPointLocator implements Serializable {
     public void setPlId(int plId) {
         this.plId = plId;
     }
+
+    /**
+     * @return the enabled
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * @param enabled the enabled to set
+     */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
     
     
 }

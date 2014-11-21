@@ -12,6 +12,7 @@ import java.util.Map;
  *
  * @author aploese
  */
+@Deprecated //Any Use??
 public class MonitoredValues {
    
     private final Map<String, IntegerMonitor> monitors = new HashMap<>();

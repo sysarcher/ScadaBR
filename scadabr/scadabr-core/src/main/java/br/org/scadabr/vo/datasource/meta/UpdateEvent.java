@@ -15,35 +15,39 @@ import br.org.scadabr.utils.i18n.LocalizableEnum;
 public enum UpdateEvent implements LocalizableEnum<UpdateEvent> {
 
     CONTEXT_UPDATE(0, "dsEdit.meta.event.context"),
-    MINUTES(TimePeriods.MINUTES, "dsEdit.meta.event.minute"),
-    HOURS(TimePeriods.HOURS, "dsEdit.meta.event.hour"),
-    DAYS(TimePeriods.DAYS, "dsEdit.meta.event.day"),
-    WEEKS(TimePeriods.WEEKS, "dsEdit.meta.event.week"),
-    MONTHS(TimePeriods.MONTHS, "dsEdit.meta.event.month"),
-    YEARS(TimePeriods.YEARS, "dsEdit.meta.event.year"),
+    SECONDS(TimePeriods.SECONDS, "dsEdit.meta.event.second", "0 * * * * * * *"), 
+    MINUTES(TimePeriods.MINUTES, "dsEdit.meta.event.minute", "0 0 * * * * * *"),
+    HOURS(TimePeriods.HOURS, "dsEdit.meta.event.hour", "0 0 0 * * * * *"),
+    DAYS(TimePeriods.DAYS, "dsEdit.meta.event.day", "0 0 0 0 * * * *"),
+    WEEKS(TimePeriods.WEEKS, "dsEdit.meta.event.week", "0 0 0 0 * * 0 *"),
+    MONTHS(TimePeriods.MONTHS, "dsEdit.meta.event.month", "0 0 0 0 0 * 0 *"),
+    YEARS(TimePeriods.YEARS, "dsEdit.meta.event.year", "0 0 0 0 0 0 * *"),
     CRON(100, "dsEdit.meta.event.cron");
 
     private final int id;
     private final String i18nKey;
     private final TimePeriods timePeriods;
+    private final String cronPattern;
 
     private UpdateEvent(int id, String i18nKey) {
         this.id = id;
         this.timePeriods = null;
         this.i18nKey = i18nKey;
+        this.cronPattern = null;
     }
 
-    private UpdateEvent(TimePeriods timePeriods, String i18nKey) {
+    private UpdateEvent(TimePeriods timePeriods, String i18nKey, String cronPattern) {
         this.id = timePeriods.getId();
         this.timePeriods = timePeriods;
         this.i18nKey = i18nKey;
+        this.cronPattern = cronPattern;
     }
 
     @Override
     public String getName() {
         return name();
     }
-    
+
     @Override
     public String getI18nKey() {
         return i18nKey;
@@ -53,7 +57,7 @@ public enum UpdateEvent implements LocalizableEnum<UpdateEvent> {
     public Object[] getArgs() {
         return null;
     }
-    
+
     public int getId() {
         return id;
     }
@@ -62,6 +66,8 @@ public enum UpdateEvent implements LocalizableEnum<UpdateEvent> {
         switch (id) {
             case 0:
                 return CONTEXT_UPDATE;
+            case 1:
+                return SECONDS;
             case 2:
                 return MINUTES;
             case 3:
@@ -81,9 +87,13 @@ public enum UpdateEvent implements LocalizableEnum<UpdateEvent> {
 
         }
     }
-    
+
     public TimePeriods getTimePeriods() {
         return timePeriods;
+    }
+
+    public String getCronPattern() {
+        return cronPattern;
     }
 
 }

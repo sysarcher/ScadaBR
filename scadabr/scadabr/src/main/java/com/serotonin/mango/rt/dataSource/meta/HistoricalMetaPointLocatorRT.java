@@ -11,6 +11,7 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
 import br.org.scadabr.timer.SimulationTimer;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -29,6 +30,8 @@ public class HistoricalMetaPointLocatorRT extends MetaPointLocatorRT {
     }
 
     public void initialize(SimulationTimer timer, DataPointRT dataPoint) {
+        throw new ImplementMeException();
+        /*
         this.timer = timer;
         this.dataPoint = dataPoint;
         initialized = true;
@@ -41,16 +44,20 @@ public class HistoricalMetaPointLocatorRT extends MetaPointLocatorRT {
                     timer, pointValueDao);
             context.put(contextEntry.getValue(), point);
         }
+                */
     }
 
     @Override
     public void terminate() {
+        throw new ImplementMeException();
+/*
         synchronized (LOCK) {
             // Cancel scheduled job
             if (timerTask != null) {
                 timerTask.cancel();
             }
         }
+*/
     }
 
     public long getUpdates() {

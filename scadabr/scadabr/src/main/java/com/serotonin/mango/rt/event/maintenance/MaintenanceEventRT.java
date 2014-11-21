@@ -4,7 +4,7 @@ import br.org.scadabr.utils.ImplementMeException;
 import java.text.ParseException;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import com.serotonin.mango.Common;
+import br.org.scadabr.rt.SchedulerPool;
 import com.serotonin.mango.rt.event.type.MaintenanceEventType;
 import com.serotonin.mango.util.timeout.RunWithArgClient;
 import com.serotonin.mango.util.timeout.SystemRunWithArgTask;
@@ -13,7 +13,10 @@ import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
+@Configurable
 public class MaintenanceEventRT implements RunWithArgClient<Boolean> {
 
     private final MaintenanceEventVO vo;
@@ -22,6 +25,9 @@ public class MaintenanceEventRT implements RunWithArgClient<Boolean> {
     private SystemRunWithArgTask<Boolean> activeTask;
     private SystemRunWithArgTask<Boolean> inactiveTask;
 
+    @Autowired
+    private SchedulerPool schedulerPool;
+    
     public MaintenanceEventRT(MaintenanceEventVO vo) {
         this.vo = vo;
     }
@@ -77,12 +83,12 @@ public class MaintenanceEventRT implements RunWithArgClient<Boolean> {
             // Schedule the active event.
             final CronExpression activeTrigger = createTrigger(true);
             activeTask = new SystemRunWithArgTask<>(activeTrigger, this, true);
-            Common.systemCronPool.schedule(activeTask);
+            schedulerPool.schedule(activeTask);
 
             // Schedule the inactive event
             final CronExpression inactiveTrigger = createTrigger(false);
             inactiveTask = new SystemRunWithArgTask<>(inactiveTrigger, this, false);
-            Common.systemCronPool.schedule(inactiveTask);
+            schedulerPool.schedule(inactiveTask);
 
             if (vo.getScheduleType() != MaintenanceEventVO.TYPE_ONCE) {
                 // Check if we are currently active.

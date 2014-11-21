@@ -19,6 +19,7 @@
 package com.serotonin.mango.rt.event.handlers;
 
 import br.org.scadabr.l10n.AbstractLocalizer;
+import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
@@ -57,6 +58,8 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
     private MailingListDao mailingListDao;
     @Autowired
     private SystemSettingsDao systemSettingsDao;
+    @Autowired
+    private SchedulerPool schedulerPool;
 
     private static final Log LOG = LogFactory.getLog(EmailHandlerRT.class);
 
@@ -125,7 +128,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
             GregorianCalendar c = new GregorianCalendar();
             c.setTimeInMillis(vo.getEscalationDelayType().getMillis(vo.getEscalationDelay()));
             escalationTask = new EventRunWithArgTask<>(new CronExpression(c), this, evt);
-            Common.eventCronPool.schedule(escalationTask);
+            schedulerPool.schedule(escalationTask);
         }
     }
 

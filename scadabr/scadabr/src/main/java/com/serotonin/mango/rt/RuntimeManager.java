@@ -46,6 +46,7 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.utils.TimePeriods;
+import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.util.HashSet;
 import java.util.Set;
@@ -71,8 +72,6 @@ public class RuntimeManager {
      * before the point is enabled).
      */
     private final Map<Integer, DataPointListener> dataPointListeners = new ConcurrentHashMap<>();
-
-
 
     private boolean started = false;
 
@@ -236,7 +235,9 @@ public class RuntimeManager {
     private void startDataSourcePolling(DataSourceVO<?> vo) {
         DataSourceRT dataSource = getRunningDataSource(vo.getId());
         if (dataSource != null) {
-            dataSource.beginPolling();
+            if (dataSource instanceof PollingDataSource) {
+                ((PollingDataSource) dataSource).beginPolling();
+            }
         }
     }
 
@@ -477,17 +478,17 @@ public class RuntimeManager {
     public void addPointToHierarchy(DataPointVO dp, String... pathToPoint) {
         dataPointDao.addPointToHierarchy(dp, pathToPoint);
     }
-    
+
     public void UserSessionStarts(UserSessionContextBean us) {
         userSessions.add(us);
     }
-    
+
     public void UserSessionEnds(UserSessionContextBean us) {
         userSessions.remove(us);
     }
-    
+
     public Set<UserSessionContextBean> getUserSessionContextBeans() {
         return userSessions;
     }
-    
+
 }
