@@ -222,7 +222,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
                 content.addInline(new EmailInline.FileInline(s, new File(Common.ctx.getServletContext().getRealPath(s))));
             }
 
-            EmailWorkItem.queueEmail(toAddrs, content);
+            new EmailWorkItem().queueEmail(toAddrs, content);
         } catch (TemplateException | IOException | AddressException | RuntimeException e) {
             LOG.error("", e);
         }

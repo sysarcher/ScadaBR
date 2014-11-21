@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverMulticaster;
-import com.serotonin.mango.rt.maint.BackgroundProcessing;
 import com.serotonin.mango.util.DocumentationManifest;
 import com.serotonin.mango.view.DynamicImage;
 import com.serotonin.mango.view.ImageSet;
@@ -107,12 +106,6 @@ public class ContextWrapper {
     public Configuration getFreemarkerConfig() {
         return (Configuration) ctx
                 .getAttribute(Common.ContextKeys.FREEMARKER_CONFIG);
-    }
-
-    @Deprecated // use Bean
-    public BackgroundProcessing getBackgroundProcessing() {
-        return (BackgroundProcessing) ctx
-                .getAttribute(Common.ContextKeys.BACKGROUND_PROCESSING);
     }
 
     @Deprecated // use Bean

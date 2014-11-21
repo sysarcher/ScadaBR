@@ -30,7 +30,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.io.StreamUtils;
+import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.CronExpression;
+import br.org.scadabr.timer.cron.SystemRunnable;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.ImageSaveException;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -38,7 +40,6 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
-import com.serotonin.mango.rt.maint.work.WorkItem;
 import com.serotonin.mango.vo.dataSource.http.HttpImageDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpImagePointLocatorVO;
 import br.org.scadabr.util.image.BoxScaledImage;
@@ -65,6 +66,8 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
 
     @Autowired
     private Common common;
+    @Autowired
+    private SchedulerPool schedulerPool;
     
     public HttpImageDataSourceRT(HttpImageDataSourceVO vo) {
         super(vo, true);
@@ -119,7 +122,7 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
 
         synchronized void addRetriever(ImageRetriever retriever) {
             retrievers.add(retriever);
-            Common.ctx.getBackgroundProcessing().addWorkItem(retriever);
+            schedulerPool.execute(retriever);
         }
 
         synchronized void removeRetriever(ImageRetriever retriever) {
@@ -151,7 +154,7 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
         }
     }
 
-    class ImageRetriever implements WorkItem {
+    class ImageRetriever implements SystemRunnable {
 
         private final ImageRetrieverMonitor monitor;
         private final DataPointRT dp;
@@ -166,7 +169,7 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
         }
 
         @Override
-        public void execute() {
+        public void run() {
             try {
                 executeImpl();
             } finally {
@@ -223,11 +226,12 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
         public LocalizableMessage getSaveFailure() {
             return saveFailure;
         }
-
+/*
         @Override
         public int getPriority() {
             return WorkItem.PRIORITY_HIGH;
         }
+        */
     }
 
     public byte[] getData(String url, int timeoutSeconds, int retries, int readLimitKb)

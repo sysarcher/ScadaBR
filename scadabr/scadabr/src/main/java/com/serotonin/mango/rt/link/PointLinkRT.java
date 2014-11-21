@@ -19,6 +19,7 @@
 package com.serotonin.mango.rt.link;
 
 import br.org.scadabr.DataType;
+import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.rt.datasource.meta.ScriptExecutor;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import java.util.HashMap;
@@ -54,6 +55,8 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
     private final SystemEventType eventType;
     @Autowired
     private RuntimeManager runtimeManager;
+    @Autowired
+    private SchedulerPool schedulerPool;
 
     public PointLinkRT(PointLinkVO vo) {
         this.vo = vo;
@@ -142,7 +145,7 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
         }
 
         // Queue a work item to perform the update.
-        Common.ctx.getBackgroundProcessing().addWorkItem(new SetPointWorkItem(vo.getTargetPointId(), newValue, this));
+        schedulerPool.execute(new SetPointWorkItem(vo.getTargetPointId(), newValue, this));
         returnToNormal();
     }
 

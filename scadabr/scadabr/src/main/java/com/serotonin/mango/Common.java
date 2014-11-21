@@ -46,7 +46,6 @@ import org.directwebremoting.WebContextFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.KeyValuePair;
-import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.util.BackgroundContext;
 import com.serotonin.mango.util.CommPortConfigException;
@@ -55,14 +54,6 @@ import com.serotonin.mango.view.custom.CustomView;
 import com.serotonin.mango.vo.CommPortProxy;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.ContextWrapper;
-import br.org.scadabr.monitor.MonitoredValues;
-import br.org.scadabr.timer.CronTimerPool;
-import br.org.scadabr.timer.cron.DataSourceCronTask;
-import br.org.scadabr.timer.cron.DataSourceRunnable;
-import br.org.scadabr.timer.cron.EventCronTask;
-import br.org.scadabr.timer.cron.EventRunnable;
-import br.org.scadabr.timer.cron.SystemCronTask;
-import br.org.scadabr.timer.cron.SystemRunnable;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.utils.ImplementMeException;
 import java.util.MissingResourceException;
@@ -92,9 +83,6 @@ public class Common {
     //TODO inject this
     private static final ResourceBundle env = ResourceBundle.getBundle("env");
 
-    @Deprecated // move to own bean ??? And what is monitored ???
-    public static final MonitoredValues MONITORED_VALUES = new MonitoredValues();
-
     /*
      * Updating the Mango version: - Create a DBUpdate subclass for the old
      * version number. This may not do anything in particular to the schema, but
@@ -116,7 +104,6 @@ public class Common {
         @Deprecated
         String SCHEDULER = "SCHEDULER";
         String FREEMARKER_CONFIG = "FREEMARKER_CONFIG";
-        String BACKGROUND_PROCESSING = "BACKGROUND_PROCESSING";
         String HTTP_RECEIVER_MULTICASTER = "HTTP_RECEIVER_MULTICASTER";
         String DOCUMENTATION_MANIFEST = "DOCUMENTATION_MANIFEST";
         String DATA_POINTS_NAME_ID_MAPPING = "DATAPOINTS_NAME_ID_MAPPING";

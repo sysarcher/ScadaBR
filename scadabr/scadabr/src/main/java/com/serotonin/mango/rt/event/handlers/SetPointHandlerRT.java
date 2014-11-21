@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.l10n.AbstractLocalizer;
+import br.org.scadabr.rt.SchedulerPool;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -47,6 +48,8 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
     private static final Log LOG = LogFactory.getLog(SetPointHandlerRT.class);
     @Autowired
     private RuntimeManager runtimeManager;
+    @Autowired
+    private SchedulerPool schedulerPool;
 
     public SetPointHandlerRT(EventHandlerVO vo) {
         this.vo = vo;
@@ -100,8 +103,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
         }
 
         // Queue a work item to perform the set point.
-        Common.ctx.getBackgroundProcessing().addWorkItem(
-                new SetPointWorkItem(vo.getTargetPointId(), new PointValueTime(value, evt.getFireTimestamp()), this));
+        schedulerPool.execute(new SetPointWorkItem(vo.getTargetPointId(), new PointValueTime(value, evt.getFireTimestamp()), this));
     }
 
     @Override
@@ -151,8 +153,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
             throw new ShouldNeverHappenException("Unknown active action: " + vo.getInactiveAction());
         }
 
-        Common.ctx.getBackgroundProcessing().addWorkItem(
-                new SetPointWorkItem(vo.getTargetPointId(), new PointValueTime(value, evt.getInactiveTimestamp()), this));
+        schedulerPool.execute(new SetPointWorkItem(vo.getTargetPointId(), new PointValueTime(value, evt.getInactiveTimestamp()), this));
     }
 
     private void raiseFailureEvent(LocalizableMessage message, EventType et) {
