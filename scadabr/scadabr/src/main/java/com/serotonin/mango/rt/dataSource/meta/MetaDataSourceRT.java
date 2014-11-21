@@ -27,6 +27,7 @@ import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
+import com.serotonin.mango.vo.DataPointVO;
 
 /**
  * @author Matthew Lohbihler
@@ -37,7 +38,6 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
     public static final int EVENT_TYPE_SCRIPT_ERROR = 2;
     public static final int EVENT_TYPE_RESULT_TYPE_ERROR = 3;
 
-    private final List<DataPointRT> points = new CopyOnWriteArrayList<>();
     private boolean contextPointDisabledEventActive;
 
     public MetaDataSourceRT(MetaDataSourceVO vo) {
@@ -52,33 +52,25 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
     @Override
     public void dataPointEnabled(DataPointRT dataPoint) {
         super.dataPointEnabled(dataPoint);
-            remove(dataPoint);
-
             MetaPointLocatorRT locator = dataPoint.getPointLocator();
-            points.add(dataPoint);
             locator.start(this, dataPoint); 
             checkForDisabledPoints();
     }
 
-    /*
     @Override
-    public void removeDataPoint(DataPointRT dataPoint) {
-        synchronized (pointListChangeLock) {
-            remove(dataPoint);
-            checkForDisabledPoints();
+    public void dataPointDisabled(DataPointVO dataPoint) {
+        DataPointRT dp = enabledDataPointsCache.get(dataPoint.getId());
+        if (dp != null) {
+            MetaPointLocatorRT locator = dp.getPointLocator();
+            locator.terminate();
         }
-    }
-*/
-    private void remove(DataPointRT dataPoint) {
-        MetaPointLocatorRT locator = dataPoint.getPointLocator();
-        locator.terminate();
-        points.remove(dataPoint);
+        super.dataPointDisabled(dataPoint);
     }
 
     synchronized void checkForDisabledPoints() {
         DataPointRT problemPoint = null;
 
-        for (DataPointRT dp : points) {
+        for (DataPointRT dp : enabledDataPoints.values()) {
             MetaPointLocatorRT locator = dp.getPointLocator();
             if (!locator.isContextCreated()) {
                 problemPoint = dp;

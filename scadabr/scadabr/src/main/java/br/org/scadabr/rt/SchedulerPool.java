@@ -13,8 +13,8 @@ import br.org.scadabr.timer.cron.EventCronTask;
 import br.org.scadabr.timer.cron.EventRunnable;
 import br.org.scadabr.timer.cron.SystemCronTask;
 import br.org.scadabr.timer.cron.SystemRunnable;
-import com.serotonin.mango.util.timeout.EventRunWithArgTask;
-import com.serotonin.mango.util.timeout.SystemRunWithArgTask;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -95,6 +95,10 @@ public class SchedulerPool {
         dataSourcePool.execute(runnable);
     }
 
+    public <T> Future<T> systemPoolInvoke(Callable<T> t) throws InterruptedException {
+        return systemPool.invoke(t);
+    }
+    
     public void execute(SystemRunnable runnable) {
         systemPool.execute(runnable);
     }
