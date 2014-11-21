@@ -7,6 +7,7 @@ package br.org.scadabr.timer;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +18,8 @@ import java.util.logging.Logger;
 /**
  *
  * @author aploese
+ * @param <T>
+ * @param <V>
  */
 public class CronTimerPool<T extends CronTask, V extends Runnable> {
     
@@ -100,6 +103,11 @@ public class CronTimerPool<T extends CronTask, V extends Runnable> {
 
     ThreadPoolExecutor tpe;
 
+    public <O> Future<O> submit(CronTaskCallable<O> task) throws InterruptedException {
+        return tpe.submit(task); 
+    }
+
+    
     public void execute(V r) {
         tpe.execute(r);
     }

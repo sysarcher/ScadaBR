@@ -33,7 +33,6 @@ class BatchWriteBehindEntry {
         params[index++] = pointId;
         params[index++] = dataType.mangoDbId;
         params[index++] = dvalue;
-        Logger.getLogger(LogUtils.LOGGER_SCADABR_DAO).log(Level.SEVERE, "WRITE TO PARAM TS {0} VALUE: {1}", new Object[]{new Date(time), dvalue});
         params[index++] = time;
     }
     

@@ -9,7 +9,6 @@ import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
-import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
 
 /**
  *

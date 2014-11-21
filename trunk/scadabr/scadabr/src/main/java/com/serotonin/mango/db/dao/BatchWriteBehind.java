@@ -8,16 +8,13 @@ package com.serotonin.mango.db.dao;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.rt.SchedulerPool;
-import br.org.scadabr.timer.cron.SystemRunnable;
+import br.org.scadabr.timer.cron.SystemCallable;
 import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.db.DatabaseAccessFactory;
-import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -33,7 +30,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @Named
 class BatchWriteBehind {
 
-    class BatchWriteBehindCallable implements Callable<Integer> {
+    class BatchWriteBehindCallable implements SystemCallable<Integer> {
 
         private JdbcTemplate ejt;
         private Future<Integer> future;
@@ -45,6 +42,7 @@ class BatchWriteBehind {
 
         @Override
         public Integer call() {
+            LOG.log(Level.FINE, "Start Write Batch entries: {0}", entriesToWrite.size());
             int entriesWritten = 0;
             try {
                 BatchWriteBehindEntry[] inserts;
@@ -70,10 +68,12 @@ class BatchWriteBehind {
                     int retries = 10;
                     while (true) {
                         try {
+                            final long start = System.currentTimeMillis();
+                            LOG.log(Level.FINER, "Concurrency saving call ejt");
                             final int count = ejt.update(sb.toString(), params);
                             entriesWritten += count;
-                            if (LOG.isLoggable(Level.FINEST)) {
-                                LOG.log(Level.FINEST, "Concurrency saving SUCCESS {0}", count);
+                            if (LOG.isLoggable(Level.FINER)) {
+                                LOG.log(Level.FINER, "Concurrency saving SUCCESS {0} rows in {1}ms", new Object[]{count, System.currentTimeMillis() - start});
                             }
                             break;
                         } catch (ConcurrencyFailureException e) {
@@ -95,15 +95,20 @@ class BatchWriteBehind {
                         } catch (DataAccessException e) {
                             LOG.log(Level.SEVERE, "Error saving batch inserts. Data lost.", e);
                             break;
+                        } catch (Throwable t) {
+                            LOG.log(Level.SEVERE, "Unknown Error saving batch inserts. Data lost.", t);
+                            break;
                         }
                     }
                 }
                 return entriesWritten;
             } finally {
+                LOG.finer("Will finish Write Batch");
                 synchronized (sheduledOrRunningLock) {
                     future = null;
                     sheduledOrRunning = false;
                 }
+                LOG.finer("Write Batch finished");
             }
         }
 
@@ -141,11 +146,13 @@ class BatchWriteBehind {
     }
 
     void add(BatchWriteBehindEntry e, JdbcTemplate ejt) {
+        boolean needsFlush = false;
         synchronized (entriesToWrite) {
             entriesToWrite.add(e);
-            if (entriesToWrite.size() > maxRows) {
-                flush(ejt);
-            }
+            needsFlush = (entriesToWrite.size() > maxRows) && !batchWriteBehindCallable.sheduledOrRunning;
+        }
+        if (needsFlush) {
+            flush(ejt);
         }
     }
 
@@ -159,22 +166,33 @@ class BatchWriteBehind {
      * @return a Future if any data to write otherwise null.
      */
     public Future<Integer> flush(JdbcTemplate ejt) {
+        LOG.log(Level.FINE, "flush called, entries: {0}", entriesToWrite.size());
         synchronized (batchWriteBehindCallable) {
-            Future<Integer> f = batchWriteBehindCallable.future; 
+            Future<Integer> f = batchWriteBehindCallable.future;
             if (f != null) {
+                LOG.fine("flush already scheduled");
                 return f;
             }
             try {
                 if (entriesToWrite.isEmpty()) {
+                    LOG.fine("nothing to flush");
                     return null;
                 }
                 batchWriteBehindCallable.ejt = ejt;
                 batchWriteBehindCallable.sheduledOrRunning = true;
-                f = schedulerPool.systemPoolInvoke(batchWriteBehindCallable);
+                LOG.finest("will schedule Batch");
+                f = schedulerPool.submit(batchWriteBehindCallable);
+                LOG.finest("Batch scheduled");
                 synchronized (batchWriteBehindCallable.sheduledOrRunningLock) {
-                    if (batchWriteBehindCallable.sheduledOrRunning) 
+                    if (batchWriteBehindCallable.sheduledOrRunning) {
+                        LOG.fine("Batch runnung");
                         batchWriteBehindCallable.future = f;
+                    } else {
+                        LOG.fine("Batch finished before");
+                    }
+
                 }
+
             } catch (InterruptedException ex) {
                 LOG.log(Level.SEVERE, null, ex);
                 throw new RuntimeException("Cant flush", ex);
