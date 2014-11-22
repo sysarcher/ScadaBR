@@ -64,8 +64,8 @@ import br.org.scadabr.i18n.LocalizableMessageParseException;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.utils.ImplementMeException;
-import br.org.scadabr.vo.event.type.AuditEventSource;
-import br.org.scadabr.vo.event.type.SystemEventSource;
+import br.org.scadabr.vo.event.type.AuditEventKey;
+import br.org.scadabr.vo.event.type.SystemEventKey;
 import static com.serotonin.mango.db.dao.BaseDao.charToBool;
 import com.serotonin.mango.vo.User;
 import java.sql.Connection;
@@ -423,7 +423,7 @@ public class EventDao extends BaseDao {
             case DATA_SOURCE:
                 return new DataSourceEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
             case SYSTEM:
-                return new SystemEventType(SystemEventSource.fromId(rs.getInt(offset + 1)), rs.getInt(offset + 2));
+                return new SystemEventType(SystemEventKey.fromId(rs.getInt(offset + 1)), rs.getInt(offset + 2));
             case COMPOUND:
                 return new CompoundDetectorEventType(rs.getInt(offset + 1));
             case SCHEDULED:
@@ -431,7 +431,7 @@ public class EventDao extends BaseDao {
             case PUBLISHER:
                 return new PublisherEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
             case AUDIT:
-                return new AuditEventType(AuditEventSource.fromId(rs.getInt(offset + 1)), rs.getInt(offset + 2));
+                return new AuditEventType(AuditEventKey.fromId(rs.getInt(offset + 1)), rs.getInt(offset + 2));
             case MAINTENANCE:
                 return new MaintenanceEventType(rs.getInt(offset + 1));
             default:
@@ -852,7 +852,7 @@ public class EventDao extends BaseDao {
                     }
                 }));
 
-        AuditEventType.raiseAddedEvent(AuditEventSource.EVENT_HANDLER,
+        AuditEventType.raiseAddedEvent(AuditEventKey.EVENT_HANDLER,
                 handler);
     }
 
@@ -872,7 +872,7 @@ public class EventDao extends BaseDao {
             }
         });
 
-        AuditEventType.raiseChangedEvent(AuditEventSource.EVENT_HANDLER,
+        AuditEventType.raiseChangedEvent(AuditEventKey.EVENT_HANDLER,
                 old, handler);
     }
 
@@ -880,7 +880,7 @@ public class EventDao extends BaseDao {
         EventHandlerVO handler = getEventHandler(handlerId);
         ejt.update("delete from eventHandlers where id=?",
                 new Object[]{handlerId});
-        AuditEventType.raiseDeletedEvent(AuditEventSource.EVENT_HANDLER,
+        AuditEventType.raiseDeletedEvent(AuditEventKey.EVENT_HANDLER,
                 handler);
     }
 

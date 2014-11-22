@@ -41,7 +41,7 @@ import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.rt.event.type.EventSources;
-import br.org.scadabr.vo.event.type.AuditEventSource;
+import br.org.scadabr.vo.event.type.AuditEventKey;
 import java.sql.Connection;
 import java.sql.Statement;
 import javax.inject.Inject;
@@ -136,7 +136,7 @@ public class DataSourceDao extends BaseDao {
             }
         });
         vo.setId(id);
-        AuditEventType.raiseAddedEvent(AuditEventSource.DATA_SOURCE, vo);
+        AuditEventType.raiseAddedEvent(AuditEventKey.DATA_SOURCE, vo);
     }
 
     @SuppressWarnings("unchecked")
@@ -168,7 +168,7 @@ public class DataSourceDao extends BaseDao {
 
         }
 
-        AuditEventType.raiseChangedEvent(AuditEventSource.DATA_SOURCE, old, (ChangeComparable<DataSourceVO<?>>) vo);
+        AuditEventType.raiseChangedEvent(AuditEventKey.DATA_SOURCE, old, (ChangeComparable<DataSourceVO<?>>) vo);
     }
 
     public void deleteDataSource(final int dataSourceId) {
@@ -189,7 +189,7 @@ public class DataSourceDao extends BaseDao {
                 }
             });
 
-            AuditEventType.raiseDeletedEvent(AuditEventSource.DATA_SOURCE, vo);
+            AuditEventType.raiseDeletedEvent(AuditEventKey.DATA_SOURCE, vo);
         }
     }
 

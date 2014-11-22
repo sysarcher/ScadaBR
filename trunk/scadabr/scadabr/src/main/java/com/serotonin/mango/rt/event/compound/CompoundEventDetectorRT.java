@@ -33,7 +33,7 @@ import br.org.scadabr.util.LifecycleException;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import br.org.scadabr.vo.event.type.SystemEventSource;
+import br.org.scadabr.vo.event.type.SystemEventKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -230,7 +230,7 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
     // }
     // }
     public void raiseFailureEvent(LocalizableMessage message) {
-        final SystemEventType failureEventType = new SystemEventType(SystemEventSource.COMPOUND_DETECTOR_FAILURE, vo.getId());
+        final SystemEventType failureEventType = new SystemEventType(SystemEventKey.COMPOUND_DETECTOR_FAILURE, vo.getId());
         failureEventType.fire(message);
         vo.setDisabled(true);
         compoundEventDetectorDao.saveCompoundEventDetector(vo);

@@ -30,7 +30,7 @@ import br.org.scadabr.io.StreamUtils;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.SystemRunnable;
 import com.serotonin.mango.rt.event.type.SystemEventType;
-import br.org.scadabr.vo.event.type.SystemEventSource;
+import br.org.scadabr.vo.event.type.SystemEventKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -61,7 +61,7 @@ public class ProcessWorkItem implements SystemRunnable {
         try {
             executeProcessCommand(command);
         } catch (IOException e) {
-            new SystemEventType(SystemEventSource.PROCESS_FAILURE).fire("event.process.failure", command, e.getMessage());
+            new SystemEventType(SystemEventKey.PROCESS_FAILURE).fire("event.process.failure", command, e.getMessage());
         }
     }
 

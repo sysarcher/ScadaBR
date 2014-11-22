@@ -27,17 +27,14 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.ShouldNeverHappenException;
-import com.serotonin.mango.Common;
 import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
-import br.org.scadabr.vo.event.type.AuditEventSource;
-import br.org.scadabr.vo.event.type.SystemEventSource;
+import br.org.scadabr.vo.event.type.AuditEventKey;
+import br.org.scadabr.vo.event.type.SystemEventKey;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import javax.annotation.PostConstruct;
 import javax.inject.Named;
-import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -118,17 +115,32 @@ public class SystemSettingsDao extends BaseDao {
     @Override
     public void init() {
         super.init();
-        for (SystemEventSource s : SystemEventSource.values()) {
-            final AlarmLevel l = s.getAlarmLevel();
+        for (SystemEventKey s : SystemEventKey.values()) {
+            final AlarmLevel l = getAlarmLevel(s);
             if (l != null) {
                 // override if avail
                 s.setAlarmLevel(l);
             }
         }
+        for (AuditEventKey a : AuditEventKey.values()) {
+            final AlarmLevel l = getAlarmLevel(a);
+            if (l != null) {
+                // override if avail
+                a.setAlarmLevel(l);
+            }
+        }
     }
 
-    public AlarmLevel getAlarmLevel(SystemEventSource key) {
+    public AlarmLevel getAlarmLevel(SystemEventKey key) {
         String value = getValue(SYSTEM_EVENT_ALARMLEVEL_PREFIX + key.name(), null);
+        if (value == null) {
+            return null;
+        }
+        return AlarmLevel.values()[Integer.parseInt(value)];
+    }
+
+    public AlarmLevel getAlarmLevel(AuditEventKey key) {
+        String value = getValue(AUDIT_EVENT_ALARMLEVEL_PREFIX + key.name(), null);
         if (value == null) {
             return null;
         }
@@ -369,11 +381,11 @@ public class SystemSettingsDao extends BaseDao {
 
     }
 
-    public void saveAlarmLevel(SystemEventSource key) {
+    public void saveAlarmLevel(SystemEventKey key) {
         setValue(SYSTEM_EVENT_ALARMLEVEL_PREFIX + key.name(), Integer.toString(key.getAlarmLevel().getId()));
     }
 
-    public void saveAlarmlevel(AuditEventSource key) {
+    public void saveAlarmlevel(AuditEventKey key) {
         setValue(AUDIT_EVENT_ALARMLEVEL_PREFIX + key.name(), Integer.toString(key.getAlarmLevel().getId()));
     }
 }
