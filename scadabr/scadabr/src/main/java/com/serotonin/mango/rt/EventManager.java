@@ -49,7 +49,7 @@ import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.AlarmLevel;
-import br.org.scadabr.vo.event.type.SystemEventSource;
+import br.org.scadabr.vo.event.type.SystemEventKey;
 import java.io.Serializable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -164,7 +164,7 @@ public class EventManager implements ILifecycle, Serializable {
                 if (type.getAlarmLevel().meIsHigher(highestActiveAlarmLevel)) {
                     AlarmLevel oldValue = highestActiveAlarmLevel;
                     highestActiveAlarmLevel = type.getAlarmLevel();
-                    new SystemEventType(SystemEventSource.MAX_ALARM_LEVEL_CHANGED).fire(timestamp, "event.alarmMaxIncreased", oldValue, highestActiveAlarmLevel);
+                    new SystemEventType(SystemEventKey.MAX_ALARM_LEVEL_CHANGED).fire(timestamp, "event.alarmMaxIncreased", oldValue, highestActiveAlarmLevel);
                 }
             }
 
@@ -278,11 +278,11 @@ public class EventManager implements ILifecycle, Serializable {
             if (max.meIsHigher(highestActiveAlarmLevel)) {
                 AlarmLevel oldValue = highestActiveAlarmLevel;
                 highestActiveAlarmLevel = max;
-                new SystemEventType(SystemEventSource.MAX_ALARM_LEVEL_CHANGED).fire(time, "event.alarmMaxIncreased", oldValue, highestActiveAlarmLevel);
+                new SystemEventType(SystemEventKey.MAX_ALARM_LEVEL_CHANGED).fire(time, "event.alarmMaxIncreased", oldValue, highestActiveAlarmLevel);
             } else if (max.meIsLower(highestActiveAlarmLevel)) {
                 AlarmLevel oldValue = highestActiveAlarmLevel;
                 highestActiveAlarmLevel = max;
-                new SystemEventType(SystemEventSource.MAX_ALARM_LEVEL_CHANGED).fire(time, "event.alarmMaxDecreased", oldValue, highestActiveAlarmLevel);
+                new SystemEventType(SystemEventKey.MAX_ALARM_LEVEL_CHANGED).fire(time, "event.alarmMaxDecreased", oldValue, highestActiveAlarmLevel);
             }
         }
     }

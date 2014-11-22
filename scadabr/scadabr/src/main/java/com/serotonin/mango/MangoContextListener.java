@@ -49,7 +49,7 @@ import com.serotonin.mango.view.ViewGraphicLoader;
 import com.serotonin.mango.vo.report.ReportTaskManager;
 import com.serotonin.mango.vo.report.ReportVO;
 import com.serotonin.mango.web.ContextWrapper;
-import br.org.scadabr.vo.event.type.SystemEventSource;
+import br.org.scadabr.vo.event.type.SystemEventKey;
 
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -119,7 +119,7 @@ public class MangoContextListener implements ServletContextListener {
         reportsInitialize();
         maintenanceInitialize();
         // Notify the event manager of the startup.
-        new SystemEventType(SystemEventSource.SYSTEM_STARTUP).fire("event.system.startup");
+        new SystemEventType(SystemEventKey.SYSTEM_STARTUP).fire("event.system.startup");
 
         LOG.info("Mango context started");
     }
@@ -130,7 +130,7 @@ public class MangoContextListener implements ServletContextListener {
 
         if (eventManager != null) {
             // Notify the event manager of the shutdown.
-            new SystemEventType(SystemEventSource.SYSTEM_SHUTDOWN).fire("event.system.shutdown");
+            new SystemEventType(SystemEventKey.SYSTEM_SHUTDOWN).fire("event.system.shutdown");
         }
         //Logout the User 
         for (UserSessionContextBean us : runtimeManager.getUserSessionContextBeans()) {

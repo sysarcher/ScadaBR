@@ -5,14 +5,14 @@
  */
 package br.org.scadabr.vo.event.type;
 
-import br.org.scadabr.utils.i18n.LocalizableEnum;
+import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.vo.event.AlarmLevel;
 
 /**
  *
  * @author aploese
  */
-public enum AuditEventSource implements LocalizableEnum<AuditEventSource> {
+public enum AuditEventKey implements EventKey<AuditEventKey>{
 
     DATA_SOURCE(1, "event.audit.dataSource"),
     DATA_POINT(2, "event.audit.dataPoint"),
@@ -26,7 +26,7 @@ public enum AuditEventSource implements LocalizableEnum<AuditEventSource> {
     private final int id;
     private AlarmLevel alarmLevel;
 
-    private AuditEventSource(int id, String i18nKey) {
+    private AuditEventKey(int id, String i18nKey) {
         this.i18nKey = i18nKey;
         this.id = id;
         this.alarmLevel = getDefaultAlarmLevel();
@@ -42,11 +42,12 @@ public enum AuditEventSource implements LocalizableEnum<AuditEventSource> {
         return i18nKey;
     }
     
+    @Override
     public int getId() {
         return id;
     }
 
-    public static AuditEventSource fromId(int id) {
+    public static AuditEventKey fromId(int id) {
         switch (id) {
             case 1:
                 return DATA_SOURCE;
@@ -77,6 +78,7 @@ public enum AuditEventSource implements LocalizableEnum<AuditEventSource> {
     /**
      * @return the defaultAlarmLevel
      */
+    @Override
     public AlarmLevel getDefaultAlarmLevel() {
         return AlarmLevel.INFORMATION;
     }
@@ -97,6 +99,16 @@ public enum AuditEventSource implements LocalizableEnum<AuditEventSource> {
     
     public boolean isDefaultAlarmlevel() {
         return getDefaultAlarmLevel() == alarmLevel;
+    }
+
+    @Override
+    public DuplicateHandling getDuplicateHandling() {
+        return DuplicateHandling.IGNORE;
+    }
+
+    @Override
+    public boolean isStateful() {
+        return false;
     }
 
 

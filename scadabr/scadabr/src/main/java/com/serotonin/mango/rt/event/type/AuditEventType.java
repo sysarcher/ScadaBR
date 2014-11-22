@@ -31,19 +31,21 @@ import com.serotonin.mango.vo.User;
 import br.org.scadabr.web.i18n.LocalizableI18nKey;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import br.org.scadabr.vo.event.type.AuditEventSource;
+import br.org.scadabr.vo.event.type.AuditEventKey;
+import com.serotonin.mango.db.dao.SystemSettingsDao;
 import java.util.Objects;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 public class AuditEventType extends EventType {
 
-    public static void raiseAddedEvent(AuditEventSource auditEventType, ChangeComparable<?> o) {
+    public static void raiseAddedEvent(AuditEventKey auditEventType, ChangeComparable<?> o) {
         List<LocalizableMessage> list = new ArrayList<>();
         o.addProperties(list);
         raiseEvent(auditEventType, o, "event.audit.added", list.toArray());
     }
 
-    public static <T> void raiseChangedEvent(AuditEventSource auditEventType, T from, ChangeComparable<T> to) {
+    public static <T> void raiseChangedEvent(AuditEventKey auditEventType, T from, ChangeComparable<T> to) {
         List<LocalizableMessage> changes = new ArrayList<>();
         to.addPropertyChanges(changes, from);
         if (changes.isEmpty()) // If the object wasn't in fact changed, don't raise an event.
@@ -53,13 +55,13 @@ public class AuditEventType extends EventType {
         raiseEvent(auditEventType, to, "event.audit.changed", changes.toArray());
     }
 
-    public static void raiseDeletedEvent(AuditEventSource auditEventType, ChangeComparable<?> o) {
+    public static void raiseDeletedEvent(AuditEventKey auditEventType, ChangeComparable<?> o) {
         List<LocalizableMessage> list = new ArrayList<>();
         o.addProperties(list);
         raiseEvent(auditEventType, o, "event.audit.deleted", list.toArray());
     }
 
-    private static void raiseEvent(AuditEventSource auditEventType, ChangeComparable<?> o, String key, Object[] props) {
+    private static void raiseEvent(AuditEventKey auditEventType, ChangeComparable<?> o, String key, Object[] props) {
         User user = Common.getUser();
         Object username;
         if (user != null) {
@@ -175,15 +177,11 @@ public class AuditEventType extends EventType {
     // / Instance stuff
     // /
     //
-    private AuditEventSource auditEventType;
+    private final AuditEventKey auditEventType;
     private int referenceId;
     private User raisingUser;
 
-    public AuditEventType() {
-        // Required for reflection.
-    }
-
-    public AuditEventType(AuditEventSource auditEventType, int referenceId) {
+    public AuditEventType(AuditEventKey auditEventType, int referenceId) {
         this.auditEventType = auditEventType;
         this.referenceId = referenceId;
     }
@@ -193,7 +191,7 @@ public class AuditEventType extends EventType {
         return EventSources.AUDIT;
     }
 
-    public AuditEventSource getAuditEventType() {
+    public AuditEventKey getAuditEventType() {
         return auditEventType;
     }
 
@@ -257,7 +255,7 @@ public class AuditEventType extends EventType {
 
     @Override
     public boolean isStateful() {
-        return false;
+        return auditEventType.isStateful();
     }
 
 }

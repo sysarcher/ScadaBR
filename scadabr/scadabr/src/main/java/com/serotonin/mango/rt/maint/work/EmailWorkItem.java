@@ -28,7 +28,7 @@ import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.web.email.MangoEmailContent;
 import br.org.scadabr.web.email.EmailContent;
 import br.org.scadabr.web.email.EmailSender;
-import br.org.scadabr.vo.event.type.SystemEventSource;
+import br.org.scadabr.vo.event.type.SystemEventKey;
 import java.io.UnsupportedEncodingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -110,7 +110,7 @@ public class EmailWorkItem implements SystemRunnable {
                 }
                 to += addr.getAddress();
             }
-            new SystemEventType(SystemEventSource.EMAIL_SEND_FAILURE).fire("event.email.failure", subject, to, e.getMessage());
+            new SystemEventType(SystemEventKey.EMAIL_SEND_FAILURE).fire("event.email.failure", subject, to, e.getMessage());
         } finally {
             if (postSendExecution != null) {
                 for (Runnable runnable : postSendExecution) {

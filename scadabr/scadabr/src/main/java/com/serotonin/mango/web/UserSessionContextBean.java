@@ -6,7 +6,7 @@
 package com.serotonin.mango.web;
 
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import br.org.scadabr.vo.event.type.SystemEventSource;
+import br.org.scadabr.vo.event.type.SystemEventKey;
 import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.event.type.SystemEventType;
@@ -51,7 +51,7 @@ public class UserSessionContextBean implements Serializable {
      */
     public void loginUser(User user) {
         this.user = user;
-        new SystemEventType(SystemEventSource.USER_LOGIN, user.getId()).fire("event.login", user.getUsername());
+        new SystemEventType(SystemEventKey.USER_LOGIN, user.getId()).fire("event.login", user.getUsername());
         runtimeManager.UserSessionStarts(this);
     }
 
@@ -59,7 +59,7 @@ public class UserSessionContextBean implements Serializable {
      * @param user the user to set
      */
     public void logoutUser() {
-        new SystemEventType(SystemEventSource.USER_LOGIN, user.getId()).clearAlarm();
+        new SystemEventType(SystemEventKey.USER_LOGIN, user.getId()).clearAlarm();
         user.cancelTestingUtility();
         runtimeManager.UserSessionEnds(this);
         this.user = null;
@@ -166,7 +166,7 @@ public class UserSessionContextBean implements Serializable {
     }
 
     public void systemShutdown() {
-        new SystemEventType(SystemEventSource.USER_LOGIN, user.getId()).disableAlarm();
+        new SystemEventType(SystemEventKey.USER_LOGIN, user.getId()).disableAlarm();
         user.cancelTestingUtility();
         this.user = null;
     }

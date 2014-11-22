@@ -55,7 +55,7 @@ import br.org.scadabr.util.queue.ByteQueue;
 import br.org.scadabr.web.http.HttpUtils;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import br.org.scadabr.vo.event.type.SystemEventSource;
+import br.org.scadabr.vo.event.type.SystemEventKey;
 import java.text.ParseException;
 import java.util.TimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,8 +136,7 @@ public class VersionCheck extends SystemCronTask {
     }
 
     private static SystemEventType getEventType() {
-        return new SystemEventType(SystemEventSource.VERSION_CHECK, 0,
-                DuplicateHandling.IGNORE_SAME_MESSAGE);
+        return new SystemEventType(SystemEventKey.VERSION_CHECK, 0);
     }
 
     private LocalizableMessage newVersionCheck(long fireTime, String notifLevel) throws Exception {

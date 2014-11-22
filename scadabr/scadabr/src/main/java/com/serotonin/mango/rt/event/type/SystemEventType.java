@@ -21,37 +21,28 @@ package com.serotonin.mango.rt.event.type;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
-import br.org.scadabr.vo.event.type.SystemEventSource;
-
+import br.org.scadabr.vo.event.type.SystemEventKey;
+import com.serotonin.mango.db.dao.SystemSettingsDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 public class SystemEventType extends EventType {
-
+    
     //
     // /
     // / Instance stuff
     // /
     //
-    private SystemEventSource systemEventType;
+    private final SystemEventKey systemEventType;
     private int referenceId;
-    private DuplicateHandling duplicateHandling = DuplicateHandling.ALLOW;
 
-    public SystemEventType() {
-        // Required for reflection.
-    }
-
-    public SystemEventType(SystemEventSource systemEventType) {
+    public SystemEventType(SystemEventKey systemEventType) {
         this.systemEventType = systemEventType;
     }
 
-    public SystemEventType(SystemEventSource systemEventType, int referenceId) {
+    public SystemEventType(SystemEventKey systemEventType, int referenceId) {
         this(systemEventType);
         this.referenceId = referenceId;
-    }
-
-    public SystemEventType(SystemEventSource systemEventType, int referenceId, DuplicateHandling duplicateHandling) {
-        this(systemEventType);
-        this.referenceId = referenceId;
-        this.duplicateHandling = duplicateHandling;
     }
 
     @Override
@@ -59,7 +50,7 @@ public class SystemEventType extends EventType {
         return EventSources.SYSTEM;
     }
 
-    public SystemEventSource getSystemEventType() {
+    public SystemEventKey getSystemEventType() {
         return systemEventType;
     }
 
@@ -75,7 +66,7 @@ public class SystemEventType extends EventType {
 
     @Override
     public DuplicateHandling getDuplicateHandling() {
-        return duplicateHandling;
+        return systemEventType.getDuplicateHandling();
     }
 
     public int getReferenceId() {

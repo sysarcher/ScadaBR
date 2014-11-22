@@ -33,8 +33,8 @@ import com.serotonin.mango.rt.event.type.PublisherEventType;
 import com.serotonin.mango.rt.event.type.ScheduledEventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.vo.event.type.AuditEventSource;
-import br.org.scadabr.vo.event.type.SystemEventSource;
+import br.org.scadabr.vo.event.type.AuditEventKey;
+import br.org.scadabr.vo.event.type.SystemEventKey;
 
 @Deprecated //TODO Whats this for anyway currently stateful is not handled at all...
 public class EventTypeVO {
@@ -93,7 +93,7 @@ public class EventTypeVO {
             case DATA_SOURCE:
                 return new DataSourceEventType(typeRef1, typeRef2, alarmLevel, duplicateHandling, stateful);
             case SYSTEM:
-                return new SystemEventType(SystemEventSource.fromId(typeRef1), typeRef2);
+                return new SystemEventType(SystemEventKey.fromId(typeRef1), typeRef2);
             case COMPOUND:
                 return new CompoundDetectorEventType(typeRef1);
             case SCHEDULED:
@@ -101,7 +101,7 @@ public class EventTypeVO {
             case PUBLISHER:
                 return new PublisherEventType(typeRef1, typeRef2);
             case AUDIT:
-                return new AuditEventType(AuditEventSource.fromId(typeRef1), typeRef2);
+                return new AuditEventType(AuditEventKey.fromId(typeRef1), typeRef2);
             case MAINTENANCE:
                 return new MaintenanceEventType(typeRef1);
             default:
