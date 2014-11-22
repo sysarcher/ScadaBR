@@ -11,7 +11,7 @@ import br.org.scadabr.rt.dataSource.dnp3.Dnp3DataSource;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteProperty;
+
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.Common;
@@ -55,22 +55,22 @@ abstract public class Dnp3DataSourceVO<T extends Dnp3DataSourceVO<T>> extends Da
         return new Dnp3PointLocatorVO();
     }
 
-    @JsonRemoteProperty
+    
     private int synchPeriods = 20;
-    @JsonRemoteProperty
+    
     private int staticPollPeriods = 30;
     private TimePeriods rbePeriodType = TimePeriods.SECONDS;
-    @JsonRemoteProperty
+    
     private int rbePollPeriods = 1;
-    @JsonRemoteProperty
+    
     private boolean quantize;
-    @JsonRemoteProperty
+    
     private int timeout = 800;
-    @JsonRemoteProperty
+    
     private int retries = 2;
-    @JsonRemoteProperty
+    
     private int sourceAddress = 1;
-    @JsonRemoteProperty
+    
     private int slaveAddress = 2;
 
     public int getSynchPeriods() {

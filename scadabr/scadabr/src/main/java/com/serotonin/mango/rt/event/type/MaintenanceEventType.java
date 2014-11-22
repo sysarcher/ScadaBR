@@ -1,10 +1,6 @@
 package com.serotonin.mango.rt.event.type;
 
-import java.util.Map;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
@@ -87,22 +83,6 @@ public class MaintenanceEventType extends EventType {
             return false;
         }
         return true;
-    }
-
-    //
-    //
-    // Serialization
-    //
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-        map.put("XID", maintenanceEventDao.getMaintenanceEvent(maintenanceId).getXid());
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-        maintenanceId = getMaintenanceEventId(json, "XID");
     }
 
     @Override

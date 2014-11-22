@@ -28,8 +28,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import br.org.scadabr.rt.datasource.vmstat.VMStatPointLocatorRT;
@@ -42,10 +42,10 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class VMStatPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
-    @JsonRemoteProperty
+    
     private Attribute attribute = Attribute.CPU_ID;
 
     @Override

@@ -10,16 +10,13 @@ import java.util.List;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import com.serotonin.mango.Common;
 import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import javax.inject.Named;
-import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -99,7 +96,7 @@ public class MaintenanceEventDao extends BaseDao {
     }
 
     public void saveMaintenanceEvent(final MaintenanceEventVO me) {
-        if (me.getId() == Common.NEW_ID) {
+        if (me.isNew()) {
             insertMaintenanceEvent(me);
         } else {
             updateMaintenanceEvent(me);

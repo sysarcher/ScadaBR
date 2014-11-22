@@ -24,26 +24,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import br.org.scadabr.db.IntValuePair;
-import br.org.scadabr.json.JsonArray;
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
-import br.org.scadabr.json.JsonValue;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.meta.MetaPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
@@ -51,12 +41,8 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.datasource.meta.UpdateEvent;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.serotonin.mango.rt.dataImage.DataPointRT;
-import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
 import java.text.ParseException;
 import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.Set;
 import java.util.TimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -64,23 +50,23 @@ import org.springframework.beans.factory.annotation.Configurable;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 @Configurable
-public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+public class MetaPointLocatorVO extends AbstractPointLocatorVO {
 
     @Autowired
     private DataPointDao dataPointDao;
 
     private List<IntValuePair> context = new ArrayList<>();
-    @JsonRemoteProperty
+    
     private String script;
     private DataType dataType;
-    @JsonRemoteProperty
+    
     private boolean settable;
     private UpdateEvent updateEvent = UpdateEvent.CONTEXT_UPDATE;
-    @JsonRemoteProperty
+    
     private String updateCronPattern;
-    @JsonRemoteProperty
+    
     private int executionDelaySeconds;
     private String name;
 
@@ -293,68 +279,6 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         }
     }
 
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        DataType value = deserializeDataType(json, EnumSet.of(DataType.IMAGE));
-        if (value != null) {
-            dataType = value;
-        }
-
-        String text = json.getString("updateEvent");
-        if (text != null) {
-            try {
-                updateEvent = UpdateEvent.valueOf(text);
-            } catch (Exception e) {
-                throw new LocalizableJsonException("emport.error.invalid", "updateEvent", text,
-                        UpdateEvent.values());
-            }
-        }
-
-        JsonArray jsonContext = json.getJsonArray("context");
-        if (jsonContext != null) {
-            context.clear();
-
-            for (JsonValue jv : jsonContext.getElements()) {
-                JsonObject jo = jv.toJsonObject();
-                String xid = jo.getString("dataPointXid");
-                if (xid == null) {
-                    throw new LocalizableJsonException("emport.error.meta.missing", "dataPointXid");
-                }
-
-                DataPointVO dp = dataPointDao.getDataPoint(xid);
-                if (dp == null) {
-                    throw new LocalizableJsonException("emport.error.missingPoint", xid);
-                }
-
-                String var = jo.getString("varName");
-                if (var == null) {
-                    throw new LocalizableJsonException("emport.error.meta.missing", "varName");
-                }
-
-                context.add(new IntValuePair(dp.getId(), var));
-            }
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        serializeDataType(map);
-
-        map.put("updateEvent", updateEvent.name());
-
-        List<Map<String, Object>> pointList = new ArrayList<>();
-        for (IntValuePair p : context) {
-            DataPointVO dp = dataPointDao.getDataPoint(p.getKey());
-            if (dp != null) {
-                Map<String, Object> point = new HashMap<>();
-                pointList.add(point);
-                point.put("varName", p.getValue());
-                point.put("dataPointXid", dp.getXid());
-            }
-        }
-        map.put("context", pointList);
-    }
-
     public boolean isScriptEmpty() {
         return script == null ? true : script.isEmpty();
     }
@@ -362,6 +286,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
     /**
      * @return the name
      */
+    @Override
     public String getName() {
         return name;
     }

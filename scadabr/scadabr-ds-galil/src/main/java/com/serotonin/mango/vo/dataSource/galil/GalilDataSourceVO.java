@@ -27,8 +27,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.galil.GalilDataSourceRT;
@@ -46,7 +46,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class GalilDataSourceVO extends DataSourceVO<GalilDataSourceVO> {
 
     public static final Type TYPE = Type.GALIL;
@@ -94,16 +94,16 @@ public class GalilDataSourceVO extends DataSourceVO<GalilDataSourceVO> {
         return new GalilDataSourceRT(this);
     }
 
-    @JsonRemoteProperty
+    
     private String host;
-    @JsonRemoteProperty
+    
     private int port = 2000;
-    @JsonRemoteProperty
+    
     private int timeout = 1000;
-    @JsonRemoteProperty
+    
     private int retries = 2;
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 5;
 
     public String getHost() {

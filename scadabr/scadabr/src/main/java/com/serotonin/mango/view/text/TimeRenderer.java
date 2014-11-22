@@ -25,15 +25,15 @@ import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
 import java.util.EnumSet;
 
-@JsonRemoteEntity
+
 public class TimeRenderer extends BaseTextRenderer {
 
     private static ImplDefinition definition = new ImplDefinition("textRendererTime", "TIME", "textRenderer.time",
@@ -53,9 +53,9 @@ public class TimeRenderer extends BaseTextRenderer {
         return definition;
     }
 
-    @JsonRemoteProperty
+    
     private String format;
-    @JsonRemoteProperty
+    
     private int conversionExponent;
 
     private SimpleDateFormat formatInstance;

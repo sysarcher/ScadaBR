@@ -17,7 +17,7 @@ import br.org.scadabr.json.JsonArray;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import br.org.scadabr.json.JsonValue;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.util.ChangeComparable;
@@ -25,7 +25,7 @@ import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 
-@JsonRemoteEntity
+
 public class ContextualizedScriptVO extends ScriptVO<ContextualizedScriptVO>
         implements ChangeComparable<ContextualizedScriptVO> {
 

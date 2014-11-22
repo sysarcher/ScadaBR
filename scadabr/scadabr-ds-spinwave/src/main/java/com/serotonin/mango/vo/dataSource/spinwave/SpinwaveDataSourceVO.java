@@ -24,8 +24,8 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.spinwave.SpinwaveDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -42,7 +42,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class SpinwaveDataSourceVO extends DataSourceVO<SpinwaveDataSourceVO> {
 
     public static final Type TYPE = Type.SPINWAVE;
@@ -93,13 +93,13 @@ public class SpinwaveDataSourceVO extends DataSourceVO<SpinwaveDataSourceVO> {
         return new SpinwaveV1PointLocatorVO();
     }
 
-    @JsonRemoteProperty
+    
     private int messageVersion;
-    @JsonRemoteProperty
+    
     private String commPortId;
-    @JsonRemoteProperty
+    
     private long[] sensorAddresses = new long[0];
-    @JsonRemoteProperty
+    
     private int heartbeatTimeout = 30;
 
     public String getCommPortId() {

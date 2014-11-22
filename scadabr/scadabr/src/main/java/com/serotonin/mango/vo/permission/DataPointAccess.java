@@ -18,17 +18,8 @@
  */
 package com.serotonin.mango.vo.permission;
 
-import java.util.Map;
-
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.mango.util.LocalizableJsonException;
-import com.serotonin.mango.vo.DataPointVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -36,9 +27,9 @@ import org.springframework.beans.factory.annotation.Configurable;
  * @author Matthew Lohbihler
  *
  */
-@JsonRemoteEntity
+
 @Configurable
-public class DataPointAccess implements JsonSerializable {
+public class DataPointAccess {
 
     public static final int READ = 1;
     public static final int SET = 2;
@@ -71,32 +62,4 @@ public class DataPointAccess implements JsonSerializable {
         this.permission = permission;
     }
 
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        String text = json.getString("dataPointXid");
-        if (text == null) {
-            throw new LocalizableJsonException("emport.error.permission.missing", "dataPointXid");
-        }
-
-        DataPointVO dp = dataPointDao.getDataPoint(text);
-        if (dp == null) {
-            throw new LocalizableJsonException("emport.error.missingPoint", text);
-        }
-        dataPointId = dp.getId();
-
-        text = json.getString("permission");
-        if (text == null) {
-            throw new LocalizableJsonException("emport.error.missing", "permission", ACCESS_CODES.getCodeList());
-        }
-        permission = ACCESS_CODES.getId(text);
-        if (permission == -1) {
-            throw new LocalizableJsonException("emport.error.invalid", "permission", text, ACCESS_CODES.getCodeList());
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("dataPointXid", dataPointDao.getDataPoint(dataPointId).getXid());
-        map.put("permission", ACCESS_CODES.getCode(permission));
-    }
 }

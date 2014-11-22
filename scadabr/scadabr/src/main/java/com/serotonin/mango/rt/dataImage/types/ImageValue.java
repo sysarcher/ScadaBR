@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import br.org.scadabr.InvalidArgumentException;
+import br.org.scadabr.ScadaBrConstants;
 import br.org.scadabr.io.StreamUtils;
 import com.serotonin.mango.Common;
 import br.org.scadabr.util.ArrayUtils;
@@ -48,7 +49,7 @@ public class ImageValue extends MangoValue implements Comparable<ImageValue> {
     public static final int TYPE_JPG = 1;
     private static final String[] TYPES = {"", "jpg"};
 
-    private long id = Common.NEW_ID;
+    private long id = ScadaBrConstants.NEW_ID;
     private int type;
     private byte[] data;
 
@@ -111,8 +112,8 @@ public class ImageValue extends MangoValue implements Comparable<ImageValue> {
         return TYPES[type];
     }
 
-    public boolean isSaved() {
-        return id != Common.NEW_ID;
+    public boolean isNew() {
+        return id == ScadaBrConstants.NEW_ID;
     }
 
     public Image getImage() {
@@ -128,7 +129,7 @@ public class ImageValue extends MangoValue implements Comparable<ImageValue> {
     }
 
     public byte[] getImageData() throws IOException {
-        if (!isSaved()) {
+        if (isNew()) {
             return data;
         }
 

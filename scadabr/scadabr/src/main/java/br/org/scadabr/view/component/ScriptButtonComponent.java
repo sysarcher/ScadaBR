@@ -4,22 +4,22 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.component.HtmlComponent;
 import br.org.scadabr.util.SerializationHelper;
 
-@JsonRemoteEntity
+
 public class ScriptButtonComponent extends HtmlComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition(
             "scriptButton", "SCRIPT_BUTTON", "graphic.scriptButton", null);
 
-    @JsonRemoteProperty
+    
     private String scriptXid;
 
-    @JsonRemoteProperty
+    
     private String text;
 
     @Override

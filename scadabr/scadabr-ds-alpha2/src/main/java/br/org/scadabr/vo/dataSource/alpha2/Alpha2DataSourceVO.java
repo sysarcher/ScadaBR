@@ -11,8 +11,8 @@ import br.org.scadabr.rt.dataSource.alpha2.Alpha2DataSource;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.modbus.ModbusDataSource;
@@ -27,29 +27,29 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class Alpha2DataSourceVO extends DataSourceVO<Alpha2DataSourceVO> {
 
     public static final Type TYPE = Type.ALPHA_2;
 
     private TimePeriods updatePeriodType = TimePeriods.SECONDS;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 1;
-    @JsonRemoteProperty
+    
     private String commPortId;
-    @JsonRemoteProperty
+    
     private int baudRate = 9600;
-    @JsonRemoteProperty
+    
     private int dataBits = 8;
-    @JsonRemoteProperty
+    
     private int stopBits = 1;
-    @JsonRemoteProperty
+    
     private int parity = 0;
-    @JsonRemoteProperty
+    
     private int timeout = 300;
-    @JsonRemoteProperty
+    
     private int retries = 2;
-    @JsonRemoteProperty
+    
     private int station = 0;
 
     @Override

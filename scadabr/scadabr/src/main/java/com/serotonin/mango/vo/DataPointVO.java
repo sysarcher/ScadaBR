@@ -24,28 +24,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 import br.org.scadabr.InvalidArgumentException;
+import br.org.scadabr.ScadaBrConstants;
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.json.JsonArray;
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
-import br.org.scadabr.json.JsonValue;
-import com.serotonin.mango.Common;
+
+
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.chart.ChartRenderer;
-import com.serotonin.mango.view.text.BaseTextRenderer;
 import com.serotonin.mango.view.text.NoneRenderer;
 import com.serotonin.mango.view.text.PlainRenderer;
 import com.serotonin.mango.view.text.TextRenderer;
@@ -58,15 +49,15 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.vo.IntervalLoggingTypes;
 import br.org.scadabr.vo.LoggingTypes;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
 import java.util.EnumSet;
-import java.util.Objects;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@JsonRemoteEntity
 
-public class DataPointVO implements Serializable, Cloneable, JsonSerializable, ChangeComparable<DataPointVO> {
+
+public class DataPointVO implements Serializable, Cloneable, ChangeComparable<DataPointVO> {
 
     @Autowired //TODO use @Configurable for Validator
     private DataPointDao dataPointDao;
@@ -96,51 +87,51 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         return pointLocator.getConfigurationDescription();
     }
 
+    @JsonIgnore
     public boolean isNew() {
-        return id == Common.NEW_ID;
+        return id == ScadaBrConstants.NEW_ID;
     }
 
     //
     //
     // Properties
     //
-    private int id = Common.NEW_ID;
+    private int id = ScadaBrConstants.NEW_ID;
     private String xid;
-    @JsonRemoteProperty
+    
     private String name;
     private int dataSourceId;
-    @JsonRemoteProperty
+    
     private String deviceName;
-    @JsonRemoteProperty
+    
     private boolean enabled;
     private int pointFolderId;
     private LoggingTypes loggingType = LoggingTypes.ON_CHANGE;
     private TimePeriods intervalLoggingPeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int intervalLoggingPeriod = 15;
     private IntervalLoggingTypes intervalLoggingType = IntervalLoggingTypes.INSTANT;
-    @JsonRemoteProperty
+    
     private double tolerance = 0;
     private TimePeriods _purgeType = TimePeriods.YEARS;
-    @JsonRemoteProperty
+    
     private int purgePeriod = 1;
-    @JsonRemoteProperty(typeFactory = BaseTextRenderer.Factory.class)
     private TextRenderer textRenderer;
-//TODO    @JsonRemoteProperty(typeFactory = BaseChartRenderer.Factory.class)
+//TODO    (typeFactory = BaseChartRenderer.Factory.class)
     private ChartRenderer chartRenderer;
     private List<PointEventDetectorVO> eventDetectors;
     private List<UserComment> comments;
-    @JsonRemoteProperty
+    
     @Deprecated
     private int defaultCacheSize = 1;
-    @JsonRemoteProperty
+    
     private boolean discardExtremeValues = false;
-    @JsonRemoteProperty
+    
     private double discardLowLimit = -Double.MAX_VALUE;
-    @JsonRemoteProperty
+    
     private double discardHighLimit = Double.MAX_VALUE;
     private int engineeringUnits = ENGINEERING_UNITS_DEFAULT;
-    @JsonRemoteProperty
+    
     private String chartColour;
 
     private PointLocatorVO pointLocator;
@@ -156,7 +147,7 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
     //
     // Required for importing
     //
-    @JsonRemoteProperty
+    
     private String dataSourceXid;
 
     //
@@ -798,103 +789,4 @@ public class DataPointVO implements Serializable, Cloneable, JsonSerializable, C
         }
     }
 
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("xid", xid);
-        map.put("loggingType", loggingType.name());
-        map.put("intervalLoggingPeriodType", intervalLoggingPeriodType.name());
-        map.put("intervalLoggingType", intervalLoggingType.name());
-        map.put("purgeType", _purgeType.name());
-        map.put("pointLocator", pointLocator);
-        map.put("eventDetectors", eventDetectors);
-        map.put("engineeringUnits", ENGINEERING_UNITS_CODES.getCode(engineeringUnits));
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        String text = json.getString("loggingType");
-        if (text != null) {
-            try {
-            loggingType = LoggingTypes.valueOf(text);
-            } catch (Exception e) {
-                throw new LocalizableJsonException("emport.error.invalid", "loggingType", text,
-                        loggingType.values());
-            }
-        }
-
-        text = json.getString("intervalLoggingPeriodType");
-        if (text != null) {
-            try {
-                intervalLoggingPeriodType = TimePeriods.valueOf(text);
-            } catch (Exception e) {
-                throw new LocalizableJsonException("emport.error.invalid", "intervalLoggingPeriodType", text,
-                        TimePeriods.values());
-            }
-        }
-
-        text = json.getString("intervalLoggingType");
-        if (text != null) {
-            try {
-            intervalLoggingType = IntervalLoggingTypes.valueOf(text);
-            } catch (Exception e) {
-                throw new LocalizableJsonException("emport.error.invalid", "intervalLoggingType", text,
-                        IntervalLoggingTypes.values());
-            }
-        }
-
-        text = json.getString("purgeType");
-        if (text != null) {
-            try {
-                _purgeType = TimePeriods.valueOf(text);
-            } catch (Exception e) {
-                throw new LocalizableJsonException("emport.error.invalid", "purgeType", text,
-                        TimePeriods.values());
-            }
-        }
-
-        JsonObject locatorJson = json.getJsonObject("pointLocator");
-        if (locatorJson != null) {
-            reader.populateObject(pointLocator, locatorJson);
-        }
-
-        JsonArray pedArray = json.getJsonArray("eventDetectors");
-        if (pedArray != null) {
-            for (JsonValue jv : pedArray.getElements()) {
-                JsonObject pedObject = jv.toJsonObject();
-
-                String pedXid = pedObject.getString("xid");
-                if (pedXid.isEmpty()) {
-                    throw new LocalizableJsonException("emport.error.ped.missingAttr", "xid");
-                }
-
-                // Use the ped xid to lookup an existing ped.
-                PointEventDetectorVO ped = null;
-                for (PointEventDetectorVO existing : eventDetectors) {
-                    if (Objects.equals(pedXid, existing.getXid())) {
-                        ped = existing;
-                        break;
-                    }
-                }
-
-                if (ped == null) {
-                    // Create a new one
-                    ped = new PointEventDetectorVO();
-                    ped.setId(Common.NEW_ID);
-                    ped.setXid(pedXid);
-                    ped.njbSetDataPoint(this);
-                    eventDetectors.add(ped);
-                }
-
-                reader.populateObject(ped, pedObject);
-            }
-        }
-
-        text = json.getString("engineeringUnits");
-        if (text != null) {
-            engineeringUnits = ENGINEERING_UNITS_CODES.getId(text);
-            if (engineeringUnits == -1) {
-                engineeringUnits = ENGINEERING_UNITS_DEFAULT;
-            }
-        }
-    }
 }

@@ -27,8 +27,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.sql.SqlDataSourceRT;
@@ -46,7 +46,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class SqlDataSourceVO extends DataSourceVO<SqlDataSourceVO> {
 
     public static final Type TYPE = Type.SQL;
@@ -93,20 +93,20 @@ public class SqlDataSourceVO extends DataSourceVO<SqlDataSourceVO> {
         return new SqlPointLocatorVO();
     }
 
-    @JsonRemoteProperty
+    
     private String driverClassname;
-    @JsonRemoteProperty
+    
     private String connectionUrl;
-    @JsonRemoteProperty
+    
     private String username;
-    @JsonRemoteProperty
+    
     private String password;
-    @JsonRemoteProperty
+    
     private String selectStatement;
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 5;
-    @JsonRemoteProperty
+    
     private boolean rowBasedQuery = false;
 
     public String getDriverClassname() {

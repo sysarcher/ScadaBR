@@ -23,14 +23,6 @@ import java.util.Set;
 
 import org.joda.time.DateTime;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import com.serotonin.mango.util.LocalizableJsonException;
-import br.org.scadabr.util.StringUtils;
-
-@JsonRemoteEntity
 public class AddressEntry extends EmailRecipient {
 
     private String address;
@@ -73,19 +65,4 @@ public class AddressEntry extends EmailRecipient {
         return address;
     }
 
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-        map.put("address", address);
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-
-        address = json.getString("address");
-        if (address.isEmpty()) {
-            throw new LocalizableJsonException("emport.error.recipient.missing.reference", "address");
-        }
-    }
 }

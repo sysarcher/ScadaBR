@@ -27,7 +27,7 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteProperty;
+
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.Common;
@@ -75,23 +75,23 @@ abstract public class ModbusDataSourceVO<T extends ModbusDataSourceVO<T>> extend
     }
 
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 5;
-    @JsonRemoteProperty
+    
     private boolean quantize;
-    @JsonRemoteProperty
+    
     private int timeout = 500;
-    @JsonRemoteProperty
+    
     private int retries = 2;
-    @JsonRemoteProperty
+    
     private boolean contiguousBatches;
-    @JsonRemoteProperty
+    
     private boolean createSlaveMonitorPoints;
-    @JsonRemoteProperty
+    
     private int maxReadBitCount = Modbus.DEFAULT_MAX_READ_BIT_COUNT;
-    @JsonRemoteProperty
+    
     private int maxReadRegisterCount = Modbus.DEFAULT_MAX_READ_REGISTER_COUNT;
-    @JsonRemoteProperty
+    
     private int maxWriteRegisterCount = Modbus.DEFAULT_MAX_WRITE_REGISTER_COUNT;
 
     public int getUpdatePeriods() {

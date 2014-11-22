@@ -28,7 +28,7 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import br.org.scadabr.logger.LogUtils;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import br.org.scadabr.rt.datasource.mbus.MBusDataSourceRT;
@@ -54,7 +54,7 @@ import net.sf.mbus4j.SerialPortConnection;
 import net.sf.mbus4j.TcpIpConnection;
 import net.sf.mbus4j.dataframes.MBusMedium;
 
-@JsonRemoteEntity
+
 public class MBusDataSourceVO extends DataSourceVO<MBusDataSourceVO> {
 
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCARABR_DS_MBUS);

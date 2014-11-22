@@ -24,22 +24,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonSerializable;
-import br.org.scadabr.json.JsonValue;
-import br.org.scadabr.json.TypeFactory;
 import br.org.scadabr.view.FormatPatternHolder;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImplDefinition;
 
-abstract public class BaseTextRenderer implements TextRenderer, JsonSerializable, FormatPatternHolder {
+abstract public class BaseTextRenderer implements TextRenderer, FormatPatternHolder {
 
     static List<ImplDefinition> definitions;
 
@@ -188,63 +178,6 @@ abstract public class BaseTextRenderer implements TextRenderer, JsonSerializable
 
     private void readObject(ObjectInputStream in) throws IOException {
         in.readInt(); // Read the version. Value is currently not used.
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) {
-        // no op. The type value is used by the factory.
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("type", getDef().getExportName());
-    }
-
-    public static class Factory implements TypeFactory {
-
-        @Override
-        public Class<?> getType(JsonValue jsonValue) throws JsonException {
-            JsonObject json = jsonValue.toJsonObject();
-
-            String type = json.getString("type");
-            if (type == null) {
-                throw new LocalizableJsonException("emport.error.text.missing", "type", getExportTypes());
-            }
-
-            ImplDefinition def = null;
-            ensureDefinitions();
-            for (ImplDefinition id : definitions) {
-                if (id.getExportName().equalsIgnoreCase(type)) {
-                    def = id;
-                    break;
-                }
-            }
-
-            if (def == null) {
-                throw new LocalizableJsonException("emport.error.text.invalid", "type", type, getExportTypes());
-            }
-
-            Class<? extends TextRenderer> clazz = null;
-            if (def == AnalogRenderer.getDefinition()) {
-                clazz = AnalogRenderer.class;
-            } else if (def == BinaryTextRenderer.getDefinition()) {
-                clazz = BinaryTextRenderer.class;
-            } else if (def == MultistateRenderer.getDefinition()) {
-                clazz = MultistateRenderer.class;
-            } else if (def == NoneRenderer.getDefinition()) {
-                clazz = NoneRenderer.class;
-            } else if (def == PlainRenderer.getDefinition()) {
-                clazz = PlainRenderer.class;
-            } else if (def == RangeRenderer.getDefinition()) {
-                clazz = RangeRenderer.class;
-            } else if (def == TimeRenderer.getDefinition()) {
-                clazz = TimeRenderer.class;
-            } else {
-                throw new ShouldNeverHappenException("What's this?: " + def.getName());
-            }
-
-            return clazz;
-        }
     }
 
 }

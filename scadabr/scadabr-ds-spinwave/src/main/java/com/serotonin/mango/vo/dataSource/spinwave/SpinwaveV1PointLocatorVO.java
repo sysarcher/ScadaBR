@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
@@ -34,7 +34,7 @@ import com.serotonin.spinwave.v1.SwMessageV1;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class SpinwaveV1PointLocatorVO extends BaseSpinwavePointLocatorVO {
 
     public interface AttributeTypes {

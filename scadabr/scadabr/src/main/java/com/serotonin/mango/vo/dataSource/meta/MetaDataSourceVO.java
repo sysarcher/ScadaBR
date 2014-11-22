@@ -24,7 +24,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
 import com.serotonin.mango.util.ExportCodes;
@@ -38,7 +38,7 @@ import org.springframework.validation.Validator;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class MetaDataSourceVO extends DataSourceVO<MetaDataSourceVO> {
 
     public static final Type TYPE = Type.META;

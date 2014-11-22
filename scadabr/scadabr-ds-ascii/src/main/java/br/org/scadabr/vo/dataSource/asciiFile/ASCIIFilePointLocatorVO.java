@@ -14,8 +14,8 @@ import br.org.scadabr.rt.dataSource.asciiFile.ASCIIFilePointLocatorRT;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
@@ -23,21 +23,21 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 
-@JsonRemoteEntity
+
 public class ASCIIFilePointLocatorVO extends AbstractPointLocatorVO implements
         JsonSerializable {
 
-    @JsonRemoteProperty
+    
     private String valueRegex = "";
-    @JsonRemoteProperty
+    
     private boolean customTimestamp;
-    @JsonRemoteProperty
+    
     private String timestampFormat = "";
-    @JsonRemoteProperty
+    
     private String timestampRegex = "";
-    @JsonRemoteProperty
+    
     private DataType dataType = DataType.BINARY;
-    @JsonRemoteProperty
+    
     private boolean settable;
 
     @Override

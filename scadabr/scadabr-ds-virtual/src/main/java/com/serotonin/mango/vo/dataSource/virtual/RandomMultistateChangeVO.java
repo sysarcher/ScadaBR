@@ -24,20 +24,20 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataSource.virtual.ChangeTypeRT;
 import com.serotonin.mango.rt.dataSource.virtual.RandomMultistateChangeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class RandomMultistateChangeVO extends ChangeTypeVO {
 
     public static final LocalizableMessage KEY = new LocalizableMessageImpl("dsEdit.virtual.changeType.random");
 
-    @JsonRemoteProperty
+    
     private int[] values = new int[0];
 
     @Override

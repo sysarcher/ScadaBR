@@ -18,28 +18,18 @@
  */
 package com.serotonin.mango.vo;
 
-import java.util.ArrayList;
+import br.org.scadabr.ScadaBrConstants;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import br.org.scadabr.vo.exporter.ZIPProjectManager;
-
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.json.JsonArray;
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
-import br.org.scadabr.json.JsonValue;
+
+
 import br.org.scadabr.vo.event.AlarmLevel;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.View;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.permission.DataPointAccess;
@@ -49,35 +39,36 @@ import com.serotonin.mango.vo.publish.PublisherVO;
 import com.serotonin.mango.web.dwr.beans.DataExportDefinition;
 import com.serotonin.mango.web.dwr.beans.TestingUtility;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
-@JsonRemoteEntity
-@Configurable //TODO this is not Working, so manually insert Runtimemanager for JSON
-public class User implements Serializable, SetPointSource, JsonSerializable {
 
-    private int id = Common.NEW_ID;
-    @JsonRemoteProperty
+@Configurable //TODO this is not Working, so manually insert Runtimemanager for JSON
+public class User implements Serializable, SetPointSource {
+
+    private int id = ScadaBrConstants.NEW_ID;
+    
     private String username;
-    @JsonRemoteProperty
+    
     private String password;
-    @JsonRemoteProperty
+    
     private String email;
-    @JsonRemoteProperty
+    
     private String phone;
-    @JsonRemoteProperty
+    
     private boolean admin;
-    @JsonRemoteProperty
+    
     private boolean disabled;
     private List<Integer> dataSourcePermissions;
     private List<DataPointAccess> dataPointPermissions;
     private int selectedWatchList;
-    @JsonRemoteProperty
+    
     private String homeUrl;
     private long lastLogin;
     private AlarmLevel receiveAlarmEmails;
-    @JsonRemoteProperty
+    
     private boolean receiveOwnAuditEvents;
     @Autowired
     private DataPointDao dataPointDao;
@@ -367,7 +358,7 @@ public class User implements Serializable, SetPointSource, JsonSerializable {
         if (email.isEmpty()) {
             response.addContextual("email", "validate.required");
         }
-        if (id == Common.NEW_ID && password.isEmpty()) {
+        if (id == ScadaBrConstants.NEW_ID && password.isEmpty()) {
             response.addContextual("password", "validate.required");
         }
 
@@ -380,79 +371,6 @@ public class User implements Serializable, SetPointSource, JsonSerializable {
         }
         if (phone.length() > 40) {
             response.addContextual("phone", "validate.notLongerThan", 40);
-        }
-    }
-
-    //
-    // /
-    // / Serialization
-    // /
-    //
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) {
-        // Note: data source permissions are explicitly deserialized by the
-        // import/export because the data sources and
-        // points need to be certain to exist before we can resolve the xids.
-    }
-
-    public void jsonDeserializePermissions(JsonReader reader, JsonObject json)
-            throws JsonException {
-        if (admin) {
-            dataSourcePermissions.clear();
-            dataPointPermissions.clear();
-        } else {
-            JsonArray jsonDataSources = json
-                    .getJsonArray("dataSourcePermissions");
-            if (jsonDataSources != null) {
-                dataSourcePermissions.clear();
-
-                for (JsonValue jv : jsonDataSources.getElements()) {
-                    String xid = jv.toJsonString().getValue();
-                    DataSourceVO<?> ds = dataSourceDao.getDataSource(xid);
-                    if (ds == null) {
-                        throw new LocalizableJsonException(
-                                "emport.error.missingSource", xid);
-                    }
-                    dataSourcePermissions.add(ds.getId());
-                }
-            }
-
-            JsonArray jsonPoints = json.getJsonArray("dataPointPermissions");
-            if (jsonPoints != null) {
-                // Get a list of points to which permission already exists due
-                // to data source access.
-                List<Integer> permittedPoints = new ArrayList<>();
-                for (Integer dsId : dataSourcePermissions) {
-                    for (DataPointVO dp : dataPointDao
-                            .getDataPoints(dsId, null)) {
-                        permittedPoints.add(dp.getId());
-                    }
-                }
-
-                dataPointPermissions.clear();
-
-                for (JsonValue jv : jsonPoints.getElements()) {
-                    DataPointAccess access = reader.readPropertyValue(jv,
-                            DataPointAccess.class, null);
-                    if (!permittedPoints.contains(access.getDataPointId())) // The user doesn't already have access to the point.
-                    {
-                        dataPointPermissions.add(access);
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        if (!admin) {
-            List<String> dsXids = new ArrayList<>();
-            for (Integer dsId : dataSourcePermissions) {
-                dsXids.add(dataSourceDao.getDataSource(dsId).getXid());
-            }
-            map.put("dataSourcePermissions", dsXids);
-
-            map.put("dataPointPermissions", dataPointPermissions);
         }
     }
 
@@ -482,18 +400,13 @@ public class User implements Serializable, SetPointSource, JsonSerializable {
         return true;
     }
 
-    public void setUploadedProject(ZIPProjectManager uploadedProject) {
-        this.uploadedProject = uploadedProject;
-    }
-
-    public ZIPProjectManager getUploadedProject() {
-        return uploadedProject;
-    }
-
-    private ZIPProjectManager uploadedProject;
-
     public boolean isReceiveAlarmEmails() {
         return receiveAlarmEmails != null;
+    }
+
+    @JsonIgnore
+    public boolean isNew() {
+        return id == ScadaBrConstants.NEW_ID;
     }
 
 }

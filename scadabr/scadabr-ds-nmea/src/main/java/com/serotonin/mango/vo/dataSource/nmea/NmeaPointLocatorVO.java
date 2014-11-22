@@ -28,8 +28,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.nmea.NmeaPointLocatorRT;
@@ -44,7 +44,7 @@ import java.util.EnumSet;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
     @Override
@@ -62,12 +62,12 @@ public class NmeaPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         return new LocalizableMessageImpl("dsEdit.nmea.dpconn", messageName, fieldIndex);
     }
 
-    @JsonRemoteProperty
+    
     private String messageName;
-    @JsonRemoteProperty
+    
     private int fieldIndex = 1;
     private DataType dataType;
-    @JsonRemoteProperty
+    
     private String binary0Value;
 
     public String getMessageName() {

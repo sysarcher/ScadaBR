@@ -27,8 +27,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.modbus.ModbusSerialDataSource;
@@ -41,7 +41,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class ModbusSerialDataSourceVO extends ModbusDataSourceVO<ModbusSerialDataSourceVO> implements JsonSerializable {
 
     public static final Type TYPE = Type.MODBUS_SERIAL;
@@ -91,23 +91,23 @@ public class ModbusSerialDataSourceVO extends ModbusDataSourceVO<ModbusSerialDat
         return new ModbusSerialDataSource(this);
     }
 
-    @JsonRemoteProperty
+    
     private String commPortId;
-    @JsonRemoteProperty
+    
     private int baudRate = 9600;
-    @JsonRemoteProperty
+    
     private int flowControlIn = 0;
-    @JsonRemoteProperty
+    
     private int flowControlOut = 0;
-    @JsonRemoteProperty
+    
     private int dataBits = 8;
-    @JsonRemoteProperty
+    
     private int stopBits = 1;
-    @JsonRemoteProperty
+    
     private int parity = 0;
-    @JsonRemoteProperty
+    
     private EncodingType encoding;
-    @JsonRemoteProperty
+    
     private boolean echo = false;
     private int concurrency = SerialMaster.SYNC_FUNCTION;
 

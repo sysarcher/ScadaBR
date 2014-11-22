@@ -6,7 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.persistent.PersistentPointLocatorRT;
@@ -14,7 +14,7 @@ import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class PersistentPointLocatorVO extends AbstractPointLocatorVO {
 
     @Override

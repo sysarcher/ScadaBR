@@ -23,7 +23,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import br.org.scadabr.rt.datasource.vmstat.VMStatDataSourceRT;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
@@ -41,7 +41,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class VMStatDataSourceVO extends DataSourceVO<VMStatDataSourceVO> {
 
     @Override

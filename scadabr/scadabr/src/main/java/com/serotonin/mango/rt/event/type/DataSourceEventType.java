@@ -18,21 +18,15 @@
  */
 package com.serotonin.mango.rt.event.type;
 
-import java.util.Map;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.db.dao.DataSourceDao;
-import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
-@JsonRemoteEntity
+
 @Configurable
 public class DataSourceEventType extends EventType {
     @Autowired
@@ -122,27 +116,6 @@ public class DataSourceEventType extends EventType {
             return false;
         }
         return dataSourceId == other.dataSourceId;
-    }
-
-    //
-    // /
-    // / Serialization
-    // /
-    //
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-        DataSourceVO<?> ds = dataSourceDao.getDataSource(dataSourceId);
-        map.put("XID", ds.getXid());
-        map.put("dataSourceEventType", ds.getEventCodes().getCode(dataSourceEventTypeId));
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-        DataSourceVO<?> ds = getDataSource(json, "XID");
-        dataSourceId = ds.getId();
-        dataSourceEventTypeId = getInt(json, "dataSourceEventType", ds.getEventCodes());
     }
 
     @Override

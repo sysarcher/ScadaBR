@@ -24,8 +24,8 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -42,7 +42,7 @@ import org.springframework.validation.Errors;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourceVO> {
 
     @Override
@@ -128,9 +128,9 @@ public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourc
         return new HttpReceiverPointLocatorVO();
     }
 
-    @JsonRemoteProperty
+    
     private String[] ipWhiteList = new String[]{"*.*.*.*"};
-    @JsonRemoteProperty
+    
     private String[] deviceIdWhiteList = new String[]{"*"};
 
     public String[] getIpWhiteList() {

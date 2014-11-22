@@ -28,16 +28,9 @@ import java.util.List;
 import java.util.Map;
 
 import br.org.scadabr.db.IntValuePair;
-import br.org.scadabr.json.JsonArray;
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonValue;
+
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import java.util.EnumSet;
@@ -45,14 +38,14 @@ import java.util.EnumSet;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class MultistateGraphicComponent extends ImageSetComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("multistateGraphic", "MULTISTATE_GRAPHIC",
             "graphic.multistateGraphic", EnumSet.of(DataType.MULTISTATE));
 
     private Map<Integer, Integer> stateImageMap = new HashMap<>();
-    @JsonRemoteProperty
+    
     private int defaultImage;
 
     public int getDefaultImage() {
@@ -182,42 +175,4 @@ public class MultistateGraphicComponent extends ImageSetComponent {
         }
     }
 
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-
-        JsonArray jsonStateList = json.getJsonArray("stateImageMappings");
-        if (jsonStateList != null) {
-            stateImageMap.clear();
-
-            for (JsonValue jv : jsonStateList.getElements()) {
-                JsonObject jsonMapping = jv.toJsonObject();
-                Integer state = jsonMapping.getInt("state");
-                if (state == null) {
-                    throw new LocalizableJsonException("emport.error.missingValue", "state");
-                }
-
-                Integer index = jsonMapping.getInt("imageIndex");
-                if (index == null) {
-                    throw new LocalizableJsonException("emport.error.missingValue", "index");
-                }
-
-                stateImageMap.put(state, index);
-            }
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-
-        List<Map<String, Object>> jsonStateList = new ArrayList<>();
-        map.put("stateImageMappings", jsonStateList);
-        for (Map.Entry<Integer, Integer> mapping : stateImageMap.entrySet()) {
-            Map<String, Object> jsonMapping = new HashMap<>();
-            jsonMapping.put("state", mapping.getKey());
-            jsonMapping.put("imageIndex", mapping.getValue());
-            jsonStateList.add(jsonMapping);
-        }
-    }
 }

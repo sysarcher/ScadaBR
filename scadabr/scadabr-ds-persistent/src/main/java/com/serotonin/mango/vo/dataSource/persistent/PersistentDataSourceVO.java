@@ -5,8 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.persistent.PersistentDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -18,7 +18,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class PersistentDataSourceVO extends DataSourceVO<PersistentDataSourceVO> {
 
     public static final Type TYPE = Type.PERSISTENT;
@@ -60,11 +60,11 @@ public class PersistentDataSourceVO extends DataSourceVO<PersistentDataSourceVO>
         return new PersistentPointLocatorVO();
     }
 
-    @JsonRemoteProperty
+    
     private int port;
-    @JsonRemoteProperty
+    
     private String authorizationKey;
-    @JsonRemoteProperty
+    
     private boolean acceptPointUpdates;
 
     public int getPort() {

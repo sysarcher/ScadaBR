@@ -29,8 +29,8 @@ import br.org.scadabr.db.KeyValuePair;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.publish.PublisherRT;
@@ -48,7 +48,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class HttpSenderVO extends PublisherVO<HttpPointVO> {
 
     @Override
@@ -105,15 +105,15 @@ public class HttpSenderVO extends PublisherVO<HttpPointVO> {
         return new HttpPointVO();
     }
 
-    @JsonRemoteProperty
+    
     private String url;
-    @JsonRemoteProperty
+    
     private boolean usePost;
-    @JsonRemoteProperty(innerType = KeyValuePair.class)
+    (innerType = KeyValuePair.class)
     private List<KeyValuePair> staticHeaders = new ArrayList<>();
-    @JsonRemoteProperty(innerType = KeyValuePair.class)
+    (innerType = KeyValuePair.class)
     private List<KeyValuePair> staticParameters = new ArrayList<>();
-    @JsonRemoteProperty
+    
     private boolean raiseResultWarning = true;
     private int dateFormat = DATE_FORMAT_BASIC;
 

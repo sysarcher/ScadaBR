@@ -27,8 +27,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataSource.virtual.AnalogAttractorChangeRT;
 import com.serotonin.mango.rt.dataSource.virtual.ChangeTypeRT;
@@ -38,14 +38,14 @@ import com.serotonin.mango.vo.DataPointVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class AnalogAttractorChangeVO extends ChangeTypeVO {
 
     public static final LocalizableMessage KEY = new LocalizableMessageImpl("dsEdit.virtual.changeType.attractor");
 
-    @JsonRemoteProperty
+    
     private double maxChange;
-    @JsonRemoteProperty
+    
     private double volatility;
     private int attractionPointId;
 

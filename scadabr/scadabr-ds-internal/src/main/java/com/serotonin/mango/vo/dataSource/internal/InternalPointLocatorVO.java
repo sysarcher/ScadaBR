@@ -28,7 +28,7 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.internal.InternalPointLocatorRT;
@@ -43,7 +43,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class InternalPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
     public interface Attributes {

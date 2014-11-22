@@ -28,8 +28,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.jmx.JmxPointLocatorRT;
@@ -44,17 +44,17 @@ import java.util.EnumSet;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class JmxPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
-    @JsonRemoteProperty
+    
     private String objectName;
-    @JsonRemoteProperty
+    
     private String attributeName;
-    @JsonRemoteProperty
+    
     private String compositeItemName;
     private DataType dataType;
-    @JsonRemoteProperty
+    
     private boolean settable;
 
     @Override

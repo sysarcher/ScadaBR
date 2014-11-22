@@ -25,12 +25,12 @@ import br.org.scadabr.vo.event.EventStatus;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.handlers.EventHandlerRT;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.UserComment;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class EventInstance {
 
@@ -41,6 +41,7 @@ public class EventInstance {
         return eventState != EventStatus.STATELESS;
     }
 
+    @JsonIgnore
     public boolean isNew() {
         return id == ScadaBrConstants.NEW_ID;
     }
@@ -54,7 +55,7 @@ public class EventInstance {
     /**
      * Configuration field. Assigned by the database.
      */
-    private int id = Common.NEW_ID;
+    private int id = ScadaBrConstants.NEW_ID;
 
     /**
      * Configuration field. Provided by the event producer. Identifies where the

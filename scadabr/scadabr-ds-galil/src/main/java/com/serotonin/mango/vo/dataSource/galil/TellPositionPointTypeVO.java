@@ -24,8 +24,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.mango.rt.dataSource.galil.TellPositionPointTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -37,20 +37,20 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class TellPositionPointTypeVO extends PointTypeVO {
 
-    @JsonRemoteProperty
+    
     private String axis;
-    @JsonRemoteProperty
+    
     private double scaleRawLow = 0;
-    @JsonRemoteProperty
+    
     private double scaleRawHigh = 1;
-    @JsonRemoteProperty
+    
     private double scaleEngLow = 0;
-    @JsonRemoteProperty
+    
     private double scaleEngHigh = 1;
-    @JsonRemoteProperty
+    
     private boolean roundToInteger;
 
     @Override

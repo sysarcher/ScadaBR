@@ -24,16 +24,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.util.Set;
@@ -44,13 +39,13 @@ import java.util.Set;
 abstract public class PointComponent extends ViewComponent {
 
     private DataPointVO dataPoint;
-    @JsonRemoteProperty
+    
     private String nameOverride;
-    @JsonRemoteProperty
+    
     private boolean settableOverride;
-    @JsonRemoteProperty
+    
     private String bkgdColorOverride;
-    @JsonRemoteProperty
+    
     private boolean displayControls;
 
     // Runtime attributes
@@ -217,15 +212,4 @@ abstract public class PointComponent extends ViewComponent {
         }
     }
 
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-        jsonDeserializeDataPoint(json.getValue("dataPointXid"), this);
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-        jsonSerializeDataPoint(map, "dataPointXid", this);
-    }
 }

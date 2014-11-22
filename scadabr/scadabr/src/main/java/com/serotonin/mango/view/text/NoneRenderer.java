@@ -23,12 +23,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.ImplDefinition;
 import java.util.EnumSet;
 
-@JsonRemoteEntity
+
 public class NoneRenderer extends BaseTextRenderer {
 
     private static final ImplDefinition definition = new ImplDefinition("textRendererNone", "NONE", "textRenderer.none",

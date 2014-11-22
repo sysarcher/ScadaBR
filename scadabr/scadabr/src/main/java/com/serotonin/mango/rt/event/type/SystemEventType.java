@@ -18,18 +18,12 @@
  */
 package com.serotonin.mango.rt.event.type;
 
-import java.util.Map;
-
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.SystemEventSource;
 
-@JsonRemoteEntity
+
 public class SystemEventType extends EventType {
 
     //
@@ -113,23 +107,6 @@ public class SystemEventType extends EventType {
             return false;
         }
         return systemEventType == other.systemEventType;
-    }
-
-    //
-    // /
-    // / Serialization
-    // /
-    //
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-        map.put("systemType", systemEventType.name());
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-        systemEventType = SystemEventSource.valueOf(json.getString("systemType"));
     }
 
     @Override

@@ -24,16 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.detectors.AlphanumericStateDetectorRT;
 import com.serotonin.mango.rt.event.detectors.AnalogHighLimitDetectorRT;
 import com.serotonin.mango.rt.event.detectors.AnalogLowLimitDetectorRT;
@@ -47,10 +40,8 @@ import com.serotonin.mango.rt.event.detectors.PointEventDetectorRT;
 import com.serotonin.mango.rt.event.detectors.PositiveCusumDetectorRT;
 import com.serotonin.mango.rt.event.detectors.StateChangeCountDetectorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
@@ -58,9 +49,8 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.util.EnumSet;
 
-@JsonRemoteEntity
-public class PointEventDetectorVO extends SimpleEventDetectorVO implements Cloneable, JsonSerializable,
-        ChangeComparable<PointEventDetectorVO> {
+
+public class PointEventDetectorVO extends SimpleEventDetectorVO implements Cloneable, ChangeComparable<PointEventDetectorVO> {
 
     public static final String XID_PREFIX = "PED_";
 
@@ -117,7 +107,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
 
     private int id;
     private String xid;
-    @JsonRemoteProperty
+    
     private String alias;
     private DataPointVO dataPoint;
     private int detectorType;
@@ -444,175 +434,4 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
         TYPE_CODES.addElement(TYPE_NEGATIVE_CUSUM, "NEGATIVE_CUSUM");
     }
 
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        String text = json.getString("type");
-        if (text == null) {
-            throw new LocalizableJsonException("emport.error.ped.missing", "type", TYPE_CODES.getCodeList());
-        }
-
-        detectorType = TYPE_CODES.getId(text);
-        if (!TYPE_CODES.isValidId(detectorType)) {
-            throw new LocalizableJsonException("emport.error.ped.invalid", "type", text, TYPE_CODES.getCodeList());
-        }
-
-        text = json.getString("alarmLevel");
-        if (text != null) {
-            try {
-                alarmLevel = AlarmLevel.valueOf(text);
-            } catch (Exception e) {
-                throw new LocalizableJsonException("emport.error.ped.invalid", "alarmLevel", text, AlarmLevel.nameValues());
-            }
-        }
-
-        switch (detectorType) {
-            case TYPE_ANALOG_HIGH_LIMIT:
-                limit = getDouble(json, "limit");
-                updateDuration(json);
-                break;
-            case TYPE_ANALOG_LOW_LIMIT:
-                limit = getDouble(json, "limit");
-                updateDuration(json);
-                break;
-            case TYPE_BINARY_STATE:
-                binaryState = getBoolean(json, "state");
-                updateDuration(json);
-                break;
-            case TYPE_MULTISTATE_STATE:
-                multistateState = getInt(json, "state");
-                updateDuration(json);
-                break;
-            case TYPE_POINT_CHANGE:
-                break;
-            case TYPE_STATE_CHANGE_COUNT:
-                changeCount = getInt(json, "changeCount");
-                updateDuration(json);
-                break;
-            case TYPE_NO_CHANGE:
-                updateDuration(json);
-                break;
-            case TYPE_NO_UPDATE:
-                updateDuration(json);
-                break;
-            case TYPE_ALPHANUMERIC_STATE:
-                alphanumericState = getString(json, "state");
-                updateDuration(json);
-                break;
-            case TYPE_POSITIVE_CUSUM:
-                limit = getDouble(json, "limit");
-                weight = getDouble(json, "weight");
-                updateDuration(json);
-                break;
-            case TYPE_NEGATIVE_CUSUM:
-                limit = getDouble(json, "limit");
-                weight = getDouble(json, "weight");
-                updateDuration(json);
-                break;
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("xid", xid);
-        map.put("type", TYPE_CODES.getCode(detectorType));
-        map.put("alarmLevel", alarmLevel.getName());
-
-        switch (detectorType) {
-            case TYPE_ANALOG_HIGH_LIMIT:
-                map.put("limit", limit);
-                addDuration(map);
-                break;
-            case TYPE_ANALOG_LOW_LIMIT:
-                map.put("limit", limit);
-                addDuration(map);
-                break;
-            case TYPE_BINARY_STATE:
-                map.put("state", binaryState);
-                addDuration(map);
-                break;
-            case TYPE_MULTISTATE_STATE:
-                map.put("state", multistateState);
-                addDuration(map);
-                break;
-            case TYPE_POINT_CHANGE:
-                break;
-            case TYPE_STATE_CHANGE_COUNT:
-                map.put("changeCount", changeCount);
-                addDuration(map);
-                break;
-            case TYPE_NO_CHANGE:
-                addDuration(map);
-                break;
-            case TYPE_NO_UPDATE:
-                addDuration(map);
-                break;
-            case TYPE_ALPHANUMERIC_STATE:
-                map.put("state", alphanumericState);
-                addDuration(map);
-                break;
-            case TYPE_POSITIVE_CUSUM:
-                map.put("limit", limit);
-                map.put("weight", weight);
-                addDuration(map);
-                break;
-            case TYPE_NEGATIVE_CUSUM:
-                map.put("limit", limit);
-                map.put("weight", weight);
-                addDuration(map);
-                break;
-        }
-    }
-
-    private double getDouble(JsonObject json, String name) throws JsonException {
-        Double d = json.getDouble(name);
-        if (d == null) {
-            throw new LocalizableJsonException("emport.error.ped.missingAttr", name);
-        }
-        return d;
-    }
-
-    private int getInt(JsonObject json, String name) throws JsonException {
-        Integer i = json.getInt(name);
-        if (i == null) {
-            throw new LocalizableJsonException("emport.error.ped.missingAttr", name);
-        }
-        return i;
-    }
-
-    private void updateDuration(JsonObject json) throws JsonException {
-        String text = json.getString("durationType");
-        if (text == null) {
-            throw new LocalizableJsonException("emport.error.ped.missing", "durationType", TimePeriods.values());
-        }
-
-        try {
-        durationType = TimePeriods.valueOf(text);
-        } catch (Exception e) {
-            throw new LocalizableJsonException("emport.error.ped.invalid", "durationType", text,
-                    TimePeriods.values());
-        }
-
-        duration = getInt(json, "duration");
-    }
-
-    private boolean getBoolean(JsonObject json, String name) throws JsonException {
-        Boolean b = json.getBoolean(name);
-        if (b == null) {
-            throw new LocalizableJsonException("emport.error.ped.missingAttr", name);
-        }
-        return b;
-    }
-
-    private String getString(JsonObject json, String name) throws JsonException {
-        String s = json.getString(name);
-        if (s == null) {
-            throw new LocalizableJsonException("emport.error.ped.missingAttr", name);
-        }
-        return s;
-    }
-
-    private void addDuration(Map<String, Object> map) {
-        map.put("durationType", durationType.name());
-        map.put("duration", duration);
-    }
 }

@@ -9,8 +9,8 @@ import java.util.List;
 import br.org.scadabr.rt.dataSource.alpha2.Alpha2PointLocatorRT;
 
 import com.i2msolucoes.alpha24j.DeviceLocator.DeviceCodes;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
@@ -18,18 +18,18 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class Alpha2PointLocatorVO extends AbstractPointLocatorVO {
 
     public static final byte RUN_STOP_CODE = 0x00;
     public static final int READ_ONLY = 1;
     public static final int WRITE_ONLY = 2;
     public static final int READ_WRITE = 3;
-    @JsonRemoteProperty
+    
     private int deviceCodeId = DeviceCodes.SYSTEM_BIT.getId();
-    @JsonRemoteProperty
+    
     private int deviceNumber = 1;
-    @JsonRemoteProperty
+    
     private int accessMode = READ_ONLY; // 1: readOnly, 2: writeOnly, 3: read
 
     // and write

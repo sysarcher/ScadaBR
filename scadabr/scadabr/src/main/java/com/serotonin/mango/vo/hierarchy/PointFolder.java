@@ -18,47 +18,36 @@
  */
 package com.serotonin.mango.vo.hierarchy;
 
+import br.org.scadabr.ScadaBrConstants;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import br.org.scadabr.db.IntValuePair;
-import br.org.scadabr.json.JsonArray;
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
-import br.org.scadabr.json.JsonValue;
-import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.util.LocalizableJsonException;
-import com.serotonin.mango.vo.DataPointVO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 /**
  * @author Matthew Lohbihler
  *
  */
-@JsonRemoteEntity
-@Configurable
-public class PointFolder implements JsonSerializable {
 
-    private int id = Common.NEW_ID;
-    @JsonRemoteProperty
+public class PointFolder {
+
+    private int id;
+    
     private String name;
 
-    @JsonRemoteProperty(innerType = PointFolder.class)
     private List<PointFolder> subfolders = new ArrayList<>();
 
     private List<IntValuePair> points = new ArrayList<>();
-    @Autowired
-    private DataPointDao dataPointDao;
 
     public PointFolder() {
         // no op
+    }
+
+    public PointFolder(String name) {
+        this.id = ScadaBrConstants.NEW_ID;
+        this.name = name;
     }
 
     public PointFolder(int id, String name) {
@@ -157,38 +146,9 @@ public class PointFolder implements JsonSerializable {
         return null;
     }
 
-    //
-    //
-    // Serialization
-    //
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        List<String> pointList = new ArrayList<>();
-        for (IntValuePair p : points) {
-            DataPointVO dp = dataPointDao.getDataPoint(p.getKey());
-            if (dp != null) {
-                pointList.add(dp.getXid());
-            }
-        }
-        map.put("points", pointList);
+    @JsonIgnore
+    public boolean isNew() {
+        return id == ScadaBrConstants.NEW_ID;
     }
 
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        JsonArray jsonPoints = json.getJsonArray("points");
-        if (jsonPoints != null) {
-            points.clear();
-
-            for (JsonValue jv : jsonPoints.getElements()) {
-                String xid = jv.toJsonString().getValue();
-
-                DataPointVO dp = dataPointDao.getDataPoint(xid);
-                if (dp == null) {
-                    throw new LocalizableJsonException("emport.error.missingPoint", xid);
-                }
-
-                points.add(new IntValuePair(dp.getId(), dp.getName()));
-            }
-        }
-    }
 }

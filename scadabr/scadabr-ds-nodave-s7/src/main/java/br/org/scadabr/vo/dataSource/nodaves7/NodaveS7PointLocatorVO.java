@@ -14,7 +14,7 @@ import br.org.scadabr.rt.dataSource.nodaves7.NodaveS7PointLocatorRT;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteProperty;
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
@@ -25,27 +25,27 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 public class NodaveS7PointLocatorVO extends AbstractPointLocatorVO implements
         JsonSerializable {
 
-    @JsonRemoteProperty
+    
     private String valueRegex = "";
-    @JsonRemoteProperty
+    
     private boolean customTimestamp;
-    @JsonRemoteProperty
+    
     private String timestampFormat = "";
-    @JsonRemoteProperty
+    
     private String timestampRegex = "";
-    @JsonRemoteProperty
+    
     private DataType dataType = DataType.BINARY;
-    @JsonRemoteProperty
+    
     private boolean settable;
-    @JsonRemoteProperty
+    
     private String s7writeMemoryArea = "";
-    @JsonRemoteProperty
+    
     private int s7writeDBNUM = 0;
-    @JsonRemoteProperty
+    
     private int s7writeStarts = 0;
-    @JsonRemoteProperty
+    
     private int s7writeBytesQty = 0;
-    @JsonRemoteProperty
+    
     private int s7writeBitOffset = 0;
 
     @Override

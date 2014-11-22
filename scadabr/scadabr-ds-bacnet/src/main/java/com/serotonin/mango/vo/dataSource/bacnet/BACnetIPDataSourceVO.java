@@ -29,8 +29,8 @@ import com.serotonin.bacnet4j.LocalDevice;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.bacnet.BACnetIPDataSourceRT;
@@ -48,7 +48,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
 
     public static final Type TYPE = Type.BACNET;
@@ -98,27 +98,27 @@ public class BACnetIPDataSourceVO extends DataSourceVO<BACnetIPDataSourceVO> {
     }
 
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 5;
-    @JsonRemoteProperty
+    
     private int deviceId;
-    @JsonRemoteProperty
+    
     private String broadcastAddress;
-    @JsonRemoteProperty
+    
     private int port;
-    @JsonRemoteProperty
+    
     private int timeout;
-    @JsonRemoteProperty
+    
     private int segTimeout;
-    @JsonRemoteProperty
+    
     private int segWindow;
-    @JsonRemoteProperty
+    
     private int retries;
-    @JsonRemoteProperty
+    
     private int covSubscriptionTimeoutMinutes = 60; // One hour
-    @JsonRemoteProperty
+    
     private int maxReadMultipleReferencesSegmented = 200;
-    @JsonRemoteProperty
+    
     private int maxReadMultipleReferencesNonsegmented = 20; // One hour
 
     public BACnetIPDataSourceVO() {

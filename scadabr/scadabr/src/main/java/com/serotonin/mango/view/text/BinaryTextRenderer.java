@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.ImplDefinition;
@@ -39,7 +39,7 @@ import java.util.EnumSet;
  *
  * @author mlohbihler
  */
-@JsonRemoteEntity
+
 public class BinaryTextRenderer extends BaseTextRenderer {
 
     private static ImplDefinition definition = new ImplDefinition("textRendererBinary", "BINARY",
@@ -59,13 +59,13 @@ public class BinaryTextRenderer extends BaseTextRenderer {
         return definition;
     }
 
-    @JsonRemoteProperty
+    
     private String zeroLabel;
-    @JsonRemoteProperty
+    
     private String zeroColour;
-    @JsonRemoteProperty
+    
     private String oneLabel;
-    @JsonRemoteProperty
+    
     private String oneColour;
 
     public BinaryTextRenderer() {

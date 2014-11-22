@@ -13,7 +13,7 @@ import br.org.scadabr.rt.scripting.ScriptRT;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteProperty;
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataSourceDao;
@@ -46,11 +46,11 @@ public abstract class ScriptVO<T extends ScriptVO<?>> implements Serializable,
             this.display = display;
         }
 
-        @JsonRemoteProperty
+        
         private final int id;
-        @JsonRemoteProperty
+        
         private final String key;
-        @JsonRemoteProperty
+        
         private final boolean display;
 
         public int getId() {
@@ -95,11 +95,11 @@ public abstract class ScriptVO<T extends ScriptVO<?>> implements Serializable,
     }
 
     private int id = Common.NEW_ID;
-    @JsonRemoteProperty
+    
     private String xid;
-    @JsonRemoteProperty
+    
     private String name;
-    @JsonRemoteProperty
+    
     private String script;
     private int userId;
 

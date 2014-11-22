@@ -24,8 +24,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.view.ImplDefinition;
@@ -34,13 +32,13 @@ import java.util.EnumSet;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class ThumbnailComponent extends PointComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("thumbnailImage", "THUMBNAIL",
             "graphic.thumbnailImage", EnumSet.of(DataType.IMAGE));
 
-    @JsonRemoteProperty
+    
     private int scalePercent;
 
     public int getScalePercent() {

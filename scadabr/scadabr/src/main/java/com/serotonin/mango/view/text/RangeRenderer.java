@@ -26,15 +26,15 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
 import java.util.EnumSet;
 
-@JsonRemoteEntity
+
 public class RangeRenderer extends BaseTextRenderer {
 
     private static ImplDefinition definition = new ImplDefinition("textRendererRange", "RANGE", "textRenderer.range",
@@ -54,9 +54,8 @@ public class RangeRenderer extends BaseTextRenderer {
         return definition;
     }
 
-    @JsonRemoteProperty
+    
     private String format;
-    @JsonRemoteProperty(innerType = RangeValue.class)
     private List<RangeValue> rangeValues = new ArrayList<>();
 
     private DecimalFormat formatInstance;

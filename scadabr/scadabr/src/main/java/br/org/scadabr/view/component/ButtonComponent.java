@@ -6,28 +6,28 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.component.ScriptComponent;
 import br.org.scadabr.util.SerializationHelper;
 import java.util.EnumSet;
 
-@JsonRemoteEntity
+
 public class ButtonComponent extends ScriptComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("button",
             "BUTTON", "graphic.button", EnumSet.of(DataType.BINARY));
-    @JsonRemoteProperty
+    
     private String whenOffLabel = "ON";
 
-    @JsonRemoteProperty
+    
     private String whenOnLabel = "OFF";
 
-    @JsonRemoteProperty
+    
     private int width;
-    @JsonRemoteProperty
+    
     private int height;
 
     public String getWhenOffLabel() {

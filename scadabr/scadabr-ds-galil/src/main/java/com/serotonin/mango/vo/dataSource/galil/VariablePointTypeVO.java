@@ -28,8 +28,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.mango.rt.dataSource.galil.VariablePointTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -42,10 +42,10 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class VariablePointTypeVO extends PointTypeVO {
 
-    @JsonRemoteProperty
+    
     private String variableName = "";
     private DataType dataType = DataType.NUMERIC;
 

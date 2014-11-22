@@ -18,12 +18,6 @@
  */
 package com.serotonin.mango.rt.event.type;
 
-import java.util.Map;
-
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
@@ -32,7 +26,7 @@ import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
-@JsonRemoteEntity
+
 @Configurable
 public class DataPointEventType extends EventType {
     @Autowired
@@ -136,25 +130,6 @@ public class DataPointEventType extends EventType {
         }
         DataPointEventType other = (DataPointEventType) obj;
         return pointEventDetectorId == other.pointEventDetectorId;
-    }
-
-    //
-    // /
-    // / Serialization
-    // /
-    //
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-        map.put("dataPointXID", dataPointDao.getDataPoint(dataPointId).getXid());
-        map.put("detectorXID", dataPointDao.getDetectorXid(pointEventDetectorId));
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-        dataPointId = getDataPointId(json, "dataPointXID");
-        pointEventDetectorId = getPointEventDetectorId(json, dataPointId, "detectorXID");
     }
 
     @Override

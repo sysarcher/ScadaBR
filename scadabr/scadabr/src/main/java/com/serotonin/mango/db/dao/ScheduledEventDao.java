@@ -28,16 +28,13 @@ import java.util.List;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import com.serotonin.mango.Common;
 import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import javax.inject.Named;
-import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -115,7 +112,7 @@ public class ScheduledEventDao extends BaseDao {
     }
 
     public void saveScheduledEvent(final ScheduledEventVO se) {
-        if (se.getId() == Common.NEW_ID) {
+        if (se.isNew()) {
             insertScheduledEvent(se);
         } else {
             updateScheduledEvent(se);

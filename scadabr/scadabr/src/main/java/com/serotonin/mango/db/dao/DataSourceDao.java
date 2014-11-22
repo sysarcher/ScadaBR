@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.db.dao;
 
+import br.org.scadabr.ScadaBrConstants;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import java.io.Serializable;
 import java.sql.Blob;
@@ -32,7 +33,6 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.vo.DataPointVO;
@@ -110,7 +110,7 @@ public class DataSourceDao extends BaseDao {
 
     public void saveDataSource(final DataSourceVO<?> vo) {
         // Decide whether to insert or update.
-        if (vo.getId() == Common.NEW_ID) {
+        if (vo.isNew()) {
             insertDataSource(vo);
         } else {
             updateDataSource(vo);
@@ -219,7 +219,7 @@ public class DataSourceDao extends BaseDao {
 
                 // Copy the data source.
                 DataSourceVO<?> dataSourceCopy = dataSource.copy();
-                dataSourceCopy.setId(Common.NEW_ID);
+                dataSourceCopy.setId(ScadaBrConstants.NEW_ID);
                 dataSourceCopy.setXid(generateUniqueXid());
                 dataSourceCopy.setEnabled(false);
                 dataSourceCopy.setName(StringUtils.truncate(
@@ -232,7 +232,7 @@ public class DataSourceDao extends BaseDao {
                 // Copy the points.
                 for (DataPointVO dataPoint : dataPointDao.getDataPoints(dataSourceId, null)) {
                     DataPointVO dataPointCopy = dataPoint.copy();
-                    dataPointCopy.setId(Common.NEW_ID);
+                    dataPointCopy.setId(ScadaBrConstants.NEW_ID);
                     dataPointCopy.setXid(dataPointDao.generateUniqueXid());
                     dataPointCopy.setName(dataPoint.getName());
                     dataPointCopy.setDataSourceId(dataSourceCopy.getId());
@@ -243,7 +243,7 @@ public class DataSourceDao extends BaseDao {
 
                     // Copy the event detectors
                     for (PointEventDetectorVO ped : dataPointCopy.getEventDetectors()) {
-                        ped.setId(Common.NEW_ID);
+                        ped.setId(ScadaBrConstants.NEW_ID);
                         ped.njbSetDataPoint(dataPointCopy);
                     }
 

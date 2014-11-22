@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.openv4j.OpenV4JPointLocatorRT;
@@ -45,7 +45,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 // Container to move data with json and ajax so ony basic datatypes
-@JsonRemoteEntity
+
 public class OpenV4JPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
     private final static Log LOG = LogFactory.getLog(OpenV4JPointLocatorVO.class);

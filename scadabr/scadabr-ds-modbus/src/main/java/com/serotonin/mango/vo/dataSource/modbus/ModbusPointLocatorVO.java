@@ -30,8 +30,8 @@ import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.modbus.ModbusPointLocatorRT;
@@ -47,7 +47,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class ModbusPointLocatorVO extends AbstractPointLocatorVO implements
         JsonSerializable {
 
@@ -180,23 +180,23 @@ public class ModbusPointLocatorVO extends AbstractPointLocatorVO implements
 
     private int range = RegisterRange.COIL_STATUS;
     private int modbusDataType = DataType.BINARY;
-    @JsonRemoteProperty
+    
     private int slaveId = 1;
-    @JsonRemoteProperty
+    
     private boolean slaveMonitor;
-    @JsonRemoteProperty
+    
     private int offset;
-    @JsonRemoteProperty
+    
     private byte bit;
-    @JsonRemoteProperty
+    
     private int registerCount;
-    @JsonRemoteProperty
+    
     private String charset = "ASCII";
-    @JsonRemoteProperty
+    
     private boolean settableOverride = true;
-    @JsonRemoteProperty
+    
     private double multiplier = 1;
-    @JsonRemoteProperty
+    
     private double additive = 0;
 
     public double getAdditive() {

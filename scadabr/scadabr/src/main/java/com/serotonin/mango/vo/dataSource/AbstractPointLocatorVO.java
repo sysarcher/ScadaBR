@@ -18,18 +18,12 @@
  */
 package com.serotonin.mango.vo.dataSource;
 
-import br.org.scadabr.DataType;
+import br.org.scadabr.ScadaBrConstants;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Map;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
-import com.serotonin.mango.Common;
-import com.serotonin.mango.util.LocalizableJsonException;
-import java.util.Set;
 
 abstract public class AbstractPointLocatorVO implements PointLocatorVO {
 
@@ -40,7 +34,7 @@ abstract public class AbstractPointLocatorVO implements PointLocatorVO {
     //
     private static final long serialVersionUID = -1;
     private static final int version = 1;
-    private int id = Common.NEW_ID;
+    private int id = ScadaBrConstants.NEW_ID;
     private boolean enabled;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -51,27 +45,10 @@ abstract public class AbstractPointLocatorVO implements PointLocatorVO {
         in.readInt(); // Read the version. Value is currently not used.
     }
 
-    protected void serializeDataType(Map<String, Object> map) {
-        map.put("dataType", getDataType().getName());
-    }
-
-    protected DataType deserializeDataType(JsonObject json, Set<DataType> excludeTypes) throws JsonException {
-        String text = json.getString("dataType");
-        if (text == null) {
-            return null;
-        }
-
-        try {
-
-            return DataType.valueOf(text);
-        } catch (Exception e) {
-            throw new LocalizableJsonException("emport.error.invalid", "dataType", text,
-                    DataType.nameValues());
-        }
-    }
 
     /**
      * Defaults to returning null. Override to return something else.
+     * @return 
      */
     @Override
     public DataPointSaveHandler getDataPointSaveHandler() {

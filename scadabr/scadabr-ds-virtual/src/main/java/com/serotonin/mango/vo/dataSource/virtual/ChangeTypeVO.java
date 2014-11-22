@@ -29,7 +29,7 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteProperty;
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.virtual.ChangeTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -99,7 +99,7 @@ abstract public class ChangeTypeVO implements Serializable, JsonSerializable, Ch
 
     abstract public ChangeTypeRT createRuntime();
 
-    @JsonRemoteProperty
+    
     private String startValue;
 
     public String getStartValue() {

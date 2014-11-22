@@ -7,8 +7,8 @@ import java.util.List;
 
 import br.org.scadabr.rt.dataSource.iec101.IEC101SerialDataSource;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
@@ -16,7 +16,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class IEC101SerialDataSourceVO extends
         IEC101DataSourceVO<IEC101SerialDataSourceVO> {
 
@@ -37,19 +37,19 @@ public class IEC101SerialDataSourceVO extends
         return new IEC101SerialDataSource(this);
     }
 
-    @JsonRemoteProperty
+    
     private String commPortId;
-    @JsonRemoteProperty
+    
     private int baudRate = 9600;
-    @JsonRemoteProperty
+    
     private int flowControlIn = 0;
-    @JsonRemoteProperty
+    
     private int flowControlOut = 0;
-    @JsonRemoteProperty
+    
     private int dataBits = 8;
-    @JsonRemoteProperty
+    
     private int stopBits = 1;
-    @JsonRemoteProperty
+    
     private int parity = 0;
 
     @Override

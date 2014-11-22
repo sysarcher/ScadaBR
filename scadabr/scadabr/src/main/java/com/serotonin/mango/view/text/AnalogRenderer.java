@@ -24,8 +24,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.DecimalFormat;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.ImplDefinition;
@@ -33,7 +33,7 @@ import br.org.scadabr.util.SerializationHelper;
 import java.text.MessageFormat;
 import java.util.EnumSet;
 
-@JsonRemoteEntity
+
 public class AnalogRenderer extends BaseTextRenderer {
 
     private static ImplDefinition definition = new ImplDefinition("textRendererAnalog", "ANALOG",
@@ -53,10 +53,10 @@ public class AnalogRenderer extends BaseTextRenderer {
         return definition;
     }
 
-    @JsonRemoteProperty
+    
     private String decimalPattern;
     private String fullPattern;
-    @JsonRemoteProperty
+    
     private String suffix;
 
     public AnalogRenderer() {

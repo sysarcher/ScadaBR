@@ -1,43 +1,26 @@
 package com.serotonin.mango.vo.event;
 
+import br.org.scadabr.ScadaBrConstants;
 import java.util.List;
-import java.util.Map;
 
 import org.joda.time.DateTime;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
-import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.event.maintenance.MaintenanceEventRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.mango.util.LocalizableJsonException;
-import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import com.serotonin.mango.db.dao.DataPointDao;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@JsonRemoteEntity
-@Configurable
-public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>, JsonSerializable {
-    @Autowired
-    private DataSourceDao dataSourceDao;
+public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO> {
 
     public static final String XID_PREFIX = "ME_";
 
@@ -63,42 +46,42 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
         TYPE_CODES.addElement(TYPE_CRON, "CRON", "maintenanceEvents.type.cron");
     }
 
-    private int id = Common.NEW_ID;
+    private int id = ScadaBrConstants.NEW_ID;
     private String xid;
     private int dataSourceId;
-    @JsonRemoteProperty
+    
     private String alias;
     private AlarmLevel alarmLevel = AlarmLevel.NONE;
     private int scheduleType = TYPE_MANUAL;
-    @JsonRemoteProperty
+    
     private boolean disabled = false;
-    @JsonRemoteProperty
+    
     private int activeYear;
-    @JsonRemoteProperty
+    
     private int activeMonth;
-    @JsonRemoteProperty
+    
     private int activeDay;
-    @JsonRemoteProperty
+    
     private int activeHour;
-    @JsonRemoteProperty
+    
     private int activeMinute;
-    @JsonRemoteProperty
+    
     private int activeSecond;
-    @JsonRemoteProperty
+    
     private String activeCron;
-    @JsonRemoteProperty
+    
     private int inactiveYear;
-    @JsonRemoteProperty
+    
     private int inactiveMonth;
-    @JsonRemoteProperty
+    
     private int inactiveDay;
-    @JsonRemoteProperty
+    
     private int inactiveHour;
-    @JsonRemoteProperty
+    
     private int inactiveMinute;
-    @JsonRemoteProperty
+    
     private int inactiveSecond;
-    @JsonRemoteProperty
+    
     private String inactiveCron;
 
     //
@@ -109,8 +92,9 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
     private String dataSourceName;
     private String dataSourceXid;
 
+    @JsonIgnore
     public boolean isNew() {
-        return id == Common.NEW_ID;
+        return id == ScadaBrConstants.NEW_ID;
     }
 
     @Override
@@ -515,46 +499,4 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO>,
         }
     }
 
-    //
-    //
-    // Serialization
-    //
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("xid", xid);
-        map.put("dataSourceXid", dataSourceXid);
-        map.put("alarmLevel", alarmLevel.getName());
-        map.put("scheduleType", TYPE_CODES.getCode(scheduleType));
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        String text = json.getString("dataSourceXid");
-        if (text != null) {
-            DataSourceVO<?> ds = dataSourceDao.getDataSource(text);
-            if (ds == null) {
-                throw new LocalizableJsonException("emport.error.maintenanceEvent.invalid", "dataSourceXid", text);
-            }
-            dataSourceId = ds.getId();
-        }
-
-        text = json.getString("alarmLevel");
-        if (text != null) {
-            try {
-                alarmLevel = AlarmLevel.valueOf(text);
-            } catch (Exception e) {
-                throw new LocalizableJsonException("emport.error.maintenanceEvent.invalid", "alarmLevel", text,
-                        AlarmLevel.nameValues());
-            }
-        }
-
-        text = json.getString("scheduleType");
-        if (text != null) {
-            scheduleType = TYPE_CODES.getId(text);
-            if (!TYPE_CODES.isValidId(scheduleType)) {
-                throw new LocalizableJsonException("emport.error.maintenanceEvent.invalid", "scheduleType", text,
-                        TYPE_CODES.getCodeList());
-            }
-        }
-    }
 }

@@ -23,15 +23,9 @@ import java.util.Set;
 
 import org.joda.time.DateTime;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.util.ExportCodes;
 
-@JsonRemoteEntity(typeFactory = EmailRecipientFactory.class)
-abstract public class EmailRecipient implements JsonSerializable {
+abstract public class EmailRecipient {
 
     public static final int TYPE_MAILING_LIST = 1;
     public static final int TYPE_USER = 2;
@@ -55,16 +49,4 @@ abstract public class EmailRecipient implements JsonSerializable {
 
     abstract public String getReferenceAddress();
 
-    /**
-     * @throws JsonException
-     */
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        // no op. The type value is used by the factory.
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("recipientType", TYPE_CODES.getCode(getRecipientType()));
-    }
 }

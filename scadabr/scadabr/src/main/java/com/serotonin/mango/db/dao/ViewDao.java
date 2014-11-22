@@ -30,14 +30,12 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.db.spring.IntValuePairRowMapper;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.view.ShareUser;
 import com.serotonin.mango.view.View;
 import br.org.scadabr.util.SerializationHelper;
 import java.sql.Connection;
 import java.sql.Statement;
 import javax.inject.Named;
-import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -151,7 +149,7 @@ public class ViewDao extends BaseDao {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 // Decide whether to insert or update.
-                if (view.getId() == Common.NEW_ID) {
+                if (view.isNew()) {
                     insertView(view);
                 } else {
                     updateView(view);

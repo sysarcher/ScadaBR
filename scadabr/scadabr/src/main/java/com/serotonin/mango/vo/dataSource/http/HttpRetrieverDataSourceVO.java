@@ -24,11 +24,6 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.http.HttpRetrieverDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -46,7 +41,7 @@ import org.springframework.validation.Errors;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSourceVO> {
 
     @Override
@@ -123,14 +118,14 @@ public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSou
         return new HttpRetrieverPointLocatorVO();
     }
 
-    @JsonRemoteProperty
+    
     private String url;
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 5;
-    @JsonRemoteProperty
+    
     private int timeoutSeconds = 30;
-    @JsonRemoteProperty
+    
     private int retries = 2;
 
     public String getUrl() {
@@ -223,18 +218,4 @@ public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSou
         }
     }
 
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-        TimePeriods value = deserializeUpdatePeriodType(json);
-        if (value != null) {
-            updatePeriodType = value;
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-        serializeUpdatePeriodType(map, updatePeriodType);
-    }
 }

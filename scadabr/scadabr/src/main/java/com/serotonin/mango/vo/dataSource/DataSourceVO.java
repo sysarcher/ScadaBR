@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.dataSource;
 
+import br.org.scadabr.ScadaBrConstants;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -28,32 +29,26 @@ import java.util.List;
 import java.util.Map;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
+
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.http.HttpImageDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpReceiverDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpRetrieverDataSourceVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.vo.event.AlarmLevel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.validation.Validator;
 
 abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
-        Serializable, Cloneable, JsonSerializable, ChangeComparable<T> {
+        Serializable, Cloneable, ChangeComparable<T> {
 
     public abstract Validator createValidator();
 
@@ -161,15 +156,16 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
 
     abstract protected void addEventTypes(List<EventTypeVO> eventTypes);
 
+    @JsonIgnore
     public boolean isNew() {
-        return id == Common.NEW_ID;
+        return id == ScadaBrConstants.NEW_ID;
     }
 
-    private int id = Common.NEW_ID;
+    private int id = ScadaBrConstants.NEW_ID;
     private String xid;
-    @JsonRemoteProperty
+    
     private String name = this.getClass().getSimpleName();
-    @JsonRemoteProperty
+    
     private boolean enabled;
     private Map<Integer, AlarmLevel> alarmLevels = new HashMap<>();
 
@@ -320,77 +316,4 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         }
     }
 
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("xid", xid);
-        map.put("type", getType().name());
-
-        ExportCodes eventCodes = getEventCodes();
-        if (eventCodes != null && eventCodes.size() > 0) {
-            Map<String, String> alarmCodeLevels = new HashMap<>();
-
-            for (int i = 0; i < eventCodes.size(); i++) {
-                int eventId = eventCodes.getId(i);
-                AlarmLevel level = getAlarmLevel(eventId, AlarmLevel.URGENT);
-                alarmCodeLevels.put(eventCodes.getCode(eventId), level.getName());
-            }
-
-            map.put("alarmLevels", alarmCodeLevels);
-        }
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json)
-            throws JsonException {
-        // Can't change the type.
-
-        JsonObject alarmCodeLevels = json.getJsonObject("alarmLevels");
-        if (alarmCodeLevels != null) {
-            ExportCodes eventCodes = getEventCodes();
-            if (eventCodes != null && eventCodes.size() > 0) {
-                for (String code : alarmCodeLevels.getProperties().keySet()) {
-                    int eventId = eventCodes.getId(code);
-                    if (!eventCodes.isValidId(eventId)) {
-                        throw new LocalizableJsonException(
-                                "emport.error.eventCode", code,
-                                eventCodes.getCodeList());
-                    }
-
-                    String text = alarmCodeLevels.getString(code);
-                    try {
-                        AlarmLevel level = AlarmLevel.valueOf(text);
-                        setAlarmLevel(eventId, level);
-                    } catch (Exception e) {
-                        throw new LocalizableJsonException(
-                                "emport.error.alarmLevel", text, code,
-                                AlarmLevel.nameValues());
-                    }
-
-                }
-            }
-        }
-    }
-
-    protected void serializeUpdatePeriodType(Map<String, Object> map,
-            TimePeriods updatePeriodType) {
-        map.put("updatePeriodType", updatePeriodType.name());
-    }
-
-    protected TimePeriods deserializeUpdatePeriodType(JsonObject json)
-            throws JsonException {
-        String text = json.getString("updatePeriodType");
-        if (text == null) {
-            return null;
-        }
-        TimePeriods value;
-        try {
-            value = TimePeriods.valueOf(text);
-        } catch (Exception e) {
-            throw new LocalizableJsonException("emport.error.invalid",
-                    "updatePeriodType", text,
-                    TimePeriods.values());
-        }
-
-        return value;
-    }
 }

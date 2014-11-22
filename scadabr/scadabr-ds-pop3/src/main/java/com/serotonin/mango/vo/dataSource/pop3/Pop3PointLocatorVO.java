@@ -32,8 +32,8 @@ import java.util.regex.PatternSyntaxException;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.pop3.Pop3PointLocatorRT;
@@ -50,7 +50,7 @@ import java.util.EnumSet;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
     @Override
@@ -68,20 +68,20 @@ public class Pop3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         return new LocalizableMessageImpl("dsEdit.pop3.dpconn", Functions.escapeLessThan(valueRegex));
     }
 
-    @JsonRemoteProperty
+    
     private boolean findInSubject;
-    @JsonRemoteProperty
+    
     private String valueRegex;
-    @JsonRemoteProperty
+    
     private boolean ignoreIfMissing;
-    @JsonRemoteProperty
+    
     private String valueFormat;
     private DataType dataType;
-    @JsonRemoteProperty
+    
     private boolean useReceivedTime;
-    @JsonRemoteProperty
+    
     private String timeRegex;
-    @JsonRemoteProperty
+    
     private String timeFormat;
 
     public boolean isFindInSubject() {

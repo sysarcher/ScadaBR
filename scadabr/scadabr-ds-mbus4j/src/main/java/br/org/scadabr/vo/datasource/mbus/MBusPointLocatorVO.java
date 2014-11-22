@@ -34,8 +34,8 @@ import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
 
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import br.org.scadabr.rt.datasource.mbus.MBusPointLocatorRT;
@@ -46,50 +46,50 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class MBusPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
     public final static String[] EMPTY_STRING_ARRAY = new String[0];
     /**
      * The address of the device.
      */
-    @JsonRemoteProperty
+    
     private byte address;
-    @JsonRemoteProperty
+    
     private String difCode;
-    @JsonRemoteProperty
+    
     private String functionField;
-    @JsonRemoteProperty
+    
     private int deviceUnit;
-    @JsonRemoteProperty
+    
     private int tariff;
-    @JsonRemoteProperty
+    
     private long storageNumber;
-    @JsonRemoteProperty
+    
     private String vifType;
-    @JsonRemoteProperty
+    
     private String vifLabel;
-    @JsonRemoteProperty
+    
     private String unitOfMeasurement;
-    @JsonRemoteProperty
+    
     private String siPrefix;
-    @JsonRemoteProperty
+    
     private Integer exponent;
-    @JsonRemoteProperty
+    
     private String[] vifeLabels = EMPTY_STRING_ARRAY;
-    @JsonRemoteProperty
+    
     private String[] vifeTypes = EMPTY_STRING_ARRAY;
-    @JsonRemoteProperty
+    
     private String medium;
-    @JsonRemoteProperty
+    
     private String responseFrame;
-    @JsonRemoteProperty
+    
     private byte version;
-    @JsonRemoteProperty
+    
     private int identNumber;
-    @JsonRemoteProperty
+    
     private String manufacturer;
-    @JsonRemoteProperty
+    
     private double correctionFactor = 1.0;
     private MBusAddressing addressing;
 

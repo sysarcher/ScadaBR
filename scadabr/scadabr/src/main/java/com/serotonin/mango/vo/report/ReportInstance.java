@@ -18,9 +18,10 @@
  */
 package com.serotonin.mango.vo.report;
 
+import br.org.scadabr.ScadaBrConstants;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.joda.time.DateTime;
 
-import com.serotonin.mango.Common;
 
 /**
  * @author Matthew Lohbihler
@@ -32,7 +33,7 @@ public class ReportInstance {
     public static final int STATE_FINISHED = 3;
     public static final int STATE_FAILED = 4;
 
-    private int id = Common.NEW_ID;
+    private int id = ScadaBrConstants.NEW_ID;
     private int userId;
     private String name;
     private int includeEvents;
@@ -192,5 +193,10 @@ public class ReportInstance {
 
     public long getRunDuration() {
         return (runEndTime > 0 && runStartTime > 0) ? runEndTime - runStartTime : 0;
+    }
+
+    @JsonIgnore
+    public boolean isNew() {
+        return id == ScadaBrConstants.NEW_ID;
     }
 }

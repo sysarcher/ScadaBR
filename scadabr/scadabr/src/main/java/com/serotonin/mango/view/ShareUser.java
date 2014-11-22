@@ -18,30 +18,14 @@
  */
 package com.serotonin.mango.view;
 
-import java.util.Map;
-
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.mango.util.LocalizableJsonException;
-import com.serotonin.mango.vo.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
-@Configurable
-public class ShareUser implements JsonSerializable {
 
-    @Autowired
-    private UserDao userDao;
-    
+public class ShareUser {
+
     public static final int ACCESS_NONE = 0;
     public static final int ACCESS_READ = 1;
     public static final int ACCESS_SET = 2;
@@ -74,33 +58,4 @@ public class ShareUser implements JsonSerializable {
         this.accessType = accessType;
     }
 
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        String text = json.getString("user");
-        if (text == null) {
-            throw new LocalizableJsonException("emport.error.viewShare.missing", "user");
-        }
-        User user = userDao.getUser(text);
-        if (user == null) {
-            throw new LocalizableJsonException("emport.error.missingUser", text);
-        }
-        userId = user.getId();
-
-        text = json.getString("accessType");
-        if (text == null) {
-            throw new LocalizableJsonException("emport.error.missing", "accessType", ACCESS_CODES
-                    .getCodeList(ACCESS_OWNER));
-        }
-        accessType = ACCESS_CODES.getId(text, ACCESS_OWNER);
-        if (accessType == -1) {
-            throw new LocalizableJsonException("emport.error.invalid", "permission", text, ACCESS_CODES
-                    .getCodeList(ACCESS_OWNER));
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("user", userDao.getUser(userId).getUsername());
-        map.put("accessType", ACCESS_CODES.getCode(accessType));
-    }
 }

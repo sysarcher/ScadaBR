@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URLEncoder;
 
-import br.org.scadabr.json.JsonRemoteProperty;
+
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.component.HtmlComponent;
 import br.org.scadabr.util.SerializationHelper;
@@ -21,19 +21,19 @@ public class FlexBuilderComponent extends HtmlComponent {
     public static final int MIN_HEIGHT = 600;
     public static final int MAX_HEIGHT = 1080;
 
-    @JsonRemoteProperty
+    
     private boolean projectDefined = false;
 
-    @JsonRemoteProperty
+    
     private String projectSource = "http://localhost:8080/ScadaBR/services/API?wsdl";
-    @JsonRemoteProperty
+    
     private int projectId = 1;
-    @JsonRemoteProperty
+    
     private boolean runtimeMode = false;
 
-    @JsonRemoteProperty
+    
     private int width = 1024;
-    @JsonRemoteProperty
+    
     private int height = 768;
 
     @Override

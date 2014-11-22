@@ -18,33 +18,25 @@
  */
 package com.serotonin.mango.vo.link;
 
+import br.org.scadabr.ScadaBrConstants;
 import java.util.List;
-import java.util.Map;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.mango.util.LocalizableJsonException;
-import com.serotonin.mango.vo.DataPointVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 @Configurable
-public class PointLinkVO implements ChangeComparable<PointLinkVO>, JsonSerializable {
+public class PointLinkVO implements ChangeComparable<PointLinkVO> {
 
     @Autowired
     private DataPointDao dataPointDao;
@@ -61,20 +53,22 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO>, JsonSerializa
         EVENT_CODES.addElement(EVENT_CHANGE, "CHANGE", "pointLinks.event.change");
     }
 
-    private int id = Common.NEW_ID;
+    private int id = ScadaBrConstants.NEW_ID;
     private String xid;
     private int sourcePointId;
     private int targetPointId;
-    @JsonRemoteProperty
+    
     private String script;
     private int event;
-    @JsonRemoteProperty
+    
     private boolean disabled;
 
+    @JsonIgnore
     public boolean isNew() {
-        return id == Common.NEW_ID;
+        return id == ScadaBrConstants.NEW_ID;
     }
 
+    @Override
     public int getId() {
         return id;
     }
@@ -174,54 +168,4 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO>, JsonSerializa
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.disabled", from.disabled, disabled);
     }
 
-    //
-    //
-    // Serialization
-    //
-    public void jsonSerialize(Map<String, Object> map) {
-
-        map.put("xid", xid);
-
-        DataPointVO dp = dataPointDao.getDataPoint(sourcePointId);
-        if (dp != null) {
-            map.put("sourcePointId", dp.getXid());
-        }
-
-        dp = dataPointDao.getDataPoint(targetPointId);
-        if (dp != null) {
-            map.put("targetPointId", dp.getXid());
-        }
-
-        map.put("event", EVENT_CODES.getCode(event));
-    }
-
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-
-        String xid = json.getString("sourcePointId");
-        if (xid != null) {
-            DataPointVO vo = dataPointDao.getDataPoint(xid);
-            if (vo == null) {
-                throw new LocalizableJsonException("emport.error.missingPoint", xid);
-            }
-            sourcePointId = vo.getId();
-        }
-
-        xid = json.getString("targetPointId");
-        if (xid != null) {
-            DataPointVO vo = dataPointDao.getDataPoint(xid);
-            if (vo == null) {
-                throw new LocalizableJsonException("emport.error.missingPoint", xid);
-            }
-            targetPointId = vo.getId();
-        }
-
-        String text = json.getString("event");
-        if (text != null) {
-            event = EVENT_CODES.getId(text);
-            if (!EVENT_CODES.isValidId(event)) {
-                throw new LocalizableJsonException("emport.error.link.invalid", "event", text,
-                        EVENT_CODES.getCodeList());
-            }
-        }
-    }
 }

@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.galil.GalilPointLocatorRT;
@@ -45,7 +45,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class GalilPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
     private static final Log LOG = LogFactory.getLog(GalilPointLocatorVO.class);

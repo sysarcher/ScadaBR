@@ -11,8 +11,8 @@ import br.org.scadabr.rt.dataSource.asciiSerial.ASCIISerialDataSource;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -26,7 +26,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class ASCIISerialDataSourceVO extends DataSourceVO<ASCIISerialDataSourceVO> {
 
     public static final Type TYPE = Type.ASCII_SERIAL;
@@ -86,39 +86,39 @@ public class ASCIISerialDataSourceVO extends DataSourceVO<ASCIISerialDataSourceV
     }
 
     private TimePeriods updatePeriodType = TimePeriods.SECONDS;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 1;
-    @JsonRemoteProperty
+    
     private String commPortId;
-    @JsonRemoteProperty
+    
     private int baudRate = 9600;
-    @JsonRemoteProperty
+    
     private int dataBits = 8;
-    @JsonRemoteProperty
+    
     private int stopBits = 1;
-    @JsonRemoteProperty
+    
     private int parity = 0;
-    @JsonRemoteProperty
+    
     private int timeout = 300;
-    @JsonRemoteProperty
+    
     private int retries = 2;
-    @JsonRemoteProperty
+    
     private int stopMode = 0;
-    @JsonRemoteProperty
+    
     private int nChar = 1;
-    @JsonRemoteProperty
+    
     private int charStopMode = 0;
-    @JsonRemoteProperty
+    
     private String charX = "";
-    @JsonRemoteProperty
+    
     private String hexValue = "";
-    @JsonRemoteProperty
+    
     private int stopTimeout = 1000;
-    @JsonRemoteProperty
+    
     private String initString = "";
-    @JsonRemoteProperty
+    
     private int bufferSize = 2;
-    @JsonRemoteProperty
+    
     private boolean quantize;
 
     @Override

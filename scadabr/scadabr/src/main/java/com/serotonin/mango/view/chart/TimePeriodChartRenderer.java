@@ -21,20 +21,13 @@ package com.serotonin.mango.view.chart;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Map;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.utils.TimePeriods;
-import com.serotonin.mango.Common;
-import com.serotonin.mango.util.LocalizableJsonException;
 
 abstract public class TimePeriodChartRenderer extends BaseChartRenderer {
 
     private TimePeriods timePeriod;
-    @JsonRemoteProperty
+    
     private int numberOfPeriods;
 
     /**
@@ -107,25 +100,4 @@ abstract public class TimePeriodChartRenderer extends BaseChartRenderer {
         }
     }
 
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-        String text = json.getString("timePeriodType");
-        if (text == null) {
-            throw new LocalizableJsonException("emport.error.chart.missing", "timePeriodType", TimePeriods.values());
-        }
-
-        try {
-            timePeriod = timePeriod.valueOf(text);
-        } catch (Exception e) {
-            throw new LocalizableJsonException("emport.error.chart.invalid", "timePeriodType", text,
-                    TimePeriods.values());
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-        map.put("timePeriodType", timePeriod.name());
-    }
 }

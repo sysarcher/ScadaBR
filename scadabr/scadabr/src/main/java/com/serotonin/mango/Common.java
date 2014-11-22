@@ -76,8 +76,6 @@ public class Common {
     public static final Charset UTF8_CS = Charset.forName(UTF8);
 
     @Deprecated
-    public static final int NEW_ID = ScadaBrConstants.NEW_ID;
-    @Deprecated
     public static ContextWrapper ctx;
 
     //TODO inject this

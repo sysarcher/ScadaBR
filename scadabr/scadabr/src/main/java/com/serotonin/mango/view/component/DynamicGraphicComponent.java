@@ -24,16 +24,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonValue;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.DynamicImage;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
@@ -42,18 +35,18 @@ import java.util.EnumSet;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class DynamicGraphicComponent extends PointComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("dynamicGraphic", "DYNAMIC_GRAPHIC",
             "graphic.dynamicGraphic", EnumSet.of(DataType.NUMERIC));
 
     private DynamicImage dynamicImage;
-    @JsonRemoteProperty
+    
     private boolean displayText;
-    @JsonRemoteProperty
+    
     private double min;
-    @JsonRemoteProperty
+    
     private double max;
 
     public DynamicImage tgetDynamicImage() {
@@ -193,33 +186,4 @@ public class DynamicGraphicComponent extends PointComponent {
         }
     }
 
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-
-        JsonValue jsonImageId = json.getValue("dynamicImage");
-        if (jsonImageId != null) {
-            if (jsonImageId.isNull()) {
-                dynamicImage = null;
-            } else {
-                String id = jsonImageId.toJsonString().getValue();
-                dynamicImage = Common.ctx.getDynamicImage(id);
-                if (dynamicImage == null) {
-                    throw new LocalizableJsonException("emport.error.component.unknownDynamicImage", id, Common.ctx
-                            .getDynamicImageIds());
-                }
-            }
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-
-        if (dynamicImage == null) {
-            map.put("dynamicImage", null);
-        } else {
-            map.put("dynamicImage", dynamicImage.getId());
-        }
-    }
 }

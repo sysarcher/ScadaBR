@@ -20,12 +20,7 @@ package com.serotonin.mango.rt.dataImage;
 
 import br.org.scadabr.DataType;
 import java.io.Serializable;
-import java.util.Map;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
@@ -42,8 +37,7 @@ import java.util.Objects;
  * @see AnnotatedPointValueTime
  * @author Matthew Lohbihler
  */
-public class PointValueTime implements Serializable, IValueTime,
-        JsonSerializable {
+public class PointValueTime implements Serializable, IValueTime {
 
     private static final long serialVersionUID = -1;
 
@@ -149,19 +143,6 @@ public class PointValueTime implements Serializable, IValueTime,
     @Override
     public String toString() {
         return MessageFormat.format("PointValueTime( {0} @{1})", value, new Date(time));
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader arg0, JsonObject arg1)
-            throws JsonException {
-        System.out.println("POINT VALUES DESERIALIZE");
-
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> arg0) {
-        System.out.println("POINT VALUES SERIALIZE");
-
     }
 
     public DataType getDataType() {

@@ -18,26 +18,17 @@
  */
 package com.serotonin.mango.vo;
 
+import br.org.scadabr.ScadaBrConstants;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import br.org.scadabr.json.JsonArray;
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
-import br.org.scadabr.json.JsonValue;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.db.dao.WatchListDao;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ShareUser;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Iterator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -45,9 +36,9 @@ import org.springframework.beans.factory.annotation.Configurable;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 @Configurable
-public class WatchList implements JsonSerializable, Iterable<DataPointVO> {
+public class WatchList implements Iterable<DataPointVO> {
     
     @Autowired
     private DataPointDao dataPointDao;
@@ -58,10 +49,10 @@ public class WatchList implements JsonSerializable, Iterable<DataPointVO> {
 
     public static final String XID_PREFIX = "WL_";
 
-    private int id = Common.NEW_ID;
+    private int id = ScadaBrConstants.NEW_ID;
     private String xid;
     private int userId;
-    @JsonRemoteProperty
+    
     private String name;
     private final List<DataPointVO> pointList = new CopyOnWriteArrayList<>();
     private List<ShareUser> watchListUsers = new ArrayList<>();
@@ -147,65 +138,13 @@ public class WatchList implements JsonSerializable, Iterable<DataPointVO> {
         }
     }
 
-    //
-    //
-    // Serialization
-    //
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("xid", xid);
-
-        map.put("user", userDao.getUser(userId).getUsername());
-
-        List<String> dpXids = new ArrayList<>();
-        for (DataPointVO dpVO : pointList) {
-            dpXids.add(dpVO.getXid());
-        }
-        map.put("dataPoints", dpXids);
-
-        map.put("sharingUsers", watchListUsers);
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        String username = json.getString("user");
-        if (username.isEmpty()) {
-            throw new LocalizableJsonException("emport.error.missingValue", "user");
-        }
-        User user = userDao.getUser(username);
-        if (user == null) {
-            throw new LocalizableJsonException("emport.error.missingUser", username);
-        }
-        userId = user.getId();
-
-        JsonArray jsonDataPoints = json.getJsonArray("dataPoints");
-        if (jsonDataPoints != null) {
-            pointList.clear();
-            for (JsonValue jv : jsonDataPoints.getElements()) {
-                String xid = jv.toJsonString().getValue();
-                DataPointVO dpVO = dataPointDao.getDataPoint(xid);
-                if (dpVO == null) {
-                    throw new LocalizableJsonException("emport.error.missingPoint", xid);
-                }
-                pointList.add(dpVO);
-            }
-        }
-
-        JsonArray jsonSharers = json.getJsonArray("sharingUsers");
-        if (jsonSharers != null) {
-            watchListUsers.clear();
-            for (JsonValue jv : jsonSharers.getElements()) {
-                ShareUser shareUser = reader.readPropertyValue(jv, ShareUser.class, null);
-                if (shareUser.getUserId() != userId) // No need for the owning user to be in this list.
-                {
-                    watchListUsers.add(shareUser);
-                }
-            }
-        }
-    }
-
     @Override
     public Iterator<DataPointVO> iterator() {
         return pointList.iterator();
+    }
+
+    @JsonIgnore
+    public boolean isNew() {
+        return id == ScadaBrConstants.NEW_ID;
     }
 }

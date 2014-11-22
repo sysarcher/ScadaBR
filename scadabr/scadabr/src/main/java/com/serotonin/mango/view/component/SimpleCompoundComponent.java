@@ -23,15 +23,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ResourceBundle;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
 
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class SimpleCompoundComponent extends CompoundComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("simpleCompound", "SIMPLE_COMPOUND",
@@ -49,7 +49,7 @@ public class SimpleCompoundComponent extends CompoundComponent {
     public static final String SUB_POINT_9 = "subPoint9";
     public static final String SUB_POINT_10 = "subPoint10";
 
-    @JsonRemoteProperty
+    
     private String backgroundColour;
 
     public SimpleCompoundComponent() {

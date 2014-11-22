@@ -29,7 +29,6 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.l10n.AbstractLocalizer;
-import com.serotonin.mango.Common;
 import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
@@ -109,7 +108,7 @@ public class ReportDao extends BaseDao {
     }
 
     public void saveReport(ReportVO report) {
-        if (report.getId() == Common.NEW_ID) {
+        if (report.isNew()) {
             insertReport(report);
         } else {
             updateReport(report);
@@ -212,7 +211,7 @@ public class ReportDao extends BaseDao {
             + "where id=?";
 
     public void saveReportInstance(final ReportInstance instance) {
-        if (instance.getId() == Common.NEW_ID) {
+        if (instance.isNew()) {
             final int id = doInsert(new PreparedStatementCreator() {
 
                 final static String SQL_INSERT = "insert into reportInstances "

@@ -26,19 +26,9 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.json.JsonArray;
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.db.dao.MailingListDao;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.event.handlers.EmailHandlerRT;
@@ -49,7 +39,6 @@ import com.serotonin.mango.rt.event.handlers.SetPointHandlerRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.mailingList.EmailRecipient;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
@@ -62,13 +51,11 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
-@JsonRemoteEntity
+
 @Configurable
-public class EventHandlerVO implements Serializable, ChangeComparable<EventHandlerVO>, JsonSerializable {
+public class EventHandlerVO implements Serializable, ChangeComparable<EventHandlerVO> {
     @Autowired
     private DataPointDao dataPointDao;
-    @Autowired
-    private EventDao eventDao;
     @Autowired 
     private UserDao userDao;
     @Autowired
@@ -124,12 +111,12 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
     }
 
     // Common fields
-    private int id = Common.NEW_ID;
+    private int id = ScadaBrConstants.NEW_ID;
     private String xid;
-    @JsonRemoteProperty
+    
     private String alias;
     private int handlerType;
-    @JsonRemoteProperty
+    
     private boolean disabled;
 
     // Set point handler fields.
@@ -215,6 +202,7 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
         this.targetPointId = targetPointId;
     }
 
+    @Override
     public int getId() {
         return id;
     }
@@ -791,231 +779,6 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
             } else if (handlerType == TYPE_SCRIPT) {
                 activeScriptCommand = in.readInt();
                 inactiveScriptCommand = in.readInt();
-            }
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("eventType", eventDao.getEventHandlerType(id));
-
-        map.put("xid", xid);
-        map.put("handlerType", TYPE_CODES.getCode(handlerType));
-
-        if (handlerType == TYPE_SET_POINT) {
-            DataPointVO dp = dataPointDao.getDataPoint(targetPointId);
-            if (dp != null) {
-                map.put("targetPointId", dp.getXid());
-            }
-
-            // Active
-            map.put("activeAction", SET_ACTION_CODES.getCode(activeAction));
-            if (activeAction == SET_ACTION_POINT_VALUE) {
-                dp = dataPointDao.getDataPoint(activePointId);
-                if (dp != null) {
-                    map.put("activePointId", dp.getXid());
-                }
-            } else if (activeAction == SET_ACTION_STATIC_VALUE) {
-                map.put("activeValueToSet", activeValueToSet);
-            }
-
-            // Inactive
-            map.put("inactiveAction", SET_ACTION_CODES.getCode(inactiveAction));
-            if (inactiveAction == SET_ACTION_POINT_VALUE) {
-                dp = dataPointDao.getDataPoint(inactivePointId);
-                if (dp != null) {
-                    map.put("inactivePointId", dp.getXid());
-                }
-            } else if (inactiveAction == SET_ACTION_STATIC_VALUE) {
-                map.put("inactiveValueToSet", inactiveValueToSet);
-            }
-        } else if (handlerType == TYPE_EMAIL) {
-            map.put("activeRecipients", activeRecipients);
-            map.put("sendEscalation", sendEscalation);
-            if (sendEscalation) {
-                map.put("escalationDelayType", escalationDelayType.name());
-                map.put("escalationDelay", escalationDelay);
-                map.put("escalationRecipients", escalationRecipients);
-            }
-            map.put("sendInactive", sendInactive);
-            if (sendInactive) {
-                map.put("inactiveOverride", inactiveOverride);
-                if (inactiveOverride) {
-                    map.put("inactiveRecipients", inactiveRecipients);
-                }
-            }
-        } else if (handlerType == TYPE_PROCESS) {
-            map.put("activeProcessCommand", activeProcessCommand);
-            map.put("inactiveProcessCommand", inactiveProcessCommand);
-        } else if (handlerType == TYPE_SCRIPT) {
-            map.put("activeScriptCommand", activeScriptCommand);
-            map.put("inactiveScriptCommand", inactiveScriptCommand);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json)
-            throws JsonException {
-
-        String text = json.getString("handlerType");
-        if (text != null) {
-            handlerType = TYPE_CODES.getId(text);
-            if (!TYPE_CODES.isValidId(handlerType)) {
-                throw new LocalizableJsonException(
-                        "emport.error.eventHandler.invalid", "handlerType",
-                        text, TYPE_CODES.getCodeList());
-            }
-        }
-
-        if (handlerType == TYPE_SET_POINT) {
-            String xid = json.getString("targetPointId");
-            if (xid != null) {
-                DataPointVO vo = dataPointDao.getDataPoint(xid);
-                if (vo == null) {
-                    throw new LocalizableJsonException(
-                            "emport.error.missingPoint", xid);
-                }
-                targetPointId = vo.getId();
-            }
-
-            // Active
-            text = json.getString("activeAction");
-            if (text != null) {
-                activeAction = SET_ACTION_CODES.getId(text);
-                if (!SET_ACTION_CODES.isValidId(activeAction)) {
-                    throw new LocalizableJsonException(
-                            "emport.error.eventHandler.invalid",
-                            "activeAction", text, SET_ACTION_CODES
-                            .getCodeList());
-                }
-            }
-
-            if (activeAction == SET_ACTION_POINT_VALUE) {
-                xid = json.getString("activePointId");
-                if (xid != null) {
-                    DataPointVO vo = dataPointDao.getDataPoint(xid);
-                    if (vo == null) {
-                        throw new LocalizableJsonException(
-                                "emport.error.missingPoint", xid);
-                    }
-                    activePointId = vo.getId();
-                }
-            } else if (activeAction == SET_ACTION_STATIC_VALUE) {
-                text = json.getString("activeValueToSet");
-                if (text != null) {
-                    activeValueToSet = text;
-                }
-            }
-
-            // Inactive
-            text = json.getString("inactiveAction");
-            if (text != null) {
-                inactiveAction = SET_ACTION_CODES.getId(text);
-                if (!SET_ACTION_CODES.isValidId(inactiveAction)) {
-                    throw new LocalizableJsonException(
-                            "emport.error.eventHandler.invalid",
-                            "inactiveAction", text, SET_ACTION_CODES
-                            .getCodeList());
-                }
-            }
-
-            if (inactiveAction == SET_ACTION_POINT_VALUE) {
-                xid = json.getString("inactivePointId");
-                if (xid != null) {
-                    DataPointVO vo = dataPointDao.getDataPoint(xid);
-                    if (vo == null) {
-                        throw new LocalizableJsonException(
-                                "emport.error.missingPoint", xid);
-                    }
-                    inactivePointId = vo.getId();
-                }
-            } else if (inactiveAction == SET_ACTION_STATIC_VALUE) {
-                text = json.getString("inactiveValueToSet");
-                if (text != null) {
-                    inactiveValueToSet = text;
-                }
-            }
-        } else if (handlerType == TYPE_EMAIL) {
-            JsonArray jsonActiveRecipients = json
-                    .getJsonArray("activeRecipients");
-            if (jsonActiveRecipients != null) {
-                activeRecipients = reader.readPropertyValue(
-                        jsonActiveRecipients, List.class,
-                        RecipientListEntryBean.class);
-            }
-
-            Boolean b = json.getBoolean("sendEscalation");
-            if (b != null) {
-                sendEscalation = b;
-            }
-
-            if (sendEscalation) {
-                text = json.getString("escalationDelayType");
-                if (text != null) {
-                    try {
-                        escalationDelayType = TimePeriods.valueOf(text);
-                    } catch (Exception e) {
-                        throw new LocalizableJsonException(
-                                "emport.error.invalid", "escalationDelayType",
-                                text, TimePeriods.values());
-                    }
-                }
-
-                Integer i = json.getInt("escalationDelay");
-                if (i != null) {
-                    escalationDelay = i;
-                }
-
-                JsonArray jsonEscalationRecipients = json
-                        .getJsonArray("escalationRecipients");
-                if (jsonEscalationRecipients != null) {
-                    escalationRecipients = reader.readPropertyValue(
-                            jsonEscalationRecipients, List.class,
-                            RecipientListEntryBean.class);
-                }
-            }
-
-            b = json.getBoolean("sendInactive");
-            if (b != null) {
-                sendInactive = b;
-            }
-
-            if (sendInactive) {
-                b = json.getBoolean("inactiveOverride");
-                if (b != null) {
-                    inactiveOverride = b;
-                }
-
-                if (inactiveOverride) {
-                    JsonArray jsonInactiveRecipients = json
-                            .getJsonArray("inactiveRecipients");
-                    if (jsonInactiveRecipients != null) {
-                        inactiveRecipients = reader.readPropertyValue(
-                                jsonInactiveRecipients, List.class,
-                                RecipientListEntryBean.class);
-                    }
-                }
-            }
-        } else if (handlerType == TYPE_PROCESS) {
-            text = json.getString("activeProcessCommand");
-            if (text != null) {
-                activeProcessCommand = text;
-            }
-
-            text = json.getString("inactiveProcessCommand");
-            if (text != null) {
-                inactiveProcessCommand = text;
-            }
-        } else if (handlerType == TYPE_SCRIPT) {
-            Integer script = json.getInt("activeScriptCommand");
-            if (text != null) {
-                activeScriptCommand = script;
-            }
-
-            script = json.getInt("inactiveScriptCommand");
-            if (text != null) {
-                inactiveScriptCommand = script;
             }
         }
     }

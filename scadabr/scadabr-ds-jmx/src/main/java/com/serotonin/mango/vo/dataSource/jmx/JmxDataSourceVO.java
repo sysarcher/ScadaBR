@@ -27,8 +27,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
@@ -48,7 +48,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class JmxDataSourceVO extends DataSourceVO<JmxDataSourceVO> {
 
     public static final Type TYPE = Type.JMX;
@@ -99,14 +99,14 @@ public class JmxDataSourceVO extends DataSourceVO<JmxDataSourceVO> {
         return new JmxPointLocatorVO();
     }
 
-    @JsonRemoteProperty
+    
     private boolean useLocalServer;
-    @JsonRemoteProperty
+    
     private String remoteServerAddr;
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 5;
-    @JsonRemoteProperty
+    
     private boolean quantize;
 
     public boolean isUseLocalServer() {

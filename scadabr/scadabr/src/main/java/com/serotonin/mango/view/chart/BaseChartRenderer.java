@@ -23,12 +23,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonSerializable;
-
-abstract public class BaseChartRenderer implements ChartRenderer, JsonSerializable {
+abstract public class BaseChartRenderer implements ChartRenderer {
 
     //
     // /
@@ -44,19 +39,6 @@ abstract public class BaseChartRenderer implements ChartRenderer, JsonSerializab
 
     private void readObject(ObjectInputStream in) throws IOException {
         in.readInt();
-    }
-
-    /**
-     * @throws JsonException
-     */
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        // no op. The type value is used by the factory.
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> paramMap) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

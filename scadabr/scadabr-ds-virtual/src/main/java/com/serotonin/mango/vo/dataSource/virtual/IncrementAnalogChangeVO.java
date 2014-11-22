@@ -23,26 +23,26 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataSource.virtual.ChangeTypeRT;
 import com.serotonin.mango.rt.dataSource.virtual.IncrementAnalogChangeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class IncrementAnalogChangeVO extends ChangeTypeVO {
 
     public static final LocalizableMessage KEY = new LocalizableMessageImpl("dsEdit.virtual.changeType.increment");
 
-    @JsonRemoteProperty
+    
     private double min;
-    @JsonRemoteProperty
+    
     private double max;
-    @JsonRemoteProperty
+    
     private double change;
-    @JsonRemoteProperty
+    
     private boolean roll;
 
     @Override

@@ -23,7 +23,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import com.serotonin.mango.Common;
 import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.link.PointLinkVO;
@@ -31,7 +30,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import javax.inject.Named;
-import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -99,7 +97,7 @@ public class PointLinkDao extends BaseDao {
     }
 
     public void savePointLink(final PointLinkVO pl) {
-        if (pl.getId() == Common.NEW_ID) {
+        if (pl.isNew()) {
             insertPointLink(pl);
         } else {
             updatePointLink(pl);

@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.vo.User;
 import br.org.scadabr.util.SerializationHelper;
@@ -31,12 +31,12 @@ import br.org.scadabr.util.SerializationHelper;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class HtmlComponent extends ViewComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("html", "HTML", "graphic.html", null);
 
-    @JsonRemoteProperty
+    
     private String content;
 
     public String getContent() {

@@ -18,26 +18,14 @@
  */
 package com.serotonin.mango.vo.mailingList;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.joda.time.DateTime;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import com.serotonin.mango.db.dao.UserDao;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 
-@JsonRemoteEntity
-@Configurable
+
 public class UserEntry extends EmailRecipient {
-    @Autowired
-    private UserDao userDao;
     
     private int userId;
     private User user;
@@ -96,29 +84,4 @@ public class UserEntry extends EmailRecipient {
         return user.getUsername();
     }
 
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-        if (user == null) {
-            user = userDao.getUser(userId);
-        }
-        map.put("username", user.getUsername());
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-
-        String username = json.getString("username");
-        if (username == null) {
-            throw new LocalizableJsonException("emport.error.recipient.missing.reference", "username");
-        }
-
-        user = userDao.getUser(username);
-        if (user == null) {
-            throw new LocalizableJsonException("emport.error.recipient.invalid.reference", "username", username);
-        }
-
-        userId = user.getId();
-    }
 }

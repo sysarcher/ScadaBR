@@ -22,20 +22,20 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import br.org.scadabr.util.SerializationHelper;
 
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class HttpPointVO extends PublishedPointVO {
 
-    @JsonRemoteProperty
+    
     private String parameterName;
-    @JsonRemoteProperty
+    
     private boolean includeTimestamp;
 
     public String getParameterName() {

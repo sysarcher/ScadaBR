@@ -13,7 +13,7 @@ import br.org.scadabr.rt.dataSource.nodaves7.NodaveS7DataSource;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteProperty;
+
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
@@ -88,13 +88,13 @@ public class NodaveS7DataSourceVO extends DataSourceVO<NodaveS7DataSourceVO> {
     }
 
     private TimePeriods updatePeriodType = TimePeriods.SECONDS;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 1;
-    @JsonRemoteProperty
+    
     private String filePath = "";
-    @JsonRemoteProperty
+    
     private boolean quantize;
-    @JsonRemoteProperty
+    
     private String nodaveWriteBaseCmd = "";
 
     @Override

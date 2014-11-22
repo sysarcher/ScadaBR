@@ -28,8 +28,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.onewire.OneWireDataSourceRT;
@@ -50,7 +50,7 @@ import java.util.Arrays;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class OneWireDataSourceVO extends DataSourceVO<OneWireDataSourceVO> {
 
     public static final Type TYPE = Type.ONE_WIRE;
@@ -99,16 +99,16 @@ public class OneWireDataSourceVO extends DataSourceVO<OneWireDataSourceVO> {
         return new OneWirePointLocatorVO();
     }
 
-    @JsonRemoteProperty
+    
     private String commPortId;
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 5;
     /**
      * null means no rescan ...
      */
     private TimePeriods rescanPeriodType = null;
-    @JsonRemoteProperty
+    
     private int rescanPeriods = 1;
 
     public String getCommPortId() {

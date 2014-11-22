@@ -32,8 +32,8 @@ import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.virtual.VirtualPointLocatorRT;
@@ -46,7 +46,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import java.util.EnumSet;
 
-@JsonRemoteEntity
+
 public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
     private static final Log LOG = LogFactory.getLog(VirtualPointLocatorVO.class);
@@ -198,7 +198,7 @@ public class VirtualPointLocatorVO extends AbstractPointLocatorVO implements Jso
 
     private DataType dataType = DataType.BINARY;
     private int changeTypeId = ChangeTypeVO.Types.ALTERNATE_BOOLEAN;
-    @JsonRemoteProperty
+    
     private boolean settable;
     private AlternateBooleanChangeVO alternateBooleanChange = new AlternateBooleanChangeVO();
     private BrownianChangeVO brownianChange = new BrownianChangeVO();
