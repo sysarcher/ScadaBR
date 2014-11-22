@@ -31,8 +31,8 @@ import org.snmp4j.mp.SnmpConstants;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.snmp.SnmpDataSourceRT;
@@ -50,7 +50,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
  * @author Matthew Lohbihler
  *
  */
-@JsonRemoteEntity
+
 public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
 
     public static final Type TYPE = Type.SNMP;
@@ -110,40 +110,40 @@ public class SnmpDataSourceVO extends DataSourceVO<SnmpDataSourceVO> {
         return new SnmpPointLocatorVO();
     }
 
-    @JsonRemoteProperty
+    
     private String host;
-    @JsonRemoteProperty
+    
     private int port = SnmpConstants.DEFAULT_COMMAND_RESPONDER_PORT;
-    @JsonRemoteProperty
+    
     private int snmpVersion;
-    @JsonRemoteProperty
+    
     private String community;
-    @JsonRemoteProperty
+    
     private String engineId;
-    @JsonRemoteProperty
+    
     private String contextEngineId;
-    @JsonRemoteProperty
+    
     private String contextName;
-    @JsonRemoteProperty
+    
     private String securityName;
-    @JsonRemoteProperty
+    
     private String authProtocol;
-    @JsonRemoteProperty
+    
     private String authPassphrase;
-    @JsonRemoteProperty
+    
     private String privProtocol;
-    @JsonRemoteProperty
+    
     private String privPassphrase;
-    @JsonRemoteProperty
+    
     private int retries = 2;
-    @JsonRemoteProperty
+    
     private int timeout = 1000;
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 5;
-    @JsonRemoteProperty
+    
     private int trapPort = SnmpConstants.DEFAULT_NOTIFICATION_RECEIVER_PORT;
-    @JsonRemoteProperty
+    
     private String localAddress;
 
     public String getAuthPassphrase() {

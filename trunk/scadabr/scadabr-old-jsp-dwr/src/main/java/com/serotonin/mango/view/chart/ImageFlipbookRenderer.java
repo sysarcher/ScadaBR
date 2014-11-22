@@ -23,8 +23,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.vo.DataPointVO;
@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Configurable;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 @Configurable
 public class ImageFlipbookRenderer extends BaseChartRenderer {
 
@@ -46,7 +46,7 @@ public class ImageFlipbookRenderer extends BaseChartRenderer {
         return ChartType.IMAGE_FLIPBOOK;
     }
 
-    @JsonRemoteProperty
+    
     private int limit;
 
     public ImageFlipbookRenderer() {

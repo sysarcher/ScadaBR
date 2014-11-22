@@ -18,31 +18,25 @@
  */
 package com.serotonin.mango.vo.mailingList;
 
+import br.org.scadabr.ScadaBrConstants;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.joda.time.DateTime;
 
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import com.serotonin.mango.Common;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@JsonRemoteEntity
+
 public class MailingList extends EmailRecipient {
 
     public static final String XID_PREFIX = "ML_";
 
-    private int id = Common.NEW_ID;
+    private int id = ScadaBrConstants.NEW_ID;
     private String xid;
-    @JsonRemoteProperty
+    
     private String name;
-    @JsonRemoteProperty(innerType = EmailRecipient.class)
     private List<EmailRecipient> entries;
 
     /**
@@ -51,7 +45,6 @@ public class MailingList extends EmailRecipient {
      * into 15 minutes, starting at [00:00 to 00:15) on Monday. Thus, there are
      * 4 * 24 * 7 = 672 individual periods.
      */
-    @JsonRemoteProperty(innerType = Integer.class)
     private Set<Integer> inactiveIntervals = new TreeSet<>();
 
     @Override
@@ -154,14 +147,8 @@ public class MailingList extends EmailRecipient {
         return "MailingList(" + entries + ")";
     }
 
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        // Don't call the super method, because a mailing list can't be a member of a mailing list.
-        map.put("xid", xid);
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) {
-        // no op
+    @JsonIgnore
+    public boolean isNew() {
+        return id == ScadaBrConstants.NEW_ID;
     }
 }

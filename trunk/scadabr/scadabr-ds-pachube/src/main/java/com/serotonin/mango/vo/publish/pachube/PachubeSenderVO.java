@@ -23,8 +23,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.publish.PublisherRT;
@@ -39,7 +39,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class PachubeSenderVO extends PublisherVO<PachubePointVO> {
 
     @Override
@@ -80,11 +80,11 @@ public class PachubeSenderVO extends PublisherVO<PachubePointVO> {
         return new PachubePointVO();
     }
 
-    @JsonRemoteProperty
+    
     private String apiKey;
-    @JsonRemoteProperty
+    
     private int timeoutSeconds = 30;
-    @JsonRemoteProperty
+    
     private int retries = 2;
 
     public String getApiKey() {

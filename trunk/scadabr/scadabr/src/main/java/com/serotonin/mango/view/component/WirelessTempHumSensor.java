@@ -21,14 +21,14 @@ package com.serotonin.mango.view.component;
 import br.org.scadabr.DataType;
 import java.util.ResourceBundle;
 
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import com.serotonin.mango.view.ImplDefinition;
 import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class WirelessTempHumSensor extends CompoundComponent {
 
     private static final long serialVersionUID = -1;

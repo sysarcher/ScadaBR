@@ -28,8 +28,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.pachube.PachubePointLocatorRT;
@@ -41,7 +41,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.util.EnumSet;
 
-@JsonRemoteEntity
+
 public class PachubePointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
     @Override
@@ -54,14 +54,14 @@ public class PachubePointLocatorVO extends AbstractPointLocatorVO implements Jso
         return new LocalizableMessageImpl("dsEdit.pachube.dpconn", feedId, dataStreamId);
     }
 
-    @JsonRemoteProperty
+    
     private int feedId;
-    @JsonRemoteProperty
+    
     private String dataStreamId;
     private DataType dataType;
-    @JsonRemoteProperty
+    
     private String binary0Value;
-    @JsonRemoteProperty
+    
     private boolean settable;
 
     public int getFeedId() {

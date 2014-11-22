@@ -25,14 +25,12 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.ImplDefinition;
 import java.awt.Color;
 import java.util.EnumSet;
 
-@JsonRemoteEntity
+
 public class MultistateRenderer extends BaseTextRenderer {
 
     private static final ImplDefinition definition = new ImplDefinition("textRendererMultistate", "MULTISTATE",
@@ -52,7 +50,6 @@ public class MultistateRenderer extends BaseTextRenderer {
         return definition;
     }
 
-    @JsonRemoteProperty(innerType = MultistateValue.class)
     private List<MultistateValue> multistateValues = new ArrayList<>();
 
     public void addMultistateValue(int key, String text, String colour) {

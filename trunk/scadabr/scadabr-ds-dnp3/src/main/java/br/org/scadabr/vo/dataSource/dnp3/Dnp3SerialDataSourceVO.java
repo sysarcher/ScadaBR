@@ -11,8 +11,8 @@ import br.org.scadabr.rt.dataSource.dnp3.Dnp3SerialDataSource;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import br.org.scadabr.util.SerializationHelper;
@@ -21,7 +21,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class Dnp3SerialDataSourceVO extends
         Dnp3DataSourceVO<Dnp3SerialDataSourceVO> {
 
@@ -42,17 +42,17 @@ public class Dnp3SerialDataSourceVO extends
         return new Dnp3SerialDataSource(this);
     }
 
-    @JsonRemoteProperty
+    
     private String commPortId;
-    @JsonRemoteProperty
+    
     private int baudRate = 9600;
-    @JsonRemoteProperty
+    
     private int dataBits = 8;
-    @JsonRemoteProperty
+    
     private int stopBits = 1;
-    @JsonRemoteProperty
+    
     private int parity = 0;
-    @JsonRemoteProperty
+    
     private boolean echo = false;
 
     /**

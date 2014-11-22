@@ -37,6 +37,7 @@ import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.db.RowCallback;
 import br.org.scadabr.db.spring.IntValuePairRowMapper;
 import br.org.scadabr.io.StreamUtils;
+import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.ImageSaveException;
 import com.serotonin.mango.rt.dataImage.AnnotatedPointValueTime;
@@ -107,7 +108,7 @@ public class PointValueDao extends BaseDao {
         // Use our ejt, so that there is no tranaction boundary... // otherwise we wont see the values written there here
         batchWriteBehind.init(daf);
     }
-    
+
     /**
      * Flush anything
      */
@@ -160,16 +161,24 @@ public class PointValueDao extends BaseDao {
         double dvalue = 0;
         String svalue = null;
 
-        if (dataType == DataType.IMAGE) {
-            ImageValue imageValue = (ImageValue) value;
-            dvalue = imageValue.getType();
-            if (imageValue.isSaved()) {
-                svalue = Long.toString(imageValue.getId());
-            }
-        } else if (value.hasDoubleRepresentation()) {
-            dvalue = value.getDoubleValue();
-        } else {
-            svalue = value.getStringValue();
+        switch (dataType) {
+            case IMAGE:
+                ImageValue imageValue = (ImageValue) value;
+                dvalue = imageValue.getType();
+                if (!imageValue.isNew()) {
+                    svalue = Long.toString(imageValue.getId());
+                }
+                break;
+            case BINARY:
+            case MULTISTATE:
+            case NUMERIC:
+                dvalue = value.getDoubleValue();
+                break;
+            case ALPHANUMERIC:
+                svalue = value.getStringValue();
+                break;
+            default:
+                throw new ImplementMeException();
         }
 
         // Check if we need to create an annotation.
@@ -189,8 +198,8 @@ public class PointValueDao extends BaseDao {
                                         svalueFinal, source, false);
                             }
                         });
-            } else // Single sql call, so no transaction required.
-            {
+            } else {
+                // Single sql call, so no transaction required.
                 id = savePointValue(pointId, dataType, dvalue,
                         pointValue.getTime(), svalue, source, async);
             }
@@ -206,7 +215,7 @@ public class PointValueDao extends BaseDao {
         // Check if we need to save an image
         if (dataType == DataType.IMAGE) {
             ImageValue imageValue = (ImageValue) value;
-            if (!imageValue.isSaved()) {
+            if (imageValue.isNew()) {
                 imageValue.setId(id);
 
                 File file = new File(common.getFiledataPath(),

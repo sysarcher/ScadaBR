@@ -188,13 +188,13 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
         LocalizableMessage subjectMsg;
         LocalizableMessage notifTypeMsg = new LocalizableMessageImpl(notificationType.getKey());
         if (alias == null) {
-            if (evt.getId() == Common.NEW_ID) {
+            if (evt.isNew()) {
                 subjectMsg = new LocalizableMessageImpl("ftl.subject.default", notifTypeMsg);
             } else {
                 subjectMsg = new LocalizableMessageImpl("ftl.subject.default.id", notifTypeMsg, evt.getId());
             }
         } else {
-            if (evt.getId() == Common.NEW_ID) {
+            if (evt.isNew()) {
                 subjectMsg = new LocalizableMessageImpl("ftl.subject.alias", alias, notifTypeMsg);
             } else {
                 subjectMsg = new LocalizableMessageImpl("ftl.subject.alias.id", alias, notifTypeMsg, evt.getId());

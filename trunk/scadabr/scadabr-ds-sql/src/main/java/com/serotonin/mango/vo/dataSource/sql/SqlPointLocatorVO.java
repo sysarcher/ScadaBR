@@ -28,8 +28,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.sql.SqlPointLocatorRT;
@@ -45,7 +45,7 @@ import java.util.EnumSet;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
     @Override
@@ -63,12 +63,12 @@ public class SqlPointLocatorVO extends AbstractPointLocatorVO implements JsonSer
         return new SqlPointLocatorRT(this);
     }
 
-    @JsonRemoteProperty
+    
     private String fieldName;
-    @JsonRemoteProperty
+    
     private String timeOverrideName;
     private DataType dataType;
-    @JsonRemoteProperty
+    
     private String updateStatement;
 
     public String getFieldName() {

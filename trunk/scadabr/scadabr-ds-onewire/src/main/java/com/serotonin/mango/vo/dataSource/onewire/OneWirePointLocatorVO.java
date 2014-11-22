@@ -28,8 +28,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.onewire.OneWirePointLocatorRT;
@@ -45,7 +45,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
     public interface AttributeTypes {
@@ -104,7 +104,7 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
     /**
      * The address of the container.
      */
-    @JsonRemoteProperty
+    
     private String address;
     /**
      * The attribute within the container that we are interested in.
@@ -115,7 +115,7 @@ public class OneWirePointLocatorVO extends AbstractPointLocatorVO implements Jso
      * voltages and latch states (channel), wiper positions (potentiometer), and
      * pages (counters).
      */
-    @JsonRemoteProperty
+    
     private int index;
 
     public String getAttributeDescription() {

@@ -23,19 +23,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
-import java.util.Map;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.http.HttpImagePointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
@@ -45,8 +37,8 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
-public class HttpImagePointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+
+public class HttpImagePointLocatorVO extends AbstractPointLocatorVO {
 
     public static final int SCALE_TYPE_NONE = 0;
     public static final int SCALE_TYPE_PERCENT = 1;
@@ -75,22 +67,22 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO implements J
         return new LocalizableMessageImpl("common.default", url);
     }
 
-    @JsonRemoteProperty
+    
     private String url;
-    @JsonRemoteProperty
+    
     private int timeoutSeconds = 30;
-    @JsonRemoteProperty
+    
     private int retries = 2;
     private int scaleType;
-    @JsonRemoteProperty
+    
     private int scalePercent = 25;
-    @JsonRemoteProperty
+    
     private int scaleWidth = 100;
-    @JsonRemoteProperty
+    
     private int scaleHeight = 100;
-    @JsonRemoteProperty
+    
     private int readLimit = 10000;
-    @JsonRemoteProperty
+    
     private String webcamLiveFeedCode;
 
     public String getUrl() {
@@ -271,22 +263,6 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO implements J
             readLimit = in.readInt();
             webcamLiveFeedCode = SerializationHelper.readSafeUTF(in);
         }
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        String text = json.getString("scaleType");
-        if (text != null) {
-            scaleType = SCALE_TYPE_CODES.getId(text);
-            if (scaleType == -1) {
-                throw new LocalizableJsonException("emport.error.invalid", "scaleType", text, SCALE_TYPE_CODES);
-            }
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("scaleType", SCALE_TYPE_CODES.getCode(scaleType));
     }
 
     @Override

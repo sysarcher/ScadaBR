@@ -27,7 +27,6 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import com.serotonin.mango.Common;
 import com.serotonin.mango.view.ShareUser;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.WatchList;
@@ -35,7 +34,6 @@ import java.sql.Connection;
 import java.sql.Statement;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -165,7 +163,7 @@ public class WatchListDao extends BaseDao {
             @SuppressWarnings("synthetic-access")
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
-                if (watchList.getId() == Common.NEW_ID) {
+                if (watchList.isNew()) {
                     final int id = doInsert(new PreparedStatementCreator() {
 
                         final static String SQL_INSERT = "insert into watchLists (xid, name, userId) values (?,?,?)";

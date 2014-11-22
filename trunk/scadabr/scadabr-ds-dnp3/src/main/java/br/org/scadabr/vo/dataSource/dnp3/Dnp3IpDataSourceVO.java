@@ -11,15 +11,15 @@ import br.org.scadabr.rt.dataSource.dnp3.Dnp3IpDataSource;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class Dnp3IpDataSourceVO extends Dnp3DataSourceVO<Dnp3IpDataSourceVO> {
 
     public static final Type TYPE = Type.DNP3_IP;
@@ -39,9 +39,9 @@ public class Dnp3IpDataSourceVO extends Dnp3DataSourceVO<Dnp3IpDataSourceVO> {
         return new Dnp3IpDataSource(this);
     }
 
-    @JsonRemoteProperty
+    
     private String host = "localhost";
-    @JsonRemoteProperty
+    
     private int port = 20000;
 
     public String getHost() {

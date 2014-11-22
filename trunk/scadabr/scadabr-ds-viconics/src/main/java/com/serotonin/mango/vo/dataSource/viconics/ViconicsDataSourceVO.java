@@ -23,8 +23,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.viconics.ViconicsDataSourceRT;
@@ -45,7 +45,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
  *
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class ViconicsDataSourceVO extends DataSourceVO<ViconicsDataSourceVO> {
 
     public static final Type TYPE = Type.VICONICS;
@@ -101,25 +101,25 @@ public class ViconicsDataSourceVO extends DataSourceVO<ViconicsDataSourceVO> {
         return new ViconicsPointLocatorVO();
     }
 
-    @JsonRemoteProperty
+    
     private String commPortId;
-    @JsonRemoteProperty
+    
     private int panId = 1;
-    @JsonRemoteProperty
+    
     private int channel = 1;
-    @JsonRemoteProperty
+    
     private int timeout = 30000;
-    @JsonRemoteProperty
+    
     private int retries = 2;
-    @JsonRemoteProperty
+    
     private int networkTimeoutSeconds = 20;
-    @JsonRemoteProperty
+    
     private int deviceWarningTimeoutSeconds = 60;
-    @JsonRemoteProperty
+    
     private int deviceRemoveTimeoutSeconds = 300;
-    @JsonRemoteProperty
+    
     private int pointValueMinimumFreshnessSeconds = 1800;
-    @JsonRemoteProperty
+    
     private boolean convertToCelsius = false;
 
     public String getCommPortId() {

@@ -27,8 +27,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.publish.PublisherRT;
@@ -43,7 +43,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class PersistentSenderVO extends PublisherVO<PersistentPointVO> {
 
     @Override
@@ -115,13 +115,13 @@ public class PersistentSenderVO extends PublisherVO<PersistentPointVO> {
         return new PersistentPointVO();
     }
 
-    @JsonRemoteProperty
+    
     private String host;
-    @JsonRemoteProperty
+    
     private int port;
-    @JsonRemoteProperty
+    
     private String authorizationKey;
-    @JsonRemoteProperty
+    
     private String xidPrefix;
     private int syncType = SYNC_TYPE_DAILY;
 

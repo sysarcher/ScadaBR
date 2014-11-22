@@ -18,27 +18,18 @@
  */
 package com.serotonin.mango.vo.publish;
 
+import br.org.scadabr.ScadaBrConstants;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import br.org.scadabr.json.JsonArray;
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
-import br.org.scadabr.json.JsonValue;
 import br.org.scadabr.rt.event.type.EventSources;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.PublisherDao;
 import com.serotonin.mango.rt.publish.PublisherRT;
 import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.ImplementMeException;
@@ -47,6 +38,7 @@ import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -55,7 +47,7 @@ import org.springframework.beans.factory.annotation.Configurable;
  * @param <T>
  */
 @Configurable
-abstract public class PublisherVO<T extends PublishedPointVO> implements Serializable, JsonSerializable {
+abstract public class PublisherVO<T extends PublishedPointVO> implements Serializable {
 
     @Autowired
     private PublisherDao publisherDao;
@@ -165,25 +157,26 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
 
     abstract protected T createPublishedPointInstance();
 
+    @JsonIgnore
     public boolean isNew() {
-        return id == Common.NEW_ID;
+        return id == ScadaBrConstants.NEW_ID;
     }
 
-    private int id = Common.NEW_ID;
+    private int id = ScadaBrConstants.NEW_ID;
     private String xid;
-    @JsonRemoteProperty
+    
     private String name;
-    @JsonRemoteProperty
+    
     private boolean enabled;
     protected List<T> points = new ArrayList<>();
-    @JsonRemoteProperty
+    
     private boolean changesOnly;
-    @JsonRemoteProperty
+    
     private int cacheWarningSize = 100;
-    @JsonRemoteProperty
+    
     private boolean sendSnapshot;
     private TimePeriods snapshotSendPeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int snapshotSendPeriods = 5;
 
     public boolean isEnabled() {
@@ -340,34 +333,4 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
         }
     }
 
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("xid", xid);
-        map.put("type", getType().name());
-        map.put("points", points);
-        map.put("snapshotSendPeriodType", snapshotSendPeriodType.name());
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException, LocalizableJsonException {
-        JsonArray arr = json.getJsonArray("points");
-        if (arr != null) {
-            points.clear();
-            for (JsonValue jv : arr.getElements()) {
-                T point = createPublishedPointInstance();
-                reader.populateObject(point, jv.toJsonObject());
-                points.add(point);
-            }
-        }
-
-        String text = json.getString("snapshotSendPeriodType");
-        if (text != null) {
-            try {
-                snapshotSendPeriodType = TimePeriods.valueOf(text);
-            } catch (Exception e) {
-                throw new LocalizableJsonException("emport.error.invalid", "snapshotSendPeriodType", text,
-                        TimePeriods.values());
-            }
-        }
-    }
 }

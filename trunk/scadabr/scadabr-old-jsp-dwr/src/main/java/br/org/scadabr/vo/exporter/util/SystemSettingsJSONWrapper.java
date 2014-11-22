@@ -7,13 +7,13 @@ import java.util.Set;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.db.dao.SystemSettingsDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
-@JsonRemoteEntity
+
 @Configurable
 public class SystemSettingsJSONWrapper implements JsonSerializable {
 

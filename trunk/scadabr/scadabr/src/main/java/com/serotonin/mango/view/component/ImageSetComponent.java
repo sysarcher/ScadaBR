@@ -23,26 +23,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonValue;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImageSet;
 import br.org.scadabr.util.SerializationHelper;
 
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 abstract public class ImageSetComponent extends PointComponent {
 
     protected ImageSet imageSet;
-    @JsonRemoteProperty
+    
     private boolean displayText;
 
     public ImageSet tgetImageSet() {
@@ -145,33 +138,4 @@ abstract public class ImageSetComponent extends PointComponent {
         }
     }
 
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-
-        JsonValue jsonImageId = json.getValue("imageSet");
-        if (jsonImageId != null) {
-            if (jsonImageId.isNull()) {
-                imageSet = null;
-            } else {
-                String id = jsonImageId.toJsonString().getValue();
-                imageSet = Common.ctx.getImageSet(id);
-                if (imageSet == null) {
-                    throw new LocalizableJsonException("emport.error.component.unknownImageSet", id, Common.ctx
-                            .getImageSetIds());
-                }
-            }
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-
-        if (imageSet == null) {
-            map.put("imageSet", null);
-        } else {
-            map.put("imageSet", imageSet.getId());
-        }
-    }
 }

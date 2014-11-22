@@ -29,12 +29,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.http.HttpRetrieverPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -49,8 +43,8 @@ import java.util.EnumSet;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
-public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
+
+public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO {
 
     @Override
     public boolean isSettable() {
@@ -67,16 +61,16 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
         return new LocalizableMessageImpl("dsEdit.httpRetriever.dpconn", Functions.escapeLessThan(valueRegex));
     }
 
-    @JsonRemoteProperty
+    
     private String valueRegex;
-    @JsonRemoteProperty
+    
     private boolean ignoreIfMissing;
-    @JsonRemoteProperty
+    
     private String valueFormat;
     private DataType dataType;
-    @JsonRemoteProperty
+    
     private String timeRegex;
-    @JsonRemoteProperty
+    
     private String timeFormat;
 
     public String getValueRegex() {
@@ -229,19 +223,6 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO implemen
             timeRegex = SerializationHelper.readSafeUTF(in);
             timeFormat = SerializationHelper.readSafeUTF(in);
         }
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        DataType value = deserializeDataType(json, EnumSet.of(DataType.IMAGE));
-        if (value != null) {
-            dataType = value;
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        serializeDataType(map);
     }
 
     @Override

@@ -34,8 +34,8 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.bacnet.BACnetIPPointLocatorRT;
@@ -53,7 +53,7 @@ import java.util.EnumSet;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
     @Override
@@ -66,25 +66,25 @@ public class BACnetIPPointLocatorVO extends AbstractPointLocatorVO implements Js
         return new LocalizableMessageImpl("common.default", remoteDeviceIp);
     }
 
-    @JsonRemoteProperty
+    
     private String remoteDeviceIp;
-    @JsonRemoteProperty
+    
     private int remoteDevicePort = LocalDevice.DEFAULT_PORT;
-    @JsonRemoteProperty
+    
     private int networkNumber;
-    @JsonRemoteProperty
+    
     private String networkAddress;
-    @JsonRemoteProperty
+    
     private int remoteDeviceInstanceNumber;
     private int objectTypeId;
-    @JsonRemoteProperty
+    
     private int objectInstanceNumber;
     private int propertyIdentifierId = PropertyIdentifier.presentValue.intValue();
-    @JsonRemoteProperty
+    
     private boolean useCovSubscription;
-    @JsonRemoteProperty
+    
     private boolean settable;
-    @JsonRemoteProperty
+    
     private int writePriority = 16;
     private DataType dataType;
 

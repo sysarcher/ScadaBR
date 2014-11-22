@@ -22,13 +22,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
-import java.util.Map;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
 import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.http.HttpImageDataSourceRT;
@@ -45,7 +40,7 @@ import org.springframework.validation.Errors;
  * @author Craig McFetridge
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
 
     @Override
@@ -114,7 +109,7 @@ public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
     }
 
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 5;
 
     public TimePeriods getUpdatePeriodType() {
@@ -169,18 +164,4 @@ public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
         }
     }
 
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-        TimePeriods value = deserializeUpdatePeriodType(json);
-        if (value != null) {
-            updatePeriodType = value;
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-        serializeUpdatePeriodType(map, updatePeriodType);
-    }
 }

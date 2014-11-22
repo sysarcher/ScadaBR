@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.view.ImplDefinition;
@@ -34,15 +34,13 @@ import java.util.EnumSet;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class BinaryGraphicComponent extends ImageSetComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("binaryGraphic", "BINARY_GRAPHIC",
             "graphic.binaryGraphic", EnumSet.of(DataType.BINARY));
 
-    @JsonRemoteProperty(alias = "zeroImageIndex")
     private int zeroImage;
-    @JsonRemoteProperty(alias = "oneImageIndex")
     private int oneImage;
 
     public int getZeroImage() {

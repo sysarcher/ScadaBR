@@ -35,8 +35,8 @@ import org.apache.commons.logging.LogFactory;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.openv4j.OpenV4JDataSourceRT;
@@ -51,7 +51,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
 
     private final static Log LOG = LogFactory.getLog(OpenV4JDataSourceVO.class);
@@ -62,14 +62,14 @@ public class OpenV4JDataSourceVO extends DataSourceVO<OpenV4JDataSourceVO> {
         EVENT_CODES.addElement(OpenV4JDataSourceRT.POINT_READ_EXCEPTION_EVENT, "POINT_READ_EXCEPTION");
         EVENT_CODES.addElement(OpenV4JDataSourceRT.POINT_WRITE_EXCEPTION_EVENT, "POINT_WRITE_EXCEPTION");
     }
-    @JsonRemoteProperty
+    
     private String commPortId;
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 1;
-    @JsonRemoteProperty
+    
     private Devices device;
-    @JsonRemoteProperty
+    
     private Protocol protocol;
 
     @Override

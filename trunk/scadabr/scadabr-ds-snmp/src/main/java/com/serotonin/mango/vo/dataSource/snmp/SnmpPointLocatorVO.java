@@ -30,8 +30,8 @@ import org.snmp4j.smi.OID;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.snmp.SnmpPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -46,7 +46,7 @@ import java.util.EnumSet;
  * @author Matthew Lohbihler
  *
  */
-@JsonRemoteEntity
+
 public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
     public interface SetTypes {
@@ -78,14 +78,14 @@ public class SnmpPointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         return new SnmpPointLocatorRT(this);
     }
 
-    @JsonRemoteProperty
+    
     private String oid;
     private DataType dataType;
-    @JsonRemoteProperty
+    
     private String binary0Value = "0";
-    @JsonRemoteProperty
+    
     private int setType;
-    @JsonRemoteProperty
+    
     private boolean trapOnly;
 
     public String getOid() {

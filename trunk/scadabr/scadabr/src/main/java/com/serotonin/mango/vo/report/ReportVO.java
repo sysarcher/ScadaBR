@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.vo.report;
 
+import br.org.scadabr.ScadaBrConstants;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -27,10 +28,10 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
-import com.serotonin.mango.Common;
 import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.TimePeriods;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.TimeZone;
 
 /**
@@ -52,7 +53,7 @@ public class ReportVO implements Serializable {
         return schedulePeriod == null;
     }
 
-    private int id = Common.NEW_ID;
+    private int id = ScadaBrConstants.NEW_ID;
     private int userId;
     private String name;
     private List<ReportPointVO> points = new ArrayList<>();
@@ -630,5 +631,10 @@ public class ReportVO implements Serializable {
     //TODO implement me!!
     public TimeZone getTimeZone() {
         return TimeZone.getDefault();
+    }
+
+    @JsonIgnore
+    public boolean isNew() {
+        return id == ScadaBrConstants.NEW_ID;
     }
 }

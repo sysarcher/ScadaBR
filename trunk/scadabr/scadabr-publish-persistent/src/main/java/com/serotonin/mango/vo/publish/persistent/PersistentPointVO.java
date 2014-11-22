@@ -22,10 +22,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 
-@JsonRemoteEntity
+
 public class PersistentPointVO extends PublishedPointVO {
     // No properties
 

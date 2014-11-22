@@ -27,8 +27,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.ebro.EBI25DataSourceRT;
@@ -47,7 +47,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class EBI25DataSourceVO extends DataSourceVO<EBI25DataSourceVO> {
 
     public static final Type TYPE = Type.EBI25;
@@ -89,18 +89,18 @@ public class EBI25DataSourceVO extends DataSourceVO<EBI25DataSourceVO> {
         return new LocalizableMessageImpl("common.default", host + ":" + port);
     }
 
-    @JsonRemoteProperty
+    
     private String host;
-    @JsonRemoteProperty
+    
     private int port = ModbusUtils.TCP_PORT;
-    @JsonRemoteProperty
+    
     private boolean keepAlive = true;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 5;
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int timeout = 500;
-    @JsonRemoteProperty
+    
     private int retries = 2;
 
     // Read-only properties (i.e. not editable by users)

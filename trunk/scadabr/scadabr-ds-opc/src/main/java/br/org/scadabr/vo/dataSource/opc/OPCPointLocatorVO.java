@@ -12,7 +12,7 @@ import br.org.scadabr.rt.dataSource.opc.OPCPointLocatorRT;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteProperty;
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -53,11 +53,11 @@ public class OPCPointLocatorVO extends AbstractPointLocatorVO implements
         this.settable = settable;
     }
 
-    @JsonRemoteProperty
+    
     private String tag = "";
-    @JsonRemoteProperty
+    
     private DataType dataType = DataType.BINARY;
-    @JsonRemoteProperty
+    
     private boolean settable;
 
     @Override

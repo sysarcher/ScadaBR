@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.ImplDefinition;
@@ -33,15 +33,15 @@ import java.util.EnumSet;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class AnalogGraphicComponent extends ImageSetComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("analogGraphic", "ANALOG_GRAPHIC",
             "graphic.analogGraphic", EnumSet.of(DataType.NUMERIC));
 
-    @JsonRemoteProperty
+    
     private double min;
-    @JsonRemoteProperty
+    
     private double max;
 
     public double getMin() {

@@ -24,7 +24,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import com.serotonin.mango.rt.dataSource.galil.CommandPointTypeRT;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
@@ -34,7 +34,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class CommandPointTypeVO extends PointTypeVO {
 
     @Override

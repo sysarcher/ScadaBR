@@ -12,8 +12,8 @@ import br.org.scadabr.rt.dataSource.iec101.IEC101PointLocatorRT;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.util.ExportCodes;
@@ -24,7 +24,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class IEC101PointLocatorVO extends AbstractPointLocatorVO implements
         JsonSerializable {
 
@@ -67,9 +67,9 @@ public class IEC101PointLocatorVO extends AbstractPointLocatorVO implements
     }
 
     private int iec101DataType = DataType.BINARY;
-    @JsonRemoteProperty
+    
     private int objectAddress = 1;
-    @JsonRemoteProperty
+    
     private boolean settable = true;
 
     private int controlMode = IEC101Master.EXECUTE_ONLY;

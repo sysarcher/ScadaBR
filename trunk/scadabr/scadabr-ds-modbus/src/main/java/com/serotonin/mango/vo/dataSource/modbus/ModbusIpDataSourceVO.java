@@ -28,8 +28,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.modbus.ModbusIpDataSource;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -41,7 +41,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class ModbusIpDataSourceVO extends ModbusDataSourceVO<ModbusIpDataSourceVO> {
 
     public static final Type TYPE = Type.MODBUS_IP;
@@ -95,11 +95,11 @@ public class ModbusIpDataSourceVO extends ModbusDataSourceVO<ModbusIpDataSourceV
     }
 
     private TransportType transportType;
-    @JsonRemoteProperty
+    
     private String host;
-    @JsonRemoteProperty
+    
     private int port = ModbusUtils.TCP_PORT;
-    @JsonRemoteProperty
+    
     private boolean encapsulated;
 
     public String getHost() {

@@ -22,17 +22,17 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import br.org.scadabr.util.SerializationHelper;
 
-@JsonRemoteEntity
+
 public class PachubePointVO extends PublishedPointVO {
 
-    @JsonRemoteProperty
+    
     private int feedId;
-    @JsonRemoteProperty
+    
     private String dataStreamId;
 
     public int getFeedId() {

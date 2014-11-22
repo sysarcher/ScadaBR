@@ -11,8 +11,8 @@ import br.org.scadabr.rt.dataSource.opc.OPCDataSource;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -26,7 +26,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class OPCDataSourceVO extends DataSourceVO<OPCDataSourceVO> {
 
     public static final Type TYPE = Type.OPC;
@@ -84,21 +84,21 @@ public class OPCDataSourceVO extends DataSourceVO<OPCDataSourceVO> {
     }
 
     private TimePeriods updatePeriodType = TimePeriods.SECONDS;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 1;
-    @JsonRemoteProperty
+    
     private String host = "localhost";
-    @JsonRemoteProperty
+    
     private String domain = "localhost";
-    @JsonRemoteProperty
+    
     private String user = "";
-    @JsonRemoteProperty
+    
     private String password = "";
-    @JsonRemoteProperty
+    
     private String server = "";
-    @JsonRemoteProperty
+    
     private boolean quantize;
-    @JsonRemoteProperty
+    
     private int creationMode;
 
     public int getCreationMode() {

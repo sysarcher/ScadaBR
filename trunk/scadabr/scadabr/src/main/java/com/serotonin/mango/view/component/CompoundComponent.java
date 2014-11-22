@@ -23,18 +23,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonValue;
 import br.org.scadabr.l10n.AbstractLocalizer;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import br.org.scadabr.util.SerializationHelper;
@@ -46,7 +38,7 @@ import java.util.Set;
  */
 abstract public class CompoundComponent extends ViewComponent {
 
-    @JsonRemoteProperty
+    
     private String name;
     private List<CompoundChild> children = new ArrayList<CompoundChild>();
 
@@ -267,43 +259,4 @@ abstract public class CompoundComponent extends ViewComponent {
         }
     }
 
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-
-        JsonObject jsonChildren = json.getJsonObject("children");
-        if (jsonChildren != null) {
-            for (Map.Entry<String, JsonValue> jsonChild : jsonChildren.getProperties().entrySet()) {
-                CompoundChild child = getChild(jsonChild.getKey());
-                if (child == null || !child.getViewComponent().isPointComponent()) {
-                    throw new LocalizableJsonException("emport.error.compound.invalidChildId", jsonChild.getKey(),
-                            definition().getId(), getPointComponentChildIds());
-                }
-                jsonDeserializeDataPoint(jsonChild.getValue(), (PointComponent) child.getViewComponent());
-            }
-        }
-    }
-
-    private List<String> getPointComponentChildIds() {
-        List<String> result = new ArrayList<>();
-        for (CompoundChild child : children) {
-            if (child.getViewComponent().isPointComponent()) {
-                result.add(child.getId());
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-
-        Map<String, Object> jsonChildren = new HashMap<>();
-        for (CompoundChild child : children) {
-            if (child.getViewComponent().isPointComponent()) {
-                jsonSerializeDataPoint(jsonChildren, child.getId(), (PointComponent) child.getViewComponent());
-            }
-        }
-        map.put("children", jsonChildren);
-    }
 }

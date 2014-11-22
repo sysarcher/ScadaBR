@@ -23,8 +23,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.nmea.NmeaDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -39,7 +39,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class NmeaDataSourceVO extends DataSourceVO<NmeaDataSourceVO> {
 
     public static final Type TYPE = Type.NMEA;
@@ -83,11 +83,11 @@ public class NmeaDataSourceVO extends DataSourceVO<NmeaDataSourceVO> {
         return new NmeaPointLocatorVO();
     }
 
-    @JsonRemoteProperty
+    
     private String commPortId;
-    @JsonRemoteProperty
+    
     private int baudRate = 4800;
-    @JsonRemoteProperty
+    
     private int resetTimeout = 30;
 
     public String getCommPortId() {

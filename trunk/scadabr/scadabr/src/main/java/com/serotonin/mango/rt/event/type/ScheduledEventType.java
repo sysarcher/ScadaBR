@@ -18,31 +18,18 @@
  */
 package com.serotonin.mango.rt.event.type;
 
-import java.util.Map;
-
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
-import com.serotonin.mango.db.dao.ScheduledEventDao;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  *
  */
-@JsonRemoteEntity
-@Configurable
+
 public class ScheduledEventType extends EventType {
 
-    @Autowired
-    private ScheduledEventDao scheduledEventDao;
-    
     private int scheduleId;
     private DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
     private AlarmLevel alarmLevel;
@@ -124,27 +111,7 @@ public class ScheduledEventType extends EventType {
             return false;
         }
         ScheduledEventType other = (ScheduledEventType) obj;
-        if (scheduleId != other.scheduleId) {
-            return false;
-        }
-        return true;
-    }
-
-    //
-    // /
-    // / Serialization
-    // /
-    //
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-        map.put("XID", scheduledEventDao.getScheduledEvent(scheduleId).getXid());
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-        scheduleId = getScheduledEventId(json, "XID");
+        return scheduleId == other.scheduleId;
     }
 
     @Override

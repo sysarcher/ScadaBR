@@ -6,15 +6,15 @@ import java.io.ObjectOutputStream;
 
 import br.org.scadabr.rt.dataSource.iec101.IEC101EthernetDataSource;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class IEC101EthernetDataSourceVO extends IEC101DataSourceVO<IEC101EthernetDataSourceVO> {
 
     public static final Type TYPE = Type.IEC101_ETHERNET;
@@ -34,9 +34,9 @@ public class IEC101EthernetDataSourceVO extends IEC101DataSourceVO<IEC101Etherne
         return TYPE;
     }
 
-    @JsonRemoteProperty
+    
     private String host = "localhost";
-    @JsonRemoteProperty
+    
     private int port = 2404;
 
     @Override

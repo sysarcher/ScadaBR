@@ -27,8 +27,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.pachube.PachubeDataSourceRT;
@@ -42,7 +42,7 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class PachubeDataSourceVO extends DataSourceVO<PachubeDataSourceVO> {
 
     public static final Type TYPE = Type.PACHUBE;
@@ -91,14 +91,14 @@ public class PachubeDataSourceVO extends DataSourceVO<PachubeDataSourceVO> {
         return new PachubePointLocatorVO();
     }
 
-    @JsonRemoteProperty
+    
     private String apiKey;
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 5;
-    @JsonRemoteProperty
+    
     private int timeoutSeconds = 30;
-    @JsonRemoteProperty
+    
     private int retries = 2;
 
     public String getApiKey() {

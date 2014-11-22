@@ -34,16 +34,9 @@ import br.org.scadabr.view.component.LinkComponent;
 import br.org.scadabr.view.component.ScriptButtonComponent;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
-import br.org.scadabr.json.JsonValue;
-import br.org.scadabr.json.TypeFactory;
+
+
 import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
@@ -55,9 +48,8 @@ import org.springframework.beans.factory.annotation.Configurable;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity(typeFactory = ViewComponent.Factory.class)
 @Configurable
-abstract public class ViewComponent implements Serializable, JsonSerializable {
+abstract public class ViewComponent implements Serializable {
     @Autowired
     private DataPointDao dataPointDao;
 
@@ -171,9 +163,9 @@ abstract public class ViewComponent implements Serializable, JsonSerializable {
     private int index;
     private String idSuffix;
     private String style;
-    @JsonRemoteProperty
+    
     private int x;
-    @JsonRemoteProperty
+    
     private int y;
 
     public void setLocation(int x, int y) {
@@ -314,75 +306,4 @@ abstract public class ViewComponent implements Serializable, JsonSerializable {
         return dataPointDao.getDataPoint(in.readInt());
     }
 
-    /**
-     * @throws JsonException
-     */
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json)
-            throws JsonException {
-        // no op
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("type", definition().getExportName());
-    }
-
-    protected void jsonSerializeDataPoint(Map<String, Object> map, String key,
-            PointComponent comp) {
-        DataPointVO dataPoint = comp.tgetDataPoint();
-        if (dataPoint == null) {
-            map.put(key, null);
-        } else {
-            map.put(key, dataPoint.getXid());
-        }
-    }
-
-    protected void jsonDeserializeDataPoint(JsonValue jsonXid,
-            PointComponent comp) throws JsonException {
-        if (jsonXid != null) {
-            if (jsonXid.isNull()) {
-                comp.tsetDataPoint(null);
-            } else {
-                String xid = jsonXid.toJsonString().getValue();
-                DataPointVO dataPoint = dataPointDao.getDataPoint(xid);
-                if (dataPoint == null) {
-                    throw new LocalizableJsonException(
-                            "emport.error.missingPoint", xid);
-                }
-                if (!comp.definition().supports(
-                        dataPoint.getDataType())) {
-                    throw new LocalizableJsonException(
-                            "emport.error.component.incompatibleDataType", xid,
-                            definition().getExportName());
-                }
-                comp.tsetDataPoint(dataPoint);
-            }
-        }
-    }
-
-    public static class Factory implements TypeFactory {
-
-        @Override
-        public Class<?> getType(JsonValue jsonValue) throws JsonException {
-            JsonObject json = jsonValue.toJsonObject();
-
-            String type = json.getString("type");
-            if (type == null) {
-                throw new LocalizableJsonException(
-                        "emport.error.component.missing", "type",
-                        getExportTypes());
-            }
-
-            ImplDefinition def = ImplDefinition.findByExportName(
-                    getImplementations(), type);
-
-            if (def == null) {
-                throw new LocalizableJsonException("emport.error.text.invalid",
-                        "type", type, getExportTypes());
-            }
-
-            return resolveClass(def);
-        }
-    }
 }

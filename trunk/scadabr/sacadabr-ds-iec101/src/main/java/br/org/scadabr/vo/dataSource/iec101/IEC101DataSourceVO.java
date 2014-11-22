@@ -11,7 +11,7 @@ import br.org.scadabr.rt.dataSource.iec101.IEC101DataSource;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteProperty;
+
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.Common;
@@ -56,37 +56,37 @@ abstract public class IEC101DataSourceVO<T extends IEC101DataSourceVO<T>> extend
         return new IEC101PointLocatorVO();
     }
 
-    @JsonRemoteProperty
+    
     private int transmissionProcedure = 1; // 0 - balanced / 1 - unbalanced
 
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 5;
-    @JsonRemoteProperty
+    
     private int giRelativePeriod = 30; // relative to updatePeriod
-    @JsonRemoteProperty
+    
     private int clockSynchRelativePeriod = 60; // relative to updatePeriod
 
-    @JsonRemoteProperty
+    
     private int linkLayerAddressSize = 1;
-    @JsonRemoteProperty
+    
     private int linkLayerAddress = 1;
 
-    @JsonRemoteProperty
+    
     private int asduAddressSize = 2;
-    @JsonRemoteProperty
+    
     private int asduAddress = 1;
 
-    @JsonRemoteProperty
+    
     private int cotSize = 1;
-    @JsonRemoteProperty
+    
     private int objectAddressSize = 2;
 
-    @JsonRemoteProperty
+    
     private int timeout = 500;
-    @JsonRemoteProperty
+    
     private int retries = 2;
-    @JsonRemoteProperty
+    
     private boolean quantize;
 
     @Override

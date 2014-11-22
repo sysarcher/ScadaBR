@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
@@ -26,7 +26,7 @@ import java.util.EnumSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
-@JsonRemoteEntity
+
 @Configurable
 public class AlarmListComponent extends CustomComponent {
 
@@ -35,11 +35,11 @@ public class AlarmListComponent extends CustomComponent {
 
     @Autowired
     private EventDao eventDao;
-    @JsonRemoteProperty
+    
     private AlarmLevel minAlarmLevel = AlarmLevel.INFORMATION;
-    @JsonRemoteProperty
+    
     private int maxListSize = 5;
-    @JsonRemoteProperty
+    
     private int width = 500;
 
     private boolean hideIdColumn = true;

@@ -28,8 +28,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataSource.galil.InputPointTypeRT;
 import com.serotonin.mango.rt.dataSource.galil.PointTypeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -43,21 +43,21 @@ import java.util.Set;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class InputPointTypeVO extends PointTypeVO {
 
     private static final Set<DataType> EXCLUDE_DATA_TYPES = EnumSet.of(DataType.ALPHANUMERIC, DataType.IMAGE, DataType.MULTISTATE);
 
     private DataType dataType = DataType.BINARY;
-    @JsonRemoteProperty
+    
     private int inputId = 1;
-    @JsonRemoteProperty
+    
     private double scaleRawLow = 0;
-    @JsonRemoteProperty
+    
     private double scaleRawHigh = 1;
-    @JsonRemoteProperty
+    
     private double scaleEngLow = 0;
-    @JsonRemoteProperty
+    
     private double scaleEngHigh = 1;
 
     @Override

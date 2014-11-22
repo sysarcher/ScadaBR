@@ -18,26 +18,16 @@
  */
 package com.serotonin.mango.view;
 
+import br.org.scadabr.ScadaBrConstants;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import br.org.scadabr.json.JsonArray;
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
-import br.org.scadabr.json.JsonValue;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.db.dao.ViewDao;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.component.CompoundComponent;
 import com.serotonin.mango.view.component.PointComponent;
 import com.serotonin.mango.view.component.ViewComponent;
@@ -47,9 +37,9 @@ import br.org.scadabr.web.dwr.DwrResponseI18n;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
-@JsonRemoteEntity
+
 @Configurable
-public class View implements Serializable, JsonSerializable {
+public class View implements Serializable {
 
     public static final String XID_PREFIX = "GV_";
 
@@ -58,12 +48,12 @@ public class View implements Serializable, JsonSerializable {
     @Autowired
     private ViewDao viewDao;
     
-    private int id = Common.NEW_ID;
-    @JsonRemoteProperty
+    private int id = ScadaBrConstants.NEW_ID;
+    
     private String xid;
-    @JsonRemoteProperty
+    
     private String name;
-    @JsonRemoteProperty
+    
     private String backgroundFilename;
     private int userId;
     private List<ViewComponent> viewComponents = new CopyOnWriteArrayList<>();
@@ -99,7 +89,7 @@ public class View implements Serializable, JsonSerializable {
     }
 
     public boolean isNew() {
-        return id == Common.NEW_ID;
+        return id == ScadaBrConstants.NEW_ID;
     }
 
     public boolean containsValidVisibleDataPoint(int dataPointId) {
@@ -150,6 +140,7 @@ public class View implements Serializable, JsonSerializable {
      * that the given user is allowed to access points that back any components
      * - that the points that back components still have valid data types for
      * the components that render them
+     * @param makeReadOnly
      */
     public void validateViewComponents(boolean makeReadOnly) {
         User owner = userDao.getUser(userId);
@@ -264,63 +255,4 @@ public class View implements Serializable, JsonSerializable {
         }
     }
 
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json)
-            throws JsonException {
-        if (isNew()) {
-            String username = json.getString("user");
-            if (username.isEmpty()) {
-                throw new LocalizableJsonException("emport.error.missingValue",
-                        "user");
-            }
-            User user = userDao.getUser(username);
-            if (user == null) {
-                throw new LocalizableJsonException("emport.error.missingUser",
-                        username);
-            }
-            userId = user.getId();
-        }
-
-        JsonArray components = json.getJsonArray("viewComponents");
-        if (components != null) {
-            viewComponents.clear();
-            for (JsonValue jv : components.getElements()) {
-                addViewComponent(reader.readPropertyValue(jv,
-                        ViewComponent.class, null));
-            }
-        }
-
-        String text = json.getString("anonymousAccess");
-        if (text != null) {
-            anonymousAccess = ShareUser.ACCESS_CODES.getId(text);
-            if (anonymousAccess == -1) {
-                throw new LocalizableJsonException("emport.error.invalid",
-                        "anonymousAccess", text, ShareUser.ACCESS_CODES
-                        .getCodeList());
-            }
-        }
-
-        JsonArray jsonSharers = json.getJsonArray("sharingUsers");
-        if (jsonSharers != null) {
-            viewUsers.clear();
-
-            for (JsonValue jv : jsonSharers.getElements()) {
-                ShareUser shareUser = reader.readPropertyValue(jv,
-                        ShareUser.class, null);
-                if (shareUser.getUserId() != userId) // No need for the owning user to be in this list.
-                {
-                    viewUsers.add(shareUser);
-                }
-            }
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("user", userDao.getUser(userId).getUsername());
-        map.put("anonymousAccess", ShareUser.ACCESS_CODES
-                .getCode(anonymousAccess));
-        map.put("viewComponents", viewComponents);
-        map.put("sharingUsers", viewUsers);
-    }
 }

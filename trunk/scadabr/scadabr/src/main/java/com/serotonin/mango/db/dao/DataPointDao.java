@@ -274,7 +274,7 @@ public class DataPointDao extends BaseDao {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 // Decide whether to insert or update.
-                if (dp.getId() == Common.NEW_ID) {
+                if (dp.isNew()) {
                     insertDataPoint(dp);
                     // Reset the point hierarchy so that the new point gets included.
                     cachedPointHierarchy = null;
@@ -708,7 +708,7 @@ public class DataPointDao extends BaseDao {
      */
     public void savePointFolder(final LazyTreeNode folder) {
         // Save the folder.
-        if (folder.getId() == null || folder.getId() == Common.NEW_ID) {
+        if (folder.isNew()) {
             final int id = doInsert(new PreparedStatementCreator() {
 
                 final static String SQL_INSERT = "insert into pointHierarchy (parentId, name) values (?,?)";
@@ -730,7 +730,7 @@ public class DataPointDao extends BaseDao {
 
     public void savePointFolder(final PointFolder folder, final int parentId) {
         // Save the folder.
-        if (folder.getId() == Common.NEW_ID) {
+        if (folder.isNew()) {
             final int id = doInsert(new PreparedStatementCreator() {
 
                 final static String SQL_INSERT = "insert into pointHierarchy (parentId, name) values (?,?)";
@@ -814,7 +814,7 @@ public class DataPointDao extends BaseDao {
                 }
             }
             if (!folderFound) {
-                PointFolder newFolder = new PointFolder(Common.NEW_ID, folderName);
+                PointFolder newFolder = new PointFolder(folderName);
                 pf.addSubfolder(newFolder);
                 pf = newFolder;
 //                savePointFolder(newFolder, pf.getId());

@@ -9,8 +9,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.component.HtmlComponent;
@@ -19,7 +19,7 @@ import br.org.scadabr.util.SerializationHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
-@JsonRemoteEntity
+
 @Configurable
 public class ChartComparatorComponent extends HtmlComponent {
     @Autowired
@@ -29,10 +29,10 @@ public class ChartComparatorComponent extends HtmlComponent {
             "chartComparator", "CHART_COMPARATOR", "graphic.chartComparator",
             null);
 
-    @JsonRemoteProperty
+    
     private int width = 480;
 
-    @JsonRemoteProperty
+    
     private int height = 320;
 
     @Override

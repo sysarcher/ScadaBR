@@ -20,15 +20,9 @@ package com.serotonin.mango.rt.event.type;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
-import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.util.ChangeComparable;
@@ -40,7 +34,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.AuditEventSource;
 import java.util.Objects;
 
-@JsonRemoteEntity
+
 public class AuditEventType extends EventType {
 
     public static void raiseAddedEvent(AuditEventSource auditEventType, ChangeComparable<?> o) {
@@ -254,23 +248,6 @@ public class AuditEventType extends EventType {
             return false;
         }
         return referenceId == other.referenceId;
-    }
-
-    //
-    // /
-    // / Serialization
-    // /
-    //
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-        map.put("auditType", auditEventType.name());
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-        auditEventType = AuditEventSource.valueOf(json.getString("auditType"));
     }
 
     @Override

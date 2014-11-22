@@ -32,7 +32,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.vo.mailingList.AddressEntry;
 import com.serotonin.mango.vo.mailingList.EmailRecipient;
 import com.serotonin.mango.vo.mailingList.MailingList;
@@ -189,7 +188,7 @@ public class MailingListDao extends BaseDao {
             @SuppressWarnings("synthetic-access")
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
-                if (ml.getId() == Common.NEW_ID) {
+                if (ml.isNew()) {
                     final int id = doInsert(new PreparedStatementCreator() {
 
                         final static String SQL_INSERT = "insert into mailingLists (xid, name) values (?,?)";

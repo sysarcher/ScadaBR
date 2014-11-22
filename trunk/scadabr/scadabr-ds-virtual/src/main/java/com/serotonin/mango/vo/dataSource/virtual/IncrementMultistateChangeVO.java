@@ -24,14 +24,14 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import com.serotonin.mango.rt.dataSource.virtual.ChangeTypeRT;
 import com.serotonin.mango.rt.dataSource.virtual.IncrementMultistateChangeRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-@JsonRemoteEntity
+
 public class IncrementMultistateChangeVO extends ChangeTypeVO {
 
     public static final LocalizableMessage KEY = new LocalizableMessageImpl("dsEdit.virtual.changeType.increment");

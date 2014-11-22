@@ -22,24 +22,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Map;
 
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonSerializable;
-import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.util.LocalizableJsonException;
-import com.serotonin.mango.vo.DataPointVO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
-@Configurable
-abstract public class PublishedPointVO implements Serializable, JsonSerializable {
-    @Autowired
-    private DataPointDao dataPointDao;
+abstract public class PublishedPointVO implements Serializable {
 
     private int dataPointId;
 
@@ -73,30 +61,4 @@ abstract public class PublishedPointVO implements Serializable, JsonSerializable
         }
     }
 
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        DataPointVO dp = dataPointDao.getDataPoint(dataPointId);
-        String xid;
-        if (dp == null) {
-            xid = null;
-        } else {
-            xid = dp.getXid();
-        }
-
-        map.put("dataPointId", xid);
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws LocalizableJsonException {
-        String xid = json.getString("dataPointId");
-        if (xid == null) {
-            throw new LocalizableJsonException("emport.error.publishedPoint.missing", "dataPointId");
-        }
-
-        DataPointVO vo = dataPointDao.getDataPoint(xid);
-        if (vo == null) {
-            throw new LocalizableJsonException("emport.error.missingPoint", xid);
-        }
-        dataPointId = vo.getId();
-    }
 }

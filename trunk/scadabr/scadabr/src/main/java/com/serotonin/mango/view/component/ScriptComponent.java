@@ -28,8 +28,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.rt.datasource.meta.ScriptExecutor;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImplDefinition;
@@ -42,7 +42,7 @@ import java.util.EnumSet;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class ScriptComponent extends PointComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("script", "SCRIPT", "graphic.script",
@@ -51,7 +51,7 @@ public class ScriptComponent extends PointComponent {
     private static final String SCRIPT_PREFIX = "function __scriptRenderer__() {";
     private static final String SCRIPT_SUFFIX = "\r\n}\r\n__scriptRenderer__();";
 
-    @JsonRemoteProperty
+    
     private String script;
 
     @Override

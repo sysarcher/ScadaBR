@@ -23,11 +23,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.vo.DataPointVO;
 
-@JsonRemoteEntity
+
 public class ImageChartRenderer extends TimePeriodChartRenderer {
 
     @Override

@@ -23,7 +23,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteProperty;
+
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.spinwave.SpinwavePointLocatorRT;
@@ -59,11 +59,11 @@ abstract public class BaseSpinwavePointLocatorVO extends AbstractPointLocatorVO 
 
     abstract public String getAttributeDescription();
 
-    @JsonRemoteProperty
+    
     private int sensorAddress;
-    @JsonRemoteProperty
+    
     private int attributeId;
-    @JsonRemoteProperty
+    
     private boolean convertToCelsius;
 
     public int getAttributeId() {

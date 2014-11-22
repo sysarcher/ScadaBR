@@ -24,7 +24,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import br.org.scadabr.json.JsonRemoteEntity;
+
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.viconics.ViconicsPointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
@@ -36,7 +36,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class ViconicsPointLocatorVO extends AbstractPointLocatorVO {
 
     @Override

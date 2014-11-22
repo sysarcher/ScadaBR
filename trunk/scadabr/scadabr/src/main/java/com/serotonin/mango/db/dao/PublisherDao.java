@@ -31,8 +31,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import com.serotonin.mango.Common;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.util.SerializationHelper;
@@ -40,7 +38,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import javax.inject.Named;
-import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -116,7 +113,7 @@ public class PublisherDao extends BaseDao {
 
     public void savePublisher(final PublisherVO<? extends PublishedPointVO> vo) {
         // Decide whether to insert or update.
-        if (vo.getId() == Common.NEW_ID) {
+        if (vo.isNew()) {
             final int id = doInsert(new PreparedStatementCreator() {
 
                 final static String SQL_INSERT = "insert into publishers (xid, data) values (?,?)";

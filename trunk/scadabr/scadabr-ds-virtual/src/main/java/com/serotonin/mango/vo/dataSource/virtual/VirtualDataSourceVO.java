@@ -27,8 +27,8 @@ import java.util.Map;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
@@ -40,7 +40,7 @@ import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 
-@JsonRemoteEntity
+
 public class VirtualDataSourceVO extends DataSourceVO<VirtualDataSourceVO> {
 
     public static final Type TYPE = Type.VIRTUAL;
@@ -76,7 +76,7 @@ public class VirtualDataSourceVO extends DataSourceVO<VirtualDataSourceVO> {
     }
 
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
-    @JsonRemoteProperty
+    
     private int updatePeriods = 5;
 
     public int getUpdatePeriods() {

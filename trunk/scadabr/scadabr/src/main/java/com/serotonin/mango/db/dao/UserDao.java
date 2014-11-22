@@ -144,7 +144,7 @@ public class UserDao extends BaseDao {
         getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
-                if (user.getId() == Common.NEW_ID) {
+                if (user.isNew()) {
                     insertUser(user);
                 } else {
                     updateUser(user);

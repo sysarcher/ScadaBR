@@ -23,15 +23,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.vo.DataPointVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
-@JsonRemoteEntity
+
 @Configurable
 public class TableChartRenderer extends BaseChartRenderer {
 
@@ -43,7 +43,7 @@ public class TableChartRenderer extends BaseChartRenderer {
         return ChartType.TABLE;
     }
 
-    @JsonRemoteProperty
+    
     private int limit;
 
     public TableChartRenderer() {

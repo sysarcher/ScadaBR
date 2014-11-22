@@ -4,22 +4,22 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.component.HtmlComponent;
 import br.org.scadabr.util.SerializationHelper;
 
-@JsonRemoteEntity
+
 public class LinkComponent extends HtmlComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("link",
             "LINK", "graphic.link", null);
 
-    @JsonRemoteProperty
+    
     private String link;
 
-    @JsonRemoteProperty
+    
     private String text;
 
     @Override

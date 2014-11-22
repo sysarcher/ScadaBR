@@ -18,15 +18,8 @@
  */
 package com.serotonin.mango.vo.event;
 
+import br.org.scadabr.ScadaBrConstants;
 import java.util.List;
-import java.util.Map;
-
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
 import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -35,7 +28,6 @@ import com.serotonin.mango.rt.event.compound.ConditionParseException;
 import com.serotonin.mango.rt.event.compound.LogicalOperator;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
@@ -43,34 +35,36 @@ import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 @Configurable
-public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDetectorVO>, JsonSerializable {
+public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDetectorVO> {
     @Autowired
     private DataPointDao dataPointDao;
 
     public static final String XID_PREFIX = "CED_";
 
-    private int id = Common.NEW_ID;
+    private int id = ScadaBrConstants.NEW_ID;
     private String xid;
-    @JsonRemoteProperty
+    
     private String name;
     private AlarmLevel alarmLevel = AlarmLevel.NONE;
-    @JsonRemoteProperty
+    
     private boolean returnToNormal = true;
-    @JsonRemoteProperty
+    
     private boolean disabled = false;
-    @JsonRemoteProperty
+    
     private String condition;
 
+    @JsonIgnore
     public boolean isNew() {
-        return id == Common.NEW_ID;
+        return id == ScadaBrConstants.NEW_ID;
     }
 
     @Deprecated // use EfventType
@@ -221,27 +215,4 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
         this.condition = condition;
     }
 
-    //
-    // /
-    // / Serialization
-    // /
-    //
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("xid", xid);
-        map.put("alarmLevel", alarmLevel.getName());
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        String text = json.getString("alarmLevel");
-        if (text != null) {
-            try {
-                alarmLevel = AlarmLevel.valueOf(text);
-            } catch (Exception e) {
-                throw new LocalizableJsonException("emport.error.scheduledEvent.invalid", "alarmLevel", text,
-                        AlarmLevel.nameValues());
-            }
-        }
-    }
 }

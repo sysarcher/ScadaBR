@@ -12,15 +12,15 @@ import br.org.scadabr.rt.dataSource.dnp3.Dnp3PointLocatorRT;
 import br.org.scadabr.json.JsonException;
 import br.org.scadabr.json.JsonObject;
 import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import br.org.scadabr.json.JsonSerializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 
-@JsonRemoteEntity
+
 public class Dnp3PointLocatorVO extends AbstractPointLocatorVO implements JsonSerializable {
 
     public static final int BINARY_INPUT = 0;
@@ -57,28 +57,28 @@ public class Dnp3PointLocatorVO extends AbstractPointLocatorVO implements JsonSe
         return DataType.NUMERIC;
     }
 
-    @JsonRemoteProperty
+    
     private int dnp3DataType = BINARY_INPUT;
-    @JsonRemoteProperty
+    
     private int index = 0;
-    @JsonRemoteProperty
+    
     private double multiplier = 1;
-    @JsonRemoteProperty
+    
     private double additive = 0;
 
-    @JsonRemoteProperty
+    
     private int operateMode = DIRECT;
 
-    @JsonRemoteProperty
+    
     private int controlCommand = LATCH;
 
-    @JsonRemoteProperty
+    
     private int timeOn = 0;
 
-    @JsonRemoteProperty
+    
     private int timeOff = 0;
 
-    @JsonRemoteProperty
+    
     private boolean settable;
 
     public int getDnp3DataType() {

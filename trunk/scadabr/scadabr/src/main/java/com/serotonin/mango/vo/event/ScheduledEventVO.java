@@ -18,43 +18,36 @@
  */
 package com.serotonin.mango.vo.event;
 
+import br.org.scadabr.ScadaBrConstants;
 import java.util.List;
-import java.util.Map;
 
 import org.joda.time.DateTime;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
-import br.org.scadabr.json.JsonSerializable;
+
+
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.schedule.ScheduledEventRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.mango.util.LocalizableJsonException;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.text.ParseException;
 
 /**
  * @author Matthew Lohbihler
  *
  */
-@JsonRemoteEntity
-public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeComparable<ScheduledEventVO>,
-        JsonSerializable {
+
+public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeComparable<ScheduledEventVO> {
 
     public static final String XID_PREFIX = "SE_";
 
@@ -82,47 +75,48 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         TYPE_CODES.addElement(TYPE_CRON, "CRON", "scheduledEvents.type.cron");
     }
 
+    @JsonIgnore
     public boolean isNew() {
-        return id == Common.NEW_ID;
+        return id == ScadaBrConstants.NEW_ID;
     }
 
-    private int id = Common.NEW_ID;
+    private int id = ScadaBrConstants.NEW_ID;
     private String xid;
-    @JsonRemoteProperty
+    
     private String alias;
     private AlarmLevel alarmLevel = AlarmLevel.NONE;
     private int scheduleType = TYPE_DAILY;
-    @JsonRemoteProperty
+    
     private boolean stateful = true;
-    @JsonRemoteProperty
+    
     private boolean disabled = false;
-    @JsonRemoteProperty
+    
     private int activeYear;
-    @JsonRemoteProperty
+    
     private int activeMonth;
-    @JsonRemoteProperty
+    
     private int activeDay;
-    @JsonRemoteProperty
+    
     private int activeHour;
-    @JsonRemoteProperty
+    
     private int activeMinute;
-    @JsonRemoteProperty
+    
     private int activeSecond;
-    @JsonRemoteProperty
+    
     private String activeCron;
-    @JsonRemoteProperty
+    
     private int inactiveYear;
-    @JsonRemoteProperty
+    
     private int inactiveMonth;
-    @JsonRemoteProperty
+    
     private int inactiveDay;
-    @JsonRemoteProperty
+    
     private int inactiveHour;
-    @JsonRemoteProperty
+    
     private int inactiveMinute;
-    @JsonRemoteProperty
+    
     private int inactiveSecond;
-    @JsonRemoteProperty
+    
     private String inactiveCron;
 
     public EventTypeVO getEventType() {
@@ -542,37 +536,4 @@ public class ScheduledEventVO extends SimpleEventDetectorVO implements ChangeCom
         this.disabled = disabled;
     }
 
-    //
-    // /
-    // / Serialization
-    // /
-    //
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        map.put("xid", xid);
-        map.put("alarmLevel", alarmLevel.getName());
-        map.put("scheduleType", TYPE_CODES.getCode(scheduleType));
-    }
-
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        String text = json.getString("alarmLevel");
-        if (text != null) {
-            try {
-                alarmLevel = AlarmLevel.valueOf(text);
-            } catch (Exception e) {
-                throw new LocalizableJsonException("emport.error.scheduledEvent.invalid", "alarmLevel", text,
-                        AlarmLevel.nameValues());
-            }
-        }
-
-        text = json.getString("scheduleType");
-        if (text != null) {
-            scheduleType = TYPE_CODES.getId(text);
-            if (!TYPE_CODES.isValidId(scheduleType)) {
-                throw new LocalizableJsonException("emport.error.scheduledEvent.invalid", "scheduleType", text,
-                        TYPE_CODES.getCodeList());
-            }
-        }
-    }
 }

@@ -21,23 +21,15 @@ package com.serotonin.mango.view.component;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Map;
 import java.util.ResourceBundle;
 
-import br.org.scadabr.json.JsonException;
-import br.org.scadabr.json.JsonObject;
-import br.org.scadabr.json.JsonReader;
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
 import br.org.scadabr.utils.TimePeriods;
-import com.serotonin.mango.Common;
-import com.serotonin.mango.util.LocalizableJsonException;
 import com.serotonin.mango.view.ImplDefinition;
 
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class ImageChartComponent extends CompoundComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("imageChart", "IMAGE_CHART", "graphic.imageChart",
@@ -54,12 +46,12 @@ public class ImageChartComponent extends CompoundComponent {
     public static final String POINT_9 = "point9";
     public static final String POINT_10 = "point10";
 
-    @JsonRemoteProperty
+    
     private int width = 500;
-    @JsonRemoteProperty
+    
     private int height = 300;
     private TimePeriods durationType = TimePeriods.DAYS;
-    @JsonRemoteProperty
+    
     private int durationPeriods = 1;
 
     public ImageChartComponent() {
@@ -166,27 +158,4 @@ public class ImageChartComponent extends CompoundComponent {
         }
     }
 
-    @Override
-    public void jsonDeserialize(JsonReader reader, JsonObject json) throws JsonException {
-        super.jsonDeserialize(reader, json);
-
-        String text = json.getString("durationType");
-        if (text == null) {
-            throw new LocalizableJsonException("emport.error.chart.missing", "durationType", TimePeriods.values());
-        }
-
-        try {
-        durationType = TimePeriods.valueOf(text);
-        } catch (Exception e) {
-            throw new LocalizableJsonException("emport.error.chart.invalid", "durationType", text,
-                    TimePeriods.values());
-        }
-    }
-
-    @Override
-    public void jsonSerialize(Map<String, Object> map) {
-        super.jsonSerialize(map);
-
-        map.put("durationType", durationType.name());
-    }
 }

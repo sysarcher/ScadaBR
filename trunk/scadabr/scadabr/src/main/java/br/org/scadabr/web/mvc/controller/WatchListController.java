@@ -18,6 +18,7 @@
  */
 package br.org.scadabr.web.mvc.controller;
 
+import br.org.scadabr.ScadaBrConstants;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,7 +121,7 @@ public class WatchListController {
 
         modelMap.put(KEY_WATCHLISTS, watchListNames);
         modelMap.put(KEY_SELECTED_WATCHLIST, selected);
-        modelMap.put("NEW_ID", Common.NEW_ID);
+        modelMap.put("NEW_ID", ScadaBrConstants.NEW_ID);
     }
 
     public static class JsonWatchList {

@@ -1,5 +1,7 @@
 package br.org.scadabr.web;
 
+import br.org.scadabr.ScadaBrConstants;
+
 /**
  *
  * @author aploese
@@ -19,6 +21,10 @@ public class LazyTreeNode {
         this.name = name;
     }
 
+    public boolean isNew() {
+        return id == null || id == ScadaBrConstants.NEW_ID;
+    }
+    
     /**
      * @return the id
      */

@@ -24,8 +24,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-import br.org.scadabr.json.JsonRemoteEntity;
-import br.org.scadabr.json.JsonRemoteProperty;
+
+
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
@@ -34,16 +34,16 @@ import java.util.EnumSet;
 /**
  * @author Matthew Lohbihler
  */
-@JsonRemoteEntity
+
 public class SimplePointComponent extends PointComponent {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("simple", "SIMPLE", "graphic.simple",
             EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC, DataType.ALPHANUMERIC));
 
-    @JsonRemoteProperty
+    
     private boolean displayPointName;
 
-    @JsonRemoteProperty
+    
     private String styleAttribute;
 
     public boolean isDisplayPointName() {
