@@ -65,6 +65,7 @@ import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.type.AuditEventKey;
+import br.org.scadabr.vo.event.type.DataPointDetectorKey;
 import br.org.scadabr.vo.event.type.SystemEventKey;
 import static com.serotonin.mango.db.dao.BaseDao.charToBool;
 import com.serotonin.mango.vo.User;
@@ -72,6 +73,8 @@ import java.sql.Connection;
 import java.sql.Statement;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -87,7 +90,9 @@ public class EventDao extends BaseDao {
     private UserDao userDao;
     @Inject
     private SchedulerPool schedulerPool;
-    
+    @Inject
+    private DataSourceDao dataSourceDao;
+
     public EventDao() {
         super();
     }
@@ -118,7 +123,7 @@ public class EventDao extends BaseDao {
                 switch (type.getEventSource()) {
                     case AUDIT: {
                         final AuditEventType et = (AuditEventType) type;
-                        ps.setInt(2, et.getAuditEventType().getId());
+                        ps.setInt(2, et.getEventKey().getId());
                         ps.setInt(3, et.getReferenceId());
                     }
                     break;
@@ -131,8 +136,8 @@ public class EventDao extends BaseDao {
                         ps.setInt(3, ((DataPointEventType) type).getReferenceId2());
                         break;
                     case DATA_SOURCE:
-                        ps.setInt(2, ((DataSourceEventType) type).getReferenceId1());
-                        ps.setInt(3, ((DataSourceEventType) type).getReferenceId2());
+                        ps.setInt(2, ((DataSourceEventType) type).getDataSourceId());
+                        ps.setInt(3, ((DataSourceEventType) type).getEventKey().getId());
                         break;
                     case MAINTENANCE:
                         ps.setInt(2, ((MaintenanceEventType) type).getReferenceId1());
@@ -148,7 +153,7 @@ public class EventDao extends BaseDao {
                         break;
                     case SYSTEM: {
                         final SystemEventType et = (SystemEventType) type;
-                        ps.setInt(2, et.getSystemEventType().getId());
+                        ps.setInt(2, et.getEventKey().getId());
                         ps.setInt(3, et.getReferenceId());
                     }
                     break;
@@ -360,13 +365,13 @@ public class EventDao extends BaseDao {
                 new EventInstanceRowMapper(), eventId);
     }
 
-    public static class EventInstanceRowMapper implements
-            RowMapper<EventInstance> {
+    public class EventInstanceRowMapper implements RowMapper<EventInstance> {
 
         @Override
         public EventInstance mapRow(ResultSet rs, int rowNum)
                 throws SQLException {
-            EventType type = createEventType(rs, 2);
+            final AlarmLevel alarmLevel = AlarmLevel.fromId(rs.getInt(9));
+            final EventType type = createEventType(EventSources.fromMangoDbId(rs.getInt(2)), rs.getInt(3), rs.getInt(4), alarmLevel);
 
             LocalizableMessage message;
             try {
@@ -385,7 +390,7 @@ public class EventDao extends BaseDao {
                 state = EventStatus.STATELESS;
             }
 
-            EventInstance event = new EventInstance(type, rs.getLong(5), AlarmLevel.fromId(rs.getInt(9)), state, rs.getLong(7), message);
+            EventInstance event = new EventInstance(type, rs.getLong(5), alarmLevel, state, rs.getLong(7), message);
             event.setId(rs.getInt(1));
             long ackTs = rs.getLong(11);
             if (!rs.wasNull()) {
@@ -415,28 +420,31 @@ public class EventDao extends BaseDao {
         }
     }
 
-    static EventType createEventType(ResultSet rs, int offset)
+    EventType createEventType(final EventSources eventSource, final int refId1, final int refId2, final AlarmLevel alarmLevel)
             throws SQLException {
-        switch (EventSources.fromMangoDbId(rs.getInt(offset))) {
+        switch (eventSource) {
             case DATA_POINT:
-                return new DataPointEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
+                return new DataPointEventType(refId1, DataPointDetectorKey.fromId(refId2), alarmLevel);
             case DATA_SOURCE:
-                return new DataSourceEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
+                return dataSourceDao.getEventType(refId1, refId2);
             case SYSTEM:
-                return new SystemEventType(SystemEventKey.fromId(rs.getInt(offset + 1)), rs.getInt(offset + 2));
+                return new SystemEventType(SystemEventKey.fromId(refId1), refId2); // TODO set alarmlevel from old db value???
             case COMPOUND:
-                return new CompoundDetectorEventType(rs.getInt(offset + 1));
+                throw new ImplementMeException();
+                //TODO return new CompoundDetectorEventType(refId1);
             case SCHEDULED:
-                return new ScheduledEventType(rs.getInt(offset + 1));
+                throw new ImplementMeException();
+                //TODO return new ScheduledEventType(refId1);
             case PUBLISHER:
-                return new PublisherEventType(rs.getInt(offset + 1), rs.getInt(offset + 2));
+                throw new ImplementMeException();
+                //TODO return new PublisherEventType(refId1, refId2);
             case AUDIT:
-                return new AuditEventType(AuditEventKey.fromId(rs.getInt(offset + 1)), rs.getInt(offset + 2));
+                return new AuditEventType(AuditEventKey.fromId(refId1), refId2, null); // TODO we do not know the user who did this. alarmlevel??
             case MAINTENANCE:
-                return new MaintenanceEventType(rs.getInt(offset + 1));
+                throw new ImplementMeException();
+                //TODO return new MaintenanceEventType(refId1);
             default:
-                throw new ShouldNeverHappenException("Unknown eventSource: "
-                        + rs.getInt(offset));
+                throw new ShouldNeverHappenException("Unknown eventSource: " + eventSource);
         }
     }
 
@@ -532,11 +540,11 @@ public class EventDao extends BaseDao {
                     where.add("e.rtnApplicable=? and e.rtnTs is null");
                     params.add(boolToChar(true));
                     break;
-/*                case INACTIVE:
-                    where.add("e.rtnApplicable=? and e.rtnTs is not null");
-                    params.add(boolToChar(true));
-                    break;
-*/                case STATELESS:
+                /*                case INACTIVE:
+                 where.add("e.rtnApplicable=? and e.rtnTs is not null");
+                 params.add(boolToChar(true));
+                 break;
+                 */ case STATELESS:
                     where.add("e.rtnApplicable=?");
                     params.add(boolToChar(false));
                     break;
@@ -668,21 +676,21 @@ public class EventDao extends BaseDao {
 
     public EventType getEventHandlerType(int handlerId) {
         return ejt.queryForObject(
-                "select eventTypeId, eventTypeRef1, eventTypeRef2 from eventHandlers where id=?",
-                new Object[]{handlerId}, new RowMapper<EventType>() {
+                "select eventTypeId, eventTypeRef1, eventTypeRef2, alarmLevel from eventHandlers where id=?",
+                new RowMapper<EventType>() {
                     @Override
-                    public EventType mapRow(ResultSet rs, int rowNum)
-                    throws SQLException {
-                        return createEventType(rs, 1);
+                    public EventType mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        final AlarmLevel alarmLevel = AlarmLevel.fromId(rs.getInt(4));
+                        return createEventType(EventSources.fromMangoDbId(rs.getInt(1)), rs.getInt(2), rs.getInt(3), alarmLevel);
                     }
-                });
+                }, handlerId);
     }
 
     public List<EventHandlerVO> getEventHandlers(EventType type) {
         switch (type.getEventSource()) {
             case AUDIT: {
                 final AuditEventType et = (AuditEventType) type;
-                return getEventHandlers(et.getEventSource(), et.getAuditEventType().getId(), et.getReferenceId());
+                return getEventHandlers(et.getEventSource(), et.getEventKey().getId(), et.getReferenceId());
             }
             case DATA_POINT: {
                 final DataPointEventType et = (DataPointEventType) type;
@@ -690,7 +698,7 @@ public class EventDao extends BaseDao {
             }
             case DATA_SOURCE: {
                 final DataSourceEventType et = (DataSourceEventType) type;
-                return getEventHandlers(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2());
+                return getEventHandlers(et.getEventSource(), et.getDataSourceId(), et.getEventKey().getId());
             }
             case MAINTENANCE: {
                 final MaintenanceEventType et = (MaintenanceEventType) type;
@@ -706,7 +714,7 @@ public class EventDao extends BaseDao {
             }
             case SYSTEM: {
                 final SystemEventType et = (SystemEventType) type;
-                return getEventHandlers(et.getEventSource(), et.getSystemEventType().getId(), et.getReferenceId());
+                return getEventHandlers(et.getEventSource(), et.getEventKey().getId(), et.getReferenceId());
             }
             default:
                 throw new ShouldNeverHappenException("Eventtype not supported");
@@ -773,7 +781,7 @@ public class EventDao extends BaseDao {
         switch (type.getEventSource()) {
             case AUDIT: {
                 final AuditEventType et = (AuditEventType) type;
-                return saveEventHandler(et.getEventSource(), et.getAuditEventType().getId(), et.getReferenceId(), handler);
+                return saveEventHandler(et.getEventSource(), et.getEventKey().getId(), et.getReferenceId(), handler);
             }
             case DATA_POINT: {
                 final DataPointEventType et = (DataPointEventType) type;
@@ -781,7 +789,7 @@ public class EventDao extends BaseDao {
             }
             case DATA_SOURCE: {
                 final DataSourceEventType et = (DataSourceEventType) type;
-                return saveEventHandler(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2(), handler);
+                return saveEventHandler(et.getEventSource(), et.getDataSourceId(), et.getEventKey().getId(), handler);
             }
             case MAINTENANCE: {
                 final MaintenanceEventType et = (MaintenanceEventType) type;
@@ -797,7 +805,7 @@ public class EventDao extends BaseDao {
             }
             case SYSTEM: {
                 final SystemEventType et = (SystemEventType) type;
-                return saveEventHandler(et.getEventSource(), et.getSystemEventType().getId(), et.getReferenceId(), handler);
+                return saveEventHandler(et.getEventSource(), et.getEventKey().getId(), et.getReferenceId(), handler);
             }
             default:
                 throw new ShouldNeverHappenException("Eventtype not supported");

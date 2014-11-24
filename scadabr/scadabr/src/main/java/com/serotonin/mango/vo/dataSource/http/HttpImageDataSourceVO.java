@@ -28,12 +28,16 @@ import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.http.HttpImageDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.dataSource.DataSourceValidator;
+import br.org.scadabr.vo.datasource.http.HttpImageDataSourceEventKey;
+import br.org.scadabr.vo.event.type.DataSourceEventKey;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.validation.Errors;
 
 /**
@@ -46,6 +50,16 @@ public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
     @Override
     public HttpImageDataSourceValidator createValidator() {
       return new HttpImageDataSourceValidator();
+    }
+
+    @Override
+    public Set<HttpImageDataSourceEventKey> createEventKeySet() {
+        return EnumSet.allOf(HttpImageDataSourceEventKey.class);
+    }
+
+    @Override
+    public Map<HttpImageDataSourceEventKey, ?> createEventKeyMap() {
+        return new EnumMap(HttpImageDataSourceEventKey.class);
     }
 
     public static class HttpImageDataSourceValidator extends DataSourceValidator {
@@ -66,28 +80,6 @@ public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
 
     }
 
-    public static final Type TYPE = Type.HTTP_IMAGE;
-
-    @Override
-    protected void addEventTypes(List<EventTypeVO> ets) {
-        ets.add(createEventType(HttpImageDataSourceRT.DATA_RETRIEVAL_FAILURE_EVENT, new LocalizableMessageImpl(
-                "event.ds.dataRetrieval")));
-        ets.add(createEventType(HttpImageDataSourceRT.FILE_SAVE_EXCEPTION_EVENT, new LocalizableMessageImpl(
-                "event.ds.fileSave")));
-    }
-
-    private static final ExportCodes EVENT_CODES = new ExportCodes();
-
-    static {
-        EVENT_CODES.addElement(HttpImageDataSourceRT.DATA_RETRIEVAL_FAILURE_EVENT, "DATA_RETRIEVAL_FAILURE");
-        EVENT_CODES.addElement(HttpImageDataSourceRT.FILE_SAVE_EXCEPTION_EVENT, "FILE_SAVE_EXCEPTION");
-    }
-
-    @Override
-    public ExportCodes getEventCodes() {
-        return EVENT_CODES;
-    }
-
     @Override
     public LocalizableMessage getConnectionDescription() {
         return new LocalizableMessageImpl("dsEdit.httpImage.dsconn", updatePeriodType.getPeriodDescription(updatePeriods));
@@ -95,7 +87,7 @@ public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
 
     @Override
     public Type getType() {
-        return TYPE;
+        return Type.HTTP_IMAGE;
     }
 
     @Override

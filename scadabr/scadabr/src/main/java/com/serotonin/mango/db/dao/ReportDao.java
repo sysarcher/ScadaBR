@@ -50,6 +50,7 @@ import com.serotonin.mango.vo.report.ReportVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.rt.event.type.EventSources;
+import br.org.scadabr.utils.ImplementMeException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -567,9 +568,10 @@ public class ReportDao extends BaseDao {
             + "order by ts";
 
     public List<EventInstance> getReportInstanceEvents(int instanceId) {
-        // Get the events.
-        final List<EventInstance> events = ejt.query(EVENT_SELECT, new Object[]{instanceId},
-                new EventDao.EventInstanceRowMapper());
+        throw new ImplementMeException();
+        /* TODO handle reports from live db and not from this separate tables ...
+// Get the events.
+        final List<EventInstance> events = ejt.query(EVENT_SELECT, new Object[]{instanceId}, new EventDao.EventInstanceRowMapper());
         // Add in the comments.
         ejt.query(EVENT_COMMENT_SELECT, new Object[]{instanceId, UserComment.TYPE_EVENT}, new RowCallbackHandler() {
             @Override
@@ -594,6 +596,7 @@ public class ReportDao extends BaseDao {
         });
         // Done
         return events;
+                */
     }
 
     private static final String USER_COMMENT_SELECT = "select rc.username, rc.commentType, rc.typeKey, rp.pointName, " //

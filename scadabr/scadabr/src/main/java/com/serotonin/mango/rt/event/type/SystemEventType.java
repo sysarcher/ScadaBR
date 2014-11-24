@@ -22,22 +22,18 @@ import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.SystemEventKey;
-import com.serotonin.mango.db.dao.SystemSettingsDao;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 
-public class SystemEventType extends EventType {
+public class SystemEventType extends EventType<SystemEventKey> {
     
     //
     // /
     // / Instance stuff
     // /
     //
-    private final SystemEventKey systemEventType;
     private int referenceId;
 
-    public SystemEventType(SystemEventKey systemEventType) {
-        this.systemEventType = systemEventType;
+    public SystemEventType(SystemEventKey systemEventKey) {
+        super(systemEventKey);
     }
 
     public SystemEventType(SystemEventKey systemEventType, int referenceId) {
@@ -50,10 +46,6 @@ public class SystemEventType extends EventType {
         return EventSources.SYSTEM;
     }
 
-    public SystemEventKey getSystemEventType() {
-        return systemEventType;
-    }
-
     @Override
     public boolean isSystemMessage() {
         return true;
@@ -61,12 +53,7 @@ public class SystemEventType extends EventType {
 
     @Override
     public String toString() {
-        return "SystemEventType(eventType=" + systemEventType + ")";
-    }
-
-    @Override
-    public DuplicateHandling getDuplicateHandling() {
-        return systemEventType.getDuplicateHandling();
+        return "SystemEventType(eventType=" + eventKey + " referenceId= " + referenceId + ")";
     }
 
     public int getReferenceId() {
@@ -78,7 +65,7 @@ public class SystemEventType extends EventType {
         final int prime = 31;
         int result = 1;
         result = prime * result + referenceId;
-        result = prime * result + systemEventType.getId();
+        result = prime * result + eventKey.getId();
         return result;
     }
 
@@ -97,16 +84,12 @@ public class SystemEventType extends EventType {
         if (referenceId != other.referenceId) {
             return false;
         }
-        return systemEventType == other.systemEventType;
+        return eventKey == other.eventKey;
     }
 
     @Override
     public AlarmLevel getAlarmLevel() {
-        return systemEventType.getAlarmLevel();
+        return eventKey.getAlarmLevel();
     }
 
-    @Override
-    public boolean isStateful() {
-        return systemEventType.isStateful();
-    }
 }

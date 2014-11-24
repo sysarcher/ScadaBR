@@ -27,15 +27,18 @@ import java.util.Map;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.http.HttpRetrieverDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.dataSource.DataSourceValidator;
+import br.org.scadabr.vo.datasource.http.HttpRetrieverDataSourceEventKey;
+import br.org.scadabr.vo.event.type.DataSourceEventKey;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Set;
 import org.springframework.validation.Errors;
 
 /**
@@ -47,6 +50,16 @@ public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSou
     @Override
     public HttpRetrieverDataSourceVOValidator createValidator() {
         return new HttpRetrieverDataSourceVOValidator();
+    }
+
+    @Override
+    public Set<HttpRetrieverDataSourceEventKey> createEventKeySet() {
+        return EnumSet.allOf(HttpRetrieverDataSourceEventKey.class);
+    }
+
+    @Override
+    public Map<HttpRetrieverDataSourceEventKey, ?> createEventKeyMap() {
+        return new EnumMap(HttpRetrieverDataSourceEventKey.class);
     }
 
     public static class HttpRetrieverDataSourceVOValidator extends DataSourceValidator {
@@ -76,36 +89,15 @@ public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSou
 
     }
 
-    public static final Type TYPE = Type.HTTP_RETRIEVER;
-
-    @Override
-    protected void addEventTypes(List<EventTypeVO> ets) {
-        ets.add(createEventType(HttpRetrieverDataSourceRT.DATA_RETRIEVAL_FAILURE_EVENT, new LocalizableMessageImpl(
-                "event.ds.dataRetrieval")));
-        ets.add(createEventType(HttpRetrieverDataSourceRT.PARSE_EXCEPTION_EVENT, new LocalizableMessageImpl(
-                "event.ds.dataParse")));
-    }
-
-    private static final ExportCodes EVENT_CODES = new ExportCodes();
-
-    static {
-        EVENT_CODES.addElement(HttpRetrieverDataSourceRT.DATA_RETRIEVAL_FAILURE_EVENT, "DATA_RETRIEVAL_FAILURE");
-        EVENT_CODES.addElement(HttpRetrieverDataSourceRT.PARSE_EXCEPTION_EVENT, "PARSE_EXCEPTION");
-    }
-
-    @Override
-    public ExportCodes getEventCodes() {
-        return EVENT_CODES;
-    }
-
     @Override
     public LocalizableMessage getConnectionDescription() {
         return new LocalizableMessageImpl("common.default", StringUtils.truncate(url, 30, " ..."));
     }
 
+
     @Override
     public Type getType() {
-        return TYPE;
+        return Type.HTTP_RETRIEVER;
     }
 
     @Override
@@ -213,7 +205,6 @@ public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSou
             updatePeriodType = TimePeriods.fromId(in.readInt());
             updatePeriods = in.readInt();
             timeoutSeconds = in.readInt();
-            ;
             retries = in.readInt();
         }
     }

@@ -18,13 +18,10 @@
  */
 package com.serotonin.mango.vo.event;
 
-import br.org.scadabr.DataType;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.rt.event.type.EventSources;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.rt.event.detectors.AlphanumericStateDetectorRT;
@@ -41,76 +38,23 @@ import com.serotonin.mango.rt.event.detectors.PositiveCusumDetectorRT;
 import com.serotonin.mango.rt.event.detectors.StateChangeCountDetectorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
-import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import java.util.EnumSet;
+import br.org.scadabr.vo.event.type.DataPointDetectorKey;
+import com.serotonin.mango.rt.event.type.DataPointEventType;
 
-
-public class PointEventDetectorVO extends SimpleEventDetectorVO implements Cloneable, ChangeComparable<PointEventDetectorVO> {
+public class PointEventDetectorVO implements EventDetectorVO, Cloneable, ChangeComparable<PointEventDetectorVO> {
 
     public static final String XID_PREFIX = "PED_";
 
-    public static final int TYPE_ANALOG_HIGH_LIMIT = 1;
-    public static final int TYPE_ANALOG_LOW_LIMIT = 2;
-    public static final int TYPE_BINARY_STATE = 3;
-    public static final int TYPE_MULTISTATE_STATE = 4;
-    public static final int TYPE_POINT_CHANGE = 5;
-    public static final int TYPE_STATE_CHANGE_COUNT = 6;
-    public static final int TYPE_NO_CHANGE = 7;
-    public static final int TYPE_NO_UPDATE = 8;
-    public static final int TYPE_ALPHANUMERIC_STATE = 9;
-    public static final int TYPE_POSITIVE_CUSUM = 10;
-    public static final int TYPE_NEGATIVE_CUSUM = 11;
-
-    private static List<ImplDefinition> definitions;
-
-    public static List<ImplDefinition> getImplementations(DataType dataType) {
-        if (definitions == null) {
-            List<ImplDefinition> d = new ArrayList<ImplDefinition>();
-            d.add(new ImplDefinition(TYPE_ANALOG_HIGH_LIMIT, null, "pointEdit.detectors.highLimit",
-                    EnumSet.of(DataType.NUMERIC)));
-            d.add(new ImplDefinition(TYPE_ANALOG_LOW_LIMIT, null, "pointEdit.detectors.lowLimit",
-                    EnumSet.of(DataType.NUMERIC)));
-            d.add(new ImplDefinition(TYPE_POINT_CHANGE, null, "pointEdit.detectors.change",
-                    EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC, DataType.ALPHANUMERIC)));
-            d.add(new ImplDefinition(TYPE_BINARY_STATE, null, "pointEdit.detectors.state",
-                    EnumSet.of(DataType.BINARY)));
-            d.add(new ImplDefinition(TYPE_MULTISTATE_STATE, null, "pointEdit.detectors.state",
-                    EnumSet.of(DataType.MULTISTATE)));
-            d.add(new ImplDefinition(TYPE_ALPHANUMERIC_STATE, null, "pointEdit.detectors.state",
-                    EnumSet.of(DataType.ALPHANUMERIC)));
-            d.add(new ImplDefinition(TYPE_STATE_CHANGE_COUNT, null, "pointEdit.detectors.changeCount",
-                    EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.ALPHANUMERIC)));
-            d.add(new ImplDefinition(TYPE_NO_CHANGE, null, "pointEdit.detectors.noChange",
-                    EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC, DataType.ALPHANUMERIC)));
-            d.add(new ImplDefinition(TYPE_NO_UPDATE, null, "pointEdit.detectors.noUpdate",
-                    EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC, DataType.ALPHANUMERIC, DataType.IMAGE)));
-            d.add(new ImplDefinition(TYPE_POSITIVE_CUSUM, null, "pointEdit.detectors.posCusum",
-                    EnumSet.of(DataType.NUMERIC)));
-            d.add(new ImplDefinition(TYPE_NEGATIVE_CUSUM, null, "pointEdit.detectors.negCusum",
-                    EnumSet.of(DataType.NUMERIC)));
-            definitions = d;
-        }
-
-        List<ImplDefinition> impls = new ArrayList<ImplDefinition>();
-        for (ImplDefinition def : definitions) {
-            if (def.supports(dataType)) {
-                impls.add(def);
-            }
-        }
-        return impls;
-    }
-
     private int id;
     private String xid;
-    
+
     private String alias;
     private DataPointVO dataPoint;
-    private int detectorType;
+    private DataPointDetectorKey dataPointDetectorKey;
     private AlarmLevel alarmLevel;
     private double limit;
     private int duration;
@@ -120,61 +64,46 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
     private int changeCount = 2;
     private String alphanumericState;
     private double weight;
+    private DataPointEventType dataPointEventType;
 
-    public EventTypeVO getEventType() {
-        return new EventTypeVO(EventSources.DATA_POINT, dataPoint.getId(), id, getDescription(), alarmLevel,
-                getEventDetectorKey());
-    }
-
-    public ImplDefinition getDef() {
-        // Ensure that definitions is not null.
-        if (definitions == null) {
-            getImplementations(DataType.UNKNOWN);
+    public synchronized DataPointEventType getEventType() {
+        if (dataPointEventType == null) {
+            dataPointEventType = new DataPointEventType(this);
         }
-
-        for (ImplDefinition def : definitions) {
-            if (def.getId() == detectorType) {
-                return def;
-            }
-        }
-        return null;
+        return dataPointEventType;
     }
 
     public PointEventDetectorRT createRuntime() {
-        switch (detectorType) {
-            case TYPE_ANALOG_HIGH_LIMIT:
+        switch (dataPointDetectorKey) {
+            case ANALOG_HIGH_LIMIT:
                 return new AnalogHighLimitDetectorRT(this);
-            case TYPE_ANALOG_LOW_LIMIT:
+            case ANALOG_LOW_LIMIT:
                 return new AnalogLowLimitDetectorRT(this);
-            case TYPE_BINARY_STATE:
+            case BINARY_STATE:
                 return new BinaryStateDetectorRT(this);
-            case TYPE_MULTISTATE_STATE:
+            case MULTISTATE_STATE:
                 return new MultistateStateDetectorRT(this);
-            case TYPE_POINT_CHANGE:
+            case POINT_CHANGE:
                 return new PointChangeDetectorRT(this);
-            case TYPE_STATE_CHANGE_COUNT:
+            case STATE_CHANGE_COUNT:
                 return new StateChangeCountDetectorRT(this);
-            case TYPE_NO_CHANGE:
+            case NO_CHANGE:
                 return new NoChangeDetectorRT(this);
-            case TYPE_NO_UPDATE:
+            case NO_UPDATE:
                 return new NoUpdateDetectorRT(this);
-            case TYPE_ALPHANUMERIC_STATE:
+            case ALPHANUMERIC_STATE:
                 return new AlphanumericStateDetectorRT(this);
-            case TYPE_POSITIVE_CUSUM:
+            case POSITIVE_CUSUM:
                 return new PositiveCusumDetectorRT(this);
-            case TYPE_NEGATIVE_CUSUM:
+            case NEGATIVE_CUSUM:
                 return new NegativeCusumDetectorRT(this);
         }
-        throw new ShouldNeverHappenException("Unknown detector type: " + detectorType);
-    }
-
-    public boolean isStateful() {
-        return detectorType != TYPE_POINT_CHANGE;
+        throw new ShouldNeverHappenException("Unknown detector type: " + dataPointDetectorKey);
     }
 
     @Override
     public String getEventDetectorKey() {
-        return SimpleEventDetectorVO.POINT_EVENT_DETECTOR_PREFIX + id;
+        return EventDetectorVO.POINT_EVENT_DETECTOR_PREFIX + id;
     }
 
     public LocalizableMessage getDescription() {
@@ -185,77 +114,75 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
     }
 
     private LocalizableMessage getConfigurationDescription() {
-        LocalizableMessage message;
         LocalizableMessage durationDesc = getDurationDescription();
-        if (detectorType == TYPE_ANALOG_HIGH_LIMIT) {
-            if (durationDesc == null) {
-                message = new LocalizableMessageImpl("event.detectorVo.highLimit", dataPoint.getTextRenderer().getText(
-                        limit, TextRenderer.HINT_SPECIFIC));
-            } else {
-                message = new LocalizableMessageImpl("event.detectorVo.highLimitPeriod", dataPoint.getTextRenderer()
-                        .getText(limit, TextRenderer.HINT_SPECIFIC), durationDesc);
-            }
-        } else if (detectorType == TYPE_ANALOG_LOW_LIMIT) {
-            if (durationDesc == null) {
-                message = new LocalizableMessageImpl("event.detectorVo.lowLimit", dataPoint.getTextRenderer().getText(
-                        limit, TextRenderer.HINT_SPECIFIC));
-            } else {
-                message = new LocalizableMessageImpl("event.detectorVo.lowLimitPeriod", dataPoint.getTextRenderer()
-                        .getText(limit, TextRenderer.HINT_SPECIFIC), durationDesc);
-            }
-        } else if (detectorType == TYPE_BINARY_STATE) {
-            if (durationDesc == null) {
-                message = new LocalizableMessageImpl("event.detectorVo.state", dataPoint.getTextRenderer().getText(
-                        binaryState, TextRenderer.HINT_SPECIFIC));
-            } else {
-                message = new LocalizableMessageImpl("event.detectorVo.statePeriod", dataPoint.getTextRenderer().getText(
-                        binaryState, TextRenderer.HINT_SPECIFIC), durationDesc);
-            }
-        } else if (detectorType == TYPE_MULTISTATE_STATE) {
-            if (durationDesc == null) {
-                message = new LocalizableMessageImpl("event.detectorVo.state", dataPoint.getTextRenderer().getText(
-                        multistateState, TextRenderer.HINT_SPECIFIC));
-            } else {
-                message = new LocalizableMessageImpl("event.detectorVo.statePeriod", dataPoint.getTextRenderer().getText(
-                        multistateState, TextRenderer.HINT_SPECIFIC), durationDesc);
-            }
-        } else if (detectorType == TYPE_POINT_CHANGE) {
-            message = new LocalizableMessageImpl("event.detectorVo.change");
-        } else if (detectorType == TYPE_STATE_CHANGE_COUNT) {
-            message = new LocalizableMessageImpl("event.detectorVo.changeCount", changeCount, durationDesc);
-        } else if (detectorType == TYPE_NO_CHANGE) {
-            message = new LocalizableMessageImpl("event.detectorVo.noChange", durationDesc);
-        } else if (detectorType == TYPE_NO_UPDATE) {
-            message = new LocalizableMessageImpl("event.detectorVo.noUpdate", durationDesc);
-        } else if (detectorType == TYPE_ALPHANUMERIC_STATE) {
-            if (durationDesc == null) {
-                message = new LocalizableMessageImpl("event.detectorVo.state", dataPoint.getTextRenderer().getText(
-                        alphanumericState, TextRenderer.HINT_SPECIFIC));
-            } else {
-                message = new LocalizableMessageImpl("event.detectorVo.statePeriod", dataPoint.getTextRenderer().getText(
-                        alphanumericState, TextRenderer.HINT_SPECIFIC), durationDesc);
-            }
-        } else if (detectorType == TYPE_POSITIVE_CUSUM) {
-            if (durationDesc == null) {
-                message = new LocalizableMessageImpl("event.detectorVo.posCusum", dataPoint.getTextRenderer().getText(
-                        limit, TextRenderer.HINT_SPECIFIC));
-            } else {
-                message = new LocalizableMessageImpl("event.detectorVo.posCusumPeriod", dataPoint.getTextRenderer()
-                        .getText(limit, TextRenderer.HINT_SPECIFIC), durationDesc);
-            }
-        } else if (detectorType == TYPE_NEGATIVE_CUSUM) {
-            if (durationDesc == null) {
-                message = new LocalizableMessageImpl("event.detectorVo.negCusum", dataPoint.getTextRenderer().getText(
-                        limit, TextRenderer.HINT_SPECIFIC));
-            } else {
-                message = new LocalizableMessageImpl("event.detectorVo.negCusumPeriod", dataPoint.getTextRenderer()
-                        .getText(limit, TextRenderer.HINT_SPECIFIC), durationDesc);
-            }
-        } else {
-            throw new ShouldNeverHappenException("Unknown detector type: " + detectorType);
+        switch (dataPointDetectorKey) {
+            case ANALOG_HIGH_LIMIT:
+                if (durationDesc == null) {
+                    return new LocalizableMessageImpl("event.detectorVo.highLimit", dataPoint.getTextRenderer().getText(
+                            limit, TextRenderer.HINT_SPECIFIC));
+                } else {
+                    return new LocalizableMessageImpl("event.detectorVo.highLimitPeriod", dataPoint.getTextRenderer()
+                            .getText(limit, TextRenderer.HINT_SPECIFIC), durationDesc);
+                }
+            case ANALOG_LOW_LIMIT:
+                if (durationDesc == null) {
+                    return new LocalizableMessageImpl("event.detectorVo.lowLimit", dataPoint.getTextRenderer().getText(
+                            limit, TextRenderer.HINT_SPECIFIC));
+                } else {
+                    return new LocalizableMessageImpl("event.detectorVo.lowLimitPeriod", dataPoint.getTextRenderer()
+                            .getText(limit, TextRenderer.HINT_SPECIFIC), durationDesc);
+                }
+            case BINARY_STATE:
+                if (durationDesc == null) {
+                    return new LocalizableMessageImpl("event.detectorVo.state", dataPoint.getTextRenderer().getText(
+                            binaryState, TextRenderer.HINT_SPECIFIC));
+                } else {
+                    return new LocalizableMessageImpl("event.detectorVo.statePeriod", dataPoint.getTextRenderer().getText(
+                            binaryState, TextRenderer.HINT_SPECIFIC), durationDesc);
+                }
+            case MULTISTATE_STATE:
+                if (durationDesc == null) {
+                    return new LocalizableMessageImpl("event.detectorVo.state", dataPoint.getTextRenderer().getText(
+                            multistateState, TextRenderer.HINT_SPECIFIC));
+                } else {
+                    return new LocalizableMessageImpl("event.detectorVo.statePeriod", dataPoint.getTextRenderer().getText(
+                            multistateState, TextRenderer.HINT_SPECIFIC), durationDesc);
+                }
+            case POINT_CHANGE:
+                return new LocalizableMessageImpl("event.detectorVo.change");
+            case STATE_CHANGE_COUNT:
+                return new LocalizableMessageImpl("event.detectorVo.changeCount", changeCount, durationDesc);
+            case NO_CHANGE:
+                return new LocalizableMessageImpl("event.detectorVo.noChange", durationDesc);
+            case NO_UPDATE:
+                return new LocalizableMessageImpl("event.detectorVo.noUpdate", durationDesc);
+            case ALPHANUMERIC_STATE:
+                if (durationDesc == null) {
+                    return new LocalizableMessageImpl("event.detectorVo.state", dataPoint.getTextRenderer().getText(
+                            alphanumericState, TextRenderer.HINT_SPECIFIC));
+                } else {
+                    return new LocalizableMessageImpl("event.detectorVo.statePeriod", dataPoint.getTextRenderer().getText(
+                            alphanumericState, TextRenderer.HINT_SPECIFIC), durationDesc);
+                }
+            case POSITIVE_CUSUM:
+                if (durationDesc == null) {
+                    return new LocalizableMessageImpl("event.detectorVo.posCusum", dataPoint.getTextRenderer().getText(
+                            limit, TextRenderer.HINT_SPECIFIC));
+                } else {
+                    return new LocalizableMessageImpl("event.detectorVo.posCusumPeriod", dataPoint.getTextRenderer()
+                            .getText(limit, TextRenderer.HINT_SPECIFIC), durationDesc);
+                }
+            case NEGATIVE_CUSUM:
+                if (durationDesc == null) {
+                    return new LocalizableMessageImpl("event.detectorVo.negCusum", dataPoint.getTextRenderer().getText(
+                            limit, TextRenderer.HINT_SPECIFIC));
+                } else {
+                    return new LocalizableMessageImpl("event.detectorVo.negCusumPeriod", dataPoint.getTextRenderer()
+                            .getText(limit, TextRenderer.HINT_SPECIFIC), durationDesc);
+                }
+            default:
+                throw new ShouldNeverHappenException("Unknown detector type: " + dataPointDetectorKey);
         }
-
-        return message;
     }
 
     public LocalizableMessage getDurationDescription() {
@@ -282,7 +209,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "pointEdit.detectors.alias", alias);
-        AuditEventType.addPropertyMessage(list, "pointEdit.detectors.type", getDef().getNameKey());
+        AuditEventType.addPropertyMessage(list, "pointEdit.detectors.type", dataPointDetectorKey);
         AuditEventType.addPropertyMessage(list, "common.alarmLevel", alarmLevel.getI18nKey());
         AuditEventType.addPropertyMessage(list, "common.configuration", getConfigurationDescription());
         AuditEventType.addPropertyMessage(list, "pointEdit.detectors.weight", weight);
@@ -292,9 +219,9 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
     public void addPropertyChanges(List<LocalizableMessage> list, PointEventDetectorVO from) {
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.xid", from.xid, xid);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.detectors.alias", from.alias, alias);
-        if (from.detectorType != detectorType) {
-            AuditEventType.addPropertyChangeMessage(list, "pointEdit.detectors.type", from.getDef().getNameKey(),
-                    getDef().getNameKey());
+        if (from.dataPointDetectorKey != dataPointDetectorKey) {
+            AuditEventType.addPropertyChangeMessage(list, "pointEdit.detectors.type", from.dataPointDetectorKey,
+                    dataPointDetectorKey);
         }
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.alarmLevel", from.alarmLevel, alarmLevel);
         if (from.limit != limit || from.duration != duration || from.durationType != durationType
@@ -322,6 +249,7 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
         this.alarmLevel = alarmLevel;
     }
 
+    @Override
     public int getId() {
         return id;
     }
@@ -360,14 +288,6 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
 
     public void setChangeCount(int changeCount) {
         this.changeCount = changeCount;
-    }
-
-    public int getDetectorType() {
-        return detectorType;
-    }
-
-    public void setDetectorType(int detectorType) {
-        this.detectorType = detectorType;
     }
 
     public int getDuration() {
@@ -418,20 +338,22 @@ public class PointEventDetectorVO extends SimpleEventDetectorVO implements Clone
         this.weight = weight;
     }
 
-    private static final ExportCodes TYPE_CODES = new ExportCodes();
+    /**
+     * @return the dataPointDetectorKey
+     */
+    public DataPointDetectorKey getDataPointDetectorKey() {
+        return dataPointDetectorKey;
+    }
 
-    static {
-        TYPE_CODES.addElement(TYPE_ANALOG_HIGH_LIMIT, "HIGH_LIMIT");
-        TYPE_CODES.addElement(TYPE_ANALOG_LOW_LIMIT, "LOW_LIMIT");
-        TYPE_CODES.addElement(TYPE_BINARY_STATE, "BINARY_STATE");
-        TYPE_CODES.addElement(TYPE_MULTISTATE_STATE, "MULTISTATE_STATE");
-        TYPE_CODES.addElement(TYPE_POINT_CHANGE, "POINT_CHANGE");
-        TYPE_CODES.addElement(TYPE_STATE_CHANGE_COUNT, "STATE_CHANGE_COUNT");
-        TYPE_CODES.addElement(TYPE_NO_CHANGE, "NO_CHANGE");
-        TYPE_CODES.addElement(TYPE_NO_UPDATE, "NO_UPDATE");
-        TYPE_CODES.addElement(TYPE_ALPHANUMERIC_STATE, "ALPHANUMERIC_STATE");
-        TYPE_CODES.addElement(TYPE_POSITIVE_CUSUM, "POSITIVE_CUSUM");
-        TYPE_CODES.addElement(TYPE_NEGATIVE_CUSUM, "NEGATIVE_CUSUM");
+    /**
+     * @param dataPointDetectorKey the dataPointDetectorKey to set
+     */
+    public void setDataPointDetectorKey(DataPointDetectorKey dataPointDetectorKey) {
+        this.dataPointDetectorKey = dataPointDetectorKey;
+    }
+
+    boolean isStateful() {
+        throw new ImplementMeException();
     }
 
 }

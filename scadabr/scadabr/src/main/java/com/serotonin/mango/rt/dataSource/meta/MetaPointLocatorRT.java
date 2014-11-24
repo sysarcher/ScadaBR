@@ -35,12 +35,9 @@ import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
-import br.org.scadabr.timer.cron.DataSourceCronTask;
 import br.org.scadabr.timer.cron.PointLocatorCronTask;
-import br.org.scadabr.timer.cron.PollingDataSourceCronTask;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.datasource.meta.UpdateEvent;
 import java.util.Date;
 import java.util.logging.Level;
@@ -199,7 +196,7 @@ public class MetaPointLocatorRT extends PollingPointLocatorRT<MetaPointLocatorVO
         }
 
         if (count > MAX_RECURSION) {
-            handleError(runtime, new LocalizableMessageImpl("event.meta.recursionFailure"));
+            fireScriptErrorEvent(runtime, "event.meta.recursionFailure");
             return;
         }
 
@@ -209,15 +206,16 @@ public class MetaPointLocatorRT extends PollingPointLocatorRT<MetaPointLocatorVO
             ScriptExecutor executor = new ScriptExecutor();
             try {
                 PointValueTime pvt = executor.execute(vo.getScript(), context, System.currentTimeMillis(), vo.getDataType(), runtime);
-                if (pvt.getValue() == null) {
-                    handleError(runtime, new LocalizableMessageImpl("event.meta.nullResult"));
+                if (pvt == null || pvt.getValue() == null) {
+                    fireScriptErrorEvent(runtime, "event.meta.nullResult");
                 } else {
+                    clearScriptErrorEvent(runtime);
                     updatePoint(pvt);
                 }
             } catch (ScriptException e) {
-                handleError(runtime, new LocalizableMessageImpl("common.default", e.getMessage()));
+                fireScriptErrorEvent(runtime, "common.default", e.getMessage());
             } catch (ResultTypeException e) {
-                handleError(runtime, e);
+                fireScriptErrorEvent(runtime, e);
             }
         } finally {
             threadLocal.remove();
@@ -238,10 +236,22 @@ public class MetaPointLocatorRT extends PollingPointLocatorRT<MetaPointLocatorVO
         dpRT.updatePointValue(pvt);
     }
 
-    protected void handleError(long runtime, LocalizableMessage message) {
-        ((MetaDataSourceRT)dsRT).raiseScriptError(runtime, dpRT, message);
+    protected void fireScriptErrorEvent(long runtime, LocalizableMessage msg) {
+        ((MetaDataSourceRT)dsRT).fireScriptErrorEvent(runtime, dpRT, msg);
     }
    
+    protected void fireScriptErrorEvent(long runtime, String i18nKey) {
+        ((MetaDataSourceRT)dsRT).fireScriptErrorEvent(runtime, dpRT, i18nKey);
+    }
+   
+    protected void fireScriptErrorEvent(long runtime, String i18nKey, Object... args) {
+        ((MetaDataSourceRT)dsRT).fireScriptErrorEvent(runtime, dpRT, i18nKey, args);
+    }
+   
+    protected void clearScriptErrorEvent(long runtime) {
+        ((MetaDataSourceRT)dsRT).clearScriptErrorAlarmt(runtime, dpRT);
+    }
+    
     protected List<Integer> getSourceIds() {
          final List<Integer> result = threadLocal.get();
          return result != null ? result : new ArrayList<Integer>();

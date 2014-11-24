@@ -22,42 +22,34 @@ package com.serotonin.mango.rt.event.type;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.type.PublisherEventKey;
 import com.serotonin.mango.vo.publish.PublisherVO;
 
 /**
  * @author Matthew Lohbihler
  */
 
-public class PublisherEventType extends EventType {
+public class PublisherEventType extends EventType<PublisherEventKey> {
 
-    private int publisherId;
-    private int publisherEventTypeId;
-    private AlarmLevel alarmLevel;
-
-    public PublisherEventType() {
-        // Required for reflection.
-    }
+    private final int publisherId;
+    private final AlarmLevel alarmLevel;
 
     @Deprecated
-    public PublisherEventType(int publisherId, int publisherEventTypeId) {
+    public PublisherEventType(int publisherId, PublisherEventKey publisherEventKey, AlarmLevel alarmLevel) {
+        super(publisherEventKey);
         this.publisherId = publisherId;
-        this.publisherEventTypeId = publisherEventTypeId;
-//        this.alarmLevel = alarmLevel;
+        this.alarmLevel = alarmLevel;
     }
 
-    public PublisherEventType(PublisherVO vo, int publisherEventTypeId) {
+    public PublisherEventType(PublisherVO vo) {
+        super(vo.getPublisherEventKey());
         this.publisherId = vo.getId();
-        this.publisherEventTypeId = publisherEventTypeId;
         this.alarmLevel = AlarmLevel.URGENT;
     }
 
     @Override
     public EventSources getEventSource() {
         return EventSources.PUBLISHER;
-    }
-
-    public int getPublisherEventTypeId() {
-        return publisherEventTypeId;
     }
 
     @Override
@@ -67,27 +59,28 @@ public class PublisherEventType extends EventType {
 
     @Override
     public String toString() {
-        return "PublisherEventType(publisherId=" + publisherId + ", eventTypeId=" + publisherEventTypeId + ")";
+        return "PublisherEventType(publisherId=" + publisherId + ", eventTypeId=" + eventKey.getId() + ")";
     }
 
+    /* TODO
     @Override
     public DuplicateHandling getDuplicateHandling() {
         return DuplicateHandling.IGNORE;
     }
-
+*/
     public int getReferenceId1() {
         return publisherId;
     }
 
     public int getReferenceId2() {
-        return publisherEventTypeId;
+        return eventKey.getId();
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + publisherEventTypeId;
+        result = prime * result + eventKey.getId();
         result = prime * result + publisherId;
         return result;
     }
@@ -104,7 +97,7 @@ public class PublisherEventType extends EventType {
             return false;
         }
         PublisherEventType other = (PublisherEventType) obj;
-        if (publisherEventTypeId != other.publisherEventTypeId) {
+        if (eventKey.getId() != other.eventKey.getId()) {
             return false;
         }
         if (publisherId != other.publisherId) {
@@ -116,11 +109,6 @@ public class PublisherEventType extends EventType {
     @Override
     public AlarmLevel getAlarmLevel() {
         return alarmLevel;
-    }
-
-    @Override
-    public boolean isStateful() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

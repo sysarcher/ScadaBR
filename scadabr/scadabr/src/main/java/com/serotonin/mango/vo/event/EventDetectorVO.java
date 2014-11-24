@@ -21,10 +21,10 @@ package com.serotonin.mango.vo.event;
 /**
  * @author Matthew Lohbihler
  */
-abstract public class SimpleEventDetectorVO {
+public interface EventDetectorVO {
 
     public static final String POINT_EVENT_DETECTOR_PREFIX = "P";
     public static final String SCHEDULED_EVENT_PREFIX = "S";
 
-    abstract public String getEventDetectorKey();
+    String getEventDetectorKey();
 }

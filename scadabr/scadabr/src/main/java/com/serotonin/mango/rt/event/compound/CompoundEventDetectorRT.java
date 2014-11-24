@@ -61,7 +61,7 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
     }
 
     private void raiseEvent(long time) {
-        if (vo.isReturnToNormal()) {
+        if (vo.isStateful()) {
             eventType.fire(time, "event.compound.activated", vo.getName());
         } else {
             eventType.fire(time, "event.compound.activated", vo.getName());
@@ -69,7 +69,7 @@ public class CompoundEventDetectorRT implements EventDetectorListener, ILifecycl
     }
 
     private void returnToNormal(long time) {
-        if (vo.isReturnToNormal()) {
+        if (vo.isStateful()) {
             // no Alarm was raised . so no clearing ...
         } else {
             eventType.clearAlarm(time);

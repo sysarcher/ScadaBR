@@ -18,25 +18,22 @@
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.datasource.meta.MetaDataSourceEventKey;
 import com.serotonin.mango.vo.DataPointVO;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Matthew Lohbihler
  */
 public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
-
-    public static final int EVENT_TYPE_CONTEXT_POINT_DISABLED = 1;
-    public static final int EVENT_TYPE_SCRIPT_ERROR = 2;
-    public static final int EVENT_TYPE_RESULT_TYPE_ERROR = 3;
 
     private boolean contextPointDisabledEventActive;
 
@@ -52,9 +49,9 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
     @Override
     public void dataPointEnabled(DataPointRT dataPoint) {
         super.dataPointEnabled(dataPoint);
-            MetaPointLocatorRT locator = dataPoint.getPointLocator();
-            locator.start(this, dataPoint); 
-            checkForDisabledPoints();
+        MetaPointLocatorRT locator = dataPoint.getPointLocator();
+        locator.start(this, dataPoint);
+        checkForDisabledPoints();
     }
 
     @Override
@@ -79,22 +76,59 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
         }
 
         if (contextPointDisabledEventActive != (problemPoint != null)) {
-            contextPointDisabledEventActive = problemPoint != null;
             if (contextPointDisabledEventActive) // A context point has been terminated, was never enabled, or not longer exists.
             {
-                raiseAlarm(EVENT_TYPE_CONTEXT_POINT_DISABLED, "event.meta.pointUnavailable", problemPoint.getVo().getName());
+                raiseAlarm(MetaDataSourceEventKey.CONTEXT_POINT_DISABLED, "event.meta.pointUnavailable", problemPoint.getVo().getName());
             } else // Everything is good
             {
-                clearAlarm(EVENT_TYPE_CONTEXT_POINT_DISABLED);
+                clearAlarm(MetaDataSourceEventKey.CONTEXT_POINT_DISABLED);
             }
         }
     }
 
-    public void raiseScriptError(long runtime, DataPointRT dataPoint, LocalizableMessage message) {
-        fireEvent(EVENT_TYPE_SCRIPT_ERROR, runtime, "event.meta.scriptError", dataPoint.getVo().getName(), message);
+    //TODO eventhandling should not be delegated to DataSource but rather handled here ... to filter out errors ...
+    public void fireScriptErrorEvent(long runtime, DataPointRT dataPoint, LocalizableMessage msg) {
+        Set<Integer> pointsWithErrors = (Set<Integer>) activeEvents.get(MetaDataSourceEventKey.SCRIPT_ERROR);
+        if (pointsWithErrors == null) {
+            pointsWithErrors = new HashSet<>();
+            activeEvents.put(MetaDataSourceEventKey.SCRIPT_ERROR, pointsWithErrors);
+        }
+        if (!pointsWithErrors.contains(dataPoint.getId())) {
+            pointsWithErrors.add(dataPoint.getId());
+            fireEvent(MetaDataSourceEventKey.SCRIPT_ERROR, runtime, "event.meta.scriptError", dataPoint.getVo().getName(), msg);
+        }
     }
 
-    public void raiseResultTypeError(long runtime, DataPointRT dataPoint, LocalizableMessage message) {
-        fireEvent(EVENT_TYPE_RESULT_TYPE_ERROR, runtime, "event.meta.typeError", dataPoint.getVo().getName(), message);
+    public void fireScriptErrorEvent(long runtime, DataPointRT dataPoint, String i18nKey) {
+        fireScriptErrorEvent(runtime, dataPoint, new LocalizableMessageImpl(i18nKey));
+    }
+
+    public void fireScriptErrorEvent(long runtime, DataPointRT dataPoint, String i18nKey, Object... args) {
+        fireScriptErrorEvent(runtime, dataPoint, new LocalizableMessageImpl(i18nKey, args));
+    }
+
+    public void clearScriptErrorAlarmt(long runtime, DataPointRT dataPoint) {
+        final Set<Integer> pointsWithErrors = (Set<Integer>) activeEvents.get(MetaDataSourceEventKey.SCRIPT_ERROR);
+        if (pointsWithErrors == null) {
+            // no key no error
+            //TODO startup information is lost ... so we wont clear any errors before pot metaInfo in EventInstances Table instead of refId2 ???
+            return;
+        } else {
+            if (pointsWithErrors.contains(dataPoint.getId())) {
+                clearAlarm(MetaDataSourceEventKey.SCRIPT_ERROR, runtime);
+            }
+        }
+    }
+
+    public void fireResultTypeErrorEvent(long runtime, DataPointRT dataPoint, LocalizableMessage message) {
+        Set<Integer> pointsWithErrors = (Set<Integer>) activeEvents.get(MetaDataSourceEventKey.RESULT_TYPE_ERROR);
+        if (pointsWithErrors == null) {
+            pointsWithErrors = new HashSet<>();
+            activeEvents.put(MetaDataSourceEventKey.RESULT_TYPE_ERROR, pointsWithErrors);
+        }
+        if (!pointsWithErrors.contains(dataPoint.getId())) {
+            pointsWithErrors.add(dataPoint.getId());
+        fireEvent(MetaDataSourceEventKey.RESULT_TYPE_ERROR, runtime, "event.meta.typeError", dataPoint.getVo().getName(), message);
+        }
     }
 }

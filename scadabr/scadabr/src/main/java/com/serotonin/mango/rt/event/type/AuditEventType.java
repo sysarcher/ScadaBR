@@ -21,7 +21,6 @@ package com.serotonin.mango.rt.event.type;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
@@ -32,12 +31,10 @@ import br.org.scadabr.web.i18n.LocalizableI18nKey;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.AuditEventKey;
-import com.serotonin.mango.db.dao.SystemSettingsDao;
 import java.util.Objects;
-import org.springframework.beans.factory.annotation.Autowired;
 
 
-public class AuditEventType extends EventType {
+public class AuditEventType extends EventType<AuditEventKey> {
 
     public static void raiseAddedEvent(AuditEventKey auditEventType, ChangeComparable<?> o) {
         List<LocalizableMessage> list = new ArrayList<>();
@@ -78,8 +75,7 @@ public class AuditEventType extends EventType {
         LocalizableMessage message = new LocalizableMessageImpl(key, username, new LocalizableMessageImpl(o.getTypeKey()),
                 o.getId(), new LocalizableMessageImpl("event.audit.propertyList." + props.length, props));
 
-        AuditEventType type = new AuditEventType(auditEventType, o.getId());
-        type.setRaisingUser(user);
+        AuditEventType type = new AuditEventType(auditEventType, o.getId(), user);
 
         type.fire(message);
     }
@@ -177,13 +173,14 @@ public class AuditEventType extends EventType {
     // / Instance stuff
     // /
     //
-    private final AuditEventKey auditEventType;
-    private int referenceId;
-    private User raisingUser;
+    private final int referenceId;
+    // THis is a kind of contextual data where to put this - This looks not the place to do so....
+    private final User raisingUser;
 
-    public AuditEventType(AuditEventKey auditEventType, int referenceId) {
-        this.auditEventType = auditEventType;
+    public AuditEventType(AuditEventKey auditEventType, int referenceId, User raisingUser) {
+        super(auditEventType);
         this.referenceId = referenceId;
+        this.raisingUser = raisingUser;
     }
 
     @Override
@@ -191,26 +188,13 @@ public class AuditEventType extends EventType {
         return EventSources.AUDIT;
     }
 
-    public AuditEventKey getAuditEventType() {
-        return auditEventType;
-    }
-
     @Override
     public String toString() {
-        return "AuditEventType(auditType=" + auditEventType + ", referenceId=" + referenceId + ")";
-    }
-
-    @Override
-    public DuplicateHandling getDuplicateHandling() {
-        return DuplicateHandling.ALLOW;
+        return "AuditEventType(auditType=" + eventKey + ", referenceId=" + referenceId + ")";
     }
 
     public int getReferenceId() {
         return referenceId;
-    }
-
-    public void setRaisingUser(User raisingUser) {
-        this.raisingUser = raisingUser;
     }
 
     @Override
@@ -225,7 +209,7 @@ public class AuditEventType extends EventType {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + auditEventType.getId();
+        result = prime * result + eventKey.getId();
         result = prime * result + referenceId;
         return result;
     }
@@ -242,7 +226,7 @@ public class AuditEventType extends EventType {
             return false;
         }
         AuditEventType other = (AuditEventType) obj;
-        if (auditEventType != other.auditEventType) {
+        if (eventKey != other.eventKey) {
             return false;
         }
         return referenceId == other.referenceId;
@@ -250,12 +234,8 @@ public class AuditEventType extends EventType {
 
     @Override
     public AlarmLevel getAlarmLevel() {
-        return auditEventType.getAlarmLevel();
+        return eventKey.getAlarmLevel();
     }
 
-    @Override
-    public boolean isStateful() {
-        return auditEventType.isStateful();
-    }
 
 }

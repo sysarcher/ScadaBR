@@ -18,9 +18,10 @@
  */
 package com.serotonin.mango.rt.event.type;
 
-import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.type.DataPointDetectorKey;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,41 +29,25 @@ import org.springframework.beans.factory.annotation.Configurable;
 
 
 @Configurable
-public class DataPointEventType extends EventType {
+public class DataPointEventType extends EventType<DataPointDetectorKey> {
     @Autowired
     private DataPointDao dataPointDao;
 
     private int dataSourceId = -1;
-    private int dataPointId;
-    private int pointEventDetectorId;
-    private DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
+    private final int dataPointId;
     private AlarmLevel alarmLevel;
-    private boolean stateful;
     
-    public DataPointEventType() {
-        // Required for reflection.
-    }
-
     @Deprecated
-    public DataPointEventType(int dataPointId, int pointEventDetectorId) {
+    public DataPointEventType(int dataPointId, DataPointDetectorKey pointDetectorKey, AlarmLevel alarmLevel) {
+        super(pointDetectorKey);
         this.dataPointId = dataPointId;
-        this.pointEventDetectorId = pointEventDetectorId;
-/*
-        this.alarmLevel = vo.getAlarmLevel();
-        if (!vo.isRtnApplicable()) {
-            duplicateHandling = DuplicateHandling.ALLOW;
-        }
-        */
+        this.alarmLevel = alarmLevel;
     }
 
     public DataPointEventType(PointEventDetectorVO vo) {
+        super(vo.getDataPointDetectorKey());
         this.dataPointId = vo.njbGetDataPoint().getId();
-        this.pointEventDetectorId = vo.getId();
         this.alarmLevel = vo.getAlarmLevel();
-        this.stateful = vo.isStateful();
-        if (!vo.isStateful()) {
-            duplicateHandling = DuplicateHandling.ALLOW;
-        }
     }
 
     @Override
@@ -71,11 +56,15 @@ public class DataPointEventType extends EventType {
     }
 
     @Override
+    @Deprecated //TODO fethch if needed
     public int getDataSourceId() {
+        throw new ImplementMeException();
+        /*
         if (dataSourceId == -1) {
             dataSourceId = dataPointDao.getDataPoint(dataPointId).getDataSourceId();
         }
         return dataSourceId;
+        */
     }
 
     @Override
@@ -84,21 +73,12 @@ public class DataPointEventType extends EventType {
     }
 
     public int getPointEventDetectorId() {
-        return pointEventDetectorId;
+        return eventKey.getId();
     }
 
     @Override
     public String toString() {
-        return "DataPointEventType(dataPointId=" + dataPointId + ", detectorId=" + pointEventDetectorId + ")";
-    }
-
-    @Override
-    public DuplicateHandling getDuplicateHandling() {
-        return duplicateHandling;
-    }
-
-    public void setDuplicateHandling(DuplicateHandling duplicateHandling) {
-        this.duplicateHandling = duplicateHandling;
+        return "DataPointEventType(dataPointId=" + dataPointId + ", detectorId=" + getPointEventDetectorId() + ")";
     }
 
     public int getReferenceId1() {
@@ -106,14 +86,15 @@ public class DataPointEventType extends EventType {
     }
 
     public int getReferenceId2() {
-        return pointEventDetectorId;
+        return getPointEventDetectorId();
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + pointEventDetectorId;
+        result = prime * result + dataPointId;
+        result = prime * result + getPointEventDetectorId();
         return result;
     }
 
@@ -129,20 +110,15 @@ public class DataPointEventType extends EventType {
             return false;
         }
         DataPointEventType other = (DataPointEventType) obj;
-        return pointEventDetectorId == other.pointEventDetectorId;
+        if (dataPointId != other.dataPointId) {
+            return false;
+        }
+        return eventKey.getId() == other.eventKey.getId();
     }
 
     @Override
     public AlarmLevel getAlarmLevel() {
         return alarmLevel;
-    }
-
-    /**
-     * @return the stateful
-     */
-    @Override
-    public boolean isStateful() {
-        return stateful;
     }
 
 }

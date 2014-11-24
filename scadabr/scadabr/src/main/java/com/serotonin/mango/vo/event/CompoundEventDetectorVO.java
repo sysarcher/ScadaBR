@@ -35,16 +35,19 @@ import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.CompoundEventKey;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.serotonin.mango.rt.event.type.CompoundDetectorEventType;
+import org.junit.runner.Computer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  */
-
 @Configurable
 public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDetectorVO> {
+
     @Autowired
     private DataPointDao dataPointDao;
 
@@ -52,25 +55,28 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
 
     private int id = ScadaBrConstants.NEW_ID;
     private String xid;
-    
+
     private String name;
     private AlarmLevel alarmLevel = AlarmLevel.NONE;
-    
-    private boolean returnToNormal = true;
-    
+
+    private boolean stateful = true;
+
     private boolean disabled = false;
-    
+
     private String condition;
+    private CompoundDetectorEventType compoundEventType;
+    private CompoundEventKey compoundEventKey;
+
+    public synchronized CompoundDetectorEventType getEventType() {
+        if (compoundEventType == null) {
+            compoundEventType = new CompoundDetectorEventType(this);
+        }
+        return compoundEventType;
+    }
 
     @JsonIgnore
     public boolean isNew() {
         return id == ScadaBrConstants.NEW_ID;
-    }
-
-    @Deprecated // use EfventType
-    public EventTypeVO getEventType() {
-        return new EventTypeVO(EventSources.COMPOUND, id, 0, new LocalizableMessageImpl("common.default", name),
-                alarmLevel);
     }
 
     @Override
@@ -98,7 +104,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
             List<DataPointVO> dataPoints = dataPointDao.getDataPoints(null, true);
 
             for (String key : keys) {
-                if (!key.startsWith(SimpleEventDetectorVO.POINT_EVENT_DETECTOR_PREFIX)) {
+                if (!key.startsWith(EventDetectorVO.POINT_EVENT_DETECTOR_PREFIX)) {
                     continue;
                 }
 
@@ -139,7 +145,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "compoundDetectors.name", name);
         AuditEventType.addPropertyMessage(list, "common.alarmLevel", alarmLevel.getI18nKey());
-        AuditEventType.addPropertyMessage(list, "common.rtn", returnToNormal);
+        AuditEventType.addPropertyMessage(list, "common.rtn", stateful);
         AuditEventType.addPropertyMessage(list, "common.disabled", disabled);
         AuditEventType.addPropertyMessage(list, "compoundDetectors.condition", condition);
     }
@@ -149,7 +155,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.xid", from.xid, xid);
         AuditEventType.maybeAddPropertyChangeMessage(list, "compoundDetectors.name", from.name, name);
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.alarmLevel", from.alarmLevel, alarmLevel);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "common.rtn", from.returnToNormal, returnToNormal);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "common.rtn", from.stateful, stateful);
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.disabled", from.disabled, disabled);
         AuditEventType.maybeAddPropertyChangeMessage(list, "compoundDetectors.condition", from.condition, condition);
     }
@@ -183,12 +189,12 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
         this.alarmLevel = alarmLevel;
     }
 
-    public boolean isReturnToNormal() {
-        return returnToNormal;
+    public boolean isStateful() {
+        return stateful;
     }
 
-    public void setReturnToNormal(boolean returnToNormal) {
-        this.returnToNormal = returnToNormal;
+    public void setStateful(boolean stateful) {
+        this.stateful = stateful;
     }
 
     public boolean isDisabled() {
@@ -213,6 +219,20 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
 
     public void setCondition(String condition) {
         this.condition = condition;
+    }
+
+    /**
+     * @return the compoundEventKey
+     */
+    public CompoundEventKey getCompoundEventKey() {
+        return compoundEventKey;
+    }
+
+    /**
+     * @param compoundEventKey the compoundEventKey to set
+     */
+    public void setCompoundEventKey(CompoundEventKey compoundEventKey) {
+        this.compoundEventKey = compoundEventKey;
     }
 
 }

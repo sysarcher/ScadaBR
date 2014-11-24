@@ -39,7 +39,9 @@ import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.DataSourceEventKey;
 import com.serotonin.mango.rt.EventManager;
+import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.vo.DataPointVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -65,7 +67,12 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
 
     public static final String ATTR_UNRELIABLE_KEY = "UNRELIABLE";
     protected final T vo;
-    private final List<DataSourceEventType> eventTypes;
+    /**
+     * If a entry is there for a key this key has an statefull event.
+     * The type of the enty is dependend on the suclass and key
+     */
+    protected Map<DataSourceEventKey, Object> activeEvents;
+    
     /**
      * Under the expectation that most data sources will run in their own
      * threads, the addedPoints field is used as a cache for points that have
@@ -112,12 +119,8 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
      */
     public DataSourceRT(T vo, boolean doCache) {
         this.vo = vo;
+        activeEvents = (Map<DataSourceEventKey, Object>)vo.createEventKeyMap();
         caching = doCache;
-
-        eventTypes = new ArrayList<>();
-        for (EventTypeVO etvo : vo.getEventTypes()) {
-            eventTypes.add((DataSourceEventType) etvo.createEventType());
-        }
     }
 
     public int getId() {
@@ -229,59 +232,49 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
         // No op by default. Override as required.
     }
 
-    protected void raiseAlarm(int eventId, LocalizableMessage message) {
-        final DataSourceEventType type = getEventType(eventId);
+    protected void raiseAlarm(DataSourceEventKey eventKey, LocalizableMessage message) {
+        final DataSourceEventType type = vo.getEventType(eventKey);
         final Map<String, Object> context = new HashMap<>();
         context.put("dataSource", vo);
 
         type.fire(context, "event.ds", vo.getName(), message);
     }
     
-    protected void raiseAlarm(int eventId, String i18nKey, Object ... i18nArgs) {
-        raiseAlarm(eventId, new LocalizableMessageImpl(i18nKey, i18nArgs));
+    protected void raiseAlarm(DataSourceEventKey eventKey, String i18nKey, Object ... i18nArgs) {
+        raiseAlarm(eventKey, new LocalizableMessageImpl(i18nKey, i18nArgs));
     }
     
-    protected void raiseAlarm(int eventId, long timestamp, LocalizableMessage message) {
-        final DataSourceEventType type = getEventType(eventId);
+    protected void raiseAlarm(DataSourceEventKey eventKey, long timestamp, LocalizableMessage message) {
+        final DataSourceEventType type = vo.getEventType(eventKey);
         final Map<String, Object> context = new HashMap<>();
         context.put("dataSource", vo);
 
         type.fire(context, timestamp, "event.ds", vo.getName(), message);
     }
     
-    protected void fireEvent(int eventId, LocalizableMessage message) {
-        fireEvent(eventId, System.currentTimeMillis(), message);
+    protected void fireEvent(DataSourceEventKey eventKey, LocalizableMessage message) {
+        fireEvent(eventKey, System.currentTimeMillis(), message);
     }
 
-    protected void fireEvent(int eventId, long timestamp, LocalizableMessage message) {
-        final DataSourceEventType type = getEventType(eventId);
+    protected void fireEvent(DataSourceEventKey eventKey, long timestamp, LocalizableMessage message) {
+        final DataSourceEventType type = vo.getEventType(eventKey);
         final Map<String, Object> context = new HashMap<>();
         context.put("dataSource", vo);
-
         type.fire(context, timestamp, new LocalizableMessageImpl("event.ds", vo.getName(), message));
     }
 
-    protected void fireEvent(int eventId, long timestamp, String i18nKey, Object ... i18nArgs) {
-        fireEvent(eventId, timestamp, new LocalizableMessageImpl(i18nKey, i18nArgs));
+    protected void fireEvent(DataSourceEventKey eventKey, long timestamp, String i18nKey, Object ... i18nArgs) {
+        fireEvent(eventKey, timestamp, new LocalizableMessageImpl(i18nKey, i18nArgs));
     }
 
-    protected void clearAlarm(int eventId) {
-        final DataSourceEventType type = getEventType(eventId);
+    protected void clearAlarm(DataSourceEventKey eventKey) {
+        final DataSourceEventType type = vo.getEventType(eventKey);
         type.clearAlarm();
     }
 
-    protected void clearAlarm(int eventId, long timestamp) {
-        final DataSourceEventType type = getEventType(eventId);
+    protected void clearAlarm(DataSourceEventKey eventKey, long timestamp) {
+        final DataSourceEventType type = vo.getEventType(eventKey);
         type.clearAlarm(timestamp);
-    }
-
-    private DataSourceEventType getEventType(int eventId) {
-        for (DataSourceEventType et : eventTypes) {
-            if (et.getDataSourceEventTypeId() == eventId) {
-                return et;
-            }
-        }
-        return null;
     }
 
     public static LocalizableException wrapSerialException(Exception e, String portId) {

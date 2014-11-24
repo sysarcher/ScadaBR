@@ -12,76 +12,55 @@ import br.org.scadabr.timer.cron.CronParser;
 import com.serotonin.mango.rt.event.maintenance.MaintenanceEventRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
-import com.serotonin.mango.util.ExportCodes;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.MaintenanceEventKey;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.serotonin.mango.rt.event.type.MaintenanceEventType;
 
 public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO> {
 
     public static final String XID_PREFIX = "ME_";
 
-    public static final int TYPE_MANUAL = 1;
-    public static final int TYPE_HOURLY = 2;
-    public static final int TYPE_DAILY = 3;
-    public static final int TYPE_WEEKLY = 4;
-    public static final int TYPE_MONTHLY = 5;
-    public static final int TYPE_YEARLY = 6;
-    public static final int TYPE_ONCE = 7;
-    public static final int TYPE_CRON = 8;
-
-    public final static ExportCodes TYPE_CODES = new ExportCodes();
-
-    static {
-        TYPE_CODES.addElement(TYPE_MANUAL, "MANUAL", "maintenanceEvents.type.manual");
-        TYPE_CODES.addElement(TYPE_HOURLY, "HOURLY", "maintenanceEvents.type.hour");
-        TYPE_CODES.addElement(TYPE_DAILY, "DAILY", "maintenanceEvents.type.day");
-        TYPE_CODES.addElement(TYPE_WEEKLY, "WEEKLY", "maintenanceEvents.type.week");
-        TYPE_CODES.addElement(TYPE_MONTHLY, "MONTHLY", "maintenanceEvents.type.month");
-        TYPE_CODES.addElement(TYPE_YEARLY, "YEARLY", "maintenanceEvents.type.year");
-        TYPE_CODES.addElement(TYPE_ONCE, "ONCE", "maintenanceEvents.type.once");
-        TYPE_CODES.addElement(TYPE_CRON, "CRON", "maintenanceEvents.type.cron");
-    }
-
     private int id = ScadaBrConstants.NEW_ID;
     private String xid;
     private int dataSourceId;
-    
+
     private String alias;
     private AlarmLevel alarmLevel = AlarmLevel.NONE;
-    private int scheduleType = TYPE_MANUAL;
-    
+    private MaintenanceEventKey scheduleType = MaintenanceEventKey.MANUAL;
+
     private boolean disabled = false;
-    
+
     private int activeYear;
-    
+
     private int activeMonth;
-    
+
     private int activeDay;
-    
+
     private int activeHour;
-    
+
     private int activeMinute;
-    
+
     private int activeSecond;
-    
+
     private String activeCron;
-    
+
     private int inactiveYear;
-    
+
     private int inactiveMonth;
-    
+
     private int inactiveDay;
-    
+
     private int inactiveHour;
-    
+
     private int inactiveMinute;
-    
+
     private int inactiveSecond;
-    
+
     private String inactiveCron;
 
     //
@@ -91,6 +70,15 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO> 
     private int dataSourceTypeId;
     private String dataSourceName;
     private String dataSourceXid;
+    private MaintenanceEventType maintenanceEventType;
+
+    public synchronized MaintenanceEventType getEventType() {
+        if (maintenanceEventType == null) {
+            maintenanceEventType = new MaintenanceEventType(this);
+        }
+        return maintenanceEventType;
+    }
+
 
     @JsonIgnore
     public boolean isNew() {
@@ -138,11 +126,11 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO> 
         this.alarmLevel = alarmLevel;
     }
 
-    public int getScheduleType() {
+    public MaintenanceEventKey getScheduleType() {
         return scheduleType;
     }
 
-    public void setScheduleType(int scheduleType) {
+    public void setScheduleType(MaintenanceEventKey scheduleType) {
         this.scheduleType = scheduleType;
     }
 
@@ -290,61 +278,35 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO> 
         this.dataSourceXid = dataSourceXid;
     }
 
-    public EventTypeVO getEventType() {
-        return new EventTypeVO(EventSources.MAINTENANCE, id, 0, getDescription(), alarmLevel);
-    }
-
     public LocalizableMessage getDescription() {
         if (alias != null) {
             return new LocalizableMessageImpl("common.default", alias);
         }
         switch (scheduleType) {
-            case TYPE_MANUAL:
+            case MANUAL:
                 return new LocalizableMessageImpl("maintenanceEvents.schedule.manual", dataSourceName);
-            case TYPE_ONCE:
+            case ONCE:
                 return new LocalizableMessageImpl("maintenanceEvents.schedule.onceUntil", dataSourceName, new DateTime(activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0).toDate(),
                         new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute, inactiveSecond, 0).toDate());
-            case TYPE_HOURLY:
+            case HOURLY:
                 String activeTime = StringUtils.pad(Integer.toString(activeMinute), '0', 2) + ":"
                         + StringUtils.pad(Integer.toString(activeSecond), '0', 2);
                 return new LocalizableMessageImpl("maintenanceEvents.schedule.hoursUntil", dataSourceName, activeTime,
                         StringUtils.pad(Integer.toString(inactiveMinute), '0', 2) + ":"
                         + StringUtils.pad(Integer.toString(inactiveSecond), '0', 2));
-            case TYPE_DAILY:
+            case DAILY:
                 return new LocalizableMessageImpl("maintenanceEvents.schedule.dailyUntil", dataSourceName, activeTime(), inactiveTime());
-            case TYPE_WEEKLY:
+            case WEEKLY:
                 return new LocalizableMessageImpl("maintenanceEvents.schedule.weeklyUntil", dataSourceName, weekday(true), activeTime(), weekday(false), inactiveTime());
-            case TYPE_MONTHLY:
+            case MONTHLY:
                 return new LocalizableMessageImpl("maintenanceEvents.schedule.monthlyUntil", dataSourceName, monthday(true), activeTime(), monthday(false), inactiveTime());
-            case TYPE_YEARLY:
+            case YEARLY:
                 return new LocalizableMessageImpl("maintenanceEvents.schedule.yearlyUntil", dataSourceName, monthday(true), month(true), activeTime(), monthday(false), month(false), inactiveTime());
-            case TYPE_CRON:
+            case CRON:
                 return new LocalizableMessageImpl("maintenanceEvents.schedule.cronUntil", dataSourceName, activeCron, inactiveCron);
             default:
                 throw new ShouldNeverHappenException("Unknown schedule type: " + scheduleType);
         }
-    }
-
-    private LocalizableMessage getTypeMessage() {
-        switch (scheduleType) {
-            case TYPE_MANUAL:
-                return new LocalizableMessageImpl("maintenanceEvents.type.manual");
-            case TYPE_HOURLY:
-                return new LocalizableMessageImpl("maintenanceEvents.type.hour");
-            case TYPE_DAILY:
-                return new LocalizableMessageImpl("maintenanceEvents.type.day");
-            case TYPE_WEEKLY:
-                return new LocalizableMessageImpl("maintenanceEvents.type.week");
-            case TYPE_MONTHLY:
-                return new LocalizableMessageImpl("maintenanceEvents.type.month");
-            case TYPE_YEARLY:
-                return new LocalizableMessageImpl("maintenanceEvents.type.year");
-            case TYPE_ONCE:
-                return new LocalizableMessageImpl("maintenanceEvents.type.once");
-            case TYPE_CRON:
-                return new LocalizableMessageImpl("maintenanceEvents.type.cron");
-        }
-        return null;
     }
 
     private String activeTime() {
@@ -425,7 +387,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO> 
         }
 
         // Check that cron patterns are ok.
-        if (scheduleType == TYPE_CRON) {
+        if (scheduleType == MaintenanceEventKey.CRON) {
             try {
                 new CronParser().parse(activeCron, CronExpression.TIMEZONE_UTC);
             } catch (Exception e) {
@@ -454,7 +416,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO> 
         }
 
         // If the event is once, make sure the active time is earlier than the inactive time.
-        if (scheduleType == TYPE_ONCE) {
+        if (scheduleType == MaintenanceEventKey.ONCE) {
             DateTime adt = new DateTime(activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0);
             DateTime idt = new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute,
                     inactiveSecond, 0);
@@ -470,7 +432,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO> 
         AuditEventType.addPropertyMessage(list, "maintenanceEvents.dataSource", dataSourceId);
         AuditEventType.addPropertyMessage(list, "maintenanceEvents.alias", alias);
         AuditEventType.addPropertyMessage(list, "common.alarmLevel", alarmLevel.getI18nKey());
-        AuditEventType.addPropertyMessage(list, "maintenanceEvents.type", getTypeMessage());
+        AuditEventType.addPropertyMessage(list, "maintenanceEvents.type", scheduleType);
         AuditEventType.addPropertyMessage(list, "common.disabled", disabled);
         AuditEventType.addPropertyMessage(list, "common.configuration", getDescription());
     }
@@ -483,8 +445,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO> 
         AuditEventType.maybeAddPropertyChangeMessage(list, "maintenanceEvents.alias", from.alias, alias);
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.alarmLevel", from.alarmLevel, alarmLevel);
         if (from.scheduleType != scheduleType) {
-            AuditEventType.addPropertyChangeMessage(list, "maintenanceEvents.type", from.getTypeMessage(),
-                    getTypeMessage());
+            AuditEventType.addPropertyChangeMessage(list, "maintenanceEvents.type", from.scheduleType, scheduleType);
         }
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.disabled", from.disabled, disabled);
         if (from.activeYear != activeYear || from.activeMonth != activeMonth || from.activeDay != activeDay

@@ -38,6 +38,7 @@ import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.PublisherEventKey;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -124,6 +125,10 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
         return Type.valueOf(typeId).createPublisherVO();
     }
 
+    public PublisherEventKey getPublisherEventKey() {
+        throw new ImplementMeException();
+    }
+    
     abstract public Type getType();
 
     abstract public LocalizableMessage getConfigDescription();

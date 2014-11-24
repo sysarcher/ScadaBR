@@ -19,48 +19,25 @@
 package com.serotonin.mango.rt.event.type;
 
 
-import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
-import com.serotonin.mango.db.dao.DataSourceDao;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
+import br.org.scadabr.vo.event.type.DataSourceEventKey;
 
 
-@Configurable
-public class DataSourceEventType extends EventType {
-    @Autowired
-    private DataSourceDao dataSourceDao;
+public class DataSourceEventType<E extends DataSourceEventKey<E>> extends EventType<E> {
 
-    private int dataSourceId;
-    private int dataSourceEventTypeId;
-    private AlarmLevel alarmLevel;
-    private DuplicateHandling duplicateHandling;
-    private boolean stateful;
-
-    public DataSourceEventType() {
-        // Required for reflection.
-    }
-
-    public DataSourceEventType(int dataSourceId, int dataSourceEventTypeId) {
-        this(dataSourceId, dataSourceEventTypeId, AlarmLevel.URGENT, DuplicateHandling.IGNORE, true);
-    }
-
-    public DataSourceEventType(int dataSourceId, int dataSourceEventTypeId, AlarmLevel alarmLevel, DuplicateHandling duplicateHandling, boolean stateful) {
+    private final int dataSourceId;
+    private final AlarmLevel alarmLevel;
+    
+    public DataSourceEventType(int dataSourceId, E dataSourceEventKey, AlarmLevel alarmLevel) {
+        super(dataSourceEventKey);
         this.dataSourceId = dataSourceId;
-        this.dataSourceEventTypeId = dataSourceEventTypeId;
         this.alarmLevel = alarmLevel;
-        this.duplicateHandling = duplicateHandling;
-        this.stateful = stateful;
     }
 
     @Override
     public EventSources getEventSource() {
         return EventSources.DATA_SOURCE;
-    }
-
-    public int getDataSourceEventTypeId() {
-        return dataSourceEventTypeId;
     }
 
     @Override
@@ -75,27 +52,14 @@ public class DataSourceEventType extends EventType {
 
     @Override
     public String toString() {
-        return "DataSoureEventType(dataSourceId=" + dataSourceId + ", eventTypeId=" + dataSourceEventTypeId + ")";
-    }
-
-    @Override
-    public DuplicateHandling getDuplicateHandling() {
-        return duplicateHandling;
-    }
-
-    public int getReferenceId1() {
-        return dataSourceId;
-    }
-
-    public int getReferenceId2() {
-        return dataSourceEventTypeId;
+        return "DataSoureEventType(dataSourceId=" + dataSourceId + ", eventKey=" + eventKey + ")";
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + dataSourceEventTypeId;
+        result = prime * result + eventKey.getId();
         result = prime * result + dataSourceId;
         return result;
     }
@@ -112,15 +76,10 @@ public class DataSourceEventType extends EventType {
             return false;
         }
         DataSourceEventType other = (DataSourceEventType) obj;
-        if (dataSourceEventTypeId != other.dataSourceEventTypeId) {
+        if (!eventKey.equals(other.eventKey)) {
             return false;
         }
         return dataSourceId == other.dataSourceId;
-    }
-
-    @Override
-    public boolean isStateful() {
-        return stateful;
     }
 
 }

@@ -26,12 +26,7 @@ import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.AlarmLevel;
-import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
-import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.db.dao.DataSourceDao;
-import com.serotonin.mango.db.dao.MaintenanceEventDao;
-import com.serotonin.mango.db.dao.PublisherDao;
-import com.serotonin.mango.db.dao.ScheduledEventDao;
+import br.org.scadabr.vo.event.type.EventKey;
 import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.vo.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +38,11 @@ import org.springframework.beans.factory.annotation.Configurable;
  * @author Matthew Lohbihler
  */
 @Configurable
-abstract public class EventType {
+abstract public class EventType<K extends EventKey<K>> {
 
     @Autowired
     private EventManager eventManager;
-    
+
     //TODO do we need the context or can this data be retieved later???
     public void fire(Map<String, Object> context, String i18nKey, Object... i18nArgs) {
         eventManager.handleFiredEvent(this, System.currentTimeMillis(), new LocalizableMessageImpl(i18nKey, i18nArgs), context);
@@ -62,7 +57,6 @@ abstract public class EventType {
     public void fire(Map<String, Object> context, long timestamp, String i18nKey, Object... i18nArgs) {
         eventManager.handleFiredEvent(this, timestamp, new LocalizableMessageImpl(i18nKey, i18nArgs), context);
     }
-
 
     public void fire(String i18nKey, Object... i18nArgs) {
         eventManager.handleFiredEvent(this, System.currentTimeMillis(), new LocalizableMessageImpl(i18nKey, i18nArgs), null);
@@ -163,6 +157,12 @@ abstract public class EventType {
         throw new ShouldNeverHappenException("getPublisherId() from" + this.getClass().getCanonicalName());
     }
 
+    protected final K eventKey;
+
+    public EventType(K eventKey) {
+        this.eventKey = eventKey;
+    }
+
     /**
      * Determines whether an event type that, once raised, will always first be
      * deactivated or whether overriding events can be raised. Overrides can
@@ -173,7 +173,13 @@ abstract public class EventType {
      * @return whether this event type can be overridden with newer event
      * instances.
      */
-    abstract public DuplicateHandling getDuplicateHandling();
+    public final DuplicateHandling getDuplicateHandling() {
+        return eventKey.getDuplicateHandling();
+    }
+
+    public K getEventKey() {
+        return eventKey;
+    }
 
     /**
      * Determines if the notification of this event to the given user should be
@@ -194,6 +200,36 @@ abstract public class EventType {
      */
     public abstract AlarmLevel getAlarmLevel();
 
-    public abstract boolean isStateful();
+    public final boolean isStateful() {
+        return eventKey.isStateful();
+    }
+
+    @Override
+    public String toString() {
+        return "EventType(eventType=" + eventKey + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + eventKey.getId();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        EventType other = (EventType) obj;
+        return eventKey == other.eventKey;
+    }
 
 }
