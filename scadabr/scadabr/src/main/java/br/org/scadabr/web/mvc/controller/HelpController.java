@@ -42,4 +42,8 @@ public class HelpController extends ParameterizableViewController {
         return "help/en/" + id;
     }
 
+    @RequestMapping(method = RequestMethod.GET)
+    protected String getHelp() throws Exception {
+        return "help";
+    }
 }

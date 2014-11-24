@@ -249,7 +249,7 @@ public class MetaPointLocatorRT extends PollingPointLocatorRT<MetaPointLocatorVO
     }
    
     protected void clearScriptErrorEvent(long runtime) {
-        ((MetaDataSourceRT)dsRT).clearScriptErrorAlarmt(runtime, dpRT);
+        ((MetaDataSourceRT)dsRT).clearScriptErrorAlarm(runtime, dpRT);
     }
     
     protected List<Integer> getSourceIds() {

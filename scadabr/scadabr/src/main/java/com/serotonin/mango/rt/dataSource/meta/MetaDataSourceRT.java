@@ -107,14 +107,14 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
         fireScriptErrorEvent(runtime, dataPoint, new LocalizableMessageImpl(i18nKey, args));
     }
 
-    public void clearScriptErrorAlarmt(long runtime, DataPointRT dataPoint) {
+    public void clearScriptErrorAlarm(long runtime, DataPointRT dataPoint) {
         final Set<Integer> pointsWithErrors = (Set<Integer>) activeEvents.get(MetaDataSourceEventKey.SCRIPT_ERROR);
         if (pointsWithErrors == null) {
             // no key no error
             //TODO startup information is lost ... so we wont clear any errors before pot metaInfo in EventInstances Table instead of refId2 ???
             return;
         } else {
-            if (pointsWithErrors.contains(dataPoint.getId())) {
+            if (pointsWithErrors.remove(dataPoint.getId())) {
                 clearAlarm(MetaDataSourceEventKey.SCRIPT_ERROR, runtime);
             }
         }
