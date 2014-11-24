@@ -21,42 +21,47 @@ package com.serotonin.mango.rt.event.type;
 
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.type.CompoundEventKey;
 import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
 
 /**
  * @author Matthew Lohbihler
  */
 
-public class CompoundDetectorEventType extends EventType {
+public class CompoundDetectorEventType extends EventType<CompoundEventKey> {
     
-    private int compoundDetectorId;
-    private DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
-    private AlarmLevel alarmLevel;
-    private boolean stateful;
-
-    public CompoundDetectorEventType() {
-        // Required for reflection.
-    }
+    private final int compoundDetectorId;
+    private final DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
+    private final AlarmLevel alarmLevel;
+    private final boolean stateful;
 
     @Deprecated
-    public CompoundDetectorEventType(int compoundDetectorId) {
+    public CompoundDetectorEventType(int compoundDetectorId, CompoundEventKey eventKey, AlarmLevel alarmLevel, boolean stateful) {
+        super(eventKey);
         this.compoundDetectorId = compoundDetectorId;
+        this.alarmLevel = alarmLevel;
+        this.stateful = stateful;
+        throw new ImplementMeException();
 /*        
         this.alarmLevel = vo.getAlarmLevel();
-        if (!vo.isReturnToNormal()) {
+        if (!vo.isStateful()) {
             duplicateHandling = DuplicateHandling.ALLOW;
         }
         */
     }
 
     public CompoundDetectorEventType(CompoundEventDetectorVO vo) {
+        super(vo.getCompoundEventKey());
         this.compoundDetectorId = vo.getId();
         this.alarmLevel = vo.getAlarmLevel();
-        this.stateful = vo.isReturnToNormal();
-        if (!vo.isReturnToNormal()) {
+        this.stateful = vo.isStateful();
+        throw new ImplementMeException();
+/*        if (!vo.isStateful()) {
             duplicateHandling = DuplicateHandling.ALLOW;
         }
+        */
     }
 
     @Override
@@ -73,6 +78,7 @@ public class CompoundDetectorEventType extends EventType {
         return "CompoundDetectorEventType(compoundDetectorId=" + compoundDetectorId + ")";
     }
 
+    /* TODO
     @Override
     public DuplicateHandling getDuplicateHandling() {
         return duplicateHandling;
@@ -81,7 +87,7 @@ public class CompoundDetectorEventType extends EventType {
     public void setDuplicateHandling(DuplicateHandling duplicateHandling) {
         this.duplicateHandling = duplicateHandling;
     }
-
+*/
     public int getReferenceId1() {
         return compoundDetectorId;
     }
@@ -126,9 +132,11 @@ public class CompoundDetectorEventType extends EventType {
         return alarmLevel;
     }
 
+    /* TODO
     @Override
     public boolean isStateful() {
         return stateful;
     }
+    */
 
 }

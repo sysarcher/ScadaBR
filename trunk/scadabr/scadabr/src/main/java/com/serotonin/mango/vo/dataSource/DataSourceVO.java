@@ -30,21 +30,20 @@ import java.util.Map;
 
 import br.org.scadabr.ShouldNeverHappenException;
 
-import br.org.scadabr.rt.event.type.DuplicateHandling;
-import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
-import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.http.HttpImageDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpReceiverDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpRetrieverDataSourceVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
-import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.type.DataSourceEventKey;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.serotonin.mango.rt.event.type.DataSourceEventType;
+import java.util.Set;
 import org.springframework.validation.Validator;
 
 abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
@@ -52,6 +51,12 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
 
     public abstract Validator createValidator();
 
+    private void fillEventTypeMap() {
+        this.eventTypeMap = (Map<DataSourceEventKey, DataSourceEventType>) createEventKeyMap();
+        for (DataSourceEventKey key : createEventKeySet()) {
+            eventTypeMap.put(key, new DataSourceEventType(id, key, key.getDefaultAlarmLevel()));
+        }
+    }
 
     public enum Type {
 
@@ -138,6 +143,8 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         return Type.valueOf(typeId).createDataSourceVO();
     }
 
+    private Map<DataSourceEventKey, DataSourceEventType> eventTypeMap;
+
     abstract public Type getType();
 
     abstract public LocalizableMessage getConnectionDescription();
@@ -146,15 +153,9 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
 
     abstract public DataSourceRT<T> createDataSourceRT();
 
-    abstract public ExportCodes getEventCodes();
-
-    final public List<EventTypeVO> getEventTypes() {
-        List<EventTypeVO> eventTypes = new ArrayList<>();
-        addEventTypes(eventTypes);
-        return eventTypes;
+    public DataSourceVO() {
+        fillEventTypeMap();
     }
-
-    abstract protected void addEventTypes(List<EventTypeVO> eventTypes);
 
     @JsonIgnore
     public boolean isNew() {
@@ -163,11 +164,10 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
 
     private int id = ScadaBrConstants.NEW_ID;
     private String xid;
-    
+
     private String name = this.getClass().getSimpleName();
-    
+
     private boolean enabled;
-    private Map<Integer, AlarmLevel> alarmLevels = new HashMap<>();
 
     public boolean isEnabled() {
         return enabled;
@@ -184,6 +184,11 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
 
     public void setId(int id) {
         this.id = id;
+        // replace id with righth id...
+        for (DataSourceEventKey key : eventTypeMap.keySet()) {
+            DataSourceEventType dsEvt = eventTypeMap.get(key);
+            eventTypeMap.put(key, new DataSourceEventType(id, key, dsEvt.getAlarmLevel()));
+        }
     }
 
     public String getXid() {
@@ -200,40 +205,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setAlarmLevel(int eventId, AlarmLevel level) {
-        alarmLevels.put(eventId, level);
-    }
-
-    public AlarmLevel getAlarmLevel(int eventId, AlarmLevel defaultLevel) {
-        AlarmLevel level = alarmLevels.get(eventId);
-        if (level == null) {
-            return defaultLevel;
-        }
-        return level;
-    }
-
-    public EventTypeVO getEventType(int eventId) {
-        for (EventTypeVO vo : getEventTypes()) {
-            if (vo.getTypeRef2() == eventId) {
-                return vo;
-            }
-        }
-        return null;
-    }
-
-    protected EventTypeVO createEventType(int eventId,
-            LocalizableMessage message) {
-        return createEventType(eventId, message, DuplicateHandling.IGNORE, AlarmLevel.URGENT);
-    }
-
-    protected EventTypeVO createEventType(int eventId,
-            LocalizableMessage message, DuplicateHandling duplicateHandling,
-            AlarmLevel defaultAlarmLevel) {
-        return new EventTypeVO(EventSources.DATA_SOURCE, getId(),
-                eventId, message, getAlarmLevel(eventId, defaultAlarmLevel),
-                duplicateHandling);
     }
 
     public DataSourceVO<?> copy() {
@@ -255,7 +226,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         AuditEventType.addPropertyMessage(list, "dsEdit.head.name", name);
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "common.enabled", enabled);
-
+//TODO events??
         addPropertiesImpl(list);
     }
 
@@ -269,6 +240,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.enabled",
                 fromVO.enabled, enabled);
 
+//TODO events??
         addPropertyChangesImpl(list, from);
     }
 
@@ -289,31 +261,56 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         out.writeInt(version);
         out.writeBoolean(enabled);
         final Map<Integer, Integer> _alarmLevels = new HashMap<>();
-        for (Map.Entry<Integer, AlarmLevel> e : alarmLevels.entrySet()) {
-            _alarmLevels.put(e.getKey(), e.getValue().getId());
+        for (Map.Entry<DataSourceEventKey, DataSourceEventType> e : eventTypeMap.entrySet()) {
+            _alarmLevels.put(e.getKey().getId(), e.getValue().getAlarmLevel().getId());
         }
-        out.writeObject(alarmLevels);
+        out.writeObject(_alarmLevels);
     }
 
     @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
-        int ver = in.readInt();
 
+        int ver = in.readInt();
         // Switch on the version of the class so that version changes can be
         // elegantly handled.
         if (ver == 1) {
             enabled = in.readBoolean();
-            alarmLevels = new HashMap<>();
+            fillEventTypeMap();
         } else if (ver == 2) {
             enabled = in.readBoolean();
             final Map<Integer, Integer> _alarmLevels = (HashMap<Integer, Integer>) in.readObject();
-            alarmLevels = new HashMap<>();
-            for (Map.Entry<Integer, Integer> e : _alarmLevels.entrySet()) {
-                alarmLevels.put(e.getKey(), AlarmLevel.fromId(e.getValue()));
+            this.eventTypeMap = (Map<DataSourceEventKey, DataSourceEventType>) createEventKeyMap();
+            for (DataSourceEventKey key : createEventKeySet()) {
+                final Integer alId = _alarmLevels.get(key.getId());
+                eventTypeMap.put(key, new DataSourceEventType(id, key, alId != null ? AlarmLevel.fromId(alId) : key.getDefaultAlarmLevel()));
             }
-
         }
+        fillEventTypeMap();
+    }
+
+    /**
+     * get all Types for configuration
+     *
+     * @return
+     */
+    public abstract <K extends DataSourceEventKey> Set<K> createEventKeySet();
+
+    /**
+     * Create a optimized map i.e. EnumMap ...
+     *
+     * @return
+     */
+    public abstract <K extends DataSourceEventKey> Map<K, ?> createEventKeyMap();
+
+    /**
+     * Get the type of a Key
+     *
+     * @param key
+     * @return
+     */
+    public DataSourceEventType getEventType(DataSourceEventKey key) {
+        return eventTypeMap.get(key);
     }
 
 }

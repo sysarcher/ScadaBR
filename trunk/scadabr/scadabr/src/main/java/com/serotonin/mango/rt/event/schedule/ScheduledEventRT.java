@@ -29,6 +29,7 @@ import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.ScheduledEventKey;
 import com.serotonin.mango.util.timeout.EventRunWithArgTask;
 import java.text.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ import org.springframework.beans.factory.annotation.Configurable;
  */
 @Configurable
 public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgClient<Boolean> {
-    
+
     private final ScheduledEventVO vo;
     private ScheduledEventType eventType;
     private boolean eventActive;
@@ -48,26 +49,25 @@ public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgC
     private EventRunWithArgTask<Boolean> inactiveTask;
     @Autowired
     private SchedulerPool schedulerPool;
-    
-    
+
     public ScheduledEventRT(ScheduledEventVO vo) {
         this.vo = vo;
     }
-    
+
     public ScheduledEventVO getVo() {
         return vo;
     }
-    
+
     private void raiseAlarm() {
         raiseAlarm(System.currentTimeMillis());
     }
-    
+
     private void raiseAlarm(long time) {
         eventType.fire(time, getMessage());
         eventActive = true;
         fireEventDetectorStateChanged(time);
     }
-    
+
     private void resetAlarm() {
         resetAlarm(System.currentTimeMillis());
     }
@@ -77,16 +77,16 @@ public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgC
         eventActive = false;
         fireEventDetectorStateChanged(time);
     }
-    
+
     public LocalizableMessage getMessage() {
         return new LocalizableMessageImpl("event.schedule.active", vo.getDescription());
     }
-    
+
     @Override
     public boolean isEventActive() {
         return eventActive;
     }
-    
+
     @Override
     synchronized public void run(Boolean active, long fireTime) {
         if (active) {
@@ -111,13 +111,13 @@ public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgC
         CronExpression activeTrigger = createTrigger(true);
         activeTask = new EventRunWithArgTask<>(activeTrigger, this, true);
         schedulerPool.schedule(activeTask);
-        
+
         if (vo.isStateful()) {
             CronExpression inactiveTrigger = createTrigger(false);
             inactiveTask = new EventRunWithArgTask<>(inactiveTrigger, this, false);
             schedulerPool.schedule(inactiveTask);
-            
-            if (vo.getScheduleType() != ScheduledEventVO.TYPE_ONCE) {
+
+            if (vo.getScheduleType() != ScheduledEventKey.ONCE) {
                 // Check if we are currently active.
                 if (inactiveTask.getNextScheduledExecutionTime() < activeTask.getNextScheduledExecutionTime()) {
                     raiseAlarm();
@@ -125,7 +125,7 @@ public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgC
             }
         }
     }
-    
+
     @Override
     public void terminate() {
         fireEventDetectorTerminated();
@@ -137,25 +137,25 @@ public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgC
         }
         resetAlarm();
     }
-    
+
     @Override
     public void joinTermination() {
         // no op
     }
-    
+
     public CronExpression createTrigger(boolean activeTrigger) {
         if (!activeTrigger && !vo.isStateful()) {
             return null;
         }
-        
+
         final int month = activeTrigger ? vo.getActiveMonth() : vo.getInactiveMonth();
         final int day = activeTrigger ? vo.getActiveDay() : vo.getInactiveDay();
         final int hour = activeTrigger ? vo.getActiveHour() : vo.getInactiveHour();
         final int minute = activeTrigger ? vo.getActiveMinute() : vo.getInactiveMinute();
         final int second = activeTrigger ? vo.getActiveSecond() : vo.getInactiveSecond();
         switch (vo.getScheduleType()) {
-            
-            case ScheduledEventVO.TYPE_CRON:
+
+            case CRON:
                 try {
                     if (activeTrigger) {
                         return new CronParser().parse(vo.getActiveCron(), CronExpression.TIMEZONE_UTC);
@@ -165,8 +165,8 @@ public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgC
                     // Should never happen, so wrap and rethrow
                     throw new ShouldNeverHappenException(e);
                 }
-            
-            case ScheduledEventVO.TYPE_ONCE:
+
+            case ONCE:
                 if (activeTrigger) {
                     return new CronExpression(vo.getActiveYear(), vo.getActiveMonth(), vo.getActiveDay(), vo.getActiveHour(),
                             vo.getActiveMinute(), vo.getActiveSecond(), 0, CronExpression.TIMEZONE_UTC);
@@ -174,13 +174,13 @@ public class ScheduledEventRT extends SimpleEventDetector implements RunWithArgC
                     return new CronExpression(vo.getInactiveYear(), vo.getInactiveMonth(), vo.getInactiveDay(),
                             vo.getInactiveHour(), vo.getInactiveMinute(), vo.getInactiveSecond(), 0, CronExpression.TIMEZONE_UTC);
                 }
-            case ScheduledEventVO.TYPE_HOURLY:
+            case HOURLY:
                 return CronExpression.createPeriodByHour(1, minute, second, 0);
-            case ScheduledEventVO.TYPE_DAILY:
+            case DAILY:
                 return CronExpression.createDaily(hour, minute, second, 0);
-            case ScheduledEventVO.TYPE_WEEKLY:
+            case WEEKLY:
                 throw new ImplementMeException();
-            case ScheduledEventVO.TYPE_MONTHLY:
+            case MONTHLY:
                 throw new ImplementMeException();
             default:
                 throw new RuntimeException();

@@ -175,7 +175,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
     private void sendEmail(EventInstance evt, NotificationType notificationType, Set<String> addresses,
             String alias) {
         if (evt.getEventType().isSystemMessage()) {
-            if (((SystemEventType) evt.getEventType()).getSystemEventType() == SystemEventKey.EMAIL_SEND_FAILURE) {
+            if (evt.getEventType().getEventKey()== SystemEventKey.EMAIL_SEND_FAILURE) {
                 // Don't send email notifications about email send failures.
                 LOG.info("Not sending email for event raised due to email failure");
                 return;

@@ -27,12 +27,18 @@ import java.util.List;
 
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
-import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.dataSource.DataSourceValidator;
+import br.org.scadabr.vo.datasource.meta.MetaDataSourceEventKey;
+import br.org.scadabr.vo.event.type.DataSourceEventKey;
+import com.serotonin.mango.rt.event.EventInstance;
+import com.serotonin.mango.rt.event.type.DataSourceEventType;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.validation.Validator;
 
 /**
@@ -51,29 +57,6 @@ public class MetaDataSourceVO extends DataSourceVO<MetaDataSourceVO> {
     @Override
     public Type getType() {
         return TYPE;
-    }
-
-    @Override
-    protected void addEventTypes(List<EventTypeVO> ets) {
-        ets.add(createEventType(MetaDataSourceRT.EVENT_TYPE_CONTEXT_POINT_DISABLED, new LocalizableMessageImpl(
-                "event.ds.contextPoint")));
-        ets.add(createEventType(MetaDataSourceRT.EVENT_TYPE_SCRIPT_ERROR,
-                new LocalizableMessageImpl("event.ds.scriptError")));
-        ets.add(createEventType(MetaDataSourceRT.EVENT_TYPE_RESULT_TYPE_ERROR, new LocalizableMessageImpl(
-                "event.ds.resultType")));
-    }
-
-    private static final ExportCodes EVENT_CODES = new ExportCodes();
-
-    static {
-        EVENT_CODES.addElement(MetaDataSourceRT.EVENT_TYPE_CONTEXT_POINT_DISABLED, "CONTEXT_POINT_DISABLED");
-        EVENT_CODES.addElement(MetaDataSourceRT.EVENT_TYPE_SCRIPT_ERROR, "SCRIPT_ERROR");
-        EVENT_CODES.addElement(MetaDataSourceRT.EVENT_TYPE_RESULT_TYPE_ERROR, "RESULT_TYPE_ERROR");
-    }
-
-    @Override
-    public ExportCodes getEventCodes() {
-        return EVENT_CODES;
     }
 
     @Override
@@ -126,4 +109,15 @@ public class MetaDataSourceVO extends DataSourceVO<MetaDataSourceVO> {
     public Validator createValidator() {
         return new DataSourceValidator();
     }
+
+    @Override
+    public Set<MetaDataSourceEventKey> createEventKeySet() {
+        return EnumSet.allOf(MetaDataSourceEventKey.class);
+    }
+
+    @Override
+    public Map<MetaDataSourceEventKey, ?> createEventKeyMap() {
+        return new EnumMap(MetaDataSourceEventKey.class);
+    }
+
 }

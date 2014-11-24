@@ -29,14 +29,19 @@ import java.util.List;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverDataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.ArrayUtils;
 import br.org.scadabr.util.IpAddressUtils;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.dataSource.DataSourceValidator;
+import br.org.scadabr.vo.datasource.http.HttpReceiverDataSourceEventKey;
+import br.org.scadabr.vo.event.type.DataSourceEventKey;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.validation.Errors;
 
 /**
@@ -48,6 +53,16 @@ public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourc
     @Override
     public HttpReceiverDataSourceVOValidator createValidator() {
         return new HttpReceiverDataSourceVOValidator();
+    }
+
+    @Override
+    public Set<HttpReceiverDataSourceEventKey> createEventKeySet() {
+        return new HashSet<>();
+    }
+
+    @Override
+    public Map<HttpReceiverDataSourceEventKey, ?> createEventKeyMap() {
+        return new HashMap<>();
     }
 
     public static class HttpReceiverDataSourceVOValidator extends DataSourceValidator {
@@ -79,16 +94,6 @@ public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourc
     }
 
     public static final Type TYPE = Type.HTTP_RECEIVER;
-
-    @Override
-    protected void addEventTypes(List<EventTypeVO> ets) {
-        // no op
-    }
-
-    @Override
-    public ExportCodes getEventCodes() {
-        return null;
-    }
 
     @Override
     public Type getType() {

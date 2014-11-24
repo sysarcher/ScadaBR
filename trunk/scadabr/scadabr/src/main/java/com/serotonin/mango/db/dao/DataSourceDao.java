@@ -42,8 +42,14 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.type.AuditEventKey;
+import br.org.scadabr.vo.event.type.DataSourceEventKey;
+import com.serotonin.mango.rt.event.type.DataSourceEventType;
+import com.serotonin.mango.rt.event.type.EventType;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -63,6 +69,8 @@ public class DataSourceDao extends BaseDao {
     @Inject
     private MaintenanceEventDao maintenanceEventDao;
 
+    Map<Integer, Map<Integer, DataSourceEventType>> dataSourceEventTypes = new HashMap<>();
+    
     public DataSourceDao() {
         super();
     }
@@ -86,6 +94,19 @@ public class DataSourceDao extends BaseDao {
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
+    }
+
+    DataSourceEventType getEventType(int dsId, int eventKeyId) {
+        Map<Integer, DataSourceEventType> eventTypes = dataSourceEventTypes.get(dsId);
+        if (eventTypes == null) {
+           final DataSourceVO dsVo = getDataSource(dsId);
+           eventTypes = new HashMap<>();
+           for (DataSourceEventKey key : (Set<DataSourceEventKey>)dsVo.createEventKeySet()) {
+               eventTypes.put(key.getId(), dsVo.getEventType(key));
+           }
+           dataSourceEventTypes.put(dsId, eventTypes);
+        }
+        return eventTypes.get(eventKeyId);
     }
 
     class DataSourceRowMapper implements RowMapper<DataSourceVO<?>> {

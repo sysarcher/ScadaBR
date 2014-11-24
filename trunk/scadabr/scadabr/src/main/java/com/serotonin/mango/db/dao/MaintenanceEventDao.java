@@ -3,6 +3,7 @@ package com.serotonin.mango.db.dao;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.AuditEventKey;
+import br.org.scadabr.vo.event.type.MaintenanceEventKey;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -72,7 +73,7 @@ public class MaintenanceEventDao extends BaseDao {
             me.setDataSourceId(rs.getInt(++i));
             me.setAlias(rs.getString(++i));
             me.setAlarmLevel(AlarmLevel.fromId(rs.getInt(++i)));
-            me.setScheduleType(rs.getInt(++i));
+            me.setScheduleType(MaintenanceEventKey.fromId(rs.getInt(++i)));
             me.setDisabled(charToBool(rs.getString(++i)));
             me.setActiveYear(rs.getInt(++i));
             me.setActiveMonth(rs.getInt(++i));
@@ -119,7 +120,7 @@ public class MaintenanceEventDao extends BaseDao {
                 ps.setInt(2, me.getDataSourceId());
                 ps.setString(3, me.getAlias());
                 ps.setInt(4, me.getAlarmLevel().getId());
-                ps.setInt(5, me.getScheduleType());
+                ps.setInt(5, me.getScheduleType().getId());
                 ps.setString(6, boolToChar(me.isDisabled()));
                 ps.setInt(7, me.getActiveYear());
                 ps.setInt(8, me.getActiveMonth());

@@ -27,7 +27,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.DataSourceUtils;
@@ -38,6 +37,7 @@ import br.org.scadabr.web.http.HttpUtils;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.datasource.http.HttpRetrieverDataSourceEventKey;
 import java.text.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -52,9 +52,6 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
     private Common common;
     
     private static final int READ_LIMIT = 1024 * 1024; // One MB
-
-    public static final int DATA_RETRIEVAL_FAILURE_EVENT = 1;
-    public static final int PARSE_EXCEPTION_EVENT = 2;
 
     public HttpRetrieverDataSourceRT(HttpRetrieverDataSourceVO vo) {
         super(vo, true);
@@ -81,12 +78,12 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
             } else {
                 lm = new LocalizableMessageImpl("event.httpRetriever.retrievalError", vo.getUrl(), e.getMessage());
             }
-            raiseAlarm(DATA_RETRIEVAL_FAILURE_EVENT, time, lm);
+            raiseAlarm(HttpRetrieverDataSourceEventKey.DATA_RETRIEVAL_FAILURE, time, lm);
             return;
         }
 
         // If we made it this far, everything is good.
-        clearAlarm(DATA_RETRIEVAL_FAILURE_EVENT, time);
+        clearAlarm(HttpRetrieverDataSourceEventKey.DATA_RETRIEVAL_FAILURE, time);
 
         // We have the data. Now run the regex.
         LocalizableMessage parseErrorMessage = null;
@@ -118,7 +115,7 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
         }
 
         if (parseErrorMessage != null) {
-            fireEvent(PARSE_EXCEPTION_EVENT, time, parseErrorMessage);
+            fireEvent(HttpRetrieverDataSourceEventKey.PARSE_EXCEPTION, time, parseErrorMessage);
         } else {
             //TODO returnToNormal was not set so there is no need to do this ???  returnToNormal(PARSE_EXCEPTION_EVENT, time);
         }

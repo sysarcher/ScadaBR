@@ -293,7 +293,7 @@ public class RuntimeManager {
         final Iterator<PointEventDetectorVO> peds = point.getEventDetectors().iterator();
         while (peds.hasNext()) {
             PointEventDetectorVO ped = peds.next();
-            if (!ped.getDef().supports(dataType)) {
+            if (!ped.getDataPointDetectorKey().supports(dataType)) {
                 // Remove the detector.
                 peds.remove();
             }

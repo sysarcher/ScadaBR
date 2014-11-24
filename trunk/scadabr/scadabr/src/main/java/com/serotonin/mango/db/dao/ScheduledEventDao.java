@@ -21,6 +21,7 @@ package com.serotonin.mango.db.dao;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.AuditEventKey;
+import br.org.scadabr.vo.event.type.ScheduledEventKey;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -90,7 +91,7 @@ public class ScheduledEventDao extends BaseDao {
             se.setXid(rs.getString(++i));
             se.setAlias(rs.getString(++i));
             se.setAlarmLevel(AlarmLevel.fromId(rs.getInt(++i)));
-            se.setScheduleType(rs.getInt(++i));
+            se.setScheduleType(ScheduledEventKey.fromId(rs.getInt(++i)));
             se.setStateful(charToBool(rs.getString(++i)));
             se.setDisabled(charToBool(rs.getString(++i)));
             se.setActiveYear(rs.getInt(++i));
@@ -134,7 +135,7 @@ public class ScheduledEventDao extends BaseDao {
                 ps.setString(1, se.getXid());
                 ps.setInt(2, se.getAlarmLevel().getId());
                 ps.setString(3, se.getAlias());
-                ps.setInt(4, se.getScheduleType());
+                ps.setInt(4, se.getScheduleType().getId());
                 ps.setString(5, boolToChar(se.isStateful()));
                 ps.setString(6, boolToChar(se.isDisabled()));
                 ps.setInt(7, se.getActiveYear());

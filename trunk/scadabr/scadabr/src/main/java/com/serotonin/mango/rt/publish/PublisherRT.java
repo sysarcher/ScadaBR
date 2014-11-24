@@ -71,8 +71,9 @@ abstract public class PublisherRT<T extends PublishedPointVO> implements RunClie
         this.vo = vo;
         queue = createPublishQueue(vo);
 
-        pointDisabledEventType = new PublisherEventType(vo, POINT_DISABLED_EVENT);
-        queueSizeWarningEventType = new PublisherEventType(vo, QUEUE_SIZE_WARNING_EVENT);
+        throw new ImplementMeException();
+//        pointDisabledEventType = new PublisherEventType(vo, POINT_DISABLED_EVENT);
+//        queueSizeWarningEventType = new PublisherEventType(vo, QUEUE_SIZE_WARNING_EVENT);
     }
 
     public int getId() {

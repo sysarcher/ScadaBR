@@ -87,7 +87,7 @@ public class CompoundEventDetectorDao extends BaseDao {
             ced.setXid(rs.getString(++i));
             ced.setName(rs.getString(++i));
             ced.setAlarmLevel(AlarmLevel.fromId(rs.getInt(++i)));
-            ced.setReturnToNormal(charToBool(rs.getString(++i)));
+            ced.setStateful(charToBool(rs.getString(++i)));
             ced.setDisabled(charToBool(rs.getString(++i)));
             ced.setCondition(rs.getString(++i));
             return ced;
@@ -114,7 +114,7 @@ public class CompoundEventDetectorDao extends BaseDao {
                 ps.setString(1, ced.getXid());
                 ps.setString(2, ced.getName());
                 ps.setInt(3, ced.getAlarmLevel().getId());
-                ps.setString(4, boolToChar(ced.isReturnToNormal()));
+                ps.setString(4, boolToChar(ced.isStateful()));
                 ps.setString(5, boolToChar(ced.isDisabled()));
                 ps.setString(6, ced.getCondition());
                 return ps;
@@ -131,7 +131,7 @@ public class CompoundEventDetectorDao extends BaseDao {
         CompoundEventDetectorVO old = getCompoundEventDetector(ced.getId());
 
         ejt.update(COMPOUND_EVENT_DETECTOR_UPDATE, new Object[]{ced.getXid(), ced.getName(), ced.getAlarmLevel(),
-            boolToChar(ced.isReturnToNormal()), boolToChar(ced.isDisabled()), ced.getCondition(), ced.getId()});
+            boolToChar(ced.isStateful()), boolToChar(ced.isDisabled()), ced.getCondition(), ced.getId()});
 
         AuditEventType.raiseChangedEvent(AuditEventKey.COMPOUND_EVENT_DETECTOR, old, ced);
 

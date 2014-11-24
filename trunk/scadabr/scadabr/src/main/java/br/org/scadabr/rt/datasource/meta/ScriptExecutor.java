@@ -171,22 +171,7 @@ public class ScriptExecutor {
 
         MangoValue value;
         if (result == null) {
-            switch (dataType) {
-                case BINARY:
-                    value = new BinaryValue(false);
-                    break;
-                case MULTISTATE:
-                    value = new MultistateValue(0);
-                    break;
-                case NUMERIC:
-                    value = new NumericValue(0);
-                    break;
-                case ALPHANUMERIC:
-                    value = new AlphanumericValue("");
-                    break;
-                default:
-                    value = null;
-            }
+            return null;
         } else if (result instanceof AbstractPointWrapper) {
             value = ((AbstractPointWrapper) result).getValueImpl();
         } // See if the type matches.

@@ -20,6 +20,7 @@ package com.serotonin.mango.vo.event;
 
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
 import java.util.List;
 
@@ -34,6 +35,7 @@ import com.serotonin.mango.rt.event.type.ScheduledEventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.vo.event.type.AuditEventKey;
+import br.org.scadabr.vo.event.type.DataPointDetectorKey;
 import br.org.scadabr.vo.event.type.SystemEventKey;
 
 @Deprecated //TODO Whats this for anyway currently stateful is not handled at all...
@@ -89,21 +91,28 @@ public class EventTypeVO {
     public EventType createEventType() {
         switch (eventSource) {
             case DATA_POINT:
-                return new DataPointEventType(typeRef1, typeRef2);
+                return new DataPointEventType(typeRef1, DataPointDetectorKey.fromId(typeRef2), alarmLevel);
             case DATA_SOURCE:
-                return new DataSourceEventType(typeRef1, typeRef2, alarmLevel, duplicateHandling, stateful);
+                throw new ImplementMeException();
+                //TODO  signature   public DataSourceEventType(int dataSourceId, DataSourceEventKey dataSourceEventKey, AlarmLevel alarmLevel) {
+                // return new DataSourceEventType(typeRef1, typeRef2, alarmLevel, duplicateHandling, stateful);
             case SYSTEM:
                 return new SystemEventType(SystemEventKey.fromId(typeRef1), typeRef2);
             case COMPOUND:
-                return new CompoundDetectorEventType(typeRef1);
+                throw new ImplementMeException();
+                //TODO return new CompoundDetectorEventType(typeRef1);
             case SCHEDULED:
-                return new ScheduledEventType(typeRef1);
+                throw new ImplementMeException();
+                //TODO return new ScheduledEventType(typeRef1);
             case PUBLISHER:
-                return new PublisherEventType(typeRef1, typeRef2);
+                throw new ImplementMeException();
+                //TODO return new PublisherEventType(typeRef1, typeRef2);
             case AUDIT:
-                return new AuditEventType(AuditEventKey.fromId(typeRef1), typeRef2);
+                throw new ImplementMeException();
+                //TODO return new AuditEventType(AuditEventKey.fromId(typeRef1), typeRef2, null);
             case MAINTENANCE:
-                return new MaintenanceEventType(typeRef1);
+                throw new ImplementMeException();
+                //TODO return new MaintenanceEventType(typeRef1);
             default:
                 throw new RuntimeException("Cant handle EventType");
         }

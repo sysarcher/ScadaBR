@@ -21,41 +21,42 @@ package com.serotonin.mango.rt.event.type;
 import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.type.ScheduledEventKey;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
 
 /**
  * @author Matthew Lohbihler
  *
  */
+public class ScheduledEventType extends EventType<ScheduledEventKey> {
 
-public class ScheduledEventType extends EventType {
-
-    private int scheduleId;
-    private DuplicateHandling duplicateHandling = DuplicateHandling.IGNORE;
-    private AlarmLevel alarmLevel;
-    private boolean stateful;
-
-    public ScheduledEventType() {
-        // Required for reflection.
-    }
+    private final int scheduleId;
+    private final DuplicateHandling duplicateHandling;
+    private final AlarmLevel alarmLevel;
+    private final boolean stateful;
 
     @Deprecated
-    public ScheduledEventType(int scheduleId) {
+    public ScheduledEventType(int scheduleId, ScheduledEventKey eventKey, AlarmLevel alarmLevel, boolean stateful) {
+        super(eventKey);
         this.scheduleId = scheduleId;
-        /*
-         this.alarmLevel = vo.getAlarmLevel();
-         if (!vo.isReturnToNormal()) {
-         duplicateHandling = DuplicateHandling.ALLOW;
-         }
-         */
+        this.alarmLevel = alarmLevel;
+        this.stateful = stateful;
+        if (this.stateful) {
+            duplicateHandling = DuplicateHandling.ALLOW;
+        } else {
+            duplicateHandling = DuplicateHandling.IGNORE;
+        }
     }
 
     public ScheduledEventType(ScheduledEventVO vo) {
+        super(vo.getScheduleType());
         this.scheduleId = vo.getId();
         this.alarmLevel = vo.getAlarmLevel();
         this.stateful = vo.isStateful();
-        if (!vo.isStateful()) {
+        if (this.stateful) {
             duplicateHandling = DuplicateHandling.ALLOW;
+        } else {
+            duplicateHandling = DuplicateHandling.IGNORE;
         }
     }
 
@@ -74,6 +75,7 @@ public class ScheduledEventType extends EventType {
         return "ScheduledEventType(scheduleId=" + scheduleId + ")";
     }
 
+    /* TODO
     @Override
     public DuplicateHandling getDuplicateHandling() {
         return duplicateHandling;
@@ -82,7 +84,7 @@ public class ScheduledEventType extends EventType {
     public void setDuplicateHandling(DuplicateHandling duplicateHandling) {
         this.duplicateHandling = duplicateHandling;
     }
-
+*/
     public int getReferenceId1() {
         return scheduleId;
     }
@@ -122,9 +124,10 @@ public class ScheduledEventType extends EventType {
     /**
      * @return the stateful
      */
+    /* TODO
     @Override
     public boolean isStateful() {
         return stateful;
     }
-
+*/
 }

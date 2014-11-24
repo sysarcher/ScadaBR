@@ -57,6 +57,7 @@ import br.org.scadabr.util.Tuple;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.AuditEventKey;
+import br.org.scadabr.vo.event.type.DataPointDetectorKey;
 import br.org.scadabr.web.LazyTreeNode;
 import java.sql.Connection;
 import java.sql.Statement;
@@ -499,7 +500,7 @@ public class DataPointDao extends BaseDao {
             detector.setId(rs.getInt(++i));
             detector.setXid(rs.getString(++i));
             detector.setAlias(rs.getString(++i));
-            detector.setDetectorType(rs.getInt(++i));
+            detector.setDataPointDetectorKey(DataPointDetectorKey.fromId(rs.getInt(++i)));
             detector.setAlarmLevel(AlarmLevel.fromId(rs.getInt(++i)));
             detector.setLimit(rs.getDouble(++i));
             detector.setDuration(rs.getInt(++i));
@@ -535,7 +536,7 @@ public class DataPointDao extends BaseDao {
                         ps.setString(1, ped.getXid());
                         ps.setString(2, ped.getAlias());
                         ps.setInt(3, dp.getId());
-                        ps.setInt(4, ped.getDetectorType());
+                        ps.setInt(4, ped.getDataPointDetectorKey().getId());
                         ps.setInt(5, ped.getAlarmLevel().getId());
                         ps.setDouble(6, ped.getLimit());
                         ps.setInt(7, ped.getDuration());

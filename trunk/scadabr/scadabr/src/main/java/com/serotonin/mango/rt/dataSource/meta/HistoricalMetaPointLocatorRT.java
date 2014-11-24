@@ -71,7 +71,7 @@ public class HistoricalMetaPointLocatorRT extends MetaPointLocatorRT {
     }
 
     @Override
-    protected void handleError(long runtime, LocalizableMessage message) {
+    protected void fireScriptErrorEvent(long runtime, LocalizableMessage message) {
         throw new MetaPointExecutionException(message);
     }
 }

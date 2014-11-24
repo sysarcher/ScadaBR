@@ -157,8 +157,8 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
     }
 
     private void raiseFailureEvent(LocalizableMessage message, EventType et) {
-        if (et != null && et.isSystemMessage()) {
-            if (((SystemEventType) et).getSystemEventType() == SystemEventKey.SET_POINT_HANDLER_FAILURE) {
+        if (et != null) {
+            if (et.getEventKey() == SystemEventKey.SET_POINT_HANDLER_FAILURE) {
                 // The set point attempt failed for an event that is a set point handler failure in the first place.
                 // Do not propagate the event, but rather just write a log message.
                 LOG.warn("A set point event due to a set point handler failure itself failed. The failure event "

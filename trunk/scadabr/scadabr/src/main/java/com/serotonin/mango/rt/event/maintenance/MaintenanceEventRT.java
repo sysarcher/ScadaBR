@@ -13,6 +13,7 @@ import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.type.MaintenanceEventKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -27,7 +28,7 @@ public class MaintenanceEventRT implements RunWithArgClient<Boolean> {
 
     @Autowired
     private SchedulerPool schedulerPool;
-    
+
     public MaintenanceEventRT(MaintenanceEventVO vo) {
         this.vo = vo;
     }
@@ -79,7 +80,7 @@ public class MaintenanceEventRT implements RunWithArgClient<Boolean> {
     public void initialize() {
         eventType = new MaintenanceEventType(vo);
 
-        if (vo.getScheduleType() != MaintenanceEventVO.TYPE_MANUAL) {
+        if (vo.getScheduleType() != MaintenanceEventKey.MANUAL) {
             // Schedule the active event.
             final CronExpression activeTrigger = createTrigger(true);
             activeTask = new SystemRunWithArgTask<>(activeTrigger, this, true);
@@ -90,7 +91,7 @@ public class MaintenanceEventRT implements RunWithArgClient<Boolean> {
             inactiveTask = new SystemRunWithArgTask<>(inactiveTrigger, this, false);
             schedulerPool.schedule(inactiveTask);
 
-            if (vo.getScheduleType() != MaintenanceEventVO.TYPE_ONCE) {
+            if (vo.getScheduleType() != MaintenanceEventKey.ONCE) {
                 // Check if we are currently active.
                 if (inactiveTask.getNextScheduledExecutionTime() < activeTask.getNextScheduledExecutionTime()) {
                     raiseEvent(System.currentTimeMillis());
@@ -123,10 +124,10 @@ public class MaintenanceEventRT implements RunWithArgClient<Boolean> {
         final int minute = activeTrigger ? vo.getActiveMinute() : vo.getInactiveMinute();
         final int second = activeTrigger ? vo.getActiveSecond() : vo.getInactiveSecond();
         switch (vo.getScheduleType()) {
-            case MaintenanceEventVO.TYPE_MANUAL:
+            case MANUAL:
                 return null;
 
-            case MaintenanceEventVO.TYPE_CRON:
+            case CRON:
                 try {
                     if (activeTrigger) {
                         return new CronParser().parse(vo.getActiveCron(), CronExpression.TIMEZONE_UTC);
@@ -137,7 +138,7 @@ public class MaintenanceEventRT implements RunWithArgClient<Boolean> {
                     throw new ShouldNeverHappenException(e);
                 }
 
-            case MaintenanceEventVO.TYPE_ONCE:
+            case ONCE:
                 if (activeTrigger) {
                     return new CronExpression(vo.getActiveYear(), vo.getActiveMonth(), vo.getActiveDay(), vo.getActiveHour(),
                             vo.getActiveMinute(), vo.getActiveSecond(), 0, CronExpression.TIMEZONE_UTC);
@@ -145,13 +146,13 @@ public class MaintenanceEventRT implements RunWithArgClient<Boolean> {
                     return new CronExpression(vo.getInactiveYear(), vo.getInactiveMonth(), vo.getInactiveDay(),
                             vo.getInactiveHour(), vo.getInactiveMinute(), vo.getInactiveSecond(), 0, CronExpression.TIMEZONE_UTC);
                 }
-            case MaintenanceEventVO.TYPE_HOURLY:
+            case HOURLY:
                 return CronExpression.createPeriodByHour(1, minute, second, 0);
-            case MaintenanceEventVO.TYPE_DAILY:
+            case DAILY:
                 throw new ImplementMeException();
-            case MaintenanceEventVO.TYPE_WEEKLY:
+            case WEEKLY:
                 throw new ImplementMeException();
-            case MaintenanceEventVO.TYPE_MONTHLY:
+            case MONTHLY:
                 throw new ImplementMeException();
             default:
                 throw new RuntimeException();

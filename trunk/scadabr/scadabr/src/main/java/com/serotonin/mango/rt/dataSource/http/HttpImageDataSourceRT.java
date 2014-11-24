@@ -49,6 +49,7 @@ import br.org.scadabr.util.image.PercentScaledImage;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.datasource.http.HttpImageDataSourceEventKey;
 import java.text.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -102,15 +103,15 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
 
         // Check the results.
         if (monitor.getRetrievalFailure() != null) {
-            raiseAlarm(DATA_RETRIEVAL_FAILURE_EVENT, time, monitor.getRetrievalFailure());
+            raiseAlarm(HttpImageDataSourceEventKey.DATA_RETRIEVAL_FAILURE, time, monitor.getRetrievalFailure());
         } else {
-             clearAlarm(DATA_RETRIEVAL_FAILURE_EVENT, time);
+             clearAlarm(HttpImageDataSourceEventKey.DATA_RETRIEVAL_FAILURE, time);
         }
 
         if (monitor.getSaveFailure() != null) {
-            raiseAlarm(FILE_SAVE_EXCEPTION_EVENT, time, monitor.getSaveFailure());
+            raiseAlarm(HttpImageDataSourceEventKey.FILE_SAVE_EXCEPTION, time, monitor.getSaveFailure());
         } else {
-            clearAlarm(FILE_SAVE_EXCEPTION_EVENT, time);
+            clearAlarm(HttpImageDataSourceEventKey.FILE_SAVE_EXCEPTION, time);
         }
     }
 
