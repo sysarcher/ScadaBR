@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +32,6 @@ import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
-import com.serotonin.mango.vo.dataSource.http.HttpImageDataSourceVO;
-import com.serotonin.mango.vo.dataSource.http.HttpReceiverDataSourceVO;
-import com.serotonin.mango.vo.dataSource.http.HttpRetrieverDataSourceVO;
-import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.vo.event.AlarmLevel;
@@ -58,94 +53,13 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         }
     }
 
-    public enum Type {
-
-        HTTP_RECEIVER(7, "dsEdit.httpReceiver", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new HttpReceiverDataSourceVO();
-                    }
-                },
-        HTTP_RETRIEVER(11, "dsEdit.httpRetriever", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new HttpRetrieverDataSourceVO();
-                    }
-                },
-        HTTP_IMAGE(15, "dsEdit.httpImage", false) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new HttpImageDataSourceVO();
-                    }
-                },
-        META(9, "dsEdit.meta", true) {
-                    @Override
-                    public DataSourceVO<?> createDataSourceVO() {
-                        return new MetaDataSourceVO();
-                    }
-                };
-
-        private Type(int id, String key, boolean display) {
-            this.id = id;
-            this.key = key;
-            this.display = display;
-        }
-
-        private final int id;
-        private final String key;
-        private final boolean display;
-
-        @Deprecated
-        public int getId() {
-            return id;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        public boolean isDisplay() {
-            return display;
-        }
-
-        public abstract DataSourceVO<?> createDataSourceVO();
-
-        public static Type valueOf(int id) {
-            for (Type type : values()) {
-                if (type.id == id) {
-                    return type;
-                }
-            }
-            return null;
-        }
-
-        public static Type valueOfIgnoreCase(String text) {
-            for (Type type : values()) {
-                if (type.name().equalsIgnoreCase(text)) {
-                    return type;
-                }
-            }
-            return null;
-        }
-
-        public static List<String> getTypeList() {
-            List<String> result = new ArrayList<>();
-            for (Type type : values()) {
-                result.add(type.name());
-            }
-            return result;
-        }
-    }
-
     public static final String XID_PREFIX = "DS_";
-
-    public static DataSourceVO<?> createDataSourceVO(int typeId) {
-        return Type.valueOf(typeId).createDataSourceVO();
-    }
 
     private Map<DataSourceEventKey, DataSourceEventType> eventTypeMap;
 
-    abstract public Type getType();
+    abstract public String getDataSourceTypeKey();
+
+    public abstract int getDataSourceTypeId();
 
     abstract public LocalizableMessage getConnectionDescription();
 
@@ -292,6 +206,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
     /**
      * get all Types for configuration
      *
+     * @param <K>
      * @return
      */
     public abstract <K extends DataSourceEventKey> Set<K> createEventKeySet();
@@ -299,6 +214,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
     /**
      * Create a optimized map i.e. EnumMap ...
      *
+     * @param <K>
      * @return
      */
     public abstract <K extends DataSourceEventKey> Map<K, ?> createEventKeyMap();

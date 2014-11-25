@@ -3,13 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.org.scadabr.vo.dataSource.meta;
+package br.org.scadabr.vo.datasource.meta;
 
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
-import br.org.scadabr.vo.dataSource.*;
-import br.org.scadabr.vo.datasource.meta.UpdateEvent;
+import br.org.scadabr.vo.dataSource.PointLocatorValidator;
 import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
 import java.text.ParseException;

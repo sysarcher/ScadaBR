@@ -22,7 +22,7 @@ public class JsonDataSource implements Serializable {
     public JsonDataSource(DataSourceVO<?> dsVo, Localizer localizer) {
         this.name = dsVo.getName();
         this.id = dsVo.getId();
-        this.typeKey = localizer.getMessage(dsVo.getType().getKey());
+        this.typeKey = dsVo.getDataSourceTypeKey(); //TODO localizer.getMessage(dsVo.getDataSourceTypeI18n());
     }
 
     /**

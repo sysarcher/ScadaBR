@@ -3,12 +3,18 @@
     <jsp:body>
         <script type="text/javascript">
             var _dataSources;
-            require([
-                "scadabr/jsp/DataSources",
-                "dojo/domReady!"
-            ], function (DataSources) {
-                _dataSources = new DataSources("dataSourcesTree", "treeNodeDetailsWidget");
-            });
+                    require([
+                            "scadabr/jsp/DataSources",
+                            "dojo/domReady!"
+                    ], function (DataSources) {
+                    var dsTypes = [
+            <c:forEach var="dsType" items="${dataSourceTypes}" varStatus="loopStatus">
+                        {key:'${dsType.typeKey}',
+                         label: '<fmt:message key="${dsType.i18nKey}"/>'}${loopStatus.last ? '' : ','}
+            </c:forEach>
+                    ]
+                    _dataSources = new DataSources("dataSourcesTree", "treeNodeDetailsWidget", dsTypes);
+                    });
 
         </script>
 

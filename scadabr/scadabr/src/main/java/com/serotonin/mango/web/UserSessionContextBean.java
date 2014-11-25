@@ -5,16 +5,13 @@
  */
 package com.serotonin.mango.web;
 
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.SystemEventKey;
-import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.vo.User;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.TimeZone;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -30,7 +27,7 @@ import org.springframework.context.annotation.Scope;
 public class UserSessionContextBean implements Serializable {
 
     @Inject
-    private RuntimeManager runtimeManager;
+    private transient RuntimeManager runtimeManager;
             
     private User user;
     private Locale locale = Locale.getDefault();

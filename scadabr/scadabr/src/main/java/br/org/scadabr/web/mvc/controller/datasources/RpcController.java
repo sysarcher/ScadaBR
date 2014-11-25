@@ -5,9 +5,11 @@
  */
 package br.org.scadabr.web.mvc.controller.datasources;
 
+import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.LoggingTypes;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import br.org.scadabr.vo.datasource.DataSourcesRegistry;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.googlecode.jsonrpc4j.JsonRpcService;
 import com.serotonin.mango.db.dao.DataPointDao;
@@ -17,9 +19,10 @@ import com.serotonin.mango.view.chart.ImageChartRenderer;
 import com.serotonin.mango.view.text.AnalogRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.springframework.context.annotation.Scope;
@@ -33,6 +36,8 @@ import org.springframework.context.annotation.ScopedProxyMode;
 @JsonRpcService("/dataSources/rpc/")
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class RpcController {
+    
+    private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
 
     @Inject
     private DataSourceDao dataSourceDao;
@@ -42,11 +47,23 @@ public class RpcController {
     private DataPointDao dataPointDao;
     @Inject
     private RuntimeManager runtimeManager;
-
+    @Inject
+    private DataSourcesRegistry dataSourcesRegistry;
+    
     public JsonDataSource addDataSource(String type) {
-        DataSourceVO result = new MetaDataSourceVO();
+        DataSourceVO result = dataSourcesRegistry.createDataSourceVO(type);
         dataSourceDao.saveDataSource(result);
         return new JsonDataSource(result, localizer);
+    }
+
+    public boolean deleteDataSource(int id) {
+        try {
+            runtimeManager.deleteDataSource(id);
+            return true;
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error saving DataSource with id: " + id, e);
+            return false;
+        }
     }
 
     public PointLocatorVO addPointLocator(int dataSourceId, int pointlOcatorId) {

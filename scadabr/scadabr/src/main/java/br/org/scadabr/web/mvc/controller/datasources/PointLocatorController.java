@@ -20,7 +20,7 @@ package br.org.scadabr.web.mvc.controller.datasources;
 
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.vo.dataSource.PointLocatorValidator;
-import br.org.scadabr.vo.dataSource.meta.MetaPointLocatorValidator;
+import br.org.scadabr.vo.datasource.meta.MetaPointLocatorValidator;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import br.org.scadabr.web.mvc.AjaxFormPostResponse;
 import com.serotonin.mango.db.dao.DataPointDao;

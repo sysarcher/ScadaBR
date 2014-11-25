@@ -151,7 +151,7 @@ public class DataSourceDao extends BaseDao {
                 PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, vo.getXid());
                 ps.setString(2, vo.getName());
-                ps.setInt(3, vo.getType().getId());
+                ps.setInt(3, vo.getDataSourceTypeId());
                 ps.setBlob(4, SerializationHelper.writeObject(vo));
                 return ps;
             }

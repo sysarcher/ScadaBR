@@ -36,6 +36,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.dataSource.DataSourceValidator;
 import br.org.scadabr.vo.datasource.http.HttpReceiverDataSourceEventKey;
+import br.org.scadabr.vo.datasource.http.HttpReceiverDataSourceType;
 import br.org.scadabr.vo.event.type.DataSourceEventKey;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -93,11 +94,14 @@ public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourc
 
     }
 
-    public static final Type TYPE = Type.HTTP_RECEIVER;
+    @Override
+    public String getDataSourceTypeKey() {
+        return HttpReceiverDataSourceType.KEY;
+    }
 
     @Override
-    public Type getType() {
-        return TYPE;
+    public int getDataSourceTypeId() {
+        return HttpReceiverDataSourceType.DB_ID;
     }
 
     @Override

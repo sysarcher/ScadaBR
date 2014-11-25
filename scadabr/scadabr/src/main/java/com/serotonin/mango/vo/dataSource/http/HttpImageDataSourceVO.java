@@ -33,6 +33,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.dataSource.DataSourceValidator;
 import br.org.scadabr.vo.datasource.http.HttpImageDataSourceEventKey;
+import br.org.scadabr.vo.datasource.http.HttpImageDataSourceType;
 import br.org.scadabr.vo.event.type.DataSourceEventKey;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -86,8 +87,13 @@ public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
     }
 
     @Override
-    public Type getType() {
-        return Type.HTTP_IMAGE;
+    public String getDataSourceTypeKey() {
+        return HttpImageDataSourceType.KEY;
+    }
+
+    @Override
+    public int getDataSourceTypeId() {
+        return HttpImageDataSourceType.DB_ID;
     }
 
     @Override
