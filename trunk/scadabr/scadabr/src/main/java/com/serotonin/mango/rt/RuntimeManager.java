@@ -45,7 +45,6 @@ import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
-import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.util.HashSet;

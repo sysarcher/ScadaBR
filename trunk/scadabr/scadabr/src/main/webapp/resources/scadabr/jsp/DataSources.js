@@ -5,9 +5,10 @@ define(["dojo/_base/declare",
     "dojo/store/Observable",
     "dijit/Menu",
     "dijit/MenuItem",
+    "dijit/PopupMenuItem",
     "dojo/rpc/JsonService",
     "dojo/ready"
-], function (declare, registry, Tree, JsonRest, Observable, Menu, MenuItem, JsonService, ready) {
+], function (declare, registry, Tree, JsonRest, Observable, Menu, MenuItem, PopupMenuItem, JsonService, ready) {
 
     return declare(null, {
         store: null,
@@ -18,7 +19,9 @@ define(["dojo/_base/declare",
         plNodeMenu: new Menu(),
         svc: null,
         treeNodeDetailsWidget: null,
-        constructor: function (dataSourcesTreeNode, treeNodeDetailsWidgetId) {
+        dataSourceTypes: null,
+        constructor: function (dataSourcesTreeNode, treeNodeDetailsWidgetId, dataSourceTypes) {
+            this.dataSourceTypes = dataSourceTypes;
             this._initSvc();
             this._initTreeStore();
             this._initDataSourceTree(dataSourcesTreeNode);
@@ -171,20 +174,45 @@ define(["dojo/_base/declare",
                     });
                 }
             }));
-            this.rootNodeMenu.addChild(new MenuItem({
-                iconClass: "dsAddIcon",
-                label: "Add DataSource",
+            this.dsNodeMenu.addChild(new MenuItem({
+                iconClass: "dsDeleteIcon",
+                label: "Delete DataSource",
                 onClick: function () {
-                    _svc.addDataSource("META").then(function (result) {
-                        _store.getChildren(_tree.lastFocused.item, function (children) {
-                            _store.onChildrenChange(_tree.lastFocused.item, children);
-                        }, function (error) {
-                            alert(error);
-                        });
+                    _svc.deleteDataSource(_tree.lastFocused.item.id).then(function (result) {
+                        if (result) {
+                            _store.onDelete(_tree.lastFocused.item);
+                        } else {
+                            alert("Could not delete Datasource", _tree.lastFocused.item);
+                        }
                     }, function (error) {
                         alert(error);
                     });
                 }
+            }));
+            var dsAddMenu = new Menu({});
+            for (var i = 0; i < this.dataSourceTypes.length; i++) {
+                dsAddMenu.addChild(new MenuItem({
+                    iconClass: "dsAddIcon",
+                    label: this.dataSourceTypes[i].label,
+                    _dsKey: this.dataSourceTypes[i].key,
+                    onClick: function () {
+                        _svc.addDataSource(this._dsKey).then(function (result) {
+                            _store.getChildren(_tree.lastFocused.item, function (children) {
+                                _store.onChildrenChange(_tree.lastFocused.item, children);
+                            }, function (error) {
+                                alert(error);
+                            });
+                        }, function (error) {
+                            alert(error);
+                        });
+                    }
+                })
+                        );
+            }
+            this.rootNodeMenu.addChild(new PopupMenuItem({
+                iconClass: "dsAddIcon",
+                label: "Add DataSource",
+                popup: dsAddMenu
             }));
             this.plfNodeMenu.addChild(new MenuItem({
                 iconClass: "dijitIconAdd",
@@ -245,6 +273,13 @@ define(["dojo/_base/declare",
                                 type: 'STRING'
                             }
                         ]
+                    },
+                    {
+                        name: 'deleteDataSource',
+                        parameters: [{
+                                name: 'id',
+                                type: 'INT'
+                            }]
                     },
                     {
                         name: 'addPointLocator',

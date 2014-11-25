@@ -32,9 +32,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.dataSource.DataSourceValidator;
 import br.org.scadabr.vo.datasource.meta.MetaDataSourceEventKey;
-import br.org.scadabr.vo.event.type.DataSourceEventKey;
-import com.serotonin.mango.rt.event.EventInstance;
-import com.serotonin.mango.rt.event.type.DataSourceEventType;
+import br.org.scadabr.vo.datasource.meta.MetaDataSourceType;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
@@ -47,16 +45,19 @@ import org.springframework.validation.Validator;
 
 public class MetaDataSourceVO extends DataSourceVO<MetaDataSourceVO> {
 
-    public static final Type TYPE = Type.META;
-
     @Override
     public DataSourceRT createDataSourceRT() {
         return new MetaDataSourceRT(this);
     }
 
     @Override
-    public Type getType() {
-        return TYPE;
+    public String getDataSourceTypeKey() {
+        return MetaDataSourceType.KEY;
+    }
+
+    @Override
+    public int getDataSourceTypeId() {
+        return MetaDataSourceType.DB_ID;
     }
 
     @Override

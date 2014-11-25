@@ -21,9 +21,12 @@ package br.org.scadabr.web.mvc.controller.datasources;
 
 
 
+import br.org.scadabr.vo.datasource.DataSourcesRegistry;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
+import javax.inject.Inject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,6 +38,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Scope("request")
 @RequestMapping("/dataSources")
 public class DataSourcesController {
+    
+    @Inject
+    private DataSourcesRegistry dataSourcesRegistry;
 
     @RequestMapping(method = RequestMethod.GET)
     public String initializeForm() {
@@ -43,14 +49,7 @@ public class DataSourcesController {
 
     @ModelAttribute
     protected void getModel(Model model) {
-        Map<String, String> typeMap = new HashMap<>();
-        for (DataSourceVO.Type type : DataSourceVO.Type.values()) {
-            if (type.isDisplay()) {
-                typeMap.put(type.name(), type.getKey());
-            }
-        }
-        
-        model.addAttribute("dataSourceTypes", typeMap);
+        model.addAttribute("dataSourceTypes", dataSourcesRegistry.getDataSourceTypes());
 //        model.addAttribute("defaultDataSourceType", DataSourceVO.Type.M_BUS.name());
     }
     

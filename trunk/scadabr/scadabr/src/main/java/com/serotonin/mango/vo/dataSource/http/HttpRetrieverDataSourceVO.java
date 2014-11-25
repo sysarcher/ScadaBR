@@ -35,6 +35,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.dataSource.DataSourceValidator;
 import br.org.scadabr.vo.datasource.http.HttpRetrieverDataSourceEventKey;
+import br.org.scadabr.vo.datasource.http.HttpRetrieverDataSourceType;
 import br.org.scadabr.vo.event.type.DataSourceEventKey;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -96,8 +97,13 @@ public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSou
 
 
     @Override
-    public Type getType() {
-        return Type.HTTP_RETRIEVER;
+    public String getDataSourceTypeKey() {
+        return HttpRetrieverDataSourceType.KEY;
+    }
+
+    @Override
+    public int getDataSourceTypeId() {
+        return HttpRetrieverDataSourceType.DB_ID;
     }
 
     @Override
