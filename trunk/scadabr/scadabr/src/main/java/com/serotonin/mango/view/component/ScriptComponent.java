@@ -34,9 +34,9 @@ import br.org.scadabr.rt.datasource.meta.ScriptExecutor;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.web.taglib.Functions;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.ImplementMeException;
+import com.serotonin.mango.view.text.TextRenderer;
 import java.util.EnumSet;
 
 /**
@@ -82,8 +82,8 @@ public class ScriptComponent extends PointComponent {
 
             // Put the values into the engine scope.
             engine.put("value", value.getValue().getObjectValue());
-            engine.put("htmlText", Functions.getHtmlText(point, value));
-            engine.put("renderedText", Functions.getRenderedText(point, value));
+            engine.put("htmlText", getHtmlText(point, value));
+            engine.put("renderedText", getRenderedText(point, value));
             engine.put("time", value.getTime());
             engine.put("pointComponent", this);
             engine.put("point", point);
@@ -141,4 +141,41 @@ public class ScriptComponent extends PointComponent {
             script = SerializationHelper.readSafeUTF(in);
         }
     }
+    
+        public static String getHtmlText(DataPointVO point, PointValueTime pointValue) {
+        if (point == null) {
+            return "-";
+        }
+        String text = point.getTextRenderer().getText(pointValue, TextRenderer.HINT_FULL);
+        String colour = point.getTextRenderer().getColour(pointValue);
+        return getHtml(colour, text, point.getDataType() == DataType.ALPHANUMERIC);
+    }
+    private static String getHtml(String colour, String text, boolean detectOverflow) {
+
+        if (text != null && detectOverflow && text.length() > 30) {
+            text = encodeDQuot(text);
+            if (colour == null || colour.isEmpty()) {
+                return "<input type='text' readonly='readonly' class='ovrflw' value=\"" + text + "\"/>";
+            } else {
+                return "<input type='text' readonly='readonly' class='ovrflw' style='color:" + colour + ";' value=\""
+                        + text + "\"/>";
+            }
+        } else if (colour == null || colour.isEmpty()) {
+            return text;
+        } else {
+            return "<span style='color:" + colour + ";'>" + text + "</span>";
+        }
+    }
+
+        public static String getRenderedText(DataPointVO point, PointValueTime pointValue) {
+        if (point == null) {
+            return "-";
+        }
+        return point.getTextRenderer().getText(pointValue, TextRenderer.HINT_FULL);
+    }
+
+    public static String encodeDQuot(String s) {
+        return s.replaceAll("\"", "&quot;");
+    }
+
 }
