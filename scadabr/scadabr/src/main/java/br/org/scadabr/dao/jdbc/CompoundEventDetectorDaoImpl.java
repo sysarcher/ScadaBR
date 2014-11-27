@@ -16,8 +16,9 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
+import br.org.scadabr.dao.CompoundEventDetectorDao;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.AuditEventKey;
@@ -28,7 +29,6 @@ import java.util.List;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
 import java.sql.Connection;
@@ -44,11 +44,11 @@ import org.springframework.jdbc.core.RowMapper;
  * @author Matthew Lohbihler
  */
 @Named
-public class CompoundEventDetectorDao extends BaseDao {
+public class CompoundEventDetectorDaoImpl extends BaseDao implements CompoundEventDetectorDao {
 
     private static final String COMPOUND_EVENT_DETECTOR_SELECT = "select id, xid, name, alarmLevel, returnToNormal, disabled, conditionText from compoundEventDetectors ";
 
-    public CompoundEventDetectorDao() {
+    public CompoundEventDetectorDaoImpl() {
         super();
     }
 

@@ -18,10 +18,10 @@
  */
 package com.serotonin.mango.view.custom;
 
+import br.org.scadabr.dao.DataPointDao;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;

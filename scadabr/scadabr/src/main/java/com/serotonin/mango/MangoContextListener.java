@@ -31,11 +31,11 @@ import javax.servlet.ServletContextListener;
 
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.ReportDao;
+import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.CronExpression;
-import com.serotonin.mango.db.dao.ReportDao;
-import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverMulticaster;
@@ -103,7 +103,7 @@ public class MangoContextListener implements ServletContextListener {
         databaseAccessFactory.startDB();
 
         // Check if the known servlet context path has changed.
-        String knownContextPath = systemSettingsDao.getValue(systemSettingsDao.SERVLET_CONTEXT_PATH);
+        String knownContextPath = systemSettingsDao.getServletContextPath();
         if (knownContextPath != null) {
             String contextPath = ctx.getContextPath();
             if (!Objects.equals(knownContextPath, contextPath)) {
@@ -111,7 +111,7 @@ public class MangoContextListener implements ServletContextListener {
             }
         }
 
-        systemSettingsDao.setValue(SystemSettingsDao.SERVLET_CONTEXT_PATH, ctx.getContextPath());
+        systemSettingsDao.setServletContextPath(ctx.getContextPath());
 
         utilitiesInitialize(ctx);
         eventManager.initialize();
@@ -299,8 +299,7 @@ public class MangoContextListener implements ServletContextListener {
     // Reports
     //
     private void reportsInitialize() {
-        List<ReportVO> reports = reportDao.getReports();
-        for (ReportVO report : reports) {
+        for (ReportVO report : reportDao.getReports()) {
             try {
                 reportTaskManager.scheduleReportJob(report);
             } catch (ShouldNeverHappenException e) {

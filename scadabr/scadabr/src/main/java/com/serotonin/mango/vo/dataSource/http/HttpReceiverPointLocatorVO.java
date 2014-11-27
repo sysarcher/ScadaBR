@@ -29,15 +29,32 @@ import com.serotonin.mango.rt.dataSource.http.HttpReceiverPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 /**
  * @author Matthew Lohbihler
  */
-
 public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO {
+
+    public static class HttpReceiverPointLocatorVOValidator implements Validator {
+
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return HttpReceiverPointLocatorVO.class.isAssignableFrom(clazz);
+        }
+
+        @Override
+        public void validate(Object target, Errors errors) {
+            final HttpReceiverPointLocatorVO vo = (HttpReceiverPointLocatorVO) target;
+            if (vo.parameterName.isEmpty()) {
+                errors.rejectValue("parameterName", "validate.required");
+            }
+        }
+
+    }
 
     @Override
     public boolean isSettable() {
@@ -54,10 +71,9 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO {
         return new LocalizableMessageImpl("dsEdit.httpReceiver.dpconn", parameterName);
     }
 
-    
     private String parameterName;
     private DataType dataType;
-    
+
     private String binary0Value;
 
     @Override
@@ -83,13 +99,6 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO {
 
     public void setBinary0Value(String binary0Value) {
         this.binary0Value = binary0Value;
-    }
-
-//TODO refactor to own validator class    @Override
-    public void validate(DwrResponseI18n response) {
-        if (parameterName.isEmpty()) {
-            response.addContextual("parameterName", "validate.required");
-        }
     }
 
     @Override

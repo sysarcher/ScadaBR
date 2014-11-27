@@ -1,11 +1,10 @@
 package com.serotonin.mango.rt.event.type;
 
 
-import br.org.scadabr.rt.event.type.DuplicateHandling;
+import br.org.scadabr.dao.MaintenanceEventDao;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.MaintenanceEventKey;
-import com.serotonin.mango.db.dao.MaintenanceEventDao;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;

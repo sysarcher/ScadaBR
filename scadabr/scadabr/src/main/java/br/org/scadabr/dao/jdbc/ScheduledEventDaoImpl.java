@@ -16,8 +16,9 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
+import br.org.scadabr.dao.ScheduledEventDao;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.AuditEventKey;
@@ -29,7 +30,6 @@ import java.util.List;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.event.ScheduledEventVO;
 import java.sql.Connection;
@@ -46,14 +46,14 @@ import org.springframework.jdbc.core.RowMapper;
  *
  */
 @Named
-public class ScheduledEventDao extends BaseDao {
+public class ScheduledEventDaoImpl extends BaseDao implements ScheduledEventDao {
 
     private static final String SCHEDULED_EVENT_SELECT = "select id, xid, alias, alarmLevel, scheduleType, "
             + "  returnToNormal, disabled, activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, "
             + "  activeCron, inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute, inactiveSecond, "
             + "inactiveCron from scheduledEvents ";
 
-    public ScheduledEventDao() {
+    public ScheduledEventDaoImpl() {
         super();
     }
 

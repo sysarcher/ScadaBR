@@ -1,29 +1,15 @@
 package com.serotonin.mango.rt.dataSource.meta;
 
-import java.util.HashMap;
-
-import br.org.scadabr.db.IntValuePair;
-import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
-import com.serotonin.mango.rt.dataImage.HistoricalDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
 import br.org.scadabr.timer.SimulationTimer;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 
-@Configurable
 public class HistoricalMetaPointLocatorRT extends MetaPointLocatorRT {
 
     private long updates;
-    @Autowired
-    private DataPointDao dataPointDao;
-    @Autowired
-    private PointValueDao pointValueDao;
 
     public HistoricalMetaPointLocatorRT(MetaPointLocatorVO vo) {
         super(vo);

@@ -18,6 +18,8 @@
  */
 package com.serotonin.mango.rt;
 
+import br.org.scadabr.dao.EventDao;
+import br.org.scadabr.dao.UserDao;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.rt.event.maintenance.MaintenanceEventManager;
 import br.org.scadabr.rt.event.type.EventSources;
@@ -32,8 +34,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.EventDao;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.handlers.EmailHandlerRT;
 import com.serotonin.mango.rt.event.handlers.EventHandlerRT;

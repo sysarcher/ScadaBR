@@ -16,20 +16,20 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.DataType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.PointValueDao;
+import br.org.scadabr.dao.ReportDao;
 import br.org.scadabr.l10n.AbstractLocalizer;
-import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
@@ -51,6 +51,7 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.utils.ImplementMeException;
+import com.serotonin.mango.vo.report.ReportChartCreator;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -65,7 +66,7 @@ import org.springframework.jdbc.core.RowMapper;
  * @author Matthew Lohbihler
  */
 @Named
-public class ReportDao extends BaseDao {
+public class ReportDaoImpl extends BaseDao implements ReportDao {
 
     @Inject
     private PointValueDao pointValueDao;
@@ -75,10 +76,11 @@ public class ReportDao extends BaseDao {
     //
     private static final String REPORT_SELECT = "select data, id, userId, name from reports ";
 
-    public ReportDao() {
+    public ReportDaoImpl() {
         super();
     }
 
+    @Override
     public List<ReportVO> getReports() {
         return ejt.query(REPORT_SELECT, new ReportRowMapper());
     }
@@ -93,6 +95,16 @@ public class ReportDao extends BaseDao {
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
+    }
+
+    @Override
+    public PointInfo createPointInfo(DataPointVO point, String colour, boolean consolidatedChart) {
+        return new PointInfoImpl(point, colour, consolidatedChart);
+    }
+
+    @Override
+    public void reportInstanceData(int id, ReportChartCreator.StreamHandler handler) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     class ReportRowMapper implements RowMapper<ReportVO> {
@@ -194,10 +206,12 @@ public class ReportDao extends BaseDao {
         }
     }
 
+    @Override
     public void deleteReportInstance(int id, int userId) {
         ejt.update("delete from reportInstances where id=? and userId=?", new Object[]{id, userId});
     }
 
+    @Override
     public int purgeReportsBefore(final long time) {
         return ejt.update("delete from reportInstances where runStartTime<? and preventPurge=?", new Object[]{time,
             boolToChar(false)});
@@ -211,6 +225,7 @@ public class ReportDao extends BaseDao {
     private static final String REPORT_INSTANCE_UPDATE = "update reportInstances set reportStartTime=?, reportEndTime=?, runStartTime=?, runEndTime=?, recordCount=? "
             + "where id=?";
 
+    @Override
     public void saveReportInstance(final ReportInstance instance) {
         if (instance.isNew()) {
             final int id = doInsert(new PreparedStatementCreator() {
@@ -246,31 +261,35 @@ public class ReportDao extends BaseDao {
         }
     }
 
-    public static class PointInfo {
+    public static class PointInfoImpl implements PointInfo {
 
         private final DataPointVO point;
         private final String colour;
         private final boolean consolidatedChart;
 
-        public PointInfo(DataPointVO point, String colour, boolean consolidatedChart) {
+        public PointInfoImpl(DataPointVO point, String colour, boolean consolidatedChart) {
             this.point = point;
             this.colour = colour;
             this.consolidatedChart = consolidatedChart;
         }
 
+        @Override
         public DataPointVO getPoint() {
             return point;
         }
 
+        @Override
         public String getColour() {
             return colour;
         }
 
+        @Override
         public boolean isConsolidatedChart() {
             return consolidatedChart;
         }
     }
 
+    @Override
     public int runReport(final ReportInstance instance, List<PointInfo> points, ResourceBundle bundle) {
         int count = 0;
         String userLabel = AbstractLocalizer.localizeI18nKey("common.user", bundle);
@@ -567,6 +586,7 @@ public class ReportDao extends BaseDao {
             + "where reportInstanceId=? and commentType=? " //
             + "order by ts";
 
+    @Override
     public List<EventInstance> getReportInstanceEvents(int instanceId) {
         throw new ImplementMeException();
         /* TODO handle reports from live db and not from this separate tables ...
@@ -606,6 +626,7 @@ public class ReportDao extends BaseDao {
             + UserComment.TYPE_POINT
             + " " + "where rc.reportInstanceId=? " + "order by rc.ts ";
 
+    @Override
     public List<ReportUserComment> getReportInstanceUserComments(int instanceId) {
         return ejt.query(USER_COMMENT_SELECT, new ReportCommentRowMapper(), instanceId);
     }

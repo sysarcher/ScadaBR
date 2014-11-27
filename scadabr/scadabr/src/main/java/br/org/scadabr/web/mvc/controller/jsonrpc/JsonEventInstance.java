@@ -6,6 +6,7 @@ import br.org.scadabr.vo.event.EventStatus;
 import com.serotonin.mango.rt.event.EventInstance;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -108,8 +109,8 @@ public class JsonEventInstance {
         return result;
     }
 
-    public static Collection<JsonEventInstance> wrap(Collection<EventInstance> eventInstances, Localizer localizer) {
-        List<JsonEventInstance> result = new ArrayList<>(eventInstances.size());
+    public static Collection<JsonEventInstance> wrap(Iterable<EventInstance> eventInstances, Localizer localizer) {
+        List<JsonEventInstance> result = new LinkedList<>();
         for (EventInstance ei : eventInstances) {
             result.add(JsonEventInstance.wrap(ei, localizer));
         }

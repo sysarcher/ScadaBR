@@ -196,11 +196,11 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
             }
 
             try {
-                if (vo.getScaleType() == HttpImagePointLocatorVO.SCALE_TYPE_PERCENT) {
+                if (vo.getScaleType() == HttpImagePointLocatorVO.Scale.PERCENT) {
                     // Percentage scale the image.
                     PercentScaledImage scaler = new PercentScaledImage(((float) vo.getScalePercent()) / 100);
                     data = ImageUtils.scaleImage(scaler, data, new JpegImageFormat(0.85f));
-                } else if (vo.getScaleType() == HttpImagePointLocatorVO.SCALE_TYPE_BOX) {
+                } else if (vo.getScaleType() == HttpImagePointLocatorVO.Scale.BOX) {
                     // Box scale the image.
                     BoxScaledImage scaler = new BoxScaledImage(vo.getScaleWidth(), vo.getScaleHeight());
                     data = ImageUtils.scaleImage(scaler, data, new JpegImageFormat(0.85f));

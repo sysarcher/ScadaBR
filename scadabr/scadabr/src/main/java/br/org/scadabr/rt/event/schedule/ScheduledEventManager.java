@@ -5,7 +5,7 @@
  */
 package br.org.scadabr.rt.event.schedule;
 
-import com.serotonin.mango.db.dao.ScheduledEventDao;
+import br.org.scadabr.dao.ScheduledEventDao;
 import com.serotonin.mango.rt.event.SimpleEventDetector;
 import com.serotonin.mango.rt.event.detectors.PointEventDetectorRT;
 import com.serotonin.mango.rt.event.schedule.ScheduledEventRT;

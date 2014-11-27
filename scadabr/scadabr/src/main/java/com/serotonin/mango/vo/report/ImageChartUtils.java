@@ -42,8 +42,9 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.ui.TextAnchor;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.io.StreamUtils;
-import com.serotonin.mango.db.dao.SystemSettingsDao;
+import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.util.mindprod.StripEntities;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +84,8 @@ public class ImageChartUtils {
 
     public void writeChart(PointTimeSeriesCollection pointTimeSeriesCollection, boolean showLegend,
             OutputStream out, int width, int height) throws IOException {
-
+        throw new ImplementMeException();
+        /*
         JFreeChart chart = ChartFactory.createTimeSeriesChart(null, null, null, null, showLegend, false, false);
         chart.setBackgroundPaint(systemSettingsDao.getColour(SystemSettingsDao.CHART_BACKGROUND_COLOUR));
 
@@ -181,6 +183,7 @@ public class ImageChartUtils {
 
         // Return the image.
         ChartUtilities.writeChartAsPNG(out, chart, width, height);
+        */
     }
 
     // public static void writeChart(TimeSeries timeSeries, OutputStream out, int width, int height) throws IOException

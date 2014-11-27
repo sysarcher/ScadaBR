@@ -45,8 +45,8 @@ import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.db.KeyValuePair;
-import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.util.BackgroundContext;
 import com.serotonin.mango.util.CommPortConfigException;
 import com.serotonin.mango.view.View;
@@ -272,7 +272,7 @@ public class Common {
 
     public String getFiledataPath() {
         if (lazyFiledataPath == null) {
-            String name = systemSettingsDao.getValue(SystemSettingsDao.FILEDATA_PATH);
+            String name = systemSettingsDao.getFileDataPath();
             if (name.startsWith("~")) {
                 name = ctx.getServletContext().getRealPath(name.substring(1));
             }
@@ -355,12 +355,9 @@ public class Common {
         client.getHttpConnectionManager().setParams(managerParams);
         client.setParams(params);
 
-        if (systemSettingsDao
-                .getBooleanValue(SystemSettingsDao.HTTP_CLIENT_USE_PROXY)) {
-            String proxyHost = systemSettingsDao
-                    .getValue(SystemSettingsDao.HTTP_CLIENT_PROXY_SERVER);
-            int proxyPort = systemSettingsDao
-                    .getIntValue(SystemSettingsDao.HTTP_CLIENT_PROXY_PORT);
+        if (systemSettingsDao.getHttpClientProxy().isEnabled()) {
+            String proxyHost = systemSettingsDao.getHttpClientProxy().getServer();
+            int proxyPort = systemSettingsDao.getHttpClientProxy().getPort();
 
             // Set up the proxy configuration.
             client.getHostConfiguration().setProxy(proxyHost, proxyPort);
@@ -370,14 +367,8 @@ public class Common {
                     .setProxyCredentials(
                             AuthScope.ANY,
                             new UsernamePasswordCredentials(
-                                    systemSettingsDao
-                                    .getValue(
-                                            SystemSettingsDao.HTTP_CLIENT_PROXY_USERNAME,
-                                            ""),
-                                    systemSettingsDao
-                                    .getValue(
-                                            SystemSettingsDao.HTTP_CLIENT_PROXY_PASSWORD,
-                                            "")));
+                                    systemSettingsDao.getHttpClientProxy().getUsername(),
+                                    systemSettingsDao.getHttpClientProxy().getPassword()));
         }
 
         return client;

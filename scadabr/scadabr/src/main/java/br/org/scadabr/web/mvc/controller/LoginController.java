@@ -18,6 +18,7 @@
  */
 package br.org.scadabr.web.mvc.controller;
 
+import br.org.scadabr.dao.UserDao;
 import br.org.scadabr.web.i18n.LocaleResolver;
 import br.org.scadabr.web.mvc.form.LoginForm;
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +29,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.validation.BindException;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.UserSessionContextBean;
 import com.serotonin.mango.web.integration.CrowdUtils;

@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -38,11 +38,13 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.DataSourceDao;
+import br.org.scadabr.dao.EventDao;
+import br.org.scadabr.dao.UserDao;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.timer.cron.EventRunnable;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.rt.event.type.CompoundDetectorEventType;
 import com.serotonin.mango.rt.event.type.DataPointEventType;
 import com.serotonin.mango.rt.event.type.DataSourceEventType;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -67,14 +69,11 @@ import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.type.AuditEventKey;
 import br.org.scadabr.vo.event.type.DataPointDetectorKey;
 import br.org.scadabr.vo.event.type.SystemEventKey;
-import static com.serotonin.mango.db.dao.BaseDao.charToBool;
 import com.serotonin.mango.vo.User;
 import java.sql.Connection;
 import java.sql.Statement;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -82,7 +81,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.support.TransactionCallback;
 
 @Named
-public class EventDao extends BaseDao {
+public class EventDaoImpl extends BaseDao implements EventDao {
 
     private static final int MAX_PENDING_EVENTS = 100;
 
@@ -93,7 +92,7 @@ public class EventDao extends BaseDao {
     @Inject
     private DataSourceDao dataSourceDao;
 
-    public EventDao() {
+    public EventDaoImpl() {
         super();
     }
 

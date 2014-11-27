@@ -25,7 +25,6 @@ import java.io.ObjectOutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -34,17 +33,71 @@ import com.serotonin.mango.rt.dataSource.http.HttpRetrieverPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.web.taglib.Functions;
-import java.util.EnumSet;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 /**
  * @author Matthew Lohbihler
  */
-
 public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO {
+
+    public static class HttpRetrieverPointLocatorVoValidator implements Validator {
+
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return HttpRetrieverPointLocatorVO.class.isAssignableFrom(clazz);
+        }
+
+        @Override
+        public void validate(Object target, Errors errors) {
+            final HttpRetrieverPointLocatorVO vo = (HttpRetrieverPointLocatorVO) target;
+            if (vo.valueRegex.isEmpty()) {
+                errors.rejectValue("valueRegex", "validate.required");
+            } else {
+                try {
+                    Pattern pattern = Pattern.compile(vo.valueRegex);
+                    if (pattern.matcher("").groupCount() < 1) {
+                        errors.rejectValue("valueRegex", "validate.captureGroup");
+                    }
+                } catch (PatternSyntaxException e) {
+                    errors.rejectValue("valueRegex", "common.default", new Object[]{e}, "common.default");
+                }
+            }
+
+            if (vo.dataType == DataType.NUMERIC && !vo.valueFormat.isEmpty()) {
+                try {
+                    //TODO Localization with server locale !!!
+                    new DecimalFormat(vo.valueFormat);
+                } catch (IllegalArgumentException e) {
+                    errors.rejectValue("valueFormat", "common.default", new Object[]{e}, "common.default");
+                }
+            }
+
+            if (!vo.timeRegex.isEmpty()) {
+                try {
+                    Pattern pattern = Pattern.compile(vo.timeRegex);
+                    if (pattern.matcher("").groupCount() < 1) {
+                        errors.rejectValue("timeRegex", "validate.captureGroup");
+                    }
+                } catch (PatternSyntaxException e) {
+                    errors.rejectValue("timeRegex", "common.default", new Object[]{e}, "common.default");
+                }
+
+                if (vo.timeFormat.isEmpty()) {
+                    errors.rejectValue("timeFormat", "validate.required");
+                } else {
+                    try {
+                        new SimpleDateFormat(vo.timeFormat);
+                    } catch (IllegalArgumentException e) {
+                        errors.rejectValue("timeFormat", "common.default", new Object[]{e}, "common.default");
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     public boolean isSettable() {
@@ -61,16 +114,15 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO {
         return new LocalizableMessageImpl("dsEdit.httpRetriever.dpconn", Functions.escapeLessThan(valueRegex));
     }
 
-    
     private String valueRegex;
-    
+
     private boolean ignoreIfMissing;
-    
+
     private String valueFormat;
     private DataType dataType;
-    
+
     private String timeRegex;
-    
+
     private String timeFormat;
 
     public String getValueRegex() {
@@ -120,52 +172,6 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO {
 
     public void setTimeFormat(String timeFormat) {
         this.timeFormat = timeFormat;
-    }
-
-//TODO refactor to own validator class    @Override
-    public void validate(DwrResponseI18n response) {
-        if (valueRegex.isEmpty()) {
-            response.addContextual("valueRegex", "validate.required");
-        } else {
-            try {
-                Pattern pattern = Pattern.compile(valueRegex);
-                if (pattern.matcher("").groupCount() < 1) {
-                    response.addContextual("valueRegex", "validate.captureGroup");
-                }
-            } catch (PatternSyntaxException e) {
-                response.addContextual("valueRegex", "common.default", e);
-            }
-        }
-
-        if (dataType == DataType.NUMERIC && !valueFormat.isEmpty()) {
-            try {
-                //TODO Localization with server locale !!!
-                new DecimalFormat(valueFormat);
-            } catch (IllegalArgumentException e) {
-                response.addContextual("valueFormat", "common.default", e);
-            }
-        }
-
-        if (!timeRegex.isEmpty()) {
-            try {
-                Pattern pattern = Pattern.compile(timeRegex);
-                if (pattern.matcher("").groupCount() < 1) {
-                    response.addContextual("timeRegex", "validate.captureGroup");
-                }
-            } catch (PatternSyntaxException e) {
-                response.addContextual("timeRegex", "common.default", e);
-            }
-
-            if (timeFormat.isEmpty()) {
-                response.addContextual("timeFormat", "validate.required");
-            } else {
-                try {
-                    new SimpleDateFormat(timeFormat);
-                } catch (IllegalArgumentException e) {
-                    response.addContextual("timeFormat", "common.default", e);
-                }
-            }
-        }
     }
 
     @Override

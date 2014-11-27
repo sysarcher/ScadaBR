@@ -19,10 +19,10 @@
 package com.serotonin.mango.vo.event;
 
 import br.org.scadabr.ScadaBrConstants;
+import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.List;
-import br.org.scadabr.rt.event.type.EventSources;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.event.compound.CompoundEventDetectorRT;
 import com.serotonin.mango.rt.event.compound.ConditionParseException;
 import com.serotonin.mango.rt.event.compound.LogicalOperator;
@@ -32,25 +32,91 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.vo.event.AlarmLevel;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.CompoundEventKey;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.serotonin.mango.rt.event.type.CompoundDetectorEventType;
-import org.junit.runner.Computer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 /**
  * @author Matthew Lohbihler
  */
-@Configurable
 public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDetectorVO> {
 
+    @Configurable
+    public static class CompoundEventDetectorVoValidator implements Validator {
+        
     @Autowired
     private DataPointDao dataPointDao;
 
+        
+        
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return CompoundEventDetectorVO.class.isAssignableFrom(clazz);
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+        final CompoundEventDetectorVO vo = (CompoundEventDetectorVO) target;
+        
+        if (vo.name.isEmpty()) {
+            errors.rejectValue("name", "compoundDetectors.validation.nameRequired");
+        }
+        try {
+            User user = Common.getUser();
+            Permissions.ensureDataSourcePermission(user);
+
+            LogicalOperator l = CompoundEventDetectorRT.parseConditionStatement(vo.condition);
+            List<String> keys = l.getDetectorKeys();
+
+            // Get all of the point event detectors.
+            for (String key : keys) {
+                if (!key.startsWith(EventDetectorVO.POINT_EVENT_DETECTOR_PREFIX)) {
+                    continue;
+                }
+
+                boolean found = false;
+                for (DataPointVO dp : dataPointDao.getDataPoints(true)) {
+                    if (!Permissions.hasDataSourcePermission(user, dp.getDataSourceId())) {
+                        continue;
+                    }
+
+                    for (PointEventDetectorVO ped : dp.getEventDetectors()) {
+                        if (ped.getEventDetectorKey().equals(key) && ped.isStateful()) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    throw new ConditionParseException("compoundDetectors.validation.invalidKey");
+                }
+            }
+        } catch (ConditionParseException e) {
+            throw new ImplementMeException();
+            /*
+            response.addContextual("condition", e);
+            if (e.isRange()) {
+                response.addData("range", true);
+                response.addData("from", e.getFrom());
+                response.addData("to", e.getTo());
+            }
+            */
+        }
+    }
+
+
+    }
+    
     public static final String XID_PREFIX = "CED_";
 
     private int id = ScadaBrConstants.NEW_ID;
@@ -82,62 +148,6 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
     @Override
     public String getTypeKey() {
         return "event.audit.compoundEventDetector";
-    }
-
-    public void validate(DwrResponseI18n response) {
-        if (name.isEmpty()) {
-            response.addContextual("name", "compoundDetectors.validation.nameRequired");
-        }
-
-        validate(condition, response);
-    }
-
-    public void validate(String condition, DwrResponseI18n response) {
-        try {
-            User user = Common.getUser();
-            Permissions.ensureDataSourcePermission(user);
-
-            LogicalOperator l = CompoundEventDetectorRT.parseConditionStatement(condition);
-            List<String> keys = l.getDetectorKeys();
-
-            // Get all of the point event detectors.
-            List<DataPointVO> dataPoints = dataPointDao.getDataPoints(null, true);
-
-            for (String key : keys) {
-                if (!key.startsWith(EventDetectorVO.POINT_EVENT_DETECTOR_PREFIX)) {
-                    continue;
-                }
-
-                boolean found = false;
-                for (DataPointVO dp : dataPoints) {
-                    if (!Permissions.hasDataSourcePermission(user, dp.getDataSourceId())) {
-                        continue;
-                    }
-
-                    for (PointEventDetectorVO ped : dp.getEventDetectors()) {
-                        if (ped.getEventDetectorKey().equals(key) && ped.isStateful()) {
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (found) {
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    throw new ConditionParseException("compoundDetectors.validation.invalidKey");
-                }
-            }
-        } catch (ConditionParseException e) {
-            response.addContextual("condition", e);
-            if (e.isRange()) {
-                response.addData("range", true);
-                response.addData("from", e.getFrom());
-                response.addData("to", e.getTo());
-            }
-        }
     }
 
     @Override

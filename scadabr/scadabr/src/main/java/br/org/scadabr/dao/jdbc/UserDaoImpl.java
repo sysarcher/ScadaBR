@@ -16,8 +16,9 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
+import br.org.scadabr.dao.UserDao;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.vo.event.AlarmLevel;
 import java.sql.PreparedStatement;
@@ -38,14 +39,13 @@ import com.serotonin.mango.vo.permission.DataPointAccess;
 import java.sql.Connection;
 import java.sql.Statement;
 import javax.inject.Named;
-import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 
 @Named
-public class UserDao extends BaseDao {
+public class UserDaoImpl extends BaseDao implements UserDao {
 
     private static final String USER_SELECT = "select id, username, password, email, phone, admin, disabled, selectedWatchList, homeUrl, lastLogin, "
             + "  receiveAlarmEmails, receiveOwnAuditEvents " + "from users ";
@@ -55,7 +55,7 @@ public class UserDao extends BaseDao {
                 + "values ('admin', '%s', 'admin@yourScadaBRDomain.com', '', 'Y', 'N', 'events', 0, 'N')", Common.encrypt("admin")));
     }
 
-    public UserDao() {
+    public UserDaoImpl() {
         super();
     }
 

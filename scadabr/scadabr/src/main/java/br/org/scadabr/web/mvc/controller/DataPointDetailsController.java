@@ -18,9 +18,8 @@
  */
 package br.org.scadabr.web.mvc.controller;
 
+import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.logger.LogUtils;
-import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.view.chart.ChartType;
 import com.serotonin.mango.view.chart.ImageChartRenderer;

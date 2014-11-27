@@ -32,19 +32,80 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.vo.event.AlarmLevel;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.ScheduledEventKey;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.serotonin.mango.rt.event.type.ScheduledEventType;
 import java.text.ParseException;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 /**
  * @author Matthew Lohbihler
  *
  */
 public class ScheduledEventVO implements EventDetectorVO, ChangeComparable<ScheduledEventVO> {
+
+    public static class ScheduledEventVoValidator implements Validator {
+
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return ScheduledEventVO.class.isAssignableFrom(clazz);
+        }
+
+        @Override
+        public void validate(Object target, Errors errors) {
+            final ScheduledEventVO vo = (ScheduledEventVO) target;
+            if (vo.alias.length() > 50) {
+                errors.rejectValue("alias", "scheduledEvents.validate.aliasTooLong");
+            }
+
+            // Check that cron patterns are ok.
+            if (vo.scheduleType == ScheduledEventKey.CRON) {
+                try {
+                    new CronParser().parse(vo.activeCron, CronExpression.TIMEZONE_UTC);
+                } catch (ParseException e) {
+                    errors.rejectValue("activeCron", "scheduledEvents.validate.activeCron", new Object[]{e}, "scheduledEvents.validate.activeCron");
+                }
+
+                if (vo.stateful) {
+                    try {
+                        new CronParser().parse(vo.inactiveCron, CronExpression.TIMEZONE_UTC);
+                    } catch (ParseException e) {
+                        errors.rejectValue("inactiveCron", "scheduledEvents.validate.inactiveCron", new Object[]{e}, "scheduledEvents.validate.inactiveCron");
+                    }
+                }
+            }
+
+            // Test that the triggers can be created.
+            ScheduledEventRT rt = vo.createRuntime();
+            try {
+                rt.createTrigger(true);
+            } catch (RuntimeException e) {
+                errors.rejectValue("activeCron", "scheduledEvents.validate.activeTrigger", e.getMessage());
+            }
+
+            if (vo.stateful) {
+                try {
+                    rt.createTrigger(false);
+                } catch (RuntimeException e) {
+                    errors.rejectValue("inactiveCron", "scheduledEvents.validate.inactiveTrigger",
+                            e.getMessage());
+                }
+            }
+
+            // If the event is once, make sure the active time is earlier than the inactive time.
+            if (vo.scheduleType == ScheduledEventKey.ONCE && vo.stateful) {
+                DateTime adt = new DateTime(vo.activeYear, vo.activeMonth, vo.activeDay, vo.activeHour, vo.activeMinute, vo.activeSecond, 0);
+                DateTime idt = new DateTime(vo.inactiveYear, vo.inactiveMonth, vo.inactiveDay, vo.inactiveHour, vo.inactiveMinute, vo.inactiveSecond, 0);
+                if (idt.getMillis() <= adt.getMillis()) {
+                    errors.rejectValue("scheduleType", "scheduledEvents.validate.invalidRtn");
+                }
+            }
+        }
+
+    }
 
     public static final String XID_PREFIX = "SE_";
 
@@ -240,56 +301,6 @@ public class ScheduledEventVO implements EventDetectorVO, ChangeComparable<Sched
     @Override
     public String getTypeKey() {
         return "event.audit.scheduledEvent";
-    }
-
-    public void validate(DwrResponseI18n response) {
-        if (alias.length() > 50) {
-            response.addContextual("alias", "scheduledEvents.validate.aliasTooLong");
-        }
-
-        // Check that cron patterns are ok.
-        if (scheduleType == ScheduledEventKey.CRON) {
-            try {
-                new CronParser().parse(activeCron, CronExpression.TIMEZONE_UTC);
-            } catch (ParseException e) {
-                response.addContextual("activeCron", "scheduledEvents.validate.activeCron", e);
-            }
-
-            if (stateful) {
-                try {
-                    new CronParser().parse(inactiveCron, CronExpression.TIMEZONE_UTC);
-                } catch (ParseException e) {
-                    response.addContextual("inactiveCron", "scheduledEvents.validate.inactiveCron", e);
-                }
-            }
-        }
-
-        // Test that the triggers can be created.
-        ScheduledEventRT rt = createRuntime();
-        try {
-            rt.createTrigger(true);
-        } catch (RuntimeException e) {
-            response.addContextual("activeCron", "scheduledEvents.validate.activeTrigger", e.getMessage());
-        }
-
-        if (stateful) {
-            try {
-                rt.createTrigger(false);
-            } catch (RuntimeException e) {
-                response.addContextual("inactiveCron", "scheduledEvents.validate.inactiveTrigger",
-                        e.getMessage());
-            }
-        }
-
-        // If the event is once, make sure the active time is earlier than the inactive time.
-        if (scheduleType == ScheduledEventKey.ONCE && stateful) {
-            DateTime adt = new DateTime(activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0);
-            DateTime idt = new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute,
-                    inactiveSecond, 0);
-            if (idt.getMillis() <= adt.getMillis()) {
-                response.addContextual("scheduleType", "scheduledEvents.validate.invalidRtn");
-            }
-        }
     }
 
     @Override

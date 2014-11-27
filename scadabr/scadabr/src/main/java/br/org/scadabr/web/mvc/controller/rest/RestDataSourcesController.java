@@ -5,9 +5,9 @@
  */
 package br.org.scadabr.web.mvc.controller.rest;
 
+import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
-import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;

@@ -5,6 +5,8 @@
  */
 package br.org.scadabr.web.mvc.controller.datasources;
 
+import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.LoggingTypes;
@@ -12,8 +14,6 @@ import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.vo.datasource.DataSourcesRegistry;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.googlecode.jsonrpc4j.JsonRpcService;
-import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.view.chart.ImageChartRenderer;
 import com.serotonin.mango.view.text.AnalogRenderer;

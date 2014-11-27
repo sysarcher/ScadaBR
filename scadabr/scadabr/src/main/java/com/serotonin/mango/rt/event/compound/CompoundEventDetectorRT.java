@@ -18,11 +18,11 @@
  */
 package com.serotonin.mango.rt.event.compound;
 
+import br.org.scadabr.dao.CompoundEventDetectorDao;
 import br.org.scadabr.rt.event.compound.CompoundEventManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.rt.event.EventDetectorListener;
 import com.serotonin.mango.rt.event.SimpleEventDetector;
 import com.serotonin.mango.rt.event.type.CompoundDetectorEventType;

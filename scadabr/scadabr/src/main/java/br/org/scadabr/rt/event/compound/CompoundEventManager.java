@@ -5,10 +5,10 @@
  */
 package br.org.scadabr.rt.event.compound;
 
+import br.org.scadabr.dao.CompoundEventDetectorDao;
 import br.org.scadabr.util.LifecycleException;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import com.serotonin.mango.db.dao.CompoundEventDetectorDao;
 import com.serotonin.mango.rt.event.compound.CompoundEventDetectorRT;
 import com.serotonin.mango.vo.event.CompoundEventDetectorVO;
 import java.util.Map;

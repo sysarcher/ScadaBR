@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
 import java.awt.Color;
 import java.util.HashMap;
@@ -27,78 +27,80 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.AuditEventKey;
 import br.org.scadabr.vo.event.type.SystemEventKey;
+import com.serotonin.mango.web.email.MangoEmailContent;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import javax.inject.Named;
+import org.joda.time.DateTime;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @Named
-public class SystemSettingsDao extends BaseDao {
-
-    // Database schema version
-    public static final String DATABASE_SCHEMA_VERSION = "databaseSchemaVersion";
-
-    // Servlet context name
-    public static final String SERVLET_CONTEXT_PATH = "servletContextPath";
+public class SystemSettingsDaoImpl extends BaseDao implements SystemSettingsDao {
 
     // Email settings
-    public static final String EMAIL_SMTP_HOST = "emailSmtpHost";
-    public static final String EMAIL_SMTP_PORT = "emailSmtpPort";
-    public static final String EMAIL_FROM_ADDRESS = "emailFromAddress";
-    public static final String EMAIL_FROM_NAME = "emailFromName";
-    public static final String EMAIL_AUTHORIZATION = "emailAuthorization";
-    public static final String EMAIL_SMTP_USERNAME = "emailSmtpUsername";
-    public static final String EMAIL_SMTP_PASSWORD = "emailSmtpPassword";
-    public static final String EMAIL_TLS = "emailTls";
-    public static final String EMAIL_CONTENT_TYPE = "emailContentType";
-
-    // Event purging
-    public static final String EVENT_PURGE_PERIOD_TYPE = "eventPurgePeriodType";
-    public static final String EVENT_PURGE_PERIODS = "eventPurgePeriods";
-
-    // Report purging
-    public static final String REPORT_PURGE_PERIOD_TYPE = "reportPurgePeriodType";
-    public static final String REPORT_PURGE_PERIODS = "reportPurgePeriods";
-
-    // HTTP Client configuration
-    public static final String HTTP_CLIENT_USE_PROXY = "httpClientUseProxy";
-    public static final String HTTP_CLIENT_PROXY_SERVER = "httpClientProxyServer";
-    public static final String HTTP_CLIENT_PROXY_PORT = "httpClientProxyPort";
-    public static final String HTTP_CLIENT_PROXY_USERNAME = "httpClientProxyUsername";
-    public static final String HTTP_CLIENT_PROXY_PASSWORD = "httpClientProxyPassword";
-
-    // New Mango version
-    public static final String NEW_VERSION_NOTIFICATION_LEVEL = "newVersionNotificationLevel";
-    public static final String NOTIFICATION_LEVEL_STABLE = "S";
-    public static final String NOTIFICATION_LEVEL_RC = "C";
-    public static final String NOTIFICATION_LEVEL_BETA = "B";
-
-    // i18n
-    public static final String LANGUAGE = "language";
-
-    // Customization
-    public static final String FILEDATA_PATH = "filedata.path";
-    public static final String DATASOURCE_DISPLAY_SUFFIX = ".display";
-    public static final String HTTPDS_PROLOGUE = "httpdsPrologue";
-    public static final String HTTPDS_EPILOGUE = "httpdsEpilogue";
-    public static final String UI_PERFORAMANCE = "uiPerformance";
-    public static final String GROVE_LOGGING = "groveLogging";
-    public static final String FUTURE_DATE_LIMIT_PERIODS = "futureDateLimitPeriods";
-    public static final String FUTURE_DATE_LIMIT_PERIOD_TYPE = "futureDateLimitPeriodType";
-    public static final String INSTANCE_DESCRIPTION = "instanceDescription";
+    private static final String EMAIL_SMTP_HOST = "emailSmtpHost";
+    private static final String EMAIL_SMTP_PORT = "emailSmtpPort";
+    private static final String EMAIL_FROM_ADDRESS = "emailFromAddress";
+    private static final String EMAIL_FROM_NAME = "emailFromName";
+    private static final String EMAIL_AUTHORIZATION = "emailAuthorization";
+    private static final String EMAIL_SMTP_USERNAME = "emailSmtpUsername";
+    private static final String EMAIL_SMTP_PASSWORD = "emailSmtpPassword";
+    private static final String EMAIL_TLS = "emailTls";
+    private static final String EMAIL_CONTENT_TYPE = "emailContentType";
 
     // Colours
-    public static final String CHART_BACKGROUND_COLOUR = "chartBackgroundColour";
-    public static final String PLOT_BACKGROUND_COLOUR = "plotBackgroundColour";
-    public static final String PLOT_GRIDLINE_COLOUR = "plotGridlineColour";
+    private static final String CHART_BACKGROUND_COLOUR = "chartBackgroundColour";
+    private static final String PLOT_BACKGROUND_COLOUR = "plotBackgroundColour";
+    private static final String PLOT_GRIDLINE_COLOUR = "plotGridlineColour";
 
-    
+    // New Mango version
+    private static final String NEW_VERSION_NOTIFICATION_LEVEL = "newVersionNotificationLevel";
+    private static final String NOTIFICATION_LEVEL_STABLE = "S";
+    private static final String NOTIFICATION_LEVEL_RC = "C";
+    private static final String NOTIFICATION_LEVEL_BETA = "B";
+
+    // Database schema version
+    private static final String DATABASE_SCHEMA_VERSION = "databaseSchemaVersion";
+
+    // Servlet context name
+    private static final String SERVLET_CONTEXT_PATH = "servletContextPath";
+
+    // Event purging
+    private static final String EVENT_PURGE_PERIOD_TYPE = "eventPurgePeriodType";
+    private static final String EVENT_PURGE_PERIODS = "eventPurgePeriods";
+
+    // Report purging
+    private static final String REPORT_PURGE_PERIOD_TYPE = "reportPurgePeriodType";
+    private static final String REPORT_PURGE_PERIODS = "reportPurgePeriods";
+
+    // HTTP Client configuration
+    private static final String HTTP_CLIENT_USE_PROXY = "httpClientUseProxy";
+    private static final String HTTP_CLIENT_PROXY_SERVER = "httpClientProxyServer";
+    private static final String HTTP_CLIENT_PROXY_PORT = "httpClientProxyPort";
+    private static final String HTTP_CLIENT_PROXY_USERNAME = "httpClientProxyUsername";
+    private static final String HTTP_CLIENT_PROXY_PASSWORD = "httpClientProxyPassword";
+
+    // i18n
+    private static final String LANGUAGE = "language";
+
+    // Customization
+    private static final String FILEDATA_PATH = "filedata.path";
+    private static final String DATASOURCE_DISPLAY_SUFFIX = ".display";
+    private static final String HTTPDS_PROLOGUE = "httpdsPrologue";
+    private static final String HTTPDS_EPILOGUE = "httpdsEpilogue";
+    private static final String UI_PERFORAMANCE = "uiPerformance";
+    private static final String GROVE_LOGGING = "groveLogging";
+    private static final String FUTURE_DATE_LIMIT_PERIODS = "futureDateLimitPeriods";
+    private static final String FUTURE_DATE_LIMIT_PERIOD_TYPE = "futureDateLimitPeriodType";
+    private static final String INSTANCE_DESCRIPTION = "instanceDescription";
+
     //
     // /
     // / Static stuff
@@ -107,10 +109,19 @@ public class SystemSettingsDao extends BaseDao {
     private static final String SYSTEM_EVENT_ALARMLEVEL_PREFIX = "systemEventAlarmLevel";
     private static final String AUDIT_EVENT_ALARMLEVEL_PREFIX = "auditEventAlarmLevel";
 
+    public static void setSetSchemaVersion(JdbcTemplate ejt, String version) {
+        setValue(ejt, DATABASE_SCHEMA_VERSION, version);
+    }
+
     // Value cache 
     //TODO cache real objects???
-    private static final Map<String, String> cache = new HashMap<>();
+    private final Map<String, String> cache = new HashMap<>();
+    private final ReportsImpl reportsImpl = new ReportsImpl();
+    private final EventsImpl eventsImpl = new EventsImpl();
+    private final HttpClientProxyImpl httpClientProxyImpl = new HttpClientProxyImpl();
+    private final EmailImpl emailImpl = new EmailImpl();
     
+
 //    @PostConstruct // todo if getInstance is removed and no static access use this ...
     @Override
     public void init() {
@@ -132,7 +143,7 @@ public class SystemSettingsDao extends BaseDao {
     }
 
     public AlarmLevel getAlarmLevel(SystemEventKey key) {
-        String value = getValue(SYSTEM_EVENT_ALARMLEVEL_PREFIX + key.name(), null);
+        String value = getValue0(SYSTEM_EVENT_ALARMLEVEL_PREFIX + key.name(), null);
         if (value == null) {
             return null;
         }
@@ -140,26 +151,22 @@ public class SystemSettingsDao extends BaseDao {
     }
 
     public AlarmLevel getAlarmLevel(AuditEventKey key) {
-        String value = getValue(AUDIT_EVENT_ALARMLEVEL_PREFIX + key.name(), null);
+        String value = getValue0(AUDIT_EVENT_ALARMLEVEL_PREFIX + key.name(), null);
         if (value == null) {
             return null;
         }
         return AlarmLevel.values()[Integer.parseInt(value)];
     }
 
-    public static void setValue(JdbcTemplate ejt, String key, String value) {
+    private static void setValue(JdbcTemplate ejt, String key, String value) {
         ejt.execute(String.format("insert into systemSettings values ('%s','%s')", key, value));
     }
 
-    public SystemSettingsDao() {
-        super();
+    private String getValue0(String key) {
+        return getValue0(key, (String) DEFAULT_VALUES.get(key));
     }
 
-    public String getValue(String key) {
-        return getValue(key, (String) DEFAULT_VALUES.get(key));
-    }
-
-    public String getValue(String key, String defaultValue) {
+    private String getValue0(String key, String defaultValue) {
         String result = cache.get(key);
         if (result == null) {
             if (!cache.containsKey(key)) {
@@ -180,24 +187,24 @@ public class SystemSettingsDao extends BaseDao {
         return result;
     }
 
-    public int getIntValue(String key) {
+    private int getIntValue0(String key) {
         Integer defaultValue = (Integer) DEFAULT_VALUES.get(key);
         if (defaultValue == null) {
-            return getIntValue(key, 0);
+            return getIntValue0(key, 0);
         }
-        return getIntValue(key, defaultValue);
+        return getIntValue0(key, defaultValue);
     }
 
-    public TimePeriods getTimePeriodsValue(String key) {
+    private TimePeriods getTimePeriodsValue0(String key) {
         TimePeriods defaultValue = (TimePeriods) DEFAULT_VALUES.get(key);
         if (defaultValue == null) {
-            throw  new ShouldNeverHappenException("No default for: " + key);
+            throw new ShouldNeverHappenException("No default for: " + key);
         }
-        return TimePeriods.fromId(getIntValue(key, defaultValue.getId()));
+        return TimePeriods.fromId(getIntValue0(key, defaultValue.getId()));
     }
 
-    public int getIntValue(String key, int defaultValue) {
-        String value = getValue(key, null);
+    private int getIntValue0(String key, int defaultValue) {
+        String value = getValue0(key, null);
         if (value == null) {
             return defaultValue;
         }
@@ -208,19 +215,19 @@ public class SystemSettingsDao extends BaseDao {
         }
     }
 
-    public boolean getBooleanValue(String key) {
-        return getBooleanValue(key, false);
+    private boolean getBooleanValue0(String key) {
+        return getBooleanValue0(key, false);
     }
 
-    public boolean getBooleanValue(String key, boolean defaultValue) {
-        String value = getValue(key, null);
+    private boolean getBooleanValue0(String key, boolean defaultValue) {
+        String value = getValue0(key, null);
         if (value == null) {
             return defaultValue;
         }
         return charToBool(value);
     }
 
-    public void setValue(final String key, final String value) {
+    public void setValue0(final String key, final String value) {
         // Update the cache
         cache.put(key, value);
 
@@ -245,11 +252,11 @@ public class SystemSettingsDao extends BaseDao {
     }
 
     public void setIntValue(String key, int value) {
-        setValue(key, Integer.toString(value));
+        setValue0(key, Integer.toString(value));
     }
 
     public void setBooleanValue(String key, boolean value) {
-        setValue(key, boolToChar(value));
+        setValue0(key, boolToChar(value));
     }
 
     public void removeValue(String key) {
@@ -265,14 +272,14 @@ public class SystemSettingsDao extends BaseDao {
 
     public long getFutureDateLimit() {
         if (FUTURE_DATE_LIMIT == -1) {
-            FUTURE_DATE_LIMIT = getTimePeriodsValue(FUTURE_DATE_LIMIT_PERIOD_TYPE).getMillis(getIntValue(FUTURE_DATE_LIMIT_PERIODS));
+            FUTURE_DATE_LIMIT = getTimePeriodsValue0(FUTURE_DATE_LIMIT_PERIOD_TYPE).getMillis(getIntValue0(FUTURE_DATE_LIMIT_PERIODS));
         }
         return FUTURE_DATE_LIMIT;
     }
 
     public Color getColour(String key) {
         try {
-            return ColorUtils.toColor(getValue(key));
+            return ColorUtils.toColor(getValue0(key));
         } catch (InvalidArgumentException e) {
             // Should never happen. Just use the default.
             try {
@@ -382,10 +389,167 @@ public class SystemSettingsDao extends BaseDao {
     }
 
     public void saveAlarmLevel(SystemEventKey key) {
-        setValue(SYSTEM_EVENT_ALARMLEVEL_PREFIX + key.name(), Integer.toString(key.getAlarmLevel().getId()));
+        setValue0(SYSTEM_EVENT_ALARMLEVEL_PREFIX + key.name(), Integer.toString(key.getAlarmLevel().getId()));
     }
 
     public void saveAlarmlevel(AuditEventKey key) {
-        setValue(AUDIT_EVENT_ALARMLEVEL_PREFIX + key.name(), Integer.toString(key.getAlarmLevel().getId()));
+        setValue0(AUDIT_EVENT_ALARMLEVEL_PREFIX + key.name(), Integer.toString(key.getAlarmLevel().getId()));
+    }
+
+    @Override
+    public String getInstanceDescription() {
+        return getValue0(INSTANCE_DESCRIPTION);
+    }
+
+    @Override
+    public String getServletContextPath() {
+        return getValue0(SERVLET_CONTEXT_PATH);
+    }
+
+    @Override
+    public void setServletContextPath(String contextPath) {
+        setValue0(SERVLET_CONTEXT_PATH, contextPath);
+    }
+
+    @Override
+    public String getNewVersionNotificationLevel() {
+        return getValue0(NEW_VERSION_NOTIFICATION_LEVEL);
+    }
+
+    @Override
+    public HttpClientProxy getHttpClientProxy() {
+        return httpClientProxyImpl;
+    }
+
+    @Override
+    public Email getEmail() {
+        return emailImpl;
+    }
+
+    @Override
+    public Events getEvents() {
+        return eventsImpl;
+    }
+
+    @Override
+    public Reports getReports() {
+        return reportsImpl;
+    }
+
+    public class EventsImpl implements Events {
+
+        @Override
+        public TimePeriods getPurgePeriodType() {
+            return getTimePeriodsValue0(EVENT_PURGE_PERIOD_TYPE);
+        }
+
+        @Override
+        public int getPurgePeriods() {
+            return getIntValue0(EVENT_PURGE_PERIODS);
+        }
+
+        @Override
+        public DateTime getCutoff(DateTime cutoff) {
+            return getPurgePeriodType().minus(cutoff, getPurgePeriods());
+        }
+    }
+
+    public class ReportsImpl implements Reports {
+
+        @Override
+        public TimePeriods getPurgePeriodType() {
+            return getTimePeriodsValue0(REPORT_PURGE_PERIOD_TYPE);
+        }
+
+        @Override
+        public int getPurgePeriods() {
+            return getIntValue0(REPORT_PURGE_PERIODS);
+        }
+        
+        @Override
+        public DateTime getCutoff(DateTime cutoff) {
+            return getPurgePeriodType().minus(cutoff, getPurgePeriods());
+        }
+    }
+
+    @Override
+    public String getFileDataPath() {
+        return getValue0(FILEDATA_PATH);
+    }
+
+    public class EmailImpl implements Email {
+
+        @Override
+        public MangoEmailContent.ContentType getContentType() {
+            return MangoEmailContent.ContentType.valueOf(getValue0(EMAIL_CONTENT_TYPE));
+        }
+
+        @Override
+        public String getFromAddress() {
+            return getValue0(EMAIL_FROM_ADDRESS);
+        }
+
+        @Override
+        public String getFromName() {
+            return getValue0(EMAIL_FROM_NAME);
+        }
+
+        @Override
+        public String getSmtpHost() {
+            return getValue0(EMAIL_SMTP_HOST);
+        }
+
+        @Override
+        public int getSmtpPort() {
+            return getIntValue0(EMAIL_SMTP_PORT);
+        }
+
+        @Override
+        public boolean isAuthorization() {
+            return getBooleanValue0(EMAIL_AUTHORIZATION);
+        }
+
+        @Override
+        public String getSmtpUsername() {
+            return getValue0(EMAIL_SMTP_USERNAME);
+        }
+
+        @Override
+        public String getSmtpPassword() {
+            return getValue0(EMAIL_SMTP_PASSWORD);
+        }
+
+        @Override
+        public boolean isTls() {
+            return getBooleanValue0(EMAIL_TLS);
+        }
+    }
+
+    public class HttpClientProxyImpl implements HttpClientProxy {
+
+        @Override
+        public boolean isEnabled() {
+            return getBooleanValue0(HTTP_CLIENT_USE_PROXY);
+        }
+
+        @Override
+        public String getServer() {
+            return getValue0(HTTP_CLIENT_PROXY_SERVER);
+        }
+
+        @Override
+        public int getPort() {
+            return getIntValue0(HTTP_CLIENT_PROXY_PORT);
+        }
+
+        @Override
+        public String getUsername() {
+            return getValue0(HTTP_CLIENT_PROXY_USERNAME, "");
+        }
+
+        @Override
+        public String getPassword() {
+            return getValue0(HTTP_CLIENT_PROXY_PASSWORD, "");
+        }
     }
 }

@@ -27,21 +27,19 @@ import java.util.List;
 import java.util.Map;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.rt.IDataPointLiveCycleListener;
-import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.event.type.DataSourceEventType;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.event.EventTypeVO;
 import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.DataSourceEventKey;
 import com.serotonin.mango.rt.EventManager;
-import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.vo.DataPointVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -136,7 +134,7 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
      * using the setPersistentData method.
      */
     public Object getPersistentData() {
-        return dataSourceDao.getPersistentData(vo.getId());
+        return dataSourceDao.getPersistentData(vo);
     }
 
     /**
@@ -147,7 +145,7 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
      * failover purposes.
      */
     protected void setPersistentData(Object persistentData) {
-        dataSourceDao.savePersistentData(vo.getId(), persistentData);
+        dataSourceDao.savePersistentData(vo, persistentData);
     }
 
     /*

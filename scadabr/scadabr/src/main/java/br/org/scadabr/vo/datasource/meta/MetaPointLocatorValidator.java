@@ -5,11 +5,11 @@
  */
 package br.org.scadabr.vo.datasource.meta;
 
+import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
 import br.org.scadabr.vo.dataSource.PointLocatorValidator;
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
 import java.text.ParseException;
 import java.util.ArrayList;

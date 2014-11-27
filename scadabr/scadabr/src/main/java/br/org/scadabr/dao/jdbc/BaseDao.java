@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
 import java.util.List;
 
@@ -35,11 +35,11 @@ public class BaseDao extends DaoUtils {
     //
     // Convenience methods for storage of booleans.
     //
-    protected static String boolToChar(boolean b) {
+    protected String boolToChar(boolean b) {
         return b ? "Y" : "N";
     }
 
-    protected static boolean charToBool(String s) {
+    protected boolean charToBool(String s) {
         return "Y".equals(s);
     }
 

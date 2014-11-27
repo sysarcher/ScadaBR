@@ -16,9 +16,10 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.DataType;
+import br.org.scadabr.dao.PointValueDao;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -69,7 +70,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.support.TransactionCallback;
 
 @Named
-public class PointValueDao extends BaseDao {
+public class PointValueDaoImpl extends BaseDao implements PointValueDao {
 
     @Inject
     private Common common;
@@ -85,7 +86,7 @@ public class PointValueDao extends BaseDao {
     static final String POINT_VALUE_ANNOTATION_INSERT = "insert into pointValueAnnotations "
             + "(pointValueId, textPointValueShort, textPointValueLong, sourceType, sourceId) values (?,?,?,?,?)";
 
-    public PointValueDao() {
+    public PointValueDaoImpl() {
         super();
     }
 
@@ -364,7 +365,7 @@ public class PointValueDao extends BaseDao {
         return result;
     }
 
-    public List<PointValueTime> getPointValuesBetween(final int dataPointId,
+    public Iterable<PointValueTime> getPointValuesBetween(final int dataPointId,
             final long from, final long to) {
         flushWriteBehind();
         List<PointValueTime> result = ejt.query(new PreparedStatementCreator() {
@@ -668,8 +669,7 @@ public class PointValueDao extends BaseDao {
         return deletePointValues("delete from pointValues", null);
     }
 
-    public long deletePointValuesWithMismatchedType(int dataPointId,
-            DataType dataType) {
+    public long deletePointValuesWithMismatchedType(int dataPointId, DataType dataType) {
         return deletePointValues(
                 "delete from pointValues where dataPointId=? and dataType<>?",
                 new Object[]{dataPointId, dataType.mangoDbId});

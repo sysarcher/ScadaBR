@@ -18,12 +18,12 @@
  */
 package com.serotonin.mango.rt.maint.work;
 
+import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.SystemRunnable;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
-import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.web.email.MangoEmailContent;
 import br.org.scadabr.web.email.EmailContent;
@@ -88,18 +88,19 @@ public class EmailWorkItem implements SystemRunnable {
     @Override
     public void run() {
         try {
+            final SystemSettingsDao.Email mailSetting = systemSettingsDao.getEmail();
             if (fromAddress == null) {
-                String addr = systemSettingsDao.getValue(SystemSettingsDao.EMAIL_FROM_ADDRESS);
-                String pretty = systemSettingsDao.getValue(SystemSettingsDao.EMAIL_FROM_NAME);
+                String addr = mailSetting.getFromAddress();
+                String pretty = mailSetting.getFromName();
                 fromAddress = new InternetAddress(addr, pretty);
             }
 
-            EmailSender emailSender = new EmailSender(systemSettingsDao.getValue(SystemSettingsDao.EMAIL_SMTP_HOST),
-                    systemSettingsDao.getIntValue(SystemSettingsDao.EMAIL_SMTP_PORT),
-                    systemSettingsDao.getBooleanValue(SystemSettingsDao.EMAIL_AUTHORIZATION),
-                    systemSettingsDao.getValue(SystemSettingsDao.EMAIL_SMTP_USERNAME),
-                    systemSettingsDao.getValue(SystemSettingsDao.EMAIL_SMTP_PASSWORD),
-                    systemSettingsDao.getBooleanValue(SystemSettingsDao.EMAIL_TLS));
+            EmailSender emailSender = new EmailSender(mailSetting.getSmtpHost(),
+                    mailSetting.getSmtpPort(),
+                    mailSetting.isAuthorization(),
+                    mailSetting.getSmtpUsername(),
+                    mailSetting.getSmtpPassword(),
+                    mailSetting.isTls());
 
             emailSender.send(fromAddress, toAddresses, subject, content);
         } catch (UnsupportedEncodingException e) {

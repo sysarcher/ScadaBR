@@ -5,12 +5,12 @@
  */
 package br.org.scadabr.web.mvc.controller.rest;
 
+import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.dao.WatchListDao;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import br.org.scadabr.web.mvc.controller.jsonrpc.JsonWatchList;
 import br.org.scadabr.web.mvc.controller.jsonrpc.JsonWatchListPoint;
-import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import java.util.logging.Level;
 import java.util.logging.Logger;

@@ -5,12 +5,11 @@
  */
 package br.org.scadabr.web.mvc.controller.rest;
 
+import br.org.scadabr.dao.PointValueDao;
 import br.org.scadabr.logger.LogUtils;
-import com.serotonin.mango.db.dao.PointValueDao;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.springframework.context.annotation.Scope;
@@ -35,17 +34,17 @@ public class RestPointValuesController {
     private transient PointValueDao pointValueDao;
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public List<JsonPointValue> getPointValues(@PathVariable int id, @RequestParam(value = "from", required = false) Long from, @RequestParam(value = "to", required = false) Long to) {
+    public Collection<JsonPointValue> getPointValues(@PathVariable int id, @RequestParam(value = "from", required = false) Long from, @RequestParam(value = "to", required = false) Long to) {
         if (from == null) {
             from = pointValueDao.getInceptionDate(id);
         }
-        List<PointValueTime> pvt;
+        Iterable<PointValueTime> pvt;
         if (to == null) {
             pvt = pointValueDao.getPointValues(id, from);
         } else {
             pvt = pointValueDao.getPointValuesBetween(id, from, to);
         }
-        List<JsonPointValue> result = new ArrayList<>(pvt.size());
+        Collection<JsonPointValue> result = new LinkedList<>();
         for (PointValueTime p : pvt) {
             result.add(new JsonPointValue(p.getTime(), p.getDoubleValue()));
         }

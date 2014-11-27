@@ -31,9 +31,9 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.db.dao.DataSourceDao;
-import com.serotonin.mango.db.dao.PointValueDao;
+import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.dao.DataSourceDao;
+import br.org.scadabr.dao.PointValueDao;
 import com.serotonin.mango.rt.dataImage.DataPointEventMulticaster;
 import com.serotonin.mango.rt.dataImage.DataPointListener;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -167,7 +167,7 @@ public class RuntimeManager {
         return getRunningDataSource(dataSourceId) != null;
     }
 
-    public List<DataSourceVO<?>> getDataSources() {
+    public Iterable<DataSourceVO<?>> getDataSources() {
         return dataSourceDao.getDataSources();
     }
 
@@ -214,7 +214,7 @@ public class RuntimeManager {
             runningDataSources.add(dataSource);
 
             // Add the enabled points to the data source.
-            for (DataPointVO dataPoint : dataPointDao.getDataPoints(vo.getId(), null)) {
+            for (DataPointVO dataPoint : dataPointDao.getDataPoints(vo.getId())) {
                 if (dataPoint.isEnabled()) {
                     startDataPoint(dataPoint);
                 } else {

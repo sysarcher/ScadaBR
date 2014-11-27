@@ -19,20 +19,17 @@
 package br.org.scadabr.web.mvc.controller;
 
 import br.org.scadabr.ScadaBrConstants;
+import br.org.scadabr.dao.UserDao;
+import br.org.scadabr.dao.WatchListDao;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.view.ShareUser;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.permission.Permissions;
-import br.org.scadabr.l10n.Localizer;
 import br.org.scadabr.i18n.MessageSource;
-import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
-import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.util.LinkedHashMap;
 import java.util.Map;

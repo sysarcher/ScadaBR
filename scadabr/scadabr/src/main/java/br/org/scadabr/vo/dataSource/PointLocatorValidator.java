@@ -5,7 +5,7 @@
  */
 package br.org.scadabr.vo.dataSource;
 
-import com.serotonin.mango.db.dao.DataPointDao;
+import br.org.scadabr.dao.DataPointDao;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -6,22 +6,82 @@ import java.util.List;
 import org.joda.time.DateTime;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
-import com.serotonin.mango.rt.event.maintenance.MaintenanceEventRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.vo.event.AlarmLevel;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.MaintenanceEventKey;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.serotonin.mango.rt.event.maintenance.MaintenanceEventRT;
 import com.serotonin.mango.rt.event.type.MaintenanceEventType;
+import com.serotonin.mango.vo.dataSource.DataSourceVO;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO> {
+
+    public static class MaintenenanceEventVoValidator implements Validator {
+
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return DataSourceVO.class.isAssignableFrom(clazz);
+        }
+
+        @Override
+        public void validate(Object target, Errors errors) {
+            final MaintenanceEventVO vo = (MaintenanceEventVO) target;
+            if (vo.alias.length() > 50) {
+                errors.rejectValue("alias", "maintenanceEvents.validate.aliasTooLong");
+            }
+
+            if (vo.dataSourceId <= 0) {
+                errors.rejectValue("dataSourceId", "validate.invalidValue");
+            }
+
+            // Check that cron patterns are ok.
+            if (vo.scheduleType == MaintenanceEventKey.CRON) {
+                try {
+                    new CronParser().parse(vo.activeCron, CronExpression.TIMEZONE_UTC);
+                } catch (Exception e) {
+                    errors.rejectValue("activeCron", "maintenanceEvents.validate.activeCron", new Object[]{e}, "maintenanceEvents.validate.activeCron");
+                }
+
+                try {
+                    new CronParser().parse(vo.inactiveCron, CronExpression.TIMEZONE_UTC);
+                } catch (Exception e) {
+                    errors.rejectValue("inactiveCron", "maintenanceEvents.validate.inactiveCron", new Object[]{e}, "maintenanceEvents.validate.inactiveCron");
+                }
+            }
+
+            // Test that the triggers can be created.
+            MaintenanceEventRT rt = new MaintenanceEventRT(vo);
+            try {
+                rt.createTrigger(true);
+            } catch (RuntimeException e) {
+                errors.rejectValue("activeCron", "maintenanceEvents.validate.activeTrigger", new Object[]{e}, "maintenanceEvents.validate.activeTrigger");
+            }
+
+            try {
+                rt.createTrigger(false);
+            } catch (RuntimeException e) {
+                errors.rejectValue("inactiveCron", "maintenanceEvents.validate.inactiveTrigger", new Object[]{e}, "maintenanceEvents.validate.inactiveTrigger");
+            }
+
+            // If the event is once, make sure the active time is earlier than the inactive time.
+            if (vo.scheduleType == MaintenanceEventKey.ONCE) {
+                DateTime adt = new DateTime(vo.activeYear, vo.activeMonth, vo.activeDay, vo.activeHour, vo.activeMinute, vo.activeSecond, 0);
+                DateTime idt = new DateTime(vo.inactiveYear, vo.inactiveMonth, vo.inactiveDay, vo.inactiveHour, vo.inactiveMinute, vo.inactiveSecond, 0);
+                if (idt.getMillis() <= adt.getMillis()) {
+                    errors.rejectValue("scheduleType", "maintenanceEvents.validate.invalidRtn");
+                }
+            }
+        }
+
+    }
 
     public static final String XID_PREFIX = "ME_";
 
@@ -78,7 +138,6 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO> 
         }
         return maintenanceEventType;
     }
-
 
     @JsonIgnore
     public boolean isNew() {
@@ -375,55 +434,6 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO> 
     @Override
     public String getTypeKey() {
         return "event.audit.maintenanceEvent";
-    }
-
-    public void validate(DwrResponseI18n response) {
-        if (alias.length() > 50) {
-            response.addContextual("alias", "maintenanceEvents.validate.aliasTooLong");
-        }
-
-        if (dataSourceId <= 0) {
-            response.addContextual("dataSourceId", "validate.invalidValue");
-        }
-
-        // Check that cron patterns are ok.
-        if (scheduleType == MaintenanceEventKey.CRON) {
-            try {
-                new CronParser().parse(activeCron, CronExpression.TIMEZONE_UTC);
-            } catch (Exception e) {
-                response.addContextual("activeCron", "maintenanceEvents.validate.activeCron", e);
-            }
-
-            try {
-                new CronParser().parse(inactiveCron, CronExpression.TIMEZONE_UTC);
-            } catch (Exception e) {
-                response.addContextual("inactiveCron", "maintenanceEvents.validate.inactiveCron", e);
-            }
-        }
-
-        // Test that the triggers can be created.
-        MaintenanceEventRT rt = new MaintenanceEventRT(this);
-        try {
-            rt.createTrigger(true);
-        } catch (RuntimeException e) {
-            response.addContextual("activeCron", "maintenanceEvents.validate.activeTrigger", e);
-        }
-
-        try {
-            rt.createTrigger(false);
-        } catch (RuntimeException e) {
-            response.addContextual("inactiveCron", "maintenanceEvents.validate.inactiveTrigger", e);
-        }
-
-        // If the event is once, make sure the active time is earlier than the inactive time.
-        if (scheduleType == MaintenanceEventKey.ONCE) {
-            DateTime adt = new DateTime(activeYear, activeMonth, activeDay, activeHour, activeMinute, activeSecond, 0);
-            DateTime idt = new DateTime(inactiveYear, inactiveMonth, inactiveDay, inactiveHour, inactiveMinute,
-                    inactiveSecond, 0);
-            if (idt.getMillis() <= adt.getMillis()) {
-                response.addContextual("scheduleType", "maintenanceEvents.validate.invalidRtn");
-            }
-        }
     }
 
     @Override

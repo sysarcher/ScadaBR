@@ -16,8 +16,9 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
+import br.org.scadabr.dao.PublisherDao;
 import br.org.scadabr.rt.event.type.EventSources;
 import java.io.Serializable;
 import java.sql.Blob;
@@ -37,6 +38,7 @@ import br.org.scadabr.util.SerializationHelper;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Map;
 import javax.inject.Named;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -48,9 +50,9 @@ import org.springframework.jdbc.core.RowMapper;
  * @author Matthew Lohbihler
  */
 @Named
-public class PublisherDao extends BaseDao {
+public class PublisherDaoImpl extends BaseDao implements PublisherDao {
 
-    public PublisherDao() {
+    public PublisherDaoImpl() {
         super();
     }
     
@@ -58,12 +60,14 @@ public class PublisherDao extends BaseDao {
         return generateUniqueXid(PublisherVO.XID_PREFIX, "publishers");
     }
 
+    @Override
     public boolean isXidUnique(String xid, int excludeId) {
         return isXidUnique(xid, excludeId, "publishers");
     }
 
     private static final String PUBLISHER_SELECT = "select id, xid, data from publishers ";
 
+    @Override
     public List<PublisherVO<? extends PublishedPointVO>> getPublishers() {
         return ejt.query(PUBLISHER_SELECT, new PublisherRowMapper());
     }
@@ -82,6 +86,7 @@ public class PublisherDao extends BaseDao {
         }
     }
 
+    @Override
     public PublisherVO<? extends PublishedPointVO> getPublisher(int id) {
         try {
             return ejt.queryForObject(PUBLISHER_SELECT + " where id=?", new PublisherRowMapper(), id);
@@ -111,6 +116,7 @@ public class PublisherDao extends BaseDao {
         }
     }
 
+    @Override
     public void savePublisher(final PublisherVO<? extends PublishedPointVO> vo) {
         // Decide whether to insert or update.
         if (vo.isNew()) {
@@ -142,6 +148,7 @@ public class PublisherDao extends BaseDao {
         }
     }
 
+    @Override
     public void deletePublisher(final int publisherId) {
         final JdbcTemplate ejt2 = ejt;
         getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
@@ -154,11 +161,12 @@ public class PublisherDao extends BaseDao {
         });
     }
 
-    public Object getPersistentData(int id) {
-        return ejt.query("select rtdata from publishers where id=?", new Object[]{id},
-                new ResultSetExtractor<Serializable>() {
+    @Override
+    public Map<String, Serializable> getPersistentData(final PublisherVO vo) {
+        return ejt.query("select rtdata from publishers where id=?", new Object[]{vo.getId()},
+                new ResultSetExtractor<Map<String, Serializable>>() {
                     @Override
-                    public Serializable extractData(ResultSet rs) throws SQLException, DataAccessException {
+                    public Map<String, Serializable> extractData(ResultSet rs) throws SQLException, DataAccessException {
                         if (!rs.next()) {
                             return null;
                         }
@@ -168,19 +176,20 @@ public class PublisherDao extends BaseDao {
                             return null;
                         }
 
-                        return (Serializable) SerializationHelper.readObject(blob.getBinaryStream());
+                        return (Map<String, Serializable>) SerializationHelper.readObject(blob.getBinaryStream());
                     }
                 });
     }
 
-    public void savePersistentData(final int id, final Object data) {
+    @Override
+    public void savePersistentData(final PublisherVO vo, final Map<String, Serializable> data) {
         ejt.update(new PreparedStatementCreator() {
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 final PreparedStatement ps = con.prepareStatement("update publishers set rtdata=? where id=?");
                 ps.setBlob(1, SerializationHelper.writeObject(data));
-                ps.setInt(2, id);
+                ps.setInt(2, vo.getId());
                 return ps;
             }
         });

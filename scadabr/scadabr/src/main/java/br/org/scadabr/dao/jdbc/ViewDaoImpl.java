@@ -16,8 +16,9 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
+import br.org.scadabr.dao.ViewDao;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,7 +42,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 
 @Named
-public class ViewDao extends BaseDao {
+public class ViewDaoImpl extends BaseDao implements ViewDao {
 
     //
     // /
@@ -51,7 +52,7 @@ public class ViewDao extends BaseDao {
     private static final String VIEW_SELECT = "select data, id, xid, name, background, userId, anonymousAccess from mangoViews";
     private static final String USER_ID_COND = " where userId=? or id in (select mangoViewId from mangoViewUsers where userId=?)";
 
-    public ViewDao() {
+    public ViewDaoImpl() {
         super();
     }
     

@@ -16,14 +16,14 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
+import br.org.scadabr.dao.PointLinkDao;
 import br.org.scadabr.vo.event.type.AuditEventKey;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.link.PointLinkVO;
 import java.sql.Connection;
@@ -38,9 +38,9 @@ import org.springframework.jdbc.core.RowMapper;
  * @author Matthew Lohbihler
  */
 @Named
-public class PointLinkDao extends BaseDao {
+public class PointLinkDaoImpl extends BaseDao implements PointLinkDao {
 
-    public PointLinkDao() {
+    public PointLinkDaoImpl() {
         super();
     }
 
@@ -90,7 +90,7 @@ public class PointLinkDao extends BaseDao {
             pl.setSourcePointId(rs.getInt(++i));
             pl.setTargetPointId(rs.getInt(++i));
             pl.setScript(rs.getString(++i));
-            pl.setEvent(rs.getInt(++i));
+            pl.setEvent(PointLinkVO.EventType.fromId(rs.getInt(++i)));
             pl.setDisabled(charToBool(rs.getString(++i)));
             return pl;
         }
@@ -117,7 +117,7 @@ public class PointLinkDao extends BaseDao {
                 ps.setInt(2, pl.getSourcePointId());
                 ps.setInt(3, pl.getTargetPointId());
                 ps.setString(4, pl.getScript());
-                ps.setInt(5, pl.getEvent());
+                ps.setInt(5, pl.getEvent().getId());
                 ps.setString(6, boolToChar(pl.isDisabled()));
                 return ps;
             }

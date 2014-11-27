@@ -36,15 +36,15 @@ import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
 import br.org.scadabr.InvalidArgumentException;
+import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.dao.MailingListDao;
+import br.org.scadabr.dao.ReportDao;
+import br.org.scadabr.dao.UserDao;
 import br.org.scadabr.io.StreamUtils;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.SystemRunnable;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.db.dao.MailingListDao;
-import com.serotonin.mango.db.dao.ReportDao;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
@@ -94,19 +94,14 @@ public class ReportWorkItem implements SystemRunnable {
             return;
         }
 
-        // User is ok. Continue...
-        ReportWorkItem item = new ReportWorkItem();
-
         // Create the database record in process.
-        item.reportConfig = report;
-        ReportInstance reportInstance = new ReportInstance(report);
+        reportConfig = report;
+        reportInstance = new ReportInstance(report);
 
-        item.user = user;
-        item.reportDao.saveReportInstance(reportInstance);
+        reportDao.saveReportInstance(reportInstance);
 
         // Start the report work item out of process.
-        item.reportInstance = reportInstance;
-        schedulerPool.execute(item);
+        schedulerPool.execute(this);
 
         LOG.info("Queued report with id " + report.getId() + ", instance id " + reportInstance.getId());
     }
@@ -138,7 +133,7 @@ public class ReportWorkItem implements SystemRunnable {
                     // Should never happen since the colour would have been validated on save, so just let it go 
                     // as null.
                 }
-                points.add(new ReportDao.PointInfo(point, colour, reportPoint.isConsolidatedChart()));
+                points.add(reportDao.createPointInfo(point, colour, reportPoint.isConsolidatedChart()));
             }
         }
 

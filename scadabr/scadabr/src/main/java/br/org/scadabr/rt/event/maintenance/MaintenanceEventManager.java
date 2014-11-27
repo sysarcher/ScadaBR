@@ -5,7 +5,7 @@
  */
 package br.org.scadabr.rt.event.maintenance;
 
-import com.serotonin.mango.db.dao.MaintenanceEventDao;
+import br.org.scadabr.dao.MaintenanceEventDao;
 import com.serotonin.mango.rt.event.maintenance.MaintenanceEventRT;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
 import java.util.List;
