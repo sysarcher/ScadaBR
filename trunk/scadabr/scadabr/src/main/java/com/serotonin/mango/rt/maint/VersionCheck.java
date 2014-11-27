@@ -18,15 +18,15 @@
  */
 package com.serotonin.mango.rt.maint;
 
+import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.dao.DataSourceDao;
+import br.org.scadabr.dao.PublisherDao;
+import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.rt.SchedulerPool;
-import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.utils.ImplementMeException;
-import br.org.scadabr.timer.cron.CronExpression;
-import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -34,25 +34,10 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PostMethod;
-
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.db.dao.DataSourceDao;
-import com.serotonin.mango.db.dao.PublisherDao;
-import com.serotonin.mango.db.dao.SystemSettingsDao;
-import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
-import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.publish.PublisherVO;
 import br.org.scadabr.timer.cron.SystemCronTask;
 import br.org.scadabr.util.queue.ByteQueue;
-import br.org.scadabr.web.http.HttpUtils;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.SystemEventKey;
@@ -68,6 +53,7 @@ import org.springframework.beans.factory.annotation.Configurable;
 @Deprecated
 @Configurable
 public class VersionCheck extends SystemCronTask {
+
     @Autowired
     private DataPointDao dataPointDao;
     @Autowired
@@ -89,14 +75,14 @@ public class VersionCheck extends SystemCronTask {
      * corresponding system setting for running this job is true.
      */
     public static void start(String cronPattern) throws ParseException {
-        throw  new ImplementMeException();
+        throw new ImplementMeException();
         /*
-        synchronized (INSTANCE_ID_FILE) {
-            stop();
-            instance = new VersionCheck(cronPattern, CronExpression.TIMEZONE_UTC);
-           // Common.systemCronPool.schedule(instance);
-        }
-                */
+         synchronized (INSTANCE_ID_FILE) {
+         stop();
+         instance = new VersionCheck(cronPattern, CronExpression.TIMEZONE_UTC);
+         // Common.systemCronPool.schedule(instance);
+         }
+         */
     }
 
     public static void stop() {
@@ -122,7 +108,7 @@ public class VersionCheck extends SystemCronTask {
     @Override
     protected void run(long scheduledExecutionTime) {
         try {
-            String notifLevel = systemSettingsDao.getValue(SystemSettingsDao.NEW_VERSION_NOTIFICATION_LEVEL);
+            String notifLevel = systemSettingsDao.getNewVersionNotificationLevel();
             newVersionCheck(scheduledExecutionTime, notifLevel);
         } catch (SocketTimeoutException e) {
             // Ignore
@@ -156,90 +142,90 @@ public class VersionCheck extends SystemCronTask {
     private String newVersionCheckImpl(String notifLevel) throws Exception {
         throw new ImplementMeException();
         /*
-        HttpClient httpClient = common.getHttpClient();
+         HttpClient httpClient = common.getHttpClient();
 
-        PostMethod postMethod = new PostMethod(Common.getGroveUrl(Common.GroveServlets.VERSION_CHECK));
+         PostMethod postMethod = new PostMethod(Common.getGroveUrl(Common.GroveServlets.VERSION_CHECK));
 
-        postMethod.addParameter("instanceId", getInstanceId());
-        postMethod.addParameter("instanceName", systemSettingsDao.getValue(SystemSettingsDao.INSTANCE_DESCRIPTION));
-        try {
-            postMethod.addParameter("instanceIp", InetAddress.getLocalHost().getHostAddress());
-        } catch (UnknownHostException e) {
-            postMethod.addParameter("instanceIp", "unknown");
-        }
+         postMethod.addParameter("instanceId", getInstanceId());
+         postMethod.addParameter("instanceName", systemSettingsDao.getValue(SystemSettingsDao.INSTANCE_DESCRIPTION));
+         try {
+         postMethod.addParameter("instanceIp", InetAddress.getLocalHost().getHostAddress());
+         } catch (UnknownHostException e) {
+         postMethod.addParameter("instanceIp", "unknown");
+         }
 
-        postMethod.addParameter("instanceVersion", Common.getVersion());
+         postMethod.addParameter("instanceVersion", Common.getVersion());
 
-        StringBuilder datasourceTypes = new StringBuilder();
-        for (DataSourceVO<?> config : dataSourceDao.getDataSources()) {
-            if (config.isEnabled()) {
-                int points = 0;
-                for (DataPointVO point : dataPointDao.getDataPoints(config.getId(), null)) {
-                    if (point.isEnabled()) {
-                        points++;
-                    }
-                }
+         StringBuilder datasourceTypes = new StringBuilder();
+         for (DataSourceVO<?> config : dataSourceDao.getDataSources()) {
+         if (config.isEnabled()) {
+         int points = 0;
+         for (DataPointVO point : dataPointDao.getDataPoints(config.getId(), null)) {
+         if (point.isEnabled()) {
+         points++;
+         }
+         }
 
-                if (datasourceTypes.length() > 0) {
-                    datasourceTypes.append(',');
-                }
-                datasourceTypes.append(config.getType().getId()).append(':').append(points);
-            }
-        }
-        postMethod.addParameter("datasourceTypes", datasourceTypes.toString());
+         if (datasourceTypes.length() > 0) {
+         datasourceTypes.append(',');
+         }
+         datasourceTypes.append(config.getType().getId()).append(':').append(points);
+         }
+         }
+         postMethod.addParameter("datasourceTypes", datasourceTypes.toString());
 
-        StringBuilder publisherTypes = new StringBuilder();
-        for (PublisherVO<?> config : publisherDao.getPublishers()) {
-            if (config.isEnabled()) {
-                if (publisherTypes.length() > 0) {
-                    publisherTypes.append(',');
-                }
-                publisherTypes.append(config.getType().getId()).append(':').append(config.getPoints().size());
-            }
-        }
-        postMethod.addParameter("publisherTypes", publisherTypes.toString());
+         StringBuilder publisherTypes = new StringBuilder();
+         for (PublisherVO<?> config : publisherDao.getPublishers()) {
+         if (config.isEnabled()) {
+         if (publisherTypes.length() > 0) {
+         publisherTypes.append(',');
+         }
+         publisherTypes.append(config.getType().getId()).append(':').append(config.getPoints().size());
+         }
+         }
+         postMethod.addParameter("publisherTypes", publisherTypes.toString());
 
-        int responseCode = httpClient.executeMethod(postMethod);
-        if (responseCode != HttpStatus.SC_OK) {
-            throw new HttpException("Invalid response code: " + responseCode);
-        }
+         int responseCode = httpClient.executeMethod(postMethod);
+         if (responseCode != HttpStatus.SC_OK) {
+         throw new HttpException("Invalid response code: " + responseCode);
+         }
 
-        Header devHeader = postMethod.getResponseHeader("Mango-dev");
-        if (devHeader != null) {
-            String devVersion = devHeader.getValue();
-            String stage = devVersion.substring(devVersion.length() - 1);
-            devVersion = devVersion.substring(0, devVersion.length() - 1);
+         Header devHeader = postMethod.getResponseHeader("Mango-dev");
+         if (devHeader != null) {
+         String devVersion = devHeader.getValue();
+         String stage = devVersion.substring(devVersion.length() - 1);
+         devVersion = devVersion.substring(0, devVersion.length() - 1);
 
-            // There is a new version development version. Check if we're interested.
-            if (Common.getVersion().equals(devVersion)) // We already have it. Never mind.
-            {
-                return null;
-            }
+         // There is a new version development version. Check if we're interested.
+         if (Common.getVersion().equals(devVersion)) // We already have it. Never mind.
+         {
+         return null;
+         }
 
-            // Beta?
-            if (SystemSettingsDao.NOTIFICATION_LEVEL_BETA.equals(stage)
-                    && SystemSettingsDao.NOTIFICATION_LEVEL_BETA.equals(notifLevel)) {
-                return devVersion + " beta";
-            }
+         // Beta?
+         if (SystemSettingsDao.NOTIFICATION_LEVEL_BETA.equals(stage)
+         && SystemSettingsDao.NOTIFICATION_LEVEL_BETA.equals(notifLevel)) {
+         return devVersion + " beta";
+         }
 
-            // Release candidate?
-            if (SystemSettingsDao.NOTIFICATION_LEVEL_RC.equals(stage)
-                    && (SystemSettingsDao.NOTIFICATION_LEVEL_BETA.equals(notifLevel) || SystemSettingsDao.NOTIFICATION_LEVEL_RC
-                    .equals(notifLevel))) {
-                return devVersion + " release candidate";
-            }
+         // Release candidate?
+         if (SystemSettingsDao.NOTIFICATION_LEVEL_RC.equals(stage)
+         && (SystemSettingsDao.NOTIFICATION_LEVEL_BETA.equals(notifLevel) || SystemSettingsDao.NOTIFICATION_LEVEL_RC
+         .equals(notifLevel))) {
+         return devVersion + " release candidate";
+         }
                 
-        }
+         }
 
-        // Either there is no dev version available or we're not interested in it. Check the stable version
-        String stableVersion = HttpUtils.readResponseBody(postMethod);
+         // Either there is no dev version available or we're not interested in it. Check the stable version
+         String stableVersion = HttpUtils.readResponseBody(postMethod);
 
-        if (Common.getVersion().equals(stableVersion)) {
-            return null;
-        }
+         if (Common.getVersion().equals(stableVersion)) {
+         return null;
+         }
 
-        return stableVersion;
-                */
+         return stableVersion;
+         */
     }
 
     private static String calcMachineId() {

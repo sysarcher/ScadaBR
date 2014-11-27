@@ -18,17 +18,16 @@
  */
 package com.serotonin.mango.rt.maint;
 
+import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.dao.EventDao;
+import br.org.scadabr.dao.PointValueDao;
+import br.org.scadabr.dao.ReportDao;
+import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.timer.cron.SystemCronTask;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
-import br.org.scadabr.vo.LoggingTypes;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.db.dao.EventDao;
-import com.serotonin.mango.db.dao.PointValueDao;
-import com.serotonin.mango.db.dao.ReportDao;
-import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.vo.DataPointVO;
@@ -76,9 +75,8 @@ public class DataPurge {
         LOG.info("Data purge started");
 
         // Get the data point information.
-        List<DataPointVO> dataPoints = dataPointDao.getDataPoints(null, false);
         int deleteCount = 0;
-        for (DataPointVO dataPoint : dataPoints) {
+        for (DataPointVO dataPoint : dataPointDao.getDataPoints(false)) {
             deleteCount += purgePoint(dataPoint);
         }
         // if (deleteCount > 0)
@@ -134,7 +132,7 @@ public class DataPurge {
 
     private void eventPurge() {
         DateTime cutoff = TimePeriods.DAYS.truncateDateTime(new DateTime(runtime));
-        cutoff = systemSettingsDao.getTimePeriodsValue(SystemSettingsDao.EVENT_PURGE_PERIOD_TYPE).minus(cutoff, systemSettingsDao.getIntValue(SystemSettingsDao.EVENT_PURGE_PERIODS));
+        cutoff = systemSettingsDao.getEvents().getCutoff(cutoff);
 
         int deleteCount = eventDao.purgeEventsBefore(cutoff.getMillis());
         if (deleteCount > 0) {
@@ -144,7 +142,7 @@ public class DataPurge {
 
     private void reportPurge() {
         DateTime cutoff = TimePeriods.DAYS.truncateDateTime(new DateTime(runtime));
-        cutoff = systemSettingsDao.getTimePeriodsValue(SystemSettingsDao.REPORT_PURGE_PERIOD_TYPE).minus(cutoff, systemSettingsDao.getIntValue(SystemSettingsDao.REPORT_PURGE_PERIODS));
+        cutoff = systemSettingsDao.getReports().getCutoff(cutoff);
 
         int deleteCount = reportDao.purgeReportsBefore(cutoff.getMillis());
         if (deleteCount > 0) {

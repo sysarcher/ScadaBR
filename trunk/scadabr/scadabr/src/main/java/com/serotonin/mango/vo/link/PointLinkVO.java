@@ -19,48 +19,108 @@
 package com.serotonin.mango.vo.link;
 
 import br.org.scadabr.ScadaBrConstants;
+import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.utils.i18n.LocalizableEnum;
 import java.util.List;
 
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
-import com.serotonin.mango.util.ExportCodes;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 /**
  * @author Matthew Lohbihler
  */
-
 @Configurable
 public class PointLinkVO implements ChangeComparable<PointLinkVO> {
 
     @Autowired
     private DataPointDao dataPointDao;
 
+    @Configurable
+    public static class PointLinkVoValidator implements Validator {
+
+        @Autowired
+        private DataPointDao dataPointDao;
+
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return PointLinkVO.class.isAssignableFrom(clazz);
+        }
+
+        @Override
+        public void validate(Object target, Errors errors) {
+            final PointLinkVO vo = (PointLinkVO) target;
+            if (vo.sourcePointId == 0) {
+                errors.rejectValue("sourcePointId", "pointLinks.validate.sourceRequired");
+            }
+            if (vo.targetPointId == 0) {
+                errors.rejectValue("targetPointId", "pointLinks.validate.targetRequired");
+            }
+            if (vo.sourcePointId == vo.targetPointId) {
+                errors.rejectValue("targetPointId", "pointLinks.validate.samePoint");
+            }
+        }
+
+    }
+
     public static final String XID_PREFIX = "PL_";
 
-    public static final int EVENT_UPDATE = 1;
-    public static final int EVENT_CHANGE = 2;
+    public enum EventType implements LocalizableEnum<EventType> {
 
-    public final static ExportCodes EVENT_CODES = new ExportCodes();
+        UPDATE(1, "pointLinks.event.update"),
+        CHANGE(2, "pointLinks.event.change");
+        private final int id;
+        private final String i18nKey;
 
-    static {
-        EVENT_CODES.addElement(EVENT_UPDATE, "UPDATE", "pointLinks.event.update");
-        EVENT_CODES.addElement(EVENT_CHANGE, "CHANGE", "pointLinks.event.change");
+        private EventType(int id, String i18nKey) {
+            this.id = id;
+            this.i18nKey = i18nKey;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public static EventType fromId(int id) {
+            switch (id) {
+                case 1:
+                    return UPDATE;
+                case 2:
+                    return CHANGE;
+                default:
+                    throw new IndexOutOfBoundsException("Cant get EventType from: " + id);
+            }
+        }
+
+        @Override
+        public String getName() {
+            return name();
+        }
+
+        @Override
+        public String getI18nKey() {
+            return i18nKey;
+        }
+
+        @Override
+        public Object[] getArgs() {
+            return null;
+        }
     }
 
     private int id = ScadaBrConstants.NEW_ID;
     private String xid;
     private int sourcePointId;
     private int targetPointId;
-    
+
     private String script;
-    private int event;
-    
+    private EventType event;
+
     private boolean disabled;
 
     @JsonIgnore
@@ -109,11 +169,11 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO> {
         this.script = script;
     }
 
-    public int getEvent() {
+    public EventType getEvent() {
         return event;
     }
 
-    public void setEvent(int event) {
+    public void setEvent(EventType event) {
         this.event = event;
     }
 
@@ -130,25 +190,13 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO> {
         return "event.audit.pointLink";
     }
 
-    public void validate(DwrResponseI18n response) {
-        if (sourcePointId == 0) {
-            response.addContextual("sourcePointId", "pointLinks.validate.sourceRequired");
-        }
-        if (targetPointId == 0) {
-            response.addContextual("targetPointId", "pointLinks.validate.targetRequired");
-        }
-        if (sourcePointId == targetPointId) {
-            response.addContextual("targetPointId", "pointLinks.validate.samePoint");
-        }
-    }
-
     @Override
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "pointLinks.source", dataPointDao.getExtendedPointName(sourcePointId));
         AuditEventType.addPropertyMessage(list, "pointLinks.target", dataPointDao.getExtendedPointName(targetPointId));
         AuditEventType.addPropertyMessage(list, "pointLinks.script", script);
-        AuditEventType.addExportCodeMessage(list, "pointLinks.event", EVENT_CODES, event);
+        AuditEventType.addPropertyMessage(list, "pointLinks.event", event);
         AuditEventType.addPropertyMessage(list, "common.disabled", disabled);
     }
 
@@ -164,7 +212,7 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO> {
                         dataPointDao.getExtendedPointName(from.targetPointId),
                         dataPointDao.getExtendedPointName(targetPointId));
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointLinks.script", from.script, script);
-        AuditEventType.maybeAddExportCodeChangeMessage(list, "pointLinks.event", EVENT_CODES, from.event, event);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "pointLinks.event", from.event, event);
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.disabled", from.disabled, disabled);
     }
 

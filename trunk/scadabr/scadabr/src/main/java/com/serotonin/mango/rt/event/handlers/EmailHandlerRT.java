@@ -18,6 +18,8 @@
  */
 package com.serotonin.mango.rt.event.handlers;
 
+import br.org.scadabr.dao.MailingListDao;
+import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.CronExpression;
@@ -26,10 +28,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.SystemEventKey;
 import br.org.scadabr.web.email.EmailInline;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.MailingListDao;
-import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.event.EventInstance;
-import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.work.EmailWorkItem;
 import com.serotonin.mango.util.timeout.EventRunWithArgTask;
 import com.serotonin.mango.util.timeout.RunWithArgClient;
@@ -214,7 +213,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
                 model.putAll(evt.getContext());
             }
             model.put("img", inlineImages);
-            model.put("instanceDescription", systemSettingsDao.getValue(SystemSettingsDao.INSTANCE_DESCRIPTION));
+            model.put("instanceDescription", systemSettingsDao.getInstanceDescription());
             MangoEmailContent content = new MangoEmailContent(notificationType.getFile(), model, bundle, subject,
                     Common.UTF8);
 

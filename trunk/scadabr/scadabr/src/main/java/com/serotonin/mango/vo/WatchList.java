@@ -19,40 +19,75 @@
 package com.serotonin.mango.vo;
 
 import br.org.scadabr.ScadaBrConstants;
+import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.dao.UserDao;
+import br.org.scadabr.dao.WatchListDao;
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.db.dao.UserDao;
-import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.view.ShareUser;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Iterator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 /**
  * @author Matthew Lohbihler
  */
-
-@Configurable
 public class WatchList implements Iterable<DataPointVO> {
-    
-    @Autowired
-    private DataPointDao dataPointDao;
-    @Autowired
-    private UserDao userDao;
-    @Autowired
-    private WatchListDao watchListDao;
+
+    @Configurable
+    public static class WatchListValidator implements Validator {
+
+        @Autowired
+        private DataPointDao dataPointDao;
+        @Autowired
+        private UserDao userDao;
+        @Autowired
+        private WatchListDao watchListDao;
+
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return WatchList.class.isAssignableFrom(clazz);
+        }
+
+        @Override
+        public void validate(Object target, Errors errors) {
+            final WatchList vo = (WatchList) target;
+            if (vo.name.isEmpty()) {
+                errors.rejectValue("name", "validate.required");
+            } else if (vo.name.length() > 50) {
+                errors.rejectValue("name", "validate.notLongerThan", new Object[]{50}, "validate.notLongerThan");
+            }
+
+            if (vo.xid.isEmpty()) {
+                errors.rejectValue("xid", "validate.required");
+            } else if (vo.xid.length() > 50) {
+                errors.rejectValue("xid", "validate.notLongerThan", new Object[]{50}, "validate.notLongerThan");
+            } else if (!watchListDao.isXidUnique(vo.xid, vo.id)) {
+                errors.rejectValue("xid", "validate.xidUsed");
+            }
+
+            throw new ImplementMeException();
+            /*
+             for (DataPointVO dpVO : vo.pointList) {
+             dpVO.validate(response);
+             }
+             */
+        }
+
+    }
 
     public static final String XID_PREFIX = "WL_";
 
     private int id = ScadaBrConstants.NEW_ID;
     private String xid;
     private int userId;
-    
+
     private String name;
     private final List<DataPointVO> pointList = new CopyOnWriteArrayList<>();
     private List<ShareUser> watchListUsers = new ArrayList<>();
@@ -116,26 +151,6 @@ public class WatchList implements Iterable<DataPointVO> {
 
     public void setWatchListUsers(List<ShareUser> watchListUsers) {
         this.watchListUsers = watchListUsers;
-    }
-
-    public void validate(DwrResponseI18n response) {
-        if (name.isEmpty()) {
-            response.addContextual("name", "validate.required");
-        } else if (name.length() >  50) {
-            response.addContextual("name", "validate.notLongerThan", 50);
-        }
-
-        if (xid.isEmpty()) {
-            response.addContextual("xid", "validate.required");
-        } else if (xid.length() >  50) {
-            response.addContextual("xid", "validate.notLongerThan", 50);
-        } else if (!watchListDao.isXidUnique(xid, id)) {
-            response.addContextual("xid", "validate.xidUsed");
-        }
-
-        for (DataPointVO dpVO : pointList) {
-            dpVO.validate(response);
-        }
     }
 
     @Override

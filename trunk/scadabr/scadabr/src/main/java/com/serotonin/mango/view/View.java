@@ -19,6 +19,9 @@
 package com.serotonin.mango.view;
 
 import br.org.scadabr.ScadaBrConstants;
+import br.org.scadabr.dao.UserDao;
+import br.org.scadabr.dao.ViewDao;
+import br.org.scadabr.utils.ImplementMeException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -26,34 +29,69 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.serotonin.mango.db.dao.UserDao;
-import com.serotonin.mango.db.dao.ViewDao;
 import com.serotonin.mango.view.component.CompoundComponent;
 import com.serotonin.mango.view.component.PointComponent;
 import com.serotonin.mango.view.component.ViewComponent;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
-
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 @Configurable
 public class View implements Serializable {
+
+    
+    @Configurable
+public static class ViewValidator implements Validator {
+    @Autowired
+    private ViewDao viewDao;
+
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return View.class.isAssignableFrom(clazz);
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+        final View vo = (View) target;
+        if (vo.name.isEmpty()) {
+            errors.rejectValue("name",  "validate.required");
+        } else if (vo.name.length() > 100) {
+            errors.rejectValue("name", "validate.notLongerThan", new Object[]{100}, "validate.notLongerThan");
+        }
+
+        if (vo.xid.isEmpty()) {
+            errors.rejectValue("xid", "validate.required");
+        } else if (vo.xid.length() >  50) {
+            errors.rejectValue("xid", "validate.notLongerThan", new Object[]{50}, "validate.notLongerThan");
+        } else if (!viewDao.isXidUnique(vo.xid, vo.id)) {
+            errors.rejectValue("xid", "validate.xidUsed");
+        }
+
+        throw new ImplementMeException();
+        /*
+         for (ViewComponent vc : vo.viewComponents) {
+            vc.validate(response);
+        }
+        */
+    }
+
+
+}
 
     public static final String XID_PREFIX = "GV_";
 
     @Autowired
     private UserDao userDao;
-    @Autowired
-    private ViewDao viewDao;
-    
+
     private int id = ScadaBrConstants.NEW_ID;
-    
+
     private String xid;
-    
+
     private String name;
-    
+
     private String backgroundFilename;
     private int userId;
     private List<ViewComponent> viewComponents = new CopyOnWriteArrayList<>();
@@ -140,6 +178,7 @@ public class View implements Serializable {
      * that the given user is allowed to access points that back any components
      * - that the points that back components still have valid data types for
      * the components that render them
+     *
      * @param makeReadOnly
      */
     public void validateViewComponents(boolean makeReadOnly) {
@@ -209,27 +248,7 @@ public class View implements Serializable {
         this.viewUsers = viewUsers;
     }
 
-    public void validate(DwrResponseI18n response) {
-        if (name.isEmpty()) {
-            response.addContextual("name",  "validate.required");
-        } else if (name.length() > 100) {
-            response.addContextual("name", "validate.notLongerThan", 100);
-        }
-
-        if (xid.isEmpty()) {
-            response.addContextual("xid", "validate.required");
-        } else if (xid.length() >  50) {
-            response.addContextual("xid", "validate.notLongerThan", 50);
-        } else if (!viewDao.isXidUnique(xid, id)) {
-            response.addContextual("xid", "validate.xidUsed");
-        }
-
-        for (ViewComponent vc : viewComponents) {
-            vc.validate(response);
-        }
-    }
-
-	//
+    //
     // /
     // / Serialization
     // /
@@ -247,7 +266,7 @@ public class View implements Serializable {
             ClassNotFoundException {
         int ver = in.readInt();
 
-		// Switch on the version of the class so that version changes can be
+        // Switch on the version of the class so that version changes can be
         // elegantly handled.
         if (ver == 1) {
             viewComponents = new CopyOnWriteArrayList<>(

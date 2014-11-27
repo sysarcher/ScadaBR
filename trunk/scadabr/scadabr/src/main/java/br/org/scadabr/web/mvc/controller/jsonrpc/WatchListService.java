@@ -1,11 +1,11 @@
 package br.org.scadabr.web.mvc.controller.jsonrpc;
+import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.dao.PointValueDao;
+import br.org.scadabr.dao.UserDao;
+import br.org.scadabr.dao.WatchListDao;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.googlecode.jsonrpc4j.JsonRpcService;
-import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.db.dao.PointValueDao;
-import com.serotonin.mango.db.dao.UserDao;
-import com.serotonin.mango.db.dao.WatchListDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ShareUser;
@@ -130,7 +130,7 @@ public class WatchListService implements Serializable {
             final long timeStamp = System.currentTimeMillis();
             final long from = tpcr.getStartTime(timeStamp);
             final long to = tpcr.getEndTime(timeStamp);
-            List<PointValueTime> pvt = pointValueDao.getPointValuesBetween(dataPointId, from, to);
+            Iterable<PointValueTime> pvt = pointValueDao.getPointValuesBetween(dataPointId, from, to);
             return new JsonChartDataSet(from, to, dp, pvt);
         }
         return new JsonChartDataSet();

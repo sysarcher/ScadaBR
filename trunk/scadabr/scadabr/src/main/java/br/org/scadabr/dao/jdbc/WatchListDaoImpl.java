@@ -16,8 +16,10 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
+import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.dao.WatchListDao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -43,12 +45,12 @@ import org.springframework.jdbc.core.RowMapper;
  * @author Matthew Lohbihler
  */
 @Named
-public class WatchListDao extends BaseDao {
+public class WatchListDaoImpl extends BaseDao implements WatchListDao {
 
     @Inject
     private DataPointDao dataPointDao;
     
-    public WatchListDao() {
+    public WatchListDaoImpl() {
         super();
     }
     

@@ -20,6 +20,7 @@ package com.serotonin.mango.vo.dataSource.meta;
 
 import br.org.scadabr.DataType;
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.DataPointDao;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,7 +31,6 @@ import java.util.Map;
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.meta.MetaPointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;

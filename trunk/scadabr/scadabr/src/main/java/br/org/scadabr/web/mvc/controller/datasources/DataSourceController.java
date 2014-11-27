@@ -18,10 +18,10 @@
  */
 package br.org.scadabr.web.mvc.controller.datasources;
 
+import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.vo.dataSource.DataSourceValidator;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import br.org.scadabr.web.mvc.AjaxFormPostResponse;
-import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import javax.inject.Inject;
 import org.springframework.context.annotation.Scope;

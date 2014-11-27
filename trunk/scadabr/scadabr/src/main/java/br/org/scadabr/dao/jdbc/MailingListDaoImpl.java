@@ -16,7 +16,8 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
+
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,6 +33,8 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.MailingListDao;
+import br.org.scadabr.dao.UserDao;
 import com.serotonin.mango.vo.mailingList.AddressEntry;
 import com.serotonin.mango.vo.mailingList.EmailRecipient;
 import com.serotonin.mango.vo.mailingList.MailingList;
@@ -50,12 +53,12 @@ import org.springframework.jdbc.core.RowMapper;
  * @author Matthew Lohbihler
  */
 @Named
-public class MailingListDao extends BaseDao {
+public class MailingListDaoImpl extends BaseDao implements MailingListDao {
 
     @Inject
     private UserDao userDao;
     
-    public MailingListDao() {
+    public MailingListDaoImpl() {
         super();
     }
     

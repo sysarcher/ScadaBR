@@ -5,12 +5,10 @@
  */
 package br.org.scadabr.web.mvc.controller.rest;
 
+import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.web.LazyTreeNode;
-import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.DataPointDao;
 import java.util.Collection;
 import javax.inject.Inject;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

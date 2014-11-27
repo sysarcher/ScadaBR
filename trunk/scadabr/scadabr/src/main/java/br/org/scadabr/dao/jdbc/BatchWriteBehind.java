@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.logger.LogUtils;
@@ -13,7 +13,6 @@ import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.db.DatabaseAccessFactory;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,12 +55,12 @@ class BatchWriteBehind {
                     // Create the sql and parameters
                     Object[] params = new Object[inserts.length * POINT_VALUE_INSERT_VALUES_COUNT];
                     StringBuilder sb = new StringBuilder();
-                    sb.append(PointValueDao.POINT_VALUE_INSERT_START);
+                    sb.append(PointValueDaoImpl.POINT_VALUE_INSERT_START);
                     for (int i = 0; i < inserts.length; i++) {
                         if (i > 0) {
                             sb.append(',');
                         }
-                        sb.append(PointValueDao.POINT_VALUE_INSERT_VALUES);
+                        sb.append(PointValueDaoImpl.POINT_VALUE_INSERT_VALUES);
                         inserts[i].writeInto(params, i);
                     }
                     // Insert the data

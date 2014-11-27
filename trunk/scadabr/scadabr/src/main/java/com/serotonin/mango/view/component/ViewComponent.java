@@ -24,7 +24,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import br.org.scadabr.view.component.AlarmListComponent;
 import br.org.scadabr.view.component.ButtonComponent;
@@ -34,14 +33,13 @@ import br.org.scadabr.view.component.LinkComponent;
 import br.org.scadabr.view.component.ScriptButtonComponent;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.DataPointDao;
 
 
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -50,6 +48,20 @@ import org.springframework.beans.factory.annotation.Configurable;
  */
 @Configurable
 abstract public class ViewComponent implements Serializable {
+    /*
+public class ViewComponenetValidator {
+        public void validate(DwrResponseI18n response) {
+        if (x < 0) {
+            response.addContextual("x", "validate.cannotBeNegative");
+        }
+        if (y < 0) {
+            response.addContextual("y", "validate.cannotBeNegative");
+        }
+    }
+
+
+}
+*/
     @Autowired
     private DataPointDao dataPointDao;
 
@@ -57,7 +69,7 @@ abstract public class ViewComponent implements Serializable {
 
     public static List<ImplDefinition> getImplementations() {
         if (DEFINITIONS == null) {
-            List<ImplDefinition> d = new ArrayList<ImplDefinition>();
+            List<ImplDefinition> d = new ArrayList<>();
             d.add(AnalogGraphicComponent.DEFINITION);
             d.add(BinaryGraphicComponent.DEFINITION);
             d.add(DynamicGraphicComponent.DEFINITION);
@@ -252,15 +264,6 @@ abstract public class ViewComponent implements Serializable {
 
     public void setStyle(String style) {
         this.style = style;
-    }
-
-    public void validate(DwrResponseI18n response) {
-        if (x < 0) {
-            response.addContextual("x", "validate.cannotBeNegative");
-        }
-        if (y < 0) {
-            response.addContextual("y", "validate.cannotBeNegative");
-        }
     }
 
     //

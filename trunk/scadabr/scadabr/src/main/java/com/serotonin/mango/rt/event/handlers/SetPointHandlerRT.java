@@ -57,7 +57,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
 
     @Override
     public void eventRaised(EventInstance evt) {
-        if (vo.getActiveAction() == EventHandlerVO.SET_ACTION_NONE) {
+        if (vo.getActiveAction() == EventHandlerVO.SetActionType.NONE) {
             return;
         }
 
@@ -76,7 +76,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
         final DataType targetDataType = targetPoint.getDataType();
 
         MangoValue value;
-        if (vo.getActiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {
+        if (vo.getActiveAction() == EventHandlerVO.SetActionType.POINT_VALUE) {
             // Get the source data point.
             DataPointRT sourcePoint = runtimeManager.getDataPoint(vo.getActivePointId());
             if (sourcePoint == null) {
@@ -96,7 +96,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
             }
 
             value = valueTime.getValue();
-        } else if (vo.getActiveAction() == EventHandlerVO.SET_ACTION_STATIC_VALUE) {
+        } else if (vo.getActiveAction() == EventHandlerVO.SetActionType.STATIC_VALUE) {
             value = MangoValue.stringToValue(vo.getActiveValueToSet(), targetDataType);
         } else {
             throw new ShouldNeverHappenException("Unknown active action: " + vo.getActiveAction());
@@ -108,7 +108,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
 
     @Override
     public void eventInactive(EventInstance evt) {
-        if (vo.getInactiveAction() == EventHandlerVO.SET_ACTION_NONE) {
+        if (vo.getInactiveAction() == EventHandlerVO.SetActionType.NONE) {
             return;
         }
 
@@ -127,7 +127,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
         final DataType targetDataType = targetPoint.getDataType();
 
         MangoValue value;
-        if (vo.getInactiveAction() == EventHandlerVO.SET_ACTION_POINT_VALUE) {
+        if (vo.getInactiveAction() == EventHandlerVO.SetActionType.POINT_VALUE) {
             // Get the source data point.
             DataPointRT sourcePoint = runtimeManager.getDataPoint(vo.getInactivePointId());
             if (sourcePoint == null) {
@@ -147,7 +147,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
             }
 
             value = valueTime.getValue();
-        } else if (vo.getInactiveAction() == EventHandlerVO.SET_ACTION_STATIC_VALUE) {
+        } else if (vo.getInactiveAction() == EventHandlerVO.SetActionType.STATIC_VALUE) {
             value = MangoValue.stringToValue(vo.getInactiveValueToSet(), targetDataType);
         } else {
             throw new ShouldNeverHappenException("Unknown active action: " + vo.getInactiveAction());

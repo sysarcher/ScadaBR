@@ -1,5 +1,6 @@
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
+import br.org.scadabr.dao.MaintenanceEventDao;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.AuditEventKey;
@@ -11,7 +12,6 @@ import java.util.List;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.event.MaintenanceEventVO;
 import java.sql.Connection;
@@ -24,7 +24,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 
 @Named
-public class MaintenanceEventDao extends BaseDao {
+public class MaintenanceEventDaoImpl extends BaseDao implements MaintenanceEventDao {
 
     private static final String MAINTENANCE_EVENT_SELECT = //
             "select m.id, m.xid, m.dataSourceId, m.alias, m.alarmLevel, "
@@ -33,7 +33,7 @@ public class MaintenanceEventDao extends BaseDao {
             + "  m.inactiveMinute, m.inactiveSecond, m.inactiveCron, d.dataSourceType, d.name, d.xid " //
             + "from maintenanceEvents m join dataSources d on m.dataSourceId=d.id ";
 
-    public MaintenanceEventDao() {
+    public MaintenanceEventDaoImpl() {
         super();
     }
 

@@ -32,7 +32,6 @@ import br.org.scadabr.db.IntValuePair;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import com.serotonin.mango.view.ImplDefinition;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import java.util.EnumSet;
 
 /**
@@ -123,7 +122,7 @@ public class MultistateGraphicComponent extends ImageSetComponent {
             }
         }
     }
-
+/*
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
@@ -148,7 +147,7 @@ public class MultistateGraphicComponent extends ImageSetComponent {
             }
         }
     }
-
+*/
     //
     // /
     // / Serialization

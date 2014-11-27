@@ -19,6 +19,7 @@
 package com.serotonin.mango.vo.publish;
 
 import br.org.scadabr.ScadaBrConstants;
+import br.org.scadabr.dao.PublisherDao;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -27,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.org.scadabr.rt.event.type.EventSources;
-import com.serotonin.mango.db.dao.PublisherDao;
 import com.serotonin.mango.rt.publish.PublisherRT;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.event.EventTypeVO;
@@ -35,24 +35,64 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.PublisherEventKey;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 /**
  * @author Matthew Lohbihler
  * @param <T>
  */
-@Configurable
 abstract public class PublisherVO<T extends PublishedPointVO> implements Serializable {
 
-    @Autowired
-    private PublisherDao publisherDao;
-    
+    @Configurable
+    public static class PublisherVoValidator implements Validator {
+
+        @Autowired
+        private PublisherDao publisherDao;
+
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return PublisherVO.class.isAssignableFrom(clazz);
+        }
+
+        @Override
+        public void validate(Object target, Errors errors) {
+            final PublisherVO vo = (PublisherVO) target;
+            if (vo.name.isEmpty()) {
+                errors.rejectValue("name", "validate.required");
+            }
+            if (vo.name.length() > 40) {
+                errors.rejectValue("name", "validate.nameTooLong");
+            }
+
+            if (vo.xid.isEmpty()) {
+                errors.rejectValue("xid", "validate.required");
+            } else if (!publisherDao.isXidUnique(vo.xid, vo.id)) {
+                errors.rejectValue("xid", "validate.xidUsed");
+            } else if (vo.xid.length() > 50) {
+                errors.rejectValue("xid", "validate.notLongerThan", new Object[]{50}, "validate.notLongerThan");
+            }
+
+            if (vo.sendSnapshot) {
+                if (vo.snapshotSendPeriods <= 0) {
+                    errors.rejectValue("snapshotSendPeriods", "validate.greaterThanZero");
+                }
+            }
+
+            if (vo.cacheWarningSize < 1) {
+                errors.rejectValue("cacheWarningSize", "validate.greaterThanZero");
+            }
+
+        }
+
+    }
+
     public enum Type {
 
         HTTP_SENDER(1, "publisherEdit.httpSender") {
@@ -128,7 +168,7 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
     public PublisherEventKey getPublisherEventKey() {
         throw new ImplementMeException();
     }
-    
+
     abstract public Type getType();
 
     abstract public LocalizableMessage getConfigDescription();
@@ -169,19 +209,19 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
 
     private int id = ScadaBrConstants.NEW_ID;
     private String xid;
-    
+
     private String name;
-    
+
     private boolean enabled;
     protected List<T> points = new ArrayList<>();
-    
+
     private boolean changesOnly;
-    
+
     private int cacheWarningSize = 100;
-    
+
     private boolean sendSnapshot;
     private TimePeriods snapshotSendPeriodType = TimePeriods.MINUTES;
-    
+
     private int snapshotSendPeriods = 5;
 
     public boolean isEnabled() {
@@ -262,34 +302,6 @@ abstract public class PublisherVO<T extends PublishedPointVO> implements Seriali
 
     public void setSnapshotSendPeriods(int snapshotSendPeriods) {
         this.snapshotSendPeriods = snapshotSendPeriods;
-    }
-
-    public void validate(DwrResponseI18n response) {
-        if (name.isEmpty()) {
-            response.addContextual("name", "validate.required");
-        }
-        if (name.length() > 40) {
-            response.addContextual("name", "validate.nameTooLong");
-        }
-
-        if (xid.isEmpty()) {
-            response.addContextual("xid", "validate.required");
-        } else if (!publisherDao.isXidUnique(xid, id)) {
-            response.addContextual("xid", "validate.xidUsed");
-        } else if (xid.length() > 50) {
-            response.addContextual("xid", "validate.notLongerThan", 50);
-        }
-
-        if (sendSnapshot) {
-            if (snapshotSendPeriods <= 0) {
-                response.addContextual("snapshotSendPeriods", "validate.greaterThanZero");
-            }
-        }
-
-        if (cacheWarningSize < 1) {
-            response.addContextual("cacheWarningSize", "validate.greaterThanZero");
-        }
-
     }
 
     //

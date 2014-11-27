@@ -28,7 +28,6 @@ import java.io.ObjectOutputStream;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.view.ImplDefinition;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import java.util.EnumSet;
 
 /**
@@ -73,6 +72,7 @@ public class BinaryGraphicComponent extends ImageSetComponent {
         return imageSet.getImageFilename(bvalue ? oneImage : zeroImage);
     }
 
+    /*
     @Override
     public void validate(DwrResponseI18n response) {
         super.validate(response);
@@ -93,7 +93,7 @@ public class BinaryGraphicComponent extends ImageSetComponent {
             }
         }
     }
-
+*/
     //
     // /
     // / Serialization

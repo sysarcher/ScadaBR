@@ -1,12 +1,12 @@
 package com.serotonin.mango.web.email;
 
+import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.web.email.EmailContent;
 import java.io.IOException;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.SystemSettingsDao;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -18,10 +18,30 @@ public class MangoEmailContent extends EmailContent {
 
     @Autowired
     private SystemSettingsDao systemSettingsDao;
-    
-    public static final int CONTENT_TYPE_BOTH = 0;
-    public static final int CONTENT_TYPE_HTML = 1;
-    public static final int CONTENT_TYPE_TEXT = 2;
+
+    public enum ContentType {
+
+        BOTH(0, true, true),
+        HTML(1, true, false),
+        TEXT(2, false, true);
+        private final int id;
+        private boolean renderHtml;
+        private boolean renderText;
+
+        private ContentType(int id, boolean renderHtml, boolean renderText) {
+            this.id = id;
+            this.renderHtml = renderHtml;
+            this.renderText = renderText;
+        }
+
+        public boolean isRenderHtml() {
+            return renderHtml;
+        }
+
+        public boolean isRenderText() {
+            return renderText;
+        }
+    }
 
     private final String defaultSubject;
     private final SubjectDirective subjectDirective;
@@ -31,7 +51,7 @@ public class MangoEmailContent extends EmailContent {
         super(null, null, encoding);
 
         // This will raise a NÜE but compiles :)
-        int type = systemSettingsDao.getIntValue(SystemSettingsDao.EMAIL_CONTENT_TYPE);
+        ContentType type = systemSettingsDao.getEmail().getContentType();
 
         this.defaultSubject = defaultSubject;
         this.subjectDirective = new SubjectDirective(bundle);
@@ -39,11 +59,11 @@ public class MangoEmailContent extends EmailContent {
         model.put("fmt", new MessageFormatDirective(bundle));
         model.put("subject", subjectDirective);
 
-        if (type == CONTENT_TYPE_HTML || type == CONTENT_TYPE_BOTH) {
-            htmlContent =  processHtmlTemplate(getHTMLTemplate(templateName), model);
+        if (type.isRenderHtml()) {
+            htmlContent = processHtmlTemplate(getHTMLTemplate(templateName), model);
         }
 
-        if (type == CONTENT_TYPE_TEXT || type == CONTENT_TYPE_BOTH) {
+        if (type.isRenderText()) {
             plainContent = processPlainTemplate(getPlainTemplate(templateName), model);
         }
     }

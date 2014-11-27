@@ -1,5 +1,6 @@
 package br.org.scadabr.view.component;
 
+import br.org.scadabr.dao.DataPointDao;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -11,7 +12,6 @@ import java.util.List;
 
 
 
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.component.HtmlComponent;
 import com.serotonin.mango.vo.DataPointVO;
@@ -87,15 +87,12 @@ public class ChartComparatorComponent extends HtmlComponent {
     }
 
     private String createDataPointsSelectComponent(String idPrefix) {
-        List<DataPointVO> dataPoints = dataPointDao.getDataPoints(null,
-                false);
-
         StringBuilder sb = new StringBuilder();
         sb.append("<select style='float:left;'  id='").append(idPrefix).append("'>");
 
         sb.append("<option value='0'> &nbsp; </option>");
 
-        for (DataPointVO dp : dataPoints) {
+        for (DataPointVO dp : dataPointDao.getDataPoints(false)) {
             sb.append("<option value='").append(dp.getId()).append("'> ").append(dp.getName()).append("</option>");
         }
         sb.append("</select>");

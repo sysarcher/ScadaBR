@@ -24,11 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 import br.org.scadabr.ShouldNeverHappenException;
-
+import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.dao.DataSourceDao;
 
 import br.org.scadabr.vo.event.AlarmLevel;
-import com.serotonin.mango.db.dao.DataPointDao;
-import com.serotonin.mango.db.dao.DataSourceDao;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.view.View;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
@@ -38,42 +37,77 @@ import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import com.serotonin.mango.web.dwr.beans.DataExportDefinition;
 import com.serotonin.mango.web.dwr.beans.TestingUtility;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
-
-@Configurable //TODO this is not Working, so manually insert Runtimemanager for JSON
 public class User implements Serializable, SetPointSource {
 
+    @Configurable
+    public static class UserValidator implements Validator {
+
+        @Autowired
+        private DataPointDao dataPointDao;
+        @Autowired
+        private DataSourceDao dataSourceDao;
+
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return User.class.isAssignableFrom(clazz);
+        }
+
+        @Override
+        public void validate(Object target, Errors errors) {
+            final User vo = (User) target;
+            if (vo.username.isEmpty()) {
+                errors.rejectValue("username", "validate.required");
+            }
+            if (vo.email.isEmpty()) {
+                errors.rejectValue("email", "validate.required");
+            }
+            if (vo.id == ScadaBrConstants.NEW_ID && vo.password.isEmpty()) {
+                errors.rejectValue("password", "validate.required");
+            }
+
+            // Check field lengths
+            if (vo.username.length() > 40) {
+                errors.rejectValue("username", "validate.notLongerThan", new Object[]{40}, "validate.notLongerThan");
+            }
+            if (vo.email.length() > 255) {
+                errors.rejectValue("email", "validate.notLongerThan", new Object[]{255}, "validate.notLongerThan");
+            }
+            if (vo.phone.length() > 40) {
+                errors.rejectValue("phone", "validate.notLongerThan", new Object[]{40}, "validate.notLongerThan");
+            }
+        }
+
+    }
+
     private int id = ScadaBrConstants.NEW_ID;
-    
+
     private String username;
-    
+
     private String password;
-    
+
     private String email;
-    
+
     private String phone;
-    
+
     private boolean admin;
-    
+
     private boolean disabled;
     private List<Integer> dataSourcePermissions;
     private List<DataPointAccess> dataPointPermissions;
     private int selectedWatchList;
-    
+
     private String homeUrl;
     private long lastLogin;
     private AlarmLevel receiveAlarmEmails;
-    
+
     private boolean receiveOwnAuditEvents;
-    @Autowired
-    private DataPointDao dataPointDao;
-    @Autowired
-    private DataSourceDao dataSourceDao;
 
     //
     // Session data. The user object is stored in session, and some other
@@ -351,29 +385,6 @@ public class User implements Serializable, SetPointSource {
         return (T) attributes.get(key);
     }
 
-    public void validate(DwrResponseI18n response) {
-        if (username.isEmpty()) {
-            response.addContextual("username", "validate.required");
-        }
-        if (email.isEmpty()) {
-            response.addContextual("email", "validate.required");
-        }
-        if (id == ScadaBrConstants.NEW_ID && password.isEmpty()) {
-            response.addContextual("password", "validate.required");
-        }
-
-        // Check field lengths
-        if (username.length() > 40) {
-            response.addContextual("username", "validate.notLongerThan", 40);
-        }
-        if (email.length() > 255) {
-            response.addContextual("email", "validate.notLongerThan", 255);
-        }
-        if (phone.length() > 40) {
-            response.addContextual("phone", "validate.notLongerThan", 40);
-        }
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -394,10 +405,7 @@ public class User implements Serializable, SetPointSource {
             return false;
         }
         final User other = (User) obj;
-        if (id != other.id) {
-            return false;
-        }
-        return true;
+        return id == other.id;
     }
 
     public boolean isReceiveAlarmEmails() {

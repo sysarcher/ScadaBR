@@ -22,18 +22,11 @@ import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.DataPointDetectorKey;
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 
 
-@Configurable
 public class DataPointEventType extends EventType<DataPointDetectorKey> {
-    @Autowired
-    private DataPointDao dataPointDao;
 
-    private int dataSourceId = -1;
     private final int dataPointId;
     private AlarmLevel alarmLevel;
     

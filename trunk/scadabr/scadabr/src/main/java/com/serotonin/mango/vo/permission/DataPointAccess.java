@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.vo.permission;
 
-import com.serotonin.mango.db.dao.DataPointDao;
+import br.org.scadabr.dao.DataPointDao;
 import com.serotonin.mango.util.ExportCodes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;

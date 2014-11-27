@@ -40,9 +40,9 @@ import org.jfree.data.time.TimeSeries;
 
 import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.ReportDao;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.ReportDao;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.event.EventInstance;
@@ -452,7 +452,7 @@ public class ReportChartCreator {
         }
     }
 
-    class StreamHandler implements ReportDataStreamHandler, DataQuantizerCallback {
+    public class StreamHandler implements ReportDataStreamHandler, DataQuantizerCallback {
 
         private final long start;
         private final long end;

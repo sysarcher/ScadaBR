@@ -5,7 +5,7 @@
  */
 package br.org.scadabr.rt.link;
 
-import com.serotonin.mango.db.dao.PointLinkDao;
+import br.org.scadabr.dao.PointLinkDao;
 import com.serotonin.mango.rt.link.PointLinkRT;
 import com.serotonin.mango.vo.link.PointLinkVO;
 import java.util.List;

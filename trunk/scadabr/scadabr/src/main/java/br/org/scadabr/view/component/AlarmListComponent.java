@@ -1,6 +1,7 @@
 package br.org.scadabr.view.component;
 
 import br.org.scadabr.DataType;
+import br.org.scadabr.dao.EventDao;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,18 +15,15 @@ import javax.servlet.http.HttpServletRequest;
 import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;
 
-
-
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.view.ImplDefinition;
 import java.util.EnumSet;
+import java.util.LinkedList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
-
 
 @Configurable
 public class AlarmListComponent extends CustomComponent {
@@ -35,11 +33,11 @@ public class AlarmListComponent extends CustomComponent {
 
     @Autowired
     private EventDao eventDao;
-    
+
     private AlarmLevel minAlarmLevel = AlarmLevel.INFORMATION;
-    
+
     private int maxListSize = 5;
-    
+
     private int width = 500;
 
     private boolean hideIdColumn = true;
@@ -53,15 +51,11 @@ public class AlarmListComponent extends CustomComponent {
         Map<String, Object> model = new HashMap<>();
         WebContext webContext = WebContextFactory.get();
         HttpServletRequest request = webContext.getHttpServletRequest();
-        List<EventInstance> events = eventDao.getPendingEvents(Common
-                .getUser());
 
-        filter(events, minAlarmLevel);
-
-        int max = events.size() > maxListSize ? maxListSize : events.size();
+        List<EventInstance> events = filter(eventDao.getPendingEvents(Common.getUser()), minAlarmLevel);
 
         model.put("nome", "marlon");
-        model.put("events", events.subList(0, max));
+        model.put("events", events);
         model.put("width", width > 0 ? width : 500);
         model.put("hideIdColumn", hideIdColumn);
         model.put("hideAlarmLevelColumn", hideAlarmLevelColumn);
@@ -74,33 +68,18 @@ public class AlarmListComponent extends CustomComponent {
         // return content;
     }
 
-    private void filter(List<EventInstance> list, AlarmLevel alarmLevel) {
-
-        if (AlarmLevel.URGENT == alarmLevel) {
-            removeAlarmLevel(list, AlarmLevel.INFORMATION);
-        }
-        if (AlarmLevel.CRITICAL == alarmLevel) {
-            removeAlarmLevel(list, AlarmLevel.INFORMATION);
-            removeAlarmLevel(list, AlarmLevel.URGENT);
-        }
-        if (AlarmLevel.LIFE_SAFETY == alarmLevel) {
-            removeAlarmLevel(list, AlarmLevel.INFORMATION);
-            removeAlarmLevel(list, AlarmLevel.URGENT);
-            removeAlarmLevel(list, AlarmLevel.CRITICAL);
-        }
-    }
-
-    private void removeAlarmLevel(List<EventInstance> source, AlarmLevel alarmLevel) {
-        List<EventInstance> copy = new ArrayList<>();
-
-        for (EventInstance eventInstance : source) {
-            if (eventInstance.getAlarmLevel() == alarmLevel) {
-                copy.add(eventInstance);
+    private List<EventInstance> filter(Iterable<EventInstance> eventInstances, AlarmLevel alarmLevel) {
+        LinkedList result = new LinkedList();
+        int count = 0;
+        for (EventInstance eventInstance : eventInstances) {
+            if (eventInstance.getAlarmLevel().compareTo(alarmLevel) >= 0) {
+                result.add(eventInstance);
+                if (maxListSize >= count++) {
+                    return result;
+                }
             }
         }
-
-        source.removeAll(copy);
-
+        return result;
     }
 
     @Override

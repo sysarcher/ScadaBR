@@ -25,9 +25,9 @@ import java.util.TreeSet;
 
 import org.joda.time.DateTime;
 
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 public class MailingList extends EmailRecipient {
 
@@ -36,7 +36,11 @@ public class MailingList extends EmailRecipient {
     private int id = ScadaBrConstants.NEW_ID;
     private String xid;
     
+    @NotNull(message = "mailingLists.validate.nameRequired")
+    @Size(min = 1, max = 40, message = "mailingLists.validate.nameGreaterThan40")
     private String name;
+    @NotNull(message = "mailingLists.validate.entries")
+    @Size(min = 1, message = "mailingLists.validate.entries")
     private List<EmailRecipient> entries;
 
     /**
@@ -123,23 +127,6 @@ public class MailingList extends EmailRecipient {
         interval += dt.getHourOfDay() * 4;
         interval += (dt.getDayOfWeek() - 1) * 96;
         return interval;
-    }
-
-    public void validate(DwrResponseI18n response) {
-        // Check that required fields are present.
-        if (name.isEmpty()) {
-            response.addContextual("name", "mailingLists.validate.nameRequired");
-        }
-
-        // Check field lengths
-        if (name.length() > 40) {
-            response.addContextual("name", "mailingLists.validate.nameGreaterThan40");
-        }
-
-        // Check for entries.
-        if (entries.isEmpty()) {
-            response.addGeneric("mailingLists.validate.entries");
-        }
     }
 
     @Override

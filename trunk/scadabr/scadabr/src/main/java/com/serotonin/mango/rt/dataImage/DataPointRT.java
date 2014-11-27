@@ -29,10 +29,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.PointValueDao;
+import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.rt.event.schedule.ScheduledEventManager;
-import com.serotonin.mango.db.dao.PointValueDao;
-import com.serotonin.mango.db.dao.SystemSettingsDao;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
@@ -146,15 +146,6 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
         {
             throw new ShouldNeverHappenException("Data type mismatch between new value and point locator: newValue="
                     + newValue.getDataType() + ", locator=" + vo.getDataType());
-        }
-
-        // Check if this value qualifies for discardation.
-        if (vo.isDiscardExtremeValues() && newValue.getDataType() == DataType.NUMERIC) {
-            double newd = newValue.getDoubleValue();
-            if (newd < vo.getDiscardLowLimit() || newd > vo.getDiscardHighLimit()) // Discard the value
-            {
-                return;
-            }
         }
 
         if (newValue.getTime() > System.currentTimeMillis() + systemSettingsDao.getFutureDateLimit()) {

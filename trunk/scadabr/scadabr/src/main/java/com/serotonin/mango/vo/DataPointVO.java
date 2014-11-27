@@ -19,48 +19,107 @@
 package com.serotonin.mango.vo;
 
 import br.org.scadabr.DataType;
+import br.org.scadabr.InvalidArgumentException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
 
-import br.org.scadabr.InvalidArgumentException;
 import br.org.scadabr.ScadaBrConstants;
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.util.ColorUtils;
 
-
-import com.serotonin.mango.db.dao.DataPointDao;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
-import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.view.chart.ChartRenderer;
 import com.serotonin.mango.view.text.NoneRenderer;
 import com.serotonin.mango.view.text.PlainRenderer;
 import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
-import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.vo.IntervalLoggingTypes;
 import br.org.scadabr.vo.LoggingTypes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
 import java.util.EnumSet;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
-
-
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 public class DataPointVO implements Serializable, Cloneable, ChangeComparable<DataPointVO> {
 
-    @Autowired //TODO use @Configurable for Validator
-    private DataPointDao dataPointDao;
+    @Configurable
+    public static class DataPointVoValidator implements Validator {
+
+        @Autowired
+        private DataPointDao dataPointDao;
+
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return DataPointVO.class.isAssignableFrom(clazz);
+        }
+
+        @Override
+        public void validate(Object target, Errors errors) {
+            final DataPointVO vo = (DataPointVO) target;
+            if (vo.xid.isEmpty()) {
+                errors.rejectValue("xid", "validate.required");
+            } else if (vo.xid.length() > 50) {
+                errors.rejectValue("xid", "validate.notLongerThan", new Object[]{50}, "validate.notLongerThan");
+            } else if (!dataPointDao.isXidUnique(vo.xid, vo.id)) {
+                errors.rejectValue("xid", "validate.xidUsed");
+            }
+
+            if (vo.name.isEmpty()) {
+                errors.rejectValue("name", "validate.required");
+            }
+
+            if (vo.loggingType == LoggingTypes.ON_CHANGE && vo.getDataType() == DataType.NUMERIC) {
+                if (vo.tolerance < 0) {
+                    errors.rejectValue("tolerance", "validate.cannotBeNegative");
+                }
+            }
+
+            if (vo.intervalLoggingPeriod <= 0) {
+                errors.rejectValue("intervalLoggingPeriod", "validate.greaterThanZero");
+            }
+
+            if (vo.purgePeriod <= 0) {
+                errors.rejectValue("purgePeriod", "validate.greaterThanZero");
+            }
+
+            if (vo.textRenderer == null) {
+                errors.rejectValue("textRenderer", "validate.required");
+            }
+
+            if (!vo.chartColour.isEmpty()) {
+                try {
+                    ColorUtils.toColor(vo.chartColour);
+                } catch (InvalidArgumentException e) {
+                    errors.rejectValue("chartColour", "validate.invalidValue");
+                }
+            }
+
+            // Check text renderer type
+            if (vo.textRenderer != null && !vo.textRenderer.getDef().supports(vo.pointLocator.getDataType())) {
+                errors.rejectValue("textRenderer", "validate.text.incompatible");
+            }
+
+            // Check chart renderer type
+            if (vo.chartRenderer != null && !vo.chartRenderer.getType().supports(vo.pointLocator.getDataType())) {
+                errors.rejectValue("chartRenderer", "validate.chart.incompatible");
+            }
+        }
+
+    }
 
     private static final long serialVersionUID = -1;
     public static final String XID_PREFIX = "DP_";
@@ -69,19 +128,7 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
         return pointLocator.getDataType();
     }
 
-
     public static final Set<TimePeriods> PURGE_TYPES = EnumSet.of(TimePeriods.DAYS, TimePeriods.WEEKS, TimePeriods.MONTHS, TimePeriods.YEARS);
-
-
-    @Deprecated //TODO own units, not that of a subproject...
-    public static final int ENGINEERING_UNITS_DEFAULT = 95; // No units
-    private static final ExportCodes ENGINEERING_UNITS_CODES = new ExportCodes();
-
-    static {
-        for (int i = 0; i < 190; i++) {
-            ENGINEERING_UNITS_CODES.addElement(i, new EngineeringUnits(i).toString().toUpperCase().replace(' ', '_'), "engUnit." + i);
-        }
-    }
 
     public LocalizableMessage getConfigurationDescription() {
         return pointLocator.getConfigurationDescription();
@@ -98,40 +145,35 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
     //
     private int id = ScadaBrConstants.NEW_ID;
     private String xid;
-    
+
     private String name;
     private int dataSourceId;
-    
+
     private String deviceName;
-    
+
     private boolean enabled;
     private int pointFolderId;
     private LoggingTypes loggingType = LoggingTypes.ON_CHANGE;
     private TimePeriods intervalLoggingPeriodType = TimePeriods.MINUTES;
-    
+
     private int intervalLoggingPeriod = 15;
     private IntervalLoggingTypes intervalLoggingType = IntervalLoggingTypes.INSTANT;
-    
+
     private double tolerance = 0;
     private TimePeriods _purgeType = TimePeriods.YEARS;
-    
+
     private int purgePeriod = 1;
+    //TODO SingleValueRendererSettings
+    @Deprecated
     private TextRenderer textRenderer;
 //TODO    (typeFactory = BaseChartRenderer.Factory.class)
+    //TODO Rename multipleValueRenderSettings
+    @Deprecated
     private ChartRenderer chartRenderer;
     private List<PointEventDetectorVO> eventDetectors;
     private List<UserComment> comments;
     
-    @Deprecated
-    private int defaultCacheSize = 1;
-    
-    private boolean discardExtremeValues = false;
-    
-    private double discardLowLimit = -Double.MAX_VALUE;
-    
-    private double discardHighLimit = Double.MAX_VALUE;
-    private int engineeringUnits = ENGINEERING_UNITS_DEFAULT;
-    
+    @Deprecated // TODO move to ChartSetting
     private String chartColour;
 
     private PointLocatorVO pointLocator;
@@ -140,14 +182,12 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
     //
     // Convenience data from data source
     //
-    private int dataSourceTypeId;
     private String dataSourceName;
 
     //
     //
     // Required for importing
     //
-    
     private String dataSourceXid;
 
     //
@@ -178,6 +218,7 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
         return deviceName + " - " + name;
     }
 
+    @Deprecated
     public void defaultTextRenderer() {
         if (pointLocator == null) {
             textRenderer = new PlainRenderer("");
@@ -221,11 +262,6 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.valueType", intervalLoggingType);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.tolerance", tolerance);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.purge", _purgeType.getPeriodDescription(purgePeriod));
-        AuditEventType.addPropertyMessage(list, "pointEdit.logging.defaultCache", defaultCacheSize);
-        AuditEventType.addPropertyMessage(list, "pointEdit.logging.discard", discardExtremeValues);
-        AuditEventType.addDoubleSientificProperty(list, "pointEdit.logging.discardLow", discardLowLimit);
-        AuditEventType.addDoubleSientificProperty(list, "pointEdit.logging.discardHigh", discardHighLimit);
-        AuditEventType.addPropertyMessage(list, "pointEdit.logging.engineeringUnits", engineeringUnits);
         AuditEventType.addPropertyMessage(list, "pointEdit.props.chartColour", chartColour);
 
         pointLocator.addProperties(list);
@@ -243,11 +279,6 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.valueType", from.intervalLoggingType, intervalLoggingType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.tolerance", from.tolerance, tolerance);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.purge", from._purgeType.getPeriodDescription(from.purgePeriod), _purgeType.getPeriodDescription(purgePeriod));
-        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.defaultCache", from.defaultCacheSize, defaultCacheSize);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.discard", from.discardExtremeValues, discardExtremeValues);
-        AuditEventType.evaluateDoubleScientific(list, textRenderer.getMessagePattern(), "pointEdit.logging.discardLow", from.discardLowLimit, discardLowLimit);
-        AuditEventType.evaluateDoubleScientific(list, textRenderer.getMessagePattern(), "pointEdit.logging.discardHigh", from.discardHighLimit, discardHighLimit);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.engineeringUnits", from.engineeringUnits, engineeringUnits);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.props.chartColour", from.chartColour, chartColour);
 
         pointLocator.addPropertyChanges(list, from.pointLocator);
@@ -339,14 +370,6 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
         this.dataSourceXid = dataSourceXid;
     }
 
-    public int getDataSourceTypeId() {
-        return dataSourceTypeId;
-    }
-
-    public void setDataSourceTypeId(int dataSourceTypeId) {
-        this.dataSourceTypeId = dataSourceTypeId;
-    }
-
     public LoggingTypes getLoggingType() {
         return loggingType;
     }
@@ -380,18 +403,22 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
     }
 
     //TODO use MessageFormat pattern for this ???
+    @Deprecated
     public TextRenderer getTextRenderer() {
         return textRenderer;
     }
 
+    @Deprecated
     public void setTextRenderer(TextRenderer textRenderer) {
         this.textRenderer = textRenderer;
     }
 
+    @Deprecated
     public ChartRenderer getChartRenderer() {
         return chartRenderer;
     }
 
+    @Deprecated
     public void setChartRenderer(ChartRenderer chartRenderer) {
         this.chartRenderer = chartRenderer;
     }
@@ -410,14 +437,6 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
 
     public void setComments(List<UserComment> comments) {
         this.comments = comments;
-    }
-
-    public int getDefaultCacheSize() {
-        return defaultCacheSize;
-    }
-
-    public void setDefaultCacheSize(int defaultCacheSize) {
-        this.defaultCacheSize = defaultCacheSize;
     }
 
     public TimePeriods getIntervalLoggingPeriodType() {
@@ -444,42 +463,12 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
         this.intervalLoggingType = intervalLoggingType;
     }
 
-    public boolean isDiscardExtremeValues() {
-        return discardExtremeValues;
-    }
-
-    public void setDiscardExtremeValues(boolean discardExtremeValues) {
-        this.discardExtremeValues = discardExtremeValues;
-    }
-
-    public double getDiscardLowLimit() {
-        return discardLowLimit;
-    }
-
-    public void setDiscardLowLimit(double discardLowLimit) {
-        this.discardLowLimit = discardLowLimit;
-    }
-
-    public double getDiscardHighLimit() {
-        return discardHighLimit;
-    }
-
-    public void setDiscardHighLimit(double discardHighLimit) {
-        this.discardHighLimit = discardHighLimit;
-    }
-
-    public int getEngineeringUnits() {
-        return engineeringUnits;
-    }
-
-    public void setEngineeringUnits(int engineeringUnits) {
-        this.engineeringUnits = engineeringUnits;
-    }
-
+    @Deprecated
     public String getChartColour() {
         return chartColour;
     }
 
+    @Deprecated
     public void setChartColour(String chartColour) {
         this.chartColour = chartColour;
     }
@@ -499,71 +488,11 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
                 + ", loggingType=" + loggingType + ", intervalLoggingPeriodType=" + intervalLoggingPeriodType
                 + ", intervalLoggingPeriod=" + intervalLoggingPeriod + ", intervalLoggingType=" + intervalLoggingType
                 + ", tolerance=" + tolerance + ", purgeType=" + _purgeType + ", purgePeriod=" + purgePeriod
-                + ", textRenderer=" + textRenderer + ", chartRenderer=" + chartRenderer + ", eventDetectors="
-                + eventDetectors + ", comments=" + comments + ", defaultCacheSize=" + defaultCacheSize
-                + ", discardExtremeValues=" + discardExtremeValues + ", discardLowLimit=" + discardLowLimit
-                + ", discardHighLimit=" + discardHighLimit + ", engineeringUnits=" + engineeringUnits
-                + ", chartColour=" + chartColour + ", pointLocator=" + pointLocator + ", dataSourceTypeId="
-                + dataSourceTypeId + ", dataSourceName=" + dataSourceName + ", dataSourceXid=" + dataSourceXid
+                + ", textRenderer=" + textRenderer + ", chartRenderer=" + chartRenderer
+                + ", eventDetectors=" + eventDetectors + ", comments=" + comments
+                + ", chartColour=" + chartColour + ", pointLocator=" + pointLocator
+                + ", dataSourceName=" + dataSourceName + ", dataSourceXid=" + dataSourceXid
                 + ", lastValue=" + lastValue + ", settable=" + settable + "]";
-    }
-
-    public void validate(DwrResponseI18n response) {
-        if (xid.isEmpty()) {
-            response.addContextual("xid", "validate.required");
-        } else if (xid.length() > 50) {
-            response.addContextual("xid", "validate.notLongerThan", 50);
-        } else if (!dataPointDao.isXidUnique(xid, id)) {
-            response.addContextual("xid", "validate.xidUsed");
-        }
-
-        if (name.isEmpty()) {
-            response.addContextual("name", "validate.required");
-        }
-
-        if (loggingType == LoggingTypes.ON_CHANGE && getDataType() == DataType.NUMERIC) {
-            if (tolerance < 0) {
-                response.addContextual("tolerance", "validate.cannotBeNegative");
-            }
-        }
-
-        if (intervalLoggingPeriod <= 0) {
-            response.addContextual("intervalLoggingPeriod", "validate.greaterThanZero");
-        }
-
-        if (purgePeriod <= 0) {
-            response.addContextual("purgePeriod", "validate.greaterThanZero");
-        }
-
-        if (textRenderer == null) {
-            response.addContextual("textRenderer", "validate.required");
-        }
-
-        if (defaultCacheSize < 0) {
-            response.addContextual("defaultCacheSize", "validate.cannotBeNegative");
-        }
-
-        if (discardExtremeValues && discardHighLimit <= discardLowLimit) {
-            response.addContextual("discardHighLimit", "validate.greaterThanDiscardLow");
-        }
-
-        if (!chartColour.isEmpty()) {
-            try {
-                ColorUtils.toColor(chartColour);
-            } catch (InvalidArgumentException e) {
-                response.addContextual("chartColour", "validate.invalidValue");
-            }
-        }
-
-        // Check text renderer type
-        if (textRenderer != null && !textRenderer.getDef().supports(pointLocator.getDataType())) {
-            response.addGeneric("validate.text.incompatible");
-        }
-
-        // Check chart renderer type
-        if (chartRenderer != null && !chartRenderer.getType().supports(pointLocator.getDataType())) {
-            response.addGeneric("validate.chart.incompatible");
-        }
     }
 
     //
@@ -588,11 +517,11 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
         out.writeObject(textRenderer);
         out.writeObject(chartRenderer);
         out.writeObject(pointLocator);
-        out.writeInt(defaultCacheSize);
-        out.writeBoolean(discardExtremeValues);
-        out.writeDouble(discardLowLimit);
-        out.writeDouble(discardHighLimit);
-        out.writeInt(engineeringUnits);
+        out.writeInt(0);
+        out.writeBoolean(false); //discardExtremeValues);
+        out.writeDouble(-Double.MAX_VALUE); //discardLowLimit);
+        out.writeDouble(Double.MAX_VALUE); //discardHighLimit);
+        out.writeInt(0); //engineeringUnits);
         SerializationHelper.writeSafeUTF(out, chartColour);
     }
 
@@ -615,8 +544,8 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
             textRenderer = (TextRenderer) in.readObject();
             chartRenderer = (ChartRenderer) in.readObject();
             pointLocator = (PointLocatorVO) in.readObject();
-            defaultCacheSize = 0;
-            engineeringUnits = ENGINEERING_UNITS_DEFAULT;
+//            defaultCacheSize = 0;
+//            engineeringUnits = ENGINEERING_UNITS_DEFAULT;
             chartColour = null;
         } else if (ver == 2) {
             name = SerializationHelper.readSafeUTF(in);
@@ -640,8 +569,8 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
                 // Turn this guy off.
                 enabled = false;
             }
-            defaultCacheSize = 0;
-            engineeringUnits = ENGINEERING_UNITS_DEFAULT;
+//            defaultCacheSize = 0;
+//            engineeringUnits = ENGINEERING_UNITS_DEFAULT;
             chartColour = null;
         } else if (ver == 3) {
             name = SerializationHelper.readSafeUTF(in);
@@ -665,8 +594,8 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
                 // Turn this guy off.
                 enabled = false;
             }
-            defaultCacheSize = in.readInt();
-            engineeringUnits = ENGINEERING_UNITS_DEFAULT;
+//            defaultCacheSize = in.readInt();
+//            engineeringUnits = ENGINEERING_UNITS_DEFAULT;
             chartColour = null;
         } else if (ver == 4) {
             name = SerializationHelper.readSafeUTF(in);
@@ -690,8 +619,8 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
                 // Turn this guy off.
                 enabled = false;
             }
-            defaultCacheSize = in.readInt();
-            engineeringUnits = ENGINEERING_UNITS_DEFAULT;
+//            defaultCacheSize = in.readInt();
+//            engineeringUnits = ENGINEERING_UNITS_DEFAULT;
             chartColour = null;
         } else if (ver == 5) {
             name = SerializationHelper.readSafeUTF(in);
@@ -708,11 +637,15 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
             textRenderer = (TextRenderer) in.readObject();
             chartRenderer = (ChartRenderer) in.readObject();
             pointLocator = (PointLocatorVO) in.readObject();
-            defaultCacheSize = in.readInt();
-            discardExtremeValues = in.readBoolean();
-            discardLowLimit = in.readDouble();
-            discardHighLimit = in.readDouble();
-            engineeringUnits = ENGINEERING_UNITS_DEFAULT;
+            //defaultCacheSize = 
+            in.readInt();
+            //discardExtremeValues = 
+            in.readBoolean();
+            //discardLowLimit = 
+            in.readDouble();
+            //discardHighLimit = 
+            in.readDouble();
+            //engineeringUnits = ENGINEERING_UNITS_DEFAULT;
             chartColour = null;
         } else if (ver == 6) {
             name = SerializationHelper.readSafeUTF(in);
@@ -729,11 +662,16 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
             textRenderer = (TextRenderer) in.readObject();
             chartRenderer = (ChartRenderer) in.readObject();
             pointLocator = (PointLocatorVO) in.readObject();
-            defaultCacheSize = in.readInt();
-            discardExtremeValues = in.readBoolean();
-            discardLowLimit = in.readDouble();
-            discardHighLimit = in.readDouble();
-            engineeringUnits = in.readInt();
+            //defaultCacheSize = 
+            in.readInt();
+            //discardExtremeValues = 
+            in.readBoolean();
+            //discardLowLimit = 
+            in.readDouble();
+            //discardHighLimit = 
+            in.readDouble();
+            //engineeringUnits = 
+            in.readInt();
             chartColour = null;
         } else if (ver == 7) {
             name = SerializationHelper.readSafeUTF(in);
@@ -750,11 +688,16 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
             textRenderer = (TextRenderer) in.readObject();
             chartRenderer = (ChartRenderer) in.readObject();
             pointLocator = (PointLocatorVO) in.readObject();
-            defaultCacheSize = in.readInt();
-            discardExtremeValues = in.readBoolean();
-            discardLowLimit = in.readDouble();
-            discardHighLimit = in.readDouble();
-            engineeringUnits = in.readInt();
+            //defaultCacheSize = 
+            in.readInt();
+            //discardExtremeValues = 
+            in.readBoolean();
+            //discardLowLimit = 
+            in.readDouble();
+            //discardHighLimit = 
+            in.readDouble();
+            //engineeringUnits = 
+            in.readInt();
             chartColour = SerializationHelper.readSafeUTF(in);
         } else if (ver == 8) {
             name = SerializationHelper.readSafeUTF(in);
@@ -771,11 +714,16 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
             textRenderer = (TextRenderer) in.readObject();
             chartRenderer = (ChartRenderer) in.readObject();
             pointLocator = (PointLocatorVO) in.readObject();
-            defaultCacheSize = in.readInt();
-            discardExtremeValues = in.readBoolean();
-            discardLowLimit = in.readDouble();
-            discardHighLimit = in.readDouble();
-            engineeringUnits = in.readInt();
+            //defaultCacheSize = 
+            in.readInt();
+            //discardExtremeValues = 
+            in.readBoolean();
+            //discardLowLimit = 
+            in.readDouble();
+            //discardHighLimit = 
+            in.readDouble();
+            //engineeringUnits = 
+            in.readInt();
             chartColour = SerializationHelper.readSafeUTF(in);
         }
 

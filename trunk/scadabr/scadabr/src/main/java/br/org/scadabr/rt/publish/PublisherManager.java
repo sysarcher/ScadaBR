@@ -5,7 +5,7 @@
  */
 package br.org.scadabr.rt.publish;
 
-import com.serotonin.mango.db.dao.PublisherDao;
+import br.org.scadabr.dao.PublisherDao;
 import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.rt.publish.PublisherRT;
 import com.serotonin.mango.vo.publish.PublishedPointVO;

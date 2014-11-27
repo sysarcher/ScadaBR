@@ -33,10 +33,10 @@ import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.jdbc.SystemSettingsDaoImpl;
+import br.org.scadabr.dao.jdbc.UserDaoImpl;
 import br.org.scadabr.db.spring.ConnectionCallbackVoid;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.db.dao.SystemSettingsDao;
-import com.serotonin.mango.db.dao.UserDao;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 
@@ -126,11 +126,10 @@ abstract public class DatabaseAccess {
                     log.info("Setup user admin in db");
 
                     // New database. Create a default user.
-                    UserDao.createAdmin(ejt);
+                    UserDaoImpl.createAdmin(ejt);
 
                     // Record the current version.
-                    SystemSettingsDao.setValue(ejt, SystemSettingsDao.DATABASE_SCHEMA_VERSION,
-                            Common.getVersion());
+                    SystemSettingsDaoImpl.setSetSchemaVersion(ejt, Common.getVersion());
                     log.info("database sucessfully created");
                     
                 }

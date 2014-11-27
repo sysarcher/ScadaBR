@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -37,11 +36,13 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.dao.PointLinkDao;
+import br.org.scadabr.dao.PointValueDao;
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.rt.link.PointLinkManager;
 import com.serotonin.mango.Common;
-import static com.serotonin.mango.db.dao.BaseDao.boolToChar;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
@@ -70,20 +71,18 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 
 @Named
-public class DataPointDao extends BaseDao {
+public class DataPointDaoImpl extends BaseDao implements DataPointDao {
 
     public final static int ROOT_ID = 0;
 
     @Inject
     private PointLinkManager pointLinkManager;
     @Inject
-    private DataSourceDao dataSourceDao;
-    @Inject
     private PointLinkDao pointLinkDao;
     @Inject
     private PointValueDao pointValueDao;
-    
-    public DataPointDao() {
+
+    public DataPointDaoImpl() {
         super();
     }
 
@@ -91,14 +90,17 @@ public class DataPointDao extends BaseDao {
     //
     // Data Points
     //
+    @Override
     public String generateUniqueXid() {
         return generateUniqueXid(DataPointVO.XID_PREFIX, "dataPoints");
     }
 
+    @Override
     public boolean isXidUnique(String xid, int excludeId) {
         return isXidUnique(xid, excludeId, "dataPoints");
     }
 
+    @Override
     public String getCanonicalPointName(final DataPointVO dp) {
         int folderId = dp.getPointFolderId();
         StringBuilder sb = new StringBuilder();
@@ -113,6 +115,7 @@ public class DataPointDao extends BaseDao {
     }
 
     @Deprecated
+    @Override
     public String getExtendedPointName(int dataPointId) {
         DataPointVO vo = getDataPoint(dataPointId);
         if (vo == null) {
@@ -125,26 +128,23 @@ public class DataPointDao extends BaseDao {
             + "ds.xid, ds.dataSourceType " //
             + "from dataPoints dp join dataSources ds on ds.id = dp.dataSourceId ";
 
-    public List<DataPointVO> getDataPoints(Comparator<DataPointVO> comparator, boolean includeRelationalData) {
+    @Override
+    public Iterable<DataPointVO> getDataPoints(boolean includeRelationalData) {
         List<DataPointVO> dps = ejt.query(DATA_POINT_SELECT, new DataPointRowMapper());
         if (includeRelationalData) {
             setRelationalData(dps);
         }
-        if (comparator != null) {
-            Collections.sort(dps, comparator);
-        }
         return dps;
     }
 
-    public List<DataPointVO> getDataPoints(int dataSourceId, Comparator<DataPointVO> comparator) {
-        List<DataPointVO> dps = ejt.query(DATA_POINT_SELECT + " where dp.dataSourceId=?", new DataPointRowMapper(), dataSourceId);
+    @Override
+    public Iterable<DataPointVO> getDataPoints(int dataSourceId) {
+        final List<DataPointVO> dps = ejt.query(DATA_POINT_SELECT + " where dp.dataSourceId=?", new DataPointRowMapper(), dataSourceId);
         setRelationalData(dps);
-        if (comparator != null) {
-            Collections.sort(dps, comparator);
-        }
         return dps;
     }
 
+    @Override
     public DataPointVO getDataPoint(int id) {
         DataPointVO dp;
         try {
@@ -156,6 +156,7 @@ public class DataPointDao extends BaseDao {
         return dp;
     }
 
+    @Override
     public DataPointVO getDataPoint(String xid) {
         DataPointVO dp;
         try {
@@ -192,6 +193,7 @@ public class DataPointDao extends BaseDao {
     }
 
     //TODO Quick and dirty
+    @Override
     public Collection<LazyTreeNode> getFoldersAndDpByParentId(final int parentId) {
 
         final Collection<LazyTreeNode> result = new LinkedList<>();
@@ -211,8 +213,7 @@ public class DataPointDao extends BaseDao {
         }, parentId);
         //TODO the folderID is saved in the blob ... workaround: reasd all dp ... DataPoints
         // This will change the db...
-        List<DataPointVO> points = getDataPoints(DataPointExtendedNameComparator.instance, false);
-        for (DataPointVO dp : points) {
+        for (DataPointVO dp : getDataPoints(false)) {
             if (dp.getPointFolderId() == parentId) {
                 LazyTreeNode n = new LazyTreeNode();
                 n.setParentId(parentId);
@@ -250,7 +251,6 @@ public class DataPointDao extends BaseDao {
             // Data source information.
             dp.setDataSourceName(rs.getString(5));
             dp.setDataSourceXid(rs.getString(6));
-            dp.setDataSourceTypeId(rs.getInt(7));
 
             return dp;
         }
@@ -270,6 +270,7 @@ public class DataPointDao extends BaseDao {
         setPointComments(dp);
     }
 
+    @Override
     public void saveDataPoint(final DataPointVO dp) {
         getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
             @Override
@@ -317,7 +318,8 @@ public class DataPointDao extends BaseDao {
         AuditEventType.raiseAddedEvent(AuditEventKey.DATA_POINT, dp);
     }
 
-    void updateDataPoint(final DataPointVO dp) {
+    @Override
+    public void updateDataPoint(final DataPointVO dp) {
         DataPointVO old = getDataPoint(dp.getId());
 
         if (old.getDataType() != dp.getDataType()) {
@@ -350,8 +352,9 @@ public class DataPointDao extends BaseDao {
         });
     }
 
+    @Override
     public void deleteDataPoints(final int dataSourceId) {
-        List<DataPointVO> old = getDataPoints(dataSourceId, null);
+        final Iterable<DataPointVO> old = getDataPoints(dataSourceId);
         for (DataPointVO dp : old) {
             beforePointDelete(dp.getId());
         }
@@ -376,6 +379,7 @@ public class DataPointDao extends BaseDao {
         }
     }
 
+    @Override
     public void deleteDataPoint(final int dataPointId) {
         DataPointVO dp = getDataPoint(dataPointId);
         if (dp != null) {
@@ -589,6 +593,7 @@ public class DataPointDao extends BaseDao {
         return null;
     }
 
+    @Override
     public void copyPermissions(final int fromDataPointId, final int toDataPointId) {
         final List<Tuple<Integer, Integer>> ups;
         ups = ejt.query(
@@ -657,8 +662,7 @@ public class DataPointDao extends BaseDao {
             addFoldersToHeirarchy(ph, ROOT_ID, folders);
 
             // Add data points.
-            List<DataPointVO> points = getDataPoints(DataPointExtendedNameComparator.instance, false);
-            for (DataPointVO dp : points) {
+            for (DataPointVO dp : getDataPoints(false)) {
                 ph.addDataPoint(dp.getId(), dp.getPointFolderId(), dp.getExtendedName());
             }
 
@@ -774,6 +778,7 @@ public class DataPointDao extends BaseDao {
         }
     }
 
+    @Deprecated
     public List<PointHistoryCount> getTopPointHistoryCounts() {
         List<PointHistoryCount> counts = ejt.query(
                 "select dataPointId, count(*) from pointValues group by dataPointId order by 2 desc",
@@ -787,11 +792,9 @@ public class DataPointDao extends BaseDao {
                     }
                 });
 
-        List<DataPointVO> points = getDataPoints(DataPointExtendedNameComparator.instance, false);
-
         // Collate in the point names.
         for (PointHistoryCount c : counts) {
-            for (DataPointVO point : points) {
+            for (DataPointVO point : getDataPoints(false)) {
                 if (point.getId() == c.getPointId()) {
                     c.setPointName(point.getExtendedName());
                     break;

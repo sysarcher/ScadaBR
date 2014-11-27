@@ -21,13 +21,11 @@ package com.serotonin.mango.rt.link;
 import br.org.scadabr.DataType;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.rt.datasource.meta.ScriptExecutor;
-import br.org.scadabr.rt.event.type.DuplicateHandling;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.script.ScriptException;
 
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointListener;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
@@ -165,7 +163,7 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
 
     @Override
     public void pointChanged(PointValueTime oldValue, PointValueTime newValue) {
-        if (vo.getEvent() == PointLinkVO.EVENT_CHANGE) {
+        if (vo.getEvent() == PointLinkVO.EventType.CHANGE) {
             execute(newValue);
         }
     }
@@ -182,7 +180,7 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
 
     @Override
     public void pointUpdated(PointValueTime newValue) {
-        if (vo.getEvent() == PointLinkVO.EVENT_UPDATE) {
+        if (vo.getEvent() == PointLinkVO.EventType.UPDATE) {
             execute(newValue);
         }
     }

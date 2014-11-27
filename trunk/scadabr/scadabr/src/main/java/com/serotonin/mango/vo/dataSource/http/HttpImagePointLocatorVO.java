@@ -30,26 +30,103 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.web.dwr.DwrResponseI18n;
+import br.org.scadabr.utils.i18n.LocalizableEnum;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 /**
  * @author Matthew Lohbihler
  */
-
 public class HttpImagePointLocatorVO extends AbstractPointLocatorVO {
 
-    public static final int SCALE_TYPE_NONE = 0;
-    public static final int SCALE_TYPE_PERCENT = 1;
-    public static final int SCALE_TYPE_BOX = 2;
+    public static class HttpImagePointLocatorVoValidato implements Validator {
 
-    private static final ExportCodes SCALE_TYPE_CODES = new ExportCodes();
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return HttpImagePointLocatorVO.class.isAssignableFrom(clazz);
+        }
 
-    static {
-        SCALE_TYPE_CODES.addElement(SCALE_TYPE_NONE, "SCALE_TYPE_NONE", "dsEdit.httpImage.scalingType.none");
-        SCALE_TYPE_CODES.addElement(SCALE_TYPE_PERCENT, "SCALE_TYPE_PERCENT", "dsEdit.httpImage.scalingType.percent");
-        SCALE_TYPE_CODES.addElement(SCALE_TYPE_BOX, "SCALE_TYPE_BOX", "dsEdit.httpImage.scalingType.box");
+        @Override
+        public void validate(Object target, Errors errors) {
+            final HttpImagePointLocatorVO vo = (HttpImagePointLocatorVO) target;
+            if (vo.url.isEmpty()) {
+                errors.rejectValue("url", "validate.required");
+            }
+            if (vo.timeoutSeconds <= 0) {
+                errors.rejectValue("timeoutSeconds", "validate.greaterThanZero");
+            }
+            if (vo.retries < 0) {
+                errors.rejectValue("retries", "validate.cannotBeNegative");
+            }
+            switch (vo.scaleType) { case PERCENT:
+                if (vo.scalePercent <= 0) {
+                    errors.rejectValue("scalePercent", "validate.greaterThanZero");
+                } else if (vo.scalePercent > 100) {
+                    errors.rejectValue("scalePercent", "validate.lessThan100");
+                }
+            break;
+            case BOX:
+                if (vo.scaleWidth <= 0) {
+                    errors.rejectValue("scaleWidth", "validate.greaterThanZero");
+                }
+                if (vo.scaleHeight <= 0) {
+                    errors.rejectValue("scaleHeight", "validate.greaterThanZero");
+                }
+            }
+        
+            if (vo.readLimit <= 0) {
+                errors.rejectValue("readLimit", "validate.greaterThanZero");
+            }
+        }
+    }
+
+    public enum Scale implements LocalizableEnum<Scale> {
+
+        NONE(0, "dsEdit.httpImage.scalingType.none"),
+        PERCENT(1, "dsEdit.httpImage.scalingType.percent"),
+        BOX(2, "dsEdit.httpImage.scalingType.box");
+        private final int id;
+        private final String i18nKey;
+
+        private Scale(int id, String i18nKey) {
+            this.id = id;
+            this.i18nKey = i18nKey;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public static Scale fromId(int id) {
+            switch (id) {
+                case 0:
+                    return NONE;
+                case 1:
+                    return PERCENT;
+                case 2:
+                    return BOX;
+                default:
+                    throw new IndexOutOfBoundsException("Cant get Scale from id: " + id);
+            }
+        }
+
+        @Override
+        public String getName() {
+            return name();
+        }
+
+        @Override
+        public String getI18nKey() {
+            return i18nKey;
+        }
+
+        @Override
+        public Object[] getArgs() {
+            return null;
+        }
+
     }
 
     @Override
@@ -67,22 +144,21 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO {
         return new LocalizableMessageImpl("common.default", url);
     }
 
-    
     private String url;
-    
+
     private int timeoutSeconds = 30;
-    
+
     private int retries = 2;
-    private int scaleType;
-    
+    private Scale scaleType;
+
     private int scalePercent = 25;
-    
+
     private int scaleWidth = 100;
-    
+
     private int scaleHeight = 100;
-    
+
     private int readLimit = 10000;
-    
+
     private String webcamLiveFeedCode;
 
     public String getUrl() {
@@ -109,11 +185,11 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO {
         this.retries = retries;
     }
 
-    public int getScaleType() {
+    public Scale getScaleType() {
         return scaleType;
     }
 
-    public void setScaleType(int scaleType) {
+    public void setScaleType(Scale scaleType) {
         this.scaleType = scaleType;
     }
 
@@ -162,45 +238,12 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO {
         return DataType.IMAGE;
     }
 
-//TODO refactor to own validator class    @Override
-    public void validate(DwrResponseI18n response) {
-        if (url.isEmpty()) {
-            response.addContextual("url", "validate.required");
-        }
-        if (timeoutSeconds <= 0) {
-            response.addContextual("timeoutSeconds", "validate.greaterThanZero");
-        }
-        if (retries < 0) {
-            response.addContextual("retries", "validate.cannotBeNegative");
-        }
-        if (!SCALE_TYPE_CODES.isValidId(scaleType)) {
-            response.addContextual("scaleType", "validate.invalidValue");
-        }
-        if (scaleType == SCALE_TYPE_PERCENT) {
-            if (scalePercent <= 0) {
-                response.addContextual("scalePercent", "validate.greaterThanZero");
-            } else if (scalePercent > 100) {
-                response.addContextual("scalePercent", "validate.lessThan100");
-            }
-        } else if (scaleType == SCALE_TYPE_BOX) {
-            if (scaleWidth <= 0) {
-                response.addContextual("scaleWidth", "validate.greaterThanZero");
-            }
-            if (scaleHeight <= 0) {
-                response.addContextual("scaleHeight", "validate.greaterThanZero");
-            }
-        }
-        if (readLimit <= 0) {
-            response.addContextual("readLimit", "validate.greaterThanZero");
-        }
-    }
-
     @Override
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "dsEdit.httpImage.url", url);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpImage.timeout", timeoutSeconds);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpImage.retries", retries);
-        AuditEventType.addExportCodeMessage(list, "dsEdit.httpImage.scalingType", SCALE_TYPE_CODES, scaleType);
+        AuditEventType.addPropertyMessage(list, "dsEdit.httpImage.scalingType", scaleType);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpImage.scalePercent", scalePercent);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpImage.scaleWidth", scaleWidth);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpImage.scaleHeight", scaleHeight);
@@ -212,19 +255,14 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO {
     public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
         HttpImagePointLocatorVO from = (HttpImagePointLocatorVO) o;
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpImage.url", from.url, url);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpImage.timeout", from.timeoutSeconds,
-                timeoutSeconds);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpImage.timeout", from.timeoutSeconds, timeoutSeconds);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpImage.retries", from.retries, retries);
-        AuditEventType.maybeAddExportCodeChangeMessage(list, "dsEdit.httpImage.scalingType", SCALE_TYPE_CODES,
-                from.scaleType, scaleType);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpImage.scalePercent", from.scalePercent,
-                scalePercent);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpImage.scalingType", from.scaleType, scaleType);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpImage.scalePercent", from.scalePercent, scalePercent);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpImage.scaleWidth", from.scaleWidth, scaleWidth);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpImage.scaleHeight", from.scaleHeight,
-                scaleHeight);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpImage.scaleHeight", from.scaleHeight, scaleHeight);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpImage.readLimit", from.readLimit, readLimit);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpImage.liveFeed", from.webcamLiveFeedCode,
-                webcamLiveFeedCode);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpImage.liveFeed", from.webcamLiveFeedCode, webcamLiveFeedCode);
     }
 
     //
@@ -240,7 +278,7 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO {
         SerializationHelper.writeSafeUTF(out, url);
         out.writeInt(timeoutSeconds);
         out.writeInt(retries);
-        out.writeInt(scaleType);
+        out.writeInt(scaleType.getId());
         out.writeInt(scalePercent);
         out.writeInt(scaleWidth);
         out.writeInt(scaleHeight);
@@ -256,7 +294,7 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO {
             url = SerializationHelper.readSafeUTF(in);
             timeoutSeconds = in.readInt();
             retries = in.readInt();
-            scaleType = in.readInt();
+            scaleType = Scale.fromId(in.readInt());
             scalePercent = in.readInt();
             scaleWidth = in.readInt();
             scaleHeight = in.readInt();

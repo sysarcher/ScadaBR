@@ -1,8 +1,8 @@
 package br.org.scadabr.web.mvc.controller.jsonrpc;
 
+import br.org.scadabr.dao.UserDao;
 import br.org.scadabr.logger.LogUtils;
 import com.googlecode.jsonrpc4j.JsonRpcService;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.util.logging.Logger;
@@ -11,7 +11,6 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.web.context.WebApplicationContext;
 
 @Named
 @JsonRpcService("/rpc/users")

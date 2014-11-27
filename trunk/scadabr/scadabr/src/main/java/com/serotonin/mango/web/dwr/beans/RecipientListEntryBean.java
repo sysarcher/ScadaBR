@@ -21,24 +21,14 @@ package com.serotonin.mango.web.dwr.beans;
 import java.io.Serializable;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import com.serotonin.mango.db.dao.MailingListDao;
-import com.serotonin.mango.db.dao.UserDao;
 import com.serotonin.mango.vo.mailingList.AddressEntry;
 import com.serotonin.mango.vo.mailingList.EmailRecipient;
 import com.serotonin.mango.vo.mailingList.MailingList;
 import com.serotonin.mango.vo.mailingList.UserEntry;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 
 
-@Configurable
 public class RecipientListEntryBean implements Serializable {
 
-    @Autowired
-    private MailingListDao mailingListDao;
-    @Autowired
-    private UserDao userDao;
-            
     private static final long serialVersionUID = -1;
 
     private int recipientType;

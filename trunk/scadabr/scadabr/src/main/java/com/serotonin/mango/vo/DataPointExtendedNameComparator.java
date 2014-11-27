@@ -23,6 +23,7 @@ import java.util.Comparator;
 /**
  * @author Matthew Lohbihler
  */
+@Deprecated
 public class DataPointExtendedNameComparator implements Comparator<DataPointVO> {
 
     public static final DataPointExtendedNameComparator instance = new DataPointExtendedNameComparator();

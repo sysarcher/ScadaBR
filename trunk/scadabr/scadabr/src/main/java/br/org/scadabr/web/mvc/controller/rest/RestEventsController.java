@@ -18,9 +18,9 @@
  */
 package br.org.scadabr.web.mvc.controller.rest;
 
+import br.org.scadabr.dao.EventDao;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
-import com.serotonin.mango.db.dao.EventDao;
 import com.serotonin.mango.web.UserSessionContextBean;
 import br.org.scadabr.web.mvc.controller.jsonrpc.JsonEventInstance;
 import java.util.logging.Logger;

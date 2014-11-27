@@ -16,9 +16,10 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db.dao;
+package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.ScadaBrConstants;
+import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import java.io.Serializable;
 import java.sql.Blob;
@@ -44,7 +45,6 @@ import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.type.AuditEventKey;
 import br.org.scadabr.vo.event.type.DataSourceEventKey;
 import com.serotonin.mango.rt.event.type.DataSourceEventType;
-import com.serotonin.mango.rt.event.type.EventType;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.HashMap;
@@ -58,9 +58,11 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.support.TransactionCallback;
+import br.org.scadabr.dao.DataSourceDao;
+import br.org.scadabr.dao.MaintenanceEventDao;
 
 @Named
-public class DataSourceDao extends BaseDao {
+public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
 
     private static final String DATA_SOURCE_SELECT = "select id, xid, name, data from dataSources ";
 
@@ -71,15 +73,17 @@ public class DataSourceDao extends BaseDao {
 
     Map<Integer, Map<Integer, DataSourceEventType>> dataSourceEventTypes = new HashMap<>();
     
-    public DataSourceDao() {
+    public DataSourceDaoImpl() {
         super();
     }
 
-    public List<DataSourceVO<?>> getDataSources() {
+    @Override
+    public Iterable<DataSourceVO<?>> getDataSources() {
         List<DataSourceVO<?>> dss = ejt.query(DATA_SOURCE_SELECT + " order by name asc", new DataSourceRowMapper());
         return dss;
     }
 
+    @Override
     public DataSourceVO<?> getDataSource(int id) {
         try {
             return ejt.queryForObject(DATA_SOURCE_SELECT + " where id=?", new DataSourceRowMapper(), id);
@@ -96,7 +100,8 @@ public class DataSourceDao extends BaseDao {
         }
     }
 
-    DataSourceEventType getEventType(int dsId, int eventKeyId) {
+    @Override
+    public DataSourceEventType getEventType(int dsId, int eventKeyId) {
         Map<Integer, DataSourceEventType> eventTypes = dataSourceEventTypes.get(dsId);
         if (eventTypes == null) {
            final DataSourceVO dsVo = getDataSource(dsId);
@@ -125,10 +130,12 @@ public class DataSourceDao extends BaseDao {
         return generateUniqueXid(DataSourceVO.XID_PREFIX, "dataSources");
     }
 
+    @Override
     public boolean isXidUnique(String xid, int excludeId) {
         return isXidUnique(xid, excludeId, "dataSources");
     }
 
+    @Override
     public void saveDataSource(final DataSourceVO<?> vo) {
         // Decide whether to insert or update.
         if (vo.isNew()) {
@@ -180,8 +187,7 @@ public class DataSourceDao extends BaseDao {
         });
         //if datasource's name has changed, update datapoints 
         if (!vo.getName().equals(old.getName())) {
-            List<DataPointVO> dpList = dataPointDao.getDataPoints(vo.getId(), null);
-            for (DataPointVO dp : dpList) {
+            for (DataPointVO dp : dataPointDao.getDataPoints(vo.getId())) {
                 dp.setDataSourceName(vo.getName());
                 dp.setDeviceName(vo.getName());
                 dataPointDao.updateDataPoint(dp);
@@ -192,6 +198,7 @@ public class DataSourceDao extends BaseDao {
         AuditEventType.raiseChangedEvent(AuditEventKey.DATA_SOURCE, old, (ChangeComparable<DataSourceVO<?>>) vo);
     }
 
+    @Override
     public void deleteDataSource(final int dataSourceId) {
         DataSourceVO<?> vo = getDataSource(dataSourceId);
         final JdbcTemplate ejt2 = ejt;
@@ -251,7 +258,7 @@ public class DataSourceDao extends BaseDao {
                 copyPermissions(dataSource.getId(), dataSourceCopy.getId());
 
                 // Copy the points.
-                for (DataPointVO dataPoint : dataPointDao.getDataPoints(dataSourceId, null)) {
+                for (DataPointVO dataPoint : dataPointDao.getDataPoints(dataSourceId)) {
                     DataPointVO dataPointCopy = dataPoint.copy();
                     dataPointCopy.setId(ScadaBrConstants.NEW_ID);
                     dataPointCopy.setXid(dataPointDao.generateUniqueXid());
@@ -279,8 +286,9 @@ public class DataSourceDao extends BaseDao {
         });
     }
 
-    public Object getPersistentData(int id) {
-        return ejt.query("select rtdata from dataSources where id=?", new Object[]{id},
+    @Override
+    public Object getPersistentData(DataSourceVO dsVo) {
+        return ejt.query("select rtdata from dataSources where id=?", new Object[]{dsVo.getId()},
                 new ResultSetExtractor<Serializable>() {
                     @Override
                     public Serializable extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -298,14 +306,15 @@ public class DataSourceDao extends BaseDao {
                 });
     }
 
-    public void savePersistentData(final int id, final Object data) {
+    @Override
+    public void savePersistentData(final DataSourceVO dsVO, final Object data) {
         ejt.update(new PreparedStatementCreator() {
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 final PreparedStatement ps = con.prepareStatement("update dataSources set rtdata=? where id=?");
                 ps.setBlob(1, SerializationHelper.writeObject(data));
-                ps.setInt(2, id);
+                ps.setInt(2, dsVO.getId());
                 return ps;
             }
         });
