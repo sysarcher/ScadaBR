@@ -52,7 +52,6 @@ import com.serotonin.mango.rt.dataSource.meta.NumericPointWrapper;
 import com.serotonin.mango.rt.dataSource.meta.ResultTypeException;
 import com.serotonin.mango.rt.dataSource.meta.WrapperContext;
 import java.io.InputStream;
-import java.util.Date;
 import javax.script.Invocable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -218,4 +217,28 @@ public class ScriptExecutor {
         }
         functions = sw.toString();
     }
+    
+    public static void validateScript(String script, List<IntValuePair> context, DataType dataType) {
+
+        ScriptExecutor executor = new ScriptExecutor();
+        try {
+            Map<String, IDataPoint> convertedContext = executor.convertContext(context);
+            PointValueTime pvt = executor.execute(script, convertedContext,
+                    System.currentTimeMillis(), dataType, -1);
+            if (pvt.getTime() == -1) {
+//                response.addContextual("script", "dsEdit.meta.test.success", pvt.getValue());
+            } else {
+//                response.addContextual("script", "dsEdit.meta.test.successTs", pvt.getValue(), new Date(pvt.getTime()));
+            }
+        } catch (DataPointStateException e) {
+//            response.addContextual("context", e);
+        } catch (ScriptException e) {
+//            response.addContextual("script", "dsEdit.meta.test.scriptError", e);
+        } catch (ResultTypeException e) {
+//            response.addContextual("script", e);
+        }
+
+//        return response;
+    }
+
 }
