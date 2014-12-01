@@ -140,10 +140,6 @@ public class WatchListController {
         user.setSelectedWatchList(watchListId);
 
         JsonWatchList data = getWatchListData(user, watchList);
-        // Set the watchlist in the user object after getting the data since it
-        // may take a while, and the long poll
-        // updates will all be missed in the meantime.
-        user.setWatchList(watchList);
 
         return data;
     }

@@ -49,7 +49,6 @@ import com.serotonin.mango.rt.event.type.DataPointEventType;
 import com.serotonin.mango.rt.event.type.DataSourceEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.MaintenanceEventType;
-import com.serotonin.mango.rt.event.type.PublisherEventType;
 import com.serotonin.mango.rt.event.type.ScheduledEventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.vo.UserComment;
@@ -143,8 +142,8 @@ public class EventDaoImpl extends BaseDao implements EventDao {
                         ps.setInt(3, ((MaintenanceEventType) type).getReferenceId2());
                         break;
                     case PUBLISHER:
-                        ps.setInt(2, ((PublisherEventType) type).getReferenceId1());
-                        ps.setInt(3, ((PublisherEventType) type).getReferenceId2());
+                        ps.setInt(2, type.getReferenceId1());
+                        ps.setInt(3, type.getReferenceId2());
                         break;
                     case SCHEDULED:
                         ps.setInt(2, ((ScheduledEventType) type).getReferenceId1());
@@ -685,6 +684,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
                 }, handlerId);
     }
 
+    @Override
     public List<EventHandlerVO> getEventHandlers(EventType type) {
         switch (type.getEventSource()) {
             case AUDIT: {
@@ -704,8 +704,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
                 return getEventHandlers(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2());
             }
             case PUBLISHER: {
-                final PublisherEventType et = (PublisherEventType) type;
-                return getEventHandlers(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2());
+                return getEventHandlers(type.getEventSource(), type.getReferenceId1(), type.getReferenceId2());
             }
             case SCHEDULED: {
                 final ScheduledEventType et = (ScheduledEventType) type;
@@ -795,8 +794,8 @@ public class EventDaoImpl extends BaseDao implements EventDao {
                 return saveEventHandler(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2(), handler);
             }
             case PUBLISHER: {
-                final PublisherEventType et = (PublisherEventType) type;
-                return saveEventHandler(et.getEventSource(), et.getReferenceId1(), et.getReferenceId2(), handler);
+//                final PublisherEventType et = (PublisherEventType) type;
+                return saveEventHandler(type.getEventSource(), type.getReferenceId1(), type.getReferenceId2(), handler);
             }
             case SCHEDULED: {
                 final ScheduledEventType et = (ScheduledEventType) type;

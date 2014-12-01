@@ -30,7 +30,7 @@ import com.serotonin.mango.Common;
 public class CrowdUtils {
 
     private static final Log LOG = LogFactory.getLog(CrowdUtils.class);
-    private static final String CROWD_AUTHENTICATED_KEY = CrowdUtils.class.getName() + "CROWD_AUTHENTICATED_KEY";
+//TODO any Use    private static final String CROWD_AUTHENTICATED_KEY = CrowdUtils.class.getName() + "CROWD_AUTHENTICATED_KEY";
 
     private static CrowdHttpAuthenticator authenticator;
 
@@ -120,14 +120,14 @@ public class CrowdUtils {
     }
 
     public static void setCrowdAuthenticated(com.serotonin.mango.vo.User user) {
-        user.setAttribute(CROWD_AUTHENTICATED_KEY, true);
+//TODO any use of this information??        user.setAttribute(CROWD_AUTHENTICATED_KEY, true);
     }
-
+/*TODO any use of this information??
     public static boolean isCrowdAuthenticated(com.serotonin.mango.vo.User user) {
         Boolean b = user.getAttribute(CROWD_AUTHENTICATED_KEY);
         return b == null ? false : b;
     }
-
+*/
     private static void ensureAuthenticator() {
         if (authenticator == null) {
             synchronized (CrowdUtils.class) {

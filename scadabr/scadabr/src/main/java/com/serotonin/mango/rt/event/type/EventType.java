@@ -96,6 +96,10 @@ abstract public class EventType<K extends EventKey<K>> {
     }
 
     abstract public EventSources getEventSource();
+    
+    abstract public int getReferenceId1();
+    
+    abstract public int getReferenceId2();
 
     /**
      * Convenience method that keeps us from having to cast.
