@@ -29,8 +29,6 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.event.EventTypeVO;
-import com.serotonin.mango.vo.report.ReportInstance;
-import com.serotonin.mango.vo.report.ReportVO;
 
 /**
  * @author Matthew Lohbihler
@@ -241,8 +239,8 @@ public class Permissions {
 
     //
     // / Report access
-    //
-    public static void ensureReportPermission(User user, ReportVO report) throws PermissionException {
+    // TODO do this in a generic fashion
+/*    public static void ensureReportPermission(User user, ReportVO report) throws PermissionException {
         if (user == null) {
             throw new PermissionException("User is null", user);
         }
@@ -265,7 +263,7 @@ public class Permissions {
             throw new PermissionException("User does not have permission to access the report instance", user);
         }
     }
-
+*/
     //
     // / Event access
     //

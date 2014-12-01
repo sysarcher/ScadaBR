@@ -21,7 +21,6 @@ package com.serotonin.mango.rt.maint;
 import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.dao.EventDao;
 import br.org.scadabr.dao.PointValueDao;
-import br.org.scadabr.dao.ReportDao;
 import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.timer.cron.SystemCronTask;
@@ -53,8 +52,6 @@ public class DataPurge {
     private DataPointDao dataPointDao;
     @Autowired
     private EventDao eventDao;
-    @Autowired
-    private ReportDao reportDao;
     @Autowired
     private SystemSettingsDao systemSettingsDao;
     @Autowired
@@ -92,7 +89,7 @@ public class DataPurge {
         eventPurge();
 
         // Report instance purge
-        reportPurge();
+//TODO move to report package        reportPurge();
     }
 
     private long purgePoint(DataPointVO dataPoint) {
@@ -141,6 +138,7 @@ public class DataPurge {
         }
     }
 
+    /*
     private void reportPurge() {
         DateTime cutoff = TimePeriods.DAYS.truncateDateTime(new DateTime(runtime));
         cutoff = systemSettingsDao.getReports().getCutoff(cutoff);
@@ -150,7 +148,7 @@ public class DataPurge {
             LOG.log(Level.INFO, "Report purge ended, {0} report instances deleted", deleteCount);
         }
     }
-
+*/
     public static class DataPurgeTask extends SystemCronTask {
 
         public DataPurgeTask(String pattern, TimeZone tz) throws ParseException {
