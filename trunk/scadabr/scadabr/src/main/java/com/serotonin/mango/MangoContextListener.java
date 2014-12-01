@@ -31,7 +31,6 @@ import javax.servlet.ServletContextListener;
 
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.dao.ReportDao;
 import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.rt.SchedulerPool;
@@ -46,8 +45,6 @@ import com.serotonin.mango.view.DynamicImage;
 import com.serotonin.mango.view.ImageSet;
 import com.serotonin.mango.view.ViewGraphic;
 import com.serotonin.mango.view.ViewGraphicLoader;
-import com.serotonin.mango.vo.report.ReportTaskManager;
-import com.serotonin.mango.vo.report.ReportVO;
 import com.serotonin.mango.web.ContextWrapper;
 import br.org.scadabr.vo.event.type.SystemEventKey;
 
@@ -78,11 +75,7 @@ public class MangoContextListener implements ServletContextListener {
     @Inject
     private EventManager eventManager;
     @Inject
-    private ReportDao reportDao;
-    @Inject
     private SchedulerPool schedulerPool;
-    @Inject
-    private ReportTaskManager reportTaskManager;
             
 
     @Override
@@ -116,7 +109,6 @@ public class MangoContextListener implements ServletContextListener {
         utilitiesInitialize(ctx);
         eventManager.initialize();
         runtimeManagerInitialize(ctx);
-        reportsInitialize();
         maintenanceInitialize();
         // Notify the event manager of the startup.
         new SystemEventType(SystemEventKey.SYSTEM_STARTUP).fire("event.system.startup");
@@ -292,21 +284,6 @@ public class MangoContextListener implements ServletContextListener {
         }
         cfg.setObjectWrapper(new DefaultObjectWrapper());
         ctx.setAttribute(Common.ContextKeys.FREEMARKER_CONFIG, cfg);
-    }
-
-    //
-    //
-    // Reports
-    //
-    private void reportsInitialize() {
-        for (ReportVO report : reportDao.getReports()) {
-            try {
-                reportTaskManager.scheduleReportJob(report);
-            } catch (ShouldNeverHappenException e) {
-                // Don't stop the startup if there is an error. Just log it.
-                LOG.log(Level.SEVERE, "Error starting report " + report.getName(), e);
-            }
-        }
     }
 
     //
