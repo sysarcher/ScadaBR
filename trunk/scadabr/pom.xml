@@ -49,6 +49,7 @@
         <module>scadabr-ds-http</module>
         <module>scadabr-scripting</module>
         <module>scadabr-report</module>
+        <module>scadabr-publisher</module>
         -->
     </modules>
 

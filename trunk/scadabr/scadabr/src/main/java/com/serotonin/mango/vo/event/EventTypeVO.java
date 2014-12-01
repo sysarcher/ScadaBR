@@ -24,17 +24,10 @@ import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
 import java.util.List;
 
-import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.rt.event.type.CompoundDetectorEventType;
 import com.serotonin.mango.rt.event.type.DataPointEventType;
-import com.serotonin.mango.rt.event.type.DataSourceEventType;
 import com.serotonin.mango.rt.event.type.EventType;
-import com.serotonin.mango.rt.event.type.MaintenanceEventType;
-import com.serotonin.mango.rt.event.type.PublisherEventType;
-import com.serotonin.mango.rt.event.type.ScheduledEventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.vo.event.type.AuditEventKey;
 import br.org.scadabr.vo.event.type.DataPointDetectorKey;
 import br.org.scadabr.vo.event.type.SystemEventKey;
 

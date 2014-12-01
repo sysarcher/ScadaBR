@@ -237,5 +237,15 @@ public class AuditEventType extends EventType<AuditEventKey> {
         return eventKey.getAlarmLevel();
     }
 
+    @Override
+    public int getReferenceId1() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int getReferenceId2() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 
 }

@@ -19,9 +19,7 @@
 package com.serotonin.mango.vo;
 
 import br.org.scadabr.ScadaBrConstants;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.DataPointDao;
@@ -29,14 +27,8 @@ import br.org.scadabr.dao.DataSourceDao;
 
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
-import com.serotonin.mango.view.View;
-import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.permission.DataPointAccess;
 import com.serotonin.mango.vo.permission.Permissions;
-import com.serotonin.mango.vo.publish.PublishedPointVO;
-import com.serotonin.mango.vo.publish.PublisherVO;
-import com.serotonin.mango.web.dwr.beans.DataExportDefinition;
-import com.serotonin.mango.web.dwr.beans.TestingUtility;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,23 +101,6 @@ public class User implements Serializable, SetPointSource {
 
     private boolean receiveOwnAuditEvents;
 
-    //
-    // Session data. The user object is stored in session, and some other
-    // session-based information is cached here
-    // for convenience.
-    //
-    private transient View view;
-    private transient WatchList watchList;
-    private transient DataPointVO editPoint;
-    private transient DataSourceVO<?> editDataSource;
-
-    private transient TestingUtility testingUtility;
-    private transient Map<String, byte[]> reportImageData;
-    private transient PublisherVO<? extends PublishedPointVO> editPublisher;
-    private transient boolean muted = false;
-    private transient DataExportDefinition dataExportDefinition;
-    private final transient Map<String, Object> attributes = new HashMap<>();
-
     /**
      * Used for various display purposes.
      *
@@ -162,34 +137,6 @@ public class User implements Serializable, SetPointSource {
     // Convenience method for JSPs
     public boolean isDataSourcePermission() {
         return Permissions.hasDataSourcePermission(this);
-    }
-
-    //
-    // Testing utility management
-    public <T extends TestingUtility> T getTestingUtility(Class<T> requiredClass) {
-        TestingUtility tu = testingUtility;
-
-        if (tu != null) {
-            try {
-                return requiredClass.cast(tu);
-            } catch (ClassCastException e) {
-                tu.cancel();
-                testingUtility = null;
-            }
-        }
-        return null;
-    }
-
-    public void setTestingUtility(TestingUtility testingUtility) {
-        TestingUtility tu = this.testingUtility;
-        if (tu != null) {
-            tu.cancel();
-        }
-        this.testingUtility = testingUtility;
-    }
-
-    public void cancelTestingUtility() {
-        setTestingUtility(null);
     }
 
     // Properties
@@ -241,30 +188,6 @@ public class User implements Serializable, SetPointSource {
         this.username = username;
     }
 
-    public View getView() {
-        return view;
-    }
-
-    public void setView(View view) {
-        this.view = view;
-    }
-
-    public WatchList getWatchList() {
-        return watchList;
-    }
-
-    public void setWatchList(WatchList watchList) {
-        this.watchList = watchList;
-    }
-
-    public DataPointVO getEditPoint() {
-        return editPoint;
-    }
-
-    public void setEditPoint(DataPointVO editPoint) {
-        this.editPoint = editPoint;
-    }
-
     public boolean isDisabled() {
         return disabled;
     }
@@ -288,14 +211,6 @@ public class User implements Serializable, SetPointSource {
     public void setDataPointPermissions(
             List<DataPointAccess> dataPointPermissions) {
         this.dataPointPermissions = dataPointPermissions;
-    }
-
-    public DataSourceVO<?> getEditDataSource() {
-        return editDataSource;
-    }
-
-    public void setEditDataSource(DataSourceVO<?> editDataSource) {
-        this.editDataSource = editDataSource;
     }
 
     public int getSelectedWatchList() {
@@ -322,31 +237,6 @@ public class User implements Serializable, SetPointSource {
         this.lastLogin = lastLogin;
     }
 
-    public Map<String, byte[]> getReportImageData() {
-        return reportImageData;
-    }
-
-    public void setReportImageData(Map<String, byte[]> reportImageData) {
-        this.reportImageData = reportImageData;
-    }
-
-    public PublisherVO<? extends PublishedPointVO> getEditPublisher() {
-        return editPublisher;
-    }
-
-    public void setEditPublisher(
-            PublisherVO<? extends PublishedPointVO> editPublisher) {
-        this.editPublisher = editPublisher;
-    }
-
-    public boolean isMuted() {
-        return muted;
-    }
-
-    public void setMuted(boolean muted) {
-        this.muted = muted;
-    }
-
     public AlarmLevel getReceiveAlarmEmails() {
         return receiveAlarmEmails;
     }
@@ -361,28 +251,6 @@ public class User implements Serializable, SetPointSource {
 
     public void setReceiveOwnAuditEvents(boolean receiveOwnAuditEvents) {
         this.receiveOwnAuditEvents = receiveOwnAuditEvents;
-    }
-
-    public DataExportDefinition getDataExportDefinition() {
-        return dataExportDefinition;
-    }
-
-    public void setDataExportDefinition(
-            DataExportDefinition dataExportDefinition) {
-        this.dataExportDefinition = dataExportDefinition;
-    }
-
-    public void setAttribute(String key, Object value) {
-        attributes.put(key, value);
-    }
-
-    public Object removeAttribute(String key) {
-        return attributes.remove(key);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T getAttribute(String key) {
-        return (T) attributes.get(key);
     }
 
     @Override

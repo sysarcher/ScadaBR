@@ -20,7 +20,6 @@ package com.serotonin.mango.rt.maint;
 
 import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.dao.DataSourceDao;
-import br.org.scadabr.dao.PublisherDao;
 import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.utils.ImplementMeException;
@@ -60,8 +59,6 @@ public class VersionCheck extends SystemCronTask {
     private DataSourceDao dataSourceDao;
     @Autowired
     private SystemSettingsDao systemSettingsDao;
-    @Autowired
-    private PublisherDao publisherDao;
     @Autowired
     private SchedulerPool schedulerPool;
 

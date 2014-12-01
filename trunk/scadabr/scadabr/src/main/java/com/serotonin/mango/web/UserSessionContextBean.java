@@ -57,7 +57,6 @@ public class UserSessionContextBean implements Serializable {
      */
     public void logoutUser() {
         new SystemEventType(SystemEventKey.USER_LOGIN, user.getId()).clearAlarm();
-        user.cancelTestingUtility();
         runtimeManager.UserSessionEnds(this);
         this.user = null;
     }
@@ -164,7 +163,6 @@ public class UserSessionContextBean implements Serializable {
 
     public void systemShutdown() {
         new SystemEventType(SystemEventKey.USER_LOGIN, user.getId()).disableAlarm();
-        user.cancelTestingUtility();
         this.user = null;
     }
 

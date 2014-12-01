@@ -18,7 +18,6 @@
  */
 package com.serotonin.mango.rt.event.type;
 
-import br.org.scadabr.rt.event.type.DuplicateHandling;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.SystemEventKey;
@@ -90,6 +89,16 @@ public class SystemEventType extends EventType<SystemEventKey> {
     @Override
     public AlarmLevel getAlarmLevel() {
         return eventKey.getAlarmLevel();
+    }
+
+    @Override
+    public int getReferenceId1() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int getReferenceId2() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
