@@ -464,9 +464,9 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
     }
 
     public String generateEventDetectorUniqueXid(int dataPointId) {
-        String xid = Common.generateXid(PointEventDetectorVO.XID_PREFIX);
+        String xid = generateXid(PointEventDetectorVO.XID_PREFIX);
         while (!isEventDetectorXidUnique(dataPointId, xid, -1)) {
-            xid = Common.generateXid(PointEventDetectorVO.XID_PREFIX);
+            xid = generateXid(PointEventDetectorVO.XID_PREFIX);
         }
         return xid;
     }

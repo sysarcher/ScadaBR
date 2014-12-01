@@ -34,17 +34,18 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import br.org.scadabr.vo.datasource.UniqueDsXid;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.DataSourceEventKey;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.serotonin.mango.rt.event.type.DataSourceEventType;
 import java.util.Set;
-import org.springframework.validation.Validator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
+@UniqueDsXid
 abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         Serializable, Cloneable, ChangeComparable<T> {
-
-    public abstract Validator createValidator();
 
     private void fillEventTypeMap() {
         this.eventTypeMap = (Map<DataSourceEventKey, DataSourceEventType>) createEventKeyMap();
@@ -77,8 +78,12 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
     }
 
     private int id = ScadaBrConstants.NEW_ID;
+    @NotNull
+    @Size(min = 1, max = 50)
     private String xid;
 
+    @NotNull(message = "validate.nameRequired")
+    @Size(min = 1, max = 40)
     private String name = this.getClass().getSimpleName();
 
     private boolean enabled;

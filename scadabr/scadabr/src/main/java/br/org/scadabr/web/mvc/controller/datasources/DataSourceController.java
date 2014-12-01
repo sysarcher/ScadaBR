@@ -19,14 +19,14 @@
 package br.org.scadabr.web.mvc.controller.datasources;
 
 import br.org.scadabr.dao.DataSourceDao;
-import br.org.scadabr.vo.dataSource.DataSourceValidator;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import br.org.scadabr.web.mvc.AjaxFormPostResponse;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -53,17 +53,11 @@ public class DataSourceController {
     }
 
     @RequestMapping(params = "id", method = RequestMethod.POST)
-    public @ResponseBody AjaxFormPostResponse postDataSource(@ModelAttribute("dataSource") DataSourceVO dataSource) {
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(dataSource, "dataSource");
-        //TODO no autowire ??? why????
-        DataSourceValidator validator = new DataSourceValidator(dataSourceDao);
-        validator.validate(dataSource, bindingResult);
-//        dataSource.createValidator().validate(dataSource, bindingResult);
-        final AjaxFormPostResponse result = new AjaxFormPostResponse(bindingResult, localizer);
+    public @ResponseBody AjaxFormPostResponse postDataSource(@ModelAttribute("dataSource") @Valid DataSourceVO dataSource, BindingResult bindingResult) {
         if (!bindingResult.hasErrors()) {
             dataSourceDao.saveDataSource(dataSource);
         }
-        return result;
+        return new AjaxFormPostResponse(bindingResult);
     }
 
 }

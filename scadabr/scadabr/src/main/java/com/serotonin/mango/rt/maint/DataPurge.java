@@ -74,7 +74,8 @@ public class DataPurge {
     private void executeImpl() {
         LOG.info("Data purge started");
 
-        // Get the data point information.
+        if (true) return; //TODO implement this
+// Get the data point information.
         int deleteCount = 0;
         for (DataPointVO dataPoint : dataPointDao.getDataPoints(false)) {
             deleteCount += purgePoint(dataPoint);

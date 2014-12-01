@@ -413,8 +413,4 @@ public class Common {
         return languages;
     }
 
-    public static String generateXid(String prefix) {
-        return prefix + StringUtils.generateRandomString(6, "0123456789");
-    }
-
 }

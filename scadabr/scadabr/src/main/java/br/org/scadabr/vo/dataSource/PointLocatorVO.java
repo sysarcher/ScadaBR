@@ -24,8 +24,9 @@ import java.io.Serializable;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.util.ChangeComparableObject;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.vo.dataSource.DataPointSaveHandler;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 public interface PointLocatorVO extends Serializable, ChangeComparableObject {
 
@@ -67,7 +68,9 @@ public interface PointLocatorVO extends Serializable, ChangeComparableObject {
 
     DataPointSaveHandler getDataPointSaveHandler();
 
-    String getName();
+    @NotNull(message = "{validate.nameRequired}")
+    @Size(min = 1, max = 40)
+        String getName();
     
     int getId();
     

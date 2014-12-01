@@ -30,19 +30,16 @@ import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import br.org.scadabr.vo.dataSource.DataSourceValidator;
 import br.org.scadabr.vo.datasource.meta.MetaDataSourceEventKey;
 import br.org.scadabr.vo.datasource.meta.MetaDataSourceType;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.validation.Validator;
 
 /**
  * @author Matthew Lohbihler
  */
-
 public class MetaDataSourceVO extends DataSourceVO<MetaDataSourceVO> {
 
     @Override
@@ -104,11 +101,6 @@ public class MetaDataSourceVO extends DataSourceVO<MetaDataSourceVO> {
         if (ver == 1) {
             // nothing to do here.
         }
-    }
-
-    @Override
-    public Validator createValidator() {
-        return new DataSourceValidator();
     }
 
     @Override

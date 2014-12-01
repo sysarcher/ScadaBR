@@ -16,15 +16,6 @@ import java.util.regex.Pattern;
  */
 public class StringUtils {
 
-    public static final Random RANDOM;
-
-    static {
-        RANDOM = new Random();
-        for (int i = 0; i < 100; i++) {
-            RANDOM.nextInt();
-        }
-    }
-
     @Deprecated //Use Arrays.???
     public static boolean isEmpty(int[] values) {
         throw new ImplementMeException();
@@ -40,14 +31,6 @@ public class StringUtils {
             sb.append(c);
         }
         sb.append(s);
-        return sb.toString();
-    }
-
-    public static String generateRandomString(int length, String charSet) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            sb.append(charSet.charAt(RANDOM.nextInt(charSet.length())));
-        }
         return sb.toString();
     }
 

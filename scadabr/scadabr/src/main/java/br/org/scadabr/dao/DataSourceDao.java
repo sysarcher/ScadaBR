@@ -20,8 +20,6 @@ public interface DataSourceDao {
 
     void savePersistentData(DataSourceVO dsVO, Object persistentData);
 
-    boolean isXidUnique(String xid, int id);
-
     DataSourceVO getDataSource(int id);
 
     Iterable<DataSourceVO<?>> getDataSources();
@@ -31,5 +29,9 @@ public interface DataSourceDao {
     void deleteDataSource(int dsId);
 
     EventType getEventType(int refId1, int refId2);
+
+    boolean isXidUnique(DataSourceVO<?> dsVo);
     
+    boolean isXidUnique(String xid);
+
 }

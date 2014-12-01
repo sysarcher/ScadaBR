@@ -131,8 +131,13 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
     }
 
     @Override
-    public boolean isXidUnique(String xid, int excludeId) {
-        return isXidUnique(xid, excludeId, "dataSources");
+    public boolean isXidUnique(String xid) {
+        return isXidUnique(xid, "dataSources");
+    }
+
+    @Override
+    public boolean isXidUnique(DataSourceVO dsVo) {
+        return isXidUnique(dsVo.getXid(), dsVo.getId(), "dataSources");
     }
 
     @Override

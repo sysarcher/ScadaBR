@@ -39,11 +39,16 @@ import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.datasource.meta.CronPattern;
+import br.org.scadabr.vo.datasource.meta.InputVariables;
 import br.org.scadabr.vo.datasource.meta.UpdateEvent;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.TimeZone;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -52,6 +57,8 @@ import org.springframework.beans.factory.annotation.Configurable;
  */
 
 @Configurable
+@CronPattern
+@InputVariables
 public class MetaPointLocatorVO extends AbstractPointLocatorVO {
 
     @Autowired
@@ -59,6 +66,8 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO {
 
     private List<IntValuePair> context = new ArrayList<>();
     
+    @NotNull
+    @Size(min = 9) // stands for mininimum text required "return 0;"
     private String script;
     private DataType dataType;
     
@@ -67,7 +76,10 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO {
     
     private String updateCronPattern;
     
+    @Min(0)
     private int executionDelaySeconds;
+    @NotNull
+    @Size(min = 1, max = 40)
     private String name;
 
     MetaPointLocatorVO() {
