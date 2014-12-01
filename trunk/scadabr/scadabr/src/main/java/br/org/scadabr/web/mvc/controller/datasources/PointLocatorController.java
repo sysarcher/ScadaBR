@@ -20,15 +20,14 @@ package br.org.scadabr.web.mvc.controller.datasources;
 
 import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
-import br.org.scadabr.vo.dataSource.PointLocatorValidator;
-import br.org.scadabr.vo.datasource.meta.MetaPointLocatorValidator;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import br.org.scadabr.web.mvc.AjaxFormPostResponse;
 import com.serotonin.mango.vo.DataPointVO;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -55,19 +54,16 @@ public class PointLocatorController {
     }
 
     @RequestMapping(params = "id", method = RequestMethod.POST)
-    public @ResponseBody AjaxFormPostResponse postPointLocator(@ModelAttribute("pointLocator") PointLocatorVO pointLocator) {
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(pointLocator, "pointLocator");
-        //TODO no autowire ??? why????
-        PointLocatorValidator validator = new MetaPointLocatorValidator(dataPointDao); // TOdo replace with factory ...
-        validator.validate(pointLocator, bindingResult);
-//        dataSource.createValidator().validate(dataSource, bindingResult);
-        final AjaxFormPostResponse result = new AjaxFormPostResponse(bindingResult, localizer);
+    public @ResponseBody
+    AjaxFormPostResponse postPointLocator(@Valid @ModelAttribute("pointLocator") PointLocatorVO pointLocator, BindingResult bindingResult) {
+
         if (!bindingResult.hasErrors()) {
-            DataPointVO dp =  dataPointDao.getDataPoint(pointLocator.getId());
+            DataPointVO dp = dataPointDao.getDataPoint(pointLocator.getId());
             dp.setPointLocator(pointLocator);
             dataPointDao.saveDataPoint(dp);
         }
-        return result;
+
+        return new AjaxFormPostResponse(bindingResult);
     }
 
 }

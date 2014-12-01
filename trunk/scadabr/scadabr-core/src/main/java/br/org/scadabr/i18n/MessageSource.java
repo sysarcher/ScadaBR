@@ -7,6 +7,15 @@ import java.util.ResourceBundle;
 
 public class MessageSource extends org.springframework.context.support.ResourceBundleMessageSource {
 
+    public MessageSource() {
+        super();
+    }
+    
+    public MessageSource(String basename) {
+        super();
+        this.setBasename(basename);
+    }
+    
     @Override
     protected ResourceBundle doGetBundle(String basename, Locale locale) throws MissingResourceException {
         return ResourceBundle.getBundle(basename, locale, getBundleClassLoader());

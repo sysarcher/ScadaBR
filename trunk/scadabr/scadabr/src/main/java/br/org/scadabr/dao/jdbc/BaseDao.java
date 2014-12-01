@@ -21,9 +21,11 @@ package br.org.scadabr.dao.jdbc;
 import java.util.List;
 
 import br.org.scadabr.db.DaoUtils;
-import com.serotonin.mango.Common;
+import java.util.Random;
 
 public class BaseDao extends DaoUtils {
+
+    public final Random random = new Random();
 
     /**
      * Public constructor for code that needs to get stuff from the database.
@@ -55,9 +57,9 @@ public class BaseDao extends DaoUtils {
     // XID convenience methods
     //
     protected String generateUniqueXid(String prefix, String tableName) {
-        String xid = Common.generateXid(prefix);
-        while (!isXidUnique(xid, -1, tableName)) {
-            xid = Common.generateXid(prefix);
+        String xid = generateXid(prefix);
+        while (!isXidUnique(xid, tableName)) {
+            xid = generateXid(prefix);
         }
         return xid;
     }
@@ -66,4 +68,21 @@ public class BaseDao extends DaoUtils {
         return ejt.queryForInt("select count(*) from " + tableName + " where xid=? and id<>?", new Object[]{xid,
             excludeId}) == 0;
     }
+
+    protected boolean isXidUnique(String xid, String tableName) {
+        return ejt.queryForInt("select count(*) from " + tableName + " where xid=?", new Object[]{xid}) == 0;
+    }
+    
+    public String generateXid(String prefix) {
+        return prefix + generateRandomString(6, "0123456789");
+    }
+
+    public String generateRandomString(int length, String charSet) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append(charSet.charAt(random.nextInt(charSet.length())));
+        }
+        return sb.toString();
+    }
+    
 }

@@ -34,11 +34,8 @@ import br.org.scadabr.util.ArrayUtils;
 import br.org.scadabr.util.IpAddressUtils;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import br.org.scadabr.vo.dataSource.DataSourceValidator;
 import br.org.scadabr.vo.datasource.http.HttpReceiverDataSourceEventKey;
 import br.org.scadabr.vo.datasource.http.HttpReceiverDataSourceType;
-import br.org.scadabr.vo.event.type.DataSourceEventKey;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -52,11 +49,6 @@ import org.springframework.validation.Errors;
 public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourceVO> {
 
     @Override
-    public HttpReceiverDataSourceVOValidator createValidator() {
-        return new HttpReceiverDataSourceVOValidator();
-    }
-
-    @Override
     public Set<HttpReceiverDataSourceEventKey> createEventKeySet() {
         return new HashSet<>();
     }
@@ -65,7 +57,7 @@ public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourc
     public Map<HttpReceiverDataSourceEventKey, ?> createEventKeyMap() {
         return new HashMap<>();
     }
-
+/* TODO Validation
     public static class HttpReceiverDataSourceVOValidator extends DataSourceValidator {
 
         @Override
@@ -93,7 +85,7 @@ public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourc
         }
 
     }
-
+*/
     @Override
     public String getDataSourceTypeKey() {
         return HttpReceiverDataSourceType.KEY;

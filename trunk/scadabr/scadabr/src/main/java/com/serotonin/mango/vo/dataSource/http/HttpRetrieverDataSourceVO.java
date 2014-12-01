@@ -33,10 +33,8 @@ import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import br.org.scadabr.vo.dataSource.DataSourceValidator;
 import br.org.scadabr.vo.datasource.http.HttpRetrieverDataSourceEventKey;
 import br.org.scadabr.vo.datasource.http.HttpRetrieverDataSourceType;
-import br.org.scadabr.vo.event.type.DataSourceEventKey;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Set;
@@ -49,11 +47,6 @@ import org.springframework.validation.Errors;
 public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSourceVO> {
 
     @Override
-    public HttpRetrieverDataSourceVOValidator createValidator() {
-        return new HttpRetrieverDataSourceVOValidator();
-    }
-
-    @Override
     public Set<HttpRetrieverDataSourceEventKey> createEventKeySet() {
         return EnumSet.allOf(HttpRetrieverDataSourceEventKey.class);
     }
@@ -63,6 +56,7 @@ public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSou
         return new EnumMap(HttpRetrieverDataSourceEventKey.class);
     }
 
+    /*TODO Validation
     public static class HttpRetrieverDataSourceVOValidator extends DataSourceValidator {
 
         @Override
@@ -89,7 +83,7 @@ public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSou
         }
 
     }
-
+*/
     @Override
     public LocalizableMessage getConnectionDescription() {
         return new LocalizableMessageImpl("common.default", StringUtils.truncate(url, 30, " ..."));

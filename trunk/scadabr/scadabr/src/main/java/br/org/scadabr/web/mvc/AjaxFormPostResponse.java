@@ -5,42 +5,34 @@
  */
 package br.org.scadabr.web.mvc;
 
-import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import java.util.LinkedList;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 
 /**
  *
  * @author aploese
  */
-@Configurable
 public class AjaxFormPostResponse {
     private final Object target;
     private final List<FieldError> fieldErrors = new LinkedList<>();
-    @Autowired
-    private transient RequestContextAwareLocalizer localizer;
+    private final List<String> objectErrors = new LinkedList<>();
     
-    public AjaxFormPostResponse(BeanPropertyBindingResult bindingResult) {
+    
+    public AjaxFormPostResponse(BindingResult bindingResult) {
         this.target = bindingResult.getTarget();
+        if (bindingResult.hasGlobalErrors()) {
+            for (org.springframework.validation.ObjectError oe : bindingResult.getGlobalErrors()) {
+                objectErrors.add(oe.getDefaultMessage());
+            }
+        }
         if (bindingResult.hasFieldErrors()) {
             for (org.springframework.validation.FieldError fe : bindingResult.getFieldErrors()) {
-                fieldErrors.add(new FieldError(fe.getField(), fe.getRejectedValue(), localizer.getMessage(fe.getCode(), fe.getArguments())));
+                fieldErrors.add(new FieldError(fe.getField(), fe.getRejectedValue(), fe.getDefaultMessage()));
             }
         }
     }
 
-    public AjaxFormPostResponse(BeanPropertyBindingResult bindingResult, RequestContextAwareLocalizer localizer) {
-        this.target = bindingResult.getTarget();
-        if (bindingResult.hasFieldErrors()) {
-            for (org.springframework.validation.FieldError fe : bindingResult.getFieldErrors()) {
-                fieldErrors.add(new FieldError(fe.getField(), fe.getRejectedValue(), localizer.getMessage(fe.getCode(), fe.getArguments())));
-            }
-        }
-    }
-    
     public Object getTarget() {
         return target;
     }

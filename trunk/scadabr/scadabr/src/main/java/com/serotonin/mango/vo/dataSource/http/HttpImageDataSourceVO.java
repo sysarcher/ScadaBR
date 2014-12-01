@@ -31,10 +31,8 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import br.org.scadabr.vo.dataSource.DataSourceValidator;
 import br.org.scadabr.vo.datasource.http.HttpImageDataSourceEventKey;
 import br.org.scadabr.vo.datasource.http.HttpImageDataSourceType;
-import br.org.scadabr.vo.event.type.DataSourceEventKey;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
@@ -49,11 +47,6 @@ import org.springframework.validation.Errors;
 public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
 
     @Override
-    public HttpImageDataSourceValidator createValidator() {
-      return new HttpImageDataSourceValidator();
-    }
-
-    @Override
     public Set<HttpImageDataSourceEventKey> createEventKeySet() {
         return EnumSet.allOf(HttpImageDataSourceEventKey.class);
     }
@@ -63,6 +56,7 @@ public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
         return new EnumMap(HttpImageDataSourceEventKey.class);
     }
 
+    /** TODO Validation
     public static class HttpImageDataSourceValidator extends DataSourceValidator {
 
         @Override
@@ -80,7 +74,7 @@ public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
         }
 
     }
-
+*/
     @Override
     public LocalizableMessage getConnectionDescription() {
         return new LocalizableMessageImpl("dsEdit.httpImage.dsconn", updatePeriodType.getPeriodDescription(updatePeriods));

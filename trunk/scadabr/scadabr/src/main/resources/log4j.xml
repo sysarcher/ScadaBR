@@ -35,7 +35,7 @@
     </layout>
   </appender>
   
-  <appender name="grove" class="com.serotonin.mango.util.MangoGroveLogAppender"/>
+  <!--appender name="grove" class="com.serotonin.mango.util.MangoGroveLogAppender"/-->
   
   <appender name="async" class="org.apache.log4j.AsyncAppender">
     <param name="LocationInfo" value="true"/>
