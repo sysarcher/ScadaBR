@@ -59,8 +59,8 @@ public class AuditEventType extends EventType<AuditEventKey> {
     }
 
     private static void raiseEvent(AuditEventKey auditEventType, ChangeComparable<?> o, String key, Object[] props) {
-        User user = Common.getUser();
-        Object username;
+        User user = null; //TODO IMplement me !!! Common.getUser();
+        Object username = null;
         if (user != null) {
             username = user.getUsername() + " (" + user.getId() + ")";
         } else {

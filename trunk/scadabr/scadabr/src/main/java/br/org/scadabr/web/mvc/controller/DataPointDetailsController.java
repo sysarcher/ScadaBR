@@ -26,6 +26,8 @@ import com.serotonin.mango.view.chart.ImageChartRenderer;
 import com.serotonin.mango.vo.DataPointVO;
 import java.text.MessageFormat;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -126,7 +128,7 @@ class DataPointDetailsController {
             } else {
                 c.add(Calendar.DATE, -1);
             }
-        model.addAttribute("fromTimestamp", c.getTimeInMillis());
+            model.addAttribute("fromTimestamp", c.getTimeInMillis());
         }
         return "dataPointDetails/renderChart";
     }

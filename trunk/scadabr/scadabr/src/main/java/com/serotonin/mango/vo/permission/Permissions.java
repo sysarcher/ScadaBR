@@ -49,17 +49,6 @@ public class Permissions {
         // no op
     }
 
-    //
-    // / Valid user
-    //
-    public static void ensureValidUser() throws PermissionException {
-        ensureValidUser(Common.getUser());
-    }
-
-    public static void ensureValidUser(HttpServletRequest request) throws PermissionException {
-        ensureValidUser(Common.getUser(request));
-    }
-
     public static void ensureValidUser(User user) throws PermissionException {
         if (user == null) {
             throw new PermissionException("Not logged in", null);
@@ -69,28 +58,9 @@ public class Permissions {
         }
     }
 
-    //
-    // / Administrator
-    //
-    public static boolean hasAdmin() throws PermissionException {
-        return hasAdmin(Common.getUser());
-    }
-
-    public static boolean hasAdmin(HttpServletRequest request) throws PermissionException {
-        return hasAdmin(Common.getUser(request));
-    }
-
     public static boolean hasAdmin(User user) throws PermissionException {
         ensureValidUser(user);
         return user.isAdmin();
-    }
-
-    public static void ensureAdmin() throws PermissionException {
-        ensureAdmin(Common.getUser());
-    }
-
-    public static void ensureAdmin(HttpServletRequest request) throws PermissionException {
-        ensureAdmin(Common.getUser(request));
     }
 
     public static void ensureAdmin(User user) throws PermissionException {

@@ -58,7 +58,7 @@ import org.springframework.beans.factory.annotation.Configurable;
 
 @Configurable
 @CronPattern
-@InputVariables
+//TODO @InputVariables
 public class MetaPointLocatorVO extends AbstractPointLocatorVO {
 
     @Autowired
@@ -291,6 +291,7 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO {
         }
     }
 
+    @JsonIgnore
     public boolean isScriptEmpty() {
         return script == null ? true : script.isEmpty();
     }

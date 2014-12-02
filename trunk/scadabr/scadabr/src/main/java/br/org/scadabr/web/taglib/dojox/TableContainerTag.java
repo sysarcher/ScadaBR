@@ -5,62 +5,29 @@
  */
 package br.org.scadabr.web.taglib.dojox;
 
-import static br.org.scadabr.web.taglib.Functions.printAttribute;
-import br.org.scadabr.web.taglib.dojo.DataDojoProps;
-import java.io.IOException;
+import br.org.scadabr.web.taglib.DojoTag;
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspTagException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.tagext.TagSupport;
+import org.springframework.web.servlet.tags.form.TagWriter;
 
 /**
  *
  * @author aploese
  */
-public class TableContainerTag extends TagSupport {
+public class TableContainerTag extends DojoTag {
 
-    private DataDojoProps dataDojoProps = new DataDojoProps();
-    private String style; 
-    
-    @Override
-    public void release() {
-        super.release();
-        id = null;
-        dataDojoProps = null;
-        style = null;
+    public TableContainerTag() {
+        super("div", "dojox/layout/TableContainer");
     }
 
-    @Override
-    public int doStartTag() throws JspException {
-        try {
-            JspWriter out = pageContext.getOut();
-
-            out.print("<div");
-            printAttribute(out, "id", id);
-            out.append(" data-dojo-type=\"dojox/layout/TableContainer\" ");
-            dataDojoProps.print(out);
-            printAttribute(out, "style", style);
-            out.print(">");
-        } catch (IOException ex) {
-            throw new JspTagException(ex.getMessage());
-        }
-        return EVAL_BODY_INCLUDE;
-    }
+    private String style;
 
     @Override
-    public int doEndTag() throws JspException {
-        try {
-            JspWriter out = pageContext.getOut();
-            out.print("</div>");
-        } catch (IOException ex) {
-            throw new JspTagException(ex.getMessage());
-        }
-        return EVAL_PAGE;
+    protected void writeAttributes(TagWriter tagWriter) throws JspException {
+        tagWriter.writeAttribute("style", style);
     }
 
-    
     public void setCols(int cols) {
-        dataDojoProps.put("cols", cols);
+        putDataDojoProp("cols", cols);
     }
 
     /**

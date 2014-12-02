@@ -5,22 +5,23 @@
  */
 package br.org.scadabr.web.taglib.dijit;
 
-import static br.org.scadabr.web.taglib.Functions.printAttribute;
-import java.io.IOException;
+import br.org.scadabr.web.taglib.DojoTag;
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspTagException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.tagext.TagSupport;
+import org.springframework.web.servlet.tags.form.TagWriter;
 
 /**
  *
  * @author aploese
  */
-public class FormTag extends TagSupport {
+public class FormTag extends DojoTag {
+
+    public FormTag() {
+        super("form", "dijit/form/Form");
+    }
 
     private String action;
     private String method;
-    
+
     @Override
     public void release() {
         super.release();
@@ -28,31 +29,9 @@ public class FormTag extends TagSupport {
     }
 
     @Override
-    public int doStartTag() throws JspException {
-        try {
-            JspWriter out = pageContext.getOut();
-
-            out.print("<div");
-            printAttribute(out, "id", id);
-            out.append(" data-dojo-type=\"dijit/form/Form\" ");
-            printAttribute(out, "action", action);
-            printAttribute(out, "method", method);
-            out.print(">");
-        } catch (IOException ex) {
-            throw new JspTagException(ex.getMessage());
-        }
-        return EVAL_BODY_INCLUDE;
-    }
-
-    @Override
-    public int doEndTag() throws JspException {
-        try {
-            JspWriter out = pageContext.getOut();
-            out.print("</div>");
-        } catch (IOException ex) {
-            throw new JspTagException(ex.getMessage());
-        }
-        return EVAL_PAGE;
+    protected void writeAttributes(TagWriter tagWriter) throws JspException {
+        tagWriter.writeAttribute("action", action);
+        tagWriter.writeAttribute("method", method);
     }
 
     /**

@@ -14,6 +14,6 @@ public class TopContentPaneTag extends ContentPaneTag {
     
     
     public TopContentPaneTag() {
-        dataDojoProps.put("region", "top");
+        putDataDojoProp("region", "top");
     }
 }

@@ -29,32 +29,36 @@ public class DataDojoProps {
         props.put(key, value);
     }
 
-    public void print(JspWriter out) throws IOException {
-        if (props != null) {
-            boolean firstProp = true;
-            out.append(" data-dojo-props=\"");
+    public String getString() {
+        if (props == null) {
+            return null; 
+        }
+        StringBuilder sb = new StringBuilder();
+        boolean firstProp = true;
             for (String prop : props.keySet()) {
                 if (firstProp) {
                     firstProp = false;
                 } else {
-                    out.append(", ");
+                    sb.append(", ");
                 }
-                out.append(prop);
-                out.append(": ");
+                sb.append(prop);
+                sb.append(": ");
                 final Object propValue = props.get(prop);
                 if (propValue instanceof Boolean) {
-                    out.append(propValue.toString());
+                    sb.append(propValue.toString());
                 } else if (propValue instanceof Number) {
-                    out.append(propValue.toString());
+                    sb.append(propValue.toString());
                 } else {
-                    out.append('\'');
-                    out.append(propValue.toString());
-                    out.append('\'');
+                    sb.append('\'');
+                    sb.append(propValue.toString());
+                    sb.append('\'');
                 }
             }
-            out.append('\"');
+        return sb.toString();
+    }
 
-        }
+    public boolean isEmpty() {
+        return props == null ? true : props.isEmpty();
     }
 
 }

@@ -61,6 +61,8 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
 
     @Override
     public void validate(Object target, Errors errors) {
+        throw new ImplementMeException();
+        /*
         final CompoundEventDetectorVO vo = (CompoundEventDetectorVO) target;
         
         if (vo.name.isEmpty()) {
@@ -110,8 +112,9 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
                 response.addData("from", e.getFrom());
                 response.addData("to", e.getTo());
             }
-            */
+            * /
         }
+        */
     }
 
 

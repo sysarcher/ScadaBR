@@ -87,10 +87,6 @@
             <artifactId>commons-logging</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.directwebremoting</groupId>
-            <artifactId>dwr</artifactId>
-        </dependency>
-        <dependency>
             <groupId>br.org.scadabr.legacy</groupId>
             <artifactId>rxtx</artifactId>
         </dependency>

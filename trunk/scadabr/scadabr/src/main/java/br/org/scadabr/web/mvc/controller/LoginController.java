@@ -19,6 +19,7 @@
 package br.org.scadabr.web.mvc.controller;
 
 import br.org.scadabr.dao.UserDao;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.web.i18n.LocaleResolver;
 import br.org.scadabr.web.mvc.form.LoginForm;
 import javax.servlet.http.HttpServletRequest;
@@ -96,9 +97,12 @@ class LoginController {
 //                        ValidationUtils.reject(errors, "login.validation.accountDisabled");
                     } else {
                         if (CrowdUtils.isAuthenticated(request, response)) {
+                            throw new ImplementMeException();
+                            /*
                             String result = performLogin(username);
                             CrowdUtils.setCrowdAuthenticated(Common.getUser(request));
                             return result;
+                            */
                         }
                     }
                 }

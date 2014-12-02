@@ -18,7 +18,6 @@
  */
 package com.serotonin.mango;
 
-import br.org.scadabr.ScadaBrConstants;
 import gnu.io.CommPortIdentifier;
 
 import java.io.File;
@@ -33,7 +32,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.HttpClient;
@@ -41,17 +39,13 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
-import org.directwebremoting.WebContext;
-import org.directwebremoting.WebContextFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.db.KeyValuePair;
 import com.serotonin.mango.util.BackgroundContext;
 import com.serotonin.mango.util.CommPortConfigException;
-import com.serotonin.mango.view.View;
 import com.serotonin.mango.vo.CommPortProxy;
-import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.ContextWrapper;
 import br.org.scadabr.utils.ImplementMeException;
 import java.util.MissingResourceException;
@@ -112,55 +106,6 @@ public class Common {
     }
 
     //
-    // Session user
-    @Deprecated
-    public static User getUser() {
-        WebContext webContext = WebContextFactory.get();
-        if (webContext == null) {
-            // If there is no web context, check if there is a background
-            // context
-            BackgroundContext backgroundContext = BackgroundContext.get();
-            if (backgroundContext == null) {
-                return null;
-            }
-            return backgroundContext.getUser();
-        }
-        return getUser(webContext.getHttpServletRequest());
-    }
-
-    @Deprecated
-    public static User getUser(HttpServletRequest request) {
-        if (true) {
-            throw new RuntimeException("REMOVED >>USE @Inject UserSessionContextBean");
-        }
-        // Check first to see if the user object is in the request.
-        User user = (User) request.getAttribute(SESSION_USER);
-        if (user != null) {
-            return user;
-        }
-
-        // If not, get it from the session.
-        user = (User) request.getSession().getAttribute(SESSION_USER);
-
-        if (user != null) // Add the user to the request. This prevents race conditions in
-        // which long-ish lasting requests have the
-        // user object swiped from them by a quicker (logout) request.
-        {
-            request.setAttribute(SESSION_USER, user);
-        }
-
-        return user;
-    }
-
-    @Deprecated
-    public static void setUser(HttpServletRequest request, User user) {
-        if (true) {
-            throw new RuntimeException("REMOVED USE: @Inject UserSessionContextBean");
-        }
-        request.getSession().setAttribute(SESSION_USER, user);
-    }
-
-    //
     // Background process description. Used for audit logs when the system
     // automatically makes changes to data, such as
     // safe mode disabling stuff.
@@ -170,46 +115,6 @@ public class Common {
             return null;
         }
         return backgroundContext.getProcessDescriptionKey();
-    }
-
-    //
-    // Anonymous views
-    public static View getAnonymousView(int id) {
-        return getAnonymousView(
-                WebContextFactory.get().getHttpServletRequest(), id);
-    }
-
-    public static View getAnonymousView(HttpServletRequest request, int id) {
-        List<View> views = getAnonymousViews(request);
-        if (views == null) {
-            return null;
-        }
-        for (View view : views) {
-            if (view.getId() == id) {
-                return view;
-            }
-        }
-        return null;
-    }
-
-    public static void addAnonymousView(HttpServletRequest request, View view) {
-        List<View> views = getAnonymousViews(request);
-        if (views == null) {
-            views = new ArrayList<>();
-            request.getSession().setAttribute(ANON_VIEW_KEY, views);
-        }
-        // Remove the view if it already exists.
-        for (int i = views.size() - 1; i >= 0; i--) {
-            if (views.get(i).getId() == view.getId()) {
-                views.remove(i);
-            }
-        }
-        views.add(view);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static List<View> getAnonymousViews(HttpServletRequest request) {
-        return (List<View>) request.getSession().getAttribute(ANON_VIEW_KEY);
     }
 
     //

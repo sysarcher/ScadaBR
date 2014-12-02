@@ -14,6 +14,6 @@ public class RightContentPaneTag extends ContentPaneTag {
     
     
     public RightContentPaneTag() {
-        dataDojoProps.put("region", "right");
+        putDataDojoProp("region", "right");
     }
 }
