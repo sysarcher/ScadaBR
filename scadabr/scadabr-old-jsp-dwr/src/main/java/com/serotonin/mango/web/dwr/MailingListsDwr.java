@@ -36,7 +36,7 @@ import com.serotonin.mango.db.dao.MailingListDao;
 import com.serotonin.mango.rt.maint.work.EmailWorkItem;
 import com.serotonin.mango.vo.mailingList.EmailRecipient;
 import com.serotonin.mango.vo.mailingList.MailingList;
-import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
+import com.serotonin.mango.vo.event.RecipientListEntryBean;
 import com.serotonin.mango.web.email.MangoEmailContent;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;

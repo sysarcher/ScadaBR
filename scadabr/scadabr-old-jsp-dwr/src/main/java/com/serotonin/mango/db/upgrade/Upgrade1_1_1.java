@@ -31,7 +31,7 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 
 import com.serotonin.mango.vo.event.EventHandlerVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
-import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
+import com.serotonin.mango.vo.event.RecipientListEntryBean;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.TimePeriods;
 import org.springframework.jdbc.core.RowMapper;

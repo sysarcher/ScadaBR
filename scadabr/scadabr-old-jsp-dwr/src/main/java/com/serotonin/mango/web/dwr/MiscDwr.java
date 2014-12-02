@@ -49,7 +49,7 @@ import com.serotonin.mango.rt.maint.work.EmailWorkItem;
 import com.serotonin.mango.util.DocumentationItem;
 import com.serotonin.mango.util.DocumentationManifest;
 import com.serotonin.mango.vo.User;
-import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
+import com.serotonin.mango.vo.event.RecipientListEntryBean;
 import com.serotonin.mango.web.email.MangoEmailContent;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.web.dwr.MethodFilter;

@@ -50,11 +50,9 @@ import br.org.scadabr.db.KeyValuePair;
 import com.serotonin.mango.util.BackgroundContext;
 import com.serotonin.mango.util.CommPortConfigException;
 import com.serotonin.mango.view.View;
-import com.serotonin.mango.view.custom.CustomView;
 import com.serotonin.mango.vo.CommPortProxy;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.ContextWrapper;
-import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.utils.ImplementMeException;
 import java.util.MissingResourceException;
 import javax.inject.Inject;
@@ -212,20 +210,6 @@ public class Common {
     @SuppressWarnings("unchecked")
     private static List<View> getAnonymousViews(HttpServletRequest request) {
         return (List<View>) request.getSession().getAttribute(ANON_VIEW_KEY);
-    }
-
-    //
-    // Custom views
-    public static CustomView getCustomView() {
-        return getCustomView(WebContextFactory.get().getHttpServletRequest());
-    }
-
-    public static CustomView getCustomView(HttpServletRequest request) {
-        return (CustomView) request.getSession().getAttribute(CUSTOM_VIEW_KEY);
-    }
-
-    public static void setCustomView(HttpServletRequest request, CustomView view) {
-        request.getSession().setAttribute(CUSTOM_VIEW_KEY, view);
     }
 
     //

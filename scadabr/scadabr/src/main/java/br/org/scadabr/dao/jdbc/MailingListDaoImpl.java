@@ -35,11 +35,11 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.MailingListDao;
 import br.org.scadabr.dao.UserDao;
+import com.serotonin.mango.vo.event.RecipientListEntry;
 import com.serotonin.mango.vo.mailingList.AddressEntry;
 import com.serotonin.mango.vo.mailingList.EmailRecipient;
 import com.serotonin.mango.vo.mailingList.MailingList;
 import com.serotonin.mango.vo.mailingList.UserEntry;
-import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import java.sql.Connection;
 import java.sql.Statement;
 import javax.inject.Inject;
@@ -78,6 +78,7 @@ public class MailingListDaoImpl extends BaseDao implements MailingListDao {
         return result;
     }
 
+    @Override
     public MailingList getMailingList(int id) {
         MailingList ml = ejt.queryForObject(MAILING_LIST_SELECT + "where id=?", new MailingListRowMapper(), id);
         setRelationalData(ml);
@@ -157,9 +158,10 @@ public class MailingListDaoImpl extends BaseDao implements MailingListDao {
         }
     }
 
-    public Set<String> getRecipientAddresses(List<RecipientListEntryBean> beans, DateTime sendTime) {
+    @Override
+    public Set<String> getRecipientAddresses(List<RecipientListEntry> beans, DateTime sendTime) {
         List<EmailRecipient> entries = new ArrayList<>(beans.size());
-        for (RecipientListEntryBean bean : beans) {
+        for (RecipientListEntry bean : beans) {
             entries.add(bean.createEmailRecipient());
         }
         populateEntrySubclasses(entries);
