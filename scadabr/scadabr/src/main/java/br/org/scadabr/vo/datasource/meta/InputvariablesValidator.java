@@ -8,6 +8,7 @@ package br.org.scadabr.vo.datasource.meta;
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
+import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ class InputvariablesValidator implements ConstraintValidator<InputVariables, Met
 
     @Override
     public boolean isValid(MetaPointLocatorVO vo, ConstraintValidatorContext cvc) {
+        throw new ImplementMeException();
         /*
          List<String> varNameSpace = new ArrayList<>();
          for (IntValuePair point : vo.getContext()) {
@@ -49,7 +51,6 @@ class InputvariablesValidator implements ConstraintValidator<InputVariables, Met
          varNameSpace.add(varName);
          }
          */
-        return false;
     }
 
     private boolean validateVarName(String varName) {

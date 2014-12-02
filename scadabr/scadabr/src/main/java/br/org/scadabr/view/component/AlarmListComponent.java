@@ -5,19 +5,11 @@ import br.org.scadabr.dao.EventDao;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.directwebremoting.WebContext;
-import org.directwebremoting.WebContextFactory;
 
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.view.ImplDefinition;
 import java.util.EnumSet;
@@ -48,8 +40,9 @@ public class AlarmListComponent extends CustomComponent {
 
     @Override
     public String generateContent() {
+        throw new ImplementMeException();
+/*
         Map<String, Object> model = new HashMap<>();
-        WebContext webContext = WebContextFactory.get();
         HttpServletRequest request = webContext.getHttpServletRequest();
 
         List<EventInstance> events = filter(eventDao.getPendingEvents(Common.getUser()), minAlarmLevel);
@@ -66,6 +59,7 @@ public class AlarmListComponent extends CustomComponent {
         throw new ImplementMeException();
         //TODO String content = BaseDwr.generateContent(request, "alarmList.jsp", model);
         // return content;
+        */
     }
 
     private List<EventInstance> filter(Iterable<EventInstance> eventInstances, AlarmLevel alarmLevel) {

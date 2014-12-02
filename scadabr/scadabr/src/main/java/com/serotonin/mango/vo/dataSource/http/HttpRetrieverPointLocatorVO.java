@@ -35,7 +35,6 @@ import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import br.org.scadabr.web.taglib.Functions;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -111,7 +110,27 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO {
 
     @Override
     public LocalizableMessage getConfigurationDescription() {
-        return new LocalizableMessageImpl("dsEdit.httpRetriever.dpconn", Functions.escapeLessThan(valueRegex));
+        return new LocalizableMessageImpl("dsEdit.httpRetriever.dpconn", escapeLessThan(valueRegex));
+    }
+
+        public static String escapeLessThan(String value) {
+        if (value == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder(value.length());
+        for (char c : value.toCharArray()) {
+            switch (c) {
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                default:
+                    sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
     private String valueRegex;

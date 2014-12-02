@@ -18,8 +18,6 @@
  */
 package com.serotonin.mango.rt.dataSource.http;
 
-import br.org.scadabr.web.taglib.LocalizableTimeStampTag;
-
 /**
  * @author Matthew Lohbihler
  */

@@ -5,80 +5,51 @@
  */
 package br.org.scadabr.web.taglib.dijit;
 
-import static br.org.scadabr.web.taglib.Functions.printAttribute;
-import br.org.scadabr.web.taglib.dojo.DataDojoProps;
-import java.io.IOException;
+import br.org.scadabr.web.taglib.DojoTag;
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspTagException;
-import javax.servlet.jsp.JspWriter;
-import org.springframework.web.servlet.tags.RequestContextAwareTag;
+import org.springframework.web.servlet.tags.form.TagWriter;
 
 /**
  *
  * @author aploese
  */
-public class ButtonTag extends RequestContextAwareTag {
+public class ButtonTag extends DojoTag {
+
+    public ButtonTag() {
+        super("button", "dijit/form/Button");
+    }
 
     private String name;
     private String value;
     private String i18nLabel;
     private String i18nTitle;
     private String type;
-    private DataDojoProps dataDojoProps = new DataDojoProps();
     private boolean disabled;
+    private TagWriter tagWriter;
 
     @Override
-    public void release() {
-        super.release();
-        id = null;
-        value = null;
-        i18nLabel = null;
-        i18nTitle = null;
-        type = null;
-        dataDojoProps = null;
-        disabled = false;
+    protected void writeAttributes(TagWriter tagWriter) throws JspException {
+        tagWriter.writeOptionalAttributeValue("type", type);
+        tagWriter.writeOptionalAttributeValue("name", name);
+        if (i18nTitle != null) {
+            tagWriter.writeAttribute("title", getRequestContext().getMessage(i18nTitle));
+        }
+        if (disabled) {
+            tagWriter.writeAttribute("disabled", "true");
+        }
     }
 
     @Override
-    public int doStartTagInternal() throws JspException {
-        try {
-            JspWriter out = pageContext.getOut();
-
-            out.print("<button");
-            printAttribute(out, "id", id);
-            printAttribute(out, "type", type);
-            out.append(" data-dojo-type=\"dijit/form/Button\" ");
-            // make Button as wide as image...
-            if (i18nLabel == null && !dataDojoProps.containsKey("showLabel") && dataDojoProps.containsKey("iconClass")) {
-                dataDojoProps.put("showLabel", false);
-            }
-            dataDojoProps.print(out);
-            printAttribute(out, "name", name);
-            if (i18nTitle != null) {
-                printAttribute(out, "title", getRequestContext().getMessage(i18nTitle));
-            }
-            if (disabled) {
-                printAttribute(out, "disabled", "true");
-            }
-            out.print(">");
-            if (i18nLabel != null) {
-                out.print(getRequestContext().getMessage(i18nLabel));
-            }
-        } catch (IOException ex) {
-            throw new JspTagException(ex.getMessage());
+    public int writeTagContent(TagWriter tagWriter) throws JspException {
+        // make Button as wide as image...
+        if (i18nLabel == null && !containsPropsKey("showLabel") && containsPropsKey("iconClass")) {
+            putDataDojoProp("showLabel", false);
+        }
+        super.writeTagContent(tagWriter);
+        if (i18nLabel != null) {
+            tagWriter.appendValue(getRequestContext().getMessage(i18nLabel));
         }
         return EVAL_BODY_INCLUDE;
-    }
-
-    @Override
-    public int doEndTag() throws JspException {
-        try {
-            JspWriter out = pageContext.getOut();
-            out.print("</button>");
-        } catch (IOException ex) {
-            throw new JspTagException(ex.getMessage());
-        }
-        return EVAL_PAGE;
     }
 
     /**
@@ -120,7 +91,7 @@ public class ButtonTag extends RequestContextAwareTag {
      * @param iconClass the iconClass to set
      */
     public void setIconClass(String iconClass) {
-        dataDojoProps.put("iconClass", iconClass);
+        putDataDojoProp("iconClass", iconClass);
     }
 
     /**

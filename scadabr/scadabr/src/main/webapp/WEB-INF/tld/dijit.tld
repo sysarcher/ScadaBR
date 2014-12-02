@@ -10,7 +10,42 @@
         Custom tag library for dijit widgets
     </description>
     <short-name>dijit</short-name>
+
+    <tag>
+        <name>dateTextBox</name>
+        <tag-class>br.org.scadabr.web.taglib.dijit.DateTextBoxTag</tag-class>
+        <description>
+            Writes a input tag for dijit/form/DateTextBox.
+        </description>
+        <body-content>empty</body-content>
+        <attribute>
+            <description>HTML Standard Attribute</description>
+            <name>id</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>HTML Standard Attribute</description>
+            <name>name</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>HTML Standard Attribute</description>
+            <name>timestamp</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>i18nLabel</name>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>i18nTitle</name>
+        </attribute>
+    </tag>
   
+      
     <tag>
         <name>textarea</name>
         <tag-class>br.org.scadabr.web.taglib.dijit.TextareaTag</tag-class>
@@ -19,19 +54,20 @@
         </description>
         <body-content>empty</body-content>
         <attribute>
-            <description>Path to property for data binding</description>
-            <name>path</name>
-            <required>true</required>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
             <description>HTML Standard Attribute</description>
             <name>id</name>
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
         <attribute>
-            <name>value</name>
+            <description>HTML Standard Attribute</description>
+            <name>name</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>text</name>
+            <required>false</required>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
         <attribute>
@@ -79,8 +115,13 @@
         </description>
         <body-content>empty</body-content>
         <attribute>
-            <description>Path to property for data binding</description>
-            <name>path</name>
+            <description>HTML Standard Attribute</description>
+            <name>name</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>value</name>
             <required>true</required>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
@@ -344,6 +385,7 @@
             <name>splitter</name>
         </attribute>
     </tag>
+    
     <tag>
         <name>form</name>
         <tag-class>br.org.scadabr.web.taglib.dijit.FormTag</tag-class>
@@ -359,29 +401,6 @@
         </attribute>
         <attribute>
             <name>method</name>
-        </attribute>
-    </tag>
-    <tag>
-        <name>selectFromMap</name>
-        <tag-class>br.org.scadabr.web.taglib.dijit.SelectFromMapTag</tag-class>
-        <description>
-            Writes a select tag. the options are taken from the map key/value pairs.
-        </description>
-        <body-content>empty</body-content>
-        <attribute>
-            <name>id</name>
-            <required>false</required>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>value</name>
-            <required>false</required>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>map</name>
-            <required>true</required>
-            <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
 

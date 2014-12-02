@@ -9,10 +9,10 @@ calculate major|minior chart ticks...
     <dijit:topContentPane>
         <form id="timeFilterId">
             <dojox:tableContainer cols="2" style="float:left;">
-                <input id="fromDateId" label="von Datum:" title="Datum" data-dojo-type="dijit/form/DateTextBox" />
-                <input id="toDateId" label="bis Datum:" title="Datum" data-dojo-type="dijit/form/DateTextBox" />
-                <input id="fromTimeId" label="von Zeit:" title="Zeit" data-dojo-type="dojox/form/TimeSpinner" />
-                <input id="toTimeId" label="bis Zeit:" title="Zeit" data-dojo-type="dojox/form/TimeSpinner" />
+                <dijit:dateTextBox id="fromDateId" i18nLabel="common.dateRangeFrom" timestamp="${fromTimestamp}" />
+                <dijit:dateTextBox id="toDateId" i18nLabel="common.dateRangeTo" timestamp="${toTimestamp}" />
+                <dojox:timeSpinner id="fromTimeId" i18nLabel="common.dateRangeFrom" timestamp="${fromTimestamp}" />
+                <dojox:timeSpinner id="toTimeId" i18nLabel="common.dateRangeTo" timestamp="${toTimestamp}" />
                 <input id="checkInceptionId" label="vom Anfang:" data-dojo-type="dijit/form/CheckBox" />
                 <input id="checkLatestId" label="Bis Ende:" data-dojo-type="dijit/form/CheckBox" checked="true"/>
             </dojox:tableContainer>
@@ -55,10 +55,10 @@ calculate major|minior chart ticks...
 
             var date = new Date();
             date.setTime(${fromTimestamp});
-            fromDate.set("value", date);
-            fromTime.set("value", fromTime.format(date));
+          //  fromDate.set("value", date);
+            fromTime.set("value", fromTime.format(date)); //TODO Bugfix for timeSpinner
             date.setTime(${toTimestamp});
-            toDate.set("value", date);
+          //  toDate.set("value", date);
             toTime.set("value", toTime.format(date));
 
             // Attach the onsubmit event handler of the form

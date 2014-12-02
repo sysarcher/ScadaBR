@@ -14,6 +14,6 @@ public class BottomContentPaneTag extends ContentPaneTag {
     
     
     public BottomContentPaneTag() {
-        dataDojoProps.put("region", "bottom");
+        putDataDojoProp("region", "bottom");
     }
 }

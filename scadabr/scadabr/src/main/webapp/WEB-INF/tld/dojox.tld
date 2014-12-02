@@ -10,6 +10,40 @@
     <short-name>dojox</short-name>
   
     <tag>
+        <name>timeSpinner</name>
+        <tag-class>br.org.scadabr.web.taglib.dojox.TimeSpinnerTag</tag-class>
+        <description>
+            Writes a input tag for dijit/form/DateTextBox.
+        </description>
+        <body-content>empty</body-content>
+        <attribute>
+            <description>HTML Standard Attribute</description>
+            <name>id</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>HTML Standard Attribute</description>
+            <name>name</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>HTML Standard Attribute</description>
+            <name>timestamp</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>i18nLabel</name>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>i18nTitle</name>
+        </attribute>
+    </tag>
+
+    <tag>
         <name>tableContainer</name>
         <tag-class>br.org.scadabr.web.taglib.dojox.TableContainerTag</tag-class>
         <description>

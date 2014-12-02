@@ -14,6 +14,6 @@ public class CenterContentPaneTag extends ContentPaneTag {
     
     
     public CenterContentPaneTag() {
-        dataDojoProps.put("region", "center");
+        putDataDojoProp("region", "center");
     }
 }

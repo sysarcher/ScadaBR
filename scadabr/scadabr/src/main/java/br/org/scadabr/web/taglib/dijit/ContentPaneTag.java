@@ -5,59 +5,20 @@
  */
 package br.org.scadabr.web.taglib.dijit;
 
-import static br.org.scadabr.web.taglib.Functions.printAttribute;
-import br.org.scadabr.web.taglib.dojo.DataDojoProps;
-import java.io.IOException;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspTagException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.tagext.TagSupport;
+import br.org.scadabr.web.taglib.DojoTag;
 
 /**
  *
  * @author aploese
  */
-public class ContentPaneTag extends TagSupport {
+public class ContentPaneTag extends DojoTag {
 
-    protected DataDojoProps dataDojoProps = new DataDojoProps();
-    
-    
-    @Override
-    public void release() {
-        super.release();
-        id = null;
-        dataDojoProps = null;
+    public ContentPaneTag() {
+        super("div", "dijit/layout/ContentPane");
     }
 
-    @Override
-    public int doStartTag() throws JspException {
-        try {
-            JspWriter out = pageContext.getOut();
-
-            out.print("<div");
-            printAttribute(out, "id", id);
-            out.append(" data-dojo-type=\"dijit/layout/ContentPane\" ");
-            dataDojoProps.print(out); 
-            out.print(">");
-        } catch (IOException ex) {
-            throw new JspTagException(ex.getMessage());
-        }
-        return EVAL_BODY_INCLUDE;
-    }
-
-    @Override
-    public int doEndTag() throws JspException {
-        try {
-            JspWriter out = pageContext.getOut();
-            out.print("</div>");
-        } catch (IOException ex) {
-            throw new JspTagException(ex.getMessage());
-        }
-        return EVAL_PAGE;
-    }
-    
     public void setSplitter(boolean splitter) {
-        dataDojoProps.put("splitter", splitter);
+        putDataDojoProp("splitter", splitter);
     }
 
 }
