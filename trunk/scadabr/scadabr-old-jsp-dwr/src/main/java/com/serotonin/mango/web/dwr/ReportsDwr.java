@@ -37,7 +37,7 @@ import com.serotonin.mango.vo.report.ReportInstance;
 import com.serotonin.mango.vo.report.ReportTask;
 import com.serotonin.mango.vo.report.ReportPointVO;
 import com.serotonin.mango.vo.report.ReportVO;
-import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
+import com.serotonin.mango.vo.event.RecipientListEntryBean;
 import br.org.scadabr.util.ColorUtils;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.l10n.Localizer;

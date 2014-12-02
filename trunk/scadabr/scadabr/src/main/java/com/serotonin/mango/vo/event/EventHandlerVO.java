@@ -38,9 +38,7 @@ import com.serotonin.mango.rt.event.handlers.ProcessHandlerRT;
 import com.serotonin.mango.rt.event.handlers.SetPointHandlerRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
-import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.mailingList.EmailRecipient;
-import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
@@ -344,14 +342,14 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
     private int inactivePointId;
 
     // Email handler fields.
-    private List<RecipientListEntryBean> activeRecipients;
+    private List<RecipientListEntry> activeRecipients;
     private boolean sendEscalation;
     private TimePeriods escalationDelayType;
     private int escalationDelay;
-    private List<RecipientListEntryBean> escalationRecipients;
+    private List<RecipientListEntry> escalationRecipients;
     private boolean sendInactive;
     private boolean inactiveOverride;
-    private List<RecipientListEntryBean> inactiveRecipients;
+    private List<RecipientListEntry> inactiveRecipients;
 
     // Process handler fields.
     private String activeProcessCommand;
@@ -480,12 +478,12 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
         this.inactivePointId = inactivePointId;
     }
 
-    public List<RecipientListEntryBean> getActiveRecipients() {
+    public List<RecipientListEntry> getActiveRecipients() {
         return activeRecipients;
     }
 
     public void setActiveRecipients(
-            List<RecipientListEntryBean> activeRecipients) {
+            List<RecipientListEntry> activeRecipients) {
         this.activeRecipients = activeRecipients;
     }
 
@@ -505,12 +503,12 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
         this.escalationDelayType = escalationDelayType;
     }
 
-    public List<RecipientListEntryBean> getEscalationRecipients() {
+    public List<RecipientListEntry> getEscalationRecipients() {
         return escalationRecipients;
     }
 
     public void setEscalationRecipients(
-            List<RecipientListEntryBean> escalationRecipients) {
+            List<RecipientListEntry> escalationRecipients) {
         this.escalationRecipients = escalationRecipients;
     }
 
@@ -538,12 +536,12 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
         this.inactiveOverride = inactiveOverride;
     }
 
-    public List<RecipientListEntryBean> getInactiveRecipients() {
+    public List<RecipientListEntry> getInactiveRecipients() {
         return inactiveRecipients;
     }
 
     public void setInactiveRecipients(
-            List<RecipientListEntryBean> inactiveRecipients) {
+            List<RecipientListEntry> inactiveRecipients) {
         this.inactiveRecipients = inactiveRecipients;
     }
 
@@ -721,9 +719,9 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
     }
 
     private LocalizableMessage createRecipientMessage(
-            List<RecipientListEntryBean> recipients) {
+            List<RecipientListEntry> recipients) {
         ArrayList<LocalizableMessage> params = new ArrayList<>();
-        for (RecipientListEntryBean recip : recipients) {
+        for (RecipientListEntry recip : recipients) {
             LocalizableMessage msg;
             if (recip.getRecipientType() == EmailRecipient.TYPE_MAILING_LIST) {
                 msg = new LocalizableMessageImpl("event.audit.recip.mailingList",
@@ -806,12 +804,12 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
                         inactivePointId = in.readInt();
                         break;
                     case EMAIL:
-                        activeRecipients = (List<RecipientListEntryBean>) in
+                        activeRecipients = (List<RecipientListEntry>) in
                                 .readObject();
                         sendEscalation = in.readBoolean();
                         escalationDelayType = TimePeriods.fromId(in.readInt());
                         escalationDelay = in.readInt();
-                        escalationRecipients = (List<RecipientListEntryBean>) in
+                        escalationRecipients = (List<RecipientListEntry>) in
                                 .readObject();
                         sendInactive = in.readBoolean();
                         inactiveOverride = false;
@@ -836,16 +834,16 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
                         inactivePointId = in.readInt();
                         break;
                     case EMAIL:
-                        activeRecipients = (List<RecipientListEntryBean>) in
+                        activeRecipients = (List<RecipientListEntry>) in
                                 .readObject();
                         sendEscalation = in.readBoolean();
                         escalationDelayType = TimePeriods.fromId(in.readInt());
                         escalationDelay = in.readInt();
-                        escalationRecipients = (List<RecipientListEntryBean>) in
+                        escalationRecipients = (List<RecipientListEntry>) in
                                 .readObject();
                         sendInactive = in.readBoolean();
                         inactiveOverride = in.readBoolean();
-                        inactiveRecipients = (List<RecipientListEntryBean>) in
+                        inactiveRecipients = (List<RecipientListEntry>) in
                                 .readObject();
                         break;
                     case PROCESS:
@@ -867,16 +865,16 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
                         inactivePointId = in.readInt();
                         break;
                     case EMAIL:
-                        activeRecipients = (List<RecipientListEntryBean>) in
+                        activeRecipients = (List<RecipientListEntry>) in
                                 .readObject();
                         sendEscalation = in.readBoolean();
                         escalationDelayType = TimePeriods.fromId(in.readInt());
                         escalationDelay = in.readInt();
-                        escalationRecipients = (List<RecipientListEntryBean>) in
+                        escalationRecipients = (List<RecipientListEntry>) in
                                 .readObject();
                         sendInactive = in.readBoolean();
                         inactiveOverride = in.readBoolean();
-                        inactiveRecipients = (List<RecipientListEntryBean>) in
+                        inactiveRecipients = (List<RecipientListEntry>) in
                                 .readObject();
                         break;
                     case PROCESS:

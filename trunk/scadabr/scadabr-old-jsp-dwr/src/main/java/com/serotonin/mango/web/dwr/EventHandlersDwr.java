@@ -61,7 +61,7 @@ import com.serotonin.mango.vo.publish.PublishedPointVO;
 import com.serotonin.mango.vo.publish.PublisherVO;
 import com.serotonin.mango.web.dwr.beans.DataPointBean;
 import com.serotonin.mango.web.dwr.beans.EventSourceBean;
-import com.serotonin.mango.web.dwr.beans.RecipientListEntryBean;
+import com.serotonin.mango.vo.event.RecipientListEntryBean;
 import br.org.scadabr.web.dwr.DwrResponseI18n;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
