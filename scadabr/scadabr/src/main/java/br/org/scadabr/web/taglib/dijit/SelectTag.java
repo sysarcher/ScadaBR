@@ -15,81 +15,57 @@
  */
 package br.org.scadabr.web.taglib.dijit;
 
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.i18n.LocalizableEnum;
-import java.util.ArrayList;
+import br.org.scadabr.web.taglib.DojoTag;
 import java.util.Collection;
-import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import javax.servlet.jsp.JspException;
-
 import org.springframework.web.servlet.tags.form.TagWriter;
 
-@SuppressWarnings("serial")
-public class SelectTag extends org.springframework.web.servlet.tags.form.SelectTag {
+public class SelectTag extends DojoTag {
 
-    class LocalizedOption {
-
-        private final String value;
-        private final String label;
-
-        public LocalizedOption(String label, String value) {
-            this.label = label;
-            this.value = value;
-        }
-
-        /**
-         * @return the value
-         */
-        public String getValue() {
-            return value;
-        }
-
-        /**
-         * @return the label
-         */
-        public String getLabel() {
-            return label;
-        }
+    public SelectTag() {
+        super(SKIP_BODY, "select", "dijit/form/Select");
     }
 
     private String i18nLabel;
     private String i18nTitle;
+    private String name;
+    private Object selectedValue;
+    private Object items;
 
-    /**
-     * Renders the HTML '{@code select}' tag to the supplied {@link TagWriter}.
-     * <p>
-     * Renders nested '{@code option}' tags if the {@link #setItems items}
-     * property is set, otherwise exposes the bound value for the nested
-     * {@link OptionTag OptionTags}.
-     */
+    @Override
+    protected void writeAttributes(TagWriter tagWriter) throws JspException {
+        tagWriter.writeOptionalAttributeValue("name", name);
+        if (i18nLabel != null) {
+            tagWriter.writeAttribute("label", getRequestContext().getMessage(i18nLabel) + ":");
+        }
+        if (i18nTitle != null) {
+            tagWriter.writeAttribute("title", getRequestContext().getMessage(i18nTitle));
+        } else if (i18nLabel != null) {
+            tagWriter.writeAttribute("title", getRequestContext().getMessage(i18nLabel));
+        }
+    }
+
     @Override
     protected int writeTagContent(TagWriter tagWriter) throws JspException {
-        if (i18nLabel != null) {
-            setDynamicAttribute(null, "label", getRequestContext().getMessage(i18nLabel) + ":");
-            if (i18nTitle == null && getTitle() == null) {
-                setTitle(getRequestContext().getMessage(i18nLabel));
-            }
+        int result = super.writeTagContent(tagWriter);
+        if (items instanceof Collection) {
+            writeCollection(tagWriter);
+        } else if (items instanceof Map) {
+            writeMap(tagWriter);
+        } else {
+            throw new ImplementMeException();
         }
-        if (i18nTitle != null && getTitle() == null) {
-            setTitle(getRequestContext().getMessage(i18nTitle));
-        }
+        return result;
+    }
 
-        setDynamicAttribute(null, "data-dojo-type", "dijit/form/Select");
-        if (getItems() instanceof Collection) {
-            Collection items = (Collection) getItems();
-            if (!items.isEmpty()) {
-                setItemValue("value");
-                setItemLabel("label");
-                List<LocalizedOption> localizedOptions = new ArrayList<>();
-                for (Object o : items) {
-                    if (o instanceof LocalizableEnum) {
-                        final LocalizableEnum en = (LocalizableEnum) o;
-                        localizedOptions.add(new LocalizedOption(getRequestContext().getMessage(en.getI18nKey()), en.getName()));
-                    }
-                }
-                setItems(localizedOptions);
-            }
+    private void writeCollection(TagWriter tagWriter) throws JspException {
+        for (Object o : (Collection) items) {
+            writeOptionTag(tagWriter, o);
         }
-        return super.writeTagContent(tagWriter);
     }
 
     /**
@@ -107,17 +83,53 @@ public class SelectTag extends org.springframework.web.servlet.tags.form.SelectT
     }
 
     /**
-     * @return the i18nLabel
+     * @param name the name to set
      */
-    public String getI18nLabel() {
-        return i18nLabel;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
-     * @return the i18nTitle
+     * @param SelectedValue the selectedValue to set
      */
-    public String getI18nTitle() {
-        return i18nTitle;
+    public void setSelectedValue(Object selectedValue) {
+        this.selectedValue = selectedValue;
+    }
+
+    /**
+     * @param items the items to set
+     */
+    public void setItems(Object items) {
+        this.items = items;
+    }
+
+    private void writeOptionTag(TagWriter tagWriter, Object o) throws JspException {
+        tagWriter.startTag("option");
+        if (o instanceof LocalizableEnum) {
+            final LocalizableEnum e = (LocalizableEnum) o;
+            if (selectedValue == e) {
+                tagWriter.writeAttribute("selected", "selected");
+            }
+            tagWriter.writeAttribute("value", e.getName());
+            tagWriter.appendValue(getRequestContext().getMessage(e.getI18nKey()));
+        } else if (o instanceof Map.Entry) {
+            final Map.Entry me = (Map.Entry) o;
+            if (Objects.equals(selectedValue, me.getKey())) {
+                tagWriter.writeAttribute("selected", "selected");
+            }
+            tagWriter.writeAttribute("value", me.getKey().toString());
+            tagWriter.appendValue(me.getValue().toString());
+        } else {
+            throw new ImplementMeException();
+        }
+        tagWriter.endTag();
+
+    }
+
+    private void writeMap(TagWriter tagWriter) throws JspException {
+        for (Map.Entry o : ((Map<?, ?>) items).entrySet()) {
+            writeOptionTag(tagWriter, o);
+        }
     }
 
 }

@@ -65,7 +65,7 @@
             <dijit:centerContentPane >
                 <dijit:headlineLayoutContainer >
                     <dijit:topContentPane >
-                        <dijit:select id="watchListSelect" path="selectedWatchList" items="${watchLists}" />
+                        <dijit:select id="watchListSelect" selectedValue="${selectedWatchList}" items="${watchLists}" />
                     </dijit:topContentPane>
                     <dijit:centerContentPane >
                         <div id="watchListTable"></div>
