@@ -13,11 +13,11 @@ import org.springframework.web.servlet.tags.form.TagWriter;
  *
  * @author aploese
  */
-public class DijitCheckBoxTag extends DojoInputTag {
+public class CheckBoxTag extends DojoInputTag {
 
     private boolean checked;
     
-    public DijitCheckBoxTag() {
+    public CheckBoxTag() {
         super("dijit/form/CheckBox", "checkbox");
     }
 
