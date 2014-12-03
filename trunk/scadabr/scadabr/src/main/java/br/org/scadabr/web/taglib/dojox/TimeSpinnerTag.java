@@ -5,11 +5,8 @@
  */
 package br.org.scadabr.web.taglib.dojox;
 
-import br.org.scadabr.web.taglib.dijit.*;
 import br.org.scadabr.web.taglib.DojoInputTag;
 import java.util.Date;
-import javax.servlet.jsp.JspException;
-import org.springframework.web.servlet.tags.form.TagWriter;
 
 /**
  *
@@ -18,7 +15,7 @@ import org.springframework.web.servlet.tags.form.TagWriter;
 public class TimeSpinnerTag extends DojoInputTag {
 
     public TimeSpinnerTag() {
-        super("dojox/form/TimeSpinner");
+        super("dojox/form/TimeSpinner", "time");
     }
 
     private Object timestamp;

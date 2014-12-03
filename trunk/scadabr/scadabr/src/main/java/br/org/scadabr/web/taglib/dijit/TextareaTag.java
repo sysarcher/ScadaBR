@@ -16,7 +16,7 @@ public class TextareaTag extends DojoInputTag {
     private String text;
     
     public TextareaTag() {
-        super("dijit/form/Textarea");
+        super("dijit/form/Textarea", "text");
     }
     
     

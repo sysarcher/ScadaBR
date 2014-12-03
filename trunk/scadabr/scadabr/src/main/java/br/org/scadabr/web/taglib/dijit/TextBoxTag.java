@@ -5,27 +5,14 @@
  */
 package br.org.scadabr.web.taglib.dijit;
 
-import br.org.scadabr.web.taglib.DojoInputTag;
-
 /**
  *
  * @author aploese
  */
-public class TextBoxTag extends DojoInputTag {
-
-    private Object value;
+public class TextBoxTag extends AbstractTextBoxTag {
     
     public TextBoxTag() {
         super("dijit/form/TextBox");
-    }
-    
-    @Override
-    protected String getValue0()  {
-        return value == null ? null : value.toString();
-    }
-    
-    public void setValue(Object value) {
-        this.value = value;
     }
 
 }

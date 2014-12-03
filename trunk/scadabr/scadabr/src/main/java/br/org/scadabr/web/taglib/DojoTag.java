@@ -53,13 +53,12 @@ public class DojoTag extends AbstractFormTag {
     }
 
     protected void writeAttributes(TagWriter tagWriter) throws JspException {
-        
     }
-    
+
     protected boolean containsPropsKey(String key) {
         return dataDojoProps.containsKey(key);
-    } 
-    
+    }
+
     protected void putDataDojoProp(String key, Object value) {
         dataDojoProps.put(key, value);
     }
@@ -67,7 +66,7 @@ public class DojoTag extends AbstractFormTag {
     /**
      * Closes the '{@code div}' block tag.
      *
-     * @return 
+     * @return
      * @throws javax.servlet.jsp.JspException
      */
     @Override

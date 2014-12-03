@@ -14,8 +14,9 @@ import org.springframework.web.servlet.tags.form.TagWriter;
  */
 public abstract class DojoInputTag extends DojoTag {
 
-    public DojoInputTag(String dojoDataType) {
+    public DojoInputTag(String dojoDataType, String type) {
         super(SKIP_BODY, "input", dojoDataType);
+        this.type = type;
     }
 
     private String i18nLabel;

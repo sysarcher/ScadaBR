@@ -13,7 +13,7 @@ calculate major|minior chart ticks...
                 <dijit:dateTextBox id="toDateId" i18nLabel="common.dateRangeTo" timestamp="${toTimestamp}" />
                 <dojox:timeSpinner id="fromTimeId" i18nLabel="common.dateRangeFrom" timestamp="${fromTimestamp}" />
                 <dojox:timeSpinner id="toTimeId" i18nLabel="common.dateRangeTo" timestamp="${toTimestamp}" />
-                <input id="checkInceptionId" label="vom Anfang:" data-dojo-type="dijit/form/CheckBox" />
+                <dijit:checkBox id="checkInceptionId" label="vom Anfang:" data-dojo-type="dijit/form/CheckBox" />
                 <input id="checkLatestId" label="Bis Ende:" data-dojo-type="dijit/form/CheckBox" checked="true"/>
             </dojox:tableContainer>
             <dijit:button type="submit" i18nLabel="login.loginButton" />

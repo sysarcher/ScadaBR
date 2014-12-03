@@ -50,6 +50,8 @@
     For more info 
     See http://stackoverflow.com/questions/3896013/no-adapter-for-handler-exception 
     See http://forum.springsource.org/showthread.php?t=48372&highlight=UrlFilenameViewController -->
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+    
     <bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter" />
 
     <bean class="com.googlecode.jsonrpc4j.spring.AutoJsonRpcServiceExporter"/>

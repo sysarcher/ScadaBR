@@ -5,10 +5,8 @@
  */
 package br.org.scadabr.web.taglib.dojo;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.jsp.JspWriter;
 
 /**
  *

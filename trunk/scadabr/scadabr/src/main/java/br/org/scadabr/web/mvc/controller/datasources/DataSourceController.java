@@ -22,11 +22,12 @@ import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import br.org.scadabr.web.mvc.AjaxFormPostResponse;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
+import java.util.Set;
 import javax.inject.Inject;
-import javax.validation.Valid;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,6 +38,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/dataSources/dataSource")
 public class DataSourceController {
 
+    @Inject
+    private Validator validator;
     @Inject
     private DataSourceDao dataSourceDao;
     @Inject
@@ -53,11 +56,12 @@ public class DataSourceController {
     }
 
     @RequestMapping(params = "id", method = RequestMethod.POST)
-    public @ResponseBody AjaxFormPostResponse postDataSource(@ModelAttribute("dataSource") @Valid DataSourceVO dataSource, BindingResult bindingResult) {
-        if (!bindingResult.hasErrors()) {
+    public @ResponseBody AjaxFormPostResponse<DataSourceVO> postDataSource(@ModelAttribute("dataSource") DataSourceVO dataSource) {
+        Set<ConstraintViolation<DataSourceVO>> constraintViolations = validator.validate(dataSource);
+        if (constraintViolations.isEmpty()) {
             dataSourceDao.saveDataSource(dataSource);
         }
-        return new AjaxFormPostResponse(bindingResult);
+        return new AjaxFormPostResponse<>(dataSource, constraintViolations);
     }
 
 }
