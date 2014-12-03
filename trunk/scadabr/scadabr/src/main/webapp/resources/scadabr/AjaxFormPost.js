@@ -2,14 +2,13 @@ define(["dojo/_base/declare",
     "dojo/dom",
     "dojo/dom-form",
     "dojo/request",
-    "dijit/registry",
     "dojo/on",
-    "dojo/ready"
-], function (declare, dom, domForm, request, registry, on, ready) {
+    'dojo/_base/json'
+], function (declare, dom, domForm, request, on, json) {
 
     return declare(null, {
         form: null,
-        constructor: function (formId, dsId) {
+        constructor: function (formId, postHref) {
             var form = dom.byId(formId);
             // Attach the onsubmit event handler of the form
 
@@ -18,17 +17,18 @@ define(["dojo/_base/declare",
                 evt.stopPropagation();
                 evt.preventDefault();
                 // Post the data to the server
-                request.post("dataSources/dataSource", {
-                    query: {
-                        id: dsId
-                    },
-                    // Send the username and password
+                request.post(postHref, {
+                    query: {},
+                    handleAs: "json",
                     data: domForm.toObject(formId)
                             // Wait 10 seconds for a response
                             //timeout: 10000
 
                 }).then(function (response) {
-                    alert(response);
+                    if (response.constraintViolations.length !== 0) {
+                        // todo find the element and mark that as error
+                        alert(json.toJson(response.constraintViolations)); // Todo Quick and dirtx
+                    }
                 }, function (error) {
                     alert(error);
                 });

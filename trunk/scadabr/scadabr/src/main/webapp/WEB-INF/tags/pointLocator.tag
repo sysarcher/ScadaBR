@@ -4,12 +4,12 @@
     require([
         "dojo/dom",
         "dojo/parser",
-        "scadabr/jsp/dataSources/PointLocator"
-    ], function (dom, parser, PointLocator) {
+        "scadabr/AjaxFormPost"
+    ], function (dom, parser, AjaxFormPost) {
         var _plFormParseWrapper = dom.byId("plFormParseWrapperId");
         try {
             parser.parse(_plFormParseWrapper).then(function () {
-                _PointLocator = new PointLocator("plFormId", ${pointLocator.id});
+                var _PlFormPost = new AjaxFormPost("plFormId", "dataSources/pointLocator?id=" + ${pointLocator.id});
             }, function (err) {
                 alert(err);
             });
