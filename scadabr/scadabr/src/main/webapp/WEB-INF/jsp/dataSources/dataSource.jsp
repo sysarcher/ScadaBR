@@ -3,11 +3,11 @@
     require([
         "dojo/dom",
         "dojo/parser",
-        "scadabr/jsp/dataSources/DataSource"
-    ], function (dom, parser, DataSource) {
+        "scadabr/AjaxFormPost"
+    ], function (dom, parser, AjaxFormPost) {
         var _dsFormParserWrapper = dom.byId("dsFormParserWrapper");
         parser.parse(_dsFormParserWrapper).then(function () {
-            _DataSource = new DataSource("dsFormId", ${dataSource.id});
+            var _DsFormPost = new AjaxFormPost("dsFormId", "dataSources/" + ${dataSource.id});
         }, function (error) {
             alert(error);
         });
