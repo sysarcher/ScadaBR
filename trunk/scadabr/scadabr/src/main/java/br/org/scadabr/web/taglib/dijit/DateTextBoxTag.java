@@ -20,6 +20,7 @@ public class DateTextBoxTag extends DojoInputTag {
 
     private Object timestamp;
 
+    @Override
     protected String getValue0() {
         if (timestamp instanceof Long) {
             return String.format("%tF", new Date((Long) timestamp));
