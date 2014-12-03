@@ -87,9 +87,14 @@
         </description>
         <body-content>empty</body-content>
         <attribute>
-            <description>Path to property for data binding</description>
-            <name>path</name>
-            <required>true</required>
+            <description>HTML Standard Attribute</description>
+            <name>name</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>number</name>
+            <required>false</required>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
         <attribute>
@@ -142,16 +147,22 @@
             <name>i18nTitle</name>
         </attribute>
     </tag>
+    
     <tag>
-        <name>validationTextBox</name>
+        <name>checkBox</name>
+        <tag-class>br.org.scadabr.web.taglib.dijit.CheckBoxTag</tag-class>
         <description>
-            Writes a input tag for dijit/form/ValidatingTextBox.
+            Writes a input tag for dijit/form/TextBox.
         </description>
-        <tag-class>br.org.scadabr.web.taglib.dijit.ValidationTextBoxTag</tag-class>
         <body-content>empty</body-content>
         <attribute>
-            <description>Path to property for data binding</description>
-            <name>path</name>
+            <description>HTML Standard Attribute</description>
+            <name>name</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>checked</name>
             <required>true</required>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
@@ -162,7 +173,37 @@
             <rtexprvalue>true</rtexprvalue>
         </attribute>
         <attribute>
-            <name>type</name>
+            <name>i18nLabel</name>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>i18nTitle</name>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>validationTextBox</name>
+        <description>
+            Writes a input tag for dijit/form/ValidatingTextBox.
+        </description>
+        <tag-class>br.org.scadabr.web.taglib.dijit.ValidationTextBoxTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <description>HTML Standard Attribute</description>
+            <name>name</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>value</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>HTML Standard Attribute</description>
+            <name>id</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
         </attribute>
         <attribute>
             <name>i18nLabel</name>
@@ -171,9 +212,8 @@
         <attribute>
             <name>i18nTitle</name>
         </attribute>
-        <body-content>empty</body-content>
-        <dynamic-attributes>true</dynamic-attributes>
     </tag>
+
     <tag>
         <name>loginTextBox</name>
         <description>
@@ -193,9 +233,6 @@
             <name>id</name>
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>type</name>
         </attribute>
         <attribute>
             <name>i18nLabel</name>

@@ -7,8 +7,6 @@ package br.org.scadabr.web.taglib.dijit;
 
 import br.org.scadabr.web.taglib.DojoInputTag;
 import java.util.Date;
-import javax.servlet.jsp.JspException;
-import org.springframework.web.servlet.tags.form.TagWriter;
 
 /**
  *
@@ -17,7 +15,7 @@ import org.springframework.web.servlet.tags.form.TagWriter;
 public class DateTextBoxTag extends DojoInputTag {
 
     public DateTextBoxTag() {
-        super("dijit/form/DateTextBox");
+        super("dijit/form/DateTextBox", "date");
     }
 
     private Object timestamp;

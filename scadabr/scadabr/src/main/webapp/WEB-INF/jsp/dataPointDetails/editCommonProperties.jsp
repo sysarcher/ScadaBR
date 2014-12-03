@@ -13,6 +13,6 @@
 </script>
 <div id="editCommonPropertiesId">
     <dojox:tableContainer cols="1">
-        <dijit:validationTextBox i18nLabel="pointEdit.props.name"  path="dataPoint.name"/>
+        <dijit:validationTextBox i18nLabel="pointEdit.props.name"  name="name" value="${dataPoint.name}"/>
     </dojox:tableContainer>
 </div>

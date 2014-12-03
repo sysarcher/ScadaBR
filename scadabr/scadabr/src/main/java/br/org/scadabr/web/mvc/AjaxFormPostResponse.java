@@ -5,31 +5,27 @@
  */
 package br.org.scadabr.web.mvc;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
 import org.springframework.validation.BindingResult;
 
 /**
  *
  * @author aploese
+ * @param <T>
  */
-public class AjaxFormPostResponse {
+public class AjaxFormPostResponse<T extends Object> {
     private final Object target;
-    private final List<FieldError> fieldErrors = new LinkedList<>();
-    private final List<String> objectErrors = new LinkedList<>();
+    private final Collection<JsonConstraintViolation> constraintViolations = new LinkedList<>();
     
     
-    public AjaxFormPostResponse(BindingResult bindingResult) {
-        this.target = bindingResult.getTarget();
-        if (bindingResult.hasGlobalErrors()) {
-            for (org.springframework.validation.ObjectError oe : bindingResult.getGlobalErrors()) {
-                objectErrors.add(oe.getDefaultMessage());
-            }
-        }
-        if (bindingResult.hasFieldErrors()) {
-            for (org.springframework.validation.FieldError fe : bindingResult.getFieldErrors()) {
-                fieldErrors.add(new FieldError(fe.getField(), fe.getRejectedValue(), fe.getDefaultMessage()));
-            }
+    public AjaxFormPostResponse(T target, Set<ConstraintViolation<T>> constraintViolations) {
+        this.target = target;
+        for (ConstraintViolation cv : constraintViolations) {
+            this.constraintViolations.add(new JsonConstraintViolation(cv.getPropertyPath().toString(), cv.getInvalidValue(), cv.getMessage()));
         }
     }
 
@@ -37,7 +33,7 @@ public class AjaxFormPostResponse {
         return target;
     }
     
-    public List<FieldError> getFieldErrors() {
-        return fieldErrors;
+    public Collection<JsonConstraintViolation> getConstraintViolations() {
+        return constraintViolations;
     }
 }

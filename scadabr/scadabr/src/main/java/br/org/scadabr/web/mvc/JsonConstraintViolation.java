@@ -9,22 +9,15 @@ package br.org.scadabr.web.mvc;
  *
  * @author aploese
  */
-public class FieldError {
-    private final String field;
+public class JsonConstraintViolation {
+    private final String path;
     private final String msg;
     private final Object rejectedValue;
 
-    public FieldError(String field, Object rejectedValue, String msg) {
-        this.field = field;
+    public JsonConstraintViolation(String path, Object rejectedValue, String msg) {
+        this.path = path;
         this.rejectedValue = rejectedValue;
         this.msg = msg;
-    }
-
-    /**
-     * @return the field
-     */
-    public String getField() {
-        return field;
     }
 
     /**
@@ -39,6 +32,13 @@ public class FieldError {
      */
     public Object getRejectedValue() {
         return rejectedValue;
+    }
+
+    /**
+     * @return the path
+     */
+    public String getPath() {
+        return path;
     }
     
 }
