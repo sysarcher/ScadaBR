@@ -18,11 +18,8 @@
  */
 package com.serotonin.mango.rt.dataImage;
 
-import br.org.scadabr.l10n.AbstractLocalizer;
-import java.text.MessageFormat;
-import java.util.ResourceBundle;
-
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 /**
  * This class provides a way of arbitrarily annotating a PointValue. Point value
@@ -33,7 +30,7 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
  * @see SetPointSource
  * @author Matthew Lohbihler
  */
-public class AnnotatedPointValueTime extends PointValueTime {
+public class PointValueAnnotation {
 
     private static final long serialVersionUID = -1;
 
@@ -60,15 +57,9 @@ public class AnnotatedPointValueTime extends PointValueTime {
      */
     private String sourceDescriptionArgument;
 
-    public AnnotatedPointValueTime(MangoValue value, int dataPointId, long time, int sourceType, int sourceId) {
-        super(value, dataPointId, time);
+    public PointValueAnnotation(int sourceType, int sourceId) {
         this.sourceType = sourceType;
         this.sourceId = sourceId;
-    }
-
-    @Override
-    public boolean isAnnotated() {
-        return true;
     }
 
     public int getSourceId() {
@@ -101,11 +92,10 @@ public class AnnotatedPointValueTime extends PointValueTime {
         this.sourceDescriptionArgument = sourceDescriptionArgument;
     }
 
-    public String getAnnotation(ResourceBundle bundle) {
-        String pattern = AbstractLocalizer.localizeI18nKey(getSourceDescriptionKey(), bundle);
+    public LocalizableMessage getAnnotation() {
         if (sourceDescriptionArgument == null) {
-            return MessageFormat.format(pattern, AbstractLocalizer.localizeI18nKey("common.deleted", bundle));
+            return new LocalizableMessageImpl(getSourceDescriptionKey(), new LocalizableMessageImpl("common.deleted"));
         }
-        return MessageFormat.format(pattern, sourceDescriptionArgument);
+        return new LocalizableMessageImpl(getSourceDescriptionKey(), sourceDescriptionArgument);
     }
 }

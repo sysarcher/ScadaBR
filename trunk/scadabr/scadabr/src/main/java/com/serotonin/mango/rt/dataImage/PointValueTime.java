@@ -57,6 +57,7 @@ public class PointValueTime<T extends MangoValue>  implements Serializable, IVal
     private final T value;
     private final long timestamp;
     private final int dataPointId;
+    private PointValueAnnotation pointValueAnnotation;
 
     public PointValueTime(T value, int dataPointId, long timestamp) {
         this.value = value;
@@ -80,30 +81,10 @@ public class PointValueTime<T extends MangoValue>  implements Serializable, IVal
     }
 
     public boolean isAnnotated() {
-        return false;
+        return pointValueAnnotation != null;
     }
+    
 
-/*
-    public float getFloatValue() {
-        return value.getFloatValue();
-    }
-
-    public double getDoubleValue() {
-        return value.getDoubleValue();
-    }
-
-    public String getStringValue() {
-        return value.getStringValue();
-    }
-
-    public int getIntegerValue() {
-        return value.getIntegerValue();
-    }
-
-    public boolean getBooleanValue() {
-        return value.getBooleanValue();
-    }
-*/
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof PointValueTime)) {
@@ -137,6 +118,20 @@ public class PointValueTime<T extends MangoValue>  implements Serializable, IVal
     @Override
     public int getDataPointId() {
         return dataPointId;
+    }
+
+    /**
+     * @return the pointValueAnnotation
+     */
+    public PointValueAnnotation getPointValueAnnotation() {
+        return pointValueAnnotation;
+    }
+
+    /**
+     * @param pointValueAnnotation the pointValueAnnotation to set
+     */
+    public void setPointValueAnnotation(PointValueAnnotation pointValueAnnotation) {
+        this.pointValueAnnotation = pointValueAnnotation;
     }
     
 }
