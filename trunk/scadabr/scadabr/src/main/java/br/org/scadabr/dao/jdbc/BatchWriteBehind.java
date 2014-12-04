@@ -11,6 +11,8 @@ import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.SystemCallable;
 import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.db.DatabaseAccessFactory;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Future;
@@ -39,17 +41,25 @@ class BatchWriteBehind {
         public BatchWriteBehindCallable() {
         }
 
+        private void writeInto(PointValueTime<DoubleValue> pvt, Object[] params, int index) {
+            index *= BatchWriteBehind.POINT_VALUE_INSERT_VALUES_COUNT;
+            params[index++] = pvt.getDataPointId();
+            params[index++] = pvt.getDataType().mangoDbId;
+            params[index++] = pvt.getMangoValue().getDoubleValue();
+            params[index++] = pvt.getTimestamp();
+        }
+
         @Override
         public Integer call() {
-            LOG.log(Level.FINE, "Start Write Batch entries: {0}", entriesToWrite.size());
+            LOG.log(Level.FINE, "Start Write Batch entries: {0}", doubleValuesToWrite.size());
             int entriesWritten = 0;
             try {
-                BatchWriteBehindEntry[] inserts;
-                while (!entriesToWrite.isEmpty()) {
-                    synchronized (entriesToWrite) {
-                        inserts = new BatchWriteBehindEntry[entriesToWrite.size() < maxRows ? entriesToWrite.size() : maxRows];
+                PointValueTime<DoubleValue>[] inserts;
+                while (!doubleValuesToWrite.isEmpty()) {
+                    synchronized (doubleValuesToWrite) {
+                        inserts = new PointValueTime[doubleValuesToWrite.size() < maxRows ? doubleValuesToWrite.size() : maxRows];
                         for (int i = 0; i < inserts.length; i++) {
-                            inserts[i] = entriesToWrite.remove();
+                            inserts[i] = doubleValuesToWrite.remove();
                         }
                     }
                     // Create the sql and parameters
@@ -61,7 +71,7 @@ class BatchWriteBehind {
                             sb.append(',');
                         }
                         sb.append(PointValueDaoImpl.POINT_VALUE_INSERT_VALUES);
-                        inserts[i].writeInto(params, i);
+                        writeInto(inserts[i], params, i);
                     }
                     // Insert the data
                     int retries = 10;
@@ -123,7 +133,7 @@ class BatchWriteBehind {
      *
      * BatchWriteBehindEntry are collected until a minimum size s reached.
      */
-    private final Queue<BatchWriteBehindEntry> entriesToWrite = new LinkedList<>();
+    private final Queue<PointValueTime<DoubleValue>> doubleValuesToWrite = new LinkedList<>();
 
     private int maxRows;
 
@@ -144,11 +154,11 @@ class BatchWriteBehind {
         }
     }
 
-    void add(BatchWriteBehindEntry e, JdbcTemplate ejt) {
+    void add(PointValueTime<DoubleValue> e, JdbcTemplate ejt) {
         boolean needsFlush = false;
-        synchronized (entriesToWrite) {
-            entriesToWrite.add(e);
-            needsFlush = (entriesToWrite.size() > maxRows) && !batchWriteBehindCallable.sheduledOrRunning;
+        synchronized (doubleValuesToWrite) {
+            doubleValuesToWrite.add(e);
+            needsFlush = (doubleValuesToWrite.size() > maxRows) && !batchWriteBehindCallable.sheduledOrRunning;
         }
         if (needsFlush) {
             flush(ejt);
@@ -165,7 +175,7 @@ class BatchWriteBehind {
      * @return a Future if any data to write otherwise null.
      */
     public Future<Integer> flush(JdbcTemplate ejt) {
-        LOG.log(Level.FINE, "flush called, entries: {0}", entriesToWrite.size());
+        LOG.log(Level.FINE, "flush called, entries: {0}", doubleValuesToWrite.size());
         synchronized (batchWriteBehindCallable) {
             Future<Integer> f = batchWriteBehindCallable.future;
             if (f != null) {
@@ -173,7 +183,7 @@ class BatchWriteBehind {
                 return f;
             }
             try {
-                if (entriesToWrite.isEmpty()) {
+                if (doubleValuesToWrite.isEmpty()) {
                     LOG.fine("nothing to flush");
                     return null;
                 }

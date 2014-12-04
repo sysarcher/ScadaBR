@@ -24,6 +24,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
+import com.serotonin.mango.rt.dataImage.types.BooleanValue;
 import com.serotonin.mango.view.ImageSet;
 import com.serotonin.mango.view.ImplDefinition;
 import java.util.EnumSet;
@@ -38,10 +39,10 @@ import java.util.EnumSet;
  */
 @Deprecated
 // Use ViewComponent instead
-public class BinaryImageSetRenderer extends ImageSetRenderer {
+public class BinaryImageSetRenderer extends ImageSetRenderer<BooleanValue> {
 
     private static final ImplDefinition definition = new ImplDefinition("graphicRendererBinaryImage", "BINARY_IMAGE",
-            "graphic.binaryImage", EnumSet.of(DataType.BINARY));
+            "graphic.binaryImage", EnumSet.of(DataType.BOOLEAN));
 
     public static ImplDefinition getDefinition() {
         return definition;
@@ -67,10 +68,10 @@ public class BinaryImageSetRenderer extends ImageSetRenderer {
     }
 
     @Override
-    public String getImage(PointValueTime pointValue) {
+    public String getImage(PointValueTime<BooleanValue> pointValue) {
         boolean bvalue = false;
         if (pointValue != null && pointValue.getValue() != null) {
-            bvalue = pointValue.getBooleanValue();
+            bvalue = pointValue.getMangoValue().getBooleanValue();
         }
 
         return imageSet.getImageFilename(bvalue ? oneImage : zeroImage);

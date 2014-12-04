@@ -19,6 +19,8 @@
 package com.serotonin.mango.view.component;
 
 import br.org.scadabr.DataType;
+import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.rt.scripting.ScriptExecutor;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -28,30 +30,26 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-
-
-import br.org.scadabr.rt.datasource.meta.ScriptExecutor;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.vo.DataPointVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.ImplementMeException;
+import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.text.TextRenderer;
 import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
  */
-
-public class ScriptComponent extends PointComponent {
+public class ScriptComponent<T extends MangoValue> extends PointComponent<T> {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("script", "SCRIPT", "graphic.script",
-            EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC, DataType.ALPHANUMERIC));
+            EnumSet.of(DataType.BOOLEAN, DataType.MULTISTATE, DataType.DOUBLE, DataType.ALPHANUMERIC));
 
     private static final String SCRIPT_PREFIX = "function __scriptRenderer__() {";
     private static final String SCRIPT_SUFFIX = "\r\n}\r\n__scriptRenderer__();";
 
-    
     private String script;
 
     @Override
@@ -68,7 +66,7 @@ public class ScriptComponent extends PointComponent {
     }
 
     @Override
-    public void addDataToModel(Map<String, Object> model, PointValueTime value) {
+    public void addDataToModel(Map<String, Object> model, PointValueTime<T> value) {
         String result;
 
         if (value == null) {
@@ -81,19 +79,21 @@ public class ScriptComponent extends PointComponent {
             DataPointVO point = tgetDataPoint();
 
             // Put the values into the engine scope.
-            engine.put("value", value.getValue().getObjectValue());
+            engine.put("value", value.getValue());
             engine.put("htmlText", getHtmlText(point, value));
             engine.put("renderedText", getRenderedText(point, value));
-            engine.put("time", value.getTime());
+            engine.put("time", value.getTimestamp());
             engine.put("pointComponent", this);
             engine.put("point", point);
-            if (true) throw new ImplementMeException();
+            if (true) {
+                throw new ImplementMeException();
+            }
             /* TODO
-            // Copy properties from the model into the engine scope.
-            engine.put(BaseDwr.MODEL_ATTR_EVENTS, model.get(BaseDwr.MODEL_ATTR_EVENTS));
-            engine.put(BaseDwr.MODEL_ATTR_HAS_UNACKED_EVENT, model.get(BaseDwr.MODEL_ATTR_HAS_UNACKED_EVENT));
-            engine.put(BaseDwr.MODEL_ATTR_RESOURCE_BUNDLE, model.get(BaseDwr.MODEL_ATTR_RESOURCE_BUNDLE));
-*/
+             // Copy properties from the model into the engine scope.
+             engine.put(BaseDwr.MODEL_ATTR_EVENTS, model.get(BaseDwr.MODEL_ATTR_EVENTS));
+             engine.put(BaseDwr.MODEL_ATTR_HAS_UNACKED_EVENT, model.get(BaseDwr.MODEL_ATTR_HAS_UNACKED_EVENT));
+             engine.put(BaseDwr.MODEL_ATTR_RESOURCE_BUNDLE, model.get(BaseDwr.MODEL_ATTR_RESOURCE_BUNDLE));
+             */
             // Create the script.
             String evalScript = SCRIPT_PREFIX + script + SCRIPT_SUFFIX;
 
@@ -141,15 +141,19 @@ public class ScriptComponent extends PointComponent {
             script = SerializationHelper.readSafeUTF(in);
         }
     }
-    
-        public static String getHtmlText(DataPointVO point, PointValueTime pointValue) {
+
+    public static String getHtmlText(DataPointVO point, PointValueTime pointValue) {
         if (point == null) {
             return "-";
+        }
+        if (point.getId() != point.getId()) {
+            throw new ShouldNeverHappenException("Point and pointvalue mismatch for ScriptComponent");
         }
         String text = point.getTextRenderer().getText(pointValue, TextRenderer.HINT_FULL);
         String colour = point.getTextRenderer().getColour(pointValue);
         return getHtml(colour, text, point.getDataType() == DataType.ALPHANUMERIC);
     }
+
     private static String getHtml(String colour, String text, boolean detectOverflow) {
 
         if (text != null && detectOverflow && text.length() > 30) {
@@ -167,7 +171,7 @@ public class ScriptComponent extends PointComponent {
         }
     }
 
-        public static String getRenderedText(DataPointVO point, PointValueTime pointValue) {
+    public static String getRenderedText(DataPointVO point, PointValueTime pointValue) {
         if (point == null) {
             return "-";
         }

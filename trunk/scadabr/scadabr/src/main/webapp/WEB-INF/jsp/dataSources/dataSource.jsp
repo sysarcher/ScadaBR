@@ -7,7 +7,7 @@
     ], function (dom, parser, AjaxFormPost) {
         var _dsFormParserWrapper = dom.byId("dsFormParserWrapper");
         parser.parse(_dsFormParserWrapper).then(function () {
-            var _DsFormPost = new AjaxFormPost("dsFormId", "dataSources/" + ${dataSource.id});
+            var _DsFormPost = new AjaxFormPost("dsFormId", "dataSources/dataSource?id=" + ${dataSource.id});
         }, function (error) {
             alert(error);
         });

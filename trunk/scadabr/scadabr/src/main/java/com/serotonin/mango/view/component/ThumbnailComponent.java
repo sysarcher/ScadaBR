@@ -26,6 +26,7 @@ import java.util.Map;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
+import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.ImplDefinition;
 import java.util.EnumSet;
 
@@ -33,7 +34,7 @@ import java.util.EnumSet;
  * @author Matthew Lohbihler
  */
 
-public class ThumbnailComponent extends PointComponent {
+public class ThumbnailComponent extends PointComponent<MangoValue> {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("thumbnailImage", "THUMBNAIL",
             "graphic.thumbnailImage", EnumSet.of(DataType.IMAGE));
@@ -60,7 +61,7 @@ public class ThumbnailComponent extends PointComponent {
     }
 
     @Override
-    public void addDataToModel(Map<String, Object> model, PointValueTime pointValue) {
+    public void addDataToModel(Map<String, Object> model, PointValueTime<MangoValue> pointValue) {
         if (pointValue == null || pointValue.getValue() == null) {
             model.put("error", "common.noData");
             return;

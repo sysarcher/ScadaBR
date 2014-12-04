@@ -16,32 +16,30 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.rt.dataSource.meta;
+package br.org.scadabr.rt.scripting;
 
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
-import java.util.List;
 
 import com.serotonin.mango.rt.dataImage.IDataPoint;
-import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
+import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import com.serotonin.mango.view.stats.ValueChangeCounter;
 
 /**
  * @author Matthew Lohbihler
  */
-public class AlphanumericPointWrapper extends AbstractPointWrapper {
+public class AlphanumericPointWrapper extends AbstractPointWrapper<AlphanumericValue> {
 
-    public AlphanumericPointWrapper(IDataPoint point, WrapperContext context) {
+    public AlphanumericPointWrapper(IDataPoint<AlphanumericValue> point, WrapperContext context) {
         super(point, context);
     }
 
     public String getValue() {
-        MangoValue value = getValueImpl();
+        AlphanumericValue value = getValueImpl();
         if (value == null) {
             return "";
         }
-        return value.getStringValue();
+        return value.getValue();
     }
 
     @Override

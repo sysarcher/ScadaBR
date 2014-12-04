@@ -19,6 +19,7 @@
 package com.serotonin.mango.view.text;
 
 import br.org.scadabr.DataType;
+import br.org.scadabr.utils.ImplementMeException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -29,7 +30,6 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.ImplDefinition;
 import java.awt.Color;
 import java.util.EnumSet;
-
 
 public class MultistateRenderer extends BaseTextRenderer {
 
@@ -52,11 +52,11 @@ public class MultistateRenderer extends BaseTextRenderer {
 
     private List<MultistateValue> multistateValues = new ArrayList<>();
 
-    public void addMultistateValue(int key, String text, String colour) {
+    public void addMultistateValue(byte key, String text, String colour) {
         multistateValues.add(new MultistateValue(key, text, colour));
     }
 
-    public void addMultistateValue(int key, String text, Color colour) {
+    public void addMultistateValue(byte key, String text, Color colour) {
         multistateValues.add(new MultistateValue(key, text, colour));
     }
 
@@ -70,10 +70,11 @@ public class MultistateRenderer extends BaseTextRenderer {
 
     @Override
     protected String getTextImpl(MangoValue value, int hint) {
-        if (!(value instanceof com.serotonin.mango.rt.dataImage.types.MultistateValue)) {
-            return null;
+        if (value instanceof com.serotonin.mango.rt.dataImage.types.MultistateValue) {
+            return getText(((com.serotonin.mango.rt.dataImage.types.MultistateValue) value).getByteValue(), hint);
+        } else {
+            throw new ImplementMeException();
         }
-        return getText(value.getIntegerValue(), hint);
     }
 
     @Override
@@ -91,10 +92,11 @@ public class MultistateRenderer extends BaseTextRenderer {
 
     @Override
     protected String getColourImpl(MangoValue value) {
-        if (!(value instanceof com.serotonin.mango.rt.dataImage.types.MultistateValue)) {
-            return null;
+        if (value instanceof com.serotonin.mango.rt.dataImage.types.MultistateValue) {
+            return getColour(((com.serotonin.mango.rt.dataImage.types.MultistateValue) value).getByteValue());
+        } else {
+            throw new ImplementMeException();
         }
-        return getColour(value.getIntegerValue());
     }
 
     @Override

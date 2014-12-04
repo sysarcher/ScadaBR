@@ -35,7 +35,7 @@ import java.util.EnumSet;
 public class ScriptRenderer extends BaseGraphicRenderer {
 
     private static final ImplDefinition definition = new ImplDefinition("graphicRendererScript", "SCRIPT", "graphic.script",
-            EnumSet.of(DataType.ALPHANUMERIC, DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC));
+            EnumSet.of(DataType.ALPHANUMERIC, DataType.BOOLEAN, DataType.MULTISTATE, DataType.DOUBLE));
 
     public static ImplDefinition getDefinition() {
         return definition;

@@ -16,29 +16,28 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.rt.dataSource.meta;
+package br.org.scadabr.rt.scripting;
 
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
-import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
+import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 
 /**
  * @author Matthew Lohbihler
  */
-public class MultistatePointWrapper extends DistinctPointWrapper {
+public class MultistatePointWrapper extends DistinctPointWrapper<MultistateValue> {
 
-    public MultistatePointWrapper(IDataPoint point, WrapperContext context) {
+    public MultistatePointWrapper(IDataPoint<MultistateValue> point, WrapperContext context) {
         super(point, context);
     }
 
-    public int getValue() {
-        MangoValue value = getValueImpl();
+    public byte getValue() {
+        MultistateValue value = getValueImpl();
         if (value == null) {
             return 0;
         }
-        return value.getIntegerValue();
+        return value.getByteValue();
     }
 
     @Override

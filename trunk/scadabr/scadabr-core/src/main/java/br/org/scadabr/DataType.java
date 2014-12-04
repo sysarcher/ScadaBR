@@ -7,9 +7,9 @@ import java.util.Collection;
 public enum DataType implements LocalizableEnum<DataType> {
 
     UNKNOWN(0, "common.unknown"),
-    BINARY(1, "common.dataTypes.binary"),
+    BOOLEAN(1, "common.dataTypes.boolean"),
     MULTISTATE(2, "common.dataTypes.multistate"),
-    NUMERIC(3, "common.dataTypes.numeric"),
+    DOUBLE(3, "common.dataTypes.double"),
     ALPHANUMERIC(4, "common.dataTypes.alphanumeric"),
     IMAGE(5, "common.dataTypes.image");
     private final String i18nKey;
@@ -55,11 +55,11 @@ public enum DataType implements LocalizableEnum<DataType> {
             case 0:
                 return UNKNOWN;
             case 1:
-                return BINARY;
+                return BOOLEAN;
             case 2:
                 return MULTISTATE;
             case 3:
-                return NUMERIC;
+                return DOUBLE;
             case 4:
                 return ALPHANUMERIC;
             case 5:

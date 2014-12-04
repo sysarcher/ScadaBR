@@ -23,6 +23,7 @@ import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 
 /**
  * The NegativeCusumDetectorRT is used to detect occurances of point values
@@ -32,7 +33,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
  *
  * @author Matthew Lohbihler
  */
-public class NegativeCusumDetectorRT extends TimeDelayedEventDetectorRT {
+public class NegativeCusumDetectorRT extends TimeDelayedEventDetectorRT<DoubleValue> {
 
     /**
      * State field. The current negative CUSUM for the point.
@@ -95,8 +96,8 @@ public class NegativeCusumDetectorRT extends TimeDelayedEventDetectorRT {
     }
 
     @Override
-    synchronized public void pointUpdated(PointValueTime newValue) {
-        double newDouble = newValue.getDoubleValue();
+    synchronized public void pointUpdated(PointValueTime<DoubleValue> newValue) {
+        double newDouble = newValue.getMangoValue().getDoubleValue();
 
         cusum += newDouble - vo.getWeight();
         if (cusum > 0) {
@@ -105,12 +106,12 @@ public class NegativeCusumDetectorRT extends TimeDelayedEventDetectorRT {
 
         if (cusum < vo.getLimit()) {
             if (!negativeCusumActive) {
-                negativeCusumActiveTime = newValue.getTime();
+                negativeCusumActiveTime = newValue.getTimestamp();
                 changeNegativeCusumActive();
             }
         } else {
             if (negativeCusumActive) {
-                negativeCusumInactiveTime = newValue.getTime();
+                negativeCusumInactiveTime = newValue.getTimestamp();
                 changeNegativeCusumActive();
             }
         }

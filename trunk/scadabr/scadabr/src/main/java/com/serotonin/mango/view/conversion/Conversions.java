@@ -22,8 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import com.serotonin.mango.rt.dataImage.types.NumericValue;
 
 /**
  * @author Matthew Lohbihler
@@ -54,13 +55,13 @@ public class Conversions {
         return availableConversions.get(new ConversionType(from, to));
     }
 
-    public static MangoValue convert(EngineeringUnits from, EngineeringUnits to, MangoValue value) {
+    public static MangoValue convert(EngineeringUnits from, EngineeringUnits to, DoubleValue value) {
         return convert(from.intValue(), to.intValue(), value);
     }
 
-    public static MangoValue convert(Integer from, Integer to, MangoValue value) {
+    public static MangoValue convert(Integer from, Integer to, DoubleValue value) {
         double d = convert(from, to, value.getDoubleValue());
-        return new NumericValue(d);
+        return new DoubleValue(d);
     }
 
     public static double convert(EngineeringUnits from, EngineeringUnits to, double value) {

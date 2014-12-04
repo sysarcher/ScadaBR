@@ -25,7 +25,7 @@ import java.io.ObjectOutputStream;
 
 
 
-import com.serotonin.mango.rt.dataImage.types.BinaryValue;
+import com.serotonin.mango.rt.dataImage.types.BooleanValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
@@ -35,7 +35,7 @@ import java.util.EnumSet;
 public class PlainRenderer extends BaseTextRenderer {
 
     private static ImplDefinition definition = new ImplDefinition("textRendererPlain", "PLAIN", "textRenderer.plain",
-            EnumSet.of(DataType.BINARY, DataType.ALPHANUMERIC, DataType.MULTISTATE, DataType.NUMERIC));
+            EnumSet.of(DataType.BOOLEAN, DataType.ALPHANUMERIC, DataType.MULTISTATE, DataType.DOUBLE));
 
     public static ImplDefinition getDefinition() {
         return definition;
@@ -76,8 +76,8 @@ public class PlainRenderer extends BaseTextRenderer {
     }
 
     private String getStringValue(MangoValue value) {
-        if (value instanceof BinaryValue) {
-            if (value.getBooleanValue()) {
+        if (value instanceof BooleanValue) {
+            if (((BooleanValue)value).getBooleanValue()) {
                 return "1";
             }
             return "0";

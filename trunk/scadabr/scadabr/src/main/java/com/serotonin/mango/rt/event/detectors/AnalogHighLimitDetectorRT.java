@@ -23,6 +23,7 @@ import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 
 /**
  * The AnalogHighLimitDetector is used to detect occurrences of point values
@@ -39,7 +40,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
  *
  * @author Matthew Lohbihler
  */
-public class AnalogHighLimitDetectorRT extends TimeDelayedEventDetectorRT {
+public class AnalogHighLimitDetectorRT extends TimeDelayedEventDetectorRT<DoubleValue> {
 
     /**
      * State field. Whether the high limit is currently active or not. This
@@ -97,16 +98,16 @@ public class AnalogHighLimitDetectorRT extends TimeDelayedEventDetectorRT {
     }
 
     @Override
-    synchronized public void pointChanged(PointValueTime oldValue, PointValueTime newValue) {
-        double newDouble = newValue.getDoubleValue();
+    synchronized public void pointChanged(PointValueTime<DoubleValue> oldValue, PointValueTime<DoubleValue> newValue) {
+        double newDouble = newValue.getMangoValue().getDoubleValue();
         if (newDouble > vo.getLimit()) {
             if (!highLimitActive) {
-                highLimitActiveTime = newValue.getTime();
+                highLimitActiveTime = newValue.getTimestamp();
                 changeHighLimitActive();
             }
         } else {
             if (highLimitActive) {
-                highLimitInactiveTime = newValue.getTime();
+                highLimitInactiveTime = newValue.getTimestamp();
                 changeHighLimitActive();
             }
         }

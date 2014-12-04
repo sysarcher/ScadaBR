@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package br.org.scadabr.rt.datasource.meta;
+package br.org.scadabr.rt.scripting;
 
 import br.org.scadabr.DataType;
 import java.io.IOException;
@@ -39,18 +39,10 @@ import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
-import com.serotonin.mango.rt.dataImage.types.BinaryValue;
+import com.serotonin.mango.rt.dataImage.types.BooleanValue;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
-import com.serotonin.mango.rt.dataImage.types.NumericValue;
-import com.serotonin.mango.rt.dataSource.meta.AbstractPointWrapper;
-import com.serotonin.mango.rt.dataSource.meta.AlphanumericPointWrapper;
-import com.serotonin.mango.rt.dataSource.meta.BinaryPointWrapper;
-import com.serotonin.mango.rt.dataSource.meta.DataPointStateException;
-import com.serotonin.mango.rt.dataSource.meta.MultistatePointWrapper;
-import com.serotonin.mango.rt.dataSource.meta.NumericPointWrapper;
-import com.serotonin.mango.rt.dataSource.meta.ResultTypeException;
-import com.serotonin.mango.rt.dataSource.meta.WrapperContext;
 import java.io.InputStream;
 import javax.script.Invocable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +53,7 @@ import org.springframework.beans.factory.annotation.Configurable;
  */
 @Configurable
 public class ScriptExecutor {
-    
+
     private static final String SCRIPT_PREFIX = "function __scriptExecutor__() {";
     private static final String SCRIPT_SUFFIX = "\r\n}";
     private String scriptFunctionPath = "scriptFunctions.js";
@@ -90,7 +82,7 @@ public class ScriptExecutor {
     }
 
     public PointValueTime execute(String script, Map<String, IDataPoint> context, long runtime,
-            DataType dataType, long timestamp) throws ScriptException, ResultTypeException {
+            int dataPointId, DataType dataType, long timestamp) throws ScriptException, ResultTypeException {
 
         // Create the script engine.
         ScriptEngineManager manager;
@@ -121,14 +113,14 @@ public class ScriptExecutor {
             IDataPoint point = context.get(varName);
             DataType dt = point.getDataType();
             switch (dt) {
-                case BINARY:
-                    engine.put(varName, new BinaryPointWrapper(point, wrapperContext));
+                case BOOLEAN:
+                    engine.put(varName, new BooleanPointWrapper(point, wrapperContext));
                     break;
                 case MULTISTATE:
                     engine.put(varName, new MultistatePointWrapper(point, wrapperContext));
                     break;
-                case NUMERIC:
-                    engine.put(varName, new NumericPointWrapper(point, wrapperContext));
+                case DOUBLE:
+                    engine.put(varName, new DoublePointWrapper(point, wrapperContext));
                     break;
                 case ALPHANUMERIC:
                     engine.put(varName, new AlphanumericPointWrapper(point, wrapperContext));
@@ -173,21 +165,20 @@ public class ScriptExecutor {
             return null;
         } else if (result instanceof AbstractPointWrapper) {
             value = ((AbstractPointWrapper) result).getValueImpl();
-        } // See if the type matches.
-        else if (dataType == DataType.BINARY && result instanceof Boolean) {
-            value = new BinaryValue((Boolean) result);
+        } else if (dataType == DataType.BOOLEAN && result instanceof Boolean) {
+            value = new BooleanValue((Boolean) result);
         } else if (dataType == DataType.MULTISTATE && result instanceof Number) {
-            value = new MultistateValue(((Number) result).intValue());
-        } else if (dataType == DataType.NUMERIC && result instanceof Number) {
-            value = new NumericValue(((Number) result).doubleValue());
+            value = new MultistateValue(((Number) result).byteValue());
+        } else if (dataType == DataType.DOUBLE && result instanceof Number) {
+            value = new DoubleValue(((Number) result).doubleValue());
         } else if (dataType == DataType.ALPHANUMERIC && result instanceof String) {
             value = new AlphanumericValue((String) result);
-        } else // If not, ditch it.
-        {
+        } else {
+            // ditch it.
             throw new ResultTypeException("event.script.convertError", result, dataType);
         }
 
-        return new PointValueTime(value, timestamp);
+        return new PointValueTime(value, dataPointId, timestamp);
     }
 
     public static ScriptException prettyScriptMessage(ScriptException e) {
@@ -217,15 +208,15 @@ public class ScriptExecutor {
         }
         functions = sw.toString();
     }
-    
-    public static void validateScript(String script, List<IntValuePair> context, DataType dataType) {
+
+    public static void validateScript(String script, List<IntValuePair> context, int dataPointId, DataType dataType) {
 
         ScriptExecutor executor = new ScriptExecutor();
         try {
             Map<String, IDataPoint> convertedContext = executor.convertContext(context);
             PointValueTime pvt = executor.execute(script, convertedContext,
-                    System.currentTimeMillis(), dataType, -1);
-            if (pvt.getTime() == -1) {
+                    System.currentTimeMillis(), dataPointId, dataType, -1);
+            if (pvt.getTimestamp()== -1) {
 //                response.addContextual("script", "dsEdit.meta.test.success", pvt.getValue());
             } else {
 //                response.addContextual("script", "dsEdit.meta.test.successTs", pvt.getValue(), new Date(pvt.getTime()));

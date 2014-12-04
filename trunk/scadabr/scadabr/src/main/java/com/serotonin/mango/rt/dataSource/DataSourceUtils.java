@@ -27,13 +27,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
-import com.serotonin.mango.rt.dataImage.types.BinaryValue;
+import com.serotonin.mango.rt.dataImage.types.BooleanValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.text.MultistateRenderer;
 import com.serotonin.mango.view.text.MultistateValue;
 import com.serotonin.mango.view.text.TextRenderer;
 import br.org.scadabr.utils.i18n.LocalizableException;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 
 /**
  * @author Matthew Lohbihler
@@ -93,8 +94,8 @@ public class DataSourceUtils {
         switch (dataType) {
             case ALPHANUMERIC:
                 return new AlphanumericValue(valueStr);
-            case BINARY:
-                return new BinaryValue(!valueStr.equals(binary0Value));
+            case BOOLEAN:
+                return new BooleanValue(!valueStr.equals(binary0Value));
             case MULTISTATE:
                 if (textRenderer instanceof MultistateRenderer) {
                     List<MultistateValue> multistateValues = ((MultistateRenderer) textRenderer).getMultistateValues();
@@ -113,10 +114,10 @@ public class DataSourceUtils {
                     }
                     throw new LocalizableException("event.valueParse.textParsePoint", valueStr, pointName);
                 }
-            case NUMERIC:
+            case DOUBLE:
                 try {
                     if (valueFormat != null) {
-                        return new NumericValue(valueFormat.parse(valueStr).doubleValue());
+                        return new DoubleValue(valueFormat.parse(valueStr).doubleValue());
                     }
                     return NumericValue.parseNumeric(valueStr);
                 } catch (NumberFormatException e) {

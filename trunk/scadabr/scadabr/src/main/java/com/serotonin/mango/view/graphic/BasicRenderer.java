@@ -31,7 +31,7 @@ import java.util.EnumSet;
 public class BasicRenderer extends BaseGraphicRenderer {
 
     private static final ImplDefinition definition = new ImplDefinition("graphicRendererBasic", "BASIC", "graphic.basic",
-            EnumSet.of(DataType.ALPHANUMERIC, DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC));
+            EnumSet.of(DataType.ALPHANUMERIC, DataType.BOOLEAN, DataType.MULTISTATE, DataType.DOUBLE));
 
     public static ImplDefinition getDefinition() {
         return definition;

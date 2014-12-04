@@ -16,17 +16,43 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.view.stats;
+package br.org.scadabr.rt.scripting;
 
+
+import com.serotonin.mango.rt.dataImage.IDataPoint;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 
 /**
  * @author Matthew Lohbihler
- * @param <T>
  */
-public interface StatisticsGenerator<T extends MangoValue> {
+abstract public class AbstractPointWrapper<T extends MangoValue> {
 
-    void addValueTime(IValueTime<T> vt);
+    protected IDataPoint<T> point;
+    protected WrapperContext context;
 
-    void done();
+    AbstractPointWrapper(IDataPoint point, WrapperContext context) {
+        this.point = point;
+        this.context = context;
+    }
+
+    public T getValueImpl() {
+        PointValueTime<T> pvt = point.getPointValue();
+        if (pvt == null) {
+            return null;
+        }
+        return pvt.getMangoValue();
+    }
+
+    public long getTimestamp() {
+        PointValueTime pvt = point.getPointValue();
+        if (pvt == null) {
+            return -1;
+        }
+        return pvt.getTimestamp();
+    }
+
+    public String getHelp() {
+        return toString();
+    }
 }

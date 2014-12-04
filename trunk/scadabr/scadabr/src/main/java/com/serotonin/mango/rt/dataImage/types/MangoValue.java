@@ -19,18 +19,20 @@
 package com.serotonin.mango.rt.dataImage.types;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.InvalidArgumentException;
-import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.utils.ImplementMeException;
 
 /**
  * @author Matthew Lohbihler
  */
-abstract public class MangoValue {
+abstract public class MangoValue implements Comparable<MangoValue> {
 
+    @Deprecated
     public static MangoValue stringToValue(String valueStr, DataType dataType) {
+        throw new ImplementMeException();
+        /*
         switch (dataType) {
             case BINARY:
-                return BinaryValue.parseBinary(valueStr);
+                return BooleanValue.parseBinary(valueStr);
             case MULTISTATE:
                 return MultistateValue.parseMultistate(valueStr);
             case NUMERIC:
@@ -46,11 +48,15 @@ abstract public class MangoValue {
                 return new AlphanumericValue(valueStr);
         }
         throw new ShouldNeverHappenException("Invalid data type " + dataType + ". Cannot instantiate MangoValue");
+                */
     }
 
+    @Deprecated
     public static MangoValue objectToValue(Object value) {
+        throw new ImplementMeException();
+        /*
         if (value instanceof Boolean) {
-            return new BinaryValue((Boolean) value);
+            return new BooleanValue((Boolean) value);
         }
         if (value instanceof Integer) {
             return new MultistateValue((Integer) value);
@@ -63,38 +69,24 @@ abstract public class MangoValue {
         }
         throw new ShouldNeverHappenException("Unrecognized object type " + (value == null ? "null" : value.getClass())
                 + ". Cannot instantiate MangoValue");
+                */
     }
 
-    abstract public boolean hasDoubleRepresentation();
-
-    abstract public float getFloatValue();
-
-    abstract public double getDoubleValue();
-
-    abstract public String getStringValue();
-
-    abstract public byte getByteValue();
-
-    abstract public short getShortValue();
-
-    abstract public int getIntegerValue();
-
-    abstract public long getLongValue();
-
-    abstract public boolean getBooleanValue();
-
-    abstract public Object getObjectValue();
+    abstract public Object getValue();
 
     abstract public DataType getDataType();
 
-    abstract public Number numberValue();
-
-    public static Number numberValue(MangoValue value) {
-        if (value == null) {
-            return null;
+    @Override
+    public int compareTo(MangoValue that) {
+        if (getValue() == null || that.getValue() == null) {
+            return 0;
         }
-        return value.numberValue();
+        if (getValue() == null) {
+            return -1;
+        }
+        if (that.getValue() == null) {
+            return 1;
+        }
+        return ((Comparable)getValue()).compareTo(that.getValue());
     }
-
-    abstract public <T extends MangoValue> int compareTo(T that);
 }

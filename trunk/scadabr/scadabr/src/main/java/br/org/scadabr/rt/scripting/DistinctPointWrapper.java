@@ -16,90 +16,60 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.rt.dataSource.meta;
+package br.org.scadabr.rt.scripting;
 
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
-import java.util.List;
 
 import com.serotonin.mango.rt.dataImage.IDataPoint;
-import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import com.serotonin.mango.view.stats.AnalogStatistics;
+import com.serotonin.mango.view.stats.StartsAndRuntimeList;
 
 /**
  * @author Matthew Lohbihler
+ * @param <T>
+ * @param <M>
  */
-public class NumericPointWrapper extends AbstractPointWrapper {
+abstract public class DistinctPointWrapper<T extends MangoValue> extends AbstractPointWrapper<T> {
 
-    public NumericPointWrapper(IDataPoint point, WrapperContext context) {
+    public DistinctPointWrapper(IDataPoint<T> point, WrapperContext context) {
         super(point, context);
     }
 
-    public double getValue() {
-        MangoValue value = getValueImpl();
-        if (value == null) {
-            return 0;
-        }
-        return value.getDoubleValue();
-    }
-
-    @Override
-    public String toString() {
-        return "{value=" + getValue() + ", ago(periodType, count), past(periodType, count), prev(periodType, count), "
-                + "previous(periodType, count)}";
-    }
-
-    public double ago(TimePeriods periodType) {
-        return ago(periodType, 1);
-    }
-
-    public double ago(TimePeriods periodType, int count) {
-        throw new ImplementMeException();
-        /*
-         long from = periodType.minus(context.getRuntime(), count);
-         PointValueTime pvt = point.getPointValueBefore(from);
-         if (pvt == null) {
-         return 0;
-         }
-         return pvt.getDoubleValue();
-         */
-    }
-
-    public AnalogStatistics past(TimePeriods periodType) {
+    public StartsAndRuntimeList past(TimePeriods periodType) {
         return past(periodType, 1);
     }
 
-    public AnalogStatistics past(TimePeriods periodType, int count) {
+    public StartsAndRuntimeList past(TimePeriods periodType, int count) {
         long to = context.getRuntime();
         long from = periodType.minus(to, count);
         return getStats(from, to);
     }
 
-    public AnalogStatistics prev(TimePeriods periodType) {
+    public StartsAndRuntimeList prev(TimePeriods periodType) {
         return previous(periodType, 1);
     }
 
-    public AnalogStatistics prev(TimePeriods periodType, int count) {
+    public StartsAndRuntimeList prev(TimePeriods periodType, int count) {
         return previous(periodType, count);
     }
 
-    public AnalogStatistics previous(TimePeriods periodType) {
+    public StartsAndRuntimeList previous(TimePeriods periodType) {
         return previous(periodType, 1);
     }
 
-    public AnalogStatistics previous(TimePeriods periodType, int count) {
+    public StartsAndRuntimeList previous(TimePeriods periodType, int count) {
         long to = periodType.truncate(context.getRuntime());
         long from = periodType.minus(to, count);
         return getStats(from, to);
     }
 
-    private AnalogStatistics getStats(long from, long to) {
+    private StartsAndRuntimeList getStats(long from, long to) {
         throw new ImplementMeException();
         /*
          PointValueTime start = point.getPointValueBefore(from);
          List<PointValueTime> values = point.getPointValuesBetween(from, to);
-         AnalogStatistics stats = new AnalogStatistics(start, values, from, to);
+         StartsAndRuntimeList stats = new StartsAndRuntimeList(start, values, from, to);
          return stats;
          */
     }

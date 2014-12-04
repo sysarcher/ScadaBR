@@ -23,79 +23,33 @@ import br.org.scadabr.DataType;
 /**
  * @author Matthew Lohbihler
  */
-public class MultistateValue extends MangoValue implements Comparable<MultistateValue> {
+public class MultistateValue extends MangoValue {
 
     public static MultistateValue parseMultistate(String s) {
         if (s == null) {
-            return new MultistateValue(0);
+            return new MultistateValue((byte)0);
         }
         try {
-            return new MultistateValue(Integer.parseInt(s));
+            return new MultistateValue((byte)Short.parseShort(s));
         } catch (NumberFormatException e) {
             // no op
         }
-        return new MultistateValue(0);
+        return new MultistateValue((byte)0);
     }
 
-    private final int value;
+    private final byte value;
 
-    public MultistateValue(int value) {
+    public MultistateValue(byte value) {
         this.value = value;
     }
 
     @Override
-    public boolean hasDoubleRepresentation() {
-        return true;
-    }
-
-    @Override
-    public float getFloatValue() {
+    public Byte getValue() {
         return value;
     }
 
-    @Override
-    public double getDoubleValue() {
-        return value;
-    }
-
-    @Override
-    public String getStringValue() {
-        return null;
-    }
-
-    @Override
-    public boolean getBooleanValue() {
-        throw new RuntimeException("MultistateValue has no boolean value.");
-    }
-
-    @Override
-    public Object getObjectValue() {
-        return value;
-    }
-
-    @Override
     public byte getByteValue() {
         return (byte) value;
-    }
-
-    @Override
-    public short getShortValue() {
-        return (short) value;
-    }
-
-    @Override
-    public int getIntegerValue() {
-        return value;
-    }
-
-    @Override
-    public long getLongValue() {
-        return value;
-    }
-
-    @Override
-    public Number numberValue() {
-        return value;
     }
 
     @Override
@@ -134,13 +88,4 @@ public class MultistateValue extends MangoValue implements Comparable<Multistate
         return true;
     }
 
-    @Override
-    public int compareTo(MultistateValue that) {
-        return (value < that.value ? -1 : (value == that.value ? 0 : 1));
-    }
-
-    @Override
-    public <T extends MangoValue> int compareTo(T that) {
-        return compareTo((MultistateValue) that);
-    }
 }

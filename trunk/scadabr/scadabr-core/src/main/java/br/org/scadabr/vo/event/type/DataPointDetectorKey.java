@@ -16,11 +16,11 @@ import java.util.EnumSet;
  */
 public enum DataPointDetectorKey implements EventKey<DataPointDetectorKey> {
 
-    ANALOG_HIGH_LIMIT(1, "pointEdit.detectors.highLimit", EnumSet.of(DataType.NUMERIC)),
-    ANALOG_LOW_LIMIT(2, "pointEdit.detectors.lowLimit", EnumSet.of(DataType.NUMERIC)),
-    BINARY_STATE(3, "pointEdit.detectors.state", EnumSet.of(DataType.BINARY)),
+    ANALOG_HIGH_LIMIT(1, "pointEdit.detectors.highLimit", EnumSet.of(DataType.DOUBLE)),
+    ANALOG_LOW_LIMIT(2, "pointEdit.detectors.lowLimit", EnumSet.of(DataType.DOUBLE)),
+    BINARY_STATE(3, "pointEdit.detectors.state", EnumSet.of(DataType.BOOLEAN)),
     MULTISTATE_STATE(4, "pointEdit.detectors.state", EnumSet.of(DataType.MULTISTATE)),
-    POINT_CHANGE(5, "pointEdit.detectors.change", EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC, DataType.ALPHANUMERIC)) {
+    POINT_CHANGE(5, "pointEdit.detectors.change", EnumSet.of(DataType.BOOLEAN, DataType.MULTISTATE, DataType.DOUBLE, DataType.ALPHANUMERIC)) {
                 @Override
                 public boolean isStateful() {
                     return false;
@@ -32,12 +32,12 @@ public enum DataPointDetectorKey implements EventKey<DataPointDetectorKey> {
                 }
 
             },
-    STATE_CHANGE_COUNT(6, "pointEdit.detectors.changeCount", EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.ALPHANUMERIC)),
-    NO_CHANGE(7, "pointEdit.detectors.noChange", EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC, DataType.ALPHANUMERIC)),
-    NO_UPDATE(8, "pointEdit.detectors.noUpdate", EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC, DataType.ALPHANUMERIC, DataType.IMAGE)),
+    STATE_CHANGE_COUNT(6, "pointEdit.detectors.changeCount", EnumSet.of(DataType.BOOLEAN, DataType.MULTISTATE, DataType.ALPHANUMERIC)),
+    NO_CHANGE(7, "pointEdit.detectors.noChange", EnumSet.of(DataType.BOOLEAN, DataType.MULTISTATE, DataType.DOUBLE, DataType.ALPHANUMERIC)),
+    NO_UPDATE(8, "pointEdit.detectors.noUpdate", EnumSet.of(DataType.BOOLEAN, DataType.MULTISTATE, DataType.DOUBLE, DataType.ALPHANUMERIC, DataType.IMAGE)),
     ALPHANUMERIC_STATE(9, "pointEdit.detectors.state", EnumSet.of(DataType.ALPHANUMERIC)),
-    POSITIVE_CUSUM(10, "pointEdit.detectors.posCusum", EnumSet.of(DataType.NUMERIC)),
-    NEGATIVE_CUSUM(11, "pointEdit.detectors.negCusum", EnumSet.of(DataType.NUMERIC));
+    POSITIVE_CUSUM(10, "pointEdit.detectors.posCusum", EnumSet.of(DataType.DOUBLE)),
+    NEGATIVE_CUSUM(11, "pointEdit.detectors.negCusum", EnumSet.of(DataType.DOUBLE));
 
     public static DataPointDetectorKey fromId(int id) {
         switch (id) {

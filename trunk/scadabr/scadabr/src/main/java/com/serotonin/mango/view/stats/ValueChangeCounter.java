@@ -18,11 +18,9 @@
  */
 package com.serotonin.mango.view.stats;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import java.util.Objects;
 
@@ -38,7 +36,7 @@ public class ValueChangeCounter implements StatisticsGenerator {
     private MangoValue lastValue;
 
     public ValueChangeCounter(PointValueTime startValue, List<? extends IValueTime> values) {
-        this(startValue == null ? null : startValue.getValue(), values);
+        this((MangoValue)(startValue == null ? null : startValue.getMangoValue()), values);
     }
 
     public ValueChangeCounter(MangoValue startValue, List<? extends IValueTime> values) {
@@ -57,7 +55,7 @@ public class ValueChangeCounter implements StatisticsGenerator {
     public void addValueTime(IValueTime vt) {
         if (!Objects.equals(lastValue, vt.getValue())) {
             changes++;
-            lastValue = vt.getValue();
+            lastValue = vt.getMangoValue();
         }
     }
 
@@ -79,21 +77,4 @@ public class ValueChangeCounter implements StatisticsGenerator {
         return "{changeCount: " + changes + "}";
     }
 
-    public static void main(String[] args) {
-        AlphanumericValue startValue = new AlphanumericValue("asdf");
-        List<PointValueTime> values = new ArrayList<>();
-        values.add(new PointValueTime("asdf", 2000));
-        values.add(new PointValueTime("zxcv", 3000));
-        values.add(new PointValueTime("qwer", 4000));
-        values.add(new PointValueTime("wert", 5000));
-        values.add(new PointValueTime("wert", 6000));
-        values.add(new PointValueTime("erty", 8000));
-
-        System.out.println(new ValueChangeCounter(startValue, values));
-        System.out.println(new ValueChangeCounter(startValue, values));
-        System.out.println(new ValueChangeCounter((MangoValue) null, values));
-        System.out.println(new ValueChangeCounter((MangoValue) null, values));
-        System.out.println(new ValueChangeCounter((MangoValue) null, new ArrayList<PointValueTime>()));
-        System.out.println(new ValueChangeCounter(startValue, new ArrayList<PointValueTime>()));
-    }
 }

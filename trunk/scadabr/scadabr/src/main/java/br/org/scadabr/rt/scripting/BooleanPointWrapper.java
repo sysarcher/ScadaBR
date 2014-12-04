@@ -16,25 +16,24 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.rt.dataSource.meta;
+package br.org.scadabr.rt.scripting;
 
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
-import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
+import com.serotonin.mango.rt.dataImage.types.BooleanValue;
 
 /**
  * @author Matthew Lohbihler
  */
-public class BinaryPointWrapper extends DistinctPointWrapper {
+public class BooleanPointWrapper extends DistinctPointWrapper<BooleanValue> {
 
-    public BinaryPointWrapper(IDataPoint point, WrapperContext context) {
+    public BooleanPointWrapper(IDataPoint<BooleanValue> point, WrapperContext context) {
         super(point, context);
     }
 
     public boolean getValue() {
-        MangoValue value = getValueImpl();
+        BooleanValue value = getValueImpl();
         if (value == null) {
             return false;
         }

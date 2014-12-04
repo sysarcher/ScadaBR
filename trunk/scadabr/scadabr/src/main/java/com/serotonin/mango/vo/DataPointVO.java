@@ -82,7 +82,7 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
                 errors.rejectValue("name", "validate.required");
             }
 
-            if (vo.loggingType == LoggingTypes.ON_CHANGE && vo.getDataType() == DataType.NUMERIC) {
+            if (vo.loggingType == LoggingTypes.ON_CHANGE && vo.getDataType() == DataType.DOUBLE) {
                 if (vo.tolerance < 0) {
                     errors.rejectValue("tolerance", "validate.cannotBeNegative");
                 }
@@ -199,10 +199,11 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
      * browser side needs to be refreshed. Initially set to this value so that point views will update (since null
      * values in this case do in fact equal each other).
      */
-    private PointValueTime lastValue = new PointValueTime((MangoValue) null, -1);
+    //TODO use null ...
+    private PointValueTime lastValue = new PointValueTime((MangoValue) null, getId(), -1);
 
     public void resetLastValue() {
-        lastValue = new PointValueTime((MangoValue) null, -1);
+        lastValue = new PointValueTime((MangoValue) null, getId(), -1);
     }
 
     public PointValueTime lastValue() {

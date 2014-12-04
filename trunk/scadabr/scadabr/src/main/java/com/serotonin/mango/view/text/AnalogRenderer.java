@@ -24,20 +24,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.DecimalFormat;
 
-
-
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.ImplementMeException;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 import java.text.MessageFormat;
 import java.util.EnumSet;
-
 
 public class AnalogRenderer extends BaseTextRenderer {
 
     private static ImplDefinition definition = new ImplDefinition("textRendererAnalog", "ANALOG",
-            "textRenderer.analog", EnumSet.of(DataType.NUMERIC));
+            "textRenderer.analog", EnumSet.of(DataType.DOUBLE));
 
     public static ImplDefinition getDefinition() {
         return definition;
@@ -53,10 +52,9 @@ public class AnalogRenderer extends BaseTextRenderer {
         return definition;
     }
 
-    
     private String decimalPattern;
     private String fullPattern;
-    
+
     private String suffix;
 
     public AnalogRenderer() {
@@ -75,10 +73,11 @@ public class AnalogRenderer extends BaseTextRenderer {
 
     @Override
     protected String getTextImpl(MangoValue value, int hint) {
-        if (!(value instanceof NumericValue)) {
-            return null;
+        if (value instanceof DoubleValue) {
+            return getText(((DoubleValue) value).getDoubleValue(), hint);
+        } else {
+            throw new ImplementMeException();
         }
-        return getText(value.getDoubleValue(), hint);
     }
 
     @Override

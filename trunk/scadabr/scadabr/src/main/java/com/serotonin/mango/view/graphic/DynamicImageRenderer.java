@@ -28,6 +28,7 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.DynamicImage;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.EnumSet;
 
 /**
@@ -38,7 +39,7 @@ import java.util.EnumSet;
 public class DynamicImageRenderer extends BaseGraphicRenderer {
 
     private static ImplDefinition definition = new ImplDefinition("graphicRendererDynamicImage", "DYNAMIC_IMAGE",
-            "graphic.dynamicImage", EnumSet.of(DataType.NUMERIC));
+            "graphic.dynamicImage", EnumSet.of(DataType.DOUBLE));
 
     public static ImplDefinition getDefinition() {
         return definition;
@@ -73,6 +74,8 @@ public class DynamicImageRenderer extends BaseGraphicRenderer {
     }
 
     public double getProportion(PointValueTime pointValue) {
+        throw new ImplementMeException();
+        /*
         if (pointValue == null || pointValue.getValue() == null) {
             return 0;
         }
@@ -86,6 +89,7 @@ public class DynamicImageRenderer extends BaseGraphicRenderer {
             return 0;
         }
         return proportion;
+                */
     }
 
     public int getHeight() {

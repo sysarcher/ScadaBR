@@ -180,7 +180,7 @@ abstract public class CompoundComponent extends ViewComponent {
         for (String childId : childIds) {
             PointComponent comp = (PointComponent) getChild(childId).getViewComponent();
             if (comp.isValid() && comp.isVisible() && comp.tgetDataPoint().lastValue() != null) {
-                long cts = comp.tgetDataPoint().lastValue().getTime();
+                long cts = comp.tgetDataPoint().lastValue().getTimestamp();
                 if (ts < cts) {
                     ts = cts;
                 }

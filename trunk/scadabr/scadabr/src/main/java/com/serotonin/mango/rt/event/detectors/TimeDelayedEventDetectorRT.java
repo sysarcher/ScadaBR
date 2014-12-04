@@ -20,6 +20,7 @@ package com.serotonin.mango.rt.event.detectors;
 
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
+import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -30,7 +31,7 @@ import org.springframework.beans.factory.annotation.Configurable;
  * @author Matthew Lohbihler
  */
 @Configurable
-abstract public class TimeDelayedEventDetectorRT extends TimeoutDetectorRT {
+abstract public class TimeDelayedEventDetectorRT<T extends MangoValue> extends TimeoutDetectorRT<T> {
 
     @Autowired
     private RuntimeManager runtimeManager;

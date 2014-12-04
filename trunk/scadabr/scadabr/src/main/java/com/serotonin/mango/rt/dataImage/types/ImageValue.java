@@ -39,7 +39,7 @@ import org.springframework.beans.factory.annotation.Configurable;
  * @author Matthew Lohbihler
  */
 @Configurable
-public class ImageValue extends MangoValue implements Comparable<ImageValue> {
+public class ImageValue extends MangoValue {
 
     @Autowired
     private Common common;
@@ -203,60 +203,8 @@ public class ImageValue extends MangoValue implements Comparable<ImageValue> {
     }
 
     @Override
-    public boolean hasDoubleRepresentation() {
-        return false;
-    }
-
-    @Override
-    public float getFloatValue() {
-        throw new RuntimeException(
-                "ImageValue has no float value. Use hasDoubleRepresentation() to check before calling this method");
-    }
-
-    @Override
-    public double getDoubleValue() {
-        throw new RuntimeException(
-                "ImageValue has no double value. Use hasDoubleRepresentation() to check before calling this method");
-    }
-
-    @Override
-    public String getStringValue() {
-        return getFilename();
-    }
-
-    @Override
-    public boolean getBooleanValue() {
-        throw new RuntimeException("ImageValue has no boolean value.");
-    }
-
-    @Override
-    public Object getObjectValue() {
-        throw new RuntimeException("ImageValue has no object value.");
-    }
-
-    @Override
-    public byte getByteValue() {
-        throw new RuntimeException("ImageValue has no byte value.");
-    }
-
-    @Override
-    public short getShortValue() {
-        throw new RuntimeException("ImageValue has no short value.");
-    }
-
-    @Override
-    public int getIntegerValue() {
-        throw new RuntimeException("ImageValue has no int value.");
-    }
-
-    @Override
-    public long getLongValue() {
-        throw new RuntimeException("ImageValue has no long value.");
-    }
-
-    @Override
-    public Number numberValue() {
-        throw new RuntimeException("ImageValue has no Number value.");
+    public byte[] getValue() {
+        return data;
     }
 
     @Override
@@ -264,13 +212,4 @@ public class ImageValue extends MangoValue implements Comparable<ImageValue> {
         return DataType.IMAGE;
     }
 
-    @Override
-    public int compareTo(ImageValue that) {
-        return getFilename().compareTo(that.getFilename());
-    }
-
-    @Override
-    public <T extends MangoValue> int compareTo(T that) {
-        return compareTo((ImageValue) that);
-    }
 }

@@ -38,7 +38,7 @@ import java.util.EnumSet;
  * @author Matthew Lohbihler
  */
 
-public class MultistateGraphicComponent extends ImageSetComponent {
+public class MultistateGraphicComponent extends ImageSetComponent<MultistateValue> {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("multistateGraphic", "MULTISTATE_GRAPHIC",
             "graphic.multistateGraphic", EnumSet.of(DataType.MULTISTATE));
@@ -61,10 +61,10 @@ public class MultistateGraphicComponent extends ImageSetComponent {
     }
 
     @Override
-    public String getImage(PointValueTime pointValue) {
-        Integer state = null;
+    public String getImage(PointValueTime<MultistateValue> pointValue) {
+        Byte state = null;
         if (pointValue != null && pointValue.getValue() instanceof MultistateValue) {
-            state = pointValue.getIntegerValue();
+            state = pointValue.getMangoValue().getByteValue();
         }
 
         Integer imageId = null;

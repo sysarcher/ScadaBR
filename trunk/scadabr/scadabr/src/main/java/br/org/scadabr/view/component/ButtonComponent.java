@@ -12,13 +12,14 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.component.ScriptComponent;
 import br.org.scadabr.util.SerializationHelper;
+import com.serotonin.mango.rt.dataImage.types.BooleanValue;
 import java.util.EnumSet;
 
 
-public class ButtonComponent extends ScriptComponent {
+public class ButtonComponent extends ScriptComponent<BooleanValue> {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("button",
-            "BUTTON", "graphic.button", EnumSet.of(DataType.BINARY));
+            "BUTTON", "graphic.button", EnumSet.of(DataType.BOOLEAN));
     
     private String whenOffLabel = "ON";
 
@@ -100,7 +101,7 @@ public class ButtonComponent extends ScriptComponent {
     }
 
     @Override
-    public void addDataToModel(Map<String, Object> model, PointValueTime value) {
+    public void addDataToModel(Map<String, Object> model, PointValueTime<BooleanValue> value) {
         createButtonScript();
         super.addDataToModel(model, value);
     }

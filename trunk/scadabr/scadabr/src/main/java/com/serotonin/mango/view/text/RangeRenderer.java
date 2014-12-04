@@ -32,13 +32,14 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 import java.util.EnumSet;
 
 
 public class RangeRenderer extends BaseTextRenderer {
 
     private static ImplDefinition definition = new ImplDefinition("textRendererRange", "RANGE", "textRenderer.range",
-            EnumSet.of(DataType.NUMERIC));
+            EnumSet.of(DataType.DOUBLE));
 
     public static ImplDefinition getDefinition() {
         return definition;
@@ -91,10 +92,10 @@ public class RangeRenderer extends BaseTextRenderer {
 
     @Override
     protected String getTextImpl(MangoValue value, int hint) {
-        if (!(value instanceof NumericValue)) {
+        if (!(value instanceof DoubleValue)) {
             return null;
         }
-        return getText(value.getDoubleValue(), hint);
+        return getText(((DoubleValue)value).getDoubleValue(), hint);
     }
 
     @Override
@@ -112,10 +113,10 @@ public class RangeRenderer extends BaseTextRenderer {
 
     @Override
     protected String getColourImpl(MangoValue value) {
-        if (!(value instanceof NumericValue)) {
+        if (!(value instanceof DoubleValue)) {
             return null;
         }
-        return getColour(value.getDoubleValue());
+        return getColour(((DoubleValue)value).getDoubleValue());
     }
 
     @Override

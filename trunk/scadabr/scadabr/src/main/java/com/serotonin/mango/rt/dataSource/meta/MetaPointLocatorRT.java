@@ -18,6 +18,8 @@
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
+import br.org.scadabr.rt.scripting.DataPointStateException;
+import br.org.scadabr.rt.scripting.ResultTypeException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +30,7 @@ import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.rt.datasource.PollingPointLocatorRT;
-import br.org.scadabr.rt.datasource.meta.ScriptExecutor;
+import br.org.scadabr.rt.scripting.ScriptExecutor;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.DataPointListener;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
@@ -148,7 +150,7 @@ public class MetaPointLocatorRT extends PollingPointLocatorRT<MetaPointLocatorVO
                 sourceIds = threadLocal.get();
             }
 
-            long time = newValue.getTime();
+            long time = newValue.getTimestamp();
             if (vo.getExecutionDelaySeconds() == 0) {
                 execute(time, sourceIds);
             } else {
@@ -205,7 +207,7 @@ public class MetaPointLocatorRT extends PollingPointLocatorRT<MetaPointLocatorVO
         try {
             ScriptExecutor executor = new ScriptExecutor();
             try {
-                PointValueTime pvt = executor.execute(vo.getScript(), context, System.currentTimeMillis(), vo.getDataType(), runtime);
+                PointValueTime pvt = executor.execute(vo.getScript(), context, System.currentTimeMillis(), vo.getId(), vo.getDataType(), runtime);
                 if (pvt == null || pvt.getValue() == null) {
                     fireScriptErrorEvent(runtime, "event.meta.nullResult");
                 } else {

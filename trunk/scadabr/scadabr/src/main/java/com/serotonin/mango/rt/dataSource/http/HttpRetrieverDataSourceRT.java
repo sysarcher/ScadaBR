@@ -100,7 +100,7 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
                         locator.getTimeFormat(), dp.getVoName());
 
                 // Save the new value
-                dp.updatePointValue(new PointValueTime(value, valueTime));
+                dp.updatePointValue(new PointValueTime(value, dp.getId(), valueTime));
             } catch (NoMatchException e) {
                 if (!locator.isIgnoreIfMissing()) {
                     if (parseErrorMessage == null) {

@@ -34,8 +34,6 @@ import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.rt.event.schedule.ScheduledEventManager;
 import com.serotonin.mango.rt.RuntimeManager;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.event.detectors.PointEventDetectorRT;
 import com.serotonin.mango.util.timeout.RunClient;
@@ -49,9 +47,12 @@ import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.vo.IntervalLoggingTypes;
 import br.org.scadabr.vo.LoggingTypes;
 import com.serotonin.mango.rt.EventManager;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+
+//TODO split tist to datatypes Double ....
 
 @Configurable
 public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
@@ -64,7 +65,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     private final PointLocatorRT pointLocator;
 
     // Runtime data.
-    private volatile PointValueTime pointValue;
+    private volatile PointValueTime<DoubleValue> pointValue;
     @Autowired
     private RuntimeManager runtimeManager;
     @Autowired
@@ -81,7 +82,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     private final Map<String, Object> attributes = new HashMap<>();
 
     // Interval logging data.
-    private PointValueTime intervalValue;
+    private PointValueTime<DoubleValue> intervalValue;
     private long intervalStartTime = -1;
     private List<IValueTime> averagingValues;
     private final Object intervalLoggingLock = new Object();
@@ -133,14 +134,14 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
         }
     }
 
-    private void savePointValue(PointValueTime newValue, SetPointSource source, boolean async) {
+    private void savePointValue(PointValueTime<DoubleValue> newValue, SetPointSource source, boolean async) {
         // Null values are not very nice, and since they don't have a specific meaning they are hereby ignored.
         if (newValue == null) {
             return;
         }
 
         // Check the data type of the value against that of the locator, just for fun.
-        DataType valueDataType = newValue.getValue().getDataType();
+        DataType valueDataType = newValue.getDataType();
         if (valueDataType != DataType.UNKNOWN && valueDataType != vo.getDataType()) // This should never happen, but if it does it can have serious downstream consequences. Also, we need
         // to know how it happened, and the stack trace here provides the best information.
         {
@@ -148,14 +149,14 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
                     + newValue.getDataType() + ", locator=" + vo.getDataType());
         }
 
-        if (newValue.getTime() > System.currentTimeMillis() + systemSettingsDao.getFutureDateLimit()) {
+        if (newValue.getTimestamp()> System.currentTimeMillis() + systemSettingsDao.getFutureDateLimit()) {
             // Too far future dated. Toss it. But log a message first.
-            LOG.warn("Future dated value detected: pointId=" + vo.getId() + ", value=" + newValue.getStringValue()
-                    + ", type=" + vo.getDataType() + ", ts=" + newValue.getTime(), new Exception());
+            LOG.warn("Future dated value detected: pointId=" + vo.getId() + ", value=" + newValue.getValue()
+                    + ", type=" + vo.getDataType() + ", ts=" + newValue.getTimestamp(), new Exception());
             return;
         }
 
-        boolean backdated = pointValue != null && newValue.getTime() < pointValue.getTime();
+        boolean backdated = pointValue != null && newValue.getTimestamp()< pointValue.getTimestamp();
 
         // Determine whether the new value qualifies for logging.
         boolean logValue;
@@ -169,9 +170,9 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
                 {
                     logValue = false;
                 } else {
-                    if (newValue.getValue() instanceof NumericValue) {
+                    if (newValue.getMangoValue() instanceof DoubleValue) {
                         // Get the new double
-                        double newd = newValue.getDoubleValue();
+                        double newd = newValue.getMangoValue().getDoubleValue();
 
                         // See if the new value is outside of the tolerance.
                         double diff = toleranceOrigin - newd;
@@ -202,7 +203,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
                 {
                     logValue = false;
                 } else {
-                    logValue = newValue.getTime() != pointValue.getTime();
+                    logValue = newValue.getTimestamp()!= pointValue.getTimestamp();
                 }
 
                 saveValue = logValue;
@@ -218,15 +219,15 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
         if (saveValue) {
             if (logValue) {
                 if (async) {
-                    pointValueDao.savePointValueAsync(vo.getId(), newValue, source);
+                    pointValueDao.savePointValueAsync(newValue, source);
                 } else {
-                    pointValueDao.savePointValueSync(vo.getId(), newValue, source);
+                    pointValueDao.savePointValueSync(newValue, source);
                 }
             }
         }
 
         // Ignore historical values.
-        if (pointValue == null || newValue.getTime() >= pointValue.getTime()) {
+        if (pointValue == null || newValue.getTimestamp()>= pointValue.getTimestamp()) {
             PointValueTime oldValue = pointValue;
             pointValue = newValue;
             fireEvents(oldValue, newValue, source != null, false);
@@ -265,14 +266,14 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
         }
     }
 
-    private void intervalSave(PointValueTime pvt) {
+    private void intervalSave(PointValueTime<DoubleValue> pvt) {
         synchronized (intervalLoggingLock) {
             switch (vo.getIntervalLoggingType()) {
                 case MAXIMUM:
                     if (intervalValue == null) {
                         intervalValue = pvt;
                     } else if (pvt != null) {
-                        if (intervalValue.getDoubleValue() < pvt.getDoubleValue()) {
+                        if (intervalValue.getMangoValue().getDoubleValue() < pvt.getMangoValue().getDoubleValue()) {
                             intervalValue = pvt;
                         }
                     }
@@ -281,7 +282,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
                     if (intervalValue == null) {
                         intervalValue = pvt;
                     } else if (pvt != null) {
-                        if (intervalValue.getDoubleValue() > pvt.getDoubleValue()) {
+                        if (intervalValue.getMangoValue().getDoubleValue() > pvt.getMangoValue().getDoubleValue()) {
                             intervalValue = pvt;
                         }
                     }
@@ -300,7 +301,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     @Override
     public void run(long fireTime) {
         synchronized (intervalLoggingLock) {
-            MangoValue value;
+            DoubleValue value;
             switch (vo.getIntervalLoggingType()) {
                 case INSTANT:
                     value = PointValueTime.getValue(pointValue);
@@ -313,7 +314,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
                 case AVERAGE:
                     AnalogStatistics stats = new AnalogStatistics(intervalValue, averagingValues, intervalStartTime,
                             fireTime);
-                    value = new NumericValue(stats.getAverage());
+                    value = new DoubleValue(stats.getAverage());
 
                     intervalValue = pointValue;
                     averagingValues.clear();
@@ -324,7 +325,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
             }
 
             if (value != null) {
-                pointValueDao.savePointValueAsync(vo.getId(), new PointValueTime(value, fireTime), null);
+                pointValueDao.savePointValueAsync(new PointValueTime(value, vo.getId(), fireTime), null);
             }
         }
     }
@@ -471,8 +472,8 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
         pointValue = pointValueDao.getLatestPointValue(vo.getId());
 
         // Set the tolerance origin if this is a numeric
-        if (pointValue != null && pointValue.getValue() instanceof NumericValue) {
-            toleranceOrigin = pointValue.getDoubleValue();
+        if (pointValue != null && pointValue.getMangoValue() instanceof DoubleValue) {
+            toleranceOrigin = pointValue.getMangoValue().getDoubleValue();
         }
 
         // Add point event listeners

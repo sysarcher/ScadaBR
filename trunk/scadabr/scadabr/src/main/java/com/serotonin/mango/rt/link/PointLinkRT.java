@@ -20,7 +20,6 @@ package com.serotonin.mango.rt.link;
 
 import br.org.scadabr.DataType;
 import br.org.scadabr.rt.SchedulerPool;
-import br.org.scadabr.rt.datasource.meta.ScriptExecutor;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +30,8 @@ import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
-import com.serotonin.mango.rt.dataSource.meta.ResultTypeException;
+import br.org.scadabr.rt.scripting.ResultTypeException;
+import br.org.scadabr.rt.scripting.ScriptExecutor;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.work.SetPointWorkItem;
 import com.serotonin.mango.vo.link.PointLinkVO;
@@ -102,12 +102,12 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
         // Propagate the update to the target point. Validate that the target point is available.
         DataPointRT targetPoint = runtimeManager.getDataPoint(vo.getTargetPointId());
         if (targetPoint == null) {
-            raiseFailureEvent(newValue.getTime(), new LocalizableMessageImpl("event.pointLink.targetUnavailable"));
+            raiseFailureEvent(newValue.getTimestamp(), new LocalizableMessageImpl("event.pointLink.targetUnavailable"));
             return;
         }
 
         if (!targetPoint.getPointLocator().isSettable()) {
-            raiseFailureEvent(newValue.getTime(), new LocalizableMessageImpl("event.pointLink.targetNotSettable"));
+            raiseFailureEvent(newValue.getTimestamp(), new LocalizableMessageImpl("event.pointLink.targetNotSettable"));
             return;
         }
 
@@ -120,24 +120,24 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
             context.put(CONTEXT_VAR_NAME, source);
 
             try {
-                PointValueTime pvt = scriptExecutor.execute(vo.getScript(), context, newValue.getTime(),
-                        targetDataType, newValue.getTime());
+                PointValueTime pvt = scriptExecutor.execute(vo.getScript(), context, newValue.getTimestamp(),
+                        targetPoint.getId(), targetDataType, newValue.getTimestamp());
                 if (pvt.getValue() == null) {
-                    raiseFailureEvent(newValue.getTime(), new LocalizableMessageImpl("event.pointLink.nullResult"));
+                    raiseFailureEvent(newValue.getTimestamp(), new LocalizableMessageImpl("event.pointLink.nullResult"));
                     return;
                 }
                 newValue = pvt;
             } catch (ScriptException e) {
-                raiseFailureEvent(newValue.getTime(), new LocalizableMessageImpl("common.default", e.getMessage()));
+                raiseFailureEvent(newValue.getTimestamp(), new LocalizableMessageImpl("common.default", e.getMessage()));
                 return;
             } catch (ResultTypeException e) {
-                raiseFailureEvent(newValue.getTime(), e);
+                raiseFailureEvent(newValue.getTimestamp(), e);
                 return;
             }
         }
 
         if (newValue.getDataType() != targetDataType) {
-            raiseFailureEvent(newValue.getTime(), new LocalizableMessageImpl("event.pointLink.convertError"));
+            raiseFailureEvent(newValue.getTimestamp(), new LocalizableMessageImpl("event.pointLink.convertError"));
             return;
         }
 

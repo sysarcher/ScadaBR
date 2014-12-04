@@ -34,7 +34,7 @@ public class StartsAndRuntime {
         if (value == null) {
             return null;
         }
-        return value.getObjectValue();
+        return value.getValue();
     }
 
     public MangoValue getMangoValue() {

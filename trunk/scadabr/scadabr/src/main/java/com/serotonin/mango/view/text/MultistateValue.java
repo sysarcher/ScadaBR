@@ -28,7 +28,7 @@ import java.awt.Color;
 
 public class MultistateValue implements Serializable {
 
-    private int key;
+    private byte key;
     private String text;
     private String colour;
 
@@ -39,7 +39,7 @@ public class MultistateValue implements Serializable {
         // no op
     }
 
-    MultistateValue(int key, String text, Color colour) {
+    MultistateValue(byte key, String text, Color colour) {
         this.key = key;
         this.text = text;
         this.colour = String.format("#%06x", colour.getRGB());
@@ -48,7 +48,7 @@ public class MultistateValue implements Serializable {
     /**
      * Required by DWR. Should not be used otherwise.
      */
-    public void setKey(int key) {
+    public void setKey(byte key) {
         this.key = key;
     }
 
@@ -66,13 +66,13 @@ public class MultistateValue implements Serializable {
         this.colour = colour;
     }
 
-    public MultistateValue(int key, String text, String colour) {
+    public MultistateValue(byte key, String text, String colour) {
         this.key = key;
         this.text = text;
         this.colour = colour;
     }
 
-    public int getKey() {
+    public byte getKey() {
         return key;
     }
 
@@ -104,7 +104,7 @@ public class MultistateValue implements Serializable {
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            key = in.readInt();
+            key = (byte)(in.readInt() & 0xFF);
             text = SerializationHelper.readSafeUTF(in);
             colour = SerializationHelper.readSafeUTF(in);
         }

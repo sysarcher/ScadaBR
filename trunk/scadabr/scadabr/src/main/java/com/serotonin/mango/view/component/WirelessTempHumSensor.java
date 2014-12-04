@@ -80,10 +80,10 @@ public class WirelessTempHumSensor extends CompoundComponent {
         humidity.setDisplayControls(true);
 
         addChild(TEXT, "graphic.wirelessTempHumSensor.staticText", text);
-        addChild(BATTERY, "graphic.wirelessTempHumSensor.battery", battery, EnumSet.of(DataType.NUMERIC));
-        addChild(SIGNAL, "graphic.wirelessTempHumSensor.signal", signal, EnumSet.of(DataType.NUMERIC));
-        addChild(TEMPERATURE, "graphic.wirelessTempHumSensor.temperature", temperature, EnumSet.of(DataType.NUMERIC));
-        addChild(HUMIDITY, "graphic.wirelessTempHumSensor.humidity", humidity, EnumSet.of(DataType.NUMERIC));
+        addChild(BATTERY, "graphic.wirelessTempHumSensor.battery", battery, EnumSet.of(DataType.DOUBLE));
+        addChild(SIGNAL, "graphic.wirelessTempHumSensor.signal", signal, EnumSet.of(DataType.DOUBLE));
+        addChild(TEMPERATURE, "graphic.wirelessTempHumSensor.temperature", temperature, EnumSet.of(DataType.DOUBLE));
+        addChild(HUMIDITY, "graphic.wirelessTempHumSensor.humidity", humidity, EnumSet.of(DataType.DOUBLE));
     }
 
     @Override

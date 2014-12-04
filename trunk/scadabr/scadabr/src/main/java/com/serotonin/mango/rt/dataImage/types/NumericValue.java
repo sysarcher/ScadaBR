@@ -18,14 +18,17 @@
  */
 package com.serotonin.mango.rt.dataImage.types;
 
-import br.org.scadabr.DataType;
+import br.org.scadabr.utils.ImplementMeException;
 
 /**
  * @author Matthew Lohbihler
  */
-public class NumericValue extends MangoValue implements Comparable<NumericValue> {
+public abstract class NumericValue extends MangoValue {
 
+    @Deprecated
     public static NumericValue parseNumeric(String s) {
+        throw new ImplementMeException();
+        /*
         if (s == null) {
             return new NumericValue(0);
         }
@@ -35,114 +38,23 @@ public class NumericValue extends MangoValue implements Comparable<NumericValue>
             // no op
         }
         return new NumericValue(0);
+                */
     }
-
-    private final double value;
-
-    public NumericValue(double value) {
-        this.value = value;
-    }
-
+    
     @Override
-    public boolean hasDoubleRepresentation() {
-        return true;
-    }
+    abstract public Number getValue();
+    
+    abstract public float getFloatValue();
 
-    @Override
-    public double getDoubleValue() {
-        return value;
-    }
+    abstract public double getDoubleValue();
 
-    @Override
-    public float getFloatValue() {
-        return (float) value;
-    }
+    abstract public byte getByteValue();
 
-    @Override
-    public String getStringValue() {
-        return null;
-    }
+    abstract public short getShortValue();
 
-    @Override
-    public boolean getBooleanValue() {
-        throw new RuntimeException("NumericValue has no boolean value.");
-    }
+    abstract public int getIntegerValue();
 
-    @Override
-    public Object getObjectValue() {
-        return value;
-    }
+    abstract public long getLongValue();
 
-    @Override
-    public byte getByteValue() {
-        return (byte) value;
-    }
-
-    @Override
-    public short getShortValue() {
-        return (short) value;
-    }
-
-    @Override
-    public int getIntegerValue() {
-        return (int) value;
-    }
-
-    @Override
-    public long getLongValue() {
-        return (long) value;
-    }
-
-    @Override
-    public Number numberValue() {
-        return value;
-    }
-
-    @Override
-    public DataType getDataType() {
-        return DataType.NUMERIC;
-    }
-
-    @Override
-    public String toString() {
-        return Double.toString(value);
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        long temp;
-        temp = Double.doubleToLongBits(value);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final NumericValue other = (NumericValue) obj;
-        if (Double.doubleToLongBits(value) != Double.doubleToLongBits(other.value)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int compareTo(NumericValue that) {
-        return Double.compare(value, that.value);
-    }
-
-    @Override
-    public <T extends MangoValue> int compareTo(T that) {
-        return compareTo((NumericValue) that);
-    }
+    
 }
