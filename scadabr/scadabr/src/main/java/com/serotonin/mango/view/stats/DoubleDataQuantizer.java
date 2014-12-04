@@ -16,22 +16,30 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.rt.dataImage;
+package com.serotonin.mango.view.stats;
 
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 
-public class IdPointValueTime extends PointValueTime {
+/**
+ * @author Matthew Lohbihler
+ */
+public class DoubleDataQuantizer extends AbstractDataQuantizer<DoubleValue> {
 
-    private static final long serialVersionUID = 1L;
+    private double valueSum;
 
-    private final int dataPointId;
-
-    public IdPointValueTime(int dataPointId, MangoValue value, long time) {
-        super(value, time);
-        this.dataPointId = dataPointId;
+    public DoubleDataQuantizer(long start, long end, int buckets, DataQuantizerCallback callback) {
+        super(start, end, buckets, callback);
     }
 
-    public int getDataPointId() {
-        return dataPointId;
+    @Override
+    protected void periodData(DoubleValue value) {
+        valueSum += value.getDoubleValue();
+    }
+
+    @Override
+    protected DoubleValue donePeriod(int valueCounter) {
+        double result = valueSum / valueCounter;
+        valueSum = 0;
+        return new DoubleValue(result);
     }
 }

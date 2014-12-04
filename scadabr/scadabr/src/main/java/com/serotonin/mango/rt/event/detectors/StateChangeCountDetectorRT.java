@@ -90,7 +90,7 @@ public class StateChangeCountDetectorRT extends TimeoutDetectorRT {
 
     @Override
     public void pointChanged(PointValueTime oldValue, PointValueTime newValue) {
-        pointChanged(newValue.getTime(), newValue);
+        pointChanged(newValue.getTimestamp(), newValue);
     }
 
     private void pointChanged(long time, PointValueTime value) {
@@ -105,7 +105,7 @@ public class StateChangeCountDetectorRT extends TimeoutDetectorRT {
             if (pointValues.size() >= vo.getChangeCount()) {
                 if (!eventActive) {
                     eventActive = true;
-                    eventActiveTime = value.getTime();
+                    eventActiveTime = value.getTimestamp();
 
                     // Raise the event.
                     raiseAlarm(eventActiveTime, createEventContext());
@@ -115,7 +115,7 @@ public class StateChangeCountDetectorRT extends TimeoutDetectorRT {
                 }
 
                 // Schedule a job for the deactivation of this detector.
-                long eventInactiveTime = pointValues.get(pointValues.size() - vo.getChangeCount()).getTime()
+                long eventInactiveTime = pointValues.get(pointValues.size() - vo.getChangeCount()).getTimestamp()
                         + getDurationMS();
                 scheduleJob(eventInactiveTime + 1);
             }
@@ -137,7 +137,7 @@ public class StateChangeCountDetectorRT extends TimeoutDetectorRT {
                 sb.append("fireTime=").append(fireTime);
                 sb.append(", list=[");
                 for (PointValueTime pvt : pointValues) {
-                    sb.append(pvt.getTime()).append(", ");
+                    sb.append(pvt.getTimestamp()).append(", ");
                 }
                 sb.append("], durationMS=").append(getDurationMS());
                 sb.append(", changeCount=").append(vo.getChangeCount());
@@ -152,7 +152,7 @@ public class StateChangeCountDetectorRT extends TimeoutDetectorRT {
 
     private void removeOldPointValues(long time) {
         while (pointValues.size() > 0) {
-            if (pointValues.get(0).getTime() < time - getDurationMS()) {
+            if (pointValues.get(0).getTimestamp()< time - getDurationMS()) {
                 pointValues.remove(0);
             } else {
                 break;

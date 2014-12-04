@@ -417,7 +417,7 @@ public class RuntimeManager {
     public void setDataPointValue(int dataPointId, MangoValue value,
             SetPointSource source) {
         setDataPointValue(dataPointId,
-                new PointValueTime(value, System.currentTimeMillis()), source);
+                new PointValueTime(value, dataPointId, System.currentTimeMillis()), source);
     }
 
     public void setDataPointValue(int dataPointId, PointValueTime valueTime,

@@ -26,12 +26,13 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImageSet;
 import br.org.scadabr.util.SerializationHelper;
+import com.serotonin.mango.rt.dataImage.types.MangoValue;
 
 @Deprecated
 // Use ViewComponent instead
-abstract public class ImageSetRenderer extends BaseGraphicRenderer {
+abstract public class ImageSetRenderer<T extends MangoValue> extends BaseGraphicRenderer {
 
-    abstract public String getImage(PointValueTime pointValue);
+    abstract public String getImage(PointValueTime<T> pointValue);
 
     protected ImageSet imageSet;
     private boolean displayText;

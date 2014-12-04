@@ -92,7 +92,7 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
                             }
                         }
 
-                        if (vo.activeAction == SetActionType.STATIC_VALUE && dataType == DataType.NUMERIC) {
+                        if (vo.activeAction == SetActionType.STATIC_VALUE && dataType == DataType.DOUBLE) {
                             try {
                                 Double.parseDouble(vo.activeValueToSet);
                             } catch (NumberFormatException e) {
@@ -119,7 +119,7 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
                             }
                         }
 
-                        if (vo.inactiveAction == SetActionType.STATIC_VALUE && dataType == DataType.NUMERIC) {
+                        if (vo.inactiveAction == SetActionType.STATIC_VALUE && dataType == DataType.DOUBLE) {
                             try {
                                 Double.parseDouble(vo.inactiveValueToSet);
                             } catch (NumberFormatException e) {
@@ -335,9 +335,15 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
     // Set point handler fields.
     private int targetPointId;
     private SetActionType activeAction;
+    /*
+    * TODO INtroduce generic
+    */
     private String activeValueToSet;
     private int activePointId;
     private SetActionType inactiveAction;
+    /*
+    * TODO INtroduce generic
+    */
     private String inactiveValueToSet;
     private int inactivePointId;
 

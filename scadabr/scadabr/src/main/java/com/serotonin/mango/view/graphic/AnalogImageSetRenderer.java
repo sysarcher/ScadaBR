@@ -24,16 +24,17 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 import com.serotonin.mango.view.ImageSet;
 import com.serotonin.mango.view.ImplDefinition;
 import java.util.EnumSet;
 
 @Deprecated
 // Use ViewComponent instead
-public class AnalogImageSetRenderer extends ImageSetRenderer {
+public class AnalogImageSetRenderer extends ImageSetRenderer<DoubleValue> {
 
     private static final ImplDefinition definition = new ImplDefinition("graphicRendererAnalogImage", "ANALOG_IMAGE",
-            "graphic.multistateImage", EnumSet.of(DataType.NUMERIC));
+            "graphic.multistateImage", EnumSet.of(DataType.DOUBLE));
 
     public static ImplDefinition getDefinition() {
         return definition;
@@ -59,7 +60,7 @@ public class AnalogImageSetRenderer extends ImageSetRenderer {
     }
 
     @Override
-    public String getImage(PointValueTime pointValue) {
+    public String getImage(PointValueTime<DoubleValue> pointValue) {
         if (imageSet == null) // Image set not loaded?
         {
             return "imageSetNotLoaded";
@@ -69,7 +70,7 @@ public class AnalogImageSetRenderer extends ImageSetRenderer {
             return imageSet.getImageFilename(0);
         }
 
-        double dvalue = pointValue.getDoubleValue();
+        double dvalue = pointValue.getMangoValue().getDoubleValue();
 
         int index = (int) ((dvalue - min) / (max - min) * imageSet.getImageCount());
         if (index < 0) {

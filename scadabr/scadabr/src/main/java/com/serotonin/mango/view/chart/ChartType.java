@@ -16,10 +16,10 @@ import java.util.Set;
  * @author aploese
  */
 public enum ChartType {
-    NONE("chartRenderer.none", DataType.ALPHANUMERIC, DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC, DataType.IMAGE), 
-    TABLE("chartRenderer.table", DataType.ALPHANUMERIC, DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC), 
-    IMAGE("chartRenderer.image", DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC), 
-    STATS("chartRenderer.statistics", DataType.ALPHANUMERIC, DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC),
+    NONE("chartRenderer.none", DataType.ALPHANUMERIC, DataType.BOOLEAN, DataType.MULTISTATE, DataType.DOUBLE, DataType.IMAGE), 
+    TABLE("chartRenderer.table", DataType.ALPHANUMERIC, DataType.BOOLEAN, DataType.MULTISTATE, DataType.DOUBLE), 
+    IMAGE("chartRenderer.image", DataType.BOOLEAN, DataType.MULTISTATE, DataType.DOUBLE), 
+    STATS("chartRenderer.statistics", DataType.ALPHANUMERIC, DataType.BOOLEAN, DataType.MULTISTATE, DataType.DOUBLE),
     IMAGE_FLIPBOOK("chartRenderer.flipbook", DataType.IMAGE);
     
     final String i18nKey;

@@ -22,11 +22,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
+import com.serotonin.mango.rt.dataImage.types.MangoValue;
 
 /**
  * @author Matthew Lohbihler
  */
-abstract public class StateDetectorRT extends TimeDelayedEventDetectorRT {
+abstract public class StateDetectorRT<T extends MangoValue> extends TimeDelayedEventDetectorRT<T> {
 
     private final Log log = LogFactory.getLog(StateDetectorRT.class);
 
@@ -51,6 +52,7 @@ abstract public class StateDetectorRT extends TimeDelayedEventDetectorRT {
         return eventActive;
     }
 
+    @Override
     public boolean isEventActive() {
         return eventActive;
     }
@@ -66,18 +68,18 @@ abstract public class StateDetectorRT extends TimeDelayedEventDetectorRT {
         }
     }
 
-    abstract protected boolean stateDetected(PointValueTime newValue);
+    abstract protected boolean stateDetected(PointValueTime<T> newValue);
 
     @Override
-    public void pointChanged(PointValueTime oldValue, PointValueTime newValue) {
+    public void pointChanged(PointValueTime<T> oldValue, PointValueTime<T> newValue) {
         if (stateDetected(newValue)) {
             if (!stateActive) {
-                stateActiveTime = newValue.getTime();
+                stateActiveTime = newValue.getTimestamp();
                 changeStateActive();
             }
         } else {
             if (stateActive) {
-                stateInactiveTime = newValue.getTime();
+                stateInactiveTime = newValue.getTimestamp();
                 changeStateActive();
             }
         }

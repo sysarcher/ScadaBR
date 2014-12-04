@@ -23,6 +23,7 @@ import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 
 /**
  * The PositiveCusumDetector is used to detect occurances of point values
@@ -32,7 +33,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
  *
  * @author Matthew Lohbihler
  */
-public class PositiveCusumDetectorRT extends TimeDelayedEventDetectorRT {
+public class PositiveCusumDetectorRT extends TimeDelayedEventDetectorRT<DoubleValue> {
 
     /**
      * State field. The current positive CUSUM for the point.
@@ -94,8 +95,8 @@ public class PositiveCusumDetectorRT extends TimeDelayedEventDetectorRT {
     }
 
     @Override
-    synchronized public void pointUpdated(PointValueTime newValue) {
-        double newDouble = newValue.getDoubleValue();
+    synchronized public void pointUpdated(PointValueTime<DoubleValue> newValue) {
+        double newDouble = ((PointValueTime<DoubleValue>)newValue).getMangoValue().getDoubleValue();
 
         cusum += newDouble - vo.getWeight();
         if (cusum < 0) {
@@ -104,12 +105,12 @@ public class PositiveCusumDetectorRT extends TimeDelayedEventDetectorRT {
 
         if (cusum > vo.getLimit()) {
             if (!positiveCusumActive) {
-                positiveCusumActiveTime = newValue.getTime();
+                positiveCusumActiveTime = newValue.getTimestamp();
                 changePositiveCusumActive();
             }
         } else {
             if (positiveCusumActive) {
-                positiveCusumInactiveTime = newValue.getTime();
+                positiveCusumInactiveTime = newValue.getTimestamp();
                 changePositiveCusumActive();
             }
         }

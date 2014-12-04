@@ -31,9 +31,9 @@ public class JsonWatchListPoint implements Serializable {
         if (dpRt != null) {
             PointValueTime pvt = dpRt.getPointValue();
 
-            timestamp = pvt.getTime();
+            timestamp = pvt.getTimestamp();
             changed = timestamp + 30000 > System.currentTimeMillis();
-            value = localizer.format(dp, pvt.getValue());
+            value = localizer.format(dp, pvt.getMangoValue());
             final ChartRenderer renderer = dp.getChartRenderer();
             if (renderer != null) {
                 chartType = renderer.getType();

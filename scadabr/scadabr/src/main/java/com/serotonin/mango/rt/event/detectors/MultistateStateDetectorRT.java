@@ -23,8 +23,10 @@ import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.rt.dataImage.types.BooleanValue;
+import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 
-public class MultistateStateDetectorRT extends StateDetectorRT {
+public class MultistateStateDetectorRT extends StateDetectorRT<MultistateValue> {
 
     public MultistateStateDetectorRT(PointEventDetectorVO vo) {
         this.vo = vo;
@@ -44,8 +46,8 @@ public class MultistateStateDetectorRT extends StateDetectorRT {
     }
 
     @Override
-    protected boolean stateDetected(PointValueTime newValue) {
-        int newMultistate = newValue.getIntegerValue();
+    protected boolean stateDetected(PointValueTime<MultistateValue> newValue) {
+        byte newMultistate = newValue.getMangoValue().getByteValue();
         return newMultistate == vo.getMultistateState();
     }
 }

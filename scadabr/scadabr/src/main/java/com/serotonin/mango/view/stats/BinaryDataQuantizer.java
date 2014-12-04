@@ -18,7 +18,7 @@
  */
 package com.serotonin.mango.view.stats;
 
-import com.serotonin.mango.rt.dataImage.types.BinaryValue;
+import com.serotonin.mango.rt.dataImage.types.BooleanValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 
 /**
@@ -26,7 +26,7 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
  */
 public class BinaryDataQuantizer extends AbstractDataQuantizer {
 
-    private BinaryValue lastValue;
+    private BooleanValue lastValue;
 
     public BinaryDataQuantizer(long start, long end, int buckets, DataQuantizerCallback callback) {
         super(start, end, buckets, callback);
@@ -34,7 +34,7 @@ public class BinaryDataQuantizer extends AbstractDataQuantizer {
 
     @Override
     protected void periodData(MangoValue value) {
-        lastValue = (BinaryValue) value;
+        lastValue = (BooleanValue) value;
     }
 
     @Override

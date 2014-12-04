@@ -47,8 +47,8 @@ public class PointChangeDetectorRT extends PointEventDetectorRT {
     @Override
     public void pointChanged(PointValueTime oldValue, PointValueTime newValue) {
         this.oldValue = PointValueTime.getValue(oldValue);
-        this.newValue = newValue.getValue();
-        raiseAlarm(newValue.getTime(), createEventContext());
+        this.newValue = newValue.getMangoValue();
+        raiseAlarm(newValue.getTimestamp(), createEventContext());
     }
 
     @Override

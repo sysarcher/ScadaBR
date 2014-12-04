@@ -29,16 +29,17 @@ import java.util.Map;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
+import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
  */
 
-public class SimplePointComponent extends PointComponent {
+public class SimplePointComponent extends PointComponent<MangoValue> {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("simple", "SIMPLE", "graphic.simple",
-            EnumSet.of(DataType.BINARY, DataType.MULTISTATE, DataType.NUMERIC, DataType.ALPHANUMERIC));
+            EnumSet.of(DataType.BOOLEAN, DataType.MULTISTATE, DataType.DOUBLE, DataType.ALPHANUMERIC));
 
     
     private boolean displayPointName;
@@ -68,7 +69,7 @@ public class SimplePointComponent extends PointComponent {
     }
 
     @Override
-    public void addDataToModel(Map<String, Object> model, PointValueTime pointValue) {
+    public void addDataToModel(Map<String, Object> model, PointValueTime<MangoValue> pointValue) {
         model.put("displayPointName", displayPointName);
         model.put("styleAttribute", styleAttribute);
     }

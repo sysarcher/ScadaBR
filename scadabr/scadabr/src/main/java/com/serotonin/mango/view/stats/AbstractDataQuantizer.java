@@ -23,7 +23,7 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 /**
  * @author Matthew Lohbihler
  */
-abstract public class AbstractDataQuantizer {
+abstract public class AbstractDataQuantizer<T extends MangoValue> {
 
     private final long start;
     private final int buckets;
@@ -49,7 +49,7 @@ abstract public class AbstractDataQuantizer {
         periodTo = periodFrom + ((double) duration) / buckets * ++periodCounter;
     }
 
-    public void data(MangoValue value, long time) {
+    public void data(T value, long time) {
         while (time >= periodTo) {
             done();
             periodFrom = periodTo;
@@ -67,7 +67,7 @@ abstract public class AbstractDataQuantizer {
         }
     }
 
-    abstract protected void periodData(MangoValue value);
+    abstract protected void periodData(T value);
 
-    abstract protected MangoValue donePeriod(int valueCounter);
+    abstract protected T donePeriod(int valueCounter);
 }

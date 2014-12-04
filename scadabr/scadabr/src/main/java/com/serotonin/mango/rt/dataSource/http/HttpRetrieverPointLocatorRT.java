@@ -43,9 +43,9 @@ public class HttpRetrieverPointLocatorRT extends PointLocatorRT<HttpRetrieverPoi
         valuePattern = Pattern.compile(vo.getValueRegex());
         ignoreIfMissing = vo.isIgnoreIfMissing();
 
-        if (getDataType() == DataType.BINARY) {
+        if (getDataType() == DataType.BOOLEAN) {
             binary0Value = vo.getValueFormat();
-        } else if (getDataType() == DataType.NUMERIC && !vo.getValueFormat().isEmpty()) {
+        } else if (getDataType() == DataType.DOUBLE && !vo.getValueFormat().isEmpty()) {
             valueFormat = new DecimalFormat(vo.getValueFormat());
         }
 

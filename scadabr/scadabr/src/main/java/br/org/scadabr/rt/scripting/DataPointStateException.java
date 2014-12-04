@@ -16,16 +16,25 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.rt.dataSource.meta;
+package br.org.scadabr.rt.scripting;
 
 import br.org.scadabr.utils.i18n.LocalizableException;
 
 /**
  * @author Matthew Lohbihler
  */
-public class ResultTypeException extends LocalizableException {
+public class DataPointStateException extends LocalizableException {
 
-    public ResultTypeException(String i18nKey, Object... args) {
+    static final long serialVersionUID = -1;
+
+    private final int dataPointId;
+
+    public DataPointStateException(int dataPointId, String i18nKey, Object... args) {
         super(i18nKey, args);
+        this.dataPointId = dataPointId;
+    }
+
+    public int getDataPointId() {
+        return dataPointId;
     }
 }

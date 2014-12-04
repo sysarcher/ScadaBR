@@ -24,7 +24,7 @@ import br.org.scadabr.util.StringUtils;
 /**
  * @author Matthew Lohbihler
  */
-public class AlphanumericValue extends MangoValue implements Comparable<AlphanumericValue> {
+public class AlphanumericValue extends MangoValue {
 
     private final String value;
 
@@ -33,55 +33,8 @@ public class AlphanumericValue extends MangoValue implements Comparable<Alphanum
     }
 
     @Override
-    public boolean hasDoubleRepresentation() {
-        return false;
-    }
-
-    @Override
-    public float getFloatValue() {
-        throw new RuntimeException(
-                "AlphanumericValue has no float value. Use hasDoubleRepresentation() to check before calling this method");
-    }
-
-    @Override
-    public double getDoubleValue() {
-        throw new RuntimeException(
-                "AlphanumericValue has no double value. Use hasDoubleRepresentation() to check before calling this method");
-    }
-
-    @Override
-    public String getStringValue() {
+    public String getValue() {
         return value;
-    }
-
-    @Override
-    public boolean getBooleanValue() {
-        throw new RuntimeException("AlphanumericValue has no boolean value.");
-    }
-
-    @Override
-    public Object getObjectValue() {
-        return value;
-    }
-
-    @Override
-    public byte getByteValue() {
-        throw new RuntimeException("AlphanumericValue has no byte value.");
-    }
-
-    @Override
-    public short getShortValue() {
-        throw new RuntimeException("AlphanumericValue has no short value.");
-    }
-
-    @Override
-    public int getIntegerValue() {
-        throw new RuntimeException("AlphanumericValue has no int value.");
-    }
-
-    @Override
-    public long getLongValue() {
-        throw new RuntimeException("AlphanumericValue has no long value.");
     }
 
     @Override
@@ -92,11 +45,6 @@ public class AlphanumericValue extends MangoValue implements Comparable<Alphanum
     @Override
     public String toString() {
         return value;
-    }
-
-    @Override
-    public Number numberValue() {
-        throw new RuntimeException("AlphanumericValue has no Number value.");
     }
 
     @Override
@@ -129,7 +77,6 @@ public class AlphanumericValue extends MangoValue implements Comparable<Alphanum
         return true;
     }
 
-    @Override
     public int compareTo(AlphanumericValue that) {
         if (value == null || that.value == null) {
             return 0;
@@ -143,8 +90,4 @@ public class AlphanumericValue extends MangoValue implements Comparable<Alphanum
         return value.compareTo(that.value);
     }
 
-    @Override
-    public <T extends MangoValue> int compareTo(T that) {
-        return compareTo((AlphanumericValue) that);
-    }
 }

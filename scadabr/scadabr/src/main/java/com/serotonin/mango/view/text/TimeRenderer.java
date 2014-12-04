@@ -31,13 +31,14 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 import java.util.EnumSet;
 
 
 public class TimeRenderer extends BaseTextRenderer {
 
     private static ImplDefinition definition = new ImplDefinition("textRendererTime", "TIME", "textRenderer.time",
-            EnumSet.of(DataType.NUMERIC));
+            EnumSet.of(DataType.DOUBLE));
 
     public static ImplDefinition getDefinition() {
         return definition;
@@ -78,7 +79,7 @@ public class TimeRenderer extends BaseTextRenderer {
         if (!(value instanceof NumericValue)) {
             return null;
         }
-        return getText((long) value.getDoubleValue(), hint);
+        return getText((long) ((DoubleValue)value).getDoubleValue(), hint);
     }
 
     @Override

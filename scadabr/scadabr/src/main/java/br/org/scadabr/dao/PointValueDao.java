@@ -8,6 +8,7 @@ package br.org.scadabr.dao;
 import br.org.scadabr.DataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 import java.util.List;
 import javax.inject.Named;
 
@@ -20,9 +21,9 @@ public interface PointValueDao {
 
     long deletePointValuesWithMismatchedType(int id, DataType dataType);
 
-    void savePointValueAsync(int id, PointValueTime newValue, SetPointSource source);
+    void savePointValueAsync(PointValueTime<DoubleValue> newValue, SetPointSource source);
 
-    PointValueTime savePointValueSync(int id, PointValueTime newValue, SetPointSource source);
+    PointValueTime savePointValueSync(PointValueTime newValue, SetPointSource source);
 
     PointValueTime getLatestPointValue(int id);
 

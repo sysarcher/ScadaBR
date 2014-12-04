@@ -18,15 +18,15 @@
  */
 package com.serotonin.mango.view.stats;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 
 /**
  * @author Matthew Lohbihler
  */
-public class AnalogStatistics implements StatisticsGenerator {
+public class AnalogStatistics implements StatisticsGenerator<DoubleValue> {
 
     // Calculated values.
     private double minimum = Double.MAX_VALUE;
@@ -45,8 +45,8 @@ public class AnalogStatistics implements StatisticsGenerator {
     private long realDuration = -1;
     private Double lastValue;
 
-    public AnalogStatistics(PointValueTime startValue, List<? extends IValueTime> values, long start, long end) {
-        this(startValue == null ? null : startValue.getDoubleValue(), values, start, end);
+    public AnalogStatistics(PointValueTime<DoubleValue> startValue, List<? extends IValueTime> values, long start, long end) {
+        this((Double)(startValue == null ? null : startValue.getMangoValue().getDoubleValue()), values, start, end);
     }
 
     public AnalogStatistics(Double startValue, List<? extends IValueTime> values, long start, long end) {
@@ -70,7 +70,7 @@ public class AnalogStatistics implements StatisticsGenerator {
     }
 
     @Override
-    public void addValueTime(IValueTime vt) {
+    public void addValueTime(IValueTime<DoubleValue> vt) {
         if (vt.getValue() == null) {
             return;
         }
@@ -79,7 +79,7 @@ public class AnalogStatistics implements StatisticsGenerator {
         noData = false;
 
         if (lastTime == -1) {
-            lastTime = vt.getTime();
+            lastTime = vt.getTimestamp();
         }
 
         if (realDuration == -1) {
@@ -93,14 +93,14 @@ public class AnalogStatistics implements StatisticsGenerator {
 
         if (realDuration == 0) {
             // We assume that this point is the only point in the data set.
-            minimum = maximum = average = sum = vt.getValue().getDoubleValue();
+            minimum = maximum = average = sum = vt.getMangoValue().getDoubleValue();
             return;
         }
 
-        sum += vt.getValue().getDoubleValue();
+        sum += vt.getMangoValue().getDoubleValue();
 
         if (lastValue != null) {
-            average += lastValue * (((double) (vt.getTime() - lastTime)) / realDuration);
+            average += lastValue * (((double) (vt.getTimestamp()- lastTime)) / realDuration);
             if (lastValue > maximum) {
                 maximum = lastValue;
                 maxTime = lastTime;
@@ -110,8 +110,8 @@ public class AnalogStatistics implements StatisticsGenerator {
                 minTime = lastTime;
             }
         }
-        lastValue = vt.getValue().getDoubleValue();
-        lastTime = vt.getTime();
+        lastValue = vt.getMangoValue().getDoubleValue();
+        lastTime = vt.getTimestamp();
     }
 
     @Override
@@ -188,21 +188,4 @@ public class AnalogStatistics implements StatisticsGenerator {
                 + ", realStart: " + realStart + ", end: " + end + "}";
     }
 
-    public static void main(String[] args) {
-        Double startValue = 10d;
-        List<PointValueTime> values = new ArrayList<>();
-        values.add(new PointValueTime(11d, 2000));
-        values.add(new PointValueTime(12d, 3000));
-        values.add(new PointValueTime(7d, 4000));
-        values.add(new PointValueTime(13d, 5000));
-        values.add(new PointValueTime(18d, 6000));
-        values.add(new PointValueTime(14d, 8000));
-
-        System.out.println(new AnalogStatistics(startValue, values, 1000, 10000));
-        System.out.println(new AnalogStatistics(startValue, values, 1500, 15000));
-        System.out.println(new AnalogStatistics((Double) null, values, 1000, 10000));
-        System.out.println(new AnalogStatistics((Double) null, values, 1500, 15000));
-        System.out.println(new AnalogStatistics((Double) null, new ArrayList<PointValueTime>(), 1500, 15000));
-        System.out.println(new AnalogStatistics(startValue, new ArrayList<PointValueTime>(), 1500, 15000));
-    }
 }

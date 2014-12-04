@@ -21,11 +21,7 @@ package com.serotonin.mango.rt.dataImage;
 import br.org.scadabr.DataType;
 import java.io.Serializable;
 
-import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
-import com.serotonin.mango.rt.dataImage.types.BinaryValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import com.serotonin.mango.rt.dataImage.types.MultistateValue;
-import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.stats.IValueTime;
 import java.text.MessageFormat;
 import java.util.Date;
@@ -37,11 +33,11 @@ import java.util.Objects;
  * @see AnnotatedPointValueTime
  * @author Matthew Lohbihler
  */
-public class PointValueTime implements Serializable, IValueTime {
+public class PointValueTime<T extends MangoValue>  implements Serializable, IValueTime<T> {
 
     private static final long serialVersionUID = -1;
 
-    public static boolean equalValues(PointValueTime pvt1, PointValueTime pvt2) {
+    public static <T extends MangoValue> boolean equalValues(PointValueTime<T> pvt1, PointValueTime<T> pvt2) {
         if (pvt1 == null && pvt2 == null) {
             return true;
         }
@@ -51,55 +47,43 @@ public class PointValueTime implements Serializable, IValueTime {
         return Objects.equals(pvt1.getValue(), pvt2.getValue());
     }
 
-    public static MangoValue getValue(PointValueTime pvt) {
+    public static <T extends MangoValue>  T getValue(PointValueTime<T> pvt) {
         if (pvt == null) {
             return null;
         }
-        return pvt.getValue();
+        return pvt.getMangoValue();
     }
 
-    private final MangoValue value;
-    private final long time;
+    private final T value;
+    private final long timestamp;
+    private final int dataPointId;
 
-    public PointValueTime(MangoValue value, long time) {
+    public PointValueTime(T value, int dataPointId, long timestamp) {
         this.value = value;
-        this.time = time;
-    }
-
-    public PointValueTime(boolean value, long time) {
-        this(new BinaryValue(value), time);
-    }
-
-    public PointValueTime(int value, long time) {
-        this(new MultistateValue(value), time);
-    }
-
-    public PointValueTime(float value, long time) {
-        this(new NumericValue(value), time);
-    }
-
-    public PointValueTime(double value, long time) {
-        this(new NumericValue(value), time);
-    }
-
-    public PointValueTime(String value, long time) {
-        this(new AlphanumericValue(value), time);
+        this.dataPointId = dataPointId;
+        this.timestamp = timestamp;
     }
 
     @Override
-    public long getTime() {
-        return time;
+    public long getTimestamp() {
+        return timestamp;
     }
 
     @Override
-    public MangoValue getValue() {
+    public T getMangoValue() {
         return value;
+    }
+
+    @Override
+    public Object getValue() {
+        return value.getValue();
     }
 
     public boolean isAnnotated() {
         return false;
     }
 
+/*
     public float getFloatValue() {
         return value.getFloatValue();
     }
@@ -119,14 +103,14 @@ public class PointValueTime implements Serializable, IValueTime {
     public boolean getBooleanValue() {
         return value.getBooleanValue();
     }
-
+*/
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof PointValueTime)) {
             return false;
         }
         PointValueTime that = (PointValueTime) o;
-        if (time != that.time) {
+        if (timestamp != that.timestamp) {
             return false;
         }
         return Objects.equals(value, that.value);
@@ -136,16 +120,23 @@ public class PointValueTime implements Serializable, IValueTime {
     public int hashCode() {
         int hash = 5;
         hash = 29 * hash + Objects.hashCode(this.value);
-        hash = 29 * hash + (int) (this.time ^ (this.time >>> 32));
+        hash = 29 * hash + (int) (this.timestamp ^ (this.timestamp >>> 32));
         return hash;
     }
 
     @Override
     public String toString() {
-        return MessageFormat.format("PointValueTime( {0} @{1})", value, new Date(time));
+        return MessageFormat.format("PointValueTime( {0} @{1})", value, new Date(timestamp));
     }
 
+    @Override
     public DataType getDataType() {
         return value.getDataType();
     }
+    
+    @Override
+    public int getDataPointId() {
+        return dataPointId;
+    }
+    
 }

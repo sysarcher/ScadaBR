@@ -18,7 +18,9 @@
  */
 package com.serotonin.mango.rt.dataImage;
 
-public interface DataPointListener {
+import com.serotonin.mango.rt.dataImage.types.MangoValue;
+
+public interface DataPointListener<T extends MangoValue> {
 
     /**
      * This method is called for all existing listeners when the point is
@@ -34,7 +36,7 @@ public interface DataPointListener {
      *
      * @param newValue
      */
-    void pointUpdated(PointValueTime newValue);
+    void pointUpdated(PointValueTime<T> newValue);
 
     /**
      * This method is called every time the point gets a value that is different
@@ -44,7 +46,7 @@ public interface DataPointListener {
      * @param oldValue
      * @param newValue
      */
-    void pointChanged(PointValueTime oldValue, PointValueTime newValue);
+    void pointChanged(PointValueTime<T> oldValue, PointValueTime<T> newValue);
 
     /**
      * This method is called every time the point gets set, whether the value
@@ -53,14 +55,14 @@ public interface DataPointListener {
      * @param oldValue
      * @param newValue
      */
-    void pointSet(PointValueTime oldValue, PointValueTime newValue);
+    void pointSet(PointValueTime<T> oldValue, PointValueTime<T> newValue);
 
     /**
      * This method is called when a backdated value is received.
      *
      * @param value
      */
-    void pointBackdated(PointValueTime value);
+    void pointBackdated(PointValueTime<T> value);
 
     /**
      * This method is called when the point has been terminated, allowing

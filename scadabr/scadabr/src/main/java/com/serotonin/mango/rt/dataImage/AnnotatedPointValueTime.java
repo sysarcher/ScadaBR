@@ -23,8 +23,6 @@ import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import br.org.scadabr.web.i18n.I18NUtils;
-import br.org.scadabr.l10n.Localizer;
 
 /**
  * This class provides a way of arbitrarily annotating a PointValue. Point value
@@ -62,8 +60,8 @@ public class AnnotatedPointValueTime extends PointValueTime {
      */
     private String sourceDescriptionArgument;
 
-    public AnnotatedPointValueTime(MangoValue value, long time, int sourceType, int sourceId) {
-        super(value, time);
+    public AnnotatedPointValueTime(MangoValue value, int dataPointId, long time, int sourceType, int sourceId) {
+        super(value, dataPointId, time);
         this.sourceType = sourceType;
         this.sourceId = sourceId;
     }

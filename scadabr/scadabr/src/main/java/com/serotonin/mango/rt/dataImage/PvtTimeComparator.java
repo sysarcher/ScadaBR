@@ -27,7 +27,7 @@ public class PvtTimeComparator implements Comparator<PointValueTime> {
 
     @Override
     public int compare(PointValueTime o1, PointValueTime o2) {
-        long diff = o1.getTime() - o2.getTime();
+        long diff = o1.getTimestamp()- o2.getTimestamp();
         if (diff < 0) {
             return -1;
         }

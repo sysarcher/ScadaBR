@@ -8,6 +8,7 @@ package br.org.scadabr.web.mvc.controller.rest;
 import br.org.scadabr.dao.PointValueDao;
 import br.org.scadabr.logger.LogUtils;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.logging.Logger;
@@ -46,7 +47,7 @@ public class RestPointValuesController {
         }
         Collection<JsonPointValue> result = new LinkedList<>();
         for (PointValueTime p : pvt) {
-            result.add(new JsonPointValue(p.getTime(), p.getDoubleValue()));
+            result.add(new JsonPointValue(p.getTimestamp(), ((PointValueTime<DoubleValue>)p).getMangoValue().getDoubleValue()));
         }
         return result;
     }

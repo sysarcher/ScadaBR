@@ -80,7 +80,7 @@ abstract public class BaseTextRenderer implements TextRenderer, FormatPatternHol
         if (valueTime == null) {
             return getText(hint);
         }
-        return getText(valueTime.getValue(), hint);
+        return getText(valueTime.getMangoValue(), hint);
     }
 
     @Override
@@ -131,7 +131,7 @@ abstract public class BaseTextRenderer implements TextRenderer, FormatPatternHol
         if (valueTime == null) {
             return getColour();
         }
-        return getColour(valueTime.getValue());
+        return getColour(valueTime.getMangoValue());
     }
 
     @Override

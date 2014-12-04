@@ -34,7 +34,7 @@ import java.util.EnumSet;
  * @author Matthew Lohbihler
  */
 
-public class SimpleImageComponent extends PointComponent {
+public class SimpleImageComponent extends PointComponent<ImageValue> {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("simpleImage", "SIMPLE_IMAGE", "graphic.simpleImage",
             EnumSet.of(DataType.IMAGE));
@@ -45,7 +45,7 @@ public class SimpleImageComponent extends PointComponent {
     }
 
     @Override
-    public void addDataToModel(Map<String, Object> model, PointValueTime pointValue) {
+    public void addDataToModel(Map<String, Object> model, PointValueTime<ImageValue> pointValue) {
         if (pointValue == null || pointValue.getValue() == null) {
             model.put("error", "common.noData");
             return;

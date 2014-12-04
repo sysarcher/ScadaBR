@@ -27,12 +27,13 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImageSet;
 import br.org.scadabr.util.SerializationHelper;
+import com.serotonin.mango.rt.dataImage.types.MangoValue;
 
 /**
  * @author Matthew Lohbihler
  */
 
-abstract public class ImageSetComponent extends PointComponent {
+abstract public class ImageSetComponent<T extends MangoValue>  extends PointComponent<T> {
 
     protected ImageSet imageSet;
     
@@ -59,7 +60,7 @@ abstract public class ImageSetComponent extends PointComponent {
         return "imageContent";
     }
 
-    abstract public String getImage(PointValueTime pointValue);
+    abstract public String getImage(PointValueTime<T> pointValue);
 
     public String defaultImage() {
         if (imageSet != null) {
@@ -104,7 +105,7 @@ abstract public class ImageSetComponent extends PointComponent {
     }
 
     @Override
-    public void addDataToModel(Map<String, Object> model, PointValueTime pointValue) {
+    public void addDataToModel(Map<String, Object> model, PointValueTime<T> pointValue) {
         if (imageSet != null) {
             model.put("image", getImage(pointValue));
         }

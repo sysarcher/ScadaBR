@@ -26,23 +26,22 @@ import java.util.List;
 import java.util.Map;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.types.BinaryValue;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import java.util.Objects;
 
 /**
  * @author Matthew Lohbihler
  */
-public class StartsAndRuntimeList implements StatisticsGenerator {
+public class StartsAndRuntimeList implements StatisticsGenerator<DoubleValue> {
 
     private final List<StartsAndRuntime> data = new ArrayList<>();
 
-    public StartsAndRuntimeList(PointValueTime startValue, List<? extends IValueTime> values, long start, long end) {
-        this(startValue == null ? null : startValue.getValue(), values, start, end);
+    public StartsAndRuntimeList(PointValueTime<DoubleValue> startValue, List<? extends IValueTime<DoubleValue>> values, long start, long end) {
+        this(startValue == null ? null : startValue.getMangoValue(), values, start, end);
     }
 
-    public StartsAndRuntimeList(MangoValue startValue, List<? extends IValueTime> values, long start, long end) {
+    public StartsAndRuntimeList(DoubleValue startValue, List<? extends IValueTime<DoubleValue>> values, long start, long end) {
         this(startValue, start, end);
         for (IValueTime vt : values) {
             addValueTime(vt);
@@ -53,10 +52,10 @@ public class StartsAndRuntimeList implements StatisticsGenerator {
     private final long end;
     private long lastTime = -1;
     private long realStart = -1;
-    private MangoValue lastValue;
+    private DoubleValue lastValue;
     private StartsAndRuntime sar;
 
-    public StartsAndRuntimeList(MangoValue startValue, long start, long end) {
+    public StartsAndRuntimeList(DoubleValue startValue, long start, long end) {
         this.end = end;
         if (startValue != null) {
             lastTime = start;
@@ -66,9 +65,9 @@ public class StartsAndRuntimeList implements StatisticsGenerator {
     }
 
     @Override
-    public void addValueTime(IValueTime vt) {
+    public void addValueTime(IValueTime<DoubleValue> vt) {
         if (lastTime == -1) {
-            lastTime = vt.getTime();
+            lastTime = vt.getTimestamp();
         }
 
         if (realStart == -1) {
@@ -78,11 +77,11 @@ public class StartsAndRuntimeList implements StatisticsGenerator {
         if (!Objects.equals(vt.getValue(), lastValue)) {
             // Update the last value stats, if any.
             if (sar != null) {
-                sar.runtime += vt.getTime() - lastTime;
+                sar.runtime += vt.getTimestamp()- lastTime;
             }
 
-            lastValue = vt.getValue();
-            lastTime = vt.getTime();
+            lastValue = vt.getMangoValue();
+            lastTime = vt.getTimestamp();
 
             sar = get(lastValue);
             sar.starts++;
@@ -160,49 +159,4 @@ public class StartsAndRuntimeList implements StatisticsGenerator {
         return "{realStart: " + realStart + ", end: " + end + ", data: " + data.toString() + "}";
     }
 
-    public static void main(String[] args) {
-        {
-            MultistateValue startValue = new MultistateValue(3);
-            List<PointValueTime> values = new ArrayList<>();
-            values.add(new PointValueTime(1, 2000));
-            values.add(new PointValueTime(2, 3000));
-            values.add(new PointValueTime(2, 5000));
-            values.add(new PointValueTime(3, 8000));
-            values.add(new PointValueTime(1, 9000));
-            values.add(new PointValueTime(3, 10000));
-            values.add(new PointValueTime(3, 12000));
-            values.add(new PointValueTime(2, 16000));
-
-            System.out.println(new StartsAndRuntimeList(startValue, values, 1000, 21000));
-            System.out.println(new StartsAndRuntimeList(startValue, values, 1500, 26000));
-            System.out.println(new StartsAndRuntimeList((MangoValue) null, values, 1000, 21000));
-            System.out.println(new StartsAndRuntimeList((MangoValue) null, values, 1500, 26000));
-
-            System.out.println(new StartsAndRuntimeList((MangoValue) null, new ArrayList<PointValueTime>(), 0, 30000));
-            System.out.println(new StartsAndRuntimeList(startValue, new ArrayList<PointValueTime>(), 0, 30000));
-        }
-
-        System.out.println();
-
-        {
-            BinaryValue startValue = BinaryValue.ONE;
-            List<PointValueTime> values = new ArrayList<>();
-            values.add(new PointValueTime(true, 2000));
-            values.add(new PointValueTime(false, 3000));
-            values.add(new PointValueTime(false, 5000));
-            values.add(new PointValueTime(false, 8000));
-            values.add(new PointValueTime(true, 9000));
-            values.add(new PointValueTime(true, 10000));
-            values.add(new PointValueTime(false, 12000));
-            values.add(new PointValueTime(true, 16000));
-
-            System.out.println(new StartsAndRuntimeList(startValue, values, 1000, 21000));
-            System.out.println(new StartsAndRuntimeList(startValue, values, 1500, 26000));
-            System.out.println(new StartsAndRuntimeList((MangoValue) null, values, 1000, 21000));
-            System.out.println(new StartsAndRuntimeList((MangoValue) null, values, 1500, 26000));
-
-            System.out.println(new StartsAndRuntimeList((MangoValue) null, new ArrayList<PointValueTime>(), 0, 30000));
-            System.out.println(new StartsAndRuntimeList(startValue, new ArrayList<PointValueTime>(), 0, 30000));
-        }
-    }
 }

@@ -18,15 +18,23 @@
  */
 package com.serotonin.mango.view.stats;
 
+import br.org.scadabr.DataType;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 
 /**
  * @author Matthew Lohbihler
+ * @param <T>
  */
-public interface IValueTime {
+public interface IValueTime<T extends MangoValue> {
 
-    MangoValue getValue();
+    T getMangoValue();
+    
+    Object getValue();
 
-    @Deprecated //TODO change to Date ???
-    long getTime();
+    long getTimestamp();
+    
+    DataType getDataType();
+    
+    int getDataPointId();
+    
 }

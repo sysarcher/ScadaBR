@@ -61,7 +61,7 @@ abstract public class DifferenceDetectorRT extends TimeDelayedEventDetectorRT {
         int pointId = vo.njbGetDataPoint().getId();
         PointValueTime latest = runtimeManager.getDataPoint(pointId).getPointValue();
         if (latest != null) {
-            lastChange = latest.getTime();
+            lastChange = latest.getTimestamp();
         } else // The point may be new or not logged, so don't go active immediately.
         {
             lastChange = System.currentTimeMillis();

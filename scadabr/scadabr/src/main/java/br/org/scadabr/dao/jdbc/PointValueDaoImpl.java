@@ -42,15 +42,14 @@ import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.ImageSaveException;
 import com.serotonin.mango.rt.dataImage.AnnotatedPointValueTime;
-import com.serotonin.mango.rt.dataImage.IdPointValueTime;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
-import com.serotonin.mango.rt.dataImage.types.BinaryValue;
+import com.serotonin.mango.rt.dataImage.types.BooleanValue;
+import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
-import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.vo.AnonymousUser;
 import com.serotonin.mango.vo.bean.LongPair;
 import java.sql.Connection;
@@ -124,8 +123,8 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
      *
      * @param pointId
      */
-    public PointValueTime savePointValueSync(int pointId, PointValueTime pointValue, SetPointSource source) {
-        long id = savePointValueImpl(pointId, pointValue, source, false);
+    public PointValueTime savePointValueSync(PointValueTime pointValue, SetPointSource source) {
+        long id = savePointValueImpl(pointValue, source, false);
 
         PointValueTime savedPointValue;
         int retries = 5;
@@ -148,16 +147,12 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
      * Only the PointValueCache should call this method during runtime. Do not
      * use.
      */
-    public void savePointValueAsync(int pointId, PointValueTime pointValue, SetPointSource source) {
-        long id = savePointValueImpl(pointId, pointValue, source, true);
-        if (id != -1) {
-            clearUnsavedPointValues();
-        }
+    public void savePointValueAsync(PointValueTime<DoubleValue> pointValue, SetPointSource source) {
+        batchWriteBehind.add(pointValue, ejt);
     }
 
-    long savePointValueImpl(final int pointId, final PointValueTime pointValue,
-            final SetPointSource source, boolean async) {
-        MangoValue value = pointValue.getValue();
+    long savePointValueImpl(final PointValueTime pointValue, final SetPointSource source, boolean async) {
+        MangoValue value = pointValue.getMangoValue();
         final DataType dataType = value.getDataType();
         double dvalue = 0;
         String svalue = null;
@@ -170,13 +165,13 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
                     svalue = Long.toString(imageValue.getId());
                 }
                 break;
-            case BINARY:
+            case BOOLEAN:
             case MULTISTATE:
-            case NUMERIC:
-                dvalue = value.getDoubleValue();
+            case DOUBLE:
+                dvalue = ((DoubleValue)value).getDoubleValue();
                 break;
             case ALPHANUMERIC:
-                svalue = value.getStringValue();
+                svalue = ((AlphanumericValue)value).getValue();
                 break;
             default:
                 throw new ImplementMeException();
@@ -194,20 +189,20 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
                         new TransactionCallback<Long>() {
                             @Override
                             public Long doInTransaction(TransactionStatus status) {
-                                return savePointValue(pointId, dataType,
-                                        dvalueFinal, pointValue.getTime(),
+                                return savePointValue(pointValue.getDataPointId(), dataType,
+                                        dvalueFinal, pointValue.getTimestamp(),
                                         svalueFinal, source, false);
                             }
                         });
             } else {
                 // Single sql call, so no transaction required.
-                id = savePointValue(pointId, dataType, dvalue,
-                        pointValue.getTime(), svalue, source, async);
+                id = savePointValue(pointValue.getDataPointId(), dataType, dvalue,
+                        pointValue.getTimestamp(), svalue, source, async);
             }
         } catch (ConcurrencyFailureException e) {
             // Still failed to insert after all of the retries. Store the data
             synchronized (UNSAVED_POINT_VALUES) {
-                UNSAVED_POINT_VALUES.add(new UnsavedPointValue(pointId,
+                UNSAVED_POINT_VALUES.add(new UnsavedPointValue(pointValue.getDataPointId(),
                         pointValue, source));
             }
             return -1;
@@ -256,27 +251,20 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
             synchronized (UNSAVED_POINT_VALUES) {
                 while (!UNSAVED_POINT_VALUES.isEmpty()) {
                     UnsavedPointValue data = UNSAVED_POINT_VALUES.remove(0);
-                    savePointValueImpl(data.getPointId(), data.getPointValue(),
-                            data.getSource(), false);
+                    savePointValueImpl(data.getPointValue(), data.getSource(), false);
                 }
             }
         }
     }
 
-    public void savePointValue(int pointId, PointValueTime pointValue) {
-        savePointValueImpl(pointId, pointValue, new AnonymousUser(), true);
+    public void savePointValue(PointValueTime pointValue) {
+        savePointValueImpl(pointValue, new AnonymousUser(), true);
     }
 
     long savePointValue(final int pointId, final DataType dataType, double dvalue,
             final long time, final String svalue, final SetPointSource source,
             boolean async) {
         // Apply database specific bounds on double values.
-        dvalue = daf.getDatabaseAccess().applyBounds(dvalue);
-
-        if (async) {
-            batchWriteBehind.add(new BatchWriteBehindEntry(pointId, dataType, dvalue, time), ejt);
-            return -1;
-        }
 
         int retries = 5;
         while (true) {
@@ -342,7 +330,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         return id;
     }
 
-    private static final String POINT_VALUE_SELECT = "select pv.dataType, pv.pointValue, pva.textPointValueShort, pva.textPointValueLong, pv.ts, pva.sourceType, "
+    private static final String POINT_VALUE_SELECT = "select pv.dataPointId, pv.dataType, pv.pointValue, pva.textPointValueShort, pva.textPointValueLong, pv.ts, pva.sourceType, "
             + "  pva.sourceId "
             + "from pointValues pv "
             + "  left join pointValueAnnotations pva on pv.id = pva.pointValueId";
@@ -517,19 +505,20 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         @Override
         public PointValueTime mapRow(ResultSet rs, int rowNum)
                 throws SQLException {
-            MangoValue value = createMangoValue(rs, 1);
-            long time = rs.getLong(5);
+            final MangoValue value = createMangoValue(rs, 2);
+            final int dpId = rs.getInt(1);
+            final long time = rs.getLong(6);
 
-            int sourceType = rs.getInt(6);
+            int sourceType = rs.getInt(7);
             if (rs.wasNull()) // No annotations, just return a point value.
             {
-                return new PointValueTime(value, time);
+                return new PointValueTime(value, dpId, time);
             }
 
             // There was a source for the point value, so return an annotated
             // version.
-            return new AnnotatedPointValueTime(value, time, sourceType,
-                    rs.getInt(7));
+            return new AnnotatedPointValueTime(value, dpId, time, sourceType,
+                    rs.getInt(8));
         }
     }
 
@@ -538,14 +527,14 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         final DataType dataType = DataType.fromMangoDbId(rs.getInt(firstParameter));
         MangoValue value;
         switch (dataType) {
-            case NUMERIC:
-                value = new NumericValue(rs.getDouble(firstParameter + 1));
+            case DOUBLE:
+                value = new DoubleValue(rs.getDouble(firstParameter + 1));
                 break;
-            case BINARY:
-                value = new BinaryValue(rs.getDouble(firstParameter + 1) == 1);
+            case BOOLEAN:
+                value = new BooleanValue(rs.getDouble(firstParameter + 1) == 1);
                 break;
             case MULTISTATE:
-                value = new MultistateValue(rs.getInt(firstParameter + 1));
+                value = new MultistateValue(rs.getByte(firstParameter + 1));
                 break;
             case ALPHANUMERIC:
                 String s = rs.getString(firstParameter + 2);
@@ -620,34 +609,19 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
             + "  left join pointValueAnnotations pva on pv.id = pva.pointValueId";
 
     public void getPointValuesBetween(List<Integer> dataPointIds, long from,
-            long to, final RowCallback<IdPointValueTime> callback) {
+            long to, final RowCallback<PointValueTime> callback) {
         flushWriteBehind();
         String ids = createDelimitedList(dataPointIds, ",");
         ejt.query(POINT_ID_VALUE_SELECT + " where pv.dataPointId in (" + ids
                 + ") and pv.ts >= ? and pv.ts<? order by ts", new Object[]{
-                    from, to}, new IdPointValueRowMapper() {
+                    from, to}, new PointValueRowMapper() {
                     @Override
-                    public IdPointValueTime mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        final IdPointValueTime result = super.mapRow(rs, rowNum);
+                    public PointValueTime mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        final PointValueTime result = super.mapRow(rs, rowNum);
                         callback.row(result, rowNum);
                         return result;
                     }
                 });
-    }
-
-    /**
-     * Note: this does not extract source information from the annotation.
-     */
-    class IdPointValueRowMapper implements RowMapper<IdPointValueTime> {
-
-        @Override
-        public IdPointValueTime mapRow(ResultSet rs, int rowNum)
-                throws SQLException {
-            int dataPointId = rs.getInt(1);
-            MangoValue value = createMangoValue(rs, 2);
-            long time = rs.getLong(6);
-            return new IdPointValueTime(dataPointId, value, time);
-        }
     }
 
     //

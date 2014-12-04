@@ -66,7 +66,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO {
                 }
             }
 
-            if (vo.dataType == DataType.NUMERIC && !vo.valueFormat.isEmpty()) {
+            if (vo.dataType == DataType.DOUBLE && !vo.valueFormat.isEmpty()) {
                 try {
                     //TODO Localization with server locale !!!
                     new DecimalFormat(vo.valueFormat);
