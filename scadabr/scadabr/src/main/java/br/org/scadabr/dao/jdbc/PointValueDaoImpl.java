@@ -41,7 +41,7 @@ import br.org.scadabr.io.StreamUtils;
 import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.ImageSaveException;
-import com.serotonin.mango.rt.dataImage.AnnotatedPointValueTime;
+import com.serotonin.mango.rt.dataImage.PointValueAnnotation;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
@@ -168,10 +168,10 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
             case BOOLEAN:
             case MULTISTATE:
             case DOUBLE:
-                dvalue = ((DoubleValue)value).getDoubleValue();
+                dvalue = ((DoubleValue) value).getDoubleValue();
                 break;
             case ALPHANUMERIC:
-                svalue = ((AlphanumericValue)value).getValue();
+                svalue = ((AlphanumericValue) value).getValue();
                 break;
             default:
                 throw new ImplementMeException();
@@ -410,6 +410,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
     }
 
     //TODO replace with queryforObject
+    @Override
     public PointValueTime getLatestPointValue(final int dataPointId) {
         flushWriteBehind();
         //TODO optimaze into one hit of the db???
@@ -503,66 +504,57 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
     class PointValueRowMapper implements RowMapper<PointValueTime> {
 
         @Override
-        public PointValueTime mapRow(ResultSet rs, int rowNum)
-                throws SQLException {
-            final MangoValue value = createMangoValue(rs, 2);
-            final int dpId = rs.getInt(1);
-            final long time = rs.getLong(6);
-
+        public PointValueTime mapRow(ResultSet rs, int rowNum) throws SQLException {
+            final PointValueTime result = new PointValueTime(createMangoValue(rs, 2), rs.getInt(1), rs.getLong(6));
             int sourceType = rs.getInt(7);
-            if (rs.wasNull()) // No annotations, just return a point value.
-            {
-                return new PointValueTime(value, dpId, time);
+            if (!rs.wasNull()) {
+                result.setPointValueAnnotation(new PointValueAnnotation(sourceType, rs.getInt(8)));
             }
-
-            // There was a source for the point value, so return an annotated
-            // version.
-            return new AnnotatedPointValueTime(value, dpId, time, sourceType,
-                    rs.getInt(8));
+            return result;
         }
-    }
 
-    MangoValue createMangoValue(ResultSet rs, int firstParameter)
-            throws SQLException {
-        final DataType dataType = DataType.fromMangoDbId(rs.getInt(firstParameter));
-        MangoValue value;
-        switch (dataType) {
-            case DOUBLE:
-                value = new DoubleValue(rs.getDouble(firstParameter + 1));
-                break;
-            case BOOLEAN:
-                value = new BooleanValue(rs.getDouble(firstParameter + 1) == 1);
-                break;
-            case MULTISTATE:
-                value = new MultistateValue(rs.getByte(firstParameter + 1));
-                break;
-            case ALPHANUMERIC:
-                String s = rs.getString(firstParameter + 2);
-                if (s == null) {
-                    s = rs.getString(firstParameter + 3);
-                }
-                value = new AlphanumericValue(s);
-                break;
-            case IMAGE:
-                value = new ImageValue(Integer.parseInt(rs
-                        .getString(firstParameter + 2)),
-                        rs.getInt(firstParameter + 3));
-                break;
-            default:
-                value = null;
+        MangoValue createMangoValue(ResultSet rs, int firstParameter)
+                throws SQLException {
+            final DataType dataType = DataType.fromMangoDbId(rs.getInt(firstParameter));
+            MangoValue value;
+            switch (dataType) {
+                case DOUBLE:
+                    value = new DoubleValue(rs.getDouble(firstParameter + 1));
+                    break;
+                case BOOLEAN:
+                    value = new BooleanValue(rs.getDouble(firstParameter + 1) == 1);
+                    break;
+                case MULTISTATE:
+                    value = new MultistateValue(rs.getByte(firstParameter + 1));
+                    break;
+                case ALPHANUMERIC:
+                    String s = rs.getString(firstParameter + 2);
+                    if (s == null) {
+                        s = rs.getString(firstParameter + 3);
+                    }
+                    value = new AlphanumericValue(s);
+                    break;
+                case IMAGE:
+                    value = new ImageValue(Integer.parseInt(rs
+                            .getString(firstParameter + 2)),
+                            rs.getInt(firstParameter + 3));
+                    break;
+                default:
+                    value = null;
+            }
+            return value;
         }
-        return value;
     }
 
     private void updateAnnotations(List<PointValueTime> values) {
-        Map<Integer, List<AnnotatedPointValueTime>> userIds = new HashMap<>();
-        List<AnnotatedPointValueTime> alist;
+        Map<Integer, List<PointValueAnnotation>> userIds = new HashMap<>();
+        List<PointValueAnnotation> alist;
 
         // Look for annotated point values.
-        AnnotatedPointValueTime apv;
+        PointValueAnnotation apv;
         for (PointValueTime pv : values) {
-            if (pv instanceof AnnotatedPointValueTime) {
-                apv = (AnnotatedPointValueTime) pv;
+            if (pv.isAnnotated()) {
+                apv = pv.getPointValueAnnotation();
                 if (apv.getSourceType() == SetPointSource.Types.USER) {
                     alist = userIds.get(apv.getSourceId());
                     if (alist == null) {
@@ -582,24 +574,24 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
     }
 
     private void updateAnnotations(String sql,
-            Map<Integer, List<AnnotatedPointValueTime>> idMap) {
+            Map<Integer, List<PointValueAnnotation>> idMap) {
         // Get the description information from the database.
         List<IntValuePair> data = ejt.query(
                 sql + "(" + createDelimitedList(idMap.keySet(), ",")
                 + ")", new IntValuePairRowMapper());
 
-        // Collate the data with the id map, and set the values in the
+            // Collate the data with the id map, and set the values in the
         // annotations
-        List<AnnotatedPointValueTime> annos;
+        List<PointValueAnnotation> annos;
         for (IntValuePair ivp : data) {
             annos = idMap.get(ivp.getKey());
-            for (AnnotatedPointValueTime avp : annos) {
+            for (PointValueAnnotation avp : annos) {
                 avp.setSourceDescriptionArgument(ivp.getValue());
             }
         }
     }
 
-    //
+        //
     //
     // Multiple-point callback for point history replays
     //
@@ -624,7 +616,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
                 });
     }
 
-    //
+        //
     //
     // Point value deletions
     //
