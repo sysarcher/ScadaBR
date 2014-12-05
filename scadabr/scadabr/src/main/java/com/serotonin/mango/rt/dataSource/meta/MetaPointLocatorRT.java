@@ -51,7 +51,7 @@ import org.springframework.beans.factory.annotation.Configurable;
  * @author Matthew Lohbihler
  */
 @Configurable
-public class MetaPointLocatorRT extends PollingPointLocatorRT<MetaPointLocatorVO, MetaDataSourceRT> implements DataPointListener {
+public class MetaPointLocatorRT<T extends PointValueTime> extends PollingPointLocatorRT<T, MetaPointLocatorVO<T>, MetaDataSourceRT> implements DataPointListener {
 
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCARABR_DS_META);
 
@@ -68,7 +68,7 @@ public class MetaPointLocatorRT extends PollingPointLocatorRT<MetaPointLocatorVO
     boolean initialized;
     private PointLocatorCronTask pollingCronTask;
 
-    public MetaPointLocatorRT(MetaPointLocatorVO vo) {
+    public MetaPointLocatorRT(MetaPointLocatorVO<T> vo) {
         super(vo);
     }
 
@@ -207,7 +207,7 @@ public class MetaPointLocatorRT extends PollingPointLocatorRT<MetaPointLocatorVO
         try {
             ScriptExecutor executor = new ScriptExecutor();
             try {
-                PointValueTime pvt = executor.execute(vo.getScript(), context, System.currentTimeMillis(), vo.getId(), vo.getDataType(), runtime);
+                T pvt = (T)executor.execute(vo.getScript(), context, System.currentTimeMillis(), vo.getId(), vo.getDataType(), runtime);
                 if (pvt == null || pvt.getValue() == null) {
                     fireScriptErrorEvent(runtime, "event.meta.nullResult");
                 } else {
@@ -234,8 +234,8 @@ public class MetaPointLocatorRT extends PollingPointLocatorRT<MetaPointLocatorVO
         }
     }
 
-    protected void updatePoint(PointValueTime pvt) {
-        dpRT.updatePointValue(pvt);
+    protected void updatePoint(T pvt) {
+        dpRT.updatePointValueAsync(pvt);
     }
 
     protected void fireScriptErrorEvent(long runtime, LocalizableMessage msg) {

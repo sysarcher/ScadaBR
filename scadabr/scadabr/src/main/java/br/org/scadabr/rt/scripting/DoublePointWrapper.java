@@ -20,25 +20,23 @@ package br.org.scadabr.rt.scripting;
 
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
-import java.util.List;
+import com.serotonin.mango.rt.dataImage.DoubleValueTime;
 
 import com.serotonin.mango.rt.dataImage.IDataPoint;
-import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.DoubleValue;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.stats.AnalogStatistics;
 
 /**
  * @author Matthew Lohbihler
  */
-public class DoublePointWrapper extends AbstractPointWrapper<DoubleValue> {
+public class DoublePointWrapper extends AbstractPointWrapper<DoubleValueTime> {
 
     public DoublePointWrapper(IDataPoint point, WrapperContext context) {
         super(point, context);
     }
 
     public double getValue() {
-        DoubleValue value = getValueImpl();
+        DoubleValueTime value = getValueImpl();
         if (value == null) {
             return 0;
         }

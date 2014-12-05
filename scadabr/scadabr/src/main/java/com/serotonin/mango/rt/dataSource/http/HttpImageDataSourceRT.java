@@ -50,6 +50,7 @@ import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.datasource.http.HttpImageDataSourceEventKey;
+import com.serotonin.mango.rt.dataImage.ImageValueTime;
 import java.text.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -179,7 +180,7 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
         }
 
         private void executeImpl() {
-            HttpImagePointLocatorVO vo = dp.getVo().getPointLocator();
+            HttpImagePointLocatorVO vo = (HttpImagePointLocatorVO)dp.getVo().getPointLocator();
 
             byte[] data;
             try {
@@ -213,7 +214,7 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
 
             // Save the new image
             try {
-                dp.updatePointValue(new PointValueTime(new ImageValue(data, ImageValue.TYPE_JPG), dp.getId(), time), false);
+                dp.updatePointValue(new ImageValueTime(data, ImageValue.TYPE_JPG, dp.getId(), time));
             } catch (ImageSaveException e) {
                 saveFailure = new LocalizableMessageImpl("event.httpImage.saveError", e.getMessage());
                 LOG.info("Error saving image data", e);

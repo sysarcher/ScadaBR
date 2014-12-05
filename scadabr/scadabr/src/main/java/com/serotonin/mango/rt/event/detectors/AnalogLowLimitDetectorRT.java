@@ -26,6 +26,7 @@ import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.rt.dataImage.DoubleValueTime;
 import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 
 /**
@@ -43,7 +44,7 @@ import com.serotonin.mango.rt.dataImage.types.DoubleValue;
  *
  * @author Matthew Lohbihler
  */
-public class AnalogLowLimitDetectorRT extends TimeDelayedEventDetectorRT<DoubleValue> {
+public class AnalogLowLimitDetectorRT extends TimeDelayedEventDetectorRT<DoubleValueTime> {
 
     private final Log log = LogFactory.getLog(AnalogLowLimitDetectorRT.class);
 
@@ -104,8 +105,8 @@ public class AnalogLowLimitDetectorRT extends TimeDelayedEventDetectorRT<DoubleV
     }
 
     @Override
-    synchronized public void pointChanged(PointValueTime<DoubleValue> oldValue, PointValueTime<DoubleValue> newValue) {
-        double newDouble = ((PointValueTime<DoubleValue>)newValue).getMangoValue().getDoubleValue();
+    synchronized public void pointChanged(DoubleValueTime oldValue, DoubleValueTime newValue) {
+        double newDouble = newValue.getDoubleValue();
         if (newDouble < vo.getLimit()) {
             if (!lowLimitActive) {
                 lowLimitActiveTime = newValue.getTimestamp();

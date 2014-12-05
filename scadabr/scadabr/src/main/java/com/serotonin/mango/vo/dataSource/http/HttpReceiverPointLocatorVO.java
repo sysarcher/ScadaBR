@@ -31,13 +31,19 @@ import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 /**
  * @author Matthew Lohbihler
  */
-public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO {
+public class HttpReceiverPointLocatorVO<T extends PointValueTime> extends AbstractPointLocatorVO<T> {
+
+    public HttpReceiverPointLocatorVO(DataType dataType) {
+        super(dataType);
+    }
 
     public static class HttpReceiverPointLocatorVOValidator implements Validator {
 
@@ -72,18 +78,8 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO {
     }
 
     private String parameterName;
-    private DataType dataType;
 
     private String binary0Value;
-
-    @Override
-    public DataType getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(DataType dataType) {
-        this.dataType = dataType;
-    }
 
     public String getParameterName() {
         return parameterName;
@@ -103,17 +99,17 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO {
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
+        super.addProperties(list);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpReceiver.httpParamName", parameterName);
-        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType", dataType);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpReceiver.binaryZeroValue", binary0Value);
     }
 
     @Override
-    public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
+    public void addPropertyChanges(List<LocalizableMessage> list, PointLocatorVO<T> o) {
+        super.addPropertyChanges(list, o);
         HttpReceiverPointLocatorVO from = (HttpReceiverPointLocatorVO) o;
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpReceiver.httpParamName", from.parameterName,
                 parameterName);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpReceiver.binaryZeroValue", from.binary0Value,
                 binary0Value);
     }
@@ -128,19 +124,17 @@ public class HttpReceiverPointLocatorVO extends AbstractPointLocatorVO {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        SerializationHelper.writeSafeUTF(out, parameterName);
-        out.writeInt(dataType.mangoDbId);
-        SerializationHelper.writeSafeUTF(out, binary0Value);
+        out.writeObject(parameterName);
+        out.writeObject(binary0Value);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int ver = in.readInt();
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            parameterName = SerializationHelper.readSafeUTF(in);
-            dataType = dataType.fromMangoDbId(in.readInt());
-            binary0Value = SerializationHelper.readSafeUTF(in);
+            parameterName = (String)in.readObject();
+            binary0Value = (String)in.readObject();
         }
     }
 

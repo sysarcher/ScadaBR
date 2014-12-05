@@ -19,6 +19,7 @@
 package com.serotonin.mango.view.component;
 
 import br.org.scadabr.DataType;
+import com.serotonin.mango.rt.dataImage.ImageValueTime;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -34,7 +35,7 @@ import java.util.EnumSet;
  * @author Matthew Lohbihler
  */
 
-public class SimpleImageComponent extends PointComponent<ImageValue> {
+public class SimpleImageComponent extends PointComponent<ImageValueTime> {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("simpleImage", "SIMPLE_IMAGE", "graphic.simpleImage",
             EnumSet.of(DataType.IMAGE));
@@ -45,19 +46,12 @@ public class SimpleImageComponent extends PointComponent<ImageValue> {
     }
 
     @Override
-    public void addDataToModel(Map<String, Object> model, PointValueTime<ImageValue> pointValue) {
+    public void addDataToModel(Map<String, Object> model, ImageValueTime pointValue) {
         if (pointValue == null || pointValue.getValue() == null) {
             model.put("error", "common.noData");
             return;
         }
-
-        if (!(pointValue.getValue() instanceof ImageValue)) {
-            model.put("error", "common.thumb.invalidValue");
-            return;
-        }
-
-        ImageValue imageValue = (ImageValue) pointValue.getValue();
-        model.put("imageType", imageValue.getTypeExtension());
+        model.put("imageType", pointValue.getTypeExtension());
     }
 
     @Override

@@ -12,11 +12,12 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.view.component.ScriptComponent;
 import br.org.scadabr.util.SerializationHelper;
+import com.serotonin.mango.rt.dataImage.BooleanValueTime;
 import com.serotonin.mango.rt.dataImage.types.BooleanValue;
 import java.util.EnumSet;
 
 
-public class ButtonComponent extends ScriptComponent<BooleanValue> {
+public class ButtonComponent extends ScriptComponent<BooleanValueTime> {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("button",
             "BUTTON", "graphic.button", EnumSet.of(DataType.BOOLEAN));
@@ -101,7 +102,7 @@ public class ButtonComponent extends ScriptComponent<BooleanValue> {
     }
 
     @Override
-    public void addDataToModel(Map<String, Object> model, PointValueTime<BooleanValue> value) {
+    public void addDataToModel(Map<String, Object> model, BooleanValueTime value) {
         createButtonScript();
         super.addDataToModel(model, value);
     }

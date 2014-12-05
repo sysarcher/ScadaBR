@@ -30,9 +30,9 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 
 @Deprecated
 // Use ViewComponent instead
-abstract public class ImageSetRenderer<T extends MangoValue> extends BaseGraphicRenderer {
+abstract public class ImageSetRenderer<T extends PointValueTime> extends BaseGraphicRenderer {
 
-    abstract public String getImage(PointValueTime<T> pointValue);
+    abstract public String getImage(T pointValue);
 
     protected ImageSet imageSet;
     private boolean displayText;

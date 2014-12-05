@@ -19,6 +19,7 @@
 package com.serotonin.mango.view.component;
 
 import br.org.scadabr.DataType;
+import com.serotonin.mango.rt.dataImage.DoubleValueTime;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -35,7 +36,7 @@ import java.util.EnumSet;
  * @author Matthew Lohbihler
  */
 
-public class AnalogGraphicComponent extends ImageSetComponent<DoubleValue> {
+public class AnalogGraphicComponent extends ImageSetComponent<DoubleValueTime> {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("analogGraphic", "ANALOG_GRAPHIC",
             "graphic.analogGraphic", EnumSet.of(DataType.DOUBLE));
@@ -67,17 +68,17 @@ public class AnalogGraphicComponent extends ImageSetComponent<DoubleValue> {
     }
 
     @Override
-    public String getImage(PointValueTime<DoubleValue> pointValue) {
+    public String getImage(DoubleValueTime pointValue) {
         if (imageSet == null) // Image set not loaded?
         {
             return "imageSetNotLoaded";
         }
 
-        if (pointValue == null || !(pointValue.getValue() instanceof NumericValue) || imageSet.getImageCount() == 1) {
+        if (pointValue == null || imageSet.getImageCount() == 1) {
             return imageSet.getImageFilename(0);
         }
 
-        double dvalue = pointValue.getMangoValue().getDoubleValue();
+        double dvalue = pointValue.getDoubleValue();
 
         int index = (int) ((dvalue - min) / (max - min) * imageSet.getImageCount());
         if (index < 0) {

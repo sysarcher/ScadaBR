@@ -28,9 +28,8 @@ import com.serotonin.mango.rt.event.type.DataPointEventType;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
 
-abstract public class PointEventDetectorRT<T extends MangoValue> extends SimpleEventDetector implements DataPointListener<T> {
+abstract public class PointEventDetectorRT<T extends PointValueTime> extends SimpleEventDetector implements DataPointListener<T> {
 
     //TODO make this final ...
     protected PointEventDetectorVO vo;
@@ -93,22 +92,22 @@ abstract public class PointEventDetectorRT<T extends MangoValue> extends SimpleE
     // Point listener interface
     //
     @Override
-    public void pointChanged(PointValueTime<T> oldValue, PointValueTime<T> newValue) {
+    public void pointChanged(T oldValue, T newValue) {
         // no op
     }
 
     @Override
-    public void pointSet(PointValueTime<T> oldValue, PointValueTime<T> newValue) {
+    public void pointSet(T oldValue, T newValue) {
         // no op
     }
 
     @Override
-    public void pointUpdated(PointValueTime<T> newValue) {
+    public void pointUpdated(T newValue) {
         // no op
     }
 
     @Override
-    public void pointBackdated(PointValueTime<T> value) {
+    public void pointBackdated(T value) {
         // no op
     }
 

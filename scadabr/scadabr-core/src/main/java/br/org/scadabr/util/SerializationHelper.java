@@ -7,6 +7,11 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+/**
+ * TODO wrap Object*Stream and read write fields like O*S "name dataType value"...???
+ * 
+ * @author aploese
+ */
 public class SerializationHelper {
 
     public static Object readObject(InputStream is) {
@@ -21,6 +26,7 @@ public class SerializationHelper {
         return new ByteArrayInputStream(writeObjectToArray(data));
     }
 
+    @Deprecated // Write String as Object ...
     public static void writeSafeUTF(ObjectOutputStream out, String str) throws IOException {
         if (str == null) {
             out.writeBoolean(false);
@@ -30,6 +36,7 @@ public class SerializationHelper {
         }
     }
 
+    @Deprecated // Write String as Object ...
     public static String readSafeUTF(ObjectInputStream in) throws IOException {
         if (in.readBoolean()) {
             return in.readUTF();

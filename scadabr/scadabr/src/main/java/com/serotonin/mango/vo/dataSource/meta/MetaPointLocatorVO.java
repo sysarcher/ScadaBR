@@ -37,12 +37,14 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.vo.datasource.meta.CronPattern;
-import br.org.scadabr.vo.datasource.meta.InputVariables;
 import br.org.scadabr.vo.datasource.meta.UpdateEvent;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.TimeZone;
@@ -55,41 +57,33 @@ import org.springframework.beans.factory.annotation.Configurable;
 /**
  * @author Matthew Lohbihler
  */
-
 @Configurable
 @CronPattern
 //TODO @InputVariables
-public class MetaPointLocatorVO extends AbstractPointLocatorVO {
+public class MetaPointLocatorVO<T extends PointValueTime> extends AbstractPointLocatorVO<T> {
 
     @Autowired
     private DataPointDao dataPointDao;
 
     private List<IntValuePair> context = new ArrayList<>();
-    
+
     @NotNull
     @Size(min = 9) // stands for mininimum text required "return 0;"
     private String script;
-    private DataType dataType;
-    
+
     private boolean settable;
     private UpdateEvent updateEvent = UpdateEvent.CONTEXT_UPDATE;
-    
+
     private String updateCronPattern;
-    
+
     @Min(0)
     private int executionDelaySeconds;
-    @NotNull
-    @Size(min = 1, max = 40)
-    private String name;
 
-    MetaPointLocatorVO() {
-
-    }
-
-    MetaPointLocatorVO(DataType dataType) {
-        this();
-        this.dataType = dataType;
-        this.name = getClass().getSimpleName();
+    public MetaPointLocatorVO(DataType dataType) {
+        super(dataType);
+        if (dataType != DataType.DOUBLE) {
+            throw new ImplementMeException();
+        }
     }
 
     @Override
@@ -131,15 +125,6 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO {
     }
 
     @Override
-    public DataType getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(DataType dataType) {
-        this.dataType = dataType;
-    }
-
-    @Override
     public boolean isSettable() {
         return settable;
     }
@@ -170,21 +155,21 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO {
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType", dataType);
+        super.addProperties(list);
         AuditEventType.addPropertyMessage(list, "dsEdit.settable", settable);
         AuditEventType.addPropertyMessage(list, "dsEdit.meta.scriptContext", contextToString());
         AuditEventType.addPropertyMessage(list, "dsEdit.meta.script", script);
         AuditEventType.addPropertyMessage(list, "dsEdit.meta.event", updateEvent);
-        if (updateEvent == updateEvent.CRON) {
+        if (updateEvent == UpdateEvent.CRON) {
             AuditEventType.addPropertyMessage(list, "dsEdit.meta.event.cron", updateCronPattern);
         }
         AuditEventType.addPropertyMessage(list, "dsEdit.meta.delay", executionDelaySeconds);
     }
 
     @Override
-    public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
-        MetaPointLocatorVO from = (MetaPointLocatorVO) o;
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
+    public void addPropertyChanges(List<LocalizableMessage> list, PointLocatorVO<T> o) {
+        super.addProperties(list);
+        final MetaPointLocatorVO<T> from = (MetaPointLocatorVO<T>) o;
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.settable", from.settable, settable);
         if (!context.equals(context)) {
             AuditEventType.addPropertyChangeMessage(list, "dsEdit.meta.scriptContext", from.contextToString(),
@@ -223,71 +208,33 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO {
     // Serialization
     //
     private static final long serialVersionUID = -1;
-    private static final int version = 5;
+    private static final int version = 1;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        out.writeObject(name);
         out.writeObject(context);
-        SerializationHelper.writeSafeUTF(out, script);
-        out.writeInt(dataType.mangoDbId);
+        out.writeObject(script);
         out.writeBoolean(settable);
         out.writeInt(updateEvent.getId());
-        SerializationHelper.writeSafeUTF(out, updateCronPattern);
+        out.writeObject(updateCronPattern);
         out.writeInt(executionDelaySeconds);
     }
 
     @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        int ver = in.readInt();
+        final int ver = in.readInt();
+        switch (ver) {
+            case 1:
+                context = (List<IntValuePair>) in.readObject();
+                script = (String)in.readObject();
+                settable = in.readBoolean();
+                updateEvent = UpdateEvent.fromId(in.readInt());
+                updateCronPattern = (String)in.readObject();
+                executionDelaySeconds = in.readInt();
+                break;
+            default:
+                throw new ShouldNeverHappenException("Version mismatch");
 
-        // Switch on the version of the class so that version changes can be elegantly handled.
-        if (ver == 1) {
-            context = new ArrayList<>();
-            Map<Integer, String> ctxMap = (Map<Integer, String>) in.readObject();
-            for (Map.Entry<Integer, String> point : ctxMap.entrySet()) {
-                context.add(new IntValuePair(point.getKey(), point.getValue()));
-            }
-
-            script = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.fromMangoDbId(in.readInt());
-            settable = false;
-            updateEvent = UpdateEvent.fromId(in.readInt());
-            updateCronPattern = "";
-            executionDelaySeconds = in.readInt();
-        } else if (ver == 2) {
-            context = (List<IntValuePair>) in.readObject();
-            script = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.fromMangoDbId(in.readInt());
-            settable = false;
-            updateEvent = UpdateEvent.fromId(in.readInt());
-            updateCronPattern = "";
-            executionDelaySeconds = in.readInt();
-        } else if (ver == 3) {
-            context = (List<IntValuePair>) in.readObject();
-            script = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.fromMangoDbId(in.readInt());
-            settable = false;
-            updateEvent = UpdateEvent.fromId(in.readInt());
-            updateCronPattern = SerializationHelper.readSafeUTF(in);
-            executionDelaySeconds = in.readInt();
-        } else if (ver == 4) {
-            context = (List<IntValuePair>) in.readObject();
-            script = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.fromMangoDbId(in.readInt());
-            settable = in.readBoolean();
-            updateEvent = UpdateEvent.fromId(in.readInt());
-            updateCronPattern = SerializationHelper.readSafeUTF(in);
-            executionDelaySeconds = in.readInt();
-        } else if (ver == 5) {
-            name = (String) in.readObject();
-            context = (List<IntValuePair>) in.readObject();
-            script = SerializationHelper.readSafeUTF(in);
-            dataType = DataType.fromMangoDbId(in.readInt());
-            settable = in.readBoolean();
-            updateEvent = UpdateEvent.fromId(in.readInt());
-            updateCronPattern = SerializationHelper.readSafeUTF(in);
-            executionDelaySeconds = in.readInt();
         }
     }
 
@@ -296,32 +243,17 @@ public class MetaPointLocatorVO extends AbstractPointLocatorVO {
         return script == null ? true : script.isEmpty();
     }
 
-    /**
-     * @return the name
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
     @JsonIgnore
     public CronExpression getCronExpression() {
         try {
-        switch (updateEvent) {
-            case CONTEXT_UPDATE:
-                throw new ShouldNeverHappenException("Context update has no cron pattern");
-            case CRON:
-                return new CronParser().parse(updateCronPattern, TimeZone.getTimeZone("UTC"));
-            default:
-                return new CronParser().parse(updateEvent.getCronPattern(), TimeZone.getTimeZone("UTC"));
-        }
+            switch (updateEvent) {
+                case CONTEXT_UPDATE:
+                    throw new ShouldNeverHappenException("Context update has no cron pattern");
+                case CRON:
+                    return new CronParser().parse(updateCronPattern, TimeZone.getTimeZone("UTC"));
+                default:
+                    return new CronParser().parse(updateEvent.getCronPattern(), TimeZone.getTimeZone("UTC"));
+            }
         } catch (ParseException pe) {
             throw new ShouldNeverHappenException(pe.getMessage());
         }

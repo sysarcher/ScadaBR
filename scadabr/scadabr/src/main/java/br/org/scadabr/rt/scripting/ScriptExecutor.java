@@ -33,16 +33,16 @@ import javax.script.ScriptException;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.io.StreamUtils;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.rt.RuntimeManager;
+import com.serotonin.mango.rt.dataImage.AlphaNumericValueTime;
+import com.serotonin.mango.rt.dataImage.BooleanValueTime;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
+import com.serotonin.mango.rt.dataImage.DoubleValueTime;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
+import com.serotonin.mango.rt.dataImage.MultistateValueTime;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
-import com.serotonin.mango.rt.dataImage.types.BooleanValue;
-import com.serotonin.mango.rt.dataImage.types.DoubleValue;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import java.io.InputStream;
 import javax.script.Invocable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -160,25 +160,25 @@ public class ScriptExecutor {
             // }
         }
 
-        MangoValue value;
         if (result == null) {
             return null;
         } else if (result instanceof AbstractPointWrapper) {
-            value = ((AbstractPointWrapper) result).getValueImpl();
-        } else if (dataType == DataType.BOOLEAN && result instanceof Boolean) {
-            value = new BooleanValue((Boolean) result);
-        } else if (dataType == DataType.MULTISTATE && result instanceof Number) {
-            value = new MultistateValue(((Number) result).byteValue());
-        } else if (dataType == DataType.DOUBLE && result instanceof Number) {
-            value = new DoubleValue(((Number) result).doubleValue());
-        } else if (dataType == DataType.ALPHANUMERIC && result instanceof String) {
-            value = new AlphanumericValue((String) result);
+            throw new ImplementMeException();
+            //return ((AbstractPointWrapper) result).getValueImpl();
         } else {
-            // ditch it.
-            throw new ResultTypeException("event.script.convertError", result, dataType);
+            switch (dataType) {
+                case BOOLEAN:
+                    return new BooleanValueTime((Boolean) result, dataPointId, timestamp);
+                case MULTISTATE:
+                    return new MultistateValueTime(((Number) result).byteValue(), dataPointId, timestamp);
+                case DOUBLE:
+                    return new DoubleValueTime(((Number) result).doubleValue(), dataPointId, timestamp);
+                case ALPHANUMERIC:
+                    return new AlphaNumericValueTime((String) result, dataPointId, timestamp);
+                default:
+                    throw new ResultTypeException("event.script.convertError", result, dataType);
+            }
         }
-
-        return new PointValueTime(value, dataPointId, timestamp);
     }
 
     public static ScriptException prettyScriptMessage(ScriptException e) {
@@ -216,7 +216,7 @@ public class ScriptExecutor {
             Map<String, IDataPoint> convertedContext = executor.convertContext(context);
             PointValueTime pvt = executor.execute(script, convertedContext,
                     System.currentTimeMillis(), dataPointId, dataType, -1);
-            if (pvt.getTimestamp()== -1) {
+            if (pvt.getTimestamp() == -1) {
 //                response.addContextual("script", "dsEdit.meta.test.success", pvt.getValue());
             } else {
 //                response.addContextual("script", "dsEdit.meta.test.successTs", pvt.getValue(), new Date(pvt.getTime()));

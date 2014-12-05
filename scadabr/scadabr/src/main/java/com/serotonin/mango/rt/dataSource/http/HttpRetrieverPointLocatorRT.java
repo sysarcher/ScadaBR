@@ -19,6 +19,7 @@
 package com.serotonin.mango.rt.dataSource.http;
 
 import br.org.scadabr.DataType;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
@@ -29,10 +30,11 @@ import com.serotonin.mango.vo.dataSource.http.HttpRetrieverPointLocatorVO;
 /**
  * @author Matthew Lohbihler
  */
-public class HttpRetrieverPointLocatorRT extends PointLocatorRT<HttpRetrieverPointLocatorVO> {
+public class HttpRetrieverPointLocatorRT<T extends PointValueTime> extends PointLocatorRT<T, HttpRetrieverPointLocatorVO<T>> {
 
     private final Pattern valuePattern;
     private final boolean ignoreIfMissing;
+    //TODO strange Logic I would expect if matching then 1 and not  this ....
     private String binary0Value;
     private DecimalFormat valueFormat;
     private final Pattern timePattern;

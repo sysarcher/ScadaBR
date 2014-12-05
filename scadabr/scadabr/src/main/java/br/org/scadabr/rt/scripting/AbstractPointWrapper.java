@@ -26,7 +26,7 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 /**
  * @author Matthew Lohbihler
  */
-abstract public class AbstractPointWrapper<T extends MangoValue> {
+abstract public class AbstractPointWrapper<T extends PointValueTime> {
 
     protected IDataPoint<T> point;
     protected WrapperContext context;
@@ -37,11 +37,7 @@ abstract public class AbstractPointWrapper<T extends MangoValue> {
     }
 
     public T getValueImpl() {
-        PointValueTime<T> pvt = point.getPointValue();
-        if (pvt == null) {
-            return null;
-        }
-        return pvt.getMangoValue();
+        return point.getPointValue();
     }
 
     public long getTimestamp() {

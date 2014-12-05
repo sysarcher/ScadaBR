@@ -7,6 +7,7 @@ package br.org.scadabr.rt.datasource;
 
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 
@@ -16,12 +17,12 @@ import com.serotonin.mango.rt.dataSource.PointLocatorRT;
  * @param <T>
  * @param <U>
  */
-public abstract class PollingPointLocatorRT<T extends PointLocatorVO, U extends DataSourceRT> extends PointLocatorRT<T> {
+public abstract class PollingPointLocatorRT<T extends PointValueTime, VO extends PointLocatorVO<T>, U extends DataSourceRT> extends PointLocatorRT<T, VO> {
 
-    protected DataPointRT dpRT;
+    protected DataPointRT<T> dpRT;
     protected U dsRT;
     
-    public PollingPointLocatorRT(T vo) {
+    public PollingPointLocatorRT(VO vo) {
         super(vo);
     }
 
@@ -29,7 +30,7 @@ public abstract class PollingPointLocatorRT<T extends PointLocatorVO, U extends 
         return dsRT;
     }
 
-    public final DataPointRT getDpRT() {
+    public final DataPointRT<T> getDpRT() {
         return dpRT;
     }
 
@@ -38,7 +39,7 @@ public abstract class PollingPointLocatorRT<T extends PointLocatorVO, U extends 
 
     public abstract boolean overrunDetected(long lastExecutionTime, long thisExecutionTime);
 
-    public void start(U dsRT, DataPointRT dpRT) {
+    public void start(U dsRT, DataPointRT<T> dpRT) {
         this.dsRT = dsRT;
         this.dpRT = dpRT;
     }

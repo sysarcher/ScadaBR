@@ -453,6 +453,12 @@
             <name>i18nTitle</name>
         </attribute>
         <attribute>
+            <description>HTML Standard Attribute</description>
+            <name>name</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
             <name>selectedValue</name>
             <required>true</required>
             <rtexprvalue>true</rtexprvalue>

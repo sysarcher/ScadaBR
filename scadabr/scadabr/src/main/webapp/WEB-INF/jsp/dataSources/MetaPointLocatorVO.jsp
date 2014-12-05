@@ -3,7 +3,7 @@
 <tag:pointLocator>
     <jsp:body>
 
-        <dijit:select i18nLabel="dsEdit.meta.event" selectedValue="${pointLocator.updateEvent}" items="${pointLocator.updateEvents}"/>
+        <dijit:select i18nLabel="dsEdit.meta.event" name="updateEvent" selectedValue="${pointLocator.updateEvent}" items="${pointLocator.updateEvents}"/>
        
         <dijit:validationTextBox i18nLabel="dsEdit.meta.event.cron"  name="updateCronPattern" value="${pointLocator.updateCronPattern}"/>
         <dijit:numberSpinner i18nLabel="dsEdit.meta.delay"  name="executionDelaySeconds" number="${pointLocator.executionDelaySeconds}"/>

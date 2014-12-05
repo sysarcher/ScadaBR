@@ -20,20 +20,21 @@ package br.org.scadabr.rt.scripting;
 
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
+import com.serotonin.mango.rt.dataImage.BooleanValueTime;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.types.BooleanValue;
 
 /**
  * @author Matthew Lohbihler
  */
-public class BooleanPointWrapper extends DistinctPointWrapper<BooleanValue> {
+public class BooleanPointWrapper extends DistinctPointWrapper<BooleanValueTime> {
 
-    public BooleanPointWrapper(IDataPoint<BooleanValue> point, WrapperContext context) {
+    public BooleanPointWrapper(IDataPoint<BooleanValueTime> point, WrapperContext context) {
         super(point, context);
     }
 
     public boolean getValue() {
-        BooleanValue value = getValueImpl();
+        BooleanValueTime value = getValueImpl();
         if (value == null) {
             return false;
         }

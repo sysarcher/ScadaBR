@@ -22,8 +22,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,9 +40,7 @@ import br.org.scadabr.dao.PointValueDao;
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.rt.link.PointLinkManager;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.vo.DataPointExtendedNameComparator;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.vo.bean.PointHistoryCount;
@@ -55,11 +51,13 @@ import com.serotonin.mango.vo.hierarchy.PointHierarchyEventDispatcher;
 import com.serotonin.mango.vo.link.PointLinkVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.Tuple;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.AuditEventKey;
 import br.org.scadabr.vo.event.type.DataPointDetectorKey;
 import br.org.scadabr.web.LazyTreeNode;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Collection;
@@ -238,9 +236,12 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
             try {
                 dp = (DataPointVO) SerializationHelper.readObject(rs.getBlob(4).getBinaryStream());
             } catch (ShouldNeverHappenException e) {
+                throw new ImplementMeException();
+                /*
                 dp = new DataPointVO();
                 dp.setName("Point configuration lost. Please recreate.");
                 dp.defaultTextRenderer();
+                */
             }
             dp.setId(rs.getInt(1));
             dp.getPointLocator().setId(dp.getId());
@@ -326,7 +327,7 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
             // Delete any point values where data type doesn't match the vo, just in case the data type was changed.
             // Only do this if the data type has actually changed because it is just really slow if the database is
             // big or busy.
-            pointValueDao.deletePointValuesWithMismatchedType(dp.getId(), dp.getDataType());
+//            pointValueDao.deletePointValuesWithMismatchedType(dp.getId(), dp.getDataType());
         }
 
         // Save the VO information.
@@ -519,7 +520,7 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
         }
     }
 
-    private void saveEventDetectors(final DataPointVO dp) {
+    private <T extends PointValueTime> void saveEventDetectors(final DataPointVO<T> dp) {
         // Get the ids of the existing detectors for this point.
         final List<PointEventDetectorVO> existingDetectors = getEventDetectors(dp);
 

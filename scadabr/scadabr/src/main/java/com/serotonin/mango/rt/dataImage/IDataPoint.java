@@ -19,21 +19,36 @@
 package com.serotonin.mango.rt.dataImage;
 
 import br.org.scadabr.DataType;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
 
 /**
  * @author Matthew Lohbihler
  * @param <T>
  */
-public interface IDataPoint<T extends MangoValue> {
+public interface IDataPoint<T extends PointValueTime> {
 
-    void updatePointValue(PointValueTime<T> newValue);
+    void updatePointValueAsync(T newValue);
 
-    void updatePointValue(PointValueTime<T> newValue, boolean async);
+    void updatePointValueSync(T newValue);
 
-    void setPointValue(PointValueTime<T> newValue, SetPointSource source);
+    /**
+     * defaults to #updatePointValueAsync
+     *
+     * @param newValue
+     */
+    void updatePointValue(T newValue);
 
-    PointValueTime<T> getPointValue();
+    void setPointValueAsync(T newValue);
+
+    void setPointValueSync(T newValue, SetPointSource source);
+
+    /**
+     * defaults to #setPointValueAsync
+     *
+     * @param newValue
+     */
+    void setPointValue(T newValue);
+
+    T getPointValue();
 
     DataType getDataType();
 }

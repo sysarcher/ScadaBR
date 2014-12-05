@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.view.stats;
 
+import com.serotonin.mango.rt.dataImage.DoubleValueTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,27 +34,27 @@ import java.util.Objects;
 /**
  * @author Matthew Lohbihler
  */
-public class StartsAndRuntimeList implements StatisticsGenerator<DoubleValue> {
+public class StartsAndRuntimeList implements StatisticsGenerator<DoubleValueTime> {
 
     private final List<StartsAndRuntime> data = new ArrayList<>();
-
-    public StartsAndRuntimeList(PointValueTime<DoubleValue> startValue, List<? extends IValueTime<DoubleValue>> values, long start, long end) {
-        this(startValue == null ? null : startValue.getMangoValue(), values, start, end);
-    }
-
-    public StartsAndRuntimeList(DoubleValue startValue, List<? extends IValueTime<DoubleValue>> values, long start, long end) {
-        this(startValue, start, end);
-        for (IValueTime vt : values) {
-            addValueTime(vt);
-        }
-        done();
-    }
 
     private final long end;
     private long lastTime = -1;
     private long realStart = -1;
     private DoubleValue lastValue;
     private StartsAndRuntime sar;
+
+    public StartsAndRuntimeList(DoubleValueTime startValue, List<? extends DoubleValueTime> values, long start, long end) {
+        this(startValue == null ? null : startValue.toMangoValue(), values, start, end);
+    }
+
+    public StartsAndRuntimeList(DoubleValue startValue, List<? extends DoubleValueTime> values, long start, long end) {
+        this(startValue, start, end);
+        for (DoubleValueTime vt : values) {
+            addValueTime(vt);
+        }
+        done();
+    }
 
     public StartsAndRuntimeList(DoubleValue startValue, long start, long end) {
         this.end = end;
@@ -65,7 +66,7 @@ public class StartsAndRuntimeList implements StatisticsGenerator<DoubleValue> {
     }
 
     @Override
-    public void addValueTime(IValueTime<DoubleValue> vt) {
+    public void addValueTime(DoubleValueTime vt) {
         if (lastTime == -1) {
             lastTime = vt.getTimestamp();
         }
@@ -80,7 +81,7 @@ public class StartsAndRuntimeList implements StatisticsGenerator<DoubleValue> {
                 sar.runtime += vt.getTimestamp()- lastTime;
             }
 
-            lastValue = vt.getMangoValue();
+            lastValue = vt.toMangoValue();
             lastTime = vt.getTimestamp();
 
             sar = get(lastValue);

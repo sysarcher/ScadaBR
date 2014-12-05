@@ -30,6 +30,7 @@ import com.serotonin.mango.rt.dataImage.types.NumericValue;
 import com.serotonin.mango.view.DynamicImage;
 import com.serotonin.mango.view.ImplDefinition;
 import br.org.scadabr.util.SerializationHelper;
+import com.serotonin.mango.rt.dataImage.DoubleValueTime;
 import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 import java.util.EnumSet;
 
@@ -37,7 +38,7 @@ import java.util.EnumSet;
  * @author Matthew Lohbihler
  */
 
-public class DynamicGraphicComponent extends PointComponent<DoubleValue> {
+public class DynamicGraphicComponent extends PointComponent<DoubleValueTime> {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("dynamicGraphic", "DYNAMIC_GRAPHIC",
             "graphic.dynamicGraphic", EnumSet.of(DataType.DOUBLE));
@@ -99,12 +100,12 @@ public class DynamicGraphicComponent extends PointComponent<DoubleValue> {
         return dynamicImage.getImageFilename();
     }
 
-    public double getProportion(PointValueTime<DoubleValue> pointValue) {
-        if (pointValue == null || !(pointValue.getValue() instanceof NumericValue)) {
+    public double getProportion(DoubleValueTime pointValue) {
+        if (pointValue == null) {
             return 0;
         }
 
-        double dvalue = pointValue.getMangoValue().getDoubleValue();
+        double dvalue = pointValue.getDoubleValue();
         double proportion = (dvalue - min) / (max - min);
         if (proportion > 1) {
             return 1;
@@ -151,7 +152,7 @@ public class DynamicGraphicComponent extends PointComponent<DoubleValue> {
     }
 
     @Override
-    public void addDataToModel(Map<String, Object> model, PointValueTime<DoubleValue> pointValue) {
+    public void addDataToModel(Map<String, Object> model, DoubleValueTime pointValue) {
         model.put("proportion", getProportion(pointValue));
     }
 

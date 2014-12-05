@@ -9,6 +9,7 @@ import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.web.i18n.LocaleResolver;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.i18n.MessageSource;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.vo.DataPointVO;
 import java.text.DateFormat;
@@ -80,13 +81,13 @@ public class RequestContextAwareLocalizer extends AbstractLocalizer {
     }
 
     @Override
-    public String format(DataPointVO dpVo, MangoValue mv) {
+    public <T extends PointValueTime> String format(DataPointVO<T> dpVo, T mv) {
         return getMessageRender(dpVo.getTextRenderer().getMessagePattern(), getLocale()).format(new Object[]{mv.getValue()});
     }
 
 
     @Override
-    public String formatOnlyValue(DataPointVO dpVo, MangoValue mv) {
+    public <T extends PointValueTime> String formatOnlyValue(DataPointVO<T> dpVo, T mv) {
         return getMessageRender(dpVo.getTextRenderer().getValueMessagePattern(), getLocale()).format(new Object[]{mv.getValue()});
     }
 

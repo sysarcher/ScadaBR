@@ -20,6 +20,7 @@ package com.serotonin.mango.rt.dataSource;
 
 import br.org.scadabr.DataType;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 
 /**
  * This type provides the data source with the information that it needs to
@@ -27,13 +28,12 @@ import br.org.scadabr.vo.dataSource.PointLocatorVO;
  *
  * @author mlohbihler
  * @param <T>
- * @param <U>
  */
-abstract public class PointLocatorRT<T extends PointLocatorVO> {
+abstract public class PointLocatorRT<T extends PointValueTime, VO extends PointLocatorVO<T>> {
 
-    protected final T vo;
+    protected final VO vo;
 
-    public PointLocatorRT(T vo) {
+    public PointLocatorRT(VO vo) {
         this.vo = vo;
     }
 
@@ -45,7 +45,7 @@ abstract public class PointLocatorRT<T extends PointLocatorVO> {
         return false;
     }
 
-    public final T getVo() {
+    public final VO getVo() {
         return vo;
     }
 

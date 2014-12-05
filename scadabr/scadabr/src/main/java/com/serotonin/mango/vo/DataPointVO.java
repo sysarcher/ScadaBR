@@ -32,7 +32,6 @@ import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.util.ColorUtils;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.view.chart.ChartRenderer;
@@ -47,6 +46,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.vo.IntervalLoggingTypes;
 import br.org.scadabr.vo.LoggingTypes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.serotonin.mango.rt.dataImage.DataPointRT;
 import java.util.EnumSet;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +54,9 @@ import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-public class DataPointVO implements Serializable, Cloneable, ChangeComparable<DataPointVO> {
+public abstract class DataPointVO<T extends PointValueTime> implements Serializable, Cloneable, ChangeComparable<DataPointVO<T>> {
+
+    public abstract <T extends PointValueTime> DataPointRT<T> createRT(); 
 
     @Configurable
     public static class DataPointVoValidator implements Validator {
@@ -176,7 +178,7 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
     @Deprecated // TODO move to ChartSetting
     private String chartColour;
 
-    private PointLocatorVO pointLocator;
+    private PointLocatorVO<T> pointLocator;
 
     //
     //
@@ -200,17 +202,17 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
      * values in this case do in fact equal each other).
      */
     //TODO use null ...
-    private PointValueTime lastValue = new PointValueTime((MangoValue) null, getId(), -1);
+    private T lastValue;
 
     public void resetLastValue() {
-        lastValue = new PointValueTime((MangoValue) null, getId(), -1);
+        lastValue = null;
     }
 
     public PointValueTime lastValue() {
         return lastValue;
     }
 
-    public void updateLastValue(PointValueTime pvt) {
+    public void updateLastValue(T pvt) {
         lastValue = pvt;
     }
 
@@ -269,7 +271,7 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
     }
 
     @Override
-    public void addPropertyChanges(List<LocalizableMessage> list, DataPointVO from) {
+    public void addPropertyChanges(List<LocalizableMessage> list, DataPointVO<T> from) {
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.xid", from.xid, xid);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.points.name", from.name, name);
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.enabled", from.enabled, enabled);
@@ -343,12 +345,11 @@ public class DataPointVO implements Serializable, Cloneable, ChangeComparable<Da
         this.name = name;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends PointLocatorVO> T getPointLocator() {
-        return (T) pointLocator;
+    public <PL extends PointLocatorVO<T>> PL getPointLocator() {
+        return (PL) pointLocator;
     }
 
-    public void setPointLocator(PointLocatorVO pointLocator) {
+    public void setPointLocator(PointLocatorVO<T> pointLocator) {
         this.pointLocator = pointLocator;
     }
 

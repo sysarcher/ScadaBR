@@ -35,14 +35,13 @@ import com.serotonin.mango.view.ImplDefinition;
 import com.serotonin.mango.vo.DataPointVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.ImplementMeException;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.text.TextRenderer;
 import java.util.EnumSet;
 
 /**
  * @author Matthew Lohbihler
  */
-public class ScriptComponent<T extends MangoValue> extends PointComponent<T> {
+public class ScriptComponent<T extends PointValueTime> extends PointComponent<T> {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("script", "SCRIPT", "graphic.script",
             EnumSet.of(DataType.BOOLEAN, DataType.MULTISTATE, DataType.DOUBLE, DataType.ALPHANUMERIC));
@@ -66,7 +65,7 @@ public class ScriptComponent<T extends MangoValue> extends PointComponent<T> {
     }
 
     @Override
-    public void addDataToModel(Map<String, Object> model, PointValueTime<T> value) {
+    public void addDataToModel(Map<String, Object> model, T value) {
         String result;
 
         if (value == null) {
