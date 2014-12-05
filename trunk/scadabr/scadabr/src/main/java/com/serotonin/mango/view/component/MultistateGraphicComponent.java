@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import br.org.scadabr.db.IntValuePair;
+import com.serotonin.mango.rt.dataImage.MultistateValueTime;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
@@ -38,7 +39,7 @@ import java.util.EnumSet;
  * @author Matthew Lohbihler
  */
 
-public class MultistateGraphicComponent extends ImageSetComponent<MultistateValue> {
+public class MultistateGraphicComponent extends ImageSetComponent<MultistateValueTime> {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("multistateGraphic", "MULTISTATE_GRAPHIC",
             "graphic.multistateGraphic", EnumSet.of(DataType.MULTISTATE));
@@ -61,10 +62,10 @@ public class MultistateGraphicComponent extends ImageSetComponent<MultistateValu
     }
 
     @Override
-    public String getImage(PointValueTime<MultistateValue> pointValue) {
+    public String getImage(MultistateValueTime pointValue) {
         Byte state = null;
-        if (pointValue != null && pointValue.getValue() instanceof MultistateValue) {
-            state = pointValue.getMangoValue().getByteValue();
+        if (pointValue != null) {
+            state = pointValue.getByteValue();
         }
 
         Integer imageId = null;

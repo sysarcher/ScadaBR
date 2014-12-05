@@ -22,6 +22,7 @@ import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 
 import com.serotonin.mango.rt.dataImage.IDataPoint;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.stats.StartsAndRuntimeList;
 
@@ -30,7 +31,7 @@ import com.serotonin.mango.view.stats.StartsAndRuntimeList;
  * @param <T>
  * @param <M>
  */
-abstract public class DistinctPointWrapper<T extends MangoValue> extends AbstractPointWrapper<T> {
+abstract public class DistinctPointWrapper<T extends PointValueTime> extends AbstractPointWrapper<T> {
 
     public DistinctPointWrapper(IDataPoint<T> point, WrapperContext context) {
         super(point, context);

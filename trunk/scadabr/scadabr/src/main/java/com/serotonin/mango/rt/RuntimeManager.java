@@ -320,7 +320,7 @@ public class RuntimeManager {
         eventManager.cancelEventsForDataPoint(point.getId());
     }
 
-    private DataPointRT startDataPoint(DataPointVO vo) {
+    private <T extends PointValueTime> DataPointRT<T> startDataPoint(DataPointVO<T> vo) {
         synchronized (dataPoints) {
             Assert.isTrue(vo.isEnabled());
 
@@ -328,7 +328,7 @@ public class RuntimeManager {
             DataSourceRT ds = getRunningDataSource(vo.getDataSourceId());
             if (ds != null) {
                 // Change the VO into a data point implementation.
-                DataPointRT dataPoint = new DataPointRT(vo, vo.getPointLocator().createRuntime());
+                DataPointRT<T> dataPoint = vo.createRT();
 
                 // Add/update it in the data image.
                 dataPoints.put(dataPoint.getId(), dataPoint);
@@ -412,17 +412,8 @@ public class RuntimeManager {
         return dataPointListeners.get(dataPointId);
     }
 
-    //
-    // Point values
-    public void setDataPointValue(int dataPointId, MangoValue value,
-            SetPointSource source) {
-        setDataPointValue(dataPointId,
-                new PointValueTime(value, dataPointId, System.currentTimeMillis()), source);
-    }
-
-    public void setDataPointValue(int dataPointId, PointValueTime valueTime,
-            SetPointSource source) {
-        DataPointRT dataPoint = dataPoints.get(dataPointId);
+    public void setDataPointValue(PointValueTime valueTime, SetPointSource source) {
+        DataPointRT dataPoint = dataPoints.get(valueTime.getDataPointId());
         if (dataPoint == null) {
             throw new RTException("Point is not enabled");
         }

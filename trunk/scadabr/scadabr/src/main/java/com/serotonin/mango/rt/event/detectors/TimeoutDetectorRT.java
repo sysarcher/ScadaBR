@@ -21,7 +21,7 @@ package com.serotonin.mango.rt.event.detectors;
 import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.util.timeout.RunClient;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.util.timeout.SystemRunTask;
 
 /**
@@ -31,7 +31,7 @@ import com.serotonin.mango.util.timeout.SystemRunTask;
  *
  * @author Matthew Lohbihler
  */
-abstract public class TimeoutDetectorRT<T extends MangoValue> extends PointEventDetectorRT<T> implements RunClient {
+abstract public class TimeoutDetectorRT<T extends PointValueTime> extends PointEventDetectorRT<T> implements RunClient {
 
     /**
      * Internal configuration field. The millisecond version of the duration

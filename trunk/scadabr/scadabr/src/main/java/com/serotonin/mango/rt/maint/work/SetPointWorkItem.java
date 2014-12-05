@@ -77,7 +77,7 @@ public class SetPointWorkItem implements SystemRunnable {
         sourceIds.add(sourceId);
         threadLocal.set(sourceIds);
         try {
-            runtimeManager.setDataPointValue(targetPointId, pvt, source);
+            runtimeManager.setDataPointValue(pvt, source);
         } finally {
             threadLocal.remove();
         }

@@ -5,6 +5,7 @@
  */
 package br.org.scadabr.web.mvc.controller.datasources;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.logger.LogUtils;
@@ -15,10 +16,14 @@ import br.org.scadabr.vo.datasource.DataSourcesRegistry;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.googlecode.jsonrpc4j.JsonRpcService;
 import com.serotonin.mango.rt.RuntimeManager;
+import com.serotonin.mango.rt.dataImage.DoubleValueTime;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.chart.ImageChartRenderer;
 import com.serotonin.mango.view.text.AnalogRenderer;
 import com.serotonin.mango.vo.DataPointVO;
+import com.serotonin.mango.vo.DoubleDataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
+import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -36,7 +41,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 @JsonRpcService("/dataSources/rpc/")
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class RpcController {
-    
+
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
 
     @Inject
@@ -49,7 +54,7 @@ public class RpcController {
     private RuntimeManager runtimeManager;
     @Inject
     private DataSourcesRegistry dataSourcesRegistry;
-    
+
     public JsonDataSource addDataSource(String type) {
         DataSourceVO result = dataSourcesRegistry.createDataSourceVO(type);
         dataSourceDao.saveDataSource(result);
@@ -66,9 +71,9 @@ public class RpcController {
         }
     }
 
-    public PointLocatorVO addPointLocator(int dataSourceId, int pointlOcatorId) {
-        PointLocatorVO result = dataSourceDao.getDataSource(dataSourceId).createPointLocator();
-        DataPointVO dp = new DataPointVO();
+    public <T extends PointValueTime> PointLocatorVO addPointLocator(int dataSourceId, int pointLocatorId) {
+        PointLocatorVO<T> result = new MetaPointLocatorVO<>(DataType.DOUBLE);
+        DataPointVO<T> dp = (DataPointVO<T>) new DoubleDataPointVO();
         dp.setName(result.getClass().getSimpleName());
         dp.setDataSourceId(dataSourceId);
         dp.setPointLocator(result);
@@ -87,7 +92,7 @@ public class RpcController {
         runtimeManager.saveDataSource(dsVo);
         return new JsonDataSource(dsVo, localizer);
     }
-    
+
     public JsonDataSource stopDataSource(int id) {
         DataSourceVO dsVo = dataSourceDao.getDataSource(id);
         dsVo.setEnabled(false);
@@ -101,7 +106,7 @@ public class RpcController {
         runtimeManager.saveDataPoint(dpVo);
         return new JsonPointLocator(dpVo.getPointLocator(), localizer);
     }
-    
+
     public JsonPointLocator stopPointLocator(int id) {
         DataPointVO dpVo = dataPointDao.getDataPoint(id);
         dpVo.setEnabled(false);

@@ -11,8 +11,7 @@ import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.SystemCallable;
 import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.db.DatabaseAccessFactory;
-import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.types.DoubleValue;
+import com.serotonin.mango.rt.dataImage.DoubleValueTime;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Future;
@@ -41,11 +40,11 @@ class BatchWriteBehind {
         public BatchWriteBehindCallable() {
         }
 
-        private void writeInto(PointValueTime<DoubleValue> pvt, Object[] params, int index) {
+        private void writeInto(DoubleValueTime pvt, Object[] params, int index) {
             index *= BatchWriteBehind.POINT_VALUE_INSERT_VALUES_COUNT;
             params[index++] = pvt.getDataPointId();
             params[index++] = pvt.getDataType().mangoDbId;
-            params[index++] = pvt.getMangoValue().getDoubleValue();
+            params[index++] = pvt.getDoubleValue();
             params[index++] = pvt.getTimestamp();
         }
 
@@ -54,10 +53,10 @@ class BatchWriteBehind {
             LOG.log(Level.FINE, "Start Write Batch entries: {0}", doubleValuesToWrite.size());
             int entriesWritten = 0;
             try {
-                PointValueTime<DoubleValue>[] inserts;
+                DoubleValueTime[] inserts;
                 while (!doubleValuesToWrite.isEmpty()) {
                     synchronized (doubleValuesToWrite) {
-                        inserts = new PointValueTime[doubleValuesToWrite.size() < maxRows ? doubleValuesToWrite.size() : maxRows];
+                        inserts = new DoubleValueTime[doubleValuesToWrite.size() < maxRows ? doubleValuesToWrite.size() : maxRows];
                         for (int i = 0; i < inserts.length; i++) {
                             inserts[i] = doubleValuesToWrite.remove();
                         }
@@ -133,7 +132,7 @@ class BatchWriteBehind {
      *
      * BatchWriteBehindEntry are collected until a minimum size s reached.
      */
-    private final Queue<PointValueTime<DoubleValue>> doubleValuesToWrite = new LinkedList<>();
+    private final Queue<DoubleValueTime> doubleValuesToWrite = new LinkedList<>();
 
     private int maxRows;
 
@@ -154,7 +153,7 @@ class BatchWriteBehind {
         }
     }
 
-    void add(PointValueTime<DoubleValue> e, JdbcTemplate ejt) {
+    void add(DoubleValueTime e, JdbcTemplate ejt) {
         boolean needsFlush = false;
         synchronized (doubleValuesToWrite) {
             doubleValuesToWrite.add(e);

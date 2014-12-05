@@ -43,13 +43,13 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
 
     @Override
     public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source) {
-        dataPoint.setPointValue(valueTime, source);
+        dataPoint.setPointValueSync(valueTime, source);
     }
 
     @Override
     public void dataPointEnabled(DataPointRT dataPoint) {
         super.dataPointEnabled(dataPoint);
-        MetaPointLocatorRT locator = dataPoint.getPointLocator();
+        MetaPointLocatorRT locator = (MetaPointLocatorRT)dataPoint.getPointLocator();
         locator.start(this, dataPoint);
         checkForDisabledPoints();
     }
@@ -58,7 +58,7 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
     public void dataPointDisabled(DataPointVO dataPoint) {
         DataPointRT dp = enabledDataPointsCache.get(dataPoint.getId());
         if (dp != null) {
-            MetaPointLocatorRT locator = dp.getPointLocator();
+            MetaPointLocatorRT locator = (MetaPointLocatorRT)dp.getPointLocator();
             locator.terminate();
         }
         super.dataPointDisabled(dataPoint);
@@ -68,7 +68,7 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
         DataPointRT problemPoint = null;
 
         for (DataPointRT dp : enabledDataPoints.values()) {
-            MetaPointLocatorRT locator = dp.getPointLocator();
+            MetaPointLocatorRT locator = (MetaPointLocatorRT)dp.getPointLocator();
             if (!locator.isContextCreated()) {
                 problemPoint = dp;
                 break;

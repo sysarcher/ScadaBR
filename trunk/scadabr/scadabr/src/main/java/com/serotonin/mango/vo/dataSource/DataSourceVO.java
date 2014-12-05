@@ -64,8 +64,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
 
     abstract public LocalizableMessage getConnectionDescription();
 
-    abstract public PointLocatorVO createPointLocator();
-
     abstract public DataSourceRT<T> createDataSourceRT();
 
     public DataSourceVO() {

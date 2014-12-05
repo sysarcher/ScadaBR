@@ -33,7 +33,7 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
  * @author Matthew Lohbihler
  */
 
-abstract public class ImageSetComponent<T extends MangoValue>  extends PointComponent<T> {
+abstract public class ImageSetComponent<T extends PointValueTime>  extends PointComponent<T> {
 
     protected ImageSet imageSet;
     
@@ -60,7 +60,7 @@ abstract public class ImageSetComponent<T extends MangoValue>  extends PointComp
         return "imageContent";
     }
 
-    abstract public String getImage(PointValueTime<T> pointValue);
+    abstract public String getImage(T pointValue);
 
     public String defaultImage() {
         if (imageSet != null) {
@@ -105,7 +105,7 @@ abstract public class ImageSetComponent<T extends MangoValue>  extends PointComp
     }
 
     @Override
-    public void addDataToModel(Map<String, Object> model, PointValueTime<T> pointValue) {
+    public void addDataToModel(Map<String, Object> model, T pointValue) {
         if (imageSet != null) {
             model.put("image", getImage(pointValue));
         }

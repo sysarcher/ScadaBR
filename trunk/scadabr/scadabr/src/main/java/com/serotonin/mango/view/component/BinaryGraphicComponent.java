@@ -19,6 +19,7 @@
 package com.serotonin.mango.view.component;
 
 import br.org.scadabr.DataType;
+import com.serotonin.mango.rt.dataImage.BooleanValueTime;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -34,7 +35,7 @@ import java.util.EnumSet;
  * @author Matthew Lohbihler
  */
 
-public class BinaryGraphicComponent extends ImageSetComponent<BooleanValue> {
+public class BinaryGraphicComponent extends ImageSetComponent<BooleanValueTime> {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("binaryGraphic", "BINARY_GRAPHIC",
             "graphic.binaryGraphic", EnumSet.of(DataType.BOOLEAN));
@@ -64,10 +65,10 @@ public class BinaryGraphicComponent extends ImageSetComponent<BooleanValue> {
     }
 
     @Override
-    public String getImage(PointValueTime<BooleanValue> pointValue) {
+    public String getImage(BooleanValueTime pointValue) {
         boolean bvalue = false;
-        if (pointValue != null && pointValue.getValue() instanceof BooleanValue) {
-            bvalue = pointValue.getMangoValue().getBooleanValue();
+        if (pointValue != null) {
+            bvalue = pointValue.getBooleanValue();
         }
         return imageSet.getImageFilename(bvalue ? oneImage : zeroImage);
     }

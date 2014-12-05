@@ -95,11 +95,6 @@ public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
         return new HttpImageDataSourceRT(this);
     }
 
-    @Override
-    public HttpImagePointLocatorVO createPointLocator() {
-        return new HttpImagePointLocatorVO();
-    }
-
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
     
     private int updatePeriods = 5;

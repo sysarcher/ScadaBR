@@ -1,6 +1,7 @@
 package br.org.scadabr.l10n;
 
 import br.org.scadabr.utils.i18n.LocalizableMessage;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.vo.DataPointVO;
 import java.util.Locale;
@@ -23,7 +24,7 @@ public interface Localizer  {
 
     Locale getLocale();
     
-    String format(DataPointVO dpVo, MangoValue mv);
+    <T extends PointValueTime> String format(DataPointVO<T> dpVo, T pvt);
     
-    String formatOnlyValue(DataPointVO dpVo, MangoValue mv);
+    <T extends PointValueTime> String formatOnlyValue(DataPointVO<T> dpVo, T mv);
 }

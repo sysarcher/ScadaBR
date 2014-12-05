@@ -124,12 +124,6 @@ public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourc
         return new HttpReceiverDataSourceRT(this);
     }
 
-    @Override
-    public HttpReceiverPointLocatorVO createPointLocator() {
-        return new HttpReceiverPointLocatorVO();
-    }
-
-    
     private String[] ipWhiteList = new String[]{"*.*.*.*"};
     
     private String[] deviceIdWhiteList = new String[]{"*"};

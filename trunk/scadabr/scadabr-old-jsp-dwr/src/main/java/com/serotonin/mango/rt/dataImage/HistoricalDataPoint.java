@@ -41,7 +41,7 @@ public class HistoricalDataPoint implements IDataPoint {
 
     @Override
     public PointValueTime getPointValue() {
-        return pointValueDao.getPointValueBefore(id, timer.currentTimeMillis() + 1);
+        return pointValueDao.getPointValueBefore(id, dataType, timer.currentTimeMillis() + 1);
     }
 
     @Override

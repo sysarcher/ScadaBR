@@ -27,7 +27,7 @@ import com.serotonin.mango.rt.dataImage.types.MangoValue;
 /**
  * @author Matthew Lohbihler
  */
-abstract public class StateDetectorRT<T extends MangoValue> extends TimeDelayedEventDetectorRT<T> {
+abstract public class StateDetectorRT<T extends PointValueTime> extends TimeDelayedEventDetectorRT<T> {
 
     private final Log log = LogFactory.getLog(StateDetectorRT.class);
 
@@ -68,10 +68,10 @@ abstract public class StateDetectorRT<T extends MangoValue> extends TimeDelayedE
         }
     }
 
-    abstract protected boolean stateDetected(PointValueTime<T> newValue);
+    abstract protected boolean stateDetected(T newValue);
 
     @Override
-    public void pointChanged(PointValueTime<T> oldValue, PointValueTime<T> newValue) {
+    public void pointChanged(T oldValue, T newValue) {
         if (stateDetected(newValue)) {
             if (!stateActive) {
                 stateActiveTime = newValue.getTimestamp();

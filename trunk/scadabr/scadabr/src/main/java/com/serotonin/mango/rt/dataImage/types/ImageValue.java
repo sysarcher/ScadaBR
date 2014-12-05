@@ -81,6 +81,10 @@ public class ImageValue extends MangoValue {
         }
     }
 
+    public ImageValue(byte[] value) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     public String getFilename() {
         return FILENAME_PREFIX + id + '.' + TYPES[type];
     }

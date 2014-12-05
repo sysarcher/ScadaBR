@@ -23,6 +23,7 @@ import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.rt.dataImage.DoubleValueTime;
 import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 
 /**
@@ -33,7 +34,7 @@ import com.serotonin.mango.rt.dataImage.types.DoubleValue;
  *
  * @author Matthew Lohbihler
  */
-public class NegativeCusumDetectorRT extends TimeDelayedEventDetectorRT<DoubleValue> {
+public class NegativeCusumDetectorRT extends TimeDelayedEventDetectorRT<DoubleValueTime> {
 
     /**
      * State field. The current negative CUSUM for the point.
@@ -96,8 +97,8 @@ public class NegativeCusumDetectorRT extends TimeDelayedEventDetectorRT<DoubleVa
     }
 
     @Override
-    synchronized public void pointUpdated(PointValueTime<DoubleValue> newValue) {
-        double newDouble = newValue.getMangoValue().getDoubleValue();
+    synchronized public void pointUpdated(DoubleValueTime newValue) {
+        double newDouble = newValue.getDoubleValue();
 
         cusum += newDouble - vo.getWeight();
         if (cusum > 0) {

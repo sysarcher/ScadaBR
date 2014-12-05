@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.dataSource.http;
 
+import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.timer.cron.CronExpression;
 import org.apache.commons.httpclient.HttpClient;
@@ -26,10 +27,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
-import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
-import com.serotonin.mango.rt.dataSource.DataSourceUtils;
 import com.serotonin.mango.rt.dataSource.NoMatchException;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.vo.dataSource.http.HttpRetrieverDataSourceVO;
@@ -38,7 +36,15 @@ import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.datasource.http.HttpRetrieverDataSourceEventKey;
+import com.serotonin.mango.rt.dataImage.AlphaNumericValueTime;
+import com.serotonin.mango.rt.dataImage.BooleanValueTime;
+import com.serotonin.mango.rt.dataImage.DoubleValueTime;
+import com.serotonin.mango.rt.dataImage.MultistateValueTime;
+import com.serotonin.mango.view.text.MultistateRenderer;
+import com.serotonin.mango.view.text.MultistateValue;
 import java.text.ParseException;
+import java.util.List;
+import java.util.regex.Matcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -50,7 +56,7 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
 
     @Autowired
     private Common common;
-    
+
     private static final int READ_LIMIT = 1024 * 1024; // One MB
 
     public HttpRetrieverDataSourceRT(HttpRetrieverDataSourceVO vo) {
@@ -88,19 +94,62 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
         // We have the data. Now run the regex.
         LocalizableMessage parseErrorMessage = null;
         for (DataPointRT dp : enabledDataPoints.values()) {
-            HttpRetrieverPointLocatorRT locator = dp.getPointLocator();
+            final HttpRetrieverPointLocatorRT locator = (HttpRetrieverPointLocatorRT) dp.getPointLocator();
 
             try {
-                // Get the value
-                MangoValue value = DataSourceUtils.getValue(locator.getValuePattern(), data, locator.getDataType(),
-                        locator.getBinary0Value(), dp.getVo().getTextRenderer(), locator.getValueFormat(), dp.getVoName());
-
                 // Get the time.
-                long valueTime = DataSourceUtils.getValueTime(time, locator.getTimePattern(), data,
-                        locator.getTimeFormat(), dp.getVoName());
-
-                // Save the new value
-                dp.updatePointValue(new PointValueTime(value, dp.getId(), valueTime));
+                final long valueTimestamp = getValueTime(dp, time, data);
+                switch (locator.getDataType()) {
+                    case ALPHANUMERIC:
+                        dp.updatePointValue(new AlphaNumericValueTime(data, dp.getId(), valueTimestamp));
+                        break;
+                    case BOOLEAN:
+                        dp.updatePointValue(new BooleanValueTime(!data.equals(locator.getBinary0Value()), dp.getId(), valueTimestamp));
+                        break;
+                    case DOUBLE:
+                        try {
+                            if (locator.getValueFormat() != null) {
+                                dp.updatePointValue(new DoubleValueTime(locator.getValueFormat().parse(data).doubleValue(), dp.getId(), valueTimestamp));
+                            } else {
+                                dp.updatePointValue(new DoubleValueTime(Double.parseDouble(data), dp.getId(), valueTimestamp));
+                            }
+                        } catch (NumberFormatException e) {
+                            if (dp.getVoName() == null) {
+                                throw new LocalizableException("event.valueParse.numericParse", data);
+                            }
+                            throw new LocalizableException("event.valueParse.numericParsePoint", data, dp.getVoName());
+                        } catch (ParseException e) {
+                            if (dp.getVoName() == null) {
+                                throw new LocalizableException("event.valueParse.generalParse", e.getMessage(), data);
+                            }
+                            throw new LocalizableException("event.valueParse.generalParsePoint", e.getMessage(), data, dp.getVoName());
+                        }
+                        break;
+                    case IMAGE:
+                        throw new ShouldNeverHappenException("Cant handle dataType " + locator.getDataType());
+                    case MULTISTATE:
+                        boolean found = false;
+                        if (dp.getVo().getTextRenderer() instanceof MultistateRenderer) {
+                            List<MultistateValue> multistateValues = ((MultistateRenderer) dp.getVo().getTextRenderer()).getMultistateValues();
+                            for (MultistateValue multistateValue : multistateValues) {
+                                if (multistateValue.getText().equalsIgnoreCase(data)) {
+                                    dp.updatePointValue(new MultistateValueTime(multistateValue.getKey(), dp.getId(), valueTimestamp));
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!found) {
+                            try {
+                                dp.updatePointValue(new MultistateValueTime((byte) Short.parseShort(data), dp.getId(), valueTimestamp));
+                            } catch (NumberFormatException e) {
+                                throw new LocalizableException("event.valueParse.textParsePoint", data, dp.getVoName());
+                            }
+                        }
+                        break;
+                    default:
+                        throw new ShouldNeverHappenException("Cant handle dataType " + locator.getDataType());
+                }
             } catch (NoMatchException e) {
                 if (!locator.isIgnoreIfMissing()) {
                     if (parseErrorMessage == null) {
@@ -159,6 +208,30 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
         }
 
         return data;
+    }
+
+    public long getValueTime(DataPointRT dp, long time, String data)
+            throws LocalizableException {
+        if (data == null) {
+            throw new LocalizableException("event.valueParse.noData", dp.getVoName());
+        }
+        final HttpRetrieverPointLocatorRT locator = (HttpRetrieverPointLocatorRT) dp.getPointLocator();
+
+        // Get the time.
+        long valueTime = time;
+        Matcher matcher = locator.getTimePattern().matcher(data);
+        if (matcher.find()) {
+            String timeStr = matcher.group(1);
+            try {
+                valueTime = locator.getTimeFormat().parse(timeStr).getTime();
+            } catch (ParseException e) {
+                throw new LocalizableException("event.valueParse.timeParsePoint", timeStr, dp.getVoName());
+            }
+        } else {
+            throw new LocalizableException("event.valueParse.noTime", dp.getVoName());
+        }
+
+        return valueTime;
     }
 
     @Override

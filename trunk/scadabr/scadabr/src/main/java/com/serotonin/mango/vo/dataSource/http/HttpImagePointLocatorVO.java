@@ -27,19 +27,24 @@ import java.util.List;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.http.HttpImagePointLocatorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.i18n.LocalizableEnum;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 /**
  * @author Matthew Lohbihler
  */
-public class HttpImagePointLocatorVO extends AbstractPointLocatorVO {
+public class HttpImagePointLocatorVO<T extends PointValueTime> extends AbstractPointLocatorVO<T> {
+
+    public HttpImagePointLocatorVO(DataType dataType) {
+        super(DataType.IMAGE);
+    }
 
     public static class HttpImagePointLocatorVoValidato implements Validator {
 
@@ -60,22 +65,23 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO {
             if (vo.retries < 0) {
                 errors.rejectValue("retries", "validate.cannotBeNegative");
             }
-            switch (vo.scaleType) { case PERCENT:
-                if (vo.scalePercent <= 0) {
-                    errors.rejectValue("scalePercent", "validate.greaterThanZero");
-                } else if (vo.scalePercent > 100) {
-                    errors.rejectValue("scalePercent", "validate.lessThan100");
-                }
-            break;
-            case BOX:
-                if (vo.scaleWidth <= 0) {
-                    errors.rejectValue("scaleWidth", "validate.greaterThanZero");
-                }
-                if (vo.scaleHeight <= 0) {
-                    errors.rejectValue("scaleHeight", "validate.greaterThanZero");
-                }
+            switch (vo.scaleType) {
+                case PERCENT:
+                    if (vo.scalePercent <= 0) {
+                        errors.rejectValue("scalePercent", "validate.greaterThanZero");
+                    } else if (vo.scalePercent > 100) {
+                        errors.rejectValue("scalePercent", "validate.lessThan100");
+                    }
+                    break;
+                case BOX:
+                    if (vo.scaleWidth <= 0) {
+                        errors.rejectValue("scaleWidth", "validate.greaterThanZero");
+                    }
+                    if (vo.scaleHeight <= 0) {
+                        errors.rejectValue("scaleHeight", "validate.greaterThanZero");
+                    }
             }
-        
+
             if (vo.readLimit <= 0) {
                 errors.rejectValue("readLimit", "validate.greaterThanZero");
             }
@@ -234,12 +240,8 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO {
     }
 
     @Override
-    public DataType getDataType() {
-        return DataType.IMAGE;
-    }
-
-    @Override
     public void addProperties(List<LocalizableMessage> list) {
+        super.addProperties(list);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpImage.url", url);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpImage.timeout", timeoutSeconds);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpImage.retries", retries);
@@ -252,7 +254,8 @@ public class HttpImagePointLocatorVO extends AbstractPointLocatorVO {
     }
 
     @Override
-    public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
+    public void addPropertyChanges(List<LocalizableMessage> list, PointLocatorVO<T> o) {
+        super.addPropertyChanges(list, o);
         HttpImagePointLocatorVO from = (HttpImagePointLocatorVO) o;
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpImage.url", from.url, url);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpImage.timeout", from.timeoutSeconds, timeoutSeconds);

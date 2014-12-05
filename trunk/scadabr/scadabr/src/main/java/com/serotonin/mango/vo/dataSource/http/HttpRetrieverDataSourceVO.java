@@ -105,12 +105,6 @@ public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSou
         return new HttpRetrieverDataSourceRT(this);
     }
 
-    @Override
-    public HttpRetrieverPointLocatorVO createPointLocator() {
-        return new HttpRetrieverPointLocatorVO();
-    }
-
-    
     private String url;
     private TimePeriods updatePeriodType = TimePeriods.MINUTES;
     

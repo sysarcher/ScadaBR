@@ -20,6 +20,7 @@ package br.org.scadabr.rt.scripting;
 
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
+import com.serotonin.mango.rt.dataImage.AlphaNumericValueTime;
 
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
@@ -28,14 +29,14 @@ import com.serotonin.mango.view.stats.ValueChangeCounter;
 /**
  * @author Matthew Lohbihler
  */
-public class AlphanumericPointWrapper extends AbstractPointWrapper<AlphanumericValue> {
+public class AlphanumericPointWrapper extends AbstractPointWrapper<AlphaNumericValueTime> {
 
-    public AlphanumericPointWrapper(IDataPoint<AlphanumericValue> point, WrapperContext context) {
+    public AlphanumericPointWrapper(IDataPoint<AlphaNumericValueTime> point, WrapperContext context) {
         super(point, context);
     }
 
     public String getValue() {
-        AlphanumericValue value = getValueImpl();
+        AlphaNumericValueTime value = getValueImpl();
         if (value == null) {
             return "";
         }

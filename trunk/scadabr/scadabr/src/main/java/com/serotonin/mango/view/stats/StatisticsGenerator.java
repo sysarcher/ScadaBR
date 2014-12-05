@@ -18,15 +18,15 @@
  */
 package com.serotonin.mango.view.stats;
 
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 
 /**
  * @author Matthew Lohbihler
  * @param <T>
  */
-public interface StatisticsGenerator<T extends MangoValue> {
+public interface StatisticsGenerator<T extends PointValueTime> {
 
-    void addValueTime(IValueTime<T> vt);
+    void addValueTime(T vt);
 
     void done();
 }

@@ -19,10 +19,9 @@
 package com.serotonin.mango.rt.dataImage;
 
 import br.org.scadabr.DataType;
+import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import java.io.Serializable;
 
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import com.serotonin.mango.view.stats.IValueTime;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Objects;
@@ -33,52 +32,32 @@ import java.util.Objects;
  * @see AnnotatedPointValueTime
  * @author Matthew Lohbihler
  */
-public class PointValueTime<T extends MangoValue>  implements Serializable, IValueTime<T> {
+public abstract class PointValueTime  implements Serializable {
 
     private static final long serialVersionUID = -1;
 
-    public static <T extends MangoValue> boolean equalValues(PointValueTime<T> pvt1, PointValueTime<T> pvt2) {
-        if (pvt1 == null && pvt2 == null) {
-            return true;
-        }
-        if (pvt1 == null || pvt2 == null) {
-            return false;
-        }
-        return Objects.equals(pvt1.getValue(), pvt2.getValue());
+    static boolean equalValues(PointValueTime oldValue, PointValueTime newValue) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public static <T extends MangoValue>  T getValue(PointValueTime<T> pvt) {
-        if (pvt == null) {
-            return null;
-        }
-        return pvt.getMangoValue();
+    public static PointValueTime fromMangoValue(MangoValue value, int targetPointId, long fireTimestamp) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    private final T value;
     private final long timestamp;
     private final int dataPointId;
     private PointValueAnnotation pointValueAnnotation;
 
-    public PointValueTime(T value, int dataPointId, long timestamp) {
-        this.value = value;
+    public PointValueTime(int dataPointId, long timestamp) {
         this.dataPointId = dataPointId;
         this.timestamp = timestamp;
     }
 
-    @Override
     public long getTimestamp() {
         return timestamp;
     }
 
-    @Override
-    public T getMangoValue() {
-        return value;
-    }
-
-    @Override
-    public Object getValue() {
-        return value.getValue();
-    }
+    public abstract Object getValue();
 
     public boolean isAnnotated() {
         return pointValueAnnotation != null;
@@ -94,28 +73,24 @@ public class PointValueTime<T extends MangoValue>  implements Serializable, IVal
         if (timestamp != that.timestamp) {
             return false;
         }
-        return Objects.equals(value, that.value);
+        return Objects.equals(getValue(), that.getValue());
     }
 
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 29 * hash + Objects.hashCode(this.value);
+        hash = 29 * hash + Objects.hashCode(this.getValue());
         hash = 29 * hash + (int) (this.timestamp ^ (this.timestamp >>> 32));
         return hash;
     }
 
     @Override
     public String toString() {
-        return MessageFormat.format("PointValueTime( {0} @{1})", value, new Date(timestamp));
+        return MessageFormat.format("PointValueTime( {0} @{1})", getValue(), new Date(timestamp));
     }
 
-    @Override
-    public DataType getDataType() {
-        return value.getDataType();
-    }
+    public abstract DataType getDataType();
     
-    @Override
     public int getDataPointId() {
         return dataPointId;
     }
@@ -133,5 +108,8 @@ public class PointValueTime<T extends MangoValue>  implements Serializable, IVal
     public void setPointValueAnnotation(PointValueAnnotation pointValueAnnotation) {
         this.pointValueAnnotation = pointValueAnnotation;
     }
+
+    @Deprecated
+    public abstract MangoValue toMangoValue();
     
 }

@@ -5,8 +5,8 @@
  */
 package br.org.scadabr.web.mvc.controller.jsonrpc;
 
+import com.serotonin.mango.rt.dataImage.DoubleValueTime;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 import com.serotonin.mango.vo.DataPointVO;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -29,7 +29,7 @@ public class JsonChartDataSet {
         this.to = to;
         xyDataSet = new LinkedList<>();
         for (PointValueTime p : pvt) {
-            xyDataSet.add(new XYDataSet(p.getTimestamp(), ((PointValueTime<DoubleValue>) p).getMangoValue().getDoubleValue()));
+            xyDataSet.add(new XYDataSet(p.getTimestamp(), ((DoubleValueTime) p).getDoubleValue()));
         }
     }
 

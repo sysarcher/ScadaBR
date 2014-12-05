@@ -18,14 +18,22 @@
  */
 package com.serotonin.mango.vo.dataSource;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.ScadaBrConstants;
+import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
+import com.serotonin.mango.rt.event.type.AuditEventType;
+import java.util.List;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
-abstract public class AbstractPointLocatorVO implements PointLocatorVO {
+abstract public class AbstractPointLocatorVO<T extends PointValueTime> implements PointLocatorVO<T> {
 
     //
     // /
@@ -36,19 +44,51 @@ abstract public class AbstractPointLocatorVO implements PointLocatorVO {
     private static final int version = 1;
     private int id = ScadaBrConstants.NEW_ID;
     private boolean enabled;
+    @NotNull
+    @Size(min = 1, max = 40)
+    private String name;
+    private DataType dataType;
+
+    public AbstractPointLocatorVO(DataType dataType) {
+        this.name = getClass().getSimpleName();
+        this.dataType = dataType;
+    }
+
+    @Override
+    public void addProperties(List<LocalizableMessage> list) {
+        AuditEventType.addPropertyMessage(list, "dsEdit.name", name);
+        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType", getDataType());
+    }
+
+    @Override
+    public void addPropertyChanges(List<LocalizableMessage> list, PointLocatorVO<T> o) {
+        if (id != o.getId()) {
+            throw new ShouldNeverHappenException("Id mismatch! Not the same point locator???");
+        }
+        final AbstractPointLocatorVO<T> from = (AbstractPointLocatorVO<T>) o;
+        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.name", from.name, name);
+        // This below should never happen ...
+        if (from.dataType != dataType) {
+            throw new ShouldNeverHappenException("DataTypes mismatch");
+        }
+    }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
+        out.writeObject(name);
+        out.writeObject(dataType);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException {
-        in.readInt(); // Read the version. Value is currently not used.
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        final int ver = in.readInt(); // Read the version. Value is currently not used.
+        name = (String) in.readObject();
+        dataType = (DataType)in.readObject();
     }
-
 
     /**
      * Defaults to returning null. Override to return something else.
-     * @return 
+     *
+     * @return
      */
     @Override
     public DataPointSaveHandler getDataPointSaveHandler() {
@@ -82,4 +122,25 @@ abstract public class AbstractPointLocatorVO implements PointLocatorVO {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
+
+    /**
+     * @return the name
+     */
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    @Override
+    public final DataType getDataType() {
+        return dataType;
+    }
+
 }

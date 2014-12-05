@@ -19,82 +19,59 @@
 package com.serotonin.mango.rt.dataImage;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.utils.ImplementMeException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
-import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.PointValueDao;
 import br.org.scadabr.dao.SystemSettingsDao;
+import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.rt.event.schedule.ScheduledEventManager;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.event.detectors.PointEventDetectorRT;
 import com.serotonin.mango.util.timeout.RunClient;
-import com.serotonin.mango.view.stats.AnalogStatistics;
-import com.serotonin.mango.view.stats.IValueTime;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
-import br.org.scadabr.timer.cron.DataSourceCronTask;
 import br.org.scadabr.timer.cron.EventRunnable;
 import br.org.scadabr.util.ILifecycle;
-import br.org.scadabr.vo.IntervalLoggingTypes;
-import br.org.scadabr.vo.LoggingTypes;
 import com.serotonin.mango.rt.EventManager;
-import com.serotonin.mango.rt.dataImage.types.DoubleValue;
-import java.util.Objects;
+import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
 //TODO split tist to datatypes Double ....
-
 @Configurable
-public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
+public abstract class DataPointRT<T extends PointValueTime> implements IDataPoint<T>, ILifecycle, RunClient {
 
-    private static final Log LOG = LogFactory.getLog(DataPointRT.class);
+    protected static final Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_CORE);
     private static final PvtTimeComparator pvtTimeComparator = new PvtTimeComparator();
 
     // Configuration data.
-    private final DataPointVO vo;
-    private final PointLocatorRT pointLocator;
+    protected final DataPointVO<T> vo;
+    protected final PointLocatorRT pointLocator;
 
     // Runtime data.
-    private volatile PointValueTime<DoubleValue> pointValue;
+    protected volatile T pointValue;
     @Autowired
-    private RuntimeManager runtimeManager;
+    protected RuntimeManager runtimeManager;
     @Autowired
-    private ScheduledEventManager scheduledEventManager;
+    protected ScheduledEventManager scheduledEventManager;
     @Autowired
-    private EventManager eventManager;
+    protected EventManager eventManager;
     @Autowired
-    private PointValueDao pointValueDao;
+    protected PointValueDao pointValueDao;
     @Autowired
-    private SystemSettingsDao systemSettingsDao;
+    protected SystemSettingsDao systemSettingsDao;
     @Autowired
     private SchedulerPool schedulerPool;
     private List<PointEventDetectorRT> detectors;
     private final Map<String, Object> attributes = new HashMap<>();
 
-    // Interval logging data.
-    private PointValueTime<DoubleValue> intervalValue;
-    private long intervalStartTime = -1;
-    private List<IValueTime> averagingValues;
-    private final Object intervalLoggingLock = new Object();
-    private DataSourceCronTask intervalLoggingTask;
-
-    /**
-     * This is the value around which tolerance decisions will be made when
-     * determining whether to log numeric values.
-     */
-    private double toleranceOrigin;
-
-    public DataPointRT(DataPointVO vo, PointLocatorRT pointLocator) {
+    public DataPointRT(DataPointVO<T> vo, PointLocatorRT pointLocator) {
         this.vo = vo;
         this.pointLocator = pointLocator;
     }
@@ -107,13 +84,13 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
      * @param newValue
      */
     @Override
-    public void updatePointValue(PointValueTime newValue) {
-        savePointValue(newValue, null, true);
+    public void updatePointValueAsync(T newValue) {
+        savePointValueAsync(newValue, null);
     }
 
     @Override
-    public void updatePointValue(PointValueTime newValue, boolean async) {
-        savePointValue(newValue, null, async);
+    public void updatePointValueSync(T newValue) {
+        savePointValueSync(newValue, null);
     }
 
     /**
@@ -126,209 +103,17 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
      * event.
      */
     @Override
-    public void setPointValue(PointValueTime newValue, SetPointSource source) {
-        if (source == null) {
-            savePointValue(newValue, source, true);
-        } else {
-            savePointValue(newValue, source, false);
-        }
+    public void setPointValueSync(T newValue, SetPointSource source) {
+            savePointValueSync(newValue, source);
     }
 
-    private void savePointValue(PointValueTime<DoubleValue> newValue, SetPointSource source, boolean async) {
-        // Null values are not very nice, and since they don't have a specific meaning they are hereby ignored.
-        if (newValue == null) {
-            return;
-        }
-
-        // Check the data type of the value against that of the locator, just for fun.
-        DataType valueDataType = newValue.getDataType();
-        if (valueDataType != DataType.UNKNOWN && valueDataType != vo.getDataType()) // This should never happen, but if it does it can have serious downstream consequences. Also, we need
-        // to know how it happened, and the stack trace here provides the best information.
-        {
-            throw new ShouldNeverHappenException("Data type mismatch between new value and point locator: newValue="
-                    + newValue.getDataType() + ", locator=" + vo.getDataType());
-        }
-
-        if (newValue.getTimestamp()> System.currentTimeMillis() + systemSettingsDao.getFutureDateLimit()) {
-            // Too far future dated. Toss it. But log a message first.
-            LOG.warn("Future dated value detected: pointId=" + vo.getId() + ", value=" + newValue.getValue()
-                    + ", type=" + vo.getDataType() + ", ts=" + newValue.getTimestamp(), new Exception());
-            return;
-        }
-
-        boolean backdated = pointValue != null && newValue.getTimestamp()< pointValue.getTimestamp();
-
-        // Determine whether the new value qualifies for logging.
-        boolean logValue;
-        // ... or even saving in the cache.
-        boolean saveValue = true;
-        switch (vo.getLoggingType()) {
-            case ON_CHANGE:
-                if (pointValue == null) {
-                    logValue = true;
-                } else if (backdated) // Backdated. Ignore it
-                {
-                    logValue = false;
-                } else {
-                    if (newValue.getMangoValue() instanceof DoubleValue) {
-                        // Get the new double
-                        double newd = newValue.getMangoValue().getDoubleValue();
-
-                        // See if the new value is outside of the tolerance.
-                        double diff = toleranceOrigin - newd;
-                        if (diff < 0) {
-                            diff = -diff;
-                        }
-
-                        if (diff > vo.getTolerance()) {
-                            toleranceOrigin = newd;
-                            logValue = true;
-                        } else {
-                            logValue = false;
-                        }
-                    } else {
-                        logValue = !Objects.equals(newValue.getValue(), pointValue.getValue());
-                    }
-                }
-
-                saveValue = logValue;
-                break;
-            case ALL:
-                logValue = true;
-                break;
-            case ON_TS_CHANGE:
-                if (pointValue == null) {
-                    logValue = true;
-                } else if (backdated) // Backdated. Ignore it
-                {
-                    logValue = false;
-                } else {
-                    logValue = newValue.getTimestamp()!= pointValue.getTimestamp();
-                }
-
-                saveValue = logValue;
-                break;
-            case INTERVAL:
-                if (!backdated) {
-                    intervalSave(newValue);
-                }
-            default:
-                logValue = false;
-        }
-
-        if (saveValue) {
-            if (logValue) {
-                if (async) {
-                    pointValueDao.savePointValueAsync(newValue, source);
-                } else {
-                    pointValueDao.savePointValueSync(newValue, source);
-                }
-            }
-        }
-
-        // Ignore historical values.
-        if (pointValue == null || newValue.getTimestamp()>= pointValue.getTimestamp()) {
-            PointValueTime oldValue = pointValue;
-            pointValue = newValue;
-            fireEvents(oldValue, newValue, source != null, false);
-        } else {
-            fireEvents(null, newValue, false, true);
-        }
-    }
-
-    //
-    // / Interval logging
-    //
-    private void initializeIntervalLogging() {
-        synchronized (intervalLoggingLock) {
-            if (vo.getLoggingType() != LoggingTypes.INTERVAL) {
-                return;
-            }
-
-            if (true) {
-                throw new ImplementMeException(); //WAS: intervalLoggingTask = new TimeoutTask(this, vo.getIntervalLoggingPeriodType(), vo.getIntervalLoggingPeriod());
-            }
-            intervalValue = pointValue;
-            if (vo.getIntervalLoggingType() == IntervalLoggingTypes.AVERAGE) {
-                intervalStartTime = System.currentTimeMillis();
-                averagingValues = new ArrayList<>();
-            }
-        }
-    }
-
-    private void terminateIntervalLogging() {
-        synchronized (intervalLoggingLock) {
-            if (vo.getLoggingType() != LoggingTypes.INTERVAL) {
-                return;
-            }
-
-            intervalLoggingTask.cancel();
-        }
-    }
-
-    private void intervalSave(PointValueTime<DoubleValue> pvt) {
-        synchronized (intervalLoggingLock) {
-            switch (vo.getIntervalLoggingType()) {
-                case MAXIMUM:
-                    if (intervalValue == null) {
-                        intervalValue = pvt;
-                    } else if (pvt != null) {
-                        if (intervalValue.getMangoValue().getDoubleValue() < pvt.getMangoValue().getDoubleValue()) {
-                            intervalValue = pvt;
-                        }
-                    }
-                    break;
-                case MINIMUM:
-                    if (intervalValue == null) {
-                        intervalValue = pvt;
-                    } else if (pvt != null) {
-                        if (intervalValue.getMangoValue().getDoubleValue() > pvt.getMangoValue().getDoubleValue()) {
-                            intervalValue = pvt;
-                        }
-                    }
-                    break;
-                case AVERAGE:
-                    averagingValues.add(pvt);
-            }
-        }
-    }
-
-    /**
-     * Collect the data and store them
-     *
-     * @param fireTime
-     */
     @Override
-    public void run(long fireTime) {
-        synchronized (intervalLoggingLock) {
-            DoubleValue value;
-            switch (vo.getIntervalLoggingType()) {
-                case INSTANT:
-                    value = PointValueTime.getValue(pointValue);
-                    break;
-                case MAXIMUM:
-                case MINIMUM:
-                    value = PointValueTime.getValue(intervalValue);
-                    intervalValue = pointValue;
-                    break;
-                case AVERAGE:
-                    AnalogStatistics stats = new AnalogStatistics(intervalValue, averagingValues, intervalStartTime,
-                            fireTime);
-                    value = new DoubleValue(stats.getAverage());
-
-                    intervalValue = pointValue;
-                    averagingValues.clear();
-                    intervalStartTime = fireTime;
-                    break;
-                default:
-                    throw new ShouldNeverHappenException("Unknown interval logging type: " + vo.getIntervalLoggingType());
-            }
-
-            if (value != null) {
-                pointValueDao.savePointValueAsync(new PointValueTime(value, vo.getId(), fireTime), null);
-            }
-        }
+    public void setPointValueAsync(T newValue) {
+            savePointValueAsync(newValue, null);
     }
+
+    protected abstract void savePointValueAsync(T newValue, SetPointSource source);
+    protected abstract void savePointValueSync(T newValue, SetPointSource source);
 
     //
     // /
@@ -340,7 +125,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     }
 
     @Override
-    public PointValueTime getPointValue() {
+    public T getPointValue() {
         return pointValue;
     }
 
@@ -411,7 +196,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     // / Listeners
     // /
     //
-    private void fireEvents(PointValueTime oldValue, PointValueTime newValue, boolean set, boolean backdate) {
+    protected void fireEvents(PointValueTime oldValue, PointValueTime newValue, boolean set, boolean backdate) {
         DataPointListener l = runtimeManager.getDataPointListeners(vo.getId());
         if (l != null) {
             schedulerPool.execute(new EventNotifyWorkItem(l, oldValue, newValue, set, backdate));
@@ -454,12 +239,12 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
                 }
             }
         }
-/*
-        @Override
-        public int getPriority() {
-            return WorkItem.PRIORITY_MEDIUM;
-        }
-        */
+        /*
+         @Override
+         public int getPriority() {
+         return WorkItem.PRIORITY_MEDIUM;
+         }
+         */
     }
 
     //
@@ -469,12 +254,7 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     @Override
     public void initialize() {
         // Get the latest value for the point from the database.
-        pointValue = pointValueDao.getLatestPointValue(vo.getId());
-
-        // Set the tolerance origin if this is a numeric
-        if (pointValue != null && pointValue.getMangoValue() instanceof DoubleValue) {
-            toleranceOrigin = pointValue.getMangoValue().getDoubleValue();
-        }
+        pointValue = pointValueDao.getLatestPointValue(vo);
 
         // Add point event listeners
         for (PointEventDetectorVO ped : vo.getEventDetectors()) {
@@ -487,13 +267,10 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
             scheduledEventManager.addPointEventDetector(pedRT);
             runtimeManager.addDataPointListener(vo.getId(), pedRT);
         }
-
-        initializeIntervalLogging();
     }
 
     @Override
     public void terminate() {
-        terminateIntervalLogging();
 
         //TODO notify runtimeManger and lat them handle this???
         if (detectors != null) {
@@ -510,12 +287,15 @@ public class DataPointRT implements IDataPoint, ILifecycle, RunClient {
     public void joinTermination() {
         // no op
     }
-
-    public void initializeHistorical() {
-        initializeIntervalLogging();
+    
+    @Override
+    public void updatePointValue(T newValue) {
+        savePointValueAsync(pointValue, null);
     }
 
-    public void terminateHistorical() {
-        terminateIntervalLogging();
+    @Override
+    public void setPointValue(T newValue) {
+        savePointValueAsync(pointValue, null);
     }
+
 }

@@ -31,13 +31,12 @@ import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import java.util.Set;
 
 /**
  * @author Matthew Lohbihler
  */
-abstract public class PointComponent<T extends MangoValue> extends ViewComponent {
+abstract public class PointComponent<T extends PointValueTime> extends ViewComponent {
 
     private DataPointVO dataPoint;
     
@@ -58,7 +57,7 @@ abstract public class PointComponent<T extends MangoValue> extends ViewComponent
         return true;
     }
 
-    abstract public void addDataToModel(Map<String, Object> model, PointValueTime<T> pointValue);
+    abstract public void addDataToModel(Map<String, Object> model, T pointValue);
 
     abstract public String snippetName();
 

@@ -35,13 +35,19 @@ import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 /**
  * @author Matthew Lohbihler
  */
-public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO {
+public class HttpRetrieverPointLocatorVO<T extends PointValueTime> extends AbstractPointLocatorVO<T> {
+
+    public HttpRetrieverPointLocatorVO(DataType dataType) {
+        super(dataType);
+    }
 
     public static class HttpRetrieverPointLocatorVoValidator implements Validator {
 
@@ -66,7 +72,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO {
                 }
             }
 
-            if (vo.dataType == DataType.DOUBLE && !vo.valueFormat.isEmpty()) {
+            if (vo.getDataType() == DataType.DOUBLE && !vo.valueFormat.isEmpty()) {
                 try {
                     //TODO Localization with server locale !!!
                     new DecimalFormat(vo.valueFormat);
@@ -138,7 +144,6 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO {
     private boolean ignoreIfMissing;
 
     private String valueFormat;
-    private DataType dataType;
 
     private String timeRegex;
 
@@ -168,15 +173,6 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO {
         this.valueFormat = valueFormat;
     }
 
-    @Override
-    public DataType getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(DataType dataType) {
-        this.dataType = dataType;
-    }
-
     public String getTimeRegex() {
         return timeRegex;
     }
@@ -195,7 +191,7 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO {
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addPropertyMessage(list, "dsEdit.pointDataType", dataType);
+        super.addProperties(list);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpRetriever.valueRegex", valueRegex);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpRetriever.ignoreIfMissing", ignoreIfMissing);
         AuditEventType.addPropertyMessage(list, "dsEdit.httpRetriever.numberFormat", valueFormat);
@@ -204,9 +200,9 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO {
     }
 
     @Override
-    public void addPropertyChanges(List<LocalizableMessage> list, Object o) {
+    public void addPropertyChanges(List<LocalizableMessage> list, PointLocatorVO<T> o) {
+        super.addPropertyChanges(list, o);
         HttpRetrieverPointLocatorVO from = (HttpRetrieverPointLocatorVO) o;
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.pointDataType", from.dataType, dataType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpRetriever.valueRegex", from.valueRegex,
                 valueRegex);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.httpRetriever.ignoreIfMissing",
@@ -228,25 +224,23 @@ public class HttpRetrieverPointLocatorVO extends AbstractPointLocatorVO {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        SerializationHelper.writeSafeUTF(out, valueRegex);
+        out.writeObject(valueRegex);
         out.writeBoolean(ignoreIfMissing);
-        out.writeInt(dataType.mangoDbId);
-        SerializationHelper.writeSafeUTF(out, valueFormat);
-        SerializationHelper.writeSafeUTF(out, timeRegex);
-        SerializationHelper.writeSafeUTF(out, timeFormat);
+        out.writeObject(valueFormat);
+        out.writeObject(timeRegex);
+        out.writeObject(timeFormat);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int ver = in.readInt();
 
         // Switch on the version of the class so that version changes can be elegantly handled.
         if (ver == 1) {
-            valueRegex = SerializationHelper.readSafeUTF(in);
+            valueRegex = (String)in.readObject();
             ignoreIfMissing = in.readBoolean();
-            dataType = DataType.fromMangoDbId(in.readInt());
-            valueFormat = SerializationHelper.readSafeUTF(in);
-            timeRegex = SerializationHelper.readSafeUTF(in);
-            timeFormat = SerializationHelper.readSafeUTF(in);
+            valueFormat = (String)in.readObject();
+            timeRegex = (String)in.readObject();
+            timeFormat = (String)in.readObject();
         }
     }
 

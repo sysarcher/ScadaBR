@@ -18,13 +18,14 @@
  */
 package com.serotonin.mango.rt.dataSource.http;
 
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.dataSource.http.HttpReceiverPointLocatorVO;
 
 /**
  * @author Matthew Lohbihler
  */
-public class HttpReceiverPointLocatorRT extends PointLocatorRT<HttpReceiverPointLocatorVO> {
+public class HttpReceiverPointLocatorRT<T extends PointValueTime> extends PointLocatorRT<T, HttpReceiverPointLocatorVO<T>> {
 
     public HttpReceiverPointLocatorRT(HttpReceiverPointLocatorVO vo) {
         super(vo);

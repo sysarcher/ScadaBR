@@ -5,10 +5,13 @@
  */
 package br.org.scadabr.vo.datasource.meta;
 
+import br.org.scadabr.DataType;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
+import com.serotonin.mango.rt.dataImage.DoubleDataPointRT;
 import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
 import com.serotonin.mango.rt.dataSource.meta.MetaPointLocatorRT;
 import com.serotonin.mango.vo.DataPointVO;
+import com.serotonin.mango.vo.DoubleDataPointVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
 import org.junit.Test;
@@ -34,8 +37,8 @@ public class MetaPointLocatorVOTest {
     @Test
     public void testRunScript() {
         MetaDataSourceVO dsVO = new MetaDataSourceVO();
-        MetaPointLocatorVO plVO = dsVO.createPointLocator();
-        DataPointVO dpVO = new DataPointVO();
+        MetaPointLocatorVO plVO = new MetaPointLocatorVO(DataType.DOUBLE);
+        DoubleDataPointVO dpVO = new DoubleDataPointVO();
         dpVO.setPointLocator(plVO);
         
         plVO.setScript("return -1;");
@@ -43,7 +46,7 @@ public class MetaPointLocatorVOTest {
                 
         MetaDataSourceRT dsRT = (MetaDataSourceRT)dsVO.createDataSourceRT();
         MetaPointLocatorRT plRT = (MetaPointLocatorRT)plVO.createRuntime();
-        DataPointRT dpRT = new DataPointRT(dpVO, plRT);
+        DoubleDataPointRT dpRT = new DoubleDataPointRT(dpVO, plRT);
 //        plRT.start(dsRT, dpRT);
 //        plRT.doPoll(0);
         

@@ -8,7 +8,7 @@ package br.org.scadabr.dao;
 import br.org.scadabr.DataType;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
-import com.serotonin.mango.rt.dataImage.types.DoubleValue;
+import com.serotonin.mango.vo.DataPointVO;
 import java.util.List;
 import javax.inject.Named;
 
@@ -19,22 +19,28 @@ import javax.inject.Named;
 @Named
 public interface PointValueDao {
 
-    long deletePointValuesWithMismatchedType(int id, DataType dataType);
+    /**
+     * Save the value asynchonous
+     * @param <T>
+     * @param newValue Value currently not in store
+     * @param source currently ignored ???
+     */
+    <T extends PointValueTime> void savePointValueAsync(T newValue, SetPointSource source);
 
-    void savePointValueAsync(PointValueTime<DoubleValue> newValue, SetPointSource source);
+    <T extends PointValueTime> T savePointValueSync(T newValue, SetPointSource source);
 
-    PointValueTime savePointValueSync(PointValueTime newValue, SetPointSource source);
+    <T extends PointValueTime> T getLatestPointValue(DataPointVO<T> dpVo);
 
-    PointValueTime getLatestPointValue(int id);
+    long getInceptionDate(DataPointVO dpVo);
 
-    long getInceptionDate(int id);
+    <T extends PointValueTime> Iterable<T> getPointValues(DataPointVO<T> dpVo, long from);
 
-    Iterable<PointValueTime> getPointValues(int id, long from);
-
-    Iterable<PointValueTime> getPointValuesBetween(int id, long from, long to);
+    <T extends PointValueTime> Iterable<T> getPointValuesBetween(DataPointVO<T> dpVo, long from, long to);
 
     List<Long> getFiledataIds();
 
-    PointValueTime getPointValueBefore(int id, long reportStartTime);
-    
+    <T extends PointValueTime> T getPointValueBefore(DataPointVO<T> dpVo, long reportStartTime);
+
+    public PointValueTime getPointValueBefore(int id, DataType dataType, long l);
+
 }

@@ -29,9 +29,9 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
  *
  * @author Matthew Lohbihler
  */
-public interface ChangeComparableObject {
+public interface ChangeComparableObject<T>{
 
     void addProperties(List<LocalizableMessage> list);
 
-    void addPropertyChanges(List<LocalizableMessage> list, Object o);
+    void addPropertyChanges(List<LocalizableMessage> list, T o);
 }

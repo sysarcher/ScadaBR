@@ -130,7 +130,7 @@ public class WatchListService implements Serializable {
             final long timeStamp = System.currentTimeMillis();
             final long from = tpcr.getStartTime(timeStamp);
             final long to = tpcr.getEndTime(timeStamp);
-            Iterable<PointValueTime> pvt = pointValueDao.getPointValuesBetween(dataPointId, from, to);
+            Iterable<PointValueTime> pvt = pointValueDao.getPointValuesBetween(dp, from, to);
             return new JsonChartDataSet(from, to, dp, pvt);
         }
         return new JsonChartDataSet();

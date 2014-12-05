@@ -36,7 +36,7 @@ import java.util.EnumSet;
  * @author Matthew Lohbihler
  */
 
-public class SimplePointComponent extends PointComponent<MangoValue> {
+public class SimplePointComponent extends PointComponent<PointValueTime> {
 
     public static ImplDefinition DEFINITION = new ImplDefinition("simple", "SIMPLE", "graphic.simple",
             EnumSet.of(DataType.BOOLEAN, DataType.MULTISTATE, DataType.DOUBLE, DataType.ALPHANUMERIC));
@@ -69,7 +69,7 @@ public class SimplePointComponent extends PointComponent<MangoValue> {
     }
 
     @Override
-    public void addDataToModel(Map<String, Object> model, PointValueTime<MangoValue> pointValue) {
+    public void addDataToModel(Map<String, Object> model, PointValueTime pointValue) {
         model.put("displayPointName", displayPointName);
         model.put("styleAttribute", styleAttribute);
     }

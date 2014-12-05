@@ -18,15 +18,16 @@
  */
 package com.serotonin.mango.view.stats;
 
+import com.serotonin.mango.rt.dataImage.DoubleValueTime;
+import com.serotonin.mango.rt.dataImage.PointValueTime;
 import java.util.List;
 
-import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 
 /**
  * @author Matthew Lohbihler
  */
-public class AnalogStatistics implements StatisticsGenerator<DoubleValue> {
+public class AnalogStatistics implements StatisticsGenerator<DoubleValueTime> {
 
     // Calculated values.
     private double minimum = Double.MAX_VALUE;
@@ -45,13 +46,13 @@ public class AnalogStatistics implements StatisticsGenerator<DoubleValue> {
     private long realDuration = -1;
     private Double lastValue;
 
-    public AnalogStatistics(PointValueTime<DoubleValue> startValue, List<? extends IValueTime> values, long start, long end) {
-        this((Double)(startValue == null ? null : startValue.getMangoValue().getDoubleValue()), values, start, end);
+    public AnalogStatistics(DoubleValueTime startValue, List<? extends DoubleValueTime> values, long start, long end) {
+        this((Double)(startValue == null ? null : startValue.getDoubleValue()), values, start, end);
     }
 
-    public AnalogStatistics(Double startValue, List<? extends IValueTime> values, long start, long end) {
+    public AnalogStatistics(Double startValue, List<? extends DoubleValueTime> values, long start, long end) {
         this(startValue, start, end);
-        for (IValueTime p : values) {
+        for (DoubleValueTime p : values) {
             addValueTime(p);
         }
         done();
@@ -70,7 +71,7 @@ public class AnalogStatistics implements StatisticsGenerator<DoubleValue> {
     }
 
     @Override
-    public void addValueTime(IValueTime<DoubleValue> vt) {
+    public void addValueTime(DoubleValueTime vt) {
         if (vt.getValue() == null) {
             return;
         }
@@ -93,11 +94,11 @@ public class AnalogStatistics implements StatisticsGenerator<DoubleValue> {
 
         if (realDuration == 0) {
             // We assume that this point is the only point in the data set.
-            minimum = maximum = average = sum = vt.getMangoValue().getDoubleValue();
+            minimum = maximum = average = sum = vt.getDoubleValue();
             return;
         }
 
-        sum += vt.getMangoValue().getDoubleValue();
+        sum += vt.getDoubleValue();
 
         if (lastValue != null) {
             average += lastValue * (((double) (vt.getTimestamp()- lastTime)) / realDuration);
@@ -110,7 +111,7 @@ public class AnalogStatistics implements StatisticsGenerator<DoubleValue> {
                 minTime = lastTime;
             }
         }
-        lastValue = vt.getMangoValue().getDoubleValue();
+        lastValue = vt.getDoubleValue();
         lastTime = vt.getTimestamp();
     }
 

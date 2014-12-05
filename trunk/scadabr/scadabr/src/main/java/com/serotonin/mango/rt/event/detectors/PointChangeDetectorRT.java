@@ -25,7 +25,7 @@ import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
-public class PointChangeDetectorRT extends PointEventDetectorRT {
+public class PointChangeDetectorRT extends PointEventDetectorRT<PointValueTime> {
 
     private MangoValue oldValue;
     private MangoValue newValue;
@@ -46,8 +46,8 @@ public class PointChangeDetectorRT extends PointEventDetectorRT {
 
     @Override
     public void pointChanged(PointValueTime oldValue, PointValueTime newValue) {
-        this.oldValue = PointValueTime.getValue(oldValue);
-        this.newValue = newValue.getMangoValue();
+        this.oldValue = oldValue.toMangoValue();
+        this.newValue = newValue.toMangoValue();
         raiseAlarm(newValue.getTimestamp(), createEventContext());
     }
 

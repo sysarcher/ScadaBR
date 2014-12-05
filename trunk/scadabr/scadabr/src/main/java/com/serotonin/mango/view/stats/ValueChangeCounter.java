@@ -27,7 +27,7 @@ import java.util.Objects;
 /**
  * @author Matthew Lohbihler
  */
-public class ValueChangeCounter implements StatisticsGenerator {
+public class ValueChangeCounter implements StatisticsGenerator<PointValueTime> {
 
     // Calculated values.
     private int changes;
@@ -35,13 +35,13 @@ public class ValueChangeCounter implements StatisticsGenerator {
     // State values
     private MangoValue lastValue;
 
-    public ValueChangeCounter(PointValueTime startValue, List<? extends IValueTime> values) {
-        this((MangoValue)(startValue == null ? null : startValue.getMangoValue()), values);
+    public ValueChangeCounter(PointValueTime startValue, List<? extends PointValueTime> values) {
+        this((MangoValue)(startValue == null ? null : startValue.toMangoValue()), values);
     }
 
-    public ValueChangeCounter(MangoValue startValue, List<? extends IValueTime> values) {
+    public ValueChangeCounter(MangoValue startValue, List<? extends PointValueTime> values) {
         this(startValue);
-        for (IValueTime p : values) {
+        for (PointValueTime p : values) {
             addValueTime(p);
         }
         done();
@@ -52,10 +52,10 @@ public class ValueChangeCounter implements StatisticsGenerator {
     }
 
     @Override
-    public void addValueTime(IValueTime vt) {
+    public void addValueTime(PointValueTime vt) {
         if (!Objects.equals(lastValue, vt.getValue())) {
             changes++;
-            lastValue = vt.getMangoValue();
+            lastValue = vt.toMangoValue();
         }
     }
 

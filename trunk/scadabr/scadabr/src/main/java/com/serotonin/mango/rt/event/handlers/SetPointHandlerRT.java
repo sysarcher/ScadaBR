@@ -95,7 +95,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
                 return;
             }
 
-            value = valueTime.getMangoValue();
+            value = valueTime.toMangoValue();
         } else if (vo.getActiveAction() == EventHandlerVO.SetActionType.STATIC_VALUE) {
             value = MangoValue.stringToValue(vo.getActiveValueToSet(), targetDataType);
         } else {
@@ -103,7 +103,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
         }
 
         // Queue a work item to perform the set point.
-        schedulerPool.execute(new SetPointWorkItem(vo.getTargetPointId(), new PointValueTime(value, vo.getTargetPointId(), evt.getFireTimestamp()), this));
+        schedulerPool.execute(new SetPointWorkItem(vo.getTargetPointId(), PointValueTime.fromMangoValue(value, vo.getTargetPointId(), evt.getFireTimestamp()), this));
     }
 
     @Override
@@ -146,14 +146,14 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
                 return;
             }
 
-            value = valueTime.getMangoValue();
+            value = valueTime.toMangoValue();
         } else if (vo.getInactiveAction() == EventHandlerVO.SetActionType.STATIC_VALUE) {
             value = MangoValue.stringToValue(vo.getInactiveValueToSet(), targetDataType);
         } else {
             throw new ShouldNeverHappenException("Unknown active action: " + vo.getInactiveAction());
         }
 
-        schedulerPool.execute(new SetPointWorkItem(vo.getTargetPointId(), new PointValueTime(value, vo.getTargetPointId(), evt.getInactiveTimestamp()), this));
+        schedulerPool.execute(new SetPointWorkItem(vo.getTargetPointId(), PointValueTime.fromMangoValue(value, vo.getTargetPointId(), evt.getInactiveTimestamp()), this));
     }
 
     private void raiseFailureEvent(LocalizableMessage message, EventType et) {

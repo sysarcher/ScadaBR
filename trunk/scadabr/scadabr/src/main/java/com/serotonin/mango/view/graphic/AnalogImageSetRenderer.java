@@ -19,6 +19,7 @@
 package com.serotonin.mango.view.graphic;
 
 import br.org.scadabr.DataType;
+import com.serotonin.mango.rt.dataImage.DoubleValueTime;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -31,7 +32,7 @@ import java.util.EnumSet;
 
 @Deprecated
 // Use ViewComponent instead
-public class AnalogImageSetRenderer extends ImageSetRenderer<DoubleValue> {
+public class AnalogImageSetRenderer extends ImageSetRenderer<DoubleValueTime> {
 
     private static final ImplDefinition definition = new ImplDefinition("graphicRendererAnalogImage", "ANALOG_IMAGE",
             "graphic.multistateImage", EnumSet.of(DataType.DOUBLE));
@@ -60,7 +61,7 @@ public class AnalogImageSetRenderer extends ImageSetRenderer<DoubleValue> {
     }
 
     @Override
-    public String getImage(PointValueTime<DoubleValue> pointValue) {
+    public String getImage(DoubleValueTime pointValue) {
         if (imageSet == null) // Image set not loaded?
         {
             return "imageSetNotLoaded";
@@ -70,7 +71,7 @@ public class AnalogImageSetRenderer extends ImageSetRenderer<DoubleValue> {
             return imageSet.getImageFilename(0);
         }
 
-        double dvalue = pointValue.getMangoValue().getDoubleValue();
+        double dvalue = pointValue.getDoubleValue();
 
         int index = (int) ((dvalue - min) / (max - min) * imageSet.getImageCount());
         if (index < 0) {

@@ -23,13 +23,14 @@ import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.rt.dataImage.AlphaNumericValueTime;
 import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import java.util.Objects;
 
 /**
  * @author Matthew Lohbihler
  */
-public class AlphanumericStateDetectorRT extends StateDetectorRT<AlphanumericValue> {
+public class AlphanumericStateDetectorRT extends StateDetectorRT<AlphaNumericValueTime> {
 
     public AlphanumericStateDetectorRT(PointEventDetectorVO vo) {
         this.vo = vo;
@@ -49,8 +50,8 @@ public class AlphanumericStateDetectorRT extends StateDetectorRT<AlphanumericVal
     }
 
     @Override
-    protected boolean stateDetected(PointValueTime<AlphanumericValue> newValue) {
-        String newAlpha = newValue.getMangoValue().getValue();
+    protected boolean stateDetected(AlphaNumericValueTime newValue) {
+        String newAlpha = newValue.getValue();
         return Objects.equals(newAlpha, vo.getAlphanumericState());
     }
 }

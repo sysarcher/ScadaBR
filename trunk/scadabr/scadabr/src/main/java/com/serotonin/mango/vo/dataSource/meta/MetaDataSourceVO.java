@@ -68,11 +68,6 @@ public class MetaDataSourceVO extends DataSourceVO<MetaDataSourceVO> {
     }
 
     @Override
-    public MetaPointLocatorVO createPointLocator() {
-        return new MetaPointLocatorVO(DataType.DOUBLE);
-    }
-
-    @Override
     protected void addPropertiesImpl(List<LocalizableMessage> list) {
         // no op
     }

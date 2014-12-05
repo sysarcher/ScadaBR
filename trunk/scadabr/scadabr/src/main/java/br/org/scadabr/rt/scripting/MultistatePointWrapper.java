@@ -21,19 +21,20 @@ package br.org.scadabr.rt.scripting;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
+import com.serotonin.mango.rt.dataImage.MultistateValueTime;
 import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 
 /**
  * @author Matthew Lohbihler
  */
-public class MultistatePointWrapper extends DistinctPointWrapper<MultistateValue> {
+public class MultistatePointWrapper extends DistinctPointWrapper<MultistateValueTime> {
 
-    public MultistatePointWrapper(IDataPoint<MultistateValue> point, WrapperContext context) {
+    public MultistatePointWrapper(IDataPoint<MultistateValueTime> point, WrapperContext context) {
         super(point, context);
     }
 
     public byte getValue() {
-        MultistateValue value = getValueImpl();
+        MultistateValueTime value = getValueImpl();
         if (value == null) {
             return 0;
         }

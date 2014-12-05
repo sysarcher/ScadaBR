@@ -263,8 +263,8 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
                 copyPermissions(dataSource.getId(), dataSourceCopy.getId());
 
                 // Copy the points.
-                for (DataPointVO dataPoint : dataPointDao.getDataPoints(dataSourceId)) {
-                    DataPointVO dataPointCopy = dataPoint.copy();
+                for (DataPointVO<?> dataPoint : dataPointDao.getDataPoints(dataSourceId)) {
+                    DataPointVO<?> dataPointCopy = dataPoint.copy();
                     dataPointCopy.setId(ScadaBrConstants.NEW_ID);
                     dataPointCopy.setXid(dataPointDao.generateUniqueXid());
                     dataPointCopy.setName(dataPoint.getName());

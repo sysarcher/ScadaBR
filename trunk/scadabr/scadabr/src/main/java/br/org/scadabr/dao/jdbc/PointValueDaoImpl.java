@@ -19,11 +19,8 @@
 package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.DataType;
+import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.PointValueDao;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -32,25 +29,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.dao.ConcurrencyFailureException;
-import org.springframework.transaction.TransactionStatus;
 
 import br.org.scadabr.db.IntValuePair;
-import br.org.scadabr.db.RowCallback;
 import br.org.scadabr.db.spring.IntValuePairRowMapper;
-import br.org.scadabr.io.StreamUtils;
 import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.ImageSaveException;
+import com.serotonin.mango.rt.dataImage.AlphaNumericValueTime;
+import com.serotonin.mango.rt.dataImage.BooleanValueTime;
+import com.serotonin.mango.rt.dataImage.DoubleValueTime;
+import com.serotonin.mango.rt.dataImage.MultistateValueTime;
 import com.serotonin.mango.rt.dataImage.PointValueAnnotation;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
-import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
-import com.serotonin.mango.rt.dataImage.types.BooleanValue;
-import com.serotonin.mango.rt.dataImage.types.DoubleValue;
-import com.serotonin.mango.rt.dataImage.types.ImageValue;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 import com.serotonin.mango.vo.AnonymousUser;
+import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.bean.LongPair;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -66,7 +58,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.transaction.support.TransactionCallback;
 
 @Named
 public class PointValueDaoImpl extends BaseDao implements PointValueDao {
@@ -89,7 +80,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         super();
     }
 
-    protected void flushWriteBehind() {
+    private void flushWriteBehind() {
         try {
             final Future<Integer> f = batchWriteBehind.flush(ejt);
             if (f == null) {
@@ -123,6 +114,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
      *
      * @param pointId
      */
+    @Override
     public PointValueTime savePointValueSync(PointValueTime pointValue, SetPointSource source) {
         long id = savePointValueImpl(pointValue, source, false);
 
@@ -130,7 +122,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         int retries = 5;
         while (true) {
             try {
-                savedPointValue = getPointValue(id);
+                savedPointValue = getPointValue(id, pointValue.getDataPointId(), pointValue.getDataType());
                 break;
             } catch (ConcurrencyFailureException e) {
                 if (retries <= 0) {
@@ -144,106 +136,115 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
     }
 
     /**
-     * Only the PointValueCache should call this method during runtime. Do not
-     * use.
+     * @inheritDoc
      */
-    public void savePointValueAsync(PointValueTime<DoubleValue> pointValue, SetPointSource source) {
-        batchWriteBehind.add(pointValue, ejt);
-    }
-
-    long savePointValueImpl(final PointValueTime pointValue, final SetPointSource source, boolean async) {
-        MangoValue value = pointValue.getMangoValue();
-        final DataType dataType = value.getDataType();
-        double dvalue = 0;
-        String svalue = null;
-
-        switch (dataType) {
-            case IMAGE:
-                ImageValue imageValue = (ImageValue) value;
-                dvalue = imageValue.getType();
-                if (!imageValue.isNew()) {
-                    svalue = Long.toString(imageValue.getId());
-                }
-                break;
-            case BOOLEAN:
-            case MULTISTATE:
+    @Override
+    public <T extends PointValueTime> void savePointValueAsync(T pointValue, SetPointSource source) {
+        switch (pointValue.getDataType()) {
             case DOUBLE:
-                dvalue = ((DoubleValue) value).getDoubleValue();
-                break;
-            case ALPHANUMERIC:
-                svalue = ((AlphanumericValue) value).getValue();
+                batchWriteBehind.add((DoubleValueTime) pointValue, ejt);
                 break;
             default:
                 throw new ImplementMeException();
         }
+    }
 
-        // Check if we need to create an annotation.
-        long id;
-        try {
-            if (svalue != null || source != null || dataType == DataType.IMAGE) {
-                final double dvalueFinal = dvalue;
-                final String svalueFinal = svalue;
+    private long savePointValueImpl(final PointValueTime pointValue, final SetPointSource source, boolean async) {
+        throw new ImplementMeException();
+        /*
+         MangoValue value = pointValue.getMangoValue();
+         final DataType dataType = value.getDataType();
+         double dvalue = 0;
+         String svalue = null;
 
-                // Create a transaction within which to do the insert.
-                id = getTransactionTemplate().execute(
-                        new TransactionCallback<Long>() {
-                            @Override
-                            public Long doInTransaction(TransactionStatus status) {
-                                return savePointValue(pointValue.getDataPointId(), dataType,
-                                        dvalueFinal, pointValue.getTimestamp(),
-                                        svalueFinal, source, false);
-                            }
-                        });
-            } else {
-                // Single sql call, so no transaction required.
-                id = savePointValue(pointValue.getDataPointId(), dataType, dvalue,
-                        pointValue.getTimestamp(), svalue, source, async);
-            }
-        } catch (ConcurrencyFailureException e) {
-            // Still failed to insert after all of the retries. Store the data
-            synchronized (UNSAVED_POINT_VALUES) {
-                UNSAVED_POINT_VALUES.add(new UnsavedPointValue(pointValue.getDataPointId(),
-                        pointValue, source));
-            }
-            return -1;
-        }
+         switch (dataType) {
+         case IMAGE:
+         ImageValue imageValue = (ImageValue) value;
+         dvalue = imageValue.getType();
+         if (!imageValue.isNew()) {
+         svalue = Long.toString(imageValue.getId());
+         }
+         break;
+         case BOOLEAN:
+         case MULTISTATE:
+         case DOUBLE:
+         dvalue = ((DoubleValue) value).getDoubleValue();
+         break;
+         case ALPHANUMERIC:
+         svalue = ((AlphanumericValue) value).getValue();
+         break;
+         default:
+         throw new ImplementMeException();
+         }
 
-        // Check if we need to save an image
-        if (dataType == DataType.IMAGE) {
-            ImageValue imageValue = (ImageValue) value;
-            if (imageValue.isNew()) {
-                imageValue.setId(id);
+         // Check if we need to create an annotation.
+         long id;
+         try {
+         if (svalue != null || source != null || dataType == DataType.IMAGE) {
+         final double dvalueFinal = dvalue;
+         final String svalueFinal = svalue;
 
-                File file = new File(common.getFiledataPath(),
-                        imageValue.getFilename());
+         // Create a transaction within which to do the insert.
+         id = getTransactionTemplate().execute(
+         new TransactionCallback<Long>() {
+         @Override
+         public Long doInTransaction(TransactionStatus status) {
+         return savePointValue(pointValue.getDataPointId(), dataType,
+         dvalueFinal, pointValue.getTimestamp(),
+         svalueFinal, source, false);
+         }
+         });
+         } else {
+         // Single sql call, so no transaction required.
+         id = savePointValue(pointValue.getDataPointId(), dataType, dvalue,
+         pointValue.getTimestamp(), svalue, source, async);
+         }
+         } catch (ConcurrencyFailureException e) {
+         // Still failed to insert after all of the retries. Store the data
+         synchronized (UNSAVED_POINT_VALUES) {
+         UNSAVED_POINT_VALUES.add(new UnsavedPointValue(pointValue.getDataPointId(),
+         pointValue, source));
+         }
+         return -1;
+         }
 
-                // Write the file.
-                FileOutputStream out = null;
-                try {
-                    out = new FileOutputStream(file);
-                    StreamUtils
-                            .transfer(
-                                    new ByteArrayInputStream(imageValue
-                                            .getData()), out);
-                } catch (IOException e) {
-                    // Rethrow as an RTE
-                    throw new ImageSaveException(e);
-                } finally {
-                    try {
-                        if (out != null) {
-                            out.close();
-                        }
-                    } catch (IOException e) {
-                        // no op
-                    }
-                }
+         // Check if we need to save an image
+         if (dataType == DataType.IMAGE) {
+         ImageValue imageValue = (ImageValue) value;
+         if (imageValue.isNew()) {
+         imageValue.setId(id);
 
-                // Allow the data to be GC'ed
-                imageValue.setData(null);
-            }
-        }
+         File file = new File(common.getFiledataPath(),
+         imageValue.getFilename());
 
-        return id;
+         // Write the file.
+         FileOutputStream out = null;
+         try {
+         out = new FileOutputStream(file);
+         StreamUtils
+         .transfer(
+         new ByteArrayInputStream(imageValue
+         .getData()), out);
+         } catch (IOException e) {
+         // Rethrow as an RTE
+         throw new ImageSaveException(e);
+         } finally {
+         try {
+         if (out != null) {
+         out.close();
+         }
+         } catch (IOException e) {
+         // no op
+         }
+         }
+
+         // Allow the data to be GC'ed
+         imageValue.setData(null);
+         }
+         }
+
+         return id;
+         */
     }
 
     private void clearUnsavedPointValues() {
@@ -261,7 +262,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         savePointValueImpl(pointValue, new AnonymousUser(), true);
     }
 
-    long savePointValue(final int pointId, final DataType dataType, double dvalue,
+    private long savePointValue(final int pointId, final DataType dataType, double dvalue,
             final long time, final String svalue, final SetPointSource source,
             boolean async) {
         // Apply database specific bounds on double values.
@@ -330,114 +331,79 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         return id;
     }
 
-    private static final String POINT_VALUE_SELECT = "select pv.dataPointId, pv.dataType, pv.pointValue, pva.textPointValueShort, pva.textPointValueLong, pv.ts, pva.sourceType, "
+    private static final String POINT_VALUE_SELECT = "select pv.ts, pv.pointValue, pva.textPointValueShort, pva.textPointValueLong, pva.sourceType, "
             + "  pva.sourceId "
             + "from pointValues pv "
             + "  left join pointValueAnnotations pva on pv.id = pva.pointValueId";
 
-    public List<PointValueTime> getPointValues(final int dataPointId, final long since) {
+    @Override
+    public <T extends PointValueTime> List<T> getPointValues(final DataPointVO<T> vo, final long since) {
         flushWriteBehind();
-        List<PointValueTime> result = ejt.query(new PreparedStatementCreator() {
+        List<T> result = ejt.query(new PreparedStatementCreator() {
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareCall(POINT_VALUE_SELECT
                         + " where pv.dataPointId=? and pv.ts >= ? order by ts");
-                ps.setInt(1, dataPointId);
+                ps.setInt(1, vo.getId());
                 ps.setLong(2, since);
                 return ps;
 
             }
-        }, new PointValueRowMapper());
+        }, new PointValueRowMapper(vo));
         updateAnnotations(result);
         return result;
     }
 
-    public Iterable<PointValueTime> getPointValuesBetween(final int dataPointId,
-            final long from, final long to) {
+    @Override
+    public <T extends PointValueTime> Iterable<T> getPointValuesBetween(final DataPointVO<T> vo, final long from, final long to) {
         flushWriteBehind();
-        List<PointValueTime> result = ejt.query(new PreparedStatementCreator() {
+        List<T> result = ejt.query(new PreparedStatementCreator() {
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareCall(POINT_VALUE_SELECT
                         + " where pv.dataPointId=? and pv.ts >= ? and pv.ts<? order by ts");
-                ps.setInt(1, dataPointId);
+                ps.setInt(1, vo.getId());
                 ps.setLong(2, from);
                 ps.setLong(3, to);
                 return ps;
 
             }
-        }, new PointValueRowMapper());
-        updateAnnotations(result);
-        return result;
-    }
-
-    public List<PointValueTime> getLatestPointValues(final int dataPointId, final int limit) {
-        List<PointValueTime> result = ejt.query(new PreparedStatementCreator() {
-
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                PreparedStatement ps = con.prepareCall(POINT_VALUE_SELECT
-                        + " where pv.dataPointId=? order by pv.ts desc");
-                ps.setInt(1, dataPointId);
-                ps.setMaxRows(limit);
-                return ps;
-
-            }
-        }, new PointValueRowMapper());
-        updateAnnotations(result);
-        return result;
-    }
-
-    public List<PointValueTime> getLatestPointValues(final int dataPointId,
-            final int limit, final long before) {
-        List<PointValueTime> result = ejt.query(new PreparedStatementCreator() {
-
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                PreparedStatement ps = con.prepareCall(POINT_VALUE_SELECT
-                        + " where pv.dataPointId=? and pv.ts<? order by pv.ts desc");
-                ps.setInt(1, dataPointId);
-                ps.setLong(2, before);
-                ps.setMaxRows(limit);
-                return ps;
-
-            }
-        }, new PointValueRowMapper());
+        }, new PointValueRowMapper(vo));
         updateAnnotations(result);
         return result;
     }
 
     //TODO replace with queryforObject
     @Override
-    public PointValueTime getLatestPointValue(final int dataPointId) {
+    public <T extends PointValueTime> T getLatestPointValue(final DataPointVO<T> vo) {
         flushWriteBehind();
         //TODO optimaze into one hit of the db???
-        final Long maxTs = ejt.queryForObject("select max(ts) from pointValues where dataPointId=?", Long.class, dataPointId);
+        final Long maxTs = ejt.queryForObject("select max(ts) from pointValues where dataPointId=?", Long.class, vo.getId());
         if (maxTs == null) {
             return null;
         }
-        List<PointValueTime> result = ejt.query(new PreparedStatementCreator() {
+        List<T> result = ejt.query(new PreparedStatementCreator() {
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareCall(POINT_VALUE_SELECT
                         + " where pv.dataPointId=? and pv.ts=?");
-                ps.setInt(1, dataPointId);
+                ps.setInt(1, vo.getId());
                 ps.setLong(2, maxTs);
                 ps.setMaxRows(1);
                 return ps;
 
             }
-        }, new PointValueRowMapper());
+        }, new PointValueRowMapper<T>(vo));
         updateAnnotations(result);
         return result.get(0);
     }
 
-    private PointValueTime getPointValue(final long id) {
+    private <T extends PointValueTime> T getPointValue(final long id, final int dataPointId, DataType dataType) {
         flushWriteBehind();
-        List<PointValueTime> result = ejt.query(new PreparedStatementCreator() {
+        List<T> result = ejt.query(new PreparedStatementCreator() {
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
@@ -448,105 +414,128 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
                 return ps;
 
             }
-        }, new PointValueRowMapper());
+        }, new PointValueRowMapper(dataPointId, dataType));
         updateAnnotations(result);
         return result.get(0);
     }
 
-    public PointValueTime getPointValueBefore(int dataPointId, long time) {
+    @Override
+    public <T extends PointValueTime> T getPointValueBefore(DataPointVO<T> vo, long time) {
         flushWriteBehind();
         try {
             final Long valueTime = ejt.queryForObject(
                     "select max(ts) from pointValues where dataPointId=? and ts<?",
-                    Long.class, dataPointId, time);
-            return valueTime == null ? null : getPointValueAt(dataPointId, valueTime);
+                    Long.class, vo.getId(), time);
+            return valueTime == null ? null : getPointValueAt(vo, valueTime);
         } catch (DataAccessException e) {
             return null;
         }
     }
 
-    public PointValueTime getPointValueAt(final int dataPointId, final long time) {
+    public <T extends PointValueTime> T getPointValueAt(final DataPointVO<T> vo, final long time) {
         flushWriteBehind();
-        List<PointValueTime> result = ejt.query(new PreparedStatementCreator() {
+        List<T> result = ejt.query(new PreparedStatementCreator() {
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareCall(POINT_VALUE_SELECT
                         + " where pv.dataPointId=? and pv.ts=?");
-                ps.setInt(1, dataPointId);
+                ps.setInt(1, vo.getId());
                 ps.setLong(2, time);
                 ps.setMaxRows(1);
                 return ps;
 
             }
-        }, new PointValueRowMapper());
+        }, new PointValueRowMapper(vo));
         updateAnnotations(result);
         return result.get(0);
     }
 
-    public void getPointValuesBetween(int dataPointId, long from, long to,
-            final RowCallback<PointValueTime> callback) {
+    public <T extends PointValueTime> T getPointValueAt(final int dpId, DataType dataType, final long time) {
         flushWriteBehind();
-        ejt.query(POINT_VALUE_SELECT
-                + " where pv.dataPointId=? and pv.ts >= ? and pv.ts<? order by ts",
-                new Object[]{dataPointId, from, to},
-                new PointValueRowMapper() {
-                    @Override
-                    public PointValueTime mapRow(ResultSet rs, int rowNum)
-                    throws SQLException {
-                        final PointValueTime result = super.mapRow(rs, rowNum);
-                        callback.row(result, rowNum);
-                        return result;
-                    }
-                });
+        List<T> result = ejt.query(new PreparedStatementCreator() {
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareCall(POINT_VALUE_SELECT
+                        + " where pv.dataPointId=? and pv.ts=?");
+                ps.setInt(1, dpId);
+                ps.setLong(2, time);
+                ps.setMaxRows(1);
+                return ps;
+
+            }
+        }, new PointValueRowMapper(dpId, dataType));
+        updateAnnotations(result);
+        return result.get(0);
     }
 
-    class PointValueRowMapper implements RowMapper<PointValueTime> {
+    @Override
+    public PointValueTime getPointValueBefore(int id, DataType dataType, long time) {
+        flushWriteBehind();
+        try {
+            final Long valueTime = ejt.queryForObject(
+                    "select max(ts) from pointValues where dataPointId=? and ts<?",
+                    Long.class, id, time);
+            return valueTime == null ? null : getPointValueAt(id, dataType, valueTime);
+        } catch (DataAccessException e) {
+            return null;
+        }
+    }
+
+    class PointValueRowMapper<T extends PointValueTime> implements RowMapper<T> {
+
+        private final int pointId;
+        private final DataType dataType;
+
+        public PointValueRowMapper(int pointId, DataType dataType) {
+            this.pointId = pointId;
+            this.dataType = dataType;
+        }
+
+        public PointValueRowMapper(DataPointVO<T> vo) {
+            this.pointId = vo.getId();
+            this.dataType = vo.getDataType();
+        }
 
         @Override
-        public PointValueTime mapRow(ResultSet rs, int rowNum) throws SQLException {
-            final PointValueTime result = new PointValueTime(createMangoValue(rs, 2), rs.getInt(1), rs.getLong(6));
-            int sourceType = rs.getInt(7);
+        public T mapRow(ResultSet rs, int rowNum) throws SQLException {
+            T result;
+            switch (dataType) {
+                case DOUBLE:
+                    result = (T) new DoubleValueTime(rs.getDouble(2), pointId, rs.getLong(1));
+                    break;
+                case BOOLEAN:
+                    result = (T) new BooleanValueTime(rs.getDouble(2) == 1, pointId, rs.getLong(1));
+                    break;
+                case MULTISTATE:
+                    result = (T) new MultistateValueTime(rs.getByte(2), pointId, rs.getLong(1));
+                    break;
+                case ALPHANUMERIC:
+                    String s = rs.getString(+3);
+                    if (s == null) {
+                        s = rs.getString(+4);
+                    }
+                    result = (T) new AlphaNumericValueTime(s, pointId, rs.getLong(1));
+                    break;
+                case IMAGE:
+                    throw new ImplementMeException();
+//                    result = (T) new ImageValueTime(Integer.parseInt(rs.getString(3)), rs.getInt(4), pointId, rs.getLong(1));
+                // break;
+                default:
+                    throw new ShouldNeverHappenException("Cant handle datatype: " + dataType);
+            }
+
+            int sourceType = rs.getInt(5);
             if (!rs.wasNull()) {
-                result.setPointValueAnnotation(new PointValueAnnotation(sourceType, rs.getInt(8)));
+                result.setPointValueAnnotation(new PointValueAnnotation(sourceType, rs.getInt(6)));
             }
             return result;
         }
 
-        MangoValue createMangoValue(ResultSet rs, int firstParameter)
-                throws SQLException {
-            final DataType dataType = DataType.fromMangoDbId(rs.getInt(firstParameter));
-            MangoValue value;
-            switch (dataType) {
-                case DOUBLE:
-                    value = new DoubleValue(rs.getDouble(firstParameter + 1));
-                    break;
-                case BOOLEAN:
-                    value = new BooleanValue(rs.getDouble(firstParameter + 1) == 1);
-                    break;
-                case MULTISTATE:
-                    value = new MultistateValue(rs.getByte(firstParameter + 1));
-                    break;
-                case ALPHANUMERIC:
-                    String s = rs.getString(firstParameter + 2);
-                    if (s == null) {
-                        s = rs.getString(firstParameter + 3);
-                    }
-                    value = new AlphanumericValue(s);
-                    break;
-                case IMAGE:
-                    value = new ImageValue(Integer.parseInt(rs
-                            .getString(firstParameter + 2)),
-                            rs.getInt(firstParameter + 3));
-                    break;
-                default:
-                    value = null;
-            }
-            return value;
-        }
     }
 
-    private void updateAnnotations(List<PointValueTime> values) {
+    private <T extends PointValueTime> void updateAnnotations(List<T> values) {
         Map<Integer, List<PointValueAnnotation>> userIds = new HashMap<>();
         List<PointValueAnnotation> alist;
 
@@ -580,7 +569,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
                 sql + "(" + createDelimitedList(idMap.keySet(), ",")
                 + ")", new IntValuePairRowMapper());
 
-            // Collate the data with the id map, and set the values in the
+        // Collate the data with the id map, and set the values in the
         // annotations
         List<PointValueAnnotation> annos;
         for (IntValuePair ivp : data) {
@@ -591,7 +580,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         }
     }
 
-        //
+    //
     //
     // Multiple-point callback for point history replays
     //
@@ -600,23 +589,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
             + "from pointValues pv "
             + "  left join pointValueAnnotations pva on pv.id = pva.pointValueId";
 
-    public void getPointValuesBetween(List<Integer> dataPointIds, long from,
-            long to, final RowCallback<PointValueTime> callback) {
-        flushWriteBehind();
-        String ids = createDelimitedList(dataPointIds, ",");
-        ejt.query(POINT_ID_VALUE_SELECT + " where pv.dataPointId in (" + ids
-                + ") and pv.ts >= ? and pv.ts<? order by ts", new Object[]{
-                    from, to}, new PointValueRowMapper() {
-                    @Override
-                    public PointValueTime mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        final PointValueTime result = super.mapRow(rs, rowNum);
-                        callback.row(result, rowNum);
-                        return result;
-                    }
-                });
-    }
-
-        //
+    //
     //
     // Point value deletions
     //
@@ -660,12 +633,13 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
                         dataPointId, from, to);
     }
 
-    public long getInceptionDate(int dataPointId) {
+    @Override
+    public long getInceptionDate(DataPointVO vo) {
         flushWriteBehind();
         try {
             return ejt.queryForObject("select min(ts) from pointValues where dataPointId=?",
                     Long.class,
-                    dataPointId);
+                    vo.getId());
         } catch (NullPointerException e) {
             return -1;
         }

@@ -23,9 +23,10 @@ import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.event.PointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.rt.dataImage.BooleanValueTime;
 import com.serotonin.mango.rt.dataImage.types.BooleanValue;
 
-public class BinaryStateDetectorRT extends StateDetectorRT<BooleanValue> {
+public class BinaryStateDetectorRT extends StateDetectorRT<BooleanValueTime> {
 
     public BinaryStateDetectorRT(PointEventDetectorVO vo) {
         this.vo = vo;
@@ -45,8 +46,8 @@ public class BinaryStateDetectorRT extends StateDetectorRT<BooleanValue> {
     }
 
     @Override
-    protected boolean stateDetected(PointValueTime<BooleanValue> newValue) {
-        boolean newBinary = newValue.getMangoValue().getBooleanValue();
+    protected boolean stateDetected(BooleanValueTime newValue) {
+        boolean newBinary = newValue.getBooleanValue();
         return newBinary == vo.isBinaryState();
     }
 

@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Configurable;
  * @author Matthew Lohbihler
  */
 @Configurable
-abstract public class TimeDelayedEventDetectorRT<T extends MangoValue> extends TimeoutDetectorRT<T> {
+abstract public class TimeDelayedEventDetectorRT<T extends PointValueTime> extends TimeoutDetectorRT<T> {
 
     @Autowired
     private RuntimeManager runtimeManager;
@@ -80,7 +80,7 @@ abstract public class TimeDelayedEventDetectorRT<T extends MangoValue> extends T
 
     protected void initializeState() {
         int pointId = vo.njbGetDataPoint().getId();
-        PointValueTime latest = runtimeManager.getDataPoint(pointId).getPointValue();
+        T latest = (T)runtimeManager.getDataPoint(pointId).getPointValue();
 
         if (latest != null) {
             pointChanged(null, latest);
