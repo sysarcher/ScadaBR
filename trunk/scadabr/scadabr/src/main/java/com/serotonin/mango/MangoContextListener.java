@@ -41,10 +41,6 @@ import com.serotonin.mango.rt.dataSource.http.HttpReceiverMulticaster;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.DataPurge;
 import com.serotonin.mango.util.BackgroundContext;
-import com.serotonin.mango.view.DynamicImage;
-import com.serotonin.mango.view.ImageSet;
-import com.serotonin.mango.view.ViewGraphic;
-import com.serotonin.mango.view.ViewGraphicLoader;
 import com.serotonin.mango.web.ContextWrapper;
 import br.org.scadabr.vo.event.type.SystemEventKey;
 
@@ -230,30 +226,6 @@ public class MangoContextListener implements ServletContextListener {
             runtimeManager.terminate();
             runtimeManager.joinTermination();
         }
-    }
-
-    //
-    //
-    // Image sets
-    //
-    private void imageSetInitialize(ServletContext ctx) {
-        ViewGraphicLoader loader = new ViewGraphicLoader();
-        List<ImageSet> imageSets = new ArrayList<>();
-        List<DynamicImage> dynamicImages = new ArrayList<>();
-
-        for (ViewGraphic g : loader.loadViewGraphics(ctx.getRealPath("/"))) {
-            if (g.isImageSet()) {
-                imageSets.add((ImageSet) g);
-            } else if (g.isDynamicImage()) {
-                dynamicImages.add((DynamicImage) g);
-            } else {
-                throw new ShouldNeverHappenException(
-                        "Unknown view graphic type");
-            }
-        }
-
-        ctx.setAttribute(Common.ContextKeys.IMAGE_SETS, imageSets);
-        ctx.setAttribute(Common.ContextKeys.DYNAMIC_IMAGES, dynamicImages);
     }
 
     //

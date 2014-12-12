@@ -4,8 +4,6 @@ import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.l10n.Localizer;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.view.chart.ChartRenderer;
-import com.serotonin.mango.view.chart.ChartType;
 import com.serotonin.mango.vo.DataPointVO;
 import java.io.Serializable;
 
@@ -20,7 +18,6 @@ public class JsonWatchListPoint implements Serializable {
     private boolean settable;
     private long timestamp;
     private String value;
-    private ChartType chartType;
     private boolean changed;
 
     //TODO remove changed to more sophisticated Websocket, transfer raw value (formatting should be done on the client side) transfer only timestamp as long 
@@ -34,12 +31,6 @@ public class JsonWatchListPoint implements Serializable {
             timestamp = pvt.getTimestamp();
             changed = timestamp + 30000 > System.currentTimeMillis();
             value = localizer.formatValue(dp, pvt);
-//TODO            final ChartRenderer renderer = dp.getChartRenderer();
-//            if (renderer != null) {
-//                chartType = renderer.getType();
-//            } else {
-                chartType = ChartType.NONE;
-//            }
         }
     }
 
@@ -111,20 +102,6 @@ public class JsonWatchListPoint implements Serializable {
      */
     public void setValue(String value) {
         this.value = value;
-    }
-
-    /**
-     * @return the chartType
-     */
-    public ChartType getChartType() {
-        return chartType;
-    }
-
-    /**
-     * @param chartType the chartType to set
-     */
-    public void setChartType(ChartType chartType) {
-        this.chartType = chartType;
     }
 
     /**

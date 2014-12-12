@@ -21,7 +21,6 @@ package com.serotonin.mango.rt.event.detectors;
 import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
-import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;

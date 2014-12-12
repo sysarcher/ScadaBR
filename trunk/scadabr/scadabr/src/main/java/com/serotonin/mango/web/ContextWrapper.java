@@ -29,8 +29,6 @@ import br.org.scadabr.ShouldNeverHappenException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.http.HttpReceiverMulticaster;
 import com.serotonin.mango.util.DocumentationManifest;
-import com.serotonin.mango.view.DynamicImage;
-import com.serotonin.mango.view.ImageSet;
 
 import freemarker.template.Configuration;
 
@@ -47,59 +45,6 @@ public class ContextWrapper {
     @Deprecated // use Bean
     public ContextWrapper(HttpServletRequest request) {
         ctx = request.getSession().getServletContext();
-    }
-
-    @Deprecated // use Bean
-    @SuppressWarnings("unchecked")
-    public List<ImageSet> getImageSets() {
-        return (List<ImageSet>) ctx.getAttribute(Common.ContextKeys.IMAGE_SETS);
-    }
-
-    @Deprecated // use Bean
-    public List<String> getImageSetIds() {
-        List<String> result = new ArrayList<>();
-        for (ImageSet s : getImageSets()) {
-            result.add(s.getId());
-        }
-        return result;
-    }
-
-    @Deprecated // use Bean
-    @SuppressWarnings("unchecked")
-    public List<DynamicImage> getDynamicImages() {
-        return (List<DynamicImage>) ctx
-                .getAttribute(Common.ContextKeys.DYNAMIC_IMAGES);
-    }
-
-    @Deprecated // use Bean
-    public List<String> getDynamicImageIds() {
-        List<String> result = new ArrayList<>();
-        for (DynamicImage d : getDynamicImages()) {
-            result.add(d.getId());
-        }
-        return result;
-    }
-
-    @Deprecated // use Bean
-    public ImageSet getImageSet(String id) {
-        List<ImageSet> imageSets = getImageSets();
-        for (ImageSet imageSet : imageSets) {
-            if (imageSet.getId().equals(id)) {
-                return imageSet;
-            }
-        }
-        return null;
-    }
-
-    @Deprecated // use Bean
-    public DynamicImage getDynamicImage(String id) {
-        List<DynamicImage> dynamicImages = getDynamicImages();
-        for (DynamicImage dynamicImage : dynamicImages) {
-            if (dynamicImage.getId().equals(id)) {
-                return dynamicImage;
-            }
-        }
-        return null;
     }
 
     @Deprecated // use Bean

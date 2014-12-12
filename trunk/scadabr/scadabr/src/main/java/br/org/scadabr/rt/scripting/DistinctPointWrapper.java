@@ -23,7 +23,6 @@ import br.org.scadabr.utils.TimePeriods;
 
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.stats.StartsAndRuntimeList;
 
 /**
