@@ -18,13 +18,8 @@
  */
 package com.serotonin.mango.vo.permission;
 
-import javax.servlet.http.HttpServletRequest;
-
 import br.org.scadabr.ShouldNeverHappenException;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.type.EventType;
-import com.serotonin.mango.view.ShareUser;
-import com.serotonin.mango.view.View;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
@@ -175,36 +170,6 @@ public class Permissions {
             return DataPointAccessTypes.READ;
         }
         return DataPointAccessTypes.NONE;
-    }
-
-    //
-    // / View access
-    //
-    public static void ensureViewPermission(User user, View view) throws PermissionException {
-        if (view.getUserAccess(user) == ShareUser.ACCESS_NONE) {
-            throw new PermissionException("User does not have permission to the view", user);
-        }
-    }
-
-    public static void ensureViewEditPermission(User user, View view) throws PermissionException {
-        if (view.getUserAccess(user) != ShareUser.ACCESS_OWNER) {
-            throw new PermissionException("User does not have permission to edit the view", user);
-        }
-    }
-
-    //
-    // / Watch list access
-    //
-    public static void ensureWatchListPermission(User user, WatchList watchList) throws PermissionException {
-        if (watchList.getUserAccess(user) == ShareUser.ACCESS_NONE) {
-            throw new PermissionException("User does not have permission to the watch list", user);
-        }
-    }
-
-    public static void ensureWatchListEditPermission(User user, WatchList watchList) throws PermissionException {
-        if (watchList.getUserAccess(user) != ShareUser.ACCESS_OWNER) {
-            throw new PermissionException("User does not have permission to edit the watch list", user);
-        }
     }
 
     //

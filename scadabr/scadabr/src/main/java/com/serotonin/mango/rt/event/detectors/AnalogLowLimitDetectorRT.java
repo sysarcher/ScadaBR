@@ -22,13 +22,9 @@ import br.org.scadabr.utils.ImplementMeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.view.text.TextRenderer;
 import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.rt.dataImage.DoubleValueTime;
-import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 
 /**
  * The AnalogLowLimitDetector is used to detect occurances of point values below

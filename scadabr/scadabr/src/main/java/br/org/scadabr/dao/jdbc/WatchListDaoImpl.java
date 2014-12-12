@@ -20,6 +20,8 @@ package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.dao.WatchListDao;
+import br.org.scadabr.utils.ImplementMeException;
+import br.org.scadabr.view.SharedUserAcess;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,7 +31,6 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import com.serotonin.mango.view.ShareUser;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.WatchList;
 import java.sql.Connection;
@@ -221,18 +222,25 @@ public class WatchListDaoImpl extends BaseDao implements WatchListDao {
     // Watch list users
     //
     private void setWatchListUsers(WatchList watchList) {
+        throw new ImplementMeException();
+        /*
         watchList.setWatchListUsers(ejt.query("select userId, accessType from watchListUsers where watchListId=?",
                 new WatchListUserRowMapper(), watchList.getId()));
+                */
     }
 
-    class WatchListUserRowMapper implements RowMapper<ShareUser> {
+    class WatchListUserRowMapper implements RowMapper<SharedUserAcess> {
 
         @Override
-        public ShareUser mapRow(ResultSet rs, int rowNum) throws SQLException {
+        public SharedUserAcess mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    throw new ImplementMeException();
+        /*
+
             ShareUser wlu = new ShareUser();
             wlu.setUserId(rs.getInt(1));
             wlu.setAccessType(rs.getInt(2));
             return wlu;
+                    */
         }
     }
 
@@ -241,7 +249,10 @@ public class WatchListDaoImpl extends BaseDao implements WatchListDao {
     }
 
     void saveWatchListUsers(final WatchList watchList) {
-        // Delete anything that is currently there.
+        throw new ImplementMeException();
+        /*
+
+                // Delete anything that is currently there.
         deleteWatchListUsers(watchList.getId());
 
         // Add in all of the entries.
@@ -259,6 +270,7 @@ public class WatchListDaoImpl extends BaseDao implements WatchListDao {
                 ps.setInt(3, wlu.getAccessType());
             }
         });
+                */
     }
 
     public void removeUserFromWatchList(int watchListId, int userId) {

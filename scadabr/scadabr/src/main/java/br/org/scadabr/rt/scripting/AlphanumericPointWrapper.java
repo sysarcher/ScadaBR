@@ -23,7 +23,6 @@ import br.org.scadabr.utils.TimePeriods;
 import com.serotonin.mango.rt.dataImage.AlphaNumericValueTime;
 
 import com.serotonin.mango.rt.dataImage.IDataPoint;
-import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import com.serotonin.mango.view.stats.ValueChangeCounter;
 
 /**

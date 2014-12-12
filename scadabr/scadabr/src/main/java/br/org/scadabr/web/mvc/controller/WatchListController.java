@@ -24,12 +24,12 @@ import br.org.scadabr.dao.WatchListDao;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.serotonin.mango.view.ShareUser;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.i18n.MessageSource;
+import br.org.scadabr.view.SharedUserAcess;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -87,7 +87,7 @@ public class WatchListController {
                 found = true;
             }
 
-            if (watchList.getUserAccess(user) == ShareUser.ACCESS_OWNER) {
+            if (watchList.getUserAccess(user) == SharedUserAcess.OWNER) {
                 // If this is the owner, check that the user still has access to the points. If not, remove the
                 // unauthorized points, resave, and continue.
                 boolean changed = false;
@@ -133,7 +133,7 @@ public class WatchListController {
         User user = userSessionContextBean.getUser();
 
         WatchList watchList = watchListDao.getWatchList(watchListId);
-        Permissions.ensureWatchListPermission(user, watchList);
+//TODO        Permissions.ensureWatchListPermission(user, watchList);
         prepareWatchList(watchList, user);
 
         watchListDao.saveSelectedWatchList(user.getId(), watchList.getId());
@@ -162,21 +162,21 @@ public class WatchListController {
     }
 
     private void prepareWatchList(WatchList watchList, User user) {
-        int access = watchList.getUserAccess(user);
+        SharedUserAcess access = watchList.getUserAccess(user);
         User owner = userDao.getUser(watchList.getUserId());
         for (DataPointVO point : watchList.getPointList()) {
             updateSetPermission(point, access, owner);
         }
     }
 
-    private void updateSetPermission(DataPointVO point, int access, User owner) {
+    private void updateSetPermission(DataPointVO point, SharedUserAcess access, User owner) {
         // Point isn't settable
         if (!point.getPointLocator().isSettable()) {
             return;
         }
 
         // Read-only access
-        if (access != ShareUser.ACCESS_OWNER && access != ShareUser.ACCESS_SET) {
+        if (access != SharedUserAcess.OWNER && access != SharedUserAcess.SET) {
             return;
         }
 

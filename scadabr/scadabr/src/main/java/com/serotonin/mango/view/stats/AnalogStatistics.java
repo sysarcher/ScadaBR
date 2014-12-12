@@ -19,10 +19,8 @@
 package com.serotonin.mango.view.stats;
 
 import com.serotonin.mango.rt.dataImage.DoubleValueTime;
-import com.serotonin.mango.rt.dataImage.PointValueTime;
 import java.util.List;
 
-import com.serotonin.mango.rt.dataImage.types.DoubleValue;
 
 /**
  * @author Matthew Lohbihler

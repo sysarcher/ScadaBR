@@ -38,8 +38,6 @@ import com.serotonin.mango.rt.event.detectors.DoublePositiveCusumDetectorRT;
 import com.serotonin.mango.rt.event.detectors.StateChangeCountDetectorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
-import com.serotonin.mango.view.text.TextRenderer;
-import com.serotonin.mango.vo.DataPointVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.DataPointDetectorKey;

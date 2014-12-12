@@ -23,13 +23,15 @@ import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.dao.UserDao;
 import br.org.scadabr.dao.WatchListDao;
 import br.org.scadabr.utils.ImplementMeException;
+import br.org.scadabr.view.SharedUserAcess;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.serotonin.mango.view.ShareUser;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.validation.Errors;
@@ -90,19 +92,20 @@ public class WatchList implements Iterable<DataPointVO> {
 
     private String name;
     private final List<DataPointVO> pointList = new CopyOnWriteArrayList<>();
-    private List<ShareUser> watchListUsers = new ArrayList<>();
+    private Map<Integer, SharedUserAcess> watchListUsers = new HashMap<>();
 
-    public int getUserAccess(User user) {
+    public SharedUserAcess getUserAccess(User user) {
         if (user.getId() == userId) {
-            return ShareUser.ACCESS_OWNER;
+            return SharedUserAcess.OWNER;
         }
 
-        for (ShareUser wlu : watchListUsers) {
-            if (wlu.getUserId() == user.getId()) {
-                return wlu.getAccessType();
-            }
+        
+        SharedUserAcess wlu = watchListUsers.get(user.getId());
+        if (wlu != null) {
+            return wlu;
+        } else {
+            return SharedUserAcess.NONE;
         }
-        return ShareUser.ACCESS_NONE;
     }
 
     public int getId() {
@@ -143,14 +146,6 @@ public class WatchList implements Iterable<DataPointVO> {
 
     public void setUserId(int userId) {
         this.userId = userId;
-    }
-
-    public List<ShareUser> getWatchListUsers() {
-        return watchListUsers;
-    }
-
-    public void setWatchListUsers(List<ShareUser> watchListUsers) {
-        this.watchListUsers = watchListUsers;
     }
 
     @Override
