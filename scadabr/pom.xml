@@ -50,8 +50,9 @@
         <module>scadabr-scripting</module>
         <module>scadabr-report</module>
         <module>scadabr-publisher</module>
-        -->
         <module>scadabr-views-core</module>
+        -->
+        <module>scadabr-dao-jdbc</module>
     </modules>
 
     
