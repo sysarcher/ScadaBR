@@ -29,6 +29,7 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import java.util.Set;
@@ -128,10 +129,13 @@ abstract public class PointComponent<T extends PointValueTime> extends ViewCompo
     }
 
     public boolean isChartRenderer() {
+        throw new ImplementMeException();
+        /*
         if (dataPoint == null) {
             return false;
         }
         return dataPoint.getChartRenderer() != null;
+                */
     }
 
     public DataPointVO tgetDataPoint() {

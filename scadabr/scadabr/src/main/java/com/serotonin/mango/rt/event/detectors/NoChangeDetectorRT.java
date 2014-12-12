@@ -19,7 +19,7 @@
 package com.serotonin.mango.rt.event.detectors;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
@@ -28,7 +28,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
  */
 public class NoChangeDetectorRT extends DifferenceDetectorRT {
 
-    public NoChangeDetectorRT(PointEventDetectorVO vo) {
+    public NoChangeDetectorRT(DoublePointEventDetectorVO vo) {
         this.vo = vo;
     }
 

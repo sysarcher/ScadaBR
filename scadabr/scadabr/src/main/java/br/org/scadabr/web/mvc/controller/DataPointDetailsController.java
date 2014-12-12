@@ -20,6 +20,7 @@ package br.org.scadabr.web.mvc.controller;
 
 import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.vo.NumberDataPointVO;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.view.chart.ChartType;
 import com.serotonin.mango.view.chart.ImageChartRenderer;
@@ -95,32 +96,32 @@ class DataPointDetailsController {
         model.addAttribute("toTimestamp", c.getTimeInMillis());
         if (ChartType.IMAGE.supports(dp.getDataType())) {
             // This point can render an image chart. Carry on...
-            if (dp.getChartRenderer() instanceof ImageChartRenderer) {
-                ImageChartRenderer r = (ImageChartRenderer) dp.getChartRenderer();
-                switch (r.getTimePeriod()) {
+            if (dp instanceof NumberDataPointVO) {
+                final NumberDataPointVO r = (NumberDataPointVO) dp;
+                switch (r.getChartTimePeriods()) {
                     case YEARS:
-                        c.add(Calendar.YEAR, -r.getNumberOfPeriods());
+                        c.add(Calendar.YEAR, -r.getNumberOfChartPeriods());
                         break;
                     case MONTHS:
-                        c.add(Calendar.MONTH, -r.getNumberOfPeriods());
+                        c.add(Calendar.MONTH, -r.getNumberOfChartPeriods());
                         break;
                     case WEEKS:
-                        c.add(Calendar.DATE, -r.getNumberOfPeriods() * 7);
+                        c.add(Calendar.DATE, -r.getNumberOfChartPeriods() * 7);
                         break;
                     case DAYS:
-                        c.add(Calendar.DATE, -r.getNumberOfPeriods());
+                        c.add(Calendar.DATE, -r.getNumberOfChartPeriods());
                         break;
                     case HOURS:
-                        c.add(Calendar.HOUR_OF_DAY, -r.getNumberOfPeriods());
+                        c.add(Calendar.HOUR_OF_DAY, -r.getNumberOfChartPeriods());
                         break;
                     case MINUTES:
-                        c.add(Calendar.MINUTE, -r.getNumberOfPeriods());
+                        c.add(Calendar.MINUTE, -r.getNumberOfChartPeriods());
                         break;
                     case SECONDS:
-                        c.add(Calendar.SECOND, -r.getNumberOfPeriods());
+                        c.add(Calendar.SECOND, -r.getNumberOfChartPeriods());
                         break;
                     case MILLISECONDS:
-                        c.add(Calendar.MILLISECOND, -r.getNumberOfPeriods());
+                        c.add(Calendar.MILLISECOND, -r.getNumberOfChartPeriods());
                         break;
                     default:
                         throw new RuntimeException("Not implemented Yet!");

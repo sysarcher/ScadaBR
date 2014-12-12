@@ -22,7 +22,7 @@ import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.DataPointDetectorKey;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 
 
 public class DataPointEventType extends EventType<DataPointDetectorKey> {
@@ -37,7 +37,7 @@ public class DataPointEventType extends EventType<DataPointDetectorKey> {
         this.alarmLevel = alarmLevel;
     }
 
-    public DataPointEventType(PointEventDetectorVO vo) {
+    public DataPointEventType(DoublePointEventDetectorVO vo) {
         super(vo.getDataPointDetectorKey());
         this.dataPointId = vo.njbGetDataPoint().getId();
         this.alarmLevel = vo.getAlarmLevel();

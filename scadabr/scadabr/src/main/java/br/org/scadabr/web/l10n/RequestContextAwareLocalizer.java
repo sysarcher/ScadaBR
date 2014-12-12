@@ -81,14 +81,14 @@ public class RequestContextAwareLocalizer extends AbstractLocalizer {
     }
 
     @Override
-    public <T extends PointValueTime> String format(DataPointVO<T> dpVo, T mv) {
-        return getMessageRender(dpVo.getTextRenderer().getMessagePattern(), getLocale()).format(new Object[]{mv.getValue()});
+    public <T extends PointValueTime> String formatValueAndUnit(DataPointVO<T> dpVo, T mv) {
+        return getMessageRender(dpVo.getValueAndUnitPattern(mv), getLocale()).format(new Object[]{mv.getValue(), dpVo.getUnit()});
     }
 
 
     @Override
-    public <T extends PointValueTime> String formatOnlyValue(DataPointVO<T> dpVo, T mv) {
-        return getMessageRender(dpVo.getTextRenderer().getValueMessagePattern(), getLocale()).format(new Object[]{mv.getValue()});
+    public <T extends PointValueTime> String formatValue(DataPointVO<T> dpVo, T mv) {
+        return getMessageRender(dpVo.getValuePattern(mv), getLocale()).format(mv.getValue());
     }
 
 }

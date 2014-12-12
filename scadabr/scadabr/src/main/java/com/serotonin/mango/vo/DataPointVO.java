@@ -19,7 +19,6 @@
 package com.serotonin.mango.vo;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.InvalidArgumentException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -29,17 +28,11 @@ import java.util.List;
 import br.org.scadabr.ScadaBrConstants;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.DataPointDao;
-import br.org.scadabr.util.ColorUtils;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
-import com.serotonin.mango.view.chart.ChartRenderer;
-import com.serotonin.mango.view.text.NoneRenderer;
-import com.serotonin.mango.view.text.PlainRenderer;
-import com.serotonin.mango.view.text.TextRenderer;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
-import br.org.scadabr.util.SerializationHelper;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.vo.dataSource.PointLocatorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
@@ -56,7 +49,64 @@ import org.springframework.validation.Validator;
 
 public abstract class DataPointVO<T extends PointValueTime> implements Serializable, Cloneable, ChangeComparable<DataPointVO<T>> {
 
-    public abstract <T extends PointValueTime> DataPointRT<T> createRT(); 
+    public abstract <T extends PointValueTime> DataPointRT<T> createRT();
+
+    /**
+     * @return the valuePattern
+     */
+    public String getValuePattern() {
+        return valuePattern;
+    }
+
+    /**
+     * @return the valuePattern for the specific PointValueTime
+     */
+    public String getValuePattern(T pvt) {
+        return valuePattern;
+    }
+
+    /**
+     * @param valuePattern the valuePattern to set
+     */
+    public void setValuePattern(String valuePattern) {
+        this.valuePattern = valuePattern;
+    }
+
+    /**
+     * @return the valueAndUnitPattern
+     */
+    public String getValueAndUnitPattern() {
+        return valueAndUnitPattern;
+    }
+
+    /**
+     * @return the valueAndUnitPattern for the specific PointValueTime.
+     * The first param ('{0}') is the value, the second ('{1}') is the unit
+     */
+    public String getValueAndUnitPattern(T pvt) {
+        return valueAndUnitPattern;
+    }
+
+    /**
+     * @param valueAndUnitPattern the valueAndUnitPattern to set
+     */
+    public void setValueAndUnitPattern(String valueAndUnitPattern) {
+        this.valueAndUnitPattern = valueAndUnitPattern;
+    }
+
+    /**
+     * @return the unit
+     */
+    public String getUnit() {
+        return unit;
+    }
+
+    /**
+     * @param unit the unit to set
+     */
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 
     @Configurable
     public static class DataPointVoValidator implements Validator {
@@ -84,12 +134,6 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
                 errors.rejectValue("name", "validate.required");
             }
 
-            if (vo.loggingType == LoggingTypes.ON_CHANGE && vo.getDataType() == DataType.DOUBLE) {
-                if (vo.tolerance < 0) {
-                    errors.rejectValue("tolerance", "validate.cannotBeNegative");
-                }
-            }
-
             if (vo.intervalLoggingPeriod <= 0) {
                 errors.rejectValue("intervalLoggingPeriod", "validate.greaterThanZero");
             }
@@ -98,33 +142,13 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
                 errors.rejectValue("purgePeriod", "validate.greaterThanZero");
             }
 
-            if (vo.textRenderer == null) {
-                errors.rejectValue("textRenderer", "validate.required");
-            }
-
-            if (!vo.chartColour.isEmpty()) {
-                try {
-                    ColorUtils.toColor(vo.chartColour);
-                } catch (InvalidArgumentException e) {
-                    errors.rejectValue("chartColour", "validate.invalidValue");
-                }
-            }
-
-            // Check text renderer type
-            if (vo.textRenderer != null && !vo.textRenderer.getDef().supports(vo.pointLocator.getDataType())) {
-                errors.rejectValue("textRenderer", "validate.text.incompatible");
-            }
-
-            // Check chart renderer type
-            if (vo.chartRenderer != null && !vo.chartRenderer.getType().supports(vo.pointLocator.getDataType())) {
-                errors.rejectValue("chartRenderer", "validate.chart.incompatible");
-            }
         }
 
     }
 
     private static final long serialVersionUID = -1;
     public static final String XID_PREFIX = "DP_";
+    
 
     public DataType getDataType() {
         return pointLocator.getDataType();
@@ -155,30 +179,24 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
 
     private boolean enabled;
     private int pointFolderId;
-    private LoggingTypes loggingType = LoggingTypes.ON_CHANGE;
+    private LoggingTypes loggingType = LoggingTypes.ALL;
     private TimePeriods intervalLoggingPeriodType = TimePeriods.MINUTES;
 
     private int intervalLoggingPeriod = 15;
     private IntervalLoggingTypes intervalLoggingType = IntervalLoggingTypes.INSTANT;
 
-    private double tolerance = 0;
     private TimePeriods _purgeType = TimePeriods.YEARS;
 
     private int purgePeriod = 1;
-    //TODO SingleValueRendererSettings
-    @Deprecated
-    private TextRenderer textRenderer;
-//TODO    (typeFactory = BaseChartRenderer.Factory.class)
-    //TODO Rename multipleValueRenderSettings
-    @Deprecated
-    private ChartRenderer chartRenderer;
-    private List<PointEventDetectorVO> eventDetectors;
+    private List<DoublePointEventDetectorVO> eventDetectors;
     private List<UserComment> comments;
-    
-    @Deprecated // TODO move to ChartSetting
-    private String chartColour;
 
     private PointLocatorVO<T> pointLocator;
+    
+    private String valuePattern;
+    private String valueAndUnitPattern;
+    private String unit;
+    
 
     //
     //
@@ -203,6 +221,12 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
      */
     //TODO use null ...
     private T lastValue;
+    
+    
+    public DataPointVO(String valuePattern, String valueAndUnitPattern) {
+        this.valuePattern = valuePattern;
+        this.valueAndUnitPattern = valueAndUnitPattern;
+    }
 
     public void resetLastValue() {
         lastValue = null;
@@ -219,21 +243,6 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
     @Deprecated //TODO Make name with hirearchy path
     public String getExtendedName() {
         return deviceName + " - " + name;
-    }
-
-    @Deprecated
-    public void defaultTextRenderer() {
-        if (pointLocator == null) {
-            textRenderer = new PlainRenderer("");
-        } else {
-            switch (pointLocator.getDataType()) {
-                case IMAGE:
-                    textRenderer = new NoneRenderer();
-                    break;
-                default:
-                    textRenderer = new PlainRenderer("");
-            }
-        }
     }
 
     /*
@@ -263,10 +272,11 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.type", loggingType);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.period", intervalLoggingPeriodType.getPeriodDescription(intervalLoggingPeriod));
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.valueType", intervalLoggingType);
-        AuditEventType.addPropertyMessage(list, "pointEdit.logging.tolerance", tolerance);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.purge", _purgeType.getPeriodDescription(purgePeriod));
-        AuditEventType.addPropertyMessage(list, "pointEdit.props.chartColour", chartColour);
-
+        AuditEventType.addPropertyMessage(list, "pointEdit.unit", unit);
+        AuditEventType.addPropertyMessage(list, "pointEdit.valuePattern", valuePattern);
+        AuditEventType.addPropertyMessage(list, "pointEdit.valueAndUnitPattern", valueAndUnitPattern);
+        
         pointLocator.addProperties(list);
     }
 
@@ -280,9 +290,11 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
                 from.intervalLoggingPeriodType.getPeriod(from.intervalLoggingPeriod),
                 intervalLoggingPeriodType.getPeriod(intervalLoggingPeriod));
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.valueType", from.intervalLoggingType, intervalLoggingType);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.tolerance", from.tolerance, tolerance);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.purge", from._purgeType.getPeriodDescription(from.purgePeriod), _purgeType.getPeriodDescription(purgePeriod));
-        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.props.chartColour", from.chartColour, chartColour);
+
+        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.unit", from.unit, unit);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.valuePattern", from.valuePattern, valuePattern);
+        AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.valueAndUnitPattern", from.valuePattern, valuePattern);
 
         pointLocator.addPropertyChanges(list, from.pointLocator);
     }
@@ -396,40 +408,11 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
         this._purgeType = purgeType;
     }
 
-    public double getTolerance() {
-        return tolerance;
-    }
-
-    public void setTolerance(double tolerance) {
-        this.tolerance = tolerance;
-    }
-
-    //TODO use MessageFormat pattern for this ???
-    @Deprecated
-    public TextRenderer getTextRenderer() {
-        return textRenderer;
-    }
-
-    @Deprecated
-    public void setTextRenderer(TextRenderer textRenderer) {
-        this.textRenderer = textRenderer;
-    }
-
-    @Deprecated
-    public ChartRenderer getChartRenderer() {
-        return chartRenderer;
-    }
-
-    @Deprecated
-    public void setChartRenderer(ChartRenderer chartRenderer) {
-        this.chartRenderer = chartRenderer;
-    }
-
-    public List<PointEventDetectorVO> getEventDetectors() {
+    public List<DoublePointEventDetectorVO> getEventDetectors() {
         return eventDetectors;
     }
 
-    public void setEventDetectors(List<PointEventDetectorVO> eventDetectors) {
+    public void setEventDetectors(List<DoublePointEventDetectorVO> eventDetectors) {
         this.eventDetectors = eventDetectors;
     }
 
@@ -465,16 +448,6 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
         this.intervalLoggingType = intervalLoggingType;
     }
 
-    @Deprecated
-    public String getChartColour() {
-        return chartColour;
-    }
-
-    @Deprecated
-    public void setChartColour(String chartColour) {
-        this.chartColour = chartColour;
-    }
-
     public DataPointVO copy() {
         try {
             return (DataPointVO) super.clone();
@@ -489,10 +462,9 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
                 + ", deviceName=" + deviceName + ", enabled=" + enabled + ", pointFolderId=" + pointFolderId
                 + ", loggingType=" + loggingType + ", intervalLoggingPeriodType=" + intervalLoggingPeriodType
                 + ", intervalLoggingPeriod=" + intervalLoggingPeriod + ", intervalLoggingType=" + intervalLoggingType
-                + ", tolerance=" + tolerance + ", purgeType=" + _purgeType + ", purgePeriod=" + purgePeriod
-                + ", textRenderer=" + textRenderer + ", chartRenderer=" + chartRenderer
+                + ", purgeType=" + _purgeType + ", purgePeriod=" + purgePeriod
                 + ", eventDetectors=" + eventDetectors + ", comments=" + comments
-                + ", chartColour=" + chartColour + ", pointLocator=" + pointLocator
+                + ", pointLocator=" + pointLocator
                 + ", dataSourceName=" + dataSourceName + ", dataSourceXid=" + dataSourceXid
                 + ", lastValue=" + lastValue + ", settable=" + settable + "]";
     }
@@ -501,241 +473,49 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
     //
     // Serialization
     //
-    private static final int version = 8;
+    private static final int version = 1;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(version);
-        SerializationHelper.writeSafeUTF(out, name);
-        SerializationHelper.writeSafeUTF(out, deviceName);
+        out.writeObject(name);
+        out.writeObject(deviceName);
         out.writeBoolean(enabled);
         out.writeInt(pointFolderId);
-        out.writeInt(loggingType.mangoDbId);
-        out.writeInt(intervalLoggingPeriodType.getId());
+        out.writeObject(loggingType);
+        out.writeObject(intervalLoggingPeriodType);
         out.writeInt(intervalLoggingPeriod);
-        out.writeInt(intervalLoggingType.getId());
-        out.writeDouble(tolerance);
-        out.writeInt(_purgeType.getId());
+        out.writeObject(intervalLoggingType);
+        out.writeObject(_purgeType);
         out.writeInt(purgePeriod);
-        out.writeObject(textRenderer);
-        out.writeObject(chartRenderer);
+        out.writeObject(unit);
+        out.writeObject(valuePattern);
+        out.writeObject(valueAndUnitPattern);
+
         out.writeObject(pointLocator);
-        out.writeInt(0);
-        out.writeBoolean(false); //discardExtremeValues);
-        out.writeDouble(-Double.MAX_VALUE); //discardLowLimit);
-        out.writeDouble(Double.MAX_VALUE); //discardHighLimit);
-        out.writeInt(0); //engineeringUnits);
-        SerializationHelper.writeSafeUTF(out, chartColour);
+        
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int ver = in.readInt();
 
         // Switch on the version of the class so that version changes can be elegantly handled.
-        if (ver == 1) {
-            name = SerializationHelper.readSafeUTF(in);
-            deviceName = null;
-            enabled = in.readBoolean();
-            pointFolderId = 0;
-            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
-            intervalLoggingPeriodType = TimePeriods.MINUTES;
-            intervalLoggingPeriod = 15;
-            intervalLoggingType = IntervalLoggingTypes.INSTANT;
-            tolerance = in.readDouble();
-            _purgeType = TimePeriods.fromId(in.readInt());
-            purgePeriod = in.readInt();
-            textRenderer = (TextRenderer) in.readObject();
-            chartRenderer = (ChartRenderer) in.readObject();
-            pointLocator = (PointLocatorVO) in.readObject();
-//            defaultCacheSize = 0;
-//            engineeringUnits = ENGINEERING_UNITS_DEFAULT;
-            chartColour = null;
-        } else if (ver == 2) {
-            name = SerializationHelper.readSafeUTF(in);
-            deviceName = null;
-            enabled = in.readBoolean();
-            pointFolderId = in.readInt();
-            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
-            intervalLoggingPeriodType = TimePeriods.MINUTES;
-            intervalLoggingPeriod = 15;
-            intervalLoggingType = IntervalLoggingTypes.INSTANT;
-            tolerance = in.readDouble();
-            _purgeType = TimePeriods.fromId(in.readInt());
-            purgePeriod = in.readInt();
-            textRenderer = (TextRenderer) in.readObject();
-            chartRenderer = (ChartRenderer) in.readObject();
-
-            // The spinwave changes were not correctly implemented, so we need to handle potential errors here.
-            try {
+        switch (ver) {
+            case 1:
+                name = (String) in.readObject();
+                deviceName = (String) in.readObject();
+                enabled = in.readBoolean();
+                pointFolderId = in.readInt();
+                loggingType = (LoggingTypes) (in.readObject());
+                intervalLoggingPeriodType = (TimePeriods) in.readObject();
+                intervalLoggingPeriod = in.readInt();
+                intervalLoggingType = (IntervalLoggingTypes) in.readObject();
+                _purgeType = (TimePeriods) in.readObject();
+                purgePeriod = in.readInt();
+                unit = (String) in.readObject();
+                valuePattern = (String) in.readObject();
+                valueAndUnitPattern = (String) in.readObject();
+                
                 pointLocator = (PointLocatorVO) in.readObject();
-            } catch (IOException e) {
-                // Turn this guy off.
-                enabled = false;
-            }
-//            defaultCacheSize = 0;
-//            engineeringUnits = ENGINEERING_UNITS_DEFAULT;
-            chartColour = null;
-        } else if (ver == 3) {
-            name = SerializationHelper.readSafeUTF(in);
-            deviceName = null;
-            enabled = in.readBoolean();
-            pointFolderId = in.readInt();
-            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
-            intervalLoggingPeriodType = TimePeriods.MINUTES;
-            intervalLoggingPeriod = 15;
-            intervalLoggingType = IntervalLoggingTypes.INSTANT;
-            tolerance = in.readDouble();
-            _purgeType = TimePeriods.fromId(in.readInt());
-            purgePeriod = in.readInt();
-            textRenderer = (TextRenderer) in.readObject();
-            chartRenderer = (ChartRenderer) in.readObject();
-
-            // The spinwave changes were not correctly implemented, so we need to handle potential errors here.
-            try {
-                pointLocator = (PointLocatorVO) in.readObject();
-            } catch (IOException e) {
-                // Turn this guy off.
-                enabled = false;
-            }
-//            defaultCacheSize = in.readInt();
-//            engineeringUnits = ENGINEERING_UNITS_DEFAULT;
-            chartColour = null;
-        } else if (ver == 4) {
-            name = SerializationHelper.readSafeUTF(in);
-            deviceName = null;
-            enabled = in.readBoolean();
-            pointFolderId = in.readInt();
-            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
-            intervalLoggingPeriodType = TimePeriods.fromId(in.readInt());
-            intervalLoggingPeriod = in.readInt();
-            intervalLoggingType = IntervalLoggingTypes.fromId(in.readInt());
-            tolerance = in.readDouble();
-            _purgeType = TimePeriods.fromId(in.readInt());
-            purgePeriod = in.readInt();
-            textRenderer = (TextRenderer) in.readObject();
-            chartRenderer = (ChartRenderer) in.readObject();
-
-            // The spinwave changes were not correctly implemented, so we need to handle potential errors here.
-            try {
-                pointLocator = (PointLocatorVO) in.readObject();
-            } catch (IOException e) {
-                // Turn this guy off.
-                enabled = false;
-            }
-//            defaultCacheSize = in.readInt();
-//            engineeringUnits = ENGINEERING_UNITS_DEFAULT;
-            chartColour = null;
-        } else if (ver == 5) {
-            name = SerializationHelper.readSafeUTF(in);
-            deviceName = null;
-            enabled = in.readBoolean();
-            pointFolderId = in.readInt();
-            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
-            intervalLoggingPeriodType = TimePeriods.fromId(in.readInt());
-            intervalLoggingPeriod = in.readInt();
-            intervalLoggingType = IntervalLoggingTypes.fromId(in.readInt());
-            tolerance = in.readDouble();
-            _purgeType = TimePeriods.fromId(in.readInt());
-            purgePeriod = in.readInt();
-            textRenderer = (TextRenderer) in.readObject();
-            chartRenderer = (ChartRenderer) in.readObject();
-            pointLocator = (PointLocatorVO) in.readObject();
-            //defaultCacheSize = 
-            in.readInt();
-            //discardExtremeValues = 
-            in.readBoolean();
-            //discardLowLimit = 
-            in.readDouble();
-            //discardHighLimit = 
-            in.readDouble();
-            //engineeringUnits = ENGINEERING_UNITS_DEFAULT;
-            chartColour = null;
-        } else if (ver == 6) {
-            name = SerializationHelper.readSafeUTF(in);
-            deviceName = null;
-            enabled = in.readBoolean();
-            pointFolderId = in.readInt();
-            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
-            intervalLoggingPeriodType = TimePeriods.fromId(in.readInt());
-            intervalLoggingPeriod = in.readInt();
-            intervalLoggingType = IntervalLoggingTypes.fromId(in.readInt());
-            tolerance = in.readDouble();
-            _purgeType = TimePeriods.fromId(in.readInt());
-            purgePeriod = in.readInt();
-            textRenderer = (TextRenderer) in.readObject();
-            chartRenderer = (ChartRenderer) in.readObject();
-            pointLocator = (PointLocatorVO) in.readObject();
-            //defaultCacheSize = 
-            in.readInt();
-            //discardExtremeValues = 
-            in.readBoolean();
-            //discardLowLimit = 
-            in.readDouble();
-            //discardHighLimit = 
-            in.readDouble();
-            //engineeringUnits = 
-            in.readInt();
-            chartColour = null;
-        } else if (ver == 7) {
-            name = SerializationHelper.readSafeUTF(in);
-            deviceName = null;
-            enabled = in.readBoolean();
-            pointFolderId = in.readInt();
-            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
-            intervalLoggingPeriodType = TimePeriods.fromId(in.readInt());
-            intervalLoggingPeriod = in.readInt();
-            intervalLoggingType = IntervalLoggingTypes.fromId(in.readInt());
-            tolerance = in.readDouble();
-            _purgeType = TimePeriods.fromId(in.readInt());
-            purgePeriod = in.readInt();
-            textRenderer = (TextRenderer) in.readObject();
-            chartRenderer = (ChartRenderer) in.readObject();
-            pointLocator = (PointLocatorVO) in.readObject();
-            //defaultCacheSize = 
-            in.readInt();
-            //discardExtremeValues = 
-            in.readBoolean();
-            //discardLowLimit = 
-            in.readDouble();
-            //discardHighLimit = 
-            in.readDouble();
-            //engineeringUnits = 
-            in.readInt();
-            chartColour = SerializationHelper.readSafeUTF(in);
-        } else if (ver == 8) {
-            name = SerializationHelper.readSafeUTF(in);
-            deviceName = SerializationHelper.readSafeUTF(in);
-            enabled = in.readBoolean();
-            pointFolderId = in.readInt();
-            loggingType = LoggingTypes.fromMangoDbId(in.readInt());
-            intervalLoggingPeriodType = TimePeriods.fromId(in.readInt());
-            intervalLoggingPeriod = in.readInt();
-            intervalLoggingType = IntervalLoggingTypes.fromId(in.readInt());
-            tolerance = in.readDouble();
-            _purgeType = TimePeriods.fromId(in.readInt());
-            purgePeriod = in.readInt();
-            textRenderer = (TextRenderer) in.readObject();
-            chartRenderer = (ChartRenderer) in.readObject();
-            pointLocator = (PointLocatorVO) in.readObject();
-            //defaultCacheSize = 
-            in.readInt();
-            //discardExtremeValues = 
-            in.readBoolean();
-            //discardLowLimit = 
-            in.readDouble();
-            //discardHighLimit = 
-            in.readDouble();
-            //engineeringUnits = 
-            in.readInt();
-            chartColour = SerializationHelper.readSafeUTF(in);
-        }
-
-        // Check the purge type. Weird how this could have been set to 0.
-        if (_purgeType == null) {
-            _purgeType = TimePeriods.YEARS;
-        }
-        // Ditto for purge period
-        if (purgePeriod == 0) {
-            purgePeriod = 1;
         }
     }
 

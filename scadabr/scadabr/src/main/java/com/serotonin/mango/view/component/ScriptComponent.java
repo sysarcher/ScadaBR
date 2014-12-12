@@ -142,6 +142,9 @@ public class ScriptComponent<T extends PointValueTime> extends PointComponent<T>
     }
 
     public static String getHtmlText(DataPointVO point, PointValueTime pointValue) {
+                throw new ImplementMeException();
+        /* TODO half localized data...
+
         if (point == null) {
             return "-";
         }
@@ -151,6 +154,7 @@ public class ScriptComponent<T extends PointValueTime> extends PointComponent<T>
         String text = point.getTextRenderer().getText(pointValue, TextRenderer.HINT_FULL);
         String colour = point.getTextRenderer().getColour(pointValue);
         return getHtml(colour, text, point.getDataType() == DataType.ALPHANUMERIC);
+*/
     }
 
     private static String getHtml(String colour, String text, boolean detectOverflow) {
@@ -171,10 +175,13 @@ public class ScriptComponent<T extends PointValueTime> extends PointComponent<T>
     }
 
     public static String getRenderedText(DataPointVO point, PointValueTime pointValue) {
+        throw new ImplementMeException();
+        /* TODO half localized data...
         if (point == null) {
             return "-";
         }
         return point.getTextRenderer().getText(pointValue, TextRenderer.HINT_FULL);
+*/
     }
 
     public static String encodeDQuot(String s) {

@@ -38,7 +38,7 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.util.StringUtils;
 import br.org.scadabr.rt.event.type.EventSources;
@@ -60,6 +60,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.support.TransactionCallback;
 import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.dao.MaintenanceEventDao;
+import com.serotonin.mango.vo.DoubleDataPointVO;
 
 @Named
 public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
@@ -275,9 +276,9 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
                     dataPointCopy.getComments().clear();
 
                     // Copy the event detectors
-                    for (PointEventDetectorVO ped : dataPointCopy.getEventDetectors()) {
+                    for (DoublePointEventDetectorVO ped : dataPointCopy.getEventDetectors()) {
                         ped.setId(ScadaBrConstants.NEW_ID);
-                        ped.njbSetDataPoint(dataPointCopy);
+                        ped.njbSetDataPoint((DoubleDataPointVO)dataPointCopy);
                     }
 
                     dataPointDao.saveDataPoint(dataPointCopy);

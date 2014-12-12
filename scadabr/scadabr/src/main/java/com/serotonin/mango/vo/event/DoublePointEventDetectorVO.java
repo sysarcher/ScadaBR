@@ -34,7 +34,7 @@ import com.serotonin.mango.rt.event.detectors.NoChangeDetectorRT;
 import com.serotonin.mango.rt.event.detectors.NoUpdateDetectorRT;
 import com.serotonin.mango.rt.event.detectors.PointChangeDetectorRT;
 import com.serotonin.mango.rt.event.detectors.PointEventDetectorRT;
-import com.serotonin.mango.rt.event.detectors.PositiveCusumDetectorRT;
+import com.serotonin.mango.rt.event.detectors.DoublePositiveCusumDetectorRT;
 import com.serotonin.mango.rt.event.detectors.StateChangeCountDetectorRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
@@ -44,8 +44,9 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.type.DataPointDetectorKey;
 import com.serotonin.mango.rt.event.type.DataPointEventType;
+import com.serotonin.mango.vo.DoubleDataPointVO;
 
-public class PointEventDetectorVO implements EventDetectorVO, Cloneable, ChangeComparable<PointEventDetectorVO> {
+public class DoublePointEventDetectorVO implements EventDetectorVO, Cloneable, ChangeComparable<DoublePointEventDetectorVO> {
 
     public static final String XID_PREFIX = "PED_";
 
@@ -53,7 +54,7 @@ public class PointEventDetectorVO implements EventDetectorVO, Cloneable, ChangeC
     private String xid;
 
     private String alias;
-    private DataPointVO dataPoint;
+    private DoubleDataPointVO dataPoint;
     private DataPointDetectorKey dataPointDetectorKey;
     private AlarmLevel alarmLevel;
     private double limit;
@@ -94,7 +95,7 @@ public class PointEventDetectorVO implements EventDetectorVO, Cloneable, ChangeC
             case ALPHANUMERIC_STATE:
                 return new AlphanumericStateDetectorRT(this);
             case POSITIVE_CUSUM:
-                return new PositiveCusumDetectorRT(this);
+                return new DoublePositiveCusumDetectorRT(this);
             case NEGATIVE_CUSUM:
                 return new NegativeCusumDetectorRT(this);
         }
@@ -114,6 +115,8 @@ public class PointEventDetectorVO implements EventDetectorVO, Cloneable, ChangeC
     }
 
     private LocalizableMessage getConfigurationDescription() {
+        throw new ImplementMeException(); 
+        /* TODO half localized data ... haow to handle this ????
         LocalizableMessage durationDesc = getDurationDescription();
         switch (dataPointDetectorKey) {
             case ANALOG_HIGH_LIMIT:
@@ -183,6 +186,7 @@ public class PointEventDetectorVO implements EventDetectorVO, Cloneable, ChangeC
             default:
                 throw new ShouldNeverHappenException("Unknown detector type: " + dataPointDetectorKey);
         }
+        */
     }
 
     public LocalizableMessage getDurationDescription() {
@@ -192,9 +196,9 @@ public class PointEventDetectorVO implements EventDetectorVO, Cloneable, ChangeC
         return durationType.getPeriodDescription(duration);
     }
 
-    public PointEventDetectorVO copy() {
+    public DoublePointEventDetectorVO copy() {
         try {
-            return (PointEventDetectorVO) super.clone();
+            return (DoublePointEventDetectorVO) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new ShouldNeverHappenException(e);
         }
@@ -216,7 +220,7 @@ public class PointEventDetectorVO implements EventDetectorVO, Cloneable, ChangeC
     }
 
     @Override
-    public void addPropertyChanges(List<LocalizableMessage> list, PointEventDetectorVO from) {
+    public void addPropertyChanges(List<LocalizableMessage> list, DoublePointEventDetectorVO from) {
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.xid", from.xid, xid);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.detectors.alias", from.alias, alias);
         if (from.dataPointDetectorKey != dataPointDetectorKey) {
@@ -233,11 +237,11 @@ public class PointEventDetectorVO implements EventDetectorVO, Cloneable, ChangeC
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.detectors.weight", from.weight, weight);
     }
 
-    public DataPointVO njbGetDataPoint() {
+    public DoubleDataPointVO njbGetDataPoint() {
         return dataPoint;
     }
 
-    public void njbSetDataPoint(DataPointVO dataPoint) {
+    public void njbSetDataPoint(DoubleDataPointVO dataPoint) {
         this.dataPoint = dataPoint;
     }
 

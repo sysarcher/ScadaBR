@@ -18,8 +18,9 @@
  */
 package com.serotonin.mango.rt.event.detectors;
 
+import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.view.text.TextRenderer;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.rt.dataImage.DoubleValueTime;
@@ -58,12 +59,14 @@ public class AnalogHighLimitDetectorRT extends TimeDelayedEventDetectorRT<Double
      */
     private boolean eventActive;
 
-    public AnalogHighLimitDetectorRT(PointEventDetectorVO vo) {
+    public AnalogHighLimitDetectorRT(DoublePointEventDetectorVO vo) {
         this.vo = vo;
     }
 
     @Override
     public LocalizableMessage getMessage() {
+        throw new ImplementMeException();
+        /* TODO half localized stuff
         String name = vo.njbGetDataPoint().getName();
         String prettyLimit = vo.njbGetDataPoint().getTextRenderer().getText(vo.getLimit(), TextRenderer.HINT_SPECIFIC);
         LocalizableMessage durationDescription = getDurationDescription();
@@ -71,6 +74,7 @@ public class AnalogHighLimitDetectorRT extends TimeDelayedEventDetectorRT<Double
             return new LocalizableMessageImpl("event.detector.highLimit", name, prettyLimit);
         }
         return new LocalizableMessageImpl("event.detector.highLimitPeriod", name, prettyLimit, durationDescription);
+*/
     }
 
     @Override
