@@ -33,13 +33,13 @@ public class JsonWatchListPoint implements Serializable {
 
             timestamp = pvt.getTimestamp();
             changed = timestamp + 30000 > System.currentTimeMillis();
-            value = localizer.format(dp, pvt);
-            final ChartRenderer renderer = dp.getChartRenderer();
-            if (renderer != null) {
-                chartType = renderer.getType();
-            } else {
+            value = localizer.formatValue(dp, pvt);
+//TODO            final ChartRenderer renderer = dp.getChartRenderer();
+//            if (renderer != null) {
+//                chartType = renderer.getType();
+//            } else {
                 chartType = ChartType.NONE;
-            }
+//            }
         }
     }
 

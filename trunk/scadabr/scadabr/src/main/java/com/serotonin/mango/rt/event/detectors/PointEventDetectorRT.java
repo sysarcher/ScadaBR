@@ -25,14 +25,14 @@ import com.serotonin.mango.rt.dataImage.DataPointListener;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.event.SimpleEventDetector;
 import com.serotonin.mango.rt.event.type.DataPointEventType;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
 abstract public class PointEventDetectorRT<T extends PointValueTime> extends SimpleEventDetector implements DataPointListener<T> {
 
     //TODO make this final ...
-    protected PointEventDetectorVO vo;
+    protected DoublePointEventDetectorVO vo;
 
     protected DataPointEventType getEventType() {
         return new DataPointEventType(vo);

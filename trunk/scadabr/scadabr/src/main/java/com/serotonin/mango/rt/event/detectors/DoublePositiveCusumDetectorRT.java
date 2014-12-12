@@ -18,9 +18,10 @@
  */
 package com.serotonin.mango.rt.event.detectors;
 
+import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.text.TextRenderer;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.rt.dataImage.DoubleValueTime;
@@ -34,7 +35,7 @@ import com.serotonin.mango.rt.dataImage.types.DoubleValue;
  *
  * @author Matthew Lohbihler
  */
-public class PositiveCusumDetectorRT extends TimeDelayedEventDetectorRT<DoubleValueTime> {
+public class DoublePositiveCusumDetectorRT extends TimeDelayedEventDetectorRT<DoubleValueTime> {
 
     /**
      * State field. The current positive CUSUM for the point.
@@ -58,12 +59,14 @@ public class PositiveCusumDetectorRT extends TimeDelayedEventDetectorRT<DoubleVa
      */
     private boolean eventActive;
 
-    public PositiveCusumDetectorRT(PointEventDetectorVO vo) {
+    public DoublePositiveCusumDetectorRT(DoublePointEventDetectorVO vo) {
         this.vo = vo;
     }
 
     @Override
     public LocalizableMessage getMessage() {
+        throw new ImplementMeException();
+        /* TODO half localized data...
         String name = vo.njbGetDataPoint().getName();
         String prettyLimit = vo.njbGetDataPoint().getTextRenderer().getText(vo.getLimit(), TextRenderer.HINT_SPECIFIC);
         LocalizableMessage durationDescription = getDurationDescription();
@@ -71,7 +74,8 @@ public class PositiveCusumDetectorRT extends TimeDelayedEventDetectorRT<DoubleVa
             return new LocalizableMessageImpl("event.detector.posCusum", name, prettyLimit);
         }
         return new LocalizableMessageImpl("event.detector.posCusumPeriod", name, prettyLimit, durationDescription);
-    }
+    */
+        }
 
     public boolean isEventActive() {
         return eventActive;

@@ -18,13 +18,10 @@
  */
 package com.serotonin.mango.rt.event.detectors;
 
-import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.view.text.TextRenderer;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
+import br.org.scadabr.utils.ImplementMeException;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.rt.dataImage.AlphaNumericValueTime;
-import com.serotonin.mango.rt.dataImage.types.AlphanumericValue;
 import java.util.Objects;
 
 /**
@@ -32,12 +29,14 @@ import java.util.Objects;
  */
 public class AlphanumericStateDetectorRT extends StateDetectorRT<AlphaNumericValueTime> {
 
-    public AlphanumericStateDetectorRT(PointEventDetectorVO vo) {
+    public AlphanumericStateDetectorRT(DoublePointEventDetectorVO vo) {
         this.vo = vo;
     }
 
     @Override
     public LocalizableMessage getMessage() {
+        throw new ImplementMeException();
+        /* TODO half localized stuff
         String name = vo.njbGetDataPoint().getName();
         String prettyText = vo.njbGetDataPoint().getTextRenderer().getText(vo.getAlphanumericState(),
                 TextRenderer.HINT_SPECIFIC);
@@ -47,6 +46,7 @@ public class AlphanumericStateDetectorRT extends StateDetectorRT<AlphaNumericVal
             return new LocalizableMessageImpl("event.detector.periodState", name, prettyText, durationDescription);
         }
         return new LocalizableMessageImpl("event.detector.state", name, prettyText);
+*/
     }
 
     @Override

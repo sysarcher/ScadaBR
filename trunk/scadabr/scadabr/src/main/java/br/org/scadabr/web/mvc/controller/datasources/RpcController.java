@@ -24,7 +24,7 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.DoubleDataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaPointLocatorVO;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -79,9 +79,7 @@ public class RpcController {
         dp.setPointLocator(result);
         dp.setEnabled(false);
         dp.setLoggingType(LoggingTypes.ALL);
-        dp.setEventDetectors(new ArrayList<PointEventDetectorVO>());
-        dp.setTextRenderer(new AnalogRenderer("#,##0.0", ""));
-        dp.setChartRenderer(new ImageChartRenderer(TimePeriods.DAYS, 1));
+        dp.setEventDetectors(new ArrayList<DoublePointEventDetectorVO>());
         dataPointDao.saveDataPoint(dp);
         return result;
     }

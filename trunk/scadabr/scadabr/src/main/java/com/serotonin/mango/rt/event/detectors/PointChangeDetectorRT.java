@@ -18,10 +18,11 @@
  */
 package com.serotonin.mango.rt.event.detectors;
 
+import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.view.text.TextRenderer;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 
@@ -30,7 +31,7 @@ public class PointChangeDetectorRT extends PointEventDetectorRT<PointValueTime> 
     private MangoValue oldValue;
     private MangoValue newValue;
 
-    public PointChangeDetectorRT(PointEventDetectorVO vo) {
+    public PointChangeDetectorRT(DoublePointEventDetectorVO vo) {
         this.vo = vo;
     }
 
@@ -41,7 +42,10 @@ public class PointChangeDetectorRT extends PointEventDetectorRT<PointValueTime> 
     }
 
     private String formatValue(MangoValue value) {
+        throw new ImplementMeException();
+        /* TODO half localized stuff
         return vo.njbGetDataPoint().getTextRenderer().getText(value, TextRenderer.HINT_SPECIFIC);
+*/
     }
 
     @Override

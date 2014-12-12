@@ -35,7 +35,7 @@ import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.event.detectors.PointEventDetectorRT;
 import com.serotonin.mango.util.timeout.RunClient;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import br.org.scadabr.timer.cron.EventRunnable;
 import br.org.scadabr.util.ILifecycle;
 import com.serotonin.mango.rt.EventManager;
@@ -257,7 +257,7 @@ public abstract class DataPointRT<T extends PointValueTime> implements IDataPoin
         pointValue = pointValueDao.getLatestPointValue(vo);
 
         // Add point event listeners
-        for (PointEventDetectorVO ped : vo.getEventDetectors()) {
+        for (DoublePointEventDetectorVO ped : vo.getEventDetectors()) {
             if (detectors == null) {
                 detectors = new ArrayList<>();
             }

@@ -4,6 +4,7 @@ import br.org.scadabr.dao.PointValueDao;
 import br.org.scadabr.dao.UserDao;
 import br.org.scadabr.dao.WatchListDao;
 import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.googlecode.jsonrpc4j.JsonRpcService;
 import com.serotonin.mango.rt.RuntimeManager;
@@ -124,6 +125,8 @@ public class WatchListService implements Serializable {
     }
 
     public JsonChartDataSet getChartDataSet(int dataPointId) {
+        throw new ImplementMeException();
+        /* TODO half localized stuff
         DataPointVO dp = dataPointDao.getDataPoint(dataPointId);
         if (dp.getChartRenderer() instanceof TimePeriodChartRenderer) {
             final TimePeriodChartRenderer tpcr = (TimePeriodChartRenderer)dp.getChartRenderer();
@@ -134,6 +137,7 @@ public class WatchListService implements Serializable {
             return new JsonChartDataSet(from, to, dp, pvt);
         }
         return new JsonChartDataSet();
+*/
     }
 
     

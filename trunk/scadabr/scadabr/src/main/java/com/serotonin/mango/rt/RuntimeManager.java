@@ -44,7 +44,7 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.util.HashSet;
@@ -274,24 +274,10 @@ public class RuntimeManager {
         // it.
         DataType dataType = point.getDataType();
 
-        // Chart renderer
-        if (point.getChartRenderer() != null
-                && !point.getChartRenderer().getType().supports(dataType)) // Return to a default renderer
-        {
-            point.setChartRenderer(null);
-        }
-
-        // Text renderer
-        if (point.getTextRenderer() != null
-                && !point.getTextRenderer().getDef().supports(dataType)) // Return to a default renderer
-        {
-            point.defaultTextRenderer();
-        }
-
         // Event detectors
-        final Iterator<PointEventDetectorVO> peds = point.getEventDetectors().iterator();
+        final Iterator<DoublePointEventDetectorVO> peds = point.getEventDetectors().iterator();
         while (peds.hasNext()) {
-            PointEventDetectorVO ped = peds.next();
+            DoublePointEventDetectorVO ped = peds.next();
             if (!ped.getDataPointDetectorKey().supports(dataType)) {
                 // Remove the detector.
                 peds.remove();

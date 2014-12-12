@@ -18,9 +18,10 @@
  */
 package com.serotonin.mango.rt.event.detectors;
 
+import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.view.text.TextRenderer;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.rt.dataImage.MultistateValueTime;
@@ -29,12 +30,14 @@ import com.serotonin.mango.rt.dataImage.types.MultistateValue;
 
 public class MultistateStateDetectorRT extends StateDetectorRT<MultistateValueTime> {
 
-    public MultistateStateDetectorRT(PointEventDetectorVO vo) {
+    public MultistateStateDetectorRT(DoublePointEventDetectorVO vo) {
         this.vo = vo;
     }
 
     @Override
     public LocalizableMessage getMessage() {
+        throw new ImplementMeException();
+        /* TODO half localized stuff
         String name = vo.njbGetDataPoint().getName();
         String prettyText = vo.njbGetDataPoint().getTextRenderer().getText(vo.getMultistateState(),
                 TextRenderer.HINT_SPECIFIC);
@@ -44,6 +47,7 @@ public class MultistateStateDetectorRT extends StateDetectorRT<MultistateValueTi
             return new LocalizableMessageImpl("event.detector.state", name, prettyText);
         }
         return new LocalizableMessageImpl("event.detector.periodState", name, prettyText, durationDescription);
+*/
     }
 
     @Override

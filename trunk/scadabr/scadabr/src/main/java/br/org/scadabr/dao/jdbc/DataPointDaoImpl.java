@@ -44,7 +44,7 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.vo.bean.PointHistoryCount;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import com.serotonin.mango.vo.hierarchy.PointFolder;
 import com.serotonin.mango.vo.hierarchy.PointHierarchy;
 import com.serotonin.mango.vo.hierarchy.PointHierarchyEventDispatcher;
@@ -58,6 +58,7 @@ import br.org.scadabr.vo.event.type.AuditEventKey;
 import br.org.scadabr.vo.event.type.DataPointDetectorKey;
 import br.org.scadabr.web.LazyTreeNode;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
+import com.serotonin.mango.vo.DoubleDataPointVO;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Collection;
@@ -292,11 +293,6 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
         if (dp.getXid() == null || dp.getXid().isEmpty()) {
             dp.setXid(generateUniqueXid());
         }
-        // Create a default text renderer
-        if (dp.getTextRenderer() == null) {
-            dp.defaultTextRenderer();
-        }
-
         // Insert the main data point record.
         final int id = doInsert(new PreparedStatementCreator() {
 
@@ -465,9 +461,9 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
     }
 
     public String generateEventDetectorUniqueXid(int dataPointId) {
-        String xid = generateXid(PointEventDetectorVO.XID_PREFIX);
+        String xid = generateXid(DoublePointEventDetectorVO.XID_PREFIX);
         while (!isEventDetectorXidUnique(dataPointId, xid, -1)) {
-            xid = generateXid(PointEventDetectorVO.XID_PREFIX);
+            xid = generateXid(DoublePointEventDetectorVO.XID_PREFIX);
         }
         return xid;
     }
@@ -480,7 +476,7 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
         dp.setEventDetectors(getEventDetectors(dp));
     }
 
-    private List<PointEventDetectorVO> getEventDetectors(DataPointVO dp) {
+    private List<DoublePointEventDetectorVO> getEventDetectors(DataPointVO dp) {
         return ejt.query(
                 "select id, xid, alias, detectorType, alarmLevel, stateLimit, duration, durationType, binaryState, " //
                 + "  multistateState, changeCount, alphanumericState, weight " //
@@ -490,7 +486,7 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
                 new EventDetectorRowMapper(dp), dp.getId());
     }
 
-    class EventDetectorRowMapper implements RowMapper<PointEventDetectorVO> {
+    class EventDetectorRowMapper implements RowMapper<DoublePointEventDetectorVO> {
 
         private final DataPointVO dp;
 
@@ -499,8 +495,8 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
         }
 
         @Override
-        public PointEventDetectorVO mapRow(ResultSet rs, int rowNum) throws SQLException {
-            PointEventDetectorVO detector = new PointEventDetectorVO();
+        public DoublePointEventDetectorVO mapRow(ResultSet rs, int rowNum) throws SQLException {
+            DoublePointEventDetectorVO detector = new DoublePointEventDetectorVO();
             int i = 0;
             detector.setId(rs.getInt(++i));
             detector.setXid(rs.getString(++i));
@@ -515,17 +511,17 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
             detector.setChangeCount(rs.getInt(++i));
             detector.setAlphanumericState(rs.getString(++i));
             detector.setWeight(rs.getDouble(++i));
-            detector.njbSetDataPoint(dp);
+            detector.njbSetDataPoint((DoubleDataPointVO)dp);
             return detector;
         }
     }
 
     private <T extends PointValueTime> void saveEventDetectors(final DataPointVO<T> dp) {
         // Get the ids of the existing detectors for this point.
-        final List<PointEventDetectorVO> existingDetectors = getEventDetectors(dp);
+        final List<DoublePointEventDetectorVO> existingDetectors = getEventDetectors(dp);
 
         // Insert or update each detector in the point.
-        for (final PointEventDetectorVO ped : dp.getEventDetectors()) {
+        for (final DoublePointEventDetectorVO ped : dp.getEventDetectors()) {
             if (ped.getId() < 0) {
                 // Insert the record.
                 final int id = doInsert(new PreparedStatementCreator() {
@@ -557,7 +553,7 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
                 ped.setId(id);
                 AuditEventType.raiseAddedEvent(AuditEventKey.POINT_EVENT_DETECTOR, ped);
             } else {
-                PointEventDetectorVO old = removeFromList(existingDetectors, ped.getId());
+                DoublePointEventDetectorVO old = removeFromList(existingDetectors, ped.getId());
 
                 ejt.update(
                         "update pointEventDetectors set xid=?, alias=?, alarmLevel=?, stateLimit=?, duration=?, "
@@ -575,7 +571,7 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
         }
 
         // Delete detectors for any remaining ids in the list of existing detectors.
-        for (PointEventDetectorVO ped : existingDetectors) {
+        for (DoublePointEventDetectorVO ped : existingDetectors) {
             ejt.update("delete from eventHandlers " + "where eventTypeId=" + EventSources.DATA_POINT.mangoDbId
                     + " and eventTypeRef1=? and eventTypeRef2=?", new Object[]{dp.getId(), ped.getId()});
             ejt.update("delete from pointEventDetectors where id=?", new Object[]{ped.getId()});
@@ -584,8 +580,8 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
         }
     }
 
-    private PointEventDetectorVO removeFromList(List<PointEventDetectorVO> list, int id) {
-        for (PointEventDetectorVO ped : list) {
+    private DoublePointEventDetectorVO removeFromList(List<DoublePointEventDetectorVO> list, int id) {
+        for (DoublePointEventDetectorVO ped : list) {
             if (ped.getId() == id) {
                 list.remove(ped);
                 return ped;

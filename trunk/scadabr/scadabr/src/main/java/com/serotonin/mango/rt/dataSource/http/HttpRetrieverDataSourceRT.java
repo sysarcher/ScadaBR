@@ -128,6 +128,9 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
                     case IMAGE:
                         throw new ShouldNeverHappenException("Cant handle dataType " + locator.getDataType());
                     case MULTISTATE:
+        throw new ImplementMeException();
+        /* TODO half localized stuff
+                        
                         boolean found = false;
                         if (dp.getVo().getTextRenderer() instanceof MultistateRenderer) {
                             List<MultistateValue> multistateValues = ((MultistateRenderer) dp.getVo().getTextRenderer()).getMultistateValues();
@@ -147,6 +150,7 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
                             }
                         }
                         break;
+                */
                     default:
                         throw new ShouldNeverHappenException("Cant handle dataType " + locator.getDataType());
                 }

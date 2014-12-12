@@ -18,22 +18,23 @@
  */
 package com.serotonin.mango.rt.event.detectors;
 
-import com.serotonin.mango.rt.dataImage.PointValueTime;
+import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.view.text.TextRenderer;
-import com.serotonin.mango.vo.event.PointEventDetectorVO;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import com.serotonin.mango.rt.dataImage.BooleanValueTime;
-import com.serotonin.mango.rt.dataImage.types.BooleanValue;
 
 public class BinaryStateDetectorRT extends StateDetectorRT<BooleanValueTime> {
 
-    public BinaryStateDetectorRT(PointEventDetectorVO vo) {
+    public BinaryStateDetectorRT(DoublePointEventDetectorVO vo) {
         this.vo = vo;
     }
 
     @Override
     public LocalizableMessage getMessage() {
+        throw new ImplementMeException();
+        /* TODO half localized stuff
         String name = vo.njbGetDataPoint().getName();
         String prettyText = vo.njbGetDataPoint().getTextRenderer().getText(vo.isBinaryState(),
                 TextRenderer.HINT_SPECIFIC);
@@ -43,6 +44,7 @@ public class BinaryStateDetectorRT extends StateDetectorRT<BooleanValueTime> {
             return new LocalizableMessageImpl("event.detector.state", name, prettyText);
         }
         return new LocalizableMessageImpl("event.detector.periodState", name, prettyText, durationDescription);
+*/
     }
 
     @Override
