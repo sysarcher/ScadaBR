@@ -6,7 +6,6 @@
 package br.org.scadabr;
 
 import javax.inject.Named;
-import org.springframework.context.annotation.Scope;
 
 /**
  *
@@ -17,7 +16,7 @@ public class ScadaBrVersionBean {
 
     private final String versionNumber;
 
-    protected ScadaBrVersionBean() {
+    public ScadaBrVersionBean() {
         //TODO pullt this fom             "/META-INF/maven/pom.xml" - once this works...
         versionNumber = "1.1.0-SNAPSHOT";
     }

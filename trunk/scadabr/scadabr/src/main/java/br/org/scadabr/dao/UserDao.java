@@ -7,6 +7,7 @@ package br.org.scadabr.dao;
 
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.UserComment;
+import java.util.Collection;
 import javax.inject.Named;
 
 /**
@@ -16,16 +17,22 @@ import javax.inject.Named;
 @Named
 public interface UserDao {
 
-    public void insertUserComment(int TYPE_EVENT, int eventId, UserComment comment);
+    void insertUserComment(int TYPE_EVENT, int eventId, UserComment comment);
 
-    public User getUser(int userId);
+    User getUser(int userId);
 
-    public Iterable<User> getActiveUsers();
+    /**
+     * Returns all users
+     * @return 
+     */
+    Collection<User> getUsers();
 
-    public void saveHomeUrl(int id, String url);
+    Collection<User> getActiveUsers();
 
-    public User getUser(String username);
+    void saveHomeUrl(int id, String url);
 
-    public void recordLogin(int id);
+    User getUser(String username);
+
+    void recordLogin(int id);
     
 }

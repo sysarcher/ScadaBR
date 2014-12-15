@@ -18,17 +18,13 @@
  */
 package com.serotonin.mango.db;
 
-import java.io.File;
+import br.org.scadabr.ScadaBrVersionBean;
 import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.MissingResourceException;
 
-import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
@@ -36,55 +32,24 @@ import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.jdbc.SystemSettingsDaoImpl;
 import br.org.scadabr.dao.jdbc.UserDaoImpl;
 import br.org.scadabr.db.spring.ConnectionCallbackVoid;
-import com.serotonin.mango.Common;
+import br.org.scadabr.logger.LogUtils;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.inject.Inject;
 import org.springframework.jdbc.core.JdbcTemplate;
-
+import org.springframework.stereotype.Component;
 
 abstract public class DatabaseAccess {
 
-    public enum DatabaseType {
+    private final Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_DAO_JDBC);
+    protected final Properties jdbcProperties;
 
-        DERBY {
-                    @Override
-                    DatabaseAccess getImpl(ServletContext ctx) {
-                        return new DerbyAccess(ctx);
-                    }
-                },
-        MSSQL {
-                    @Override
-                    DatabaseAccess getImpl(ServletContext ctx) {
-                        return new MSSQLAccess(ctx);
-                    }
-                },
-        MYSQL {
-                    @Override
-                    DatabaseAccess getImpl(ServletContext ctx) {
-                        return new MySQLAccess(ctx);
-                    }
-                };
-
-        abstract DatabaseAccess getImpl(ServletContext ctx);
+    protected DatabaseAccess(Properties jdbcProperties) {
+        this.jdbcProperties = jdbcProperties;
     }
 
-    public static DatabaseAccess createDatabaseAccess(ServletContext ctx) {
-        String type = Common.getEnvironmentString("db.type", "derby");
-        DatabaseType dt = DatabaseType.valueOf(type.toUpperCase());
-
-        if (dt == null) {
-            throw new IllegalArgumentException("Unknown database type: " + type);
-        }
-
-        return dt.getImpl(ctx);
-    }
-
-    private final Log log = LogFactory.getLog(DatabaseAccess.class);
-    protected final ServletContext ctx;
-
-    protected DatabaseAccess(ServletContext ctx) {
-        this.ctx = ctx;
-    }
-
-    public void initialize() {
+    public void initialize(String scadaBrVersion) {
         initializeImpl("");
 
         JdbcTemplate ejt = new JdbcTemplate();
@@ -93,12 +58,7 @@ abstract public class DatabaseAccess {
         try {
             if (newDatabaseCheck(ejt)) {
                 // Check if we should convert from another database.
-                String convertTypeStr;
-                try {
-                    convertTypeStr = Common.getEnvironmentProfile().getString("convert.db.type");
-                } catch (MissingResourceException e) {
-                    convertTypeStr = "";
-                }
+                final String convertTypeStr = jdbcProperties.getProperty("convert.db.type", "");
 
                 if (!convertTypeStr.isEmpty()) {
                     // Found a database type from which to convert.
@@ -109,7 +69,7 @@ abstract public class DatabaseAccess {
                                 "Unknown convert database type: " + convertType);
                     }
 
-                    DatabaseAccess sourceAccess = convertType.getImpl(ctx);
+                    DatabaseAccess sourceAccess = convertType.getImpl(jdbcProperties);
                     sourceAccess.initializeImpl("convert.");
 
                     DBConvert convert = new DBConvert();
@@ -123,23 +83,23 @@ abstract public class DatabaseAccess {
 
                     sourceAccess.terminate();
                 } else {
-                    log.info("Setup user admin in db");
+                    LOG.info("Setup user admin in db");
 
                     // New database. Create a default user.
                     UserDaoImpl.createAdmin(ejt);
 
                     // Record the current version.
-                    SystemSettingsDaoImpl.setSetSchemaVersion(ejt, Common.getVersion());
-                    log.info("database sucessfully created");
-                    
+                    SystemSettingsDaoImpl.setSetSchemaVersion(ejt, scadaBrVersion);
+                    LOG.info("database sucessfully created");
+
                 }
             }
-			// else
+            // else
             // // The database exists, so let's make its schema version matches
             // // the application version.
             // DBUpgrade.checkUpgrade();
         } catch (CannotGetJdbcConnectionException e) {
-            log.fatal("Unable to connect to database of type "
+            LOG.log(Level.SEVERE, "Unable to connect to database of type "
                     + getType().name(), e);
             throw e;
         }
@@ -154,8 +114,6 @@ abstract public class DatabaseAccess {
     abstract public DataSource getDataSource();
 
     abstract public double applyBounds(double value);
-
-    abstract public File getDataDirectory();
 
     abstract public void executeCompress(JdbcTemplate ejt);
 
@@ -185,7 +143,7 @@ abstract public class DatabaseAccess {
                     conn.rollback();
                 }
             } catch (SQLException e1) {
-                log.warn("Exception during rollback", e1);
+                LOG.log(Level.WARNING, "Exception during rollback", e1);
             }
 
             // Wrap and rethrow
@@ -197,9 +155,4 @@ abstract public class DatabaseAccess {
         }
     }
 
-    public String getDatabasePassword(String propertyPrefix) {
-        String input = Common.getEnvironmentProfile().getString(
-                propertyPrefix + "db.password");
-        return new DatabaseAccessUtils().decrypt(input);
-    }
 }

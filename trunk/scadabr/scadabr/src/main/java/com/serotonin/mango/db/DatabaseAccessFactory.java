@@ -18,23 +18,39 @@
  */
 package com.serotonin.mango.db;
 
+import br.org.scadabr.ScadaBrVersionBean;
 import br.org.scadabr.logger.LogUtils;
+import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.ServletContext;
+import javax.sql.DataSource;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @Named
 public class DatabaseAccessFactory {
-
-    private final static Logger log = Logger.getLogger(LogUtils.LOGGER_SCADABR_DAO);
-    private DatabaseAccess databaseAccess;
-
-    @Deprecated
+    
+    private String jdbcPropertiesName = "/jdbc.properties";
     @Inject
-    ServletContext ctx;
+    private ScadaBrVersionBean scadaBrVersionBean;
+
+
+    public DatabaseAccess createDatabaseAccess(Properties jdbcProperties) {
+        String type = jdbcProperties.getProperty("db.type", "derby");
+        DatabaseType dt = DatabaseType.valueOf(type.toUpperCase());
+
+        if (dt == null) {
+            throw new IllegalArgumentException("Unknown database type: " + type);
+        }
+
+        return dt.getImpl(jdbcProperties);
+    }
+
+    private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_DAO_JDBC);
+    private DatabaseAccess databaseAccess;
 
     public DatabaseAccessFactory() {
 
@@ -42,24 +58,60 @@ public class DatabaseAccessFactory {
 
     @PostConstruct
     public void startDB() {
-        log.severe("Start DB called");
+        LOG.info("Start DB called");
         if (databaseAccess == null) {
-            databaseAccess = DatabaseAccess.createDatabaseAccess(ctx);
-            databaseAccess.initialize();
+            try {
+                final Properties jdbcPropertiers = new Properties();
+                jdbcPropertiers.load(DatabaseAccess.class.getResourceAsStream(jdbcPropertiesName));
+                databaseAccess = createDatabaseAccess(jdbcPropertiers);
+                databaseAccess.initialize(scadaBrVersionBean.getVersionNumber());
+                LOG.info("DB Running");
+            } catch (Exception e) {
+                LOG.log(Level.SEVERE, "Error during DB startup!", e);
+                throw new RuntimeException(e);
+            }
+        } else {
+            LOG.severe("DB already started, do not restart");
         }
     }
 
     @PreDestroy
     public void stopDB() {
-        log.severe("Stop DB called");
+        LOG.info("Stop DB called");
         if (databaseAccess != null) {
             databaseAccess.terminate();
+            databaseAccess = null;
+            LOG.info("DB Stopped");
+        } else {
+            LOG.severe("DB already stopped, do not stop");
         }
-        databaseAccess = null;
     }
 
-    public DatabaseAccess getDatabaseAccess() {
-        return databaseAccess;
+    /**
+     * The name of the resource
+     * @return the jdbcPropertiesName
+     */
+    public String getJdbcPropertiesName() {
+        return jdbcPropertiesName;
+    }
+
+    /**
+     * @param jdbcPropertiesName the jdbcPropertiesName to set
+     */
+    public void setJdbcPropertiesName(String jdbcPropertiesName) {
+        this.jdbcPropertiesName = jdbcPropertiesName;
+    }
+
+    public DatabaseType getDatabaseType() {
+        return databaseAccess.getType();
+    }
+
+    public DataSource getDataSource() {
+        return databaseAccess.getDataSource();
+    }
+
+    public void executeCompress(JdbcTemplate ejt) {
+        databaseAccess.executeCompress(ejt);
     }
 
 }

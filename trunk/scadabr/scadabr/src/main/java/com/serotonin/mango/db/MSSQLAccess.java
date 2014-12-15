@@ -19,16 +19,15 @@
 package com.serotonin.mango.db;
 
 import java.sql.SQLException;
-
-import javax.servlet.ServletContext;
+import java.util.Properties;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class MSSQLAccess extends BasePooledAccess {
 
-    public MSSQLAccess(ServletContext ctx) {
-        super(ctx);
+    public MSSQLAccess(Properties jdbcProperties) {
+        super(jdbcProperties);
     }
 
     @Override

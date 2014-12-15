@@ -18,19 +18,21 @@
  */
 package com.serotonin.mango.db;
 
+import br.org.scadabr.utils.ImplementMeException;
 import java.sql.SQLException;
 
-import javax.servlet.ServletContext;
 
 import org.springframework.dao.DataAccessException;
 
-import com.serotonin.mango.Common;
+import java.util.Properties;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class MySQLAccess extends BasePooledAccess {
 
-    public MySQLAccess(ServletContext ctx) {
-        super(ctx);
+    public MySQLAccess(Properties jdbcProperties) {
+        super(jdbcProperties);
+        throw  new ImplementMeException();
+        //TODO fix dbUrl from getURL
     }
 
     @Override
@@ -43,7 +45,8 @@ public class MySQLAccess extends BasePooledAccess {
         dataSource.setMinEvictableIdleTimeMillis(60000);
     }
 
-    @Override
+    /*
+    @Deprecated
     protected String getUrl(String propertyPrefix) {
         String url = super.getUrl(propertyPrefix);
         if (url.indexOf('?') > 0) {
@@ -54,7 +57,7 @@ public class MySQLAccess extends BasePooledAccess {
         url += "useUnicode=yes&characterEncoding=" + Common.UTF8;
         return url;
     }
-
+*/
     @Override
     public DatabaseType getType() {
         return DatabaseType.MYSQL;
@@ -74,7 +77,7 @@ public class MySQLAccess extends BasePooledAccess {
                 SQLException se = (SQLException) e.getCause();
                 if ("42S02".equals(se.getSQLState())) {
                     // This state means a missing table. Assume that the schema needs to be created.
-                    createSchema("/WEB-INF/db/createTables-mysql.sql");
+                    createSchema("/db/createTables-mysql.sql");
                     return true;
                 }
             }

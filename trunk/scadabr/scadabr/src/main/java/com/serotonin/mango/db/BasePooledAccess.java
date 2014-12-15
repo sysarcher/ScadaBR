@@ -35,7 +35,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import com.serotonin.mango.Common;
+import java.util.Properties;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -46,8 +46,8 @@ abstract public class BasePooledAccess extends DatabaseAccess {
     private final Log log = LogFactory.getLog(BasePooledAccess.class);
     protected BasicDataSource dataSource;
 
-    public BasePooledAccess(ServletContext ctx) {
-        super(ctx);
+    public BasePooledAccess(Properties jdbcProperties) {
+        super(jdbcProperties);
     }
 
     @Override
@@ -55,15 +55,11 @@ abstract public class BasePooledAccess extends DatabaseAccess {
         log.info("Initializing pooled connection manager");
         dataSource = new BasicDataSource();
         dataSource.setDriverClassName(getDriverClassName());
-        dataSource.setUrl(getUrl(propertyPrefix));
-        dataSource.setUsername(Common.getEnvironmentProfile().getString(propertyPrefix + "db.username"));
-        dataSource.setPassword(getDatabasePassword(propertyPrefix));
-        dataSource.setMaxActive(Common.getEnvironmentInt(propertyPrefix + "db.pool.maxActive", 10));
-        dataSource.setMaxIdle(Common.getEnvironmentInt(propertyPrefix + "db.pool.maxIdle", 10));
-    }
-
-    protected String getUrl(String propertyPrefix) {
-        return Common.getEnvironmentProfile().getString(propertyPrefix + "db.url");
+        dataSource.setUrl(jdbcProperties.getProperty(propertyPrefix + "db.url"));
+        dataSource.setUsername(jdbcProperties.getProperty(propertyPrefix + "db.username"));
+        dataSource.setPassword(jdbcProperties.getProperty(propertyPrefix+ "db.getPassword"));
+        dataSource.setMaxActive(Integer.parseInt(jdbcProperties.getProperty(propertyPrefix + "db.pool.maxActive", "10")));
+        dataSource.setMaxIdle(Integer.parseInt(jdbcProperties.getProperty(propertyPrefix + "db.pool.maxIdle", "10")));
     }
 
     abstract protected String getDriverClassName();
@@ -95,9 +91,9 @@ abstract public class BasePooledAccess extends DatabaseAccess {
     }
 
     protected void createSchema(String scriptFile) {
-        BufferedReader in = new BufferedReader(new InputStreamReader(ctx.getResourceAsStream(scriptFile)));
+        BufferedReader in = new BufferedReader(new InputStreamReader(BasePooledAccess.class.getResourceAsStream(scriptFile)));
 
-        List<String> lines = new ArrayList<String>();
+        List<String> lines = new ArrayList<>();
         try {
             String line;
             while ((line = in.readLine()) != null) {
@@ -133,8 +129,4 @@ abstract public class BasePooledAccess extends DatabaseAccess {
         return dataSource;
     }
 
-    @Override
-    public File getDataDirectory() {
-        return null;
-    }
 }

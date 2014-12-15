@@ -32,12 +32,10 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.derby.jdbc.EmbeddedXADataSource40;
 import org.apache.derby.tools.ij;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.CallableStatementCreator;
@@ -45,8 +43,9 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.spring.ConnectionCallbackVoid;
-import com.serotonin.mango.Common;
 import java.io.IOException;
+import java.util.Properties;
+import org.apache.derby.jdbc.EmbeddedXADataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -59,10 +58,10 @@ public class DerbyAccess extends DatabaseAccess {
     private static final double LARGEST_NEGATIVE = -2.225E-307;
     private static final double SMALLEST_NEGATIVE = -1.79769E+308;
 
-    private EmbeddedXADataSource40 dataSource;
+    private EmbeddedXADataSource dataSource;
 
-    public DerbyAccess(ServletContext ctx) {
-        super(ctx);
+    public DerbyAccess(Properties jdbcProperties) {
+        super(jdbcProperties);
     }
 
     @Override
@@ -73,26 +72,15 @@ public class DerbyAccess extends DatabaseAccess {
     @Override
     protected void initializeImpl(String propertyPrefix) {
         log.info("Initializing derby connection manager");
-        dataSource = new EmbeddedXADataSource40();
+        dataSource = new EmbeddedXADataSource();
         dataSource.setCreateDatabase("create");
 
-        dataSource.setDatabaseName(getUrl(propertyPrefix));
-        dataSource.setDataSourceName("mangoDataSource");
+        dataSource.setDatabaseName(jdbcProperties.getProperty(propertyPrefix + "db.url"));
+        dataSource.setDataSourceName("scadaBrDataSource");
 
         // Creation of a connection will optionally create the database.
         Connection c = DataSourceUtils.getConnection(dataSource);
         DataSourceUtils.releaseConnection(c, dataSource);
-    }
-
-    private String getUrl(String propertyPrefix) {
-        String name = Common.getEnvironmentString(propertyPrefix + "db.url", "~/../../mangoDB");
-        if (name.startsWith("~")) {
-            name = ctx.getRealPath(name.substring(1));
-            if (name == null) {
-                throw new ImplementMeException(); // missing leadiung "/" ??? 
-            }
-        }
-        return name;
     }
 
     @Override
@@ -130,7 +118,7 @@ public class DerbyAccess extends DatabaseAccess {
                 try (FileOutputStream out = new FileOutputStream("createTables.log")) {
                     Connection conn = DataSourceUtils.getConnection(dataSource);
                     org.apache.derby.tools.ij.runScript(conn,
-                            ctx.getResourceAsStream("/WEB-INF/db/createTables-derby.sql"), "ASCII", out, Common.UTF8);
+                            DerbyAccess.class.getResourceAsStream("/db/createTables-derby.sql"), "ASCII", out, "UTF-8");
                     DataSourceUtils.releaseConnection(conn, dataSource);
                     out.flush();
                 }
@@ -162,17 +150,12 @@ public class DerbyAccess extends DatabaseAccess {
             @Override
             public void doInConnection(Connection conn) {
                 try {
-                    ij.runScript(conn, in, "ASCII", out, Common.UTF8);
+                    ij.runScript(conn, in, "ASCII", out, "UTF-8");
                 } catch (UnsupportedEncodingException e) {
                     throw new ShouldNeverHappenException(e);
                 }
             }
         });
-    }
-
-    @Override
-    public File getDataDirectory() {
-        return new File(getUrl(""));
     }
 
     /**
