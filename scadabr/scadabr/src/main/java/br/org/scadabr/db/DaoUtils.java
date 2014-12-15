@@ -3,6 +3,7 @@ package br.org.scadabr.db;
 import br.org.scadabr.logger.LogUtils;
 import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.db.DatabaseAccessFactory;
+import com.serotonin.mango.db.DatabaseType;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
@@ -37,7 +38,7 @@ public class DaoUtils {
     @PostConstruct
     public void init() {
         if (dataSource == null) {
-            dataSource = daf.getDatabaseAccess().getDataSource();
+            dataSource = daf.getDataSource();
         }
         ejt = new JdbcTemplate(dataSource);
     }
@@ -89,11 +90,11 @@ public class DaoUtils {
     }
     
     public void compressTables() {
-        daf.getDatabaseAccess().executeCompress(ejt);
+        daf.executeCompress(ejt);
     }
     
-    public DatabaseAccess.DatabaseType getDataBaseType() {
-        return daf.getDatabaseAccess().getType();
+    public DatabaseType getDataBaseType() {
+        return daf.getDatabaseType();
     }
 
 

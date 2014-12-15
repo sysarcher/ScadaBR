@@ -14,7 +14,7 @@
     <name>ScadaBR JSP Dojo</name>
     <properties>
         <db.type>derby</db.type>
-        <db.url>mangodb</db.url>
+        <db.url>~/../../mangodb</db.url>
         <db.username></db.username>
         <db.password></db.password>
         <db.pool.maxActive>10</db.pool.maxActive>

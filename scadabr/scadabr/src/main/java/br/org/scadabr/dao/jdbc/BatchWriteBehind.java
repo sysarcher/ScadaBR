@@ -137,8 +137,7 @@ class BatchWriteBehind {
     private int maxRows;
 
     public void init(DatabaseAccessFactory daf) {
-        final DatabaseAccess databaseAccess = daf.getDatabaseAccess();
-        switch (databaseAccess.getType()) {
+        switch (daf.getDatabaseType()) {
             case DERBY:
                 maxRows = 1000;
                 break;
@@ -149,12 +148,12 @@ class BatchWriteBehind {
                 maxRows = 2000;
                 break;
             default:
-                throw new ShouldNeverHappenException("Unknown database type: " + databaseAccess.getType());
+                throw new ShouldNeverHappenException("Unknown database type: " + daf.getDatabaseType());
         }
     }
 
     void add(DoubleValueTime e, JdbcTemplate ejt) {
-        boolean needsFlush = false;
+        boolean needsFlush;
         synchronized (doubleValuesToWrite) {
             doubleValuesToWrite.add(e);
             needsFlush = (doubleValuesToWrite.size() > maxRows) && !batchWriteBehindCallable.sheduledOrRunning;

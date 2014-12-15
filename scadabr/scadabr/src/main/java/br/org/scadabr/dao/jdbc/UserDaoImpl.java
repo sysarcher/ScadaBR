@@ -38,6 +38,7 @@ import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.vo.permission.DataPointAccess;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.Collection;
 import javax.inject.Named;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -59,6 +60,7 @@ public class UserDaoImpl extends BaseDao implements UserDao {
         super();
     }
 
+    @Override
     public User getUser(int id) {
         try {
             User user = ejt.queryForObject(USER_SELECT + "where id=?", new UserRowMapper(), id);
@@ -69,6 +71,7 @@ public class UserDaoImpl extends BaseDao implements UserDao {
         }
     }
 
+    @Override
     public User getUser(String username) {
         try {
             User user = ejt.queryForObject(USER_SELECT + "where lower(username)=?", new UserRowMapper(), username.toLowerCase());
@@ -102,13 +105,15 @@ public class UserDaoImpl extends BaseDao implements UserDao {
         }
     }
 
-    public List<User> getUsers() {
+    @Override
+    public Collection<User> getUsers() {
         List<User> users = ejt.query(USER_SELECT + "order by username", new Object[0], new UserRowMapper());
         populateUserPermissions(users);
         return users;
     }
 
-    public List<User> getActiveUsers() {
+    @Override
+    public Collection<User> getActiveUsers() {
         List<User> users = ejt.query(USER_SELECT + "where disabled=?", new Object[]{boolToChar(false)},
                 new UserRowMapper());
         populateUserPermissions(users);
