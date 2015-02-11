@@ -86,7 +86,7 @@ public class CompoundEventDetectorDaoImpl extends BaseDao implements CompoundEve
             ced.setId(rs.getInt(++i));
             ced.setXid(rs.getString(++i));
             ced.setName(rs.getString(++i));
-            ced.setAlarmLevel(AlarmLevel.fromId(rs.getInt(++i)));
+            ced.setAlarmLevel(AlarmLevel.values()[rs.getInt(++i)]);
             ced.setStateful(charToBool(rs.getString(++i)));
             ced.setDisabled(charToBool(rs.getString(++i)));
             ced.setCondition(rs.getString(++i));
@@ -113,7 +113,7 @@ public class CompoundEventDetectorDaoImpl extends BaseDao implements CompoundEve
                 PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, ced.getXid());
                 ps.setString(2, ced.getName());
-                ps.setInt(3, ced.getAlarmLevel().getId());
+                ps.setInt(3, ced.getAlarmLevel().ordinal());
                 ps.setString(4, boolToChar(ced.isStateful()));
                 ps.setString(5, boolToChar(ced.isDisabled()));
                 ps.setString(6, ced.getCondition());
@@ -144,7 +144,7 @@ public class CompoundEventDetectorDaoImpl extends BaseDao implements CompoundEve
             getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
                 @Override
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    ejt2.update("delete from eventHandlers where eventTypeId=" + EventSources.COMPOUND.mangoDbId
+                    ejt2.update("delete from eventHandlers where eventTypeId=" + EventSources.COMPOUND.ordinal()
                             + " and eventTypeRef1=?", new Object[]{compoundEventDetectorId});
                     ejt2.update("delete from compoundEventDetectors where id=?",
                             new Object[]{compoundEventDetectorId});

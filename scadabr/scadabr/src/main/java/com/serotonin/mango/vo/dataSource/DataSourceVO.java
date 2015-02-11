@@ -33,7 +33,7 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.vo.datasource.UniqueDsXid;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.DataSourceEventKey;
@@ -99,6 +99,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         return id;
     }
 
+    @Deprecated
     public void setId(int id) {
         this.id = id;
         // replace id with righth id...
@@ -179,7 +180,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         out.writeBoolean(enabled);
         final Map<Integer, Integer> _alarmLevels = new HashMap<>();
         for (Map.Entry<DataSourceEventKey, DataSourceEventType> e : eventTypeMap.entrySet()) {
-            _alarmLevels.put(e.getKey().getId(), e.getValue().getAlarmLevel().getId());
+            _alarmLevels.put(e.getKey().getId(), e.getValue().getAlarmLevel().ordinal());
         }
         out.writeObject(_alarmLevels);
     }
@@ -200,7 +201,7 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
             this.eventTypeMap = (Map<DataSourceEventKey, DataSourceEventType>) createEventKeyMap();
             for (DataSourceEventKey key : createEventKeySet()) {
                 final Integer alId = _alarmLevels.get(key.getId());
-                eventTypeMap.put(key, new DataSourceEventType(id, key, alId != null ? AlarmLevel.fromId(alId) : key.getDefaultAlarmLevel()));
+                eventTypeMap.put(key, new DataSourceEventType(id, key, alId != null ? AlarmLevel.values()[alId] : key.getDefaultAlarmLevel()));
             }
         }
         fillEventTypeMap();

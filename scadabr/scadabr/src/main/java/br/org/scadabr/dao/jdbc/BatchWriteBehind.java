@@ -43,7 +43,6 @@ class BatchWriteBehind {
         private void writeInto(DoubleValueTime pvt, Object[] params, int index) {
             index *= BatchWriteBehind.POINT_VALUE_INSERT_VALUES_COUNT;
             params[index++] = pvt.getDataPointId();
-            params[index++] = pvt.getDataType().mangoDbId;
             params[index++] = pvt.getDoubleValue();
             params[index++] = pvt.getTimestamp();
         }
@@ -122,7 +121,7 @@ class BatchWriteBehind {
 
     }
 
-    static final int POINT_VALUE_INSERT_VALUES_COUNT = 4;
+    static final int POINT_VALUE_INSERT_VALUES_COUNT = 3;
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_DAO);
     private final BatchWriteBehindCallable batchWriteBehindCallable;
 

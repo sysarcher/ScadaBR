@@ -38,6 +38,7 @@ import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.vo.event.type.DataSourceEventKey;
 import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.vo.DataPointVO;
@@ -309,6 +310,14 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
     @Override
     public void joinTermination() {
         // no op
+    }
+
+    public void pointLocatorDisabled(PointLocatorVO pointLocatorVO) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void dataPointLocatorEnabled(PointLocatorRT rt) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

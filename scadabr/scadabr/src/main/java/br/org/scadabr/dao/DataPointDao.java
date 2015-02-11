@@ -5,10 +5,11 @@
  */
 package br.org.scadabr.dao;
 
+import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.web.LazyTreeNode;
 import com.serotonin.mango.vo.DataPointVO;
+import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.util.Collection;
-import java.util.List;
 import javax.inject.Named;
 
 /**
@@ -18,10 +19,12 @@ import javax.inject.Named;
 @Named
 public interface DataPointDao {
 
+    @Deprecated // DP no longer belang to DS
     Iterable<DataPointVO> getDataPoints(int dsId);
 
     void updateDataPoint(DataPointVO dp);
 
+    @Deprecated // DP no longer belang to DS
     void deleteDataPoints(int dataSourceId);
 
     String generateUniqueXid();
@@ -36,6 +39,7 @@ public interface DataPointDao {
 
     void deleteDataPoint(int id);
 
+    @Deprecated // DP has no extended name anymore
     String getExtendedPointName(int targetPointId);
 
     Iterable<DataPointVO> getDataPoints(boolean includeRelationalData);
@@ -53,5 +57,7 @@ public interface DataPointDao {
     public LazyTreeNode getFolderById(int id);
 
     public void savePointFolder(LazyTreeNode folder);
+
+    public Iterable<PointLocatorVO> getPointLocators(DataSourceVO<?> vo);
     
 }

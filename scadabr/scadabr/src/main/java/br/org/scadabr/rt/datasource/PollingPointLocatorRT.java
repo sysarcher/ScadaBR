@@ -5,7 +5,7 @@
  */
 package br.org.scadabr.rt.datasource;
 
-import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;

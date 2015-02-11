@@ -389,11 +389,11 @@ public class SystemSettingsDaoImpl extends BaseDao implements SystemSettingsDao 
     }
 
     public void saveAlarmLevel(SystemEventKey key) {
-        setValue0(SYSTEM_EVENT_ALARMLEVEL_PREFIX + key.name(), Integer.toString(key.getAlarmLevel().getId()));
+        setValue0(SYSTEM_EVENT_ALARMLEVEL_PREFIX + key.name(), Integer.toString(key.getAlarmLevel().ordinal()));
     }
 
     public void saveAlarmlevel(AuditEventKey key) {
-        setValue0(AUDIT_EVENT_ALARMLEVEL_PREFIX + key.name(), Integer.toString(key.getAlarmLevel().getId()));
+        setValue0(AUDIT_EVENT_ALARMLEVEL_PREFIX + key.name(), Integer.toString(key.getAlarmLevel().ordinal()));
     }
 
     @Override

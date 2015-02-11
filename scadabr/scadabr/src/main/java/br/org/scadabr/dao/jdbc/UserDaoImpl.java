@@ -32,6 +32,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
+import com.serotonin.mango.rt.event.AlternateAcknowledgementSources;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.UserComment;
@@ -98,7 +99,7 @@ public class UserDaoImpl extends BaseDao implements UserDao {
             user.setSelectedWatchList(rs.getInt(++i));
             user.setHomeUrl(rs.getString(++i));
             user.setLastLogin(rs.getLong(++i));
-            AlarmLevel l = AlarmLevel.fromId(rs.getInt(++i));
+            AlarmLevel l = AlarmLevel.values()[rs.getInt(++i)];
             user.setReceiveAlarmEmails(l == AlarmLevel.NONE ? null : l);
             user.setReceiveOwnAuditEvents(charToBool(rs.getString(++i)));
             return user;
@@ -175,7 +176,7 @@ public class UserDaoImpl extends BaseDao implements UserDao {
                 ps.setString(5, boolToChar(user.isAdmin()));
                 ps.setString(6, boolToChar(user.isDisabled()));
                 ps.setString(7, user.getHomeUrl());
-                ps.setInt(8, user.getReceiveAlarmEmails().getId());
+                ps.setInt(8, user.getReceiveAlarmEmails().ordinal());
                 ps.setString(9, boolToChar(user.isReceiveOwnAuditEvents()));
                 return ps;
             }
@@ -244,7 +245,7 @@ public class UserDaoImpl extends BaseDao implements UserDao {
                         + SetPointSource.Types.USER, args);
                 ejt.update("delete from userEvents where userId=?", args);
                 ejt.update("update events set ackUserId=null, alternateAckSource="
-                        + EventInstance.AlternateAcknowledgementSources.DELETED_USER + " where ackUserId=?", args);
+                        + AlternateAcknowledgementSources.DELETED_USER + " where ackUserId=?", args);
                 ejt.update("delete from users where id=?", args);
             }
         });

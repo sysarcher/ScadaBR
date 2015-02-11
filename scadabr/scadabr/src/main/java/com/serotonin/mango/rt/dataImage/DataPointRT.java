@@ -134,10 +134,6 @@ public abstract class DataPointRT<T extends PointValueTime> implements IDataPoin
         return (T) pointLocator;
     }
 
-    public int getDataSourceId() {
-        return vo.getDataSourceId();
-    }
-
     public DataPointVO getVo() {
         return vo;
     }

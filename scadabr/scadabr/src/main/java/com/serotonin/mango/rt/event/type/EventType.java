@@ -36,42 +36,58 @@ import org.springframework.beans.factory.annotation.Configurable;
  * An event class specifies the type of event that was raised.
  *
  * @author Matthew Lohbihler
+ * @param <K>
  */
 @Configurable
 abstract public class EventType<K extends EventKey<K>> {
 
     @Autowired
+    @Deprecated //TODO make an aspect out of it...
     private EventManager eventManager;
 
     //TODO do we need the context or can this data be retieved later???
     public void fire(Map<String, Object> context, String i18nKey, Object... i18nArgs) {
-        eventManager.handleFiredEvent(this, System.currentTimeMillis(), new LocalizableMessageImpl(i18nKey, i18nArgs), context);
+        if (eventManager != null) {
+            eventManager.handleFiredEvent(this, System.currentTimeMillis(), new LocalizableMessageImpl(i18nKey, i18nArgs), context);
+        }
     }
 
     //TODO do we need the context or can this data be retieved later???
     public void fire(Map<String, Object> context, long timestamp, LocalizableMessage msg) {
-        eventManager.handleFiredEvent(this, timestamp, msg, context);
+        if (eventManager != null) {
+            eventManager.handleFiredEvent(this, timestamp, msg, context);
+        }
     }
 
     //TODO do we need the context or can this data be retieved later???
     public void fire(Map<String, Object> context, long timestamp, String i18nKey, Object... i18nArgs) {
-        eventManager.handleFiredEvent(this, timestamp, new LocalizableMessageImpl(i18nKey, i18nArgs), context);
+        if (eventManager != null) {
+            eventManager.handleFiredEvent(this, timestamp, new LocalizableMessageImpl(i18nKey, i18nArgs), context);
+        }
     }
 
     public void fire(String i18nKey, Object... i18nArgs) {
-        eventManager.handleFiredEvent(this, System.currentTimeMillis(), new LocalizableMessageImpl(i18nKey, i18nArgs), null);
+        if (eventManager != null) {
+            eventManager.handleFiredEvent(this, System.currentTimeMillis(), new LocalizableMessageImpl(i18nKey, i18nArgs), null);
+        }
     }
 
     public void fire(long timestamp, String i18nKey, Object... i18nArgs) {
-        eventManager.handleFiredEvent(this, timestamp, new LocalizableMessageImpl(i18nKey, i18nArgs), null);
+        if (eventManager != null) {
+            eventManager.handleFiredEvent(this, timestamp, new LocalizableMessageImpl(i18nKey, i18nArgs), null);
+        }
     }
 
     public void fire(LocalizableMessage msg) {
-        eventManager.handleFiredEvent(this, System.currentTimeMillis(), msg, null);
+        if (eventManager != null) {
+            eventManager.handleFiredEvent(this, System.currentTimeMillis(), msg, null);
+        }
     }
 
     public void fire(long timestamp, LocalizableMessage msg) {
-        eventManager.handleFiredEvent(this, timestamp, msg, null);
+        if (eventManager != null) {
+            eventManager.handleFiredEvent(this, timestamp, msg, null);
+        }
     }
 
     /**
@@ -79,7 +95,9 @@ abstract public class EventType<K extends EventKey<K>> {
      *
      */
     public void clearAlarm() {
-        eventManager.handleAlarmCleared(this, System.currentTimeMillis());
+        if (eventManager != null) {
+            eventManager.handleAlarmCleared(this, System.currentTimeMillis());
+        }
     }
 
     /**
@@ -88,17 +106,21 @@ abstract public class EventType<K extends EventKey<K>> {
      * @param timestamp
      */
     public void clearAlarm(long timestamp) {
-        eventManager.handleAlarmCleared(this, timestamp);
+        if (eventManager != null) {
+            eventManager.handleAlarmCleared(this, timestamp);
+        }
     }
 
     public void disableAlarm() {
-        eventManager.handleAlarmDisabled(this, System.currentTimeMillis());
+        if (eventManager != null) {
+            eventManager.handleAlarmDisabled(this, System.currentTimeMillis());
+        }
     }
 
     abstract public EventSources getEventSource();
-    
+
     abstract public int getReferenceId1();
-    
+
     abstract public int getReferenceId2();
 
     /**

@@ -5,8 +5,9 @@
  */
 package com.serotonin.mango.vo;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.vo.NumberDataPointVO;
-import com.serotonin.mango.rt.dataImage.DataPointRT;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
 import com.serotonin.mango.rt.dataImage.DoubleDataPointRT;
 import com.serotonin.mango.rt.dataImage.DoubleValueTime;
 
@@ -22,8 +23,13 @@ public class DoubleDataPointVO extends NumberDataPointVO<DoubleValueTime>{
     }
     
     @Override
-    public DataPointRT<DoubleValueTime> createRT() {
-        return new DoubleDataPointRT(this, getPointLocator().createRuntime());
+    public DoubleDataPointRT createRT(PointLocatorVO<DoubleValueTime> pointLocatorVO) {
+        return new DoubleDataPointRT(this, pointLocatorVO.createRuntime());
+    }
+
+    @Override
+    public DataType getDataType() {
+        return DataType.DOUBLE;
     }
 
 }

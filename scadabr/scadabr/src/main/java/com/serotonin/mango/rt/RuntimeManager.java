@@ -34,19 +34,22 @@ import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.dao.PointValueDao;
+import br.org.scadabr.utils.ImplementMeException;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
 import com.serotonin.mango.rt.dataImage.DataPointEventMulticaster;
 import com.serotonin.mango.rt.dataImage.DataPointListener;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
+import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.web.UserSessionContextBean;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import javax.inject.Inject;
@@ -63,7 +66,8 @@ public class RuntimeManager {
     /**
      * Provides a quick lookup map of the running data points.
      */
-    private final Map<Integer, DataPointRT> dataPoints = new ConcurrentHashMap<>();
+    private final Map<Integer, DataPointRT> dataPoints = new HashMap<>();
+    private final Map<Integer, PointLocatorRT> pointLocators = new HashMap<>();
 
     /**
      * The list of point listeners, kept here such that listeners can be
@@ -78,8 +82,6 @@ public class RuntimeManager {
     private DataSourceDao dataSourceDao;
     @Inject
     private DataPointDao dataPointDao;
-    @Inject
-    private PointValueDao pointValueDao;
     @Inject
     private EventManager eventManager;
 
@@ -214,11 +216,11 @@ public class RuntimeManager {
             runningDataSources.add(dataSource);
 
             // Add the enabled points to the data source.
-            for (DataPointVO dataPoint : dataPointDao.getDataPoints(vo.getId())) {
-                if (dataPoint.isEnabled()) {
-                    startDataPoint(dataPoint);
+            for (PointLocatorVO pointLocatorVO : dataPointDao.getPointLocators(vo)) {
+                if (pointLocatorVO.isEnabled()) {
+                    startPointLocator(pointLocatorVO);
                 } else {
-                    dataSource.dataPointDisabled(dataPoint);
+                    dataSource.pointLocatorDisabled(pointLocatorVO);
                 }
             }
 
@@ -246,17 +248,7 @@ public class RuntimeManager {
             if (dataSource == null) {
                 return;
             }
-
-            // Stop the data points.
-            for (DataPointRT p : dataPoints.values()) {
-                if (p.getDataSourceId() == id) {
-                    stopDataPoint(p.getVo());
-                }
-            }
-
-            runningDataSources.remove(dataSource);
             dataSource.terminate();
-
             dataSource.joinTermination();
             LOG.info("Data source '" + dataSource.getName() + "' stopped");
         }
@@ -286,49 +278,50 @@ public class RuntimeManager {
 
         dataPointDao.saveDataPoint(point);
 
+        throw new ImplementMeException();
+        /*
         if (point.isEnabled()) {
             return startDataPoint(point);
         } else {
             addDisabledDataPointToRT(point);
             return null;
         }
+        */
     }
 
     public void deleteDataPoint(DataPointVO point) {
-        if (point.isEnabled()) {
-            stopDataPoint(point);
-        }
+        throw new ImplementMeException();
+        /*
         final DataSourceRT dsRt = getRunningDataSource(point.getDataSourceId());
         if (dsRt != null) {
             dsRt.dataPointDeleted(point);
         }
         dataPointDao.deleteDataPoint(point.getId());
         eventManager.cancelEventsForDataPoint(point.getId());
+        */
     }
 
-    private <T extends PointValueTime> DataPointRT<T> startDataPoint(DataPointVO<T> vo) {
-        synchronized (dataPoints) {
+    private <T extends PointValueTime, VO extends PointLocatorVO<T>>  PointLocatorRT<T, VO> startPointLocator(VO vo) {
+        synchronized (pointLocators) {
             Assert.isTrue(vo.isEnabled());
 
             // Only add the data point if its data source is enabled.
             DataSourceRT ds = getRunningDataSource(vo.getDataSourceId());
             if (ds != null) {
                 // Change the VO into a data point implementation.
-                DataPointRT<T> dataPoint = vo.createRT();
+                PointLocatorRT rt = vo.createRuntime();
 
                 // Add/update it in the data image.
-                dataPoints.put(dataPoint.getId(), dataPoint);
+                pointLocators.put(vo.getId(), rt);
 
-                // Initialize it.
-                dataPoint.initialize();
                 DataPointListener l = getDataPointListeners(vo.getId());
                 if (l != null) {
                     l.pointInitialized();
                 }
 
                 // Add/update it in the data source.
-                ds.dataPointEnabled(dataPoint);
-                return dataPoint;
+                ds.dataPointLocatorEnabled(rt);
+                return rt;
             }
         }
         return null;
@@ -342,13 +335,14 @@ public class RuntimeManager {
      */
     private void addDisabledDataPointToRT(DataPointVO vo) {
         synchronized (dataPoints) {
-            Assert.isTrue(!vo.isEnabled());
 
             // Only add the data point if its data source is enabled.
-            DataSourceRT ds = getRunningDataSource(vo.getDataSourceId());
+            throw new ImplementMeException();
+            /* TODO DataSourceRT ds = getRunningDataSource(vo.getDataSourceId());
             if (ds != null) {
                 ds.dataPointDisabled(vo);
             }
+                    */
         }
     }
 
@@ -360,12 +354,15 @@ public class RuntimeManager {
 
             // Remove it from the data source, and terminate it.
             if (p != null) {
+                throw  new ImplementMeException();
+                /* TODO
                 getRunningDataSource(p.getDataSourceId()).dataPointDisabled(p.getVo());
                 DataPointListener l = getDataPointListeners(dpVo.getId());
                 if (l != null) {
                     l.pointTerminated();
                 }
                 p.terminate();
+                        */
             }
         }
     }
@@ -408,12 +405,15 @@ public class RuntimeManager {
             throw new RTException("Point is not settable");
         }
 
+        throw new ImplementMeException();
+        /*
         // Tell the data source to set the value of the point.
         DataSourceRT ds = getRunningDataSource(dataPoint.getDataSourceId());
         // The data source may have been disabled. Just make sure.
         if (ds != null) {
             ds.setPointValue(dataPoint, valueTime, source);
         }
+                */
     }
 
     public void relinquish(int dataPointId) {
@@ -429,12 +429,15 @@ public class RuntimeManager {
             throw new RTException("Point is not relinquishable");
         }
 
+        throw new ImplementMeException();
+        /*
         // Tell the data source to relinquish value of the point.
         DataSourceRT ds = getRunningDataSource(dataPoint.getDataSourceId());
         // The data source may have been disabled. Just make sure.
         if (ds != null) {
             ds.relinquish(dataPoint);
         }
+                */
     }
 
     public void forcePointRead(int dataPointId) {
@@ -443,12 +446,15 @@ public class RuntimeManager {
             throw new RTException("Point is not enabled");
         }
 
+        throw  new ImplementMeException();
+        /*
         // Tell the data source to read the point value;
         DataSourceRT ds = getRunningDataSource(dataPoint.getDataSourceId());
         if (ds != null) // The data source may have been disabled. Just make sure.
         {
             ds.forcePointRead(dataPoint);
         }
+                */
     }
 
     public void addPointToHierarchy(DataPointVO dp, String... pathToPoint) {

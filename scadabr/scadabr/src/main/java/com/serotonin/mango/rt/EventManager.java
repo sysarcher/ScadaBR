@@ -50,6 +50,7 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.SystemEventKey;
+import com.serotonin.mango.rt.event.AlternateAcknowledgementSources;
 import java.io.Serializable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -79,13 +80,14 @@ public class EventManager implements ILifecycle, Serializable {
     // Basic event management.
     //
     /**
-     * An event get fired as single point in time
-     * An alarm gets raised if the outcom of the event exists longer - and must be cleared...
+     * An event get fired as single point in time An alarm gets raised if the
+     * outcom of the event exists longer - and must be cleared...
      *
      * TODO ducument this properly
+     *
      * @param type
      * @param i18nKey
-     * @param i18nArgs 
+     * @param i18nArgs
      */
     public void handleFiredEvent(EventType type, long timestamp, LocalizableMessage message, Map<String, Object> context) {
         // Check if there is an event for this type already active.
@@ -158,7 +160,7 @@ public class EventManager implements ILifecycle, Serializable {
         }
 
         if (suppressed) {
-            eventDao.ackEvent(evt.getId(), timestamp, 0, EventInstance.AlternateAcknowledgementSources.MAINTENANCE_MODE);
+            eventDao.ackEvent(evt.getId(), timestamp, null, AlternateAcknowledgementSources.MAINTENANCE_MODE);
         } else {
             if (evt.isActive()) {
                 if (type.getAlarmLevel().meIsHigher(highestActiveAlarmLevel)) {
@@ -198,7 +200,7 @@ public class EventManager implements ILifecycle, Serializable {
             log.debug("Event returned to normal: type=" + type);
         }
     }
-    
+
     public void handleAlarmDisabled(EventType type, long timestamp) {
         EventInstance evt = remove(type);
 

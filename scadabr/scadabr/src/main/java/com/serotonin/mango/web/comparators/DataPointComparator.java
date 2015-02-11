@@ -20,6 +20,7 @@ package com.serotonin.mango.web.comparators;
 
 import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.utils.ImplementMeException;
 import java.util.ResourceBundle;
 
 import com.serotonin.mango.vo.DataPointVO;
@@ -61,6 +62,8 @@ public class DataPointComparator extends BaseComparator<DataPointVO> {
 
     @Override
     public int compare(DataPointVO dp1, DataPointVO dp2) {
+        throw new ImplementMeException();
+        /*
         int result = 0;
         if (sortType == SORT_NAME) {
             result = dp1.getName().compareTo(dp2.getName());
@@ -82,5 +85,6 @@ public class DataPointComparator extends BaseComparator<DataPointVO> {
             return -result;
         }
         return result;
+                */
     }
 }

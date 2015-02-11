@@ -146,12 +146,12 @@ create table flexProjects (
 create table dataPoints (
   id int not null auto_increment,
   xid varchar(50) not null,
-  dataSourceId int not null,
   data longblob not null,
+  pointFolderId int not null,
   primary key (id)
 ) ENGINE=InnoDB;
 alter table dataPoints add constraint dataPointsUn1 unique (xid);
-alter table dataPoints add constraint dataPointsFk1 foreign key (dataSourceId) references dataSources(id);
+alter table dataPoints add constraint dataPointsFolderId foreign key (pointFolderId) references pointHirarchy(id);
 
 
 -- Data point permissions
@@ -195,27 +195,23 @@ alter table mangoViewUsers add constraint mangoViewUsersFk2 foreign key (userId)
 --
 -- Point Values (historical data)
 --
-create table pointValues (
-  id bigint not null auto_increment,
+create table doublePointValues (
   dataPointId int not null,
-  dataType int not null,
-  pointValue double,
   ts bigint not null,
-  primary key (id)
+  pointValue double,
+  primary key (dataPointId, ts)
 ) ENGINE=InnoDB;
-alter table pointValues add constraint pointValuesFk1 foreign key (dataPointId) references dataPoints(id) on delete cascade;
-create index pointValuesIdx1 on pointValues (ts, dataPointId);
-create index pointValuesIdx2 on pointValues (dataPointId, ts);
+alter table doublePointValues add constraint pointValuesFk1 foreign key (dataPointId) references dataPoints(id) on delete cascade;
 
 create table pointValueAnnotations (
-  pointValueId bigint not null,
+  dataPointId int not null,
+  ts bigint not null,
   textPointValueShort varchar(128),
   textPointValueLong longtext,
   sourceType smallint,
   sourceId int
 ) ENGINE=InnoDB;
-alter table pointValueAnnotations add constraint pointValueAnnotationsFk1 foreign key (pointValueId) 
-  references pointValues(id) on delete cascade;
+-- alter table pointValueAnnotations add constraint pointValueAnnotationsFk1 foreign key (pointValueId) references pointValues(id) on delete cascade;
 
 
 --
@@ -282,15 +278,15 @@ alter table pointEventDetectors add constraint pointEventDetectorsFk1 foreign ke
 --
 create table events (
   id int not null auto_increment,
+  eventState int not null,
+  alarmLevel int not null,
   typeId int not null,
   typeRef1 int not null,
   typeRef2 int not null,
-  activeTs bigint not null,
-  rtnApplicable char(1) not null,
-  rtnTs bigint,
-  rtnCause int,
-  alarmLevel int not null,
+  typeRef3 int,
+  fireTs bigint not null,
   message longtext,
+  goneTs bigint,
   ackTs bigint,
   ackUserId int,
   alternateAckSource int,

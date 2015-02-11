@@ -19,7 +19,6 @@
 package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.PointValueDao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,11 +32,7 @@ import org.springframework.dao.ConcurrencyFailureException;
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.db.spring.IntValuePairRowMapper;
 import br.org.scadabr.utils.ImplementMeException;
-import com.serotonin.mango.Common;
-import com.serotonin.mango.rt.dataImage.AlphaNumericValueTime;
-import com.serotonin.mango.rt.dataImage.BooleanValueTime;
 import com.serotonin.mango.rt.dataImage.DoubleValueTime;
-import com.serotonin.mango.rt.dataImage.MultistateValueTime;
 import com.serotonin.mango.rt.dataImage.PointValueAnnotation;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -63,14 +58,12 @@ import org.springframework.jdbc.core.RowMapper;
 public class PointValueDaoImpl extends BaseDao implements PointValueDao {
 
     @Inject
-    private Common common;
-    @Inject
     private BatchWriteBehind batchWriteBehind;
 
     private final static List<UnsavedPointValue> UNSAVED_POINT_VALUES = new ArrayList<>();
 
-    static final String POINT_VALUE_INSERT_START = "insert into pointValues (dataPointId, dataType, pointValue, ts) values ";
-    static final String POINT_VALUE_INSERT_VALUES = "(?,?,?,?)";
+    static final String POINT_VALUE_INSERT_START = "insert into doublePointValues (dataPointId, pointValue, ts) values ";
+    static final String POINT_VALUE_INSERT_VALUES = "(?,?,?)";
     static final String POINT_VALUE_INSERT = POINT_VALUE_INSERT_START
             + POINT_VALUE_INSERT_VALUES;
     static final String POINT_VALUE_ANNOTATION_INSERT = "insert into pointValueAnnotations "
@@ -331,10 +324,11 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         return id;
     }
 
-    private static final String POINT_VALUE_SELECT = "select pv.ts, pv.pointValue, pva.textPointValueShort, pva.textPointValueLong, pva.sourceType, "
-            + "  pva.sourceId "
-            + "from pointValues pv "
-            + "  left join pointValueAnnotations pva on pv.id = pva.pointValueId";
+    private static final String POINT_VALUE_SELECT
+            = "select\n"
+            + " pv.ts, pv.pointValue\n"
+            + "from\n"
+            + " doublePointValues pv\n";
 
     @Override
     public <T extends PointValueTime> List<T> getPointValues(final DataPointVO<T> vo, final long since) {
@@ -343,8 +337,12 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                PreparedStatement ps = con.prepareCall(POINT_VALUE_SELECT
-                        + " where pv.dataPointId=? and pv.ts >= ? order by ts");
+                PreparedStatement ps = con.prepareCall(
+                        POINT_VALUE_SELECT
+                        + "where\n"
+                        + " pv.dataPointId=? and pv.ts >= ?\n"
+                        + "order\n"
+                        + " by ts");
                 ps.setInt(1, vo.getId());
                 ps.setLong(2, since);
                 return ps;
@@ -380,7 +378,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
     public <T extends PointValueTime> T getLatestPointValue(final DataPointVO<T> vo) {
         flushWriteBehind();
         //TODO optimaze into one hit of the db???
-        final Long maxTs = ejt.queryForObject("select max(ts) from pointValues where dataPointId=?", Long.class, vo.getId());
+        final Long maxTs = ejt.queryForObject("select max(ts) from doublePointValues where dataPointId=?", Long.class, vo.getId());
         if (maxTs == null) {
             return null;
         }
@@ -424,7 +422,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         flushWriteBehind();
         try {
             final Long valueTime = ejt.queryForObject(
-                    "select max(ts) from pointValues where dataPointId=? and ts<?",
+                    "select max(ts) from doublePointValues where dataPointId=? and ts<?",
                     Long.class, vo.getId(), time);
             return valueTime == null ? null : getPointValueAt(vo, valueTime);
         } catch (DataAccessException e) {
@@ -475,7 +473,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         flushWriteBehind();
         try {
             final Long valueTime = ejt.queryForObject(
-                    "select max(ts) from pointValues where dataPointId=? and ts<?",
+                    "select max(ts) from doublePointValues where dataPointId=? and ts<?",
                     Long.class, id, time);
             return valueTime == null ? null : getPointValueAt(id, dataType, valueTime);
         } catch (DataAccessException e) {
@@ -503,57 +501,21 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
             T result;
             switch (dataType) {
                 case DOUBLE:
-                    result = (T) new DoubleValueTime(rs.getDouble(2), pointId, rs.getLong(1));
-                    break;
-                case BOOLEAN:
-                    result = (T) new BooleanValueTime(rs.getDouble(2) == 1, pointId, rs.getLong(1));
-                    break;
-                case MULTISTATE:
-                    result = (T) new MultistateValueTime(rs.getByte(2), pointId, rs.getLong(1));
-                    break;
-                case ALPHANUMERIC:
-                    String s = rs.getString(+3);
-                    if (s == null) {
-                        s = rs.getString(+4);
-                    }
-                    result = (T) new AlphaNumericValueTime(s, pointId, rs.getLong(1));
-                    break;
-                case IMAGE:
-                    throw new ImplementMeException();
-//                    result = (T) new ImageValueTime(Integer.parseInt(rs.getString(3)), rs.getInt(4), pointId, rs.getLong(1));
-                // break;
+                    return (T) new DoubleValueTime(rs.getDouble(2), pointId, rs.getLong(1));
                 default:
-                    throw new ShouldNeverHappenException("Cant handle datatype: " + dataType);
+                    throw new ImplementMeException();
             }
-
-            int sourceType = rs.getInt(5);
-            if (!rs.wasNull()) {
-                result.setPointValueAnnotation(new PointValueAnnotation(sourceType, rs.getInt(6)));
-            }
-            return result;
         }
 
     }
 
+    @Deprecated // TODO reimplement
     private <T extends PointValueTime> void updateAnnotations(List<T> values) {
         Map<Integer, List<PointValueAnnotation>> userIds = new HashMap<>();
         List<PointValueAnnotation> alist;
 
         // Look for annotated point values.
         PointValueAnnotation apv;
-        for (PointValueTime pv : values) {
-            if (pv.isAnnotated()) {
-                apv = pv.getPointValueAnnotation();
-                if (apv.getSourceType() == SetPointSource.Types.USER) {
-                    alist = userIds.get(apv.getSourceId());
-                    if (alist == null) {
-                        alist = new ArrayList<>();
-                        userIds.put(apv.getSourceId(), alist);
-                    }
-                    alist.add(apv);
-                }
-            }
-        }
 
         // Get the usernames from the database.
         if (userIds.size() > 0) {

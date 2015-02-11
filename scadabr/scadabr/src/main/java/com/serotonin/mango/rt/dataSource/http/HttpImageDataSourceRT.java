@@ -180,6 +180,8 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
         }
 
         private void executeImpl() {
+            throw new ImplementMeException();
+            /*
             HttpImagePointLocatorVO vo = (HttpImagePointLocatorVO)dp.getVo().getPointLocator();
 
             byte[] data;
@@ -219,6 +221,7 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
                 saveFailure = new LocalizableMessageImpl("event.httpImage.saveError", e.getMessage());
                 LOG.info("Error saving image data", e);
             }
+            */
         }
 
         public LocalizableMessage getRetrievalFailure() {

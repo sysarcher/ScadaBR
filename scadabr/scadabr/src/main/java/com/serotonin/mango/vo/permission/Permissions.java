@@ -19,6 +19,7 @@
 package com.serotonin.mango.vo.permission;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
@@ -105,7 +106,7 @@ public class Permissions {
     }
 
     public static boolean hasDataPointReadPermission(User user, DataPointVO point) throws PermissionException {
-        return hasDataPointReadPermission(user, point.getDataSourceId(), point.getId());
+        throw new ImplementMeException(); //return hasDataPointReadPermission(user, point.getDataSourceId(), point.getId());
     }
 
     private static boolean hasDataPointReadPermission(User user, int dataSourceId, int dataPointId)
@@ -121,15 +122,20 @@ public class Permissions {
     }
 
     public static void ensureDataPointSetPermission(User user, DataPointVO point) throws PermissionException {
+        throw new ImplementMeException();
+        /*
         if (!point.getPointLocator().isSettable()) {
             throw new ShouldNeverHappenException("Point is not settable");
         }
         if (!hasDataPointSetPermission(user, point)) {
             throw new PermissionException("User does not have set permission to point", user);
         }
+        */
     }
 
     public static boolean hasDataPointSetPermission(User user, DataPointVO point) throws PermissionException {
+        throw new ImplementMeException();
+        /*
         if (hasDataSourcePermission(user, point.getDataSourceId())) {
             return true;
         }
@@ -138,6 +144,7 @@ public class Permissions {
             return false;
         }
         return a.getPermission() == DataPointAccess.SET;
+        */
     }
 
     private static DataPointAccess getDataPointAccess(User user, int dataPointId) {
@@ -150,6 +157,8 @@ public class Permissions {
     }
 
     public static int getDataPointAccessType(User user, DataPointVO point) {
+        throw new ImplementMeException();
+        /*
         if (user == null || user.isDisabled()) {
             return DataPointAccessTypes.NONE;
         }
@@ -170,6 +179,7 @@ public class Permissions {
             return DataPointAccessTypes.READ;
         }
         return DataPointAccessTypes.NONE;
+        */
     }
 
     //

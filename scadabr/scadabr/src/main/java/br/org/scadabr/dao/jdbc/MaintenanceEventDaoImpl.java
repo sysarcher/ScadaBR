@@ -72,7 +72,7 @@ public class MaintenanceEventDaoImpl extends BaseDao implements MaintenanceEvent
             me.setXid(rs.getString(++i));
             me.setDataSourceId(rs.getInt(++i));
             me.setAlias(rs.getString(++i));
-            me.setAlarmLevel(AlarmLevel.fromId(rs.getInt(++i)));
+            me.setAlarmLevel(AlarmLevel.values()[rs.getInt(++i)]);
             me.setScheduleType(MaintenanceEventKey.fromId(rs.getInt(++i)));
             me.setDisabled(charToBool(rs.getString(++i)));
             me.setActiveYear(rs.getInt(++i));
@@ -119,7 +119,7 @@ public class MaintenanceEventDaoImpl extends BaseDao implements MaintenanceEvent
                 ps.setString(1, me.getXid());
                 ps.setInt(2, me.getDataSourceId());
                 ps.setString(3, me.getAlias());
-                ps.setInt(4, me.getAlarmLevel().getId());
+                ps.setInt(4, me.getAlarmLevel().ordinal());
                 ps.setInt(5, me.getScheduleType().getId());
                 ps.setString(6, boolToChar(me.isDisabled()));
                 ps.setInt(7, me.getActiveYear());
@@ -176,7 +176,7 @@ public class MaintenanceEventDaoImpl extends BaseDao implements MaintenanceEvent
             getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
                 @Override
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    ejt2.update("delete from eventHandlers where eventTypeId=" + EventSources.MAINTENANCE.mangoDbId
+                    ejt2.update("delete from eventHandlers where eventTypeId=" + EventSources.MAINTENANCE.ordinal()
                             + " and eventTypeRef1=?", new Object[]{maintenanceEventId});
                     ejt2.update("delete from maintenanceEvents where id=?", new Object[]{maintenanceEventId});
                 }

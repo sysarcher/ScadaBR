@@ -46,7 +46,6 @@ public abstract class PointValueTime  implements Serializable {
 
     private final long timestamp;
     private final int dataPointId;
-    private PointValueAnnotation pointValueAnnotation;
 
     public PointValueTime(int dataPointId, long timestamp) {
         this.dataPointId = dataPointId;
@@ -58,11 +57,6 @@ public abstract class PointValueTime  implements Serializable {
     }
 
     public abstract Object getValue();
-
-    public boolean isAnnotated() {
-        return pointValueAnnotation != null;
-    }
-    
 
     @Override
     public boolean equals(Object o) {
@@ -93,20 +87,6 @@ public abstract class PointValueTime  implements Serializable {
     
     public int getDataPointId() {
         return dataPointId;
-    }
-
-    /**
-     * @return the pointValueAnnotation
-     */
-    public PointValueAnnotation getPointValueAnnotation() {
-        return pointValueAnnotation;
-    }
-
-    /**
-     * @param pointValueAnnotation the pointValueAnnotation to set
-     */
-    public void setPointValueAnnotation(PointValueAnnotation pointValueAnnotation) {
-        this.pointValueAnnotation = pointValueAnnotation;
     }
 
     @Deprecated

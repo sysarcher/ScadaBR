@@ -6,7 +6,7 @@
 package br.org.scadabr.web.mvc.controller.datasources;
 
 import br.org.scadabr.l10n.Localizer;
-import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
 import java.io.Serializable;
 
 /**

@@ -38,8 +38,8 @@ public class MetaPointLocatorVOTest {
     public void testRunScript() {
         MetaDataSourceVO dsVO = new MetaDataSourceVO();
         MetaPointLocatorVO plVO = new MetaPointLocatorVO(DataType.DOUBLE);
+        
         DoubleDataPointVO dpVO = new DoubleDataPointVO();
-        dpVO.setPointLocator(plVO);
         
         plVO.setScript("return -1;");
         plVO.setUpdateEvent(UpdateEvent.SECONDS);
