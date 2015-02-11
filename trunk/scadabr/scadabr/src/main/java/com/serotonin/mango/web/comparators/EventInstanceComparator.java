@@ -79,7 +79,7 @@ public class EventInstanceComparator extends BaseComparator<EventInstance> {
         } else if (sortType == SORT_ID) {
             result = e1.getId() - e2.getId();
         } else if (sortType == SORT_RTN_TIME) {
-            long diff = e1.getInactiveTimestamp() - e2.getInactiveTimestamp();
+            long diff = e1.getGoneTimestamp()- e2.getGoneTimestamp();
             if (diff < 0) {
                 result = -1;
             } else if (diff > 0) {

@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package br.org.scadabr.vo.dataSource;
+package br.org.scadabr.vo.datasource;
 
 import br.org.scadabr.DataType;
 import java.io.Serializable;
@@ -31,6 +31,10 @@ import javax.validation.constraints.Size;
 
 public interface PointLocatorVO<T extends PointValueTime> extends Serializable, ChangeComparableObject<PointLocatorVO<T>> {
 
+    public static final String XID_PREFIX = "PL_";
+
+    boolean isNew();
+    
     /**
      * One of the com.serotonin.mango.DataType
      *
@@ -73,12 +77,22 @@ public interface PointLocatorVO<T extends PointValueTime> extends Serializable, 
     @Size(min = 1, max = 40)
     String getName();
 
+    void setName(String name);
+
     int getId();
-
+    
     void setId(int id);
-
+    
     boolean isEnabled();
 
     void setEnabled(boolean value);
 
+    int getDataSourceId();
+    
+    void setDataSourceId(int dataSourceId);
+
+    Integer getPointLocatorFolderId();
+    
+    void setPointLocatorFolderId(Integer pointLocatorFolderId);
+    
 }

@@ -18,11 +18,10 @@
  */
 package br.org.scadabr.web.mvc.controller.datasources;
 
-import br.org.scadabr.dao.DataPointDao;
-import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import br.org.scadabr.dao.DataSourceDao;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import br.org.scadabr.web.mvc.AjaxFormPostResponse;
-import com.serotonin.mango.vo.DataPointVO;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
@@ -42,13 +41,13 @@ public class PointLocatorController {
     @Inject
     private Validator validator;
     @Inject
-    private DataPointDao dataPointDao;
+    private DataSourceDao dataSourceDao;
     @Inject
     private transient RequestContextAwareLocalizer localizer;
 
     @ModelAttribute("pointLocator")
     protected PointLocatorVO getModel(int id) {
-        return dataPointDao.getDataPoint(id).getPointLocator();
+        return dataSourceDao.getPointLocator(id);
     }
 
     @RequestMapping(params = "id", method = RequestMethod.GET)
@@ -61,9 +60,7 @@ public class PointLocatorController {
     AjaxFormPostResponse<PointLocatorVO> postPointLocator(@ModelAttribute("pointLocator") PointLocatorVO pointLocator) {
         Set<ConstraintViolation<PointLocatorVO>> constraintViolations = validator.validate(pointLocator);
         if (constraintViolations.isEmpty()) {
-            DataPointVO dp = dataPointDao.getDataPoint(pointLocator.getId());
-            dp.setPointLocator(pointLocator);
-            dataPointDao.saveDataPoint(dp);
+            dataSourceDao.savePointLocator(pointLocator);
         }
 
         return new AjaxFormPostResponse<>(pointLocator, constraintViolations);

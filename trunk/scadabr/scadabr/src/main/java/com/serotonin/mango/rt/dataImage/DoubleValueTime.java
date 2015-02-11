@@ -7,7 +7,6 @@ package com.serotonin.mango.rt.dataImage;
 
 import br.org.scadabr.DataType;
 import com.serotonin.mango.rt.dataImage.types.DoubleValue;
-import com.serotonin.mango.rt.dataImage.types.MangoValue;
 
 /**
  *

@@ -60,20 +60,29 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.support.TransactionCallback;
 import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.dao.MaintenanceEventDao;
+import br.org.scadabr.utils.serialization.FieldDeserializer;
+import br.org.scadabr.utils.serialization.FieldSerializer;
+import br.org.scadabr.vo.datasource.PointLocatorFolderVO;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
 import com.serotonin.mango.vo.DoubleDataPointVO;
+import java.io.IOException;
+import java.sql.SQLType;
+import java.sql.Types;
 
 @Named
 public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
 
     private static final String DATA_SOURCE_SELECT = "select id, xid, name, data from dataSources ";
+    private static final String POINT_LOCATOR_SELECT = "select id, dataSourceId, pointLocatorFolderId, clazz, name, fieldData from pointLocators ";
 
     @Inject
+    @Deprecated //TODO switch to PointLocator
     private DataPointDao dataPointDao;
     @Inject
     private MaintenanceEventDao maintenanceEventDao;
 
     Map<Integer, Map<Integer, DataSourceEventType>> dataSourceEventTypes = new HashMap<>();
-    
+
     public DataSourceDaoImpl() {
         super();
     }
@@ -105,14 +114,73 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
     public DataSourceEventType getEventType(int dsId, int eventKeyId) {
         Map<Integer, DataSourceEventType> eventTypes = dataSourceEventTypes.get(dsId);
         if (eventTypes == null) {
-           final DataSourceVO dsVo = getDataSource(dsId);
-           eventTypes = new HashMap<>();
-           for (DataSourceEventKey key : (Set<DataSourceEventKey>)dsVo.createEventKeySet()) {
-               eventTypes.put(key.getId(), dsVo.getEventType(key));
-           }
-           dataSourceEventTypes.put(dsId, eventTypes);
+            final DataSourceVO dsVo = getDataSource(dsId);
+            eventTypes = new HashMap<>();
+            for (DataSourceEventKey key : (Set<DataSourceEventKey>) dsVo.createEventKeySet()) {
+                eventTypes.put(key.getId(), dsVo.getEventType(key));
+            }
+            dataSourceEventTypes.put(dsId, eventTypes);
         }
         return eventTypes.get(eventKeyId);
+    }
+
+    @Override
+    public PointLocatorFolderVO getPointLocatorFolder(int id) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void savePointLocatorFolder(PointLocatorFolderVO plfVo) {
+        // Decide whether to insert or update.
+        if (plfVo.isNew()) {
+            insertPointLocatorFolder(plfVo);
+        } else {
+            updatePointLocatorFolder(plfVo);
+        }
+    }
+    private void insertPointLocatorFolder(final PointLocatorFolderVO vo) {
+        final int id = doInsert(new PreparedStatementCreator() {
+
+            final static String SQL_INSERT = "insert into pointLocatorFolders (dataSourceId, parentId, name) values (?,?,?)";
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                ps.setInt(1, vo.getDataSourceId());
+                ps.setObject(2, vo.getParentFolderId());
+                ps.setString(3, vo.getName());
+                return ps;
+            }
+        });
+        vo.setId(id);
+//TODO        AuditEventType.raiseAddedEvent(AuditEventKey.DATA_SOURCE, vo);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void updatePointLocatorFolder(final PointLocatorFolderVO vo) {
+        PointLocatorVO old = getPointLocator(vo.getId());
+
+        ejt.update(new PreparedStatementCreator() {
+
+            final static String SQL_UPDATE = "update pointLocatorFolders set dataSourceId=?, parentId=?, name=? where id=?";
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement(SQL_UPDATE);
+                ps.setInt(1, vo.getDataSourceId());
+                ps.setObject(2, vo.getParentFolderId());
+                ps.setString(3, vo.getName());
+                ps.setInt(4, vo.getId());
+                return ps;
+            }
+        });
+//TODO        AuditEventType.raiseChangedEvent(AuditEventKey.DATA_SOURCE, old, (ChangeComparable<PointLocatorVO<?>>) vo);
+    }
+
+
+    @Override
+    public void deletePointLocatorFolder(int plfId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     class DataSourceRowMapper implements RowMapper<DataSourceVO<?>> {
@@ -191,16 +259,6 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
                 return ps;
             }
         });
-        //if datasource's name has changed, update datapoints 
-        if (!vo.getName().equals(old.getName())) {
-            for (DataPointVO dp : dataPointDao.getDataPoints(vo.getId())) {
-                dp.setDataSourceName(vo.getName());
-                dp.setDeviceName(vo.getName());
-                dataPointDao.updateDataPoint(dp);
-            }
-
-        }
-
         AuditEventType.raiseChangedEvent(AuditEventKey.DATA_SOURCE, old, (ChangeComparable<DataSourceVO<?>>) vo);
     }
 
@@ -209,14 +267,12 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
         DataSourceVO<?> vo = getDataSource(dataSourceId);
         final JdbcTemplate ejt2 = ejt;
 
-        dataPointDao.deleteDataPoints(dataSourceId);
-
         if (vo != null) {
             getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
                 @Override
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
                     maintenanceEventDao.deleteMaintenanceEventsForDataSource(dataSourceId);
-                    ejt2.update("delete from eventHandlers where eventTypeId=" + EventSources.DATA_SOURCE.mangoDbId
+                    ejt2.update("delete from eventHandlers where eventTypeId=" + EventSources.DATA_SOURCE.ordinal()
                             + " and eventTypeRef1=?", new Object[]{dataSourceId});
                     ejt2.update("delete from dataSourceUsers where dataSourceId=?", new Object[]{dataSourceId});
                     ejt2.update("delete from dataSources where id=?", new Object[]{dataSourceId});
@@ -269,16 +325,12 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
                     dataPointCopy.setId(ScadaBrConstants.NEW_ID);
                     dataPointCopy.setXid(dataPointDao.generateUniqueXid());
                     dataPointCopy.setName(dataPoint.getName());
-                    dataPointCopy.setDataSourceId(dataSourceCopy.getId());
-                    dataPointCopy.setDataSourceName(dataSourceCopy.getName());
-                    dataPointCopy.setDeviceName(dataSourceCopy.getName());
-                    dataPointCopy.setEnabled(dataPoint.isEnabled());
                     dataPointCopy.getComments().clear();
 
                     // Copy the event detectors
                     for (DoublePointEventDetectorVO ped : dataPointCopy.getEventDetectors()) {
                         ped.setId(ScadaBrConstants.NEW_ID);
-                        ped.njbSetDataPoint((DoubleDataPointVO)dataPointCopy);
+                        ped.njbSetDataPoint((DoubleDataPointVO) dataPointCopy);
                     }
 
                     dataPointDao.saveDataPoint(dataPointCopy);
@@ -325,4 +377,100 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
             }
         });
     }
+
+    class PointLocatorRowMapper implements RowMapper<PointLocatorVO> {
+
+        @Override
+        public PointLocatorVO mapRow(ResultSet rs, int rowNum) throws SQLException {
+            try {
+                FieldDeserializer fd = new FieldDeserializer(rs.getString(3));
+                final PointLocatorVO dp = (PointLocatorVO) fd.deserializeObject(rs.getBinaryStream(6));
+                dp.setId(rs.getInt(1));
+                dp.setDataSourceId(rs.getInt(2));
+                dp.setPointLocatorFolderId(rs.getInt(3));
+                dp.setName(rs.getString(5));
+                return dp;
+            } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    public PointLocatorVO getPointLocator(int id) {
+        try {
+            return ejt.queryForObject(POINT_LOCATOR_SELECT + " where id=?", new PointLocatorRowMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public void savePointLocator(PointLocatorVO<?> plVo) {
+        // Decide whether to insert or update.
+        if (plVo.isNew()) {
+            insertPointLocator(plVo);
+        } else {
+            updatePointLocator(plVo);
+        }
+    }
+
+    private void insertPointLocator(final PointLocatorVO vo) {
+        final int id = doInsert(new PreparedStatementCreator() {
+
+            final static String SQL_INSERT = "insert into pointLocators (dataSourceId, pointLocatorFolderId, clazz, name, fieldData) values (?,?,?,?, ?)";
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                ps.setInt(1, vo.getDataSourceId());
+                ps.setObject(2, vo.getPointLocatorFolderId());
+                ps.setString(3, vo.getClass().getName());
+                ps.setString(4, vo.getName());
+                ps.setBlob(5, new FieldSerializer(vo));
+                return ps;
+            }
+        });
+        vo.setId(id);
+//TODO        AuditEventType.raiseAddedEvent(AuditEventKey.DATA_SOURCE, vo);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void updatePointLocator(final PointLocatorVO vo) {
+        PointLocatorVO old = getPointLocator(vo.getId());
+
+        ejt.update(new PreparedStatementCreator() {
+
+            final static String SQL_UPDATE = "update pointLocators set dataSourceId=?, pointLocatorFolderId=?, clazz=?, name=?, fieldData=? where id=?";
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement(SQL_UPDATE);
+                ps.setInt(1, vo.getDataSourceId());
+                ps.setObject(2, vo.getPointLocatorFolderId());
+                ps.setString(3, vo.getClass().getName());
+                ps.setString(4, vo.getName());
+                ps.setBlob(5, new FieldSerializer(vo));
+                ps.setInt(6, vo.getId());
+                return ps;
+            }
+        });
+//TODO        AuditEventType.raiseChangedEvent(AuditEventKey.DATA_SOURCE, old, (ChangeComparable<PointLocatorVO<?>>) vo);
+    }
+
+    @Override
+    public void deletePointLocator(int plId) {
+        PointLocatorVO<?> vo = getPointLocator(plId);
+        if (vo != null) {
+            getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
+                @Override
+                protected void doInTransactionWithoutResult(TransactionStatus status) {
+                    ejt.update("delete from pointLocators where id=?", plId);
+                }
+            });
+
+//TODO            AuditEventType.raiseDeletedEvent(AuditEventKey.DATA_SOURCE, vo);
+        }
+    }
+
 }

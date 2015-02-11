@@ -5,6 +5,7 @@
  */
 package br.org.scadabr.dao;
 
+import com.serotonin.mango.rt.event.AlternateAcknowledgementSources;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.User;
@@ -20,20 +21,20 @@ import javax.inject.Named;
 @Named
 public interface EventDao {
 
-    public void saveEvent(EventInstance evt);
+    void saveEvent(EventInstance evt);
 
-    public void insertUserEvents(int id, List<Integer> eventUserIds, boolean alarm);
+    void insertUserEvents(int id, List<Integer> eventUserIds, boolean alarm);
 
-    public void ackEvent(int id, long timestamp, int i, int MAINTENANCE_MODE);
+    void ackEvent(int eventId, long ackTs, User user, AlternateAcknowledgementSources alternateAckSource);
 
-    public Collection<? extends EventInstance> getActiveEvents();
+    Collection<EventInstance> getActiveEvents();
 
-    public List<EventHandlerVO> getEventHandlers(EventType eventType);
+    List<EventHandlerVO> getEventHandlers(EventType eventType);
 
-    public Iterable<EventInstance> getPendingEvents(User user);
+    Collection<EventInstance> getPendingEvents(User user);
 
-    public int purgeEventsBefore(long millis);
+    int purgeEventsBefore(long millis);
 
-    public EventInstance getEventInstance(int id);
+    EventInstance getEventInstance(int id);
     
 }

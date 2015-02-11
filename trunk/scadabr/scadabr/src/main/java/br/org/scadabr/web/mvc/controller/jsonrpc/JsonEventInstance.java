@@ -101,8 +101,8 @@ public class JsonEventInstance {
         result.setAlarmLevel(eventInstance.getAlarmLevel());
         result.setFireTimestamp(eventInstance.getFireTimestamp());
         result.setStateMessage(localizer.getMessage(eventInstance.getStateMessage()));
-        if (eventInstance.getInactiveTimestamp() > 0) {
-            result.setInactiveTimestamp(eventInstance.getInactiveTimestamp());
+        if (eventInstance.isGone()) {
+            result.setInactiveTimestamp(eventInstance.getGoneTimestamp());
         }
         result.setAcknowledged(eventInstance.isAcknowledged());
         result.setMessage(localizer.getMessage(eventInstance.getMessage()));

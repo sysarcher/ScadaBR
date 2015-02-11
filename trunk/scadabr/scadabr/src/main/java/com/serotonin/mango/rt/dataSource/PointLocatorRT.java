@@ -19,7 +19,7 @@
 package com.serotonin.mango.rt.dataSource;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 
 /**

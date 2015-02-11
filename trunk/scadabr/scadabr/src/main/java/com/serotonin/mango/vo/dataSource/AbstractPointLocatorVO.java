@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import java.util.List;
@@ -43,12 +43,14 @@ abstract public class AbstractPointLocatorVO<T extends PointValueTime> implement
     private static final long serialVersionUID = -1;
     private static final int version = 1;
     private int id = ScadaBrConstants.NEW_ID;
+    private Integer pointLocatorFolderId;
     private boolean enabled;
     @NotNull
     @Size(min = 1, max = 40)
     private String name;
     private DataType dataType;
-
+    private int dataSourceId;
+    
     public AbstractPointLocatorVO(DataType dataType) {
         this.name = getClass().getSimpleName();
         this.dataType = dataType;
@@ -107,10 +109,15 @@ abstract public class AbstractPointLocatorVO<T extends PointValueTime> implement
     public int getId() {
         return id;
     }
-
+    
     @Override
     public void setId(int id) {
         this.id = id;
+    }
+    
+    @Override
+    public boolean isNew() {
+        return id == ScadaBrConstants.NEW_ID;
     }
 
     @Override
@@ -141,6 +148,38 @@ abstract public class AbstractPointLocatorVO<T extends PointValueTime> implement
     @Override
     public final DataType getDataType() {
         return dataType;
+    }
+
+    /**
+     * @return the dataSourceId
+     */
+    @Override
+    public int getDataSourceId() {
+        return dataSourceId;
+    }
+
+    /**
+     * @param dataSourceId the dataSourceId to set
+     */
+    @Override
+    public void setDataSourceId(int dataSourceId) {
+        this.dataSourceId = dataSourceId;
+    }
+
+    /**
+     * @return the pointLocatorFolderId
+     */
+    @Override
+    public Integer getPointLocatorFolderId() {
+        return pointLocatorFolderId;
+    }
+
+    /**
+     * @param pointLocatorFolderId the pointLocatorFolderId to set
+     */
+    @Override
+    public void setPointLocatorFolderId(Integer pointLocatorFolderId) {
+        this.pointLocatorFolderId = pointLocatorFolderId;
     }
 
 }

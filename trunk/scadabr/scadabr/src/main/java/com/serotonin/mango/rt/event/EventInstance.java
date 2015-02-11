@@ -31,6 +31,8 @@ import com.serotonin.mango.vo.UserComment;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Collections;
+import java.util.Objects;
 
 public class EventInstance {
 
@@ -46,10 +48,12 @@ public class EventInstance {
         return id == ScadaBrConstants.NEW_ID;
     }
 
-    public interface AlternateAcknowledgementSources {
+    public boolean isGone() {
+        return eventState == EventStatus.GONE;
+    }
 
-        int DELETED_USER = 1;
-        int MAINTENANCE_MODE = 2;
+    public void setEventComments(List<UserComment> eventComments) {
+        this.eventComments = eventComments;
     }
 
     /**
@@ -71,7 +75,7 @@ public class EventInstance {
     /**
      * State field. The time that the event returned to normal.
      */
-    private long inactiveTimestamp;
+    private long goneTimestamp;
 
     /**
      * State field. The action that caused the event to INACTIVE. One of
@@ -102,7 +106,7 @@ public class EventInstance {
     private long acknowledgedTimestamp;
     private int acknowledgedByUserId;
     private String acknowledgedByUsername;
-    private int alternateAckSource;
+    private AlternateAcknowledgementSources alternateAckSource;
 
     //
     //
@@ -122,26 +126,26 @@ public class EventInstance {
      * @param activeTimestamp
      * @param alarmLevel
      * @param state
-     * @param inactiveTimestamp
+     * @param goneTimestamp
      * @param message
      */
-    public EventInstance(EventType type, long activeTimestamp, AlarmLevel alarmLevel, EventStatus state, long inactiveTimestamp, LocalizableMessage message) {
+    public EventInstance(EventType type, long activeTimestamp, AlarmLevel alarmLevel, EventStatus state, long goneTimestamp, LocalizableMessage message) {
         this.eventType = type;
         this.fireTimestamp = activeTimestamp;
         this.eventState = state;
         this.alarmLevel = alarmLevel;
         this.message = message;
-        this.inactiveTimestamp = inactiveTimestamp;
+        this.goneTimestamp = goneTimestamp;
         this.context = null;
     }
 
     /**
      * Create a new if staeful active or stateless event.
-     * 
+     *
      * @param eventType
      * @param activeTimestamp
      * @param message
-     * @param context 
+     * @param context
      */
     public EventInstance(EventType eventType, long activeTimestamp, LocalizableMessage message, Map<String, Object> context) {
         this.eventType = eventType;
@@ -187,11 +191,11 @@ public class EventInstance {
             if (acknowledgedByUserId != 0) {
                 return new LocalizableMessageImpl("events.ackedByUser", acknowledgedByUsername);
             }
-            if (alternateAckSource == AlternateAcknowledgementSources.DELETED_USER) {
-                return new LocalizableMessageImpl("events.ackedByDeletedUser");
-            }
-            if (alternateAckSource == AlternateAcknowledgementSources.MAINTENANCE_MODE) {
-                return new LocalizableMessageImpl("events.ackedByMaintenance");
+            switch (alternateAckSource) {
+                case DELETED_USER:
+                    return new LocalizableMessageImpl("events.ackedByDeletedUser");
+                case MAINTENANCE_MODE:
+                    return new LocalizableMessageImpl("events.ackedByMaintenance");
             }
         }
 
@@ -203,11 +207,11 @@ public class EventInstance {
             if (acknowledgedByUserId != 0) {
                 return new LocalizableMessageImpl("events.export.ackedByUser", acknowledgedByUsername);
             }
-            if (alternateAckSource == AlternateAcknowledgementSources.DELETED_USER) {
-                return new LocalizableMessageImpl("events.export.ackedByDeletedUser");
-            }
-            if (alternateAckSource == AlternateAcknowledgementSources.MAINTENANCE_MODE) {
-                return new LocalizableMessageImpl("events.export.ackedByMaintenance");
+            switch (alternateAckSource) {
+                case DELETED_USER:
+                    return new LocalizableMessageImpl("events.export.ackedByDeletedUser");
+                case MAINTENANCE_MODE:
+                    return new LocalizableMessageImpl("events.export.ackedByMaintenance");
             }
         }
 
@@ -237,12 +241,12 @@ public class EventInstance {
     }
 
     public void setAlarmGone(long time) {
-        inactiveTimestamp = time;
+        goneTimestamp = time;
         this.eventState = EventStatus.GONE;
     }
 
     public void setAlarmDisabled(long time) {
-        inactiveTimestamp = time;
+        goneTimestamp = time;
         this.eventState = EventStatus.SOURCE_DISABLED;
     }
 
@@ -270,8 +274,8 @@ public class EventInstance {
         return id;
     }
 
-    public long getInactiveTimestamp() {
-        return inactiveTimestamp;
+    public long getGoneTimestamp() {
+        return goneTimestamp;
     }
 
     public LocalizableMessage getMessage() {
@@ -282,16 +286,20 @@ public class EventInstance {
         eventComments.add(comment);
     }
 
-    public void setEventComments(List<UserComment> eventComments) {
-        this.eventComments = eventComments;
+    public Iterable<UserComment> getEventComments() {
+        if (eventComments == null) {
+            return Collections.EMPTY_LIST;
+        } else {
+            return eventComments;
+        }
     }
 
-    public List<UserComment> getEventComments() {
-        return eventComments;
-    }
-
-    public List<EventHandlerRT> getHandlers() {
-        return handlers;
+    public Iterable<EventHandlerRT> getHandlers() {
+        if (handlers == null) {
+            return Collections.EMPTY_LIST;
+        } else {
+            return handlers;
+        }
     }
 
     public void setHandlers(List<EventHandlerRT> handlers) {
@@ -338,15 +346,42 @@ public class EventInstance {
         this.acknowledgedByUsername = acknowledgedByUsername;
     }
 
-    public int getAlternateAckSource() {
+    public AlternateAcknowledgementSources getAlternateAckSource() {
         return alternateAckSource;
     }
 
-    public void setAlternateAckSource(int alternateAckSource) {
+    public void setAlternateAckSource(AlternateAcknowledgementSources alternateAckSource) {
         this.alternateAckSource = alternateAckSource;
     }
 
     public Map<String, Object> getContext() {
         return context;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 67 * hash + Objects.hashCode(this.eventType);
+        hash = 67 * hash + (int) (this.fireTimestamp ^ (this.fireTimestamp >>> 32));
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final EventInstance other = (EventInstance) obj;
+        if (!Objects.equals(this.eventType, other.eventType)) {
+            return false;
+        }
+        if (this.fireTimestamp != other.fireTimestamp) {
+            return false;
+        }
+        return true;
+    }
+    
 }

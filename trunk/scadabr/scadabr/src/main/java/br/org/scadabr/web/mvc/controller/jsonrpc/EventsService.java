@@ -4,6 +4,7 @@ import br.org.scadabr.dao.EventDao;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.l10n.Localizer;
 import com.googlecode.jsonrpc4j.JsonRpcService;
+import com.serotonin.mango.rt.event.AlternateAcknowledgementSources;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.UserSessionContextBean;
@@ -33,7 +34,7 @@ public class EventsService {
         if (user != null) {
             long now = System.currentTimeMillis();
             for (EventInstance evt : eventDao.getPendingEvents(user)) {
-                eventDao.ackEvent(evt.getId(), now, user.getId(), 0);
+                eventDao.ackEvent(evt.getId(), now, user, null);
             }
         }
         return JsonEventInstance.wrap(eventDao.getPendingEvents(user), localizer);
@@ -44,7 +45,7 @@ public class EventsService {
         final User user = userSessionContextBean.getUser();
         if (user != null) {
             long now = System.currentTimeMillis();
-            eventDao.ackEvent(eventId, now, user.getId(), 0);
+            eventDao.ackEvent(eventId, now, user, null);
 //TODO impl            MiscDWR.resetLastAlarmLevelChange();
         }
         return JsonEventInstance.wrap(eventDao.getPendingEvents(user), localizer);

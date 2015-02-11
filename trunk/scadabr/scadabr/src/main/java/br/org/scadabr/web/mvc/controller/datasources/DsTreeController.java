@@ -8,6 +8,7 @@ package br.org.scadabr.web.mvc.controller.datasources;
 import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.DataPointVO;
@@ -79,11 +80,14 @@ public class DsTreeController {
      */
     @RequestMapping(params = {"dsId", "parentFolderId"}, method = RequestMethod.GET)
     public List<JsonPointLocator> getPointLocators(int dsId, int parentFolderId) {
+        throw new ImplementMeException();
+        /*
         List<JsonPointLocator> result = new LinkedList<>();
         for (DataPointVO dp : dataPointDao.getDataPoints(dsId)) {
             result.add(new JsonPointLocator(dp.getPointLocator(), localizer));
         }
         return result;
+                */
     }
 
 }

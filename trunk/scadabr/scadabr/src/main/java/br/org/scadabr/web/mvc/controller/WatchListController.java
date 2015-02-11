@@ -171,7 +171,7 @@ public class WatchListController {
 
     private void updateSetPermission(DataPointVO point, SharedUserAcess access, User owner) {
         // Point isn't settable
-        if (!point.getPointLocator().isSettable()) {
+        if (!point.isSettable()) {
             return;
         }
 

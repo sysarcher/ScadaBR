@@ -68,9 +68,11 @@ import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.type.AuditEventKey;
 import br.org.scadabr.vo.event.type.DataPointDetectorKey;
 import br.org.scadabr.vo.event.type.SystemEventKey;
+import com.serotonin.mango.rt.event.AlternateAcknowledgementSources;
 import com.serotonin.mango.vo.User;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.Collection;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -95,6 +97,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
         super();
     }
 
+    @Override
     public void saveEvent(EventInstance event) {
         if (event.isNew()) {
             insertEvent(event);
@@ -109,7 +112,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
 
             final static String SQL_INSERT
                     = "insert into events\n"
-                    + " (typeId, typeRef1, typeRef2, activeTs, rtnApplicable, rtnTs, rtnCause, alarmLevel, message, ackTs)\n"
+                    + " (typeId, eventState, alarmLevel, typeRef1, typeRef2, typeRef3, fireTs, message, goneTs, ackTs)\n"
                     + "values\n"
                     + " (?,?,?,?,?,?,?,?,?,?)";
 
@@ -117,76 +120,80 @@ public class EventDaoImpl extends BaseDao implements EventDao {
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                 final EventType type = event.getEventType();
-                ps.setInt(1, type.getEventSource().mangoDbId);
+                ps.setInt(1, type.getEventSource().ordinal());
+                ps.setInt(2, event.getEventState().ordinal());
+                ps.setInt(3, event.getAlarmLevel().ordinal());
                 switch (type.getEventSource()) {
                     case AUDIT: {
                         final AuditEventType et = (AuditEventType) type;
-                        ps.setInt(2, et.getEventKey().getId());
-                        ps.setInt(3, et.getReferenceId());
+                        ps.setInt(4, et.getEventKey().getId());
+                        ps.setInt(5, et.getReferenceId());
                     }
                     break;
                     /*TODO                    case COMPOUND:
-                     ps.setInt(2, ((CompoundEventTy) type).getAuditEventType().mangoDbId);
-                     ps.setInt(3, type.getReferenceId2());
+                     ps.setInt(4, ((CompoundEventTy) type).getAuditEventType().mangoDbId);
+                     ps.setInt(5, type.getReferenceId2());
+                        ps.setNull(6, Types.INTEGER);
                      break;
                      */ case DATA_POINT:
-                        ps.setInt(2, ((DataPointEventType) type).getReferenceId1());
-                        ps.setInt(3, ((DataPointEventType) type).getReferenceId2());
+                        ps.setInt(4, ((DataPointEventType) type).getReferenceId1());
+                        ps.setInt(5, ((DataPointEventType) type).getReferenceId2());
+                        ps.setNull(6, Types.INTEGER);
                         break;
                     case DATA_SOURCE:
-                        ps.setInt(2, ((DataSourceEventType) type).getDataSourceId());
-                        ps.setInt(3, ((DataSourceEventType) type).getEventKey().getId());
+                        ps.setInt(4, ((DataSourceEventType) type).getDataSourceId());
+                        ps.setInt(5, ((DataSourceEventType) type).getEventKey().getId());
+                        ps.setNull(6, Types.INTEGER);
                         break;
                     case MAINTENANCE:
-                        ps.setInt(2, ((MaintenanceEventType) type).getReferenceId1());
-                        ps.setInt(3, ((MaintenanceEventType) type).getReferenceId2());
+                        ps.setInt(4, ((MaintenanceEventType) type).getReferenceId1());
+                        ps.setInt(5, ((MaintenanceEventType) type).getReferenceId2());
+                        ps.setNull(6, Types.INTEGER);
                         break;
                     case PUBLISHER:
-                        ps.setInt(2, type.getReferenceId1());
-                        ps.setInt(3, type.getReferenceId2());
+                        ps.setInt(4, type.getReferenceId1());
+                        ps.setInt(5, type.getReferenceId2());
+                        ps.setNull(6, Types.INTEGER);
                         break;
                     case SCHEDULED:
-                        ps.setInt(2, ((ScheduledEventType) type).getReferenceId1());
-                        ps.setInt(3, ((ScheduledEventType) type).getReferenceId2());
+                        ps.setInt(4, ((ScheduledEventType) type).getReferenceId1());
+                        ps.setInt(5, ((ScheduledEventType) type).getReferenceId2());
+                        ps.setNull(6, Types.INTEGER);
                         break;
                     case SYSTEM: {
                         final SystemEventType et = (SystemEventType) type;
-                        ps.setInt(2, et.getEventKey().getId());
-                        ps.setInt(3, et.getReferenceId());
+                        ps.setInt(4, et.getEventKey().getId());
+                        ps.setInt(5, et.getReferenceId());
+                        ps.setNull(6, Types.INTEGER);
                     }
                     break;
                     default:
                         throw new ImplementMeException();
                 }
-                ps.setLong(4, event.getFireTimestamp());
-                ps.setString(5, boolToChar(event.isStateful()));
-                if (!event.isActive()) {
-                    ps.setLong(6, event.getInactiveTimestamp());
-                    ps.setInt(7, event.getEventState().getId());
+                ps.setLong(7, event.getFireTimestamp());
+                ps.setString(8, I18NUtils.serialize(event.getMessage()));
+                if (event.getGoneTimestamp() == 0) {
+                    ps.setNull(9, Types.BIGINT);
                 } else {
-                    ps.setNull(6, Types.BIGINT);
-                    ps.setNull(7, Types.INTEGER);
+                    ps.setLong(9, event.getGoneTimestamp());
                 }
-                ps.setInt(8, event.getAlarmLevel().getId());
-                ps.setString(9, I18NUtils.serialize(event.getMessage()));
-                if (!event.isAlarm()) {
-                    event.setAcknowledgedTimestamp(event.getFireTimestamp());
-                    ps.setLong(10, event.getAcknowledgedTimestamp());
-                } else {
+                if (event.getAcknowledgedTimestamp()== 0) {
                     ps.setNull(10, Types.BIGINT);
+                } else {
+                    ps.setLong(10, event.getAcknowledgedTimestamp());
                 }
                 return ps;
             }
         });
+        
         event.setId(id);
-        event.setEventComments(new LinkedList<UserComment>());
     }
 
-    private static final String EVENT_UPDATE = "update events set rtnTs=?, rtnCause=? where id=?";
+    private static final String EVENT_UPDATE = "update events set goneTs=?, eventState=? where id=?";
 
     private void updateEvent(EventInstance event) {
         ejt.update(EVENT_UPDATE,
-                new Object[]{event.getInactiveTimestamp(), event.getEventState().getId(),
+                new Object[]{event.getGoneTimestamp(), event.getEventState().ordinal(),
                     event.getId()});
         updateCache(event);
     }
@@ -194,10 +201,10 @@ public class EventDaoImpl extends BaseDao implements EventDao {
     private static final String EVENT_ACK = "update events set ackTs=?, ackUserId=?, alternateAckSource=? where id=? and ackTs is null";
     private static final String USER_EVENT_ACK = "update userEvents set silenced=? where eventId=?";
 
-    public void ackEvent(int eventId, long time, int userId,
-            int alternateAckSource) {
+    @Override
+    public void ackEvent(int eventId, long ackTs, User user, AlternateAcknowledgementSources alternateAckSource) {
         // Ack the event
-        ejt.update(EVENT_ACK, new Object[]{time, userId == 0 ? null : userId,
+        ejt.update(EVENT_ACK, new Object[]{ackTs, user == null ? null : user.getId(),
             alternateAckSource, eventId});
         // Silence the user events
         ejt.update(USER_EVENT_ACK, new Object[]{boolToChar(true), eventId});
@@ -207,6 +214,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
 
     private static final String USER_EVENTS_INSERT = "insert into userEvents (eventId, userId, silenced) values (?,?,?)";
 
+    @Override
     public void insertUserEvents(final int eventId,
             final List<Integer> userIds, final boolean alarm) {
         ejt.batchUpdate(USER_EVENTS_INSERT, new BatchPreparedStatementSetter() {
@@ -232,35 +240,39 @@ public class EventDaoImpl extends BaseDao implements EventDao {
     }
 
     private static final String BASIC_EVENT_SELECT
-            = "select e.id, e.typeId, e.typeRef1, e.typeRef2, e.activeTs, e.rtnApplicable, e.rtnTs, e.rtnCause, "
-            + "  e.alarmLevel, e.message, e.ackTs, e.ackUserId, u.username, e.alternateAckSource "
-            + "from events e "
-            + "  left join users u on e.ackUserId = u.id ";
+            = "select\n"
+            + " e.id, e.typeId, e.eventState, e.alarmLevel, e.typeRef1, e.typeRef2, e.typeRef3, e.fireTs, e.message, e.goneTs,\n"
+            + " e.ackTs, e.ackUserId, u.username, e.alternateAckSource\n"
+            + "from events e\n"
+            + "  left join users u on e.ackUserId = u.id\n";
 
-    public List<EventInstance> getActiveEvents() {
+    @Override
+    public Collection<EventInstance> getActiveEvents() {
         List<EventInstance> results = ejt.query(BASIC_EVENT_SELECT
-                + "where e.rtnCause=?",
-                new EventInstanceRowMapper(), EventStatus.ACTIVE.getId());
+                + "where e.eventState=?",
+                new EventInstanceRowMapper(), EventStatus.ACTIVE.ordinal());
         attachRelationalInfo(results);
         return results;
     }
 
-    private static final String EVENT_SELECT_WITH_USER_DATA = "select e.id, e.typeId, e.typeRef1, e.typeRef2, e.activeTs, e.rtnApplicable, e.rtnTs, e.rtnCause, "
-            + "  e.alarmLevel, e.message, e.ackTs, e.ackUserId, u.username, e.alternateAckSource, ue.silenced "
-            + "from events e "
-            + "  left join users u on e.ackUserId=u.id "
-            + "  left join userEvents ue on e.id=ue.eventId ";
+    private static final String EVENT_SELECT_WITH_USER_DATA
+            = "select\n"
+            + " e.id, e.typeId, e.eventState, e.alarmLevel, e.typeRef1, e.typeRef2, e.typeRef3, e.fireTs, e.message, e.goneTs,\n"
+            + " e.ackTs, e.ackUserId, u.username, e.alternateAckSource, ue.silenced\n"
+            + "from events e\n"
+            + "  left join users u on e.ackUserId=u.id\n"
+            + "  left join userEvents ue on e.id=ue.eventId\n";
 
     public List<EventInstance> getEventsForDataPoint(int dataPointId, int userId) {
         List<EventInstance> results = ejt.query(EVENT_SELECT_WITH_USER_DATA
-                + "where e.typeId=" + EventSources.DATA_POINT.mangoDbId
+                + "where e.typeId=" + EventSources.DATA_POINT.ordinal()
                 + "  and e.typeRef1=? " + "  and ue.userId=? "
-                + "order by e.activeTs desc", new Object[]{dataPointId,
+                + "order by e.fireTs desc", new Object[]{dataPointId,
                     userId}, new UserEventInstanceRowMapper());
         attachRelationalInfo(results);
         return results;
     }
-
+    
     public List<EventInstance> getPendingEventsForDataPoint(int dataPointId,
             int userId) {
         // Check the cache
@@ -322,10 +334,10 @@ public class EventDaoImpl extends BaseDao implements EventDao {
         sb.append("where e.typeId=?");
 
         if (typeRef1 == -1) {
-            params = new Object[]{eventSource.mangoDbId, userId, boolToChar(true)};
+            params = new Object[]{eventSource.ordinal(), userId, boolToChar(true)};
         } else {
             sb.append("  and e.typeRef1=?");
-            params = new Object[]{eventSource.mangoDbId, typeRef1, userId, boolToChar(true)};
+            params = new Object[]{eventSource.ordinal(), typeRef1, userId, boolToChar(true)};
         }
         sb.append("  and ue.userId=? ");
         sb.append("  and (e.ackTs is null or (e.rtnApplicable=? and e.rtnTs is null and e.alarmLevel > 0)) ");
@@ -337,19 +349,15 @@ public class EventDaoImpl extends BaseDao implements EventDao {
         return results;
     }
 
-    public List<EventInstance> getPendingEvents(final User user) {
-        return getPendingEvents(user.getId());
-    }
-
-    @Deprecated
-    public List<EventInstance> getPendingEvents(final int userId) {
+    @Override
+    public Collection<EventInstance> getPendingEvents(final User user) {
         List<EventInstance> results = ejt.query(new PreparedStatementCreator() {
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareCall(EVENT_SELECT_WITH_USER_DATA
-                        + "where ue.userId=? and e.ackTs is null order by e.activeTs desc");
-                ps.setInt(1, userId);
+                        + "where ue.userId=? and e.ackTs is null order by e.fireTs desc");
+                ps.setInt(1, user.getId());
                 ps.setMaxRows(MAX_PENDING_EVENTS);
                 return ps;
             }
@@ -358,6 +366,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
         return results;
     }
 
+    @Override
     public EventInstance getEventInstance(int eventId) {
         return ejt.queryForObject(BASIC_EVENT_SELECT + "where e.id=?",
                 new EventInstanceRowMapper(), eventId);
@@ -368,28 +377,21 @@ public class EventDaoImpl extends BaseDao implements EventDao {
         @Override
         public EventInstance mapRow(ResultSet rs, int rowNum)
                 throws SQLException {
-            final AlarmLevel alarmLevel = AlarmLevel.fromId(rs.getInt(9));
-            final EventType type = createEventType(EventSources.fromMangoDbId(rs.getInt(2)), rs.getInt(3), rs.getInt(4), alarmLevel);
+            final AlarmLevel alarmLevel = AlarmLevel.values()[rs.getInt(4)];
+            final EventStatus state = EventStatus.values()[rs.getInt(3)];
+            final EventType type = createEventType(EventSources.values()[rs.getInt(2)], rs.getInt(5), rs.getInt(6), rs.getInt(7), alarmLevel);
 
             LocalizableMessage message;
             try {
-                message = I18NUtils.deserialize(rs.getString(10));
+                message = I18NUtils.deserialize(rs.getString(9));
             } catch (LocalizableMessageParseException e) {
                 message = new LocalizableMessageImpl("common.default",
                         rs.getString(10));
             }
 
-            EventStatus state;
-            if (charToBool(rs.getString(6))) {
-                //rtnApplicable == true, so we are stateful;
-                state = EventStatus.fromId(rs.getInt(8));
-            } else {
-                // We do not cate of rs.getInt(8) we assume we are stateless.
-                state = EventStatus.STATELESS;
-            }
-
-            EventInstance event = new EventInstance(type, rs.getLong(5), alarmLevel, state, rs.getLong(7), message);
+            EventInstance event = new EventInstance(type, rs.getLong(8), alarmLevel, state, rs.getLong(10), message);
             event.setId(rs.getInt(1));
+            
             long ackTs = rs.getLong(11);
             if (!rs.wasNull()) {
                 event.setAcknowledgedTimestamp(ackTs);
@@ -397,7 +399,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
                 if (!rs.wasNull()) {
                     event.setAcknowledgedByUsername(rs.getString(13));
                 }
-                event.setAlternateAckSource(rs.getInt(14));
+                event.setAlternateAckSource(AlternateAcknowledgementSources.values()[rs.getInt(14)]);
             }
 
             return event;
@@ -418,7 +420,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
         }
     }
 
-    EventType createEventType(final EventSources eventSource, final int refId1, final int refId2, final AlarmLevel alarmLevel)
+    EventType createEventType(final EventSources eventSource, final int refId1, final int refId2,  final int refId3, final AlarmLevel alarmLevel)
             throws SQLException {
         switch (eventSource) {
             case DATA_POINT:
@@ -468,6 +470,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
         return getEventInstance(eventId);
     }
 
+    @Override
     public int purgeEventsBefore(final long time) {
         // Find a list of event ids with no remaining acknowledgements pending.
         final JdbcTemplate ejt2 = ejt;
@@ -477,7 +480,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
                     public Integer doInTransaction(TransactionStatus status) {
                         int count = ejt2
                         .update("delete from events "
-                                + "where activeTs<? "
+                                + "where activeTs < ? "
                                 + "  and ackTs is not null "
                                 + "  and (rtnApplicable=? or (rtnApplicable=? and rtnTs is not null))",
                                 new Object[]{time, boolToChar(false),
@@ -678,8 +681,9 @@ public class EventDaoImpl extends BaseDao implements EventDao {
                 new RowMapper<EventType>() {
                     @Override
                     public EventType mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        final AlarmLevel alarmLevel = AlarmLevel.fromId(rs.getInt(4));
-                        return createEventType(EventSources.fromMangoDbId(rs.getInt(1)), rs.getInt(2), rs.getInt(3), alarmLevel);
+                        final AlarmLevel alarmLevel = AlarmLevel.values()[rs.getInt(4)];
+                        throw new ImplementMeException();
+                        //TODO return createEventType(EventSources.values()[rs.getInt(1)], rs.getInt(2), rs.getInt(3), alarmLevel);
                     }
                 }, handlerId);
     }
@@ -737,7 +741,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
         return ejt.query(EVENT_HANDLER_SELECT
                 + "where eventTypeId=? and eventTypeRef1=? "
                 + "  and (eventTypeRef2=? or eventTypeRef2=0)", new Object[]{
-                    eventSource.mangoDbId, ref1, ref2}, new EventHandlerRowMapper());
+                    eventSource.ordinal(), ref1, ref2}, new EventHandlerRowMapper());
     }
 
     public EventHandlerVO getEventHandler(int eventHandlerId) {
@@ -850,7 +854,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
                         PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                         ps.setString(1, handler.getXid());
                         ps.setString(2, handler.getAlias());
-                        ps.setInt(3, eventSource.mangoDbId);
+                        ps.setInt(3, eventSource.ordinal());
                         ps.setInt(4, typeRef1);
                         ps.setInt(5, typeRef2);
                         ps.setBlob(6, SerializationHelper.writeObject(handler));

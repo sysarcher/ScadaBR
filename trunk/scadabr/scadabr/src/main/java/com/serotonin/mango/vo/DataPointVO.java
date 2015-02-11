@@ -19,9 +19,6 @@
 package com.serotonin.mango.vo;
 
 import br.org.scadabr.DataType;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
 
@@ -34,13 +31,15 @@ import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import br.org.scadabr.utils.TimePeriods;
-import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.serialization.SerializabeField;
 import br.org.scadabr.vo.IntervalLoggingTypes;
 import br.org.scadabr.vo.LoggingTypes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -49,7 +48,7 @@ import org.springframework.validation.Validator;
 
 public abstract class DataPointVO<T extends PointValueTime> implements Serializable, Cloneable, ChangeComparable<DataPointVO<T>> {
 
-    public abstract <T extends PointValueTime> DataPointRT<T> createRT();
+    public abstract DataPointRT<T> createRT(PointLocatorVO<T> pointLocatorVO);
 
     /**
      * @return the valuePattern
@@ -80,6 +79,7 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
     }
 
     /**
+     * @param pvt
      * @return the valueAndUnitPattern for the specific PointValueTime.
      * The first param ('{0}') is the value, the second ('{1}') is the unit
      */
@@ -106,6 +106,24 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
      */
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    /**
+     * @return the pointLocatorId
+     */
+    public Integer getPointLocatorId() {
+        return pointLocatorId;
+    }
+
+    /**
+     * @param pointLocatorId the pointLocatorId to set
+     */
+    public void setPointLocatorId(Integer pointLocatorId) {
+        this.pointLocatorId = pointLocatorId;
+    }
+
+    public boolean isEvtDetectorsEmpty() {
+        return eventDetectors == null ? true : eventDetectors.isEmpty();
     }
 
     @Configurable
@@ -146,19 +164,12 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
 
     }
 
-    private static final long serialVersionUID = -1;
     public static final String XID_PREFIX = "DP_";
     
 
-    public DataType getDataType() {
-        return pointLocator.getDataType();
-    }
+    public abstract DataType getDataType();
 
     public static final Set<TimePeriods> PURGE_TYPES = EnumSet.of(TimePeriods.DAYS, TimePeriods.WEEKS, TimePeriods.MONTHS, TimePeriods.YEARS);
-
-    public LocalizableMessage getConfigurationDescription() {
-        return pointLocator.getConfigurationDescription();
-    }
 
     @JsonIgnore
     public boolean isNew() {
@@ -172,17 +183,17 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
     private int id = ScadaBrConstants.NEW_ID;
     private String xid;
 
-    private String name;
-    private int dataSourceId;
+    private String name = getClass().getSimpleName();
 
-    private String deviceName;
-
-    private boolean enabled;
     private int pointFolderId;
+    @SerializabeField
     private LoggingTypes loggingType = LoggingTypes.ALL;
+    @SerializabeField
     private TimePeriods intervalLoggingPeriodType = TimePeriods.MINUTES;
 
+    @SerializabeField
     private int intervalLoggingPeriod = 15;
+    @SerializabeField
     private IntervalLoggingTypes intervalLoggingType = IntervalLoggingTypes.INSTANT;
 
     private TimePeriods _purgeType = TimePeriods.YEARS;
@@ -191,24 +202,12 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
     private List<DoublePointEventDetectorVO> eventDetectors;
     private List<UserComment> comments;
 
-    private PointLocatorVO<T> pointLocator;
+    private Integer pointLocatorId;
     
     private String valuePattern;
     private String valueAndUnitPattern;
     private String unit;
     
-
-    //
-    //
-    // Convenience data from data source
-    //
-    private String dataSourceName;
-
-    //
-    //
-    // Required for importing
-    //
-    private String dataSourceXid;
 
     //
     //
@@ -240,11 +239,6 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
         lastValue = pvt;
     }
 
-    @Deprecated //TODO Make name with hirearchy path
-    public String getExtendedName() {
-        return deviceName + " - " + name;
-    }
-
     /*
      * This value is used by the watchlists. It is set when the watchlist is loaded to determine if the user is allowed
      * to set the point or not based upon various conditions.
@@ -268,7 +262,6 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
     public void addProperties(List<LocalizableMessage> list) {
         AuditEventType.addPropertyMessage(list, "common.xid", xid);
         AuditEventType.addPropertyMessage(list, "dsEdit.points.name", name);
-        AuditEventType.addPropertyMessage(list, "common.enabled", enabled);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.type", loggingType);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.period", intervalLoggingPeriodType.getPeriodDescription(intervalLoggingPeriod));
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.valueType", intervalLoggingType);
@@ -276,15 +269,12 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
         AuditEventType.addPropertyMessage(list, "pointEdit.unit", unit);
         AuditEventType.addPropertyMessage(list, "pointEdit.valuePattern", valuePattern);
         AuditEventType.addPropertyMessage(list, "pointEdit.valueAndUnitPattern", valueAndUnitPattern);
-        
-        pointLocator.addProperties(list);
     }
 
     @Override
     public void addPropertyChanges(List<LocalizableMessage> list, DataPointVO<T> from) {
         AuditEventType.maybeAddPropertyChangeMessage(list, "common.xid", from.xid, xid);
         AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.points.name", from.name, name);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "common.enabled", from.enabled, enabled);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.type", from.loggingType, loggingType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.period",
                 from.intervalLoggingPeriodType.getPeriod(from.intervalLoggingPeriod),
@@ -295,33 +285,6 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.unit", from.unit, unit);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.valuePattern", from.valuePattern, valuePattern);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.valueAndUnitPattern", from.valuePattern, valuePattern);
-
-        pointLocator.addPropertyChanges(list, from.pointLocator);
-    }
-
-    public int getDataSourceId() {
-        return dataSourceId;
-    }
-
-    public void setDataSourceId(int dataSourceId) {
-        this.dataSourceId = dataSourceId;
-    }
-
-    public String getDeviceName() {
-        return deviceName;
-    }
-
-    public void setDeviceName(String deviceName) {
-        this.deviceName = deviceName;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean value) {
-        this.pointLocator.setEnabled(value);
-        this.enabled = value;
     }
 
     public int getPointFolderId() {
@@ -355,33 +318,6 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public <PL extends PointLocatorVO<T>> PL getPointLocator() {
-        return (PL) pointLocator;
-    }
-
-    public void setPointLocator(PointLocatorVO<T> pointLocator) {
-        this.pointLocator = pointLocator;
-    }
-
-    public String getDataSourceName() {
-        return dataSourceName;
-    }
-
-    public void setDataSourceName(String dataSourceName) {
-        this.dataSourceName = dataSourceName;
-        if (deviceName == null) {
-            deviceName = dataSourceName;
-        }
-    }
-
-    public String getDataSourceXid() {
-        return dataSourceXid;
-    }
-
-    public void setDataSourceXid(String dataSourceXid) {
-        this.dataSourceXid = dataSourceXid;
     }
 
     public LoggingTypes getLoggingType() {
@@ -458,65 +394,34 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
 
     @Override
     public String toString() {
-        return "DataPointVO [id=" + id + ", xid=" + xid + ", name=" + name + ", dataSourceId=" + dataSourceId
-                + ", deviceName=" + deviceName + ", enabled=" + enabled + ", pointFolderId=" + pointFolderId
-                + ", loggingType=" + loggingType + ", intervalLoggingPeriodType=" + intervalLoggingPeriodType
-                + ", intervalLoggingPeriod=" + intervalLoggingPeriod + ", intervalLoggingType=" + intervalLoggingType
-                + ", purgeType=" + _purgeType + ", purgePeriod=" + purgePeriod
-                + ", eventDetectors=" + eventDetectors + ", comments=" + comments
-                + ", pointLocator=" + pointLocator
-                + ", dataSourceName=" + dataSourceName + ", dataSourceXid=" + dataSourceXid
-                + ", lastValue=" + lastValue + ", settable=" + settable + "]";
+        return "DataPointVO{" + "id=" + id + ", xid=" + xid + ", name=" + name + ", pointFolderId=" + pointFolderId + ", loggingType=" + loggingType + ", intervalLoggingPeriodType=" + intervalLoggingPeriodType + ", intervalLoggingPeriod=" + intervalLoggingPeriod + ", intervalLoggingType=" + intervalLoggingType + ", _purgeType=" + _purgeType + ", purgePeriod=" + purgePeriod + ", eventDetectors=" + eventDetectors + ", comments=" + comments + ", pointLocatorId=" + pointLocatorId + ", valuePattern=" + valuePattern + ", valueAndUnitPattern=" + valueAndUnitPattern + ", unit=" + unit + ", lastValue=" + lastValue + ", settable=" + settable + '}';
     }
 
-    //
-    //
-    // Serialization
-    //
-    private static final int version = 1;
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeInt(version);
-        out.writeObject(name);
-        out.writeObject(deviceName);
-        out.writeBoolean(enabled);
-        out.writeInt(pointFolderId);
-        out.writeObject(loggingType);
-        out.writeObject(intervalLoggingPeriodType);
-        out.writeInt(intervalLoggingPeriod);
-        out.writeObject(intervalLoggingType);
-        out.writeObject(_purgeType);
-        out.writeInt(purgePeriod);
-        out.writeObject(unit);
-        out.writeObject(valuePattern);
-        out.writeObject(valueAndUnitPattern);
-
-        out.writeObject(pointLocator);
-        
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 13 * hash + Objects.hashCode(this.name);
+        hash = 13 * hash + this.pointFolderId;
+        return hash;
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        int ver = in.readInt();
-
-        // Switch on the version of the class so that version changes can be elegantly handled.
-        switch (ver) {
-            case 1:
-                name = (String) in.readObject();
-                deviceName = (String) in.readObject();
-                enabled = in.readBoolean();
-                pointFolderId = in.readInt();
-                loggingType = (LoggingTypes) (in.readObject());
-                intervalLoggingPeriodType = (TimePeriods) in.readObject();
-                intervalLoggingPeriod = in.readInt();
-                intervalLoggingType = (IntervalLoggingTypes) in.readObject();
-                _purgeType = (TimePeriods) in.readObject();
-                purgePeriod = in.readInt();
-                unit = (String) in.readObject();
-                valuePattern = (String) in.readObject();
-                valueAndUnitPattern = (String) in.readObject();
-                
-                pointLocator = (PointLocatorVO) in.readObject();
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
         }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DataPointVO<?> other = (DataPointVO<?>) obj;
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        if (this.pointFolderId != other.pointFolderId) {
+            return false;
+        }
+        return true;
     }
 
+    
 }

@@ -5,6 +5,8 @@
  */
 package br.org.scadabr.dao;
 
+import br.org.scadabr.vo.datasource.PointLocatorFolderVO;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import javax.inject.Named;
@@ -30,6 +32,19 @@ public interface DataSourceDao {
 
     EventType getEventType(int refId1, int refId2);
 
+    PointLocatorVO getPointLocator(int id);
+
+    void savePointLocator(PointLocatorVO<?> plVo);
+
+    void deletePointLocator(int plId);
+
+    PointLocatorFolderVO getPointLocatorFolder(int id);
+
+    void savePointLocatorFolder(PointLocatorFolderVO plfVo);
+
+    void deletePointLocatorFolder(int plfId);
+   
+    
     boolean isXidUnique(DataSourceVO<?> dsVo);
     
     boolean isXidUnique(String xid);

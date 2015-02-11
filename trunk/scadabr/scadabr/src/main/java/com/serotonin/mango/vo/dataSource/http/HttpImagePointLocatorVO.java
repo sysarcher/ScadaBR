@@ -32,7 +32,7 @@ import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.i18n.LocalizableEnum;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import br.org.scadabr.vo.dataSource.PointLocatorVO;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

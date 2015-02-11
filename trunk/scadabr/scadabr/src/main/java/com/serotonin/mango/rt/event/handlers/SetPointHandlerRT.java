@@ -153,7 +153,7 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
             throw new ShouldNeverHappenException("Unknown active action: " + vo.getInactiveAction());
         }
 
-        schedulerPool.execute(new SetPointWorkItem(vo.getTargetPointId(), PointValueTime.fromMangoValue(value, vo.getTargetPointId(), evt.getInactiveTimestamp()), this));
+        schedulerPool.execute(new SetPointWorkItem(vo.getTargetPointId(), PointValueTime.fromMangoValue(value, vo.getTargetPointId(), evt.getGoneTimestamp()), this));
     }
 
     private void raiseFailureEvent(LocalizableMessage message, EventType et) {

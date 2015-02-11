@@ -90,7 +90,7 @@ public class ScheduledEventDaoImpl extends BaseDao implements ScheduledEventDao 
             se.setId(rs.getInt(++i));
             se.setXid(rs.getString(++i));
             se.setAlias(rs.getString(++i));
-            se.setAlarmLevel(AlarmLevel.fromId(rs.getInt(++i)));
+            se.setAlarmLevel(AlarmLevel.values()[rs.getInt(++i)]);
             se.setScheduleType(ScheduledEventKey.fromId(rs.getInt(++i)));
             se.setStateful(charToBool(rs.getString(++i)));
             se.setDisabled(charToBool(rs.getString(++i)));
@@ -133,7 +133,7 @@ public class ScheduledEventDaoImpl extends BaseDao implements ScheduledEventDao 
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, se.getXid());
-                ps.setInt(2, se.getAlarmLevel().getId());
+                ps.setInt(2, se.getAlarmLevel().ordinal());
                 ps.setString(3, se.getAlias());
                 ps.setInt(4, se.getScheduleType().getId());
                 ps.setString(5, boolToChar(se.isStateful()));
@@ -185,7 +185,7 @@ public class ScheduledEventDaoImpl extends BaseDao implements ScheduledEventDao 
             getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
                 @Override
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    ejt2.update("delete from eventHandlers where eventTypeId=" + EventSources.SCHEDULED.mangoDbId
+                    ejt2.update("delete from eventHandlers where eventTypeId=" + EventSources.SCHEDULED.ordinal()
                             + " and eventTypeRef1=?", new Object[]{scheduledEventId});
                     ejt2.update("delete from scheduledEvents where id=?", new Object[]{scheduledEventId});
                 }
