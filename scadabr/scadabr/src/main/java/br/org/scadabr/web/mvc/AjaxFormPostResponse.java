@@ -7,10 +7,8 @@ package br.org.scadabr.web.mvc;
 
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
-import org.springframework.validation.BindingResult;
 
 /**
  *

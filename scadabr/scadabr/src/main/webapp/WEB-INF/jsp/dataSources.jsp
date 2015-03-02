@@ -12,7 +12,7 @@
                         {key:'${dsType.typeKey}',
                          label: '<fmt:message key="${dsType.i18nKey}"/>'}${loopStatus.last ? '' : ','}
             </c:forEach>
-                    ]
+                    ];
                     _dataSources = new DataSources("dataSourcesTree", "treeNodeDetailsWidget", dsTypes);
                     });
 

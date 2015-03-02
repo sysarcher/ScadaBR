@@ -31,7 +31,13 @@
                 "scadabr/jsp/DataPoints",
                 "dojo/domReady!"
             ], function (DataPoints) {
-                var _dataPoints = new DataPoints("dataPointTree", "detailViewTabContainer", {
+                    var dataTypes = [
+            <c:forEach var="dataType" items="${dataTypes}" varStatus="loopStatus">
+                        {key:'${dataType.name}',
+                         label: '<fmt:message key="${dataType.i18nKey}"/>'}${loopStatus.last ? '' : ','}
+            </c:forEach>
+                ];
+                var _dataPoints = new DataPoints("dataPointTree", "detailViewTabContainer", dataTypes, {
                     'common.edit.add': "Add...",
                     'common.edit.reanme': "Rename..."
                 });
@@ -47,13 +53,13 @@
                 <div id="detailViewTabContainer" data-dojo-type="dijit/layout/TabContainer" >
                     <div id="dataPointDetailsChartTab" data-dojo-type="dojox/layout/ContentPane" title="Show data (chart)" data-dojo-props="selected:true, parseOnLoad: false, contentUrl: 'dataPointDetails/renderChart'">
                     </div>
-                    <div id="dataPointDetailsTableTab" data-dojo-type="dojox/layout/ContentPane" title="Show data (table)" data-dojo-props="parseOnLoad: false, contentUrl: 'dataPointDetails/editCommonProperties'">
+                    <div id="dataPointDetailsTableTab" data-dojo-type="dojox/layout/ContentPane" title="Show data (table)" data-dojo-props="parseOnLoad: false, contentUrl: 'dataPointDetails/editProperties'">
                     </div>
-                    <div id="dataPointEditTab" data-dojo-type="dojox/layout/ContentPane" id="second" title="Edit" data-dojo-props="parseOnLoad: false, contentUrl: 'dataPointDetails/editCommonProperties'">
+                    <div id="dataPointEditTab" data-dojo-type="dojox/layout/ContentPane" id="second" title="Edit" data-dojo-props="parseOnLoad: false, contentUrl: 'dataPointDetails/editProperties'">
                     </div>
-                    <div id="dataPointDetailsEventsAndNotesTab" data-dojo-type="dojox/layout/ContentPane" title="point Events and Notes" data-dojo-props="parseOnLoad: false, contentUrl: 'dataPointDetails/editCommonProperties'">
+                    <div id="dataPointDetailsEventsAndNotesTab" data-dojo-type="dojox/layout/ContentPane" title="point Events and Notes" data-dojo-props="parseOnLoad: false, contentUrl: 'dataPointDetails/editProperties'">
                     </div>
-                    <div id="dataPointUsagesTab" data-dojo-type="dojox/layout/ContentPane" title="point usage" data-dojo-props="parseOnLoad: false, contentUrl: 'dataPointDetails/editCommonProperties'">
+                    <div id="dataPointUsagesTab" data-dojo-type="dojox/layout/ContentPane" title="point usage" data-dojo-props="parseOnLoad: false, contentUrl: 'dataPointDetails/editProperties'">
                     </div>
                 </div>
             </dijit:centerContentPane>

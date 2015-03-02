@@ -29,7 +29,7 @@ public interface DataPointDao {
 
     String generateUniqueXid();
 
-    void saveDataPoint(DataPointVO vo);
+    DataPointVO saveDataPoint(DataPointVO vo);
 
     void copyPermissions(int id, int id0);
 
@@ -37,7 +37,7 @@ public interface DataPointDao {
 
     DataPointVO getDataPoint(String xid);
 
-    void deleteDataPoint(int id);
+    DataPointVO deleteDataPoint(int id);
 
     @Deprecated // DP has no extended name anymore
     String getExtendedPointName(int targetPointId);
@@ -50,14 +50,17 @@ public interface DataPointDao {
 
     boolean isXidUnique(String xid, int id);
 
-    public void addPointToHierarchy(DataPointVO dp, String[] pathToPoint);
+    void addPointToHierarchy(DataPointVO dp, String[] pathToPoint);
 
-    public LazyTreeNode getRootFolder();
+    LazyTreeNode getRootFolder();
 
-    public LazyTreeNode getFolderById(int id);
+    LazyTreePointFolder getPointFolderById(int id);
 
-    public void savePointFolder(LazyTreeNode folder);
-
-    public Iterable<PointLocatorVO> getPointLocators(DataSourceVO<?> vo);
+    LazyTreePointFolder savePointFolder(LazyTreePointFolder folder);
     
+    LazyTreePointFolder deletePointFolder(int id);
+    
+    @Deprecated
+    Iterable<PointLocatorVO> getPointLocators(DataSourceVO<?> vo);
+
 }

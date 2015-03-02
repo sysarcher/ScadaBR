@@ -16,64 +16,68 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package br.org.scadabr.web.mvc.controller;
+package br.org.scadabr.web.mvc.controller.dataPoints;
 
 import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.vo.NumberDataPointVO;
+import br.org.scadabr.web.mvc.AjaxFormPostResponse;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.DataPointVO;
 import java.text.MessageFormat;
 import java.util.Calendar;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 
 import org.springframework.validation.BindException;
 
-import javax.validation.Valid;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/dataPointDetails/")
 @Scope("request")
-class DataPointDetailsController {
+class DetailsControllerDP {
 
     private static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
 
+    @Inject
+    private Validator validator;
+    
     @Inject
     private DataPointDao dataPointDao;
 
     @Inject
     private RuntimeManager runtimeManager;
 
-    public DataPointDetailsController() {
+    public DetailsControllerDP() {
         super();
     }
 
-    @RequestMapping(value = "editCommonProperties", method = RequestMethod.GET)
-    protected String getEditCommonProperties(@RequestParam int id) throws Exception {
-        LOG.severe(MessageFormat.format("getEditCommonProperties called {0}", id));
-        return "dataPointDetails/editCommonProperties";
+    @RequestMapping(value = "editProperties", params = "id", method = RequestMethod.GET)
+    protected String getEditProperties(@ModelAttribute("dataPoint") DataPointVO dpvo) throws Exception {
+        LOG.severe(MessageFormat.format("getEditProperties called {0}", dpvo.getId()));
+        return "dataPointDetails/" + dpvo.getClass().getSimpleName();
     }
 
-    @RequestMapping(value = "editCommonProperties", method = RequestMethod.POST)
-    protected String postEditCommonProperties(@RequestParam int id, @ModelAttribute("dataPoint") @Valid DataPointVO dataPoint, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response) throws BindException {
-        LOG.log(Level.SEVERE, "postEditCommonProperties called {0}", id);
-        if (bindingResult.hasErrors()) {
-            return "dataPointDetails/editCommonProperties";
+    @RequestMapping(value = "editProperties", params = "id", method = RequestMethod.POST)
+    protected @ResponseBody AjaxFormPostResponse<DataPointVO> postEditCommonProperties(@ModelAttribute("dataPoint") DataPointVO dataPoint) throws BindException {
+        LOG.log(Level.SEVERE, "postEditCommonProperties called {0}", dataPoint);
+        Set<ConstraintViolation<DataPointVO>> constraintViolations = validator.validate(dataPoint);
+        if (constraintViolations.isEmpty()) {
+            dataPointDao.saveDataPoint(dataPoint);
         }
-        runtimeManager.saveDataPoint(dataPoint);
-        return "dataPointDetails/editCommonProperties";
+        return new AjaxFormPostResponse<>(dataPoint, constraintViolations);
     }
 
     @ModelAttribute

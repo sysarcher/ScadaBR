@@ -128,6 +128,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
                         final AuditEventType et = (AuditEventType) type;
                         ps.setInt(4, et.getEventKey().getId());
                         ps.setInt(5, et.getReferenceId());
+                        ps.setNull(6, Types.INTEGER);
                     }
                     break;
                     /*TODO                    case COMPOUND:

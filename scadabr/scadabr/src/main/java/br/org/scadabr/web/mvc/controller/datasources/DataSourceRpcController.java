@@ -30,7 +30,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 @Named
 @JsonRpcService("/dataSources/rpc/")
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-public class RpcController {
+public class DataSourceRpcController {
 
     private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
 

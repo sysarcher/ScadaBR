@@ -3,10 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.org.scadabr.web.mvc.controller;
+package br.org.scadabr.web.mvc.controller.dataPoints;
 
+import br.org.scadabr.DataType;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -17,7 +20,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 @Scope("request")
 @RequestMapping(value = "/dataPoints")
-public class DataPointsController {
+public class ControllerDp {
+
+    @ModelAttribute
+    protected void getModel(Model model) {
+        model.addAttribute("dataTypes", DataType.values());
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public String showForm() {
