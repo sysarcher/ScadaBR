@@ -25,6 +25,7 @@ import java.util.List;
 import br.org.scadabr.ScadaBrConstants;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.utils.ImplementMeException;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.event.type.AuditEventType;
@@ -48,6 +49,18 @@ import org.springframework.validation.Validator;
 
 public abstract class DataPointVO<T extends PointValueTime> implements Serializable, Cloneable, ChangeComparable<DataPointVO<T>> {
 
+    public static DataPointVO create(DataType dataType) {
+        switch (dataType) {
+            case DOUBLE:
+                return new DoubleDataPointVO();
+            default:
+                throw new ImplementMeException();
+        }
+    }
+
+    public DataPointVO() {
+    }
+    
     public abstract DataPointRT<T> createRT(PointLocatorVO<T> pointLocatorVO);
 
     /**
@@ -80,8 +93,8 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
 
     /**
      * @param pvt
-     * @return the valueAndUnitPattern for the specific PointValueTime.
-     * The first param ('{0}') is the value, the second ('{1}') is the unit
+     * @return the valueAndUnitPattern for the specific PointValueTime. The
+     * first param ('{0}') is the value, the second ('{1}') is the unit
      */
     public String getValueAndUnitPattern(T pvt) {
         return valueAndUnitPattern;
@@ -165,7 +178,6 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
     }
 
     public static final String XID_PREFIX = "DP_";
-    
 
     public abstract DataType getDataType();
 
@@ -203,11 +215,10 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
     private List<UserComment> comments;
 
     private Integer pointLocatorId;
-    
+
     private String valuePattern;
     private String valueAndUnitPattern;
     private String unit;
-    
 
     //
     //
@@ -220,8 +231,7 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
      */
     //TODO use null ...
     private T lastValue;
-    
-    
+
     public DataPointVO(String valuePattern, String valueAndUnitPattern) {
         this.valuePattern = valuePattern;
         this.valueAndUnitPattern = valueAndUnitPattern;
@@ -423,5 +433,4 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
         return true;
     }
 
-    
 }

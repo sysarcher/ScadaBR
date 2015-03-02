@@ -22,10 +22,6 @@ package br.org.scadabr.web.mvc.controller.datasources;
 
 
 import br.org.scadabr.vo.datasource.DataSourcesRegistry;
-import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
 import javax.inject.Inject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;

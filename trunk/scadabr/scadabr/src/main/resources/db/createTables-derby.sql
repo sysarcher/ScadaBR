@@ -580,3 +580,5 @@ create table maintenanceEvents (
 alter table maintenanceEvents add constraint maintenanceEventsPk primary key (id);
 alter table maintenanceEvents add constraint maintenanceEventsUn1 unique (xid);
 alter table maintenanceEvents add constraint maintenanceEventsFk1 foreign key (dataSourceId) references dataSources(id);
+
+insert into dataPointFolders (id, parentId, name) values (0, 0, 'ROOT');

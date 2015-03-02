@@ -6,10 +6,10 @@
         "dojo/parser",
         "scadabr/AjaxFormPost"
     ], function (dom, parser, AjaxFormPost) {
-        var _plFormParseWrapper = dom.byId("plFormParseWrapperId");
+        var _dpFormParseWrapper = dom.byId("dpFormParseWrapperId");
         try {
-            parser.parse(_plFormParseWrapper).then(function () {
-                var _PlFormPost = new AjaxFormPost("plFormId", "dataSources/pointLocator?id=" + ${pointLocator.id});
+            parser.parse(_dpFormParseWrapper).then(function () {
+                var _DpFormPost = new AjaxFormPost("dpFormId", "dataPointDetails/editProperties?id=" + ${dataPoint.id});
             }, function (err) {
                 alert(err);
             });
@@ -18,10 +18,10 @@
         }
     });
 </script>
-<div id="plFormParseWrapperId">
-    <form id="plFormId">
+<div id="dpFormParseWrapperId">
+    <form id="dpFormId">
         <dojox:tableContainer cols="1">
-            <dijit:validationTextBox i18nLabel="pointEdit.props.name" name="name" value="${pointLocator.name}"/>
+            <dijit:validationTextBox i18nLabel="pointEdit.props.name" name="name"  value="${dataPoint.name}"/>
             <jsp:doBody />
         </dojox:tableContainer>
         <dijit:button type="submit" i18nLabel="login.loginButton" />

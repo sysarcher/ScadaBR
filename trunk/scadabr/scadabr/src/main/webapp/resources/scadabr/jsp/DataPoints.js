@@ -1,7 +1,5 @@
 define(["dojo/_base/declare",
     "dijit/Tree",
-    "dojo/request",
-    "dojo/dom",
     "dojo/store/JsonRest",
     "dojo/store/Observable",
     "dijit/registry",
@@ -11,19 +9,22 @@ define(["dojo/_base/declare",
     "dijit/form/TextBox",
     "dojo/keys",
     "dijit/popup",
-    "dijit/CheckedMenuItem",
-    "dijit/MenuSeparator",
-    "dijit/PopupMenuItem"
-], function (declare, Tree, request, dom, JsonRest, Observable, registry, Menu, MenuItem, TooltipDialog, TextBox, keys, popup, CheckedMenuItem, MenuSeparator, PopupMenuItem) {
+    "dijit/PopupMenuItem",
+    "dojo/rpc/JsonService"
+], function (declare, Tree, JsonRest, Observable, registry, Menu, MenuItem, TooltipDialog, TextBox, keys, popup, PopupMenuItem, JsonService) {
 
     return declare(null, {
         tree: null,
         store: null,
         treeMenu: null,
         nodeNameDialog: null,
-        constructor: function (treeNodeId, tabWidgetId, localizedKeys) {
+        svc: null,
+        dataTypes: null,
+        constructor: function (treeNodeId, tabWidgetId, dataTypes, localizedKeys) {
+            this.dataTypes = dataTypes;
+            this._initSvc();
             this.store = new Observable(new JsonRest({
-                target: "rest/pointHierarchy/",
+                target: "lazyConfigTree/dataPoints/",
                 getChildren: function (object, onComplete, onError) {
                     this.query({parentId: object.id}).then(onComplete, onError);
                 },
@@ -35,6 +36,9 @@ define(["dojo/_base/declare",
                 },
                 getLabel: function (object) {
                     return object.name;
+                },
+                getIdentity: function (object) {
+                    return object.nodeType + "_" + object.id;
                 },
                 //inserted manually to catch the aspect of Tree to get this working -- Observable looks wired to me ... at least JSONRest does not woirk out of the box ...
                 onChange: function (/*dojo/data/Item*/ /*===== item =====*/) {
@@ -50,12 +54,15 @@ define(["dojo/_base/declare",
                 model: this.store,
                 detailController: this,
                 onClick: function (node) {
-                    if (node.nodeType === "DP") {
-                        this.detailController.setPointId(node.id)
-                    } else if (node.nodeType === "PF") {
-                        this.detailController.setFolderId(node.id)
-                    } else {
-                        this.detailController.clearDetailViewId();
+                    switch (node.nodeType) {
+                        case "DP":
+                            this.detailController.setPointId(node.id);
+                            break;
+                        case "PF":
+                            this.detailController.setFolderId(node.id);
+                            break;
+                        default:
+                            this.detailController.clearDetailViewId();
                     }
                 }
             }, treeNodeId);
@@ -91,6 +98,7 @@ define(["dojo/_base/declare",
                 this.pfId = id;
                 this.dpId = -1;
                 //curently filter out folders
+                this.selectedTab.set(null);
                 //  this.setUpAfterChange();
             };
             this.clearDetailViewId = function () {
@@ -130,9 +138,25 @@ define(["dojo/_base/declare",
                         } else if (event.keyCode === keys.ENTER) {
                             popup.close(this.nodeNameDialog);
                             this.treeNode.item.name = this.get('value');
-                            _store.put(this.treeNode.item);
-                            _store.onChange(this.treeNode.item);
-                            this.treeNode.focus();
+                            var _treeNode = this.treeNode;
+                            switch (this.treeNode.item.nodeType) {
+                                case "PF" :
+                                    _svc.renamePointFolder(_treeNode.item.id, _treeNode.item.name).then(function (object) {
+                                        _store.onChange(_treeNode.item);
+                                        this.treeNode.focus();
+                                    }, function (error) {
+                                        alert(error);
+                                    });
+                                    break;
+                                case "DP" :
+                                    _svc.renameDataPoint(_treeNode.item.id, _treeNode.item.name).then(function (object) {
+                                        _store.onChange(_treeNode.item);
+                                        _treeNode.focus();
+                                    }, function (error) {
+                                        alert(error);
+                                    });
+                                    break;
+                            }
                         }
                     }
                 }),
@@ -151,6 +175,7 @@ define(["dojo/_base/declare",
             var _store = this.store;
             var _tree = this.tree;
             var _nodeNameDialog = this.nodeNameDialog;
+            var _svc = this.svc;
             this.treeMenu.addChild(new MenuItem({
                 iconClass: "dijitIconEdit",
                 label: localizedKeys['common.edit.reanme'],
@@ -171,7 +196,7 @@ define(["dojo/_base/declare",
                 iconClass: "dijitIconAdd",
                 label: localizedKeys['common.edit.add'],
                 onClick: function () {
-                    _store.put({parentId: _tree.lastFocused.item.id, nodeType: "PF", name: "New Folder"}).then(function (object) {
+                    _svc.addPointFolder(_tree.lastFocused.item.id, "New Folder").then(function (object) {
                         _store.getChildren(_tree.lastFocused.item, function (children) {
                             _store.onChildrenChange(_tree.lastFocused.item, children);
                         }, function (error) {
@@ -180,9 +205,34 @@ define(["dojo/_base/declare",
                     }, function (error) {
                         alert(error);
                     });
-
                 }
             }));
+            var dpAddMenu = new Menu({});
+            for (var i = 0; i < this.dataTypes.length; i++) {
+                dpAddMenu.addChild(new MenuItem({
+                    iconClass: "dsAddIcon",
+                    label: this.dataTypes[i].label,
+                    _dataType: this.dataTypes[i].key,
+                    onClick: function () {
+                        _svc.addDataPoint(_tree.lastFocused.item.id, this._dataType, this.label).then(function (result) {
+                            _store.getChildren(_tree.lastFocused.item, function (children) {
+                                _store.onChildrenChange(_tree.lastFocused.item, children);
+                            }, function (error) {
+                                alert(error);
+                            });
+                        }, function (error) {
+                            alert(error);
+                        });
+                    }
+                })
+                        );
+            }
+            this.treeMenu.addChild(new PopupMenuItem({
+                iconClass: "dsAddIcon",
+                label: "Add DataPoint",
+                popup: dpAddMenu
+            }));
+
             this.treeMenu.addChild(new MenuItem({
                 label: "Rename Folder",
                 disabled: true
@@ -193,6 +243,84 @@ define(["dojo/_base/declare",
             }));
             this.treeMenu.startup();
 
+        },
+        _initSvc: function () {
+            this.svc = new JsonService({
+                serviceUrl: 'dataPoints/rpc/', // Adress of the RPC service end point
+                timeout: 1000,
+                strictArgChecks: true,
+                methods: [{
+                        name: 'addPointFolder',
+                        parameters: [
+                            {
+                                name: 'parentFolderId',
+                                type: "INT"
+                            },
+                            {
+                                name: 'type',
+                                type: 'STRING'
+                            }
+                        ]
+                    },
+                    {
+                        name: 'deletePointFolder',
+                        parameters: [{
+                                name: 'id',
+                                type: 'INT'
+                            }]
+                    },
+                    {
+                        name: 'renamePointFolder',
+                        parameters: [
+                            {
+                                name: 'id',
+                                type: 'INT'
+                            },
+                            {
+                                name: 'name',
+                                type: 'STRING'
+                            }
+                        ]
+                    },
+                    {
+                        name: 'addDataPoint',
+                        parameters: [
+                            {
+                                name: 'parentFolderId',
+                                type: "INT"
+                            },
+                            {
+                                name: 'dataType',
+                                type: 'STRING'
+                            },
+                            {
+                                name: 'name',
+                                type: 'STRING'
+                            }
+                        ]
+                    },
+                    {
+                        name: 'deleteDataPoint',
+                        parameters: [{
+                                name: 'id',
+                                type: 'INT'
+                            }]
+                    },
+                    {
+                        name: 'renameDataPoint',
+                        parameters: [
+                            {
+                                name: 'id',
+                                type: 'INT'
+                            },
+                            {
+                                name: 'name',
+                                type: 'STRING'
+                            }
+                        ]
+                    }
+                ]
+            });
         }
 
     });

@@ -11,13 +11,11 @@ import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.serotonin.mango.rt.RuntimeManager;
-import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -32,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Rest Controller for the DataSources Tree
  * @author aploese
  */
+@Deprecated //??? use RestDataSourceController...???
 @RestController
 @RequestMapping(value = "/dataSources/dsTree/")
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)

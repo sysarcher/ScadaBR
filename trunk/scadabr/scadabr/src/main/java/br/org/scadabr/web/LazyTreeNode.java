@@ -6,18 +6,17 @@ import br.org.scadabr.ScadaBrConstants;
  *
  * @author aploese
  */
-public class LazyTreeNode {
+public abstract class LazyTreeNode {
     
     private Integer id;
     private Integer parentId;
-    private Integer index;
     private String name;
-    private String nodeType;
 
     public LazyTreeNode() {
     }
 
-    public LazyTreeNode(String name) {
+    public LazyTreeNode(int parentId, String name) {
+        this.parentId = parentId;
         this.name = name;
     }
 
@@ -70,29 +69,6 @@ public class LazyTreeNode {
     /**
      * @return the nodeType
      */
-    public String getNodeType() {
-        return nodeType;
-    }
+    public abstract String getNodeType();
 
-    /**
-     * @param nodeType the nodeType to set
-     */
-    public void setNodeType(String nodeType) {
-        this.nodeType = nodeType;
-    }
-
-    /**
-     * @return the index
-     */
-    public Integer getIndex() {
-        return index;
-    }
-
-    /**
-     * @param index the index to set
-     */
-    public void setIndex(Integer index) {
-        this.index = index;
-    }
-    
 }
