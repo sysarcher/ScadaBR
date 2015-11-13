@@ -9,12 +9,12 @@
     </parent>
 
 
-    <artifactId>scadabr</artifactId>
+    <artifactId>scadabr2</artifactId>
     <packaging>war</packaging>
     <name>ScadaBR JSP Dojo</name>
     <properties>
         <db.type>derby</db.type>
-        <db.url>~/../../mangodb</db.url>
+        <db.url>~/../../scadabr2</db.url>
         <db.username></db.username>
         <db.password></db.password>
         <db.pool.maxActive>10</db.pool.maxActive>

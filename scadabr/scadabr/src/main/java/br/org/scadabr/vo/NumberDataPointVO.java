@@ -5,8 +5,10 @@
  */
 package br.org.scadabr.vo;
 
+import br.org.scadabr.json.dao.JsonPersistence;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.serotonin.mango.rt.dataImage.NumberValueTime;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.DataPointVO;
@@ -22,8 +24,11 @@ import java.util.List;
  */
 public abstract class NumberDataPointVO<T extends NumberValueTime> extends DataPointVO<T> {
 
+    @JsonView(JsonPersistence.class)
     private TimePeriods chartTimePeriods = TimePeriods.DAYS;
+    @JsonView(JsonPersistence.class)
     private int numberOfChartPeriods = 1;
+    
     private Color chartColor = Color.BLACK;
 
     public NumberDataPointVO(String valuePattern, String valueAndUnitPattern) {
@@ -112,5 +117,12 @@ public abstract class NumberDataPointVO<T extends NumberValueTime> extends DataP
     public void setChartColor(Color chartColor) {
         this.chartColor = chartColor;
     }
+    
+    public String getChartColorHtml() {
+        return String.format("#%06x", chartColor.getRGB() & 0x00FFFFFF);
+    }
 
+    public void setChartColorHtml(String htmlHex) {
+        chartColor = new Color((int)Long.parseLong(htmlHex.substring(1), 16));
+    }
 }

@@ -18,31 +18,27 @@
  */
 package br.org.scadabr.dao.jdbc;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.dao.EventDao;
 import br.org.scadabr.dao.UserDao;
+import br.org.scadabr.i18n.I18NUtils;
+import br.org.scadabr.i18n.LocalizableMessageParseException;
 import br.org.scadabr.l10n.AbstractLocalizer;
+import br.org.scadabr.rt.SchedulerPool;
+import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.timer.cron.EventRunnable;
+import br.org.scadabr.util.SerializationHelper;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.utils.ImplementMeException;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.event.AlarmLevel;
+import br.org.scadabr.vo.event.EventStatus;
+import br.org.scadabr.vo.event.type.AuditEventKey;
+import br.org.scadabr.vo.event.type.DataPointDetectorKey;
+import br.org.scadabr.vo.event.type.SystemEventKey;
+import com.serotonin.mango.rt.event.AlternateAcknowledgementSources;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.DataPointEventType;
@@ -51,35 +47,36 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.MaintenanceEventType;
 import com.serotonin.mango.rt.event.type.ScheduledEventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
+import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.vo.event.EventHandlerVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
-import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.i18n.I18NUtils;
-import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.vo.event.AlarmLevel;
-import br.org.scadabr.vo.event.EventStatus;
-import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import br.org.scadabr.i18n.LocalizableMessageParseException;
-import br.org.scadabr.rt.SchedulerPool;
-import br.org.scadabr.rt.event.type.EventSources;
-import br.org.scadabr.utils.ImplementMeException;
-import br.org.scadabr.vo.event.type.AuditEventKey;
-import br.org.scadabr.vo.event.type.DataPointDetectorKey;
-import br.org.scadabr.vo.event.type.SystemEventKey;
-import com.serotonin.mango.rt.event.AlternateAcknowledgementSources;
-import com.serotonin.mango.vo.User;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 @Named
 public class EventDaoImpl extends BaseDao implements EventDao {
@@ -502,7 +499,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
     }
 
     public int getEventCount() {
-        return ejt.queryForInt("select count(*) from events");
+        return ejt.queryForObject("select count(*) from events", Integer.class);
     }
 
     public List<EventInstance> search(int eventId, int eventSourceType,
@@ -918,10 +915,12 @@ public class EventDaoImpl extends BaseDao implements EventDao {
     }
 
     public int getHighestUnsilencedAlarmLevel(int userId) {
-        return ejt.queryForInt("select max(e.alarmLevel) from userEvents u "
+        return ejt.queryForObject(
+                "select max(e.alarmLevel) from userEvents u "
                 + "  join events e on u.eventId=e.id "
-                + "where u.silenced=? and u.userId=?", new Object[]{
-                    boolToChar(false), userId});
+                + "where u.silenced=? and u.userId=?", 
+                Integer.class,
+                boolToChar(false), userId);
     }
 
     //

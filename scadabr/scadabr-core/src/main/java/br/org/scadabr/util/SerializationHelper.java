@@ -12,6 +12,7 @@ import java.io.ObjectOutputStream;
  * 
  * @author aploese
  */
+@Deprecated
 public class SerializationHelper {
 
     public static Object readObject(InputStream is) {

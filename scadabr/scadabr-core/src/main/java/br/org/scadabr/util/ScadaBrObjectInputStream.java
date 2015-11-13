@@ -14,6 +14,7 @@ import java.io.ObjectStreamClass;
  *
  * @author aploese
  */
+@Deprecated
 class ScadaBrObjectInputStream extends ObjectInputStream {
 
     public ScadaBrObjectInputStream(InputStream in) throws IOException {

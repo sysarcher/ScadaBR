@@ -18,22 +18,16 @@
  */
 package com.serotonin.mango.vo.dataSource.meta;
 
-import br.org.scadabr.DataType;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.List;
-
-
-import com.serotonin.mango.rt.dataSource.DataSourceRT;
-import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
-import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.datasource.meta.MetaDataSourceEventKey;
 import br.org.scadabr.vo.datasource.meta.MetaDataSourceType;
+import com.serotonin.mango.rt.dataSource.DataSourceRT;
+import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
+import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -75,27 +69,6 @@ public class MetaDataSourceVO extends DataSourceVO<MetaDataSourceVO> {
     @Override
     protected void addPropertyChangesImpl(List<LocalizableMessage> list, MetaDataSourceVO from) {
         // no op
-    }
-
-    //
-    // /
-    // / Serialization
-    // /
-    //
-    private static final long serialVersionUID = -1;
-    private static final int version = 1;
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeInt(version);
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException {
-        int ver = in.readInt();
-
-        // Switch on the version of the class so that version changes can be elegantly handled.
-        if (ver == 1) {
-            // nothing to do here.
-        }
     }
 
     @Override

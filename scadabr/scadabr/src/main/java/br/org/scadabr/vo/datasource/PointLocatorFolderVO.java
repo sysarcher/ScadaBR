@@ -7,20 +7,26 @@ package br.org.scadabr.vo.datasource;
 
 import br.org.scadabr.ScadaBrConstants;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
+import java.io.Serializable;
 
 /**
  *
  * @author aploese
  */
-public class PointLocatorFolderVO {
+public class PointLocatorFolderVO implements Serializable {
     
     private int dataSourceId = ScadaBrConstants.NEW_ID;
     private int id = ScadaBrConstants.NEW_ID;
     private Integer parentFolderId;
     private String name;
 
-    public PointLocatorFolderVO(DataSourceVO dataSource) {
+    public PointLocatorFolderVO() {
+        
+    }
+    
+    public PointLocatorFolderVO(DataSourceVO dataSource, String name) {
         this.dataSourceId = dataSource.getId();
+        this.name = name;
     }
 
     /**

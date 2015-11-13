@@ -7,9 +7,9 @@ package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.ScadaBrVersionBean;
 import br.org.scadabr.dao.DataPointDao;
-import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.dao.PointLinkDao;
 import br.org.scadabr.dao.PointValueDao;
+import br.org.scadabr.json.dao.JsonMapperFactory;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.rt.link.PointLinkManager;
 import com.serotonin.mango.db.DatabaseAccessFactory;
@@ -18,6 +18,7 @@ import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.DoubleDataPointVO;
 import javax.inject.Inject;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,9 +26,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.junit.Assert.*;
-import org.junit.Ignore;
 
 /**
  *
@@ -52,6 +50,7 @@ public class PointValuesDaoTest {
                 
         private final ScadaBrVersionBean ScadaBrVersionBean = new ScadaBrVersionBean();
         
+        private final JsonMapperFactory jsonMapperFactory = new JsonMapperFactory();
 
         /**
          * No tests with PointLinkManager so return null.
@@ -100,7 +99,11 @@ public class PointValuesDaoTest {
         public ScadaBrVersionBean getScadaBrVersionBean() {
             return ScadaBrVersionBean;
         }
-        
+
+        @Bean
+        public JsonMapperFactory getJsonMapperFactory() {
+            return jsonMapperFactory;
+        }
 
     }
 

@@ -18,9 +18,8 @@
  */
 package br.org.scadabr.dao.jdbc;
 
-import java.util.List;
-
 import br.org.scadabr.db.DaoUtils;
+import java.util.List;
 import java.util.Random;
 
 public class BaseDao extends DaoUtils {
@@ -65,12 +64,17 @@ public class BaseDao extends DaoUtils {
     }
 
     protected boolean isXidUnique(String xid, int excludeId, String tableName) {
-        return ejt.queryForInt("select count(*) from " + tableName + " where xid=? and id<>?", new Object[]{xid,
-            excludeId}) == 0;
+        return ejt.queryForObject(
+                "select count(*) from " + tableName + " where xid=? and id<>?", 
+                Integer.class, 
+                xid, excludeId) == 0;
     }
 
     protected boolean isXidUnique(String xid, String tableName) {
-        return ejt.queryForInt("select count(*) from " + tableName + " where xid=?", new Object[]{xid}) == 0;
+        return ejt.queryForObject(
+                "select count(*) from " + tableName + " where xid=?", 
+                Integer.class, 
+                xid) == 0;
     }
     
     public String generateXid(String prefix) {

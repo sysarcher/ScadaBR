@@ -21,20 +21,10 @@ package com.serotonin.mango.vo.dataSource.meta;
 import br.org.scadabr.DataType;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.DataPointDao;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import br.org.scadabr.db.IntValuePair;
+import br.org.scadabr.json.dao.JsonPersistence;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.CronParser;
-import com.serotonin.mango.rt.dataSource.PointLocatorRT;
-import com.serotonin.mango.rt.dataSource.meta.MetaPointLocatorRT;
-import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
@@ -42,9 +32,20 @@ import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.vo.datasource.meta.CronPattern;
 import br.org.scadabr.vo.datasource.meta.UpdateEvent;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
+import com.serotonin.mango.rt.dataSource.PointLocatorRT;
+import com.serotonin.mango.rt.dataSource.meta.MetaPointLocatorRT;
+import com.serotonin.mango.rt.event.type.AuditEventType;
+import com.serotonin.mango.vo.DataPointVO;
+import com.serotonin.mango.vo.dataSource.AbstractPointLocatorVO;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.TimeZone;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -67,15 +68,23 @@ public class MetaPointLocatorVO<T extends PointValueTime> extends AbstractPointL
 
     @NotNull
     @Size(min = 9) // stands for mininimum text required "return 0;"
+    @JsonView(JsonPersistence.class)
     private String script;
 
+    @JsonView(JsonPersistence.class)
     private boolean settable;
     private UpdateEvent updateEvent = UpdateEvent.CONTEXT_UPDATE;
 
+    @JsonView(JsonPersistence.class)
     private String updateCronPattern;
 
     @Min(0)
+    @JsonView(JsonPersistence.class)
     private int executionDelaySeconds;
+
+    public MetaPointLocatorVO() {
+        super();
+    }
 
     public MetaPointLocatorVO(DataType dataType) {
         super(dataType);

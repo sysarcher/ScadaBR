@@ -18,60 +18,56 @@
  */
 package br.org.scadabr.dao.jdbc;
 
-import br.org.scadabr.dao.LazyTreePointFolder;
 import br.org.scadabr.DataType;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.jdbc.UncategorizedSQLException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-
 import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.dao.LazyTreeDataPoint;
+import br.org.scadabr.dao.LazyTreePointFolder;
 import br.org.scadabr.dao.PointLinkDao;
 import br.org.scadabr.db.IntValuePair;
+import br.org.scadabr.json.dao.JsonMapperFactory;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.rt.link.PointLinkManager;
-import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.UserComment;
-import com.serotonin.mango.vo.bean.PointHistoryCount;
-import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
-import com.serotonin.mango.vo.hierarchy.PointFolder;
-import com.serotonin.mango.vo.hierarchy.PointHierarchy;
-import com.serotonin.mango.vo.hierarchy.PointHierarchyEventDispatcher;
-import com.serotonin.mango.vo.link.PointLinkVO;
 import br.org.scadabr.util.Tuple;
 import br.org.scadabr.utils.TimePeriods;
-import br.org.scadabr.utils.serialization.FieldDeserializer;
-import br.org.scadabr.utils.serialization.FieldSerializer;
 import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.AuditEventKey;
 import br.org.scadabr.vo.event.type.DataPointDetectorKey;
 import br.org.scadabr.web.LazyTreeNode;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
+import com.serotonin.mango.rt.event.type.AuditEventType;
+import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.DoubleDataPointVO;
+import com.serotonin.mango.vo.UserComment;
+import com.serotonin.mango.vo.bean.PointHistoryCount;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import java.io.IOException;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
+import com.serotonin.mango.vo.hierarchy.PointFolder;
+import com.serotonin.mango.vo.hierarchy.PointHierarchy;
+import com.serotonin.mango.vo.hierarchy.PointHierarchyEventDispatcher;
+import com.serotonin.mango.vo.link.PointLinkVO;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.UncategorizedSQLException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 @Named
 public class DataPointDaoImpl extends BaseDao implements DataPointDao {
@@ -82,6 +78,8 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
     private PointLinkManager pointLinkManager;
     @Inject
     private PointLinkDao pointLinkDao;
+    @Inject
+    private JsonMapperFactory jsonMapperFactory;
 
     public DataPointDaoImpl() {
         super();
@@ -116,7 +114,7 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
     }
 
     private static final String DATA_POINT_SELECT = "select\n"
-            + " dp.id, dp.xid, dp.clazz, dp.pointLocatorId, dp.name, dp.folderId, dp.valuePattern, dp.valueAndUnitPattern, dp.unit, dp.purgePeriodType, dp.purgePeriod, dp.fieldData\n"
+            + " dp.id, dp.xid, dp.clazz, dp.pointLocatorId, dp.name, dp.folderId, dp.valuePattern, dp.valueAndUnitPattern, dp.unit, dp.purgePeriodType, dp.purgePeriod, dp.jsonFields\n"
             + "from\n"
             + " dataPoints dp\n";
 
@@ -176,7 +174,12 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
             return result;
         }
         // Get the folder list.
-        ejt.query("select parentId, name from pointFolders where id =?", (ResultSet rs) -> {
+        ejt.query("select\n"
+                + " parentId, name\n"
+                + "from\n"
+                + " dataPointFolders\n"
+                + "where\n"
+                + " id =?", (ResultSet rs) -> {
             result.setParentId(rs.getInt(1));
             result.setName(rs.getString(2));
         }, id);
@@ -190,7 +193,12 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
         final Collection<LazyTreeNode> result = new LinkedList<>();
 
         // Get the folder list.      
-        ejt.query("select id, name from dataPointFolders where parentId = ? and parentId <> id" , (ResultSet rs) -> {
+        ejt.query("select\n"
+                + " id, name\n"
+                + "from\n"
+                + " dataPointFolders\n"
+                + "where\n"
+                + " parentId = ? and parentId <> id" , (ResultSet rs) -> {
             LazyTreePointFolder n = new LazyTreePointFolder();
             n.setParentId(parentId);
             n.setId(rs.getInt(1));
@@ -234,7 +242,7 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
             getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
                 @Override
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
-        ejt.update("delete from pointFolders where id=?",  id);
+        ejt.update("delete from dataPointFolders where id=?",  id);
                 }
             });
 
@@ -247,9 +255,7 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
 
         @Override
         public DataPointVO mapRow(ResultSet rs, int rowNum) throws SQLException {
-            try {
-                FieldDeserializer fd = new FieldDeserializer(rs.getString(3));
-                final DataPointVO dp = (DataPointVO) fd.deserializeObject(rs.getBinaryStream(12));
+                final DataPointVO dp = (DataPointVO) jsonMapperFactory.read(rs.getString(3), rs.getClob(12).getAsciiStream());
                 dp.setId(rs.getInt(1));
                 dp.setXid(rs.getString(2));
                 dp.setPointLocatorId(rs.getObject(4, Integer.class));
@@ -261,9 +267,6 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
                 dp.setPurgeType(TimePeriods.valueOf(rs.getString(10)));
                 dp.setPurgePeriod(rs.getInt(11));
                 return dp;
-            } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 
@@ -306,7 +309,7 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
 
         // Insert the main data point record.
         final int id = doInsert((Connection con) -> {
-            final String SQL_INSERT = "insert into dataPoints (xid, clazz, pointLocatorId, name, folderId, valuePattern, valueAndUnitPattern, unit, purgePeriodType, purgePeriod, fieldData) values (?,?,?,?,?,?,?,?,?,?,?)";
+            final String SQL_INSERT = "insert into dataPoints (xid, clazz, pointLocatorId, name, folderId, valuePattern, valueAndUnitPattern, unit, purgePeriodType, purgePeriod, jsonFields) values (?,?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, dp.getXid());
             ps.setString(2, dp.getClass().getName());
@@ -318,7 +321,7 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
             ps.setString(8, dp.getUnit());
             ps.setString(9, dp.getPurgeType().name());
             ps.setInt(10, dp.getPurgePeriod());
-            ps.setBlob(11, new FieldSerializer(dp));
+            ps.setClob(11, jsonMapperFactory.write(dp));
             return ps;
         });
         dp.setId(id);
@@ -332,19 +335,8 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
     public void updateDataPoint(final DataPointVO dp) {
         DataPointVO old = getDataPoint(dp.getId());
 
-        // Save the VO information.
-        updateDataPointShallow(dp);
-
-        AuditEventType.raiseChangedEvent(AuditEventKey.DATA_POINT, old, dp);
-
-        // Save the relational information.
-        saveEventDetectors(dp);
-    }
-
-    public void updateDataPointShallow(final DataPointVO dp) {
-
         ejt.update((Connection con) -> {
-            final String SQL_UPDATE = "update dataPoints set xid=?, clazz=?, pointLocatorId=?, name=?, folderId=?, valuePattern=?, valueAndUnitPattern=?, unit=?, purgePeriodType=?, purgePeriod=?, fieldData=? where id=?";
+            final String SQL_UPDATE = "update dataPoints set xid=?, clazz=?, pointLocatorId=?, name=?, folderId=?, valuePattern=?, valueAndUnitPattern=?, unit=?, purgePeriodType=?, purgePeriod=?, jsonFields=? where id=?";
             PreparedStatement ps = con.prepareStatement(SQL_UPDATE);
             ps.setString(1, dp.getXid());
             ps.setString(2, dp.getClass().getName());
@@ -356,10 +348,15 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
             ps.setString(8, dp.getUnit());
             ps.setString(9, dp.getPurgeType().name());
             ps.setInt(10, dp.getPurgePeriod());
-            ps.setBlob(11, new FieldSerializer(dp));
+            ps.setClob(11, jsonMapperFactory.write(dp));
             ps.setInt(12, dp.getId());
             return ps;
         });
+
+        AuditEventType.raiseChangedEvent(AuditEventKey.DATA_POINT, old, dp);
+
+        // Save the relational information.
+        saveEventDetectors(dp);
     }
 
     @Deprecated // cut connection between dp an pl ...  
@@ -770,17 +767,6 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
         // Save the points in the subfolders
         for (PointFolder sf : folder.getSubfolders()) {
             savePointsInFolder(sf);
-        }
-
-        // Update the folder references in the points.
-        DataPointVO dp;
-        for (IntValuePair p : folder.getPoints()) {
-            dp = getDataPoint(p.getKey());
-            // The point may have been deleted while editing the hierarchy.
-            if (dp != null) {
-                dp.setPointFolderId(folder.getId());
-                updateDataPointShallow(dp);
-            }
         }
     }
 

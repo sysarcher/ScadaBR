@@ -5,17 +5,19 @@
  */
 package br.org.scadabr.web.mvc.controller.datasources;
 
-import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.logger.LogUtils;
-import br.org.scadabr.utils.ImplementMeException;
+import br.org.scadabr.vo.datasource.PointLocatorFolderVO;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.UserSessionContextBean;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -44,20 +46,19 @@ public class DsTreeController {
     private RuntimeManager runtimeManager;
     @Inject
     private DataSourceDao dataSourceDao;
-    @Inject
-    private DataPointDao dataPointDao;
     
     @Inject 
     private RequestContextAwareLocalizer localizer;
 
-
+//TODO Use view @JsonView(View.Summary.class)
+    // ?? @JsonAppend(attrs = @JsonAppend.Attr
     @RequestMapping(method = RequestMethod.GET)
-    public List<JsonDataSource> getDataSources() {
+    public Iterable<JsonDataSourceWrapper> getDataSources() {
         final User user = userSessionContextBean.getUser();
-        List<JsonDataSource> result = new ArrayList<>();
+        List<JsonDataSourceWrapper> result = new ArrayList<>();
         for (DataSourceVO<?> ds : runtimeManager.getDataSources()) {
             if (Permissions.hasDataSourcePermission(user, ds.getId())) {
-                result.add(new JsonDataSource(ds, localizer));
+                result.add(new JsonDataSourceWrapper(ds));
             }
         }
         return result;
@@ -69,8 +70,8 @@ public class DsTreeController {
      * @return the folder
      */
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public JsonDataSource getDataSource(@PathVariable("id") int id) {
-        return new JsonDataSource(dataSourceDao.getDataSource(id), localizer);
+    public JsonDataSourceWrapper getDataSource(@PathVariable("id") int id) {
+        return new JsonDataSourceWrapper(dataSourceDao.getDataSource(id));
     }
 
     /**
@@ -78,15 +79,15 @@ public class DsTreeController {
      * @return All childnodes
      */
     @RequestMapping(params = {"dsId", "parentFolderId"}, method = RequestMethod.GET)
-    public List<JsonPointLocator> getPointLocators(int dsId, int parentFolderId) {
-        throw new ImplementMeException();
-        /*
-        List<JsonPointLocator> result = new LinkedList<>();
-        for (DataPointVO dp : dataPointDao.getDataPoints(dsId)) {
-            result.add(new JsonPointLocator(dp.getPointLocator(), localizer));
+    public List<Serializable> getPointLocators(int dsId, int parentFolderId) {
+        List<Serializable> result = new LinkedList<>();
+        for (PointLocatorFolderVO folderVO : dataSourceDao.getPointLocatorsFolderByParent(dsId, parentFolderId)) {
+            result.add(folderVO);
+        }
+        for (PointLocatorVO locatorVO : dataSourceDao.getPointLocatorsByParent(dsId, parentFolderId)) {
+            result.add(new JsonPointLocator(locatorVO, localizer));
         }
         return result;
-                */
     }
 
 }

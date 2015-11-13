@@ -19,27 +19,26 @@
 package com.serotonin.mango.vo;
 
 import br.org.scadabr.DataType;
-import java.io.Serializable;
-import java.util.List;
-
 import br.org.scadabr.ScadaBrConstants;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.json.dao.JsonPersistence;
 import br.org.scadabr.utils.ImplementMeException;
-
+import br.org.scadabr.utils.TimePeriods;
+import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.vo.IntervalLoggingTypes;
+import br.org.scadabr.vo.LoggingTypes;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
-import br.org.scadabr.utils.TimePeriods;
-import br.org.scadabr.vo.datasource.PointLocatorVO;
-import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.utils.serialization.SerializabeField;
-import br.org.scadabr.vo.IntervalLoggingTypes;
-import br.org.scadabr.vo.LoggingTypes;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.serotonin.mango.rt.dataImage.DataPointRT;
+import java.io.Serializable;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -198,14 +197,14 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
     private String name = getClass().getSimpleName();
 
     private int pointFolderId;
-    @SerializabeField
+    @JsonView(JsonPersistence.class)
     private LoggingTypes loggingType = LoggingTypes.ALL;
-    @SerializabeField
+    @JsonView(JsonPersistence.class)
     private TimePeriods intervalLoggingPeriodType = TimePeriods.MINUTES;
 
-    @SerializabeField
+    @JsonView(JsonPersistence.class)
     private int intervalLoggingPeriod = 15;
-    @SerializabeField
+    @JsonView(JsonPersistence.class)
     private IntervalLoggingTypes intervalLoggingType = IntervalLoggingTypes.INSTANT;
 
     private TimePeriods _purgeType = TimePeriods.YEARS;

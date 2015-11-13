@@ -12,6 +12,7 @@ import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.dao.MaintenanceEventDao;
 import br.org.scadabr.dao.PointLinkDao;
+import br.org.scadabr.json.dao.JsonMapperFactory;
 import br.org.scadabr.rt.link.PointLinkManager;
 import br.org.scadabr.vo.datasource.PointLocatorFolderVO;
 import com.serotonin.mango.db.DatabaseAccessFactory;
@@ -48,6 +49,8 @@ public class DataSourceDaoTest {
         private final DatabaseAccessFactory databaseAccessFactory = new DatabaseAccessFactory();
                 
         private final ScadaBrVersionBean ScadaBrVersionBean = new ScadaBrVersionBean();
+        
+        private final JsonMapperFactory jsonMapperFactory = new JsonMapperFactory();
         
 
         /**
@@ -93,6 +96,11 @@ public class DataSourceDaoTest {
             return ScadaBrVersionBean;
         }
         
+        @Bean
+        public JsonMapperFactory getJsonMapperFactory() {
+            return jsonMapperFactory;
+        }
+        
 
     }
 
@@ -112,17 +120,14 @@ public class DataSourceDaoTest {
         dataSourceDao.saveDataSource(dataSource);
         MetaDataSourceVO dataSource1 =  (MetaDataSourceVO)dataSourceDao.getDataSource(dataSource.getId());
         dataSource1.setName("Test1");
+        dataSource1.setEnabled(true);
         dataSourceDao.saveDataSource(dataSource1);
         
-        PointLocatorFolderVO plfVo = new PointLocatorFolderVO(dataSource);
+        PointLocatorFolderVO plfVo = new PointLocatorFolderVO(dataSource, "TestA");
         
         dataSourceDao.savePointLocatorFolder(plfVo);
         Assert.assertNotEquals(ScadaBrConstants.NEW_ID, plfVo.getId());
         Assert.assertEquals(dataSource.getId(), plfVo.getDataSourceId());
-        
-        
-      
-        
         
         MetaPointLocatorVO pointLocator = new MetaPointLocatorVO(DataType.DOUBLE);
         pointLocator.setDataSourceId(dataSource.getId());
