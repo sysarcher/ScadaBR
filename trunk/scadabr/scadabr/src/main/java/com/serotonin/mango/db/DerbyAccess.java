@@ -18,10 +18,11 @@
  */
 package com.serotonin.mango.db;
 
-import br.org.scadabr.utils.ImplementMeException;
+import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.db.spring.ConnectionCallbackVoid;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -31,23 +32,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
-
+import java.util.Properties;
 import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.derby.jdbc.EmbeddedXADataSource;
 import org.apache.derby.tools.ij;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.CallableStatementCreator;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-
-import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.db.spring.ConnectionCallbackVoid;
-import java.io.IOException;
-import java.util.Properties;
-import org.apache.derby.jdbc.EmbeddedXADataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 
 public class DerbyAccess extends DatabaseAccess {
 
@@ -110,7 +105,7 @@ public class DerbyAccess extends DatabaseAccess {
 
     @Override
     protected boolean newDatabaseCheck(JdbcTemplate ejt) {
-        int count = ejt.queryForInt("select count(1) from sys.systables where tablename='USERS'");
+        int count = ejt.queryForObject("select count(1) from sys.systables where tablename='USERS'", Integer.class);
         if (count == 0) {
             // The users table wasn't found, so assume that this is a new Mango instance.
             // Create the tables
@@ -166,22 +161,28 @@ public class DerbyAccess extends DatabaseAccess {
      * exist.
      */
     private void updateIndentityStarts(JdbcTemplate ejt) {
-        List<IdentityStart> starts = ejt.query("select t.tablename, c.columnname, c.autoincrementvalue " + //
-                "from sys.syscolumns c join sys.systables t on c.referenceid = t.tableid " + //
+        List<IdentityStart> starts = ejt.query("select t.tablename, c.columnname, c.autoincrementvalue "
+                + //
+                "from sys.syscolumns c join sys.systables t on c.referenceid = t.tableid "
+                + //
                 "where t.tabletype='T' and c.autoincrementvalue is not null", new RowMapper<IdentityStart>() {
-                    @Override
-                    public IdentityStart mapRow(ResultSet rs, int index) throws SQLException {
-                        IdentityStart is = new IdentityStart();
-                        is.table = rs.getString(1);
-                        is.column = rs.getString(2);
-                        is.aiValue = rs.getInt(3);
-                        return is;
-                    }
-                });
+            @Override
+            public IdentityStart mapRow(ResultSet rs, int index) throws SQLException {
+                IdentityStart is = new IdentityStart();
+                is.table = rs.getString(1);
+                is.column = rs.getString(2);
+                is.aiValue = rs.getInt(3);
+                return is;
+            }
+        });
 
         for (IdentityStart is : starts) {
-            int maxId = ejt.queryForInt("select max(" + is.column + ") from " + is.table);
-            if (is.aiValue <= maxId) {
+            Integer maxId = ejt.queryForObject("select max(" + is.column + ") from " + is.table, Integer.class);
+            if (maxId == null) {
+                if (is.aiValue <= 0) {
+                    ejt.execute("alter table " + is.table + " alter column " + is.column + " restart with " + (maxId + 1));
+                }
+            } else if (is.aiValue <= maxId) {
                 ejt.execute("alter table " + is.table + " alter column " + is.column + " restart with " + (maxId + 1));
             }
         }

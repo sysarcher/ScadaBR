@@ -22,6 +22,7 @@
     <form id="plFormId">
         <dojox:tableContainer cols="1">
             <dijit:validationTextBox i18nLabel="pointEdit.props.name" name="name" value="${pointLocator.name}"/>
+            <dijit:validationTextBox i18nLabel="common.xid" name="xid"  value="${pointLocator.xid}"/>
             <jsp:doBody />
         </dojox:tableContainer>
         <dijit:button type="submit" i18nLabel="login.loginButton" />

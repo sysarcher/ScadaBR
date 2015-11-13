@@ -43,10 +43,10 @@ public class DataSourceRpcController {
     @Inject
     private DataSourcesRegistry dataSourcesRegistry;
 
-    public JsonDataSource addDataSource(String type) {
+    public JsonDataSourceWrapper addDataSource(String type) {
         DataSourceVO result = dataSourcesRegistry.createDataSourceVO(type);
         dataSourceDao.saveDataSource(result);
-        return new JsonDataSource(result, localizer);
+        return new JsonDataSourceWrapper(result);
     }
 
     public boolean deleteDataSource(int id) {
@@ -61,22 +61,24 @@ public class DataSourceRpcController {
 
     public <T extends PointValueTime> PointLocatorVO addPointLocator(int dataSourceId, int pointLocatorId) {
         PointLocatorVO<T> result = new MetaPointLocatorVO<>(DataType.DOUBLE);
+        result.setDataSourceId(dataSourceId);
+        result.setPointLocatorFolderId(pointLocatorId);
         dataSourceDao.savePointLocator(result);
         return result;
     }
 
-    public JsonDataSource startDataSource(int id) {
+    public JsonDataSourceWrapper startDataSource(int id) {
         DataSourceVO dsVo = dataSourceDao.getDataSource(id);
         dsVo.setEnabled(true);
         runtimeManager.saveDataSource(dsVo);
-        return new JsonDataSource(dsVo, localizer);
+        return new JsonDataSourceWrapper(dsVo);
     }
 
-    public JsonDataSource stopDataSource(int id) {
+    public JsonDataSourceWrapper stopDataSource(int id) {
         DataSourceVO dsVo = dataSourceDao.getDataSource(id);
         dsVo.setEnabled(false);
         runtimeManager.saveDataSource(dsVo);
-        return new JsonDataSource(dsVo, localizer);
+        return new JsonDataSourceWrapper(dsVo);
     }
 
     public JsonPointLocator startPointLocator(int id) {

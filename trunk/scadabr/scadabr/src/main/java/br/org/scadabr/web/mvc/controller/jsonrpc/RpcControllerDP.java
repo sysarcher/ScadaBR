@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.org.scadabr.web.mvc.controller.dataPoints;
+package br.org.scadabr.web.mvc.controller.jsonrpc;
 
 import br.org.scadabr.DataType;
 import br.org.scadabr.dao.DataPointDao;

@@ -1,7 +1,6 @@
 package br.org.scadabr.db;
 
 import br.org.scadabr.logger.LogUtils;
-import com.serotonin.mango.db.DatabaseAccess;
 import com.serotonin.mango.db.DatabaseAccessFactory;
 import com.serotonin.mango.db.DatabaseType;
 import java.util.Collection;

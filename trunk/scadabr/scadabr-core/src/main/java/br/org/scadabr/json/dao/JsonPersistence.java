@@ -3,14 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.org.scadabr.utils.serialization;
-
-import java.util.LinkedList;
+package br.org.scadabr.json.dao;
 
 /**
  *
  * @author aploese
  */
-public class SerializedFieldList extends LinkedList<SerializedField> {
+public class JsonPersistence {
     
 }

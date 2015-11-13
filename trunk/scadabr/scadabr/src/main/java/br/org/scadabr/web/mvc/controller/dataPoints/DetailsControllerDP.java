@@ -71,8 +71,8 @@ class DetailsControllerDP {
     }
 
     @RequestMapping(value = "editProperties", params = "id", method = RequestMethod.POST)
-    protected @ResponseBody AjaxFormPostResponse<DataPointVO> postEditCommonProperties(@ModelAttribute("dataPoint") DataPointVO dataPoint) throws BindException {
-        LOG.log(Level.SEVERE, "postEditCommonProperties called {0}", dataPoint);
+    protected @ResponseBody AjaxFormPostResponse<DataPointVO> postEditProperties(@ModelAttribute("dataPoint") DataPointVO dataPoint) throws BindException {
+        LOG.log(Level.SEVERE, "postEditProperties called {0}", dataPoint);
         Set<ConstraintViolation<DataPointVO>> constraintViolations = validator.validate(dataPoint);
         if (constraintViolations.isEmpty()) {
             dataPointDao.saveDataPoint(dataPoint);

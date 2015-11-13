@@ -92,10 +92,11 @@ alter table mailingListMembers add constraint mailingListMembersFk1 foreign key 
 --
 create table dataSources (
   id int not null auto_increment,
+  clazzName varchar(128) not null,
+  name varchar(48) not null,
   xid varchar(50) not null,
-  name varchar(40) not null,
-  dataSourceType int not null,
-  data longblob not null,
+  enabled boolean not null,
+  data clob not null
   primary key (id)
 ) ENGINE=InnoDB;
 alter table dataSources add constraint dataSourcesUn1 unique (xid);
@@ -139,6 +140,8 @@ create table flexProjects (
   xmlConfig varchar(16384) not null,
   primary key (id)
 ) ENGINE=InnoDB;
+
+
 --
 --
 -- Data Points
@@ -146,7 +149,7 @@ create table flexProjects (
 create table dataPoints (
   id int not null auto_increment,
   xid varchar(50) not null,
-  data longblob not null,
+  jsonFields longclob not null,
   pointFolderId int not null,
   primary key (id)
 ) ENGINE=InnoDB;

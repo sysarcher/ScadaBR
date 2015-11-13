@@ -20,15 +20,6 @@ package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.DataType;
 import br.org.scadabr.dao.PointValueDao;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.springframework.dao.ConcurrencyFailureException;
-
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.db.spring.IntValuePairRowMapper;
 import br.org.scadabr.utils.ImplementMeException;
@@ -41,7 +32,14 @@ import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.bean.LongPair;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -49,6 +47,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -589,10 +588,10 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
 
     public long dateRangeCount(int dataPointId, long from, long to) {
         flushWriteBehind();
-        return ejt
-                .queryForLong(
-                        "select count(*) from pointValues where dataPointId=? and ts>=? and ts<=?",
-                        dataPointId, from, to);
+        return ejt.queryForObject(
+                "select count(*) from pointValues where dataPointId=? and ts>=? and ts<=?",
+                Long.class,
+                dataPointId, from, to);
     }
 
     @Override
@@ -612,9 +611,10 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         if (dataPointIds.isEmpty()) {
             return -1;
         }
-        return ejt
-                .queryForLong("select min(ts) from pointValues where dataPointId in ("
-                        + createDelimitedList(dataPointIds, ",") + ")");
+        return ejt.queryForObject(
+                "select min(ts) from pointValues where dataPointId in ("
+                        + createDelimitedList(dataPointIds, ",") + ")",
+                Long.class);
     }
 
     public long getEndTime(List<Integer> dataPointIds) {
@@ -622,9 +622,10 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         if (dataPointIds.isEmpty()) {
             return -1;
         }
-        return ejt
-                .queryForLong("select max(ts) from pointValues where dataPointId in ("
-                        + createDelimitedList(dataPointIds, ",") + ")");
+        return ejt.queryForObject(
+                "select max(ts) from pointValues where dataPointId in ("
+                        + createDelimitedList(dataPointIds, ",") + ")",
+                Long.class);
     }
 
     public LongPair getStartAndEndTime(List<Integer> dataPointIds) {
@@ -637,16 +638,16 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
                     "select min(ts), max(ts) from pointValues where dataPointId in ("
                     + createDelimitedList(dataPointIds, ",") + ")",
                     null, new RowMapper<LongPair>() {
-                        @Override
-                        public LongPair mapRow(ResultSet rs, int index)
+                @Override
+                public LongPair mapRow(ResultSet rs, int index)
                         throws SQLException {
-                            long l = rs.getLong(1);
-                            if (rs.wasNull()) {
-                                return null;
-                            }
-                            return new LongPair(l, rs.getLong(2));
-                        }
-                    });
+                    long l = rs.getLong(1);
+                    if (rs.wasNull()) {
+                        return null;
+                    }
+                    return new LongPair(l, rs.getLong(2));
+                }
+            });
         } catch (EmptyResultDataAccessException e) {
             return null;
         }

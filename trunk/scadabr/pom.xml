@@ -107,22 +107,22 @@
             <dependency>
                 <groupId>net.sf.atmodem4j</groupId>
                 <artifactId>spsw-nativelibs-bundle</artifactId>
-                <version>0.0.4</version>
+                <version>0.0.6-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.7</version>
+                <version>1.7.12</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>1.7.7</version>
+                <version>1.7.12</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.11</version>
+                <version>4.12</version>
             </dependency>
             <dependency>
                 <groupId>br.org.scadabr.legacy</groupId>
@@ -143,13 +143,13 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.3.2</version>
+                <version>3.4</version>
             </dependency>
         
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.2</version>
             </dependency>
             <dependency>
                 <groupId>br.org.scadabr.legacy</groupId>
@@ -230,43 +230,43 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>4.1.1.RELEASE</version>
+                <version>4.2.2.RELEASE</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-aspects</artifactId>
-                <version>4.1.1.RELEASE</version>
+                <version>4.2.2.RELEASE</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-jdbc</artifactId>
-                <version>4.1.1.RELEASE</version>
+                <version>4.2.2.RELEASE</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
-                <version>4.1.1.RELEASE</version>
+                <version>4.2.2.RELEASE</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-webmvc</artifactId>
-                <version>4.1.1.RELEASE</version>
+                <version>4.2.2.RELEASE</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context-support</artifactId>
-                <version>4.1.1.RELEASE</version>
+                <version>4.2.2.RELEASE</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-aop</artifactId>
-                <version>4.1.1.RELEASE</version>
+                <version>4.2.2.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.aspectj</groupId>
@@ -276,7 +276,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-instrument-tomcat</artifactId>
-                <version>4.1.1.RELEASE</version>
+                <version>4.2.2.RELEASE</version>
             </dependency>
             
             <dependency>
@@ -294,19 +294,19 @@
             <dependency>
                 <groupId>org.freemarker</groupId>
                 <artifactId>freemarker</artifactId>
-                <version>2.3.20</version>
+                <version>2.3.23</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.derby</groupId>
                 <artifactId>derby</artifactId>
-                <version>10.11.1.1</version>
+                <version>10.12.1.1</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.derby</groupId>
                 <artifactId>derbytools</artifactId>
-                <version>10.11.1.1</version>
+                <version>10.12.1.1</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
@@ -324,7 +324,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.9</version>
+                <version>1.10</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
@@ -384,7 +384,7 @@
             <dependency>
                 <groupId>net.sf.mbus4j</groupId>
                 <artifactId>mbus4j-master</artifactId>
-                <version>0.1.5</version>
+                <version>0.1.6-SNAPSHOT</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
@@ -413,7 +413,7 @@
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>5.1.33</version>
+                <version>5.1.37</version>
             </dependency>
             <dependency>
                 <groupId>br.org.scadabr.legacy</groupId>
@@ -434,12 +434,12 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-validator</artifactId>
-                <version>5.1.2.Final</version>
+                <version>5.2.2.Final</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.4.2</version>
+                <version>2.6.3</version>
             </dependency>
             <dependency>
                 <groupId>org.dojotoolkit</groupId>
@@ -456,7 +456,7 @@
             <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
-                <version>3.3</version>
+                <version>3.4</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
@@ -468,7 +468,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.1</version>
+                    <version>3.3</version>
                     <configuration>
                         <maxmem>512m</maxmem>
                         <source>1.8</source>
@@ -479,7 +479,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.1</version>
+                    <version>2.5.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -494,7 +494,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>2.7</version>
                     <configuration>
                         <encoding>${project.build.sourceEncoding}</encoding>
                     </configuration>

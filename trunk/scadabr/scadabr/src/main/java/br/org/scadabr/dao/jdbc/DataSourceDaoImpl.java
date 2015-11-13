@@ -20,66 +20,72 @@ package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.ScadaBrConstants;
 import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.dao.DataSourceDao;
+import br.org.scadabr.dao.MaintenanceEventDao;
+import br.org.scadabr.json.dao.JsonMapperFactory;
 import br.org.scadabr.l10n.AbstractLocalizer;
+import br.org.scadabr.rt.event.type.EventSources;
+import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.utils.ImplementMeException;
+import br.org.scadabr.vo.datasource.PointLocatorFolderVO;
+import br.org.scadabr.vo.datasource.PointLocatorVO;
+import br.org.scadabr.vo.event.type.AuditEventKey;
+import br.org.scadabr.vo.event.type.DataSourceEventKey;
+import com.serotonin.mango.rt.event.type.AuditEventType;
+import com.serotonin.mango.rt.event.type.DataSourceEventType;
+import com.serotonin.mango.util.ChangeComparable;
+import com.serotonin.mango.vo.DataPointVO;
+import com.serotonin.mango.vo.DoubleDataPointVO;
+import com.serotonin.mango.vo.dataSource.DataSourceVO;
+import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import java.io.Serializable;
 import java.sql.Blob;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-
-import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.util.ChangeComparable;
-import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
-import br.org.scadabr.util.SerializationHelper;
-import br.org.scadabr.util.StringUtils;
-import br.org.scadabr.rt.event.type.EventSources;
-import br.org.scadabr.vo.event.type.AuditEventKey;
-import br.org.scadabr.vo.event.type.DataSourceEventKey;
-import com.serotonin.mango.rt.event.type.DataSourceEventType;
-import java.sql.Connection;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
-import br.org.scadabr.dao.DataSourceDao;
-import br.org.scadabr.dao.MaintenanceEventDao;
-import br.org.scadabr.utils.serialization.FieldDeserializer;
-import br.org.scadabr.utils.serialization.FieldSerializer;
-import br.org.scadabr.vo.datasource.PointLocatorFolderVO;
-import br.org.scadabr.vo.datasource.PointLocatorVO;
-import com.serotonin.mango.vo.DoubleDataPointVO;
-import java.io.IOException;
-import java.sql.SQLType;
-import java.sql.Types;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 @Named
 public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
 
-    private static final String DATA_SOURCE_SELECT = "select id, xid, name, data from dataSources ";
-    private static final String POINT_LOCATOR_SELECT = "select id, dataSourceId, pointLocatorFolderId, clazz, name, fieldData from pointLocators ";
+    private static final String DATA_SOURCE_SELECT = "select\n"
+            + " id, name, clazzName, xid, enabled, jsonFields\n"
+            + "from\n"
+            + " dataSources\n";
+    private static final String POINT_LOCATOR_SELECT = "select\n"
+            + " id, dataSourceId, pointLocatorFolderId, clazz, name, jsonFields\n"
+            + "from\n"
+            + " pointLocators\n";
+    private static final String CHILD_FOLDER_SELECT = "select\n"
+            + " id, dataSourceId, parentId, clazz, name, jsonFields\n"
+            + "from\n"
+            + " pointLocatorFolders\n";
 
     @Inject
     @Deprecated //TODO switch to PointLocator
     private DataPointDao dataPointDao;
     @Inject
     private MaintenanceEventDao maintenanceEventDao;
+    @Inject
+    private JsonMapperFactory jsonMapperFactory;
 
     Map<Integer, Map<Integer, DataSourceEventType>> dataSourceEventTypes = new HashMap<>();
 
@@ -138,10 +144,15 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
             updatePointLocatorFolder(plfVo);
         }
     }
+
     private void insertPointLocatorFolder(final PointLocatorFolderVO vo) {
         final int id = doInsert(new PreparedStatementCreator() {
 
-            final static String SQL_INSERT = "insert into pointLocatorFolders (dataSourceId, parentId, name) values (?,?,?)";
+            final static String SQL_INSERT = "insert into\n"
+                    + "pointLocatorFolders\n"
+                    + " (dataSourceId, parentId, name, clazz, jsonFields)\n"
+                    + "values\n"
+                    + " (?,?,?,?,?)";
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
@@ -149,6 +160,8 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
                 ps.setInt(1, vo.getDataSourceId());
                 ps.setObject(2, vo.getParentFolderId());
                 ps.setString(3, vo.getName());
+                ps.setString(4, vo.getClass().getName());
+                ps.setClob(5, jsonMapperFactory.write(vo));
                 return ps;
             }
         });
@@ -162,7 +175,12 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
 
         ejt.update(new PreparedStatementCreator() {
 
-            final static String SQL_UPDATE = "update pointLocatorFolders set dataSourceId=?, parentId=?, name=? where id=?";
+            final static String SQL_UPDATE = "update\n"
+                    + " pointLocatorFolders\n"
+                    + "set\n"
+                    + " dataSourceId=?, parentId=?, name=?\n, clazz=?, jsonFields=?"
+                    + "where\n"
+                    + " id=?";
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
@@ -170,16 +188,45 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
                 ps.setInt(1, vo.getDataSourceId());
                 ps.setObject(2, vo.getParentFolderId());
                 ps.setString(3, vo.getName());
-                ps.setInt(4, vo.getId());
+                ps.setString(4, vo.getClass().getName());
+                ps.setClob(5, jsonMapperFactory.write(vo));
                 return ps;
             }
         });
 //TODO        AuditEventType.raiseChangedEvent(AuditEventKey.DATA_SOURCE, old, (ChangeComparable<PointLocatorVO<?>>) vo);
     }
 
-
     @Override
     public void deletePointLocatorFolder(int plfId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Iterable<PointLocatorVO> getPointLocatorsByParent(int dataSourceId, int parentFolderId) {
+        try {
+            return ejt.query(POINT_LOCATOR_SELECT 
+                    + "where\n"
+                    + " pointLocatorFolderId=? and dataSourceId=?", new PointLocatorRowMapper(), parentFolderId, dataSourceId);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public Iterable<PointLocatorFolderVO> getPointLocatorsFolderByParent(int dataSourceId, int parentFolderId) {
+        try {
+            return ejt.query(CHILD_FOLDER_SELECT 
+                    + "where\n"
+                    + " parentId=? and dataSourceId=?", 
+                    new PointLocatorFolderRowMapper(), 
+                    parentFolderId, dataSourceId);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public PointLocatorFolderVO getRootPointLocatorFolder(int dataSourceId) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -187,10 +234,11 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
 
         @Override
         public DataSourceVO<?> mapRow(ResultSet rs, int rowNum) throws SQLException {
-            DataSourceVO<?> ds = (DataSourceVO<?>) SerializationHelper.readObject(rs.getBlob(4).getBinaryStream());
+            DataSourceVO<?> ds = (DataSourceVO<?>) jsonMapperFactory.read(rs.getString(3), rs.getClob(6).getAsciiStream());
             ds.setId(rs.getInt(1));
-            ds.setXid(rs.getString(2));
-            ds.setName(rs.getString(3));
+            ds.setName(rs.getString(2));
+            ds.setXid(rs.getString(4));
+            ds.setEnabled(rs.getBoolean(5));
             return ds;
         }
     }
@@ -225,15 +273,16 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
         }
         final int id = doInsert(new PreparedStatementCreator() {
 
-            final static String SQL_INSERT = "insert into dataSources (xid, name, dataSourceType, data) values (?,?,?,?)";
+            final static String SQL_INSERT = "insert into dataSources (name, clazzName, xid, enabled, jsonFields) values (?,?,?,?,?)";
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
-                ps.setString(1, vo.getXid());
-                ps.setString(2, vo.getName());
-                ps.setInt(3, vo.getDataSourceTypeId());
-                ps.setBlob(4, SerializationHelper.writeObject(vo));
+                ps.setString(1, vo.getName());
+                ps.setString(2, vo.getClass().getName());
+                ps.setString(3, vo.getXid());
+                ps.setBoolean(4, vo.isEnabled());
+                ps.setClob(5, jsonMapperFactory.write(vo));
                 return ps;
             }
         });
@@ -247,15 +296,17 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
 
         ejt.update(new PreparedStatementCreator() {
 
-            final static String SQL_UPDATE = "update dataSources set xid=?, name=?, data=? where id=?";
+            final static String SQL_UPDATE = "update dataSources set name=?, clazzName=?, xid=?, enabled=?, jsonFields=? where id=?";
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareStatement(SQL_UPDATE);
-                ps.setString(1, vo.getXid());
-                ps.setString(2, vo.getName());
-                ps.setBlob(3, SerializationHelper.writeObject(vo));
-                ps.setInt(4, vo.getId());
+                ps.setString(1, vo.getName());
+                ps.setString(2, vo.getClass().getName());
+                ps.setString(3, vo.getXid());
+                ps.setBoolean(4, vo.isEnabled());
+                ps.setClob(5, jsonMapperFactory.write(vo));
+                ps.setInt(6, vo.getId());
                 return ps;
             }
         });
@@ -348,20 +399,20 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
     public Object getPersistentData(DataSourceVO dsVo) {
         return ejt.query("select rtdata from dataSources where id=?", new Object[]{dsVo.getId()},
                 new ResultSetExtractor<Serializable>() {
-                    @Override
-                    public Serializable extractData(ResultSet rs) throws SQLException, DataAccessException {
-                        if (!rs.next()) {
-                            return null;
-                        }
+            @Override
+            public Serializable extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (!rs.next()) {
+                    return null;
+                }
 
-                        Blob blob = rs.getBlob(1);
-                        if (blob == null) {
-                            return null;
-                        }
-
-                        return (Serializable) SerializationHelper.readObject(blob.getBinaryStream());
-                    }
-                });
+                Blob blob = rs.getBlob(1);
+                if (blob == null) {
+                    return null;
+                }
+                throw new ImplementMeException();
+//                        return (Serializable) SerializationHelper.readObject(blob.getBinaryStream());
+            }
+        });
     }
 
     @Override
@@ -371,7 +422,10 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 final PreparedStatement ps = con.prepareStatement("update dataSources set rtdata=? where id=?");
-                ps.setBlob(1, SerializationHelper.writeObject(data));
+                if (true) {
+                    throw new ImplementMeException();
+                }
+                //ps.setBlob(1, SerializationHelper.writeObject(data));
                 ps.setInt(2, dsVO.getId());
                 return ps;
             }
@@ -382,17 +436,24 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
 
         @Override
         public PointLocatorVO mapRow(ResultSet rs, int rowNum) throws SQLException {
-            try {
-                FieldDeserializer fd = new FieldDeserializer(rs.getString(3));
-                final PointLocatorVO dp = (PointLocatorVO) fd.deserializeObject(rs.getBinaryStream(6));
-                dp.setId(rs.getInt(1));
-                dp.setDataSourceId(rs.getInt(2));
-                dp.setPointLocatorFolderId(rs.getInt(3));
-                dp.setName(rs.getString(5));
-                return dp;
-            } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
+            final PointLocatorVO dp = (PointLocatorVO) jsonMapperFactory.read(rs.getString(4), rs.getClob(6).getAsciiStream());
+            dp.setId(rs.getInt(1));
+            dp.setDataSourceId(rs.getInt(2));
+            dp.setPointLocatorFolderId(rs.getInt(3));
+            dp.setName(rs.getString(5));
+            return dp;
+        }
+    }
+
+    class PointLocatorFolderRowMapper implements RowMapper<PointLocatorFolderVO> {
+
+        @Override
+        public PointLocatorFolderVO mapRow(ResultSet rs, int rowNum) throws SQLException {
+            final PointLocatorFolderVO dp = (PointLocatorFolderVO) jsonMapperFactory.read(rs.getString(4), rs.getClob(5).getAsciiStream());
+            dp.setId(rs.getInt(1));
+            dp.setDataSourceId(rs.getInt(2));
+            dp.setName(rs.getString(3));
+            return dp;
         }
     }
 
@@ -418,7 +479,7 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
     private void insertPointLocator(final PointLocatorVO vo) {
         final int id = doInsert(new PreparedStatementCreator() {
 
-            final static String SQL_INSERT = "insert into pointLocators (dataSourceId, pointLocatorFolderId, clazz, name, fieldData) values (?,?,?,?, ?)";
+            final static String SQL_INSERT = "insert into pointLocators (dataSourceId, pointLocatorFolderId, clazz, name, jsonFields) values (?,?,?,?, ?)";
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
@@ -427,7 +488,7 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
                 ps.setObject(2, vo.getPointLocatorFolderId());
                 ps.setString(3, vo.getClass().getName());
                 ps.setString(4, vo.getName());
-                ps.setBlob(5, new FieldSerializer(vo));
+                ps.setClob(5, jsonMapperFactory.write(vo));
                 return ps;
             }
         });
@@ -441,7 +502,12 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
 
         ejt.update(new PreparedStatementCreator() {
 
-            final static String SQL_UPDATE = "update pointLocators set dataSourceId=?, pointLocatorFolderId=?, clazz=?, name=?, fieldData=? where id=?";
+            final static String SQL_UPDATE = "update\n"
+                    + " pointLocators\n"
+                    + "set\n"
+                    + " dataSourceId=?, pointLocatorFolderId=?, clazz=?, name=?, jsonFields=?\n"
+                    + "where\n"
+                    + " id=?";
 
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
@@ -450,7 +516,7 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
                 ps.setObject(2, vo.getPointLocatorFolderId());
                 ps.setString(3, vo.getClass().getName());
                 ps.setString(4, vo.getName());
-                ps.setBlob(5, new FieldSerializer(vo));
+                ps.setClob(5, jsonMapperFactory.write(vo));
                 ps.setInt(6, vo.getId());
                 return ps;
             }

@@ -39,7 +39,13 @@ and open the template in the editor.
     height: 16px;
 }
 
-.dsIcon, .plIcon{ background-position: 0; }
+.commonSaveIcon{
+    background-image: url('commonIcons.png');
+    width: 16px;
+    height: 16px;
+}
+
+.commonSaveIcon .dsIcon, .plIcon{ background-position: 0; }
 .dsAddIcon, .plAddIcon{ background-position: -16px; }
 .dsEditIcon, .plEditIcon{ background-position: -32px; }
 .dsCopyIcon, .plCopyIcon{ background-position: -48px; }
@@ -49,3 +55,4 @@ and open the template in the editor.
 .dsRunningIcon, .plRunningIcon{ background-position: -112px; }
 .dsErrorIcon, .plErrorIcon{ background-position: -128px; }
 .dsStoppedIcon, .plStoppedIcon{ background-position: -144px; }
+

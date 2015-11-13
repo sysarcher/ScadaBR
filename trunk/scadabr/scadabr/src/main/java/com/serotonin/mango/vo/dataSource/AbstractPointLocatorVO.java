@@ -21,12 +21,10 @@ package com.serotonin.mango.vo.dataSource;
 import br.org.scadabr.DataType;
 import br.org.scadabr.ScadaBrConstants;
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.json.dao.JsonPersistence;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 import br.org.scadabr.vo.datasource.PointLocatorVO;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import java.util.List;
@@ -35,14 +33,9 @@ import javax.validation.constraints.Size;
 
 abstract public class AbstractPointLocatorVO<T extends PointValueTime> implements PointLocatorVO<T> {
 
-    //
-    // /
-    // / Serialization
-    // /
-    //
-    private static final long serialVersionUID = -1;
-    private static final int version = 1;
     private int id = ScadaBrConstants.NEW_ID;
+    @JsonView(JsonPersistence.class)
+    private String xid;
     private Integer pointLocatorFolderId;
     private boolean enabled;
     @NotNull
@@ -50,6 +43,10 @@ abstract public class AbstractPointLocatorVO<T extends PointValueTime> implement
     private String name;
     private DataType dataType;
     private int dataSourceId;
+    
+    public AbstractPointLocatorVO() {
+    }
+    
     
     public AbstractPointLocatorVO(DataType dataType) {
         this.name = getClass().getSimpleName();
@@ -73,18 +70,6 @@ abstract public class AbstractPointLocatorVO<T extends PointValueTime> implement
         if (from.dataType != dataType) {
             throw new ShouldNeverHappenException("DataTypes mismatch");
         }
-    }
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeInt(version);
-        out.writeObject(name);
-        out.writeObject(dataType);
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        final int ver = in.readInt(); // Read the version. Value is currently not used.
-        name = (String) in.readObject();
-        dataType = (DataType)in.readObject();
     }
 
     /**
@@ -180,6 +165,20 @@ abstract public class AbstractPointLocatorVO<T extends PointValueTime> implement
     @Override
     public void setPointLocatorFolderId(Integer pointLocatorFolderId) {
         this.pointLocatorFolderId = pointLocatorFolderId;
+    }
+
+    /**
+     * @return the xid
+     */
+    public String getXid() {
+        return xid;
+    }
+
+    /**
+     * @param xid the xid to set
+     */
+    public void setXid(String xid) {
+        this.xid = xid;
     }
 
 }

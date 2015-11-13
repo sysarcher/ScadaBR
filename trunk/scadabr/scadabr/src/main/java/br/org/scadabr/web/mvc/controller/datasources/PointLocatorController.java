@@ -19,10 +19,12 @@
 package br.org.scadabr.web.mvc.controller.datasources;
 
 import br.org.scadabr.dao.DataSourceDao;
+import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import br.org.scadabr.web.mvc.AjaxFormPostResponse;
 import java.util.Set;
+import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -37,6 +39,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Scope("request")
 @RequestMapping("/dataSources/pointLocator")
 public class PointLocatorController {
+
+    private static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_WEB);
+
 
     @Inject
     private Validator validator;
@@ -58,6 +63,7 @@ public class PointLocatorController {
     @RequestMapping(params = "id", method = RequestMethod.POST)
     public @ResponseBody
     AjaxFormPostResponse<PointLocatorVO> postPointLocator(@ModelAttribute("pointLocator") PointLocatorVO pointLocator) {
+        LOG.severe("POINTLOCATOR: " + pointLocator.getClass().getName());
         Set<ConstraintViolation<PointLocatorVO>> constraintViolations = validator.validate(pointLocator);
         if (constraintViolations.isEmpty()) {
             dataSourceDao.savePointLocator(pointLocator);

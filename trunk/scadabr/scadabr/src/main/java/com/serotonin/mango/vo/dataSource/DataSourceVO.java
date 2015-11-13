@@ -19,11 +19,7 @@
 package com.serotonin.mango.vo.dataSource;
 
 import br.org.scadabr.ScadaBrConstants;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,9 +29,7 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.vo.datasource.UniqueDsXid;
-import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.DataSourceEventKey;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.serotonin.mango.rt.event.type.DataSourceEventType;
@@ -166,46 +160,6 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
 
     abstract protected void addPropertyChangesImpl(
             List<LocalizableMessage> list, T from);
-
-    //
-    // /
-    // / Serialization
-    // /
-    //
-    private static final long serialVersionUID = -1;
-    private static final int version = 2;
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeInt(version);
-        out.writeBoolean(enabled);
-        final Map<Integer, Integer> _alarmLevels = new HashMap<>();
-        for (Map.Entry<DataSourceEventKey, DataSourceEventType> e : eventTypeMap.entrySet()) {
-            _alarmLevels.put(e.getKey().getId(), e.getValue().getAlarmLevel().ordinal());
-        }
-        out.writeObject(_alarmLevels);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
-
-        int ver = in.readInt();
-        // Switch on the version of the class so that version changes can be
-        // elegantly handled.
-        if (ver == 1) {
-            enabled = in.readBoolean();
-            fillEventTypeMap();
-        } else if (ver == 2) {
-            enabled = in.readBoolean();
-            final Map<Integer, Integer> _alarmLevels = (HashMap<Integer, Integer>) in.readObject();
-            this.eventTypeMap = (Map<DataSourceEventKey, DataSourceEventType>) createEventKeyMap();
-            for (DataSourceEventKey key : createEventKeySet()) {
-                final Integer alId = _alarmLevels.get(key.getId());
-                eventTypeMap.put(key, new DataSourceEventType(id, key, alId != null ? AlarmLevel.values()[alId] : key.getDefaultAlarmLevel()));
-            }
-        }
-        fillEventTypeMap();
-    }
 
     /**
      * get all Types for configuration

@@ -42,8 +42,6 @@ public class DataSourceController {
     private Validator validator;
     @Inject
     private DataSourceDao dataSourceDao;
-    @Inject
-    private transient RequestContextAwareLocalizer localizer;
 
     @ModelAttribute("dataSource")
     protected DataSourceVO getModel(int id) {

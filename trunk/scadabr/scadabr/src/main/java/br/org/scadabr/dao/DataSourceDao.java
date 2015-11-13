@@ -34,17 +34,22 @@ public interface DataSourceDao {
 
     PointLocatorVO getPointLocator(int id);
 
+    Iterable<PointLocatorVO> getPointLocatorsByParent(int dataSourceId, int parentFolderId);
+
     void savePointLocator(PointLocatorVO<?> plVo);
 
     void deletePointLocator(int plId);
 
     PointLocatorFolderVO getPointLocatorFolder(int id);
 
+    PointLocatorFolderVO getRootPointLocatorFolder(int dataSourceId);
+
+    Iterable<PointLocatorFolderVO> getPointLocatorsFolderByParent(int dataSourceId, int parentFolderId);
+
     void savePointLocatorFolder(PointLocatorFolderVO plfVo);
 
     void deletePointLocatorFolder(int plfId);
    
-    
     boolean isXidUnique(DataSourceVO<?> dsVo);
     
     boolean isXidUnique(String xid);

@@ -6,6 +6,7 @@
 package br.org.scadabr.vo.datasource.meta;
 
 import br.org.scadabr.dao.DataSourceDao;
+import br.org.scadabr.json.dao.JsonMapperFactory;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,9 +16,9 @@ import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import org.easymock.EasyMock;
-import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +38,8 @@ public class MetaDataSourceVOTest {
 
         private final Validator validator = new org.springframework.validation.beanvalidation.LocalValidatorFactoryBean();
         private final DataSourceDao dataSourceDao = EasyMock.createMock(DataSourceDao.class);
-
+        private final JsonMapperFactory jsonMapperFactory = new JsonMapperFactory();
+        
         @Bean
         public Validator getValidator() {
             return validator;
@@ -46,6 +48,11 @@ public class MetaDataSourceVOTest {
         @Bean
         public DataSourceDao getDsDao() {
             return dataSourceDao;
+        }
+        
+        @Bean
+        public JsonMapperFactory getJsonMapperFactory() {
+            return jsonMapperFactory;
         }
 
     }
@@ -57,12 +64,26 @@ public class MetaDataSourceVOTest {
     private Validator validator;
     @Inject
     private DataSourceDao dataSourceDao;
+    @Inject
+    private JsonMapperFactory jsonMapperFactory;
+            
 
     @Before
     public void setUp() {
         EasyMock.reset(dataSourceDao);
     }
 
+    
+    @Test
+    public void testJsonPersistence() {
+        MetaDataSourceVO sourceVO = new MetaDataSourceVO();
+        sourceVO.setName("Test-" + sourceVO.getName());
+        String s = jsonMapperFactory.writeValueAsString(sourceVO);
+        assertEquals("{}", s);
+        MetaDataSourceVO sourceVO1 = (MetaDataSourceVO)jsonMapperFactory.read(MetaDataSourceVO.class.getName(), s);
+    }
+    
+    
     @Test
     public void testValidateAllErrors() {
         MetaDataSourceVO instance = new MetaDataSourceVO();
