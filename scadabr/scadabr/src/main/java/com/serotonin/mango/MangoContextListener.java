@@ -32,6 +32,7 @@ import javax.servlet.ServletContextListener;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.SystemSettingsDao;
+import br.org.scadabr.l10n.JsL10N;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.CronExpression;
@@ -57,6 +58,7 @@ import javax.inject.Inject;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import com.serotonin.mango.db.DatabaseAccessFactory;
 import com.serotonin.mango.web.UserSessionContextBean;
+import java.net.MalformedURLException;
 
 public class MangoContextListener implements ServletContextListener {
 
@@ -80,7 +82,14 @@ public class MangoContextListener implements ServletContextListener {
 
         // Get a handle on the context.
         ServletContext ctx = evt.getServletContext();
-
+        try {
+            JsL10N jsL10N = new JsL10N();
+            jsL10N.init(ctx.getResource("/"));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        
+        
         // Create the common reference to the context
         Common.ctx = new ContextWrapper(ctx);
 

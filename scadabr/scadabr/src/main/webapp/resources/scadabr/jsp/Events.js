@@ -12,13 +12,14 @@ define(["dojo/_base/declare",
     "dijit/form/Button",
     "dojo/rpc/JsonService",
     "dojo/date",
-    "dojo/date/locale"
-], function (declare, lang, on, registry, domConstruct, request, Memory, Grid, Pagination, Keyboard, Selection, Button, JsonService, date, dateLocale) {
+    "dojo/date/locale",
+    "dojo/i18n!scadabr/nls/messages"
+], function (declare, lang, on, registry, domConstruct, request, Memory, Grid, Pagination, Keyboard, Selection, Button, JsonService, date, dateLocale, messages) {
 
     return declare(null, {
-        constructor: function (pendingAlarmsTableNode, localizedMap) {
+        constructor: function (pendingAlarmsTableNode) {
             this._initSvc();
-            this._initPendingAlarmsTable(pendingAlarmsTableNode, localizedMap);
+            this._initPendingAlarmsTable(pendingAlarmsTableNode);
         },
         _initSvc: function () {
             this.svc = new JsonService({
@@ -42,7 +43,7 @@ define(["dojo/_base/declare",
                 ]
             });
         },
-        _initPendingAlarmsTable: function (pendingAlarmsTableNode, localizedMap) {
+        _initPendingAlarmsTable: function (pendingAlarmsTableNode) {
             var _formatTimeStamp = function (timestamp) {
                 var now = new Date();
                 var ts = new Date();
@@ -58,10 +59,10 @@ define(["dojo/_base/declare",
                 store: new Memory(),
                 columns: {
                     id: {
-                        label: localizedMap["events.id"]
+                        label: messages["events.id"]
                     },
                     alarmLevel: {
-                        label: localizedMap["common.alarmLevel"],
+                        label: messages["common.alarmLevel"],
                         renderCell: function (event, alarmLevel, default_node, options) {
                             var node = domConstruct.create("img");
                             var imgName;
@@ -69,32 +70,32 @@ define(["dojo/_base/declare",
                                 case "INFORMATION":
                                     imgName = 'flag_blue';
                                     if (event.active) {
-                                        node.alt = localizedMap["common.alarmLevel.info"];
+                                        node.alt = messages["common.alarmLevel.info"];
                                     } else {
-                                        node.alt = localizedMap["common.alarmLevel.info.rtn"];
+                                        node.alt = messages["common.alarmLevel.info.rtn"];
                                     }
                                     break;
                                 case  "URGENT":
                                     imgName = 'flag_yellow';
                                     if (event.active) {
-                                        node.alt = localizedMap["common.alarmLevel.urgent"];
+                                        node.alt = messages["common.alarmLevel.urgent"];
                                     } else {
-                                        node.alt = localizedMap["common.alarmLevel.urgent_rtn"];
+                                        node.alt = messages["common.alarmLevel.urgent_rtn"];
                                     }
                                     break;
                                 case  "CRITICAL":
                                     if (event.active) {
-                                        node.alt = localizedMap["common.alarmLevel.critical"];
+                                        node.alt = messages["common.alarmLevel.critical"];
                                     } else {
-                                        node.alt = localizedMap["common.alarmLevel.critical.rtn"];
+                                        node.alt = messages["common.alarmLevel.critical.rtn"];
                                     }
                                     imgName = 'flag_orange';
                                     break;
                                 case  "LIVE_SAVETY":
                                     if (event.active) {
-                                        node.alt = localizedMap["common.alarmLevel.lifeSafety"];
+                                        node.alt = messages["common.alarmLevel.lifeSafety"];
                                     } else {
-                                        node.alt = localizedMap["common.alarmLevel.lifeSafety.rtn"];
+                                        node.alt = messages["common.alarmLevel.lifeSafety.rtn"];
                                     }
                                     imgName = 'flag_red';
                                     break;
@@ -108,7 +109,7 @@ define(["dojo/_base/declare",
                         }
                     },
                     fireTimestamp: {
-                        label: localizedMap["common.time"],
+                        label: messages["common.time"],
                         resizable: true,
                         formatter: function (timestamp) {
                             return _formatTimeStamp(timestamp);
@@ -122,15 +123,15 @@ define(["dojo/_base/declare",
                         }
                     },
                     inactiveTimestamp: {
-                        label: localizedMap["common.inactiveTime"],
+                        label: messages["common.inactiveTime"],
                         renderCell: function (event, timestamp, default_node, options) {
                             var node = domConstruct.create("div");
                             switch (event.eventState) {
                                 case "ACTIVE":
-                                    node.innerHTML = localizedMap["common.active"];
+                                    node.innerHTML = messages["common.active"];
                                     var img = domConstruct.create("img", null, node);
                                     img.src = "images/flag_white.png";
-                                    img.title = localizedMap["common.active"];
+                                    img.title = messages["common.active"];
                                     break;
                                 case "GONE":
                                     node.innerHTML = _formatTimeStamp(timestamp) + ' - ' + event.stateMessage;
@@ -154,10 +155,10 @@ define(["dojo/_base/declare",
                             var myLabel;
                             if (acknowledged) {
                                 myIconClass = 'scadaBrCantDoActionIcon';
-                                myLabel = localizedMap["events.acknowledged"];
+                                myLabel = messages["events.acknowledged"];
                             } else {
                                 myIconClass = 'scadaBrDoActionIcon';
-                                myLabel = localizedMap["events.acknowledge"];
+                                myLabel = messages["events.acknowledge"];
                             }
 
                             var btnAck = new Button({

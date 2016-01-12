@@ -29,6 +29,7 @@ import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.rt.link.PointLinkManager;
 import br.org.scadabr.util.Tuple;
 import br.org.scadabr.utils.TimePeriods;
+import br.org.scadabr.vo.datasource.PointLocatorFolderVO;
 import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.AuditEventKey;
@@ -226,11 +227,6 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
     }
 
     @Override
-    public Iterable<PointLocatorVO> getPointLocators(DataSourceVO<?> vo) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public String getExtendedPointName(int targetPointId) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -249,6 +245,11 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
 //TODO add auditevent for this...            AuditEventType.raiseDeletedEvent(AuditEventKey.DATA_POINT, dp);
         }
         return ltpf;
+    }
+
+    @Override
+    public PointLocatorFolderVO getPointFolderTree(DataSourceVO<?> vo) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     class DataPointRowMapper implements RowMapper<DataPointVO> {
