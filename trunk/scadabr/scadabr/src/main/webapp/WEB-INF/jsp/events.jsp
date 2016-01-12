@@ -47,25 +47,7 @@
         require(["scadabr/jsp/Events",
             "dojo/domReady!"
         ], function (Events) {
-            var localizedMap = {
-                <tag:localizedMapEntry key="common.alarmLevel" />,
-                <tag:localizedMapEntry key="common.alarmLevel.info" />,
-                <tag:localizedMapEntry key="common.alarmLevel.info.rtn" />,
-                <tag:localizedMapEntry key="common.alarmLevel.urgent" />,
-                <tag:localizedMapEntry key="common.alarmLevel.urgent.rtn" />,
-                <tag:localizedMapEntry key="common.alarmLevel.critical" />,
-                <tag:localizedMapEntry key="common.alarmLevel.critical.rtn" />,
-                <tag:localizedMapEntry key="common.alarmLevel.lifeSafety" />,
-                <tag:localizedMapEntry key="common.alarmLevel.lifeSafety.rtn" />,
-                <tag:localizedMapEntry key="common.time" />,
-                <tag:localizedMapEntry key="common.active" />,
-                <tag:localizedMapEntry key="common.inactiveTime" />,
-                <tag:localizedMapEntry key="common.nortn" />,
-                <tag:localizedMapEntry key="events.id" />,
-                <tag:localizedMapEntry key="events.acknowledged" />,
-                <tag:localizedMapEntry key="events.acknowledge" />
-        };      
-            events = new Events("pendingAlarms", localizedMap);
+            events = new Events("pendingAlarms");
             require(["dojo/ready"], function (ready) {
                 ready(function () {
                     events.wireEvents("btnAcknowledgeAll");

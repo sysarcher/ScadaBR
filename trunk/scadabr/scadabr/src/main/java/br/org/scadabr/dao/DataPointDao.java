@@ -5,6 +5,7 @@
  */
 package br.org.scadabr.dao;
 
+import br.org.scadabr.vo.datasource.PointLocatorFolderVO;
 import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.web.LazyTreeNode;
 import com.serotonin.mango.vo.DataPointVO;
@@ -60,7 +61,11 @@ public interface DataPointDao {
     
     LazyTreePointFolder deletePointFolder(int id);
     
-    @Deprecated
-    Iterable<PointLocatorVO> getPointLocators(DataSourceVO<?> vo);
+    /**
+     * Loads the complete Tree and returns the root node
+     * @param vo the DataSource
+     * @return root node of complete tree
+     */
+    PointLocatorFolderVO getPointFolderTree(DataSourceVO<?> vo);
 
 }

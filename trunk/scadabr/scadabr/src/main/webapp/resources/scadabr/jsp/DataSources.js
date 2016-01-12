@@ -7,9 +7,10 @@ define(["dojo/_base/declare",
     "dijit/MenuItem",
     "dijit/PopupMenuItem",
     "dojo/rpc/JsonService",
-    "dojo/ready"
-], function (declare, registry, Tree, JsonRest, Observable, Menu, MenuItem, PopupMenuItem, JsonService, ready) {
-
+    "dojo/ready",
+    "dojo/i18n!scadabr/nls/messages"
+], function (declare, registry, Tree, JsonRest, Observable, Menu, MenuItem, PopupMenuItem, JsonService, ready, messages) {
+   
     return declare(null, {
         store: null,
         tree: null,
@@ -154,7 +155,7 @@ define(["dojo/_base/declare",
             var _svc = this.svc;
             this.dsNodeMenu.addChild(new MenuItem({
                 iconClass: "dsStartIcon",
-                label: "Start DataSource",
+                label: messages["dataSource.action.start"],
                 onClick: function () {
                     _svc.startDataSource(_tree.lastFocused.item.id).then(function (result) {
                         _store.onChange(result);
@@ -165,7 +166,7 @@ define(["dojo/_base/declare",
             }));
             this.dsNodeMenu.addChild(new MenuItem({
                 iconClass: "dsStopIcon",
-                label: "Stop DataSource",
+                label: messages["dataSource.action.stop"],
                 onClick: function () {
                     _svc.stopDataSource(_tree.lastFocused.item.id).then(function (result) {
                         _store.onChange(result);
@@ -176,7 +177,7 @@ define(["dojo/_base/declare",
             }));
             this.dsNodeMenu.addChild(new MenuItem({
                 iconClass: "dsDeleteIcon",
-                label: "Delete DataSource",
+                label: messages["dataSource.action.delete"],
                 onClick: function () {
                     _svc.deleteDataSource(_tree.lastFocused.item.id).then(function (result) {
                         if (result) {
@@ -211,12 +212,12 @@ define(["dojo/_base/declare",
             }
             this.rootNodeMenu.addChild(new PopupMenuItem({
                 iconClass: "dsAddIcon",
-                label: "Add DataSource",
+                label: messages["dataSource.action.add"],
                 popup: dsAddMenu
             }));
             this.plfNodeMenu.addChild(new MenuItem({
                 iconClass: "dijitIconAdd",
-                label: "Add PointLocator",
+                label: messages["pointLocator.action.add"],
                 onClick: function () {
                     _svc.addPointLocator(_tree.lastFocused.item.dsId, _tree.lastFocused.folderId).then(function (result) {
                         _store.getChildren(_tree.lastFocused.item, function (children) {
@@ -230,12 +231,12 @@ define(["dojo/_base/declare",
                 }
             }));
             this.treeMenu.addChild(new MenuItem({
-                label: "Delete DataSource",
+                label: messages["dataSource.action.delete"],
                 disabled: true
             }));
             this.plNodeMenu.addChild(new MenuItem({
                 iconClass: "plStartIcon",
-                label: "Start PointLocator",
+                label: messages["pointLocator.action.start"],
                 onClick: function () {
                     _svc.startPointLocator(_tree.lastFocused.item.plId).then(function (result) {
                         _store.onChange(result);
@@ -246,7 +247,7 @@ define(["dojo/_base/declare",
             }));
             this.plNodeMenu.addChild(new MenuItem({
                 iconClass: "plStopIcon",
-                label: "Stop PointLocator",
+                label: messages["pointLocator.action.stop"],
                 onClick: function () {
                     _svc.stopPointLocator(_tree.lastFocused.item.plId).then(function (result) {
                         _store.onChange(result);

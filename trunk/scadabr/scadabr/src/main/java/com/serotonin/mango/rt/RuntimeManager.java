@@ -216,13 +216,14 @@ public class RuntimeManager {
             runningDataSources.add(dataSource);
 
             // Add the enabled points to the data source.
-            for (PointLocatorVO pointLocatorVO : dataPointDao.getPointLocators(vo)) {
-                if (pointLocatorVO.isEnabled()) {
+           // dataPointDao.loadPointFolders(vo);
+           // startPointLocator(vo)
+            /*    if (pointLocatorVO.isEnabled()) {
                     startPointLocator(pointLocatorVO);
                 } else {
                     dataSource.pointLocatorDisabled(pointLocatorVO);
                 }
-            }
+            */
 
             // Initialize and thus start the runtime version of the data source.
             dataSource.initialize();
