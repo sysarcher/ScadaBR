@@ -18,22 +18,17 @@
  */
 package br.org.scadabr.web.mvc.controller.dataPoints;
 
-import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.logger.LogUtils;
-import br.org.scadabr.vo.NumberDataPointVO;
-import br.org.scadabr.web.mvc.AjaxFormPostResponse;
+import br.org.scadabr.vo.datapoints.NumberDataPointVO;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.DataPointVO;
 import java.text.MessageFormat;
 import java.util.Calendar;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
-import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
-import org.springframework.validation.BindException;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -42,7 +37,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/dataPointDetails/")
@@ -54,9 +48,6 @@ class DetailsControllerDP {
     @Inject
     private Validator validator;
     
-    @Inject
-    private DataPointDao dataPointDao;
-
     @Inject
     private RuntimeManager runtimeManager;
 
@@ -70,6 +61,7 @@ class DetailsControllerDP {
         return "dataPointDetails/" + dpvo.getClass().getSimpleName();
     }
 
+    /*
     @RequestMapping(value = "editProperties", params = "id", method = RequestMethod.POST)
     protected @ResponseBody AjaxFormPostResponse<DataPointVO> postEditProperties(@ModelAttribute("dataPoint") DataPointVO dataPoint) throws BindException {
         LOG.log(Level.SEVERE, "postEditProperties called {0}", dataPoint);
@@ -79,11 +71,11 @@ class DetailsControllerDP {
         }
         return new AjaxFormPostResponse<>(dataPoint, constraintViolations);
     }
-
+*/
     @ModelAttribute
     protected void getModel(@RequestParam int id, Model model) {
         LOG.log(Level.SEVERE, "getModel called {0}", id);
-        final DataPointVO dataPointVO = dataPointDao.getDataPoint(id);
+        final DataPointVO dataPointVO = runtimeManager.getVo(id, DataPointVO.class);
         model.addAttribute("dataPoint", dataPointVO);
     }
 

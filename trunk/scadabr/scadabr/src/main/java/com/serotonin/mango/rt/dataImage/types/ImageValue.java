@@ -49,11 +49,11 @@ public class ImageValue extends MangoValue {
     public static final int TYPE_JPG = 1;
     private static final String[] TYPES = {"", "jpg"};
 
-    private long id = ScadaBrConstants.NEW_ID;
+    private Long id;
     private int type;
     private byte[] data;
 
-    public ImageValue(long id, int type) {
+    public ImageValue(Long id, int type) {
         this.id = id;
         this.type = type;
     }
@@ -117,7 +117,7 @@ public class ImageValue extends MangoValue {
     }
 
     public boolean isNew() {
-        return id == ScadaBrConstants.NEW_ID;
+        return id == null;
     }
 
     public Image getImage() {

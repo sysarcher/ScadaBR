@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.org.scadabr.vo;
+package br.org.scadabr.vo.datapoints;
 
-import br.org.scadabr.json.dao.JsonPersistence;
+import br.org.scadabr.json.ColorDeserializer;
+import br.org.scadabr.json.ColorSerializer;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.serotonin.mango.rt.dataImage.NumberValueTime;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.vo.DataPointVO;
@@ -21,12 +23,12 @@ import java.util.List;
 /**
  *
  * @author aploese
+ * @param <T>
+ * @param <P>
  */
-public abstract class NumberDataPointVO<T extends NumberValueTime> extends DataPointVO<T> {
+public abstract class NumberDataPointVO<T extends NumberDataPointVO<T, P>, P extends NumberValueTime> extends DataPointVO<T, P> {
 
-    @JsonView(JsonPersistence.class)
     private TimePeriods chartTimePeriods = TimePeriods.DAYS;
-    @JsonView(JsonPersistence.class)
     private int numberOfChartPeriods = 1;
     
     private Color chartColor = Color.BLACK;
@@ -57,9 +59,9 @@ public abstract class NumberDataPointVO<T extends NumberValueTime> extends DataP
     }
 
     @Override
-    public void addPropertyChanges(List<LocalizableMessage> list, DataPointVO<T> from) {
-        super.addPropertyChanges(list, from);
-        final NumberDataPointVO<T> numberDp = (NumberDataPointVO<T>) from;
+    public void addPropertyChanges(List<LocalizableMessage> list, T from) {
+        final NumberDataPointVO<T, P> numberDp = from;
+        super.addPropertyChanges(list, numberDp);
 
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.chart.timePeriods", numberDp.chartTimePeriods.getPeriodDescription(numberOfChartPeriods), chartTimePeriods.getPeriodDescription(numberOfChartPeriods));
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.chart.color", numberDp.chartColor, chartColor);
@@ -107,6 +109,7 @@ public abstract class NumberDataPointVO<T extends NumberValueTime> extends DataP
     /**
      * @return the chartColor
      */
+    @JsonSerialize(using = ColorSerializer.class)
     public Color getChartColor() {
         return chartColor;
     }
@@ -114,6 +117,7 @@ public abstract class NumberDataPointVO<T extends NumberValueTime> extends DataP
     /**
      * @param chartColor the chartColor to set
      */
+    @JsonDeserialize(using = ColorDeserializer.class)
     public void setChartColor(Color chartColor) {
         this.chartColor = chartColor;
     }

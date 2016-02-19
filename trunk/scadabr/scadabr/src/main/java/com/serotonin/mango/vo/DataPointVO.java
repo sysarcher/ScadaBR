@@ -19,34 +19,34 @@
 package com.serotonin.mango.vo;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.ScadaBrConstants;
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.dao.DataPointDao;
-import br.org.scadabr.json.dao.JsonPersistence;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.vo.AbstractVO;
 import br.org.scadabr.vo.IntervalLoggingTypes;
 import br.org.scadabr.vo.LoggingTypes;
+import br.org.scadabr.vo.NodeType;
+import br.org.scadabr.vo.datapoints.DataPointNodeVO;
 import br.org.scadabr.vo.datasource.PointLocatorVO;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.util.ChangeComparable;
 import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-public abstract class DataPointVO<T extends PointValueTime> implements Serializable, Cloneable, ChangeComparable<DataPointVO<T>> {
+public abstract class DataPointVO<T extends DataPointVO<T, P>, P extends PointValueTime> 
+        extends AbstractVO<T>
+        implements DataPointNodeVO<T>, Serializable, Cloneable {
 
     public static DataPointVO create(DataType dataType) {
         switch (dataType) {
@@ -56,11 +56,26 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
                 throw new ImplementMeException();
         }
     }
+    
+    public static Class<? extends DataPointVO> getVoClass(String dataType) {
+        return getVoClass(DataType.valueOf(dataType));
+    }
+    
+    public static Class<? extends DataPointVO> getVoClass(DataType dataType) {
+        switch (dataType) {
+            case DOUBLE:
+                return DoubleDataPointVO.class;
+            default:
+                //TODO implement proper!
+                return DoubleDataPointVO.class;
+        }
+    }
+    
 
     public DataPointVO() {
     }
-    
-    public abstract DataPointRT<T> createRT(PointLocatorVO<T> pointLocatorVO);
+
+    public abstract DataPointRT<T, P> createRT(PointLocatorVO<P> pointLocatorVO);
 
     /**
      * @return the valuePattern
@@ -72,7 +87,7 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
     /**
      * @return the valuePattern for the specific PointValueTime
      */
-    public String getValuePattern(T pvt) {
+    public String getValuePattern(P pvt) {
         return valuePattern;
     }
 
@@ -95,7 +110,7 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
      * @return the valueAndUnitPattern for the specific PointValueTime. The
      * first param ('{0}') is the value, the second ('{1}') is the unit
      */
-    public String getValueAndUnitPattern(T pvt) {
+    public String getValueAndUnitPattern(P pvt) {
         return valueAndUnitPattern;
     }
 
@@ -141,9 +156,6 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
     @Configurable
     public static class DataPointVoValidator implements Validator {
 
-        @Autowired
-        private DataPointDao dataPointDao;
-
         @Override
         public boolean supports(Class<?> clazz) {
             return DataPointVO.class.isAssignableFrom(clazz);
@@ -152,17 +164,10 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
         @Override
         public void validate(Object target, Errors errors) {
             final DataPointVO vo = (DataPointVO) target;
-            if (vo.xid.isEmpty()) {
-                errors.rejectValue("xid", "validate.required");
-            } else if (vo.xid.length() > 50) {
-                errors.rejectValue("xid", "validate.notLongerThan", new Object[]{50}, "validate.notLongerThan");
-            } else if (!dataPointDao.isXidUnique(vo.xid, vo.id)) {
-                errors.rejectValue("xid", "validate.xidUsed");
-            }
 
-            if (vo.name.isEmpty()) {
-                errors.rejectValue("name", "validate.required");
-            }
+//TODO            if (vo.name.isEmpty()) {
+//                errors.rejectValue("name", "validate.required");
+//            }
 
             if (vo.intervalLoggingPeriod <= 0) {
                 errors.rejectValue("intervalLoggingPeriod", "validate.greaterThanZero");
@@ -176,35 +181,25 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
 
     }
 
-    public static final String XID_PREFIX = "DP_";
-
     public abstract DataType getDataType();
+    
+    public void setDataType(DataType dataType) {
+        if (!getDataType().equals(dataType)) {
+            throw new ValidationException("DataType mismatch");
+        }
+    }
 
     public static final Set<TimePeriods> PURGE_TYPES = EnumSet.of(TimePeriods.DAYS, TimePeriods.WEEKS, TimePeriods.MONTHS, TimePeriods.YEARS);
-
-    @JsonIgnore
-    public boolean isNew() {
-        return id == ScadaBrConstants.NEW_ID;
-    }
 
     //
     //
     // Properties
     //
-    private int id = ScadaBrConstants.NEW_ID;
-    private String xid;
 
-    private String name = getClass().getSimpleName();
-
-    private int pointFolderId;
-    @JsonView(JsonPersistence.class)
     private LoggingTypes loggingType = LoggingTypes.ALL;
-    @JsonView(JsonPersistence.class)
     private TimePeriods intervalLoggingPeriodType = TimePeriods.MINUTES;
 
-    @JsonView(JsonPersistence.class)
     private int intervalLoggingPeriod = 15;
-    @JsonView(JsonPersistence.class)
     private IntervalLoggingTypes intervalLoggingType = IntervalLoggingTypes.INSTANT;
 
     private TimePeriods _purgeType = TimePeriods.YEARS;
@@ -229,7 +224,7 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
      * values in this case do in fact equal each other).
      */
     //TODO use null ...
-    private T lastValue;
+    private P lastValue;
 
     public DataPointVO(String valuePattern, String valueAndUnitPattern) {
         this.valuePattern = valuePattern;
@@ -240,11 +235,11 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
         lastValue = null;
     }
 
-    public PointValueTime lastValue() {
+    public P lastValue() {
         return lastValue;
     }
 
-    public void updateLastValue(T pvt) {
+    public void updateLastValue(P pvt) {
         lastValue = pvt;
     }
 
@@ -269,8 +264,7 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
 
     @Override
     public void addProperties(List<LocalizableMessage> list) {
-        AuditEventType.addPropertyMessage(list, "common.xid", xid);
-        AuditEventType.addPropertyMessage(list, "dsEdit.points.name", name);
+//TODO        AuditEventType.addPropertyMessage(list, "dsEdit.points.name", name);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.type", loggingType);
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.period", intervalLoggingPeriodType.getPeriodDescription(intervalLoggingPeriod));
         AuditEventType.addPropertyMessage(list, "pointEdit.logging.valueType", intervalLoggingType);
@@ -280,10 +274,9 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
         AuditEventType.addPropertyMessage(list, "pointEdit.valueAndUnitPattern", valueAndUnitPattern);
     }
 
-    @Override
-    public void addPropertyChanges(List<LocalizableMessage> list, DataPointVO<T> from) {
-        AuditEventType.maybeAddPropertyChangeMessage(list, "common.xid", from.xid, xid);
-        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.points.name", from.name, name);
+//TODO    @Override
+    public void addPropertyChanges(List<LocalizableMessage> list, DataPointVO<T, P> from) {
+//TODO        AuditEventType.maybeAddPropertyChangeMessage(list, "dsEdit.points.name", from.name, name);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.type", from.loggingType, loggingType);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.logging.period",
                 from.intervalLoggingPeriodType.getPeriod(from.intervalLoggingPeriod),
@@ -294,39 +287,6 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.unit", from.unit, unit);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.valuePattern", from.valuePattern, valuePattern);
         AuditEventType.maybeAddPropertyChangeMessage(list, "pointEdit.valueAndUnitPattern", from.valuePattern, valuePattern);
-    }
-
-    public int getPointFolderId() {
-        return pointFolderId;
-    }
-
-    public void setPointFolderId(int pointFolderId) {
-        this.pointFolderId = pointFolderId;
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getXid() {
-        return xid;
-    }
-
-    public void setXid(String xid) {
-        this.xid = xid;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public LoggingTypes getLoggingType() {
@@ -403,14 +363,13 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
 
     @Override
     public String toString() {
-        return "DataPointVO{" + "id=" + id + ", xid=" + xid + ", name=" + name + ", pointFolderId=" + pointFolderId + ", loggingType=" + loggingType + ", intervalLoggingPeriodType=" + intervalLoggingPeriodType + ", intervalLoggingPeriod=" + intervalLoggingPeriod + ", intervalLoggingType=" + intervalLoggingType + ", _purgeType=" + _purgeType + ", purgePeriod=" + purgePeriod + ", eventDetectors=" + eventDetectors + ", comments=" + comments + ", pointLocatorId=" + pointLocatorId + ", valuePattern=" + valuePattern + ", valueAndUnitPattern=" + valueAndUnitPattern + ", unit=" + unit + ", lastValue=" + lastValue + ", settable=" + settable + '}';
+        return "DataPointVO{" + "id=" + getId() + ", name=" + getName() + ", loggingType=" + loggingType + ", intervalLoggingPeriodType=" + intervalLoggingPeriodType + ", intervalLoggingPeriod=" + intervalLoggingPeriod + ", intervalLoggingType=" + intervalLoggingType + ", _purgeType=" + _purgeType + ", purgePeriod=" + purgePeriod + ", eventDetectors=" + eventDetectors + ", comments=" + comments + ", pointLocatorId=" + pointLocatorId + ", valuePattern=" + valuePattern + ", valueAndUnitPattern=" + valueAndUnitPattern + ", unit=" + unit + ", lastValue=" + lastValue + ", settable=" + settable + '}';
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 13 * hash + Objects.hashCode(this.name);
-        hash = 13 * hash + this.pointFolderId;
+        hash = 13 * hash + Objects.hashCode(this.getName());
         return hash;
     }
 
@@ -422,14 +381,16 @@ public abstract class DataPointVO<T extends PointValueTime> implements Serializa
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final DataPointVO<?> other = (DataPointVO<?>) obj;
-        if (!Objects.equals(this.name, other.name)) {
-            return false;
-        }
-        if (this.pointFolderId != other.pointFolderId) {
+        final DataPointVO<?, ?> other = (DataPointVO<?, ?>) obj;
+        if (!Objects.equals(this.getName(), other.getName())) {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public NodeType getNodeType() {
+        return NodeType.DATA_POINT;
     }
 
 }

@@ -29,19 +29,16 @@
         <script type="text/javascript">
 
             require([
-                    "scadabr/jsp/DataPoints",
-                    "dojo/domReady!"
+                "scadabr/jsp/DataPoints",
+                "dojo/domReady!"
             ], function (DataPoints) {
-            var dataTypes = [
+                var dataTypes = [
             <c:forEach var="dataType" items="${dataTypes}" varStatus="loopStatus">
-            {key:'${dataType.name}',
-                    label: '<fmt:message key="${dataType.i18nKey}"/>'}${loopStatus.last ? '' : ','}
+                {key:'${dataType.name}',
+                        label: '<fmt:message key="${dataType.i18nKey}"/>'}${loopStatus.last ? '' : ','}
             </c:forEach>
-            ];
-                    var _dataPoints = new DataPoints("dataPointTree", "detailViewTabContainer", dataTypes, {
-                    'common.edit.add': "Add...",
-                            'common.edit.reanme': "Rename..."
-                    });
+                ];
+                        var _dataPoints = new DataPoints("dataPointTree", "detailViewTabContainer", dataTypes);
             });
 
         </script>

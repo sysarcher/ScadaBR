@@ -35,7 +35,7 @@ public class DummyDataSource extends DataSourceVO<DummyDataSource> {
     }
 
     @Override
-    public DataSourceRT<DummyDataSource> createDataSourceRT() {
+    public DataSourceRT<DummyDataSource> createRT() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

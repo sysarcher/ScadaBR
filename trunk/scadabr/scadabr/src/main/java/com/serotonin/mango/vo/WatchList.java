@@ -86,9 +86,9 @@ public class WatchList implements Iterable<DataPointVO> {
 
     public static final String XID_PREFIX = "WL_";
 
-    private int id = ScadaBrConstants.NEW_ID;
+    private Integer id;
     private String xid;
-    private int userId;
+    private Integer userId;
 
     private String name;
     private final List<DataPointVO> pointList = new CopyOnWriteArrayList<>();
@@ -140,11 +140,11 @@ public class WatchList implements Iterable<DataPointVO> {
         return pointList;
     }
 
-    public int getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
@@ -155,6 +155,6 @@ public class WatchList implements Iterable<DataPointVO> {
 
     @JsonIgnore
     public boolean isNew() {
-        return id == ScadaBrConstants.NEW_ID;
+        return id == null;
     }
 }

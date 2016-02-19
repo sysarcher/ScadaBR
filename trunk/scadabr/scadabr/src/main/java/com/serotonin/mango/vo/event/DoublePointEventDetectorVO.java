@@ -48,7 +48,7 @@ public class DoublePointEventDetectorVO implements EventDetectorVO, Cloneable, C
 
     public static final String XID_PREFIX = "PED_";
 
-    private int id;
+    private Integer id;
     private String xid;
 
     private String alias;
@@ -252,11 +252,11 @@ public class DoublePointEventDetectorVO implements EventDetectorVO, Cloneable, C
     }
 
     @Override
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

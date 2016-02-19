@@ -74,7 +74,7 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO> {
 
         UPDATE(1, "pointLinks.event.update"),
         CHANGE(2, "pointLinks.event.change");
-        private final int id;
+        private final Integer id;
         private final String i18nKey;
 
         private EventType(int id, String i18nKey) {
@@ -82,7 +82,7 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO> {
             this.i18nKey = i18nKey;
         }
 
-        public int getId() {
+        public Integer getId() {
             return id;
         }
 
@@ -113,7 +113,7 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO> {
         }
     }
 
-    private int id = ScadaBrConstants.NEW_ID;
+    private Integer id;
     private String xid;
     private int sourcePointId;
     private int targetPointId;
@@ -125,15 +125,15 @@ public class PointLinkVO implements ChangeComparable<PointLinkVO> {
 
     @JsonIgnore
     public boolean isNew() {
-        return id == ScadaBrConstants.NEW_ID;
+        return id == null;
     }
 
     @Override
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

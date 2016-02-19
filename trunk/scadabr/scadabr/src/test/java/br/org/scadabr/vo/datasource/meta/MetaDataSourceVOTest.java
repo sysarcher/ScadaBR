@@ -6,7 +6,9 @@
 package br.org.scadabr.vo.datasource.meta;
 
 import br.org.scadabr.dao.DataSourceDao;
-import br.org.scadabr.json.dao.JsonMapperFactory;
+import br.org.scadabr.util.ScadaBrObjectMapper;
+import br.org.scadabr.vo.VO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,7 +40,7 @@ public class MetaDataSourceVOTest {
 
         private final Validator validator = new org.springframework.validation.beanvalidation.LocalValidatorFactoryBean();
         private final DataSourceDao dataSourceDao = EasyMock.createMock(DataSourceDao.class);
-        private final JsonMapperFactory jsonMapperFactory = new JsonMapperFactory();
+        private final ScadaBrObjectMapper scadaBrObjectMapper = new ScadaBrObjectMapper();
         
         @Bean
         public Validator getValidator() {
@@ -51,8 +53,8 @@ public class MetaDataSourceVOTest {
         }
         
         @Bean
-        public JsonMapperFactory getJsonMapperFactory() {
-            return jsonMapperFactory;
+        public ScadaBrObjectMapper getScadaBrObjectMapper() {
+            return scadaBrObjectMapper;
         }
 
     }
@@ -65,7 +67,7 @@ public class MetaDataSourceVOTest {
     @Inject
     private DataSourceDao dataSourceDao;
     @Inject
-    private JsonMapperFactory jsonMapperFactory;
+    private ScadaBrObjectMapper scadaBrObjectMapper;
             
 
     @Before
@@ -75,12 +77,13 @@ public class MetaDataSourceVOTest {
 
     
     @Test
-    public void testJsonPersistence() {
+    public void testJsonPersistence() throws Exception {
         MetaDataSourceVO sourceVO = new MetaDataSourceVO();
         sourceVO.setName("Test-" + sourceVO.getName());
-        String s = jsonMapperFactory.writeValueAsString(sourceVO);
-        assertEquals("{}", s);
-        MetaDataSourceVO sourceVO1 = (MetaDataSourceVO)jsonMapperFactory.read(MetaDataSourceVO.class.getName(), s);
+        String s = scadaBrObjectMapper.writeValueAsString(sourceVO);
+        assertEquals("{\"scadaBrType\":\"DATA_SOURCE.MetaDataSource\",\"id\":null,\"xid\":null,\"name\":\"Test-MetaDataSourceVO\",\"enabled\":false,\"dataSourceTypeKey\":\"META\",\"nodeType\":\"DATA_SOURCE\"}", s);
+        scadaBrObjectMapper.registerSubtypes(MetaDataSourceVO.class);
+        MetaDataSourceVO sourceVO1 = (MetaDataSourceVO)scadaBrObjectMapper.readValue(s, VO.class);
     }
     
     

@@ -120,7 +120,7 @@ public class HttpReceiverDataSourceVO extends DataSourceVO<HttpReceiverDataSourc
     }
 
     @Override
-    public DataSourceRT createDataSourceRT() {
+    public HttpReceiverDataSourceRT createRT() {
         return new HttpReceiverDataSourceRT(this);
     }
 

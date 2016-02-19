@@ -6,12 +6,13 @@
 package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.ScadaBrVersionBean;
-import br.org.scadabr.dao.DataPointDao;
+import br.org.scadabr.dao.NodeEdgeDao;
 import br.org.scadabr.dao.PointLinkDao;
 import br.org.scadabr.dao.PointValueDao;
-import br.org.scadabr.json.dao.JsonMapperFactory;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.rt.link.PointLinkManager;
+import br.org.scadabr.util.ScadaBrObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serotonin.mango.db.DatabaseAccessFactory;
 import com.serotonin.mango.rt.dataImage.DoubleValueTime;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
@@ -42,7 +43,7 @@ public class PointValuesDaoTest {
         
         private final BatchWriteBehind batchWriteBehind =  new BatchWriteBehind();
         
-        private final DataPointDao dataPointDao = new DataPointDaoImpl();
+        private final NodeEdgeDao nodeEdgeDao = new NodeEdgeDaoImpl();
         
         private final SchedulerPool schedulerPool = new SchedulerPool();
 
@@ -50,7 +51,7 @@ public class PointValuesDaoTest {
                 
         private final ScadaBrVersionBean ScadaBrVersionBean = new ScadaBrVersionBean();
         
-        private final JsonMapperFactory jsonMapperFactory = new JsonMapperFactory();
+        private final ScadaBrObjectMapper scadaBrObjectMapper = new ScadaBrObjectMapper();
 
         /**
          * No tests with PointLinkManager so return null.
@@ -86,8 +87,8 @@ public class PointValuesDaoTest {
         }
         
         @Bean
-        public DataPointDao getDataPointDao() {
-            return dataPointDao;
+        public NodeEdgeDao getNodeEdgeDao() {
+            return nodeEdgeDao;
         }
         
         @Bean
@@ -100,9 +101,9 @@ public class PointValuesDaoTest {
             return ScadaBrVersionBean;
         }
 
-        @Bean
-        public JsonMapperFactory getJsonMapperFactory() {
-            return jsonMapperFactory;
+        @Bean 
+        public ScadaBrObjectMapper getScadaBrObjectMapper() {
+            return scadaBrObjectMapper;
         }
 
     }
@@ -111,7 +112,7 @@ public class PointValuesDaoTest {
     }
 
     @Inject
-    private DataPointDao dataPointDao;
+    private NodeEdgeDao nodeEdgeDao;
 
     @Inject
     private PointValueDao pointValueDao;
@@ -125,9 +126,9 @@ public class PointValuesDaoTest {
      */
     @Test
     public void testDoubleValues() {
-        
         DataPointVO dpvo = new DoubleDataPointVO();
-        dataPointDao.saveDataPoint(dpvo);
+        dpvo.setName("DoubleDataPoint");
+        nodeEdgeDao.saveNode(dpvo);
         
         long ts1 = System.currentTimeMillis();
         

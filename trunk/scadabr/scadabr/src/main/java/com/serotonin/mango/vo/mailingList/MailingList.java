@@ -33,7 +33,7 @@ public class MailingList extends EmailRecipient {
 
     public static final String XID_PREFIX = "ML_";
 
-    private int id = ScadaBrConstants.NEW_ID;
+    private Integer id;
     private String xid;
     
     @NotNull(message = "mailingLists.validate.nameRequired")
@@ -66,11 +66,11 @@ public class MailingList extends EmailRecipient {
         return id;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -136,6 +136,6 @@ public class MailingList extends EmailRecipient {
 
     @JsonIgnore
     public boolean isNew() {
-        return id == ScadaBrConstants.NEW_ID;
+        return id == null;
     }
 }

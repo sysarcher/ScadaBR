@@ -102,7 +102,7 @@ abstract public class PollingDataSource<T extends DataSourceVO<T>> extends DataS
     }
 
     public boolean overrunDetected(long lastExecutionTime, long thisExecutionTime) {
-            LOG.log(Level.WARNING, "{0}: poll at {1} aborted because a previous poll started at {2} is still running", new Object[]{vo.getName(), new Date(thisExecutionTime), new Date(lastExecutionTime)});
+            LOG.log(Level.WARNING, "{0}: poll at {1} aborted because a previous poll started at {2} is still running", new Object[]{name, new Date(thisExecutionTime), new Date(lastExecutionTime)});
             return false;
     }
     

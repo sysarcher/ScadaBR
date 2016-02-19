@@ -10,6 +10,4 @@ package br.org.scadabr;
  * @author aploese
  */
 public interface ScadaBrConstants {
-    public final static int NEW_ID = -1;
-    
 }

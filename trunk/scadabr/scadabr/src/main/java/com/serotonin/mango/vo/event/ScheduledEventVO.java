@@ -115,10 +115,10 @@ public class ScheduledEventVO implements EventDetectorVO, ChangeComparable<Sched
 
     @JsonIgnore
     public boolean isNew() {
-        return id == ScadaBrConstants.NEW_ID;
+        return id == null;
     }
 
-    private int id = ScadaBrConstants.NEW_ID;
+    private Integer id;
     private String xid;
 
     private String alias;
@@ -338,11 +338,11 @@ public class ScheduledEventVO implements EventDetectorVO, ChangeComparable<Sched
     }
 
     @Override
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

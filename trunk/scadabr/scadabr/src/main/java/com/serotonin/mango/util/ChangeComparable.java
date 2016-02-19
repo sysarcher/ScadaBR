@@ -24,10 +24,11 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 
 /**
  * @author Matthew Lohbihler
+ * @param <T>
  */
 public interface ChangeComparable<T> {
 
-    int getId();
+    Integer getId();
 
     String getTypeKey();
 

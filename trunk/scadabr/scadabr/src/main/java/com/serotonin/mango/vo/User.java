@@ -18,7 +18,6 @@
  */
 package com.serotonin.mango.vo;
 
-import br.org.scadabr.ScadaBrConstants;
 import java.util.List;
 
 import br.org.scadabr.ShouldNeverHappenException;
@@ -60,7 +59,7 @@ public class User implements Serializable, SetPointSource {
             if (vo.email.isEmpty()) {
                 errors.rejectValue("email", "validate.required");
             }
-            if (vo.id == ScadaBrConstants.NEW_ID && vo.password.isEmpty()) {
+            if (vo.isNew() && vo.password.isEmpty()) {
                 errors.rejectValue("password", "validate.required");
             }
 
@@ -78,7 +77,7 @@ public class User implements Serializable, SetPointSource {
 
     }
 
-    private int id = ScadaBrConstants.NEW_ID;
+    private Integer id;
 
     private String username;
 
@@ -282,7 +281,7 @@ public class User implements Serializable, SetPointSource {
 
     @JsonIgnore
     public boolean isNew() {
-        return id == ScadaBrConstants.NEW_ID;
+        return id == null;
     }
 
 }

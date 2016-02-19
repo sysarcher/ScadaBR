@@ -29,22 +29,25 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.util.ChangeComparable;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
+import br.org.scadabr.vo.NodeType;
+import br.org.scadabr.vo.VO;
 import br.org.scadabr.vo.datasource.UniqueDsXid;
 import br.org.scadabr.vo.event.type.DataSourceEventKey;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.serotonin.mango.rt.event.type.DataSourceEventType;
 import java.util.Set;
+import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @UniqueDsXid
-abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
+abstract public class DataSourceVO<T extends DataSourceVO<T>> implements VO<T>,
         Serializable, Cloneable, ChangeComparable<T> {
 
     private void fillEventTypeMap() {
         this.eventTypeMap = (Map<DataSourceEventKey, DataSourceEventType>) createEventKeyMap();
         for (DataSourceEventKey key : createEventKeySet()) {
-            eventTypeMap.put(key, new DataSourceEventType(id, key, key.getDefaultAlarmLevel()));
+//TODO            eventTypeMap.put(key, new DataSourceEventType(id, key, key.getDefaultAlarmLevel()));
         }
     }
 
@@ -53,12 +56,20 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
     private Map<DataSourceEventKey, DataSourceEventType> eventTypeMap;
 
     abstract public String getDataSourceTypeKey();
+    
+    public void setDataSourceTypeKey(String dataSourceTypeKey) {
+        if (!getDataSourceTypeKey().equals(dataSourceTypeKey)) {
+            throw new ValidationException("dataSourceTypeKey mismatch");
+        }
+    }
 
+    @JsonIgnore
     public abstract int getDataSourceTypeId();
 
     abstract public LocalizableMessage getConnectionDescription();
 
-    abstract public DataSourceRT<T> createDataSourceRT();
+    @Override
+    abstract public DataSourceRT<T> createRT();
 
     public DataSourceVO() {
         fillEventTypeMap();
@@ -66,10 +77,10 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
 
     @JsonIgnore
     public boolean isNew() {
-        return id == ScadaBrConstants.NEW_ID;
+        return id == null;
     }
 
-    private int id = ScadaBrConstants.NEW_ID;
+    private Integer id;
     @NotNull
     @Size(min = 1, max = 50)
     private String xid;
@@ -89,12 +100,12 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
     }
 
     @Override
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
     @Deprecated
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
         // replace id with righth id...
         for (DataSourceEventKey key : eventTypeMap.keySet()) {
@@ -127,11 +138,18 @@ abstract public class DataSourceVO<T extends DataSourceVO<T>> implements
         }
     }
 
+    @JsonIgnore
     @Override
     //TODO is tis everytime an audit event ???
     public String getTypeKey() {
         return "event.audit.dataSource";
     }
+
+    @Override
+    public NodeType getNodeType() {
+        return NodeType.DATA_SOURCE;
+    }
+
 
     @Override
     public final void addProperties(List<LocalizableMessage> list) {

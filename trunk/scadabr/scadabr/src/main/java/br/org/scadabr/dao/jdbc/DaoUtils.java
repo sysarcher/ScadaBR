@@ -1,4 +1,4 @@
-package br.org.scadabr.db;
+package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.logger.LogUtils;
 import com.serotonin.mango.db.DatabaseAccessFactory;

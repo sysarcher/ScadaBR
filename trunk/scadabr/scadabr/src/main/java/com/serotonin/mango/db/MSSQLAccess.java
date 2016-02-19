@@ -41,21 +41,29 @@ public class MSSQLAccess extends BasePooledAccess {
     }
 
     @Override
-    protected boolean newDatabaseCheck(JdbcTemplate ejt) {
+    protected boolean checkDataBaseExists(JdbcTemplate ejt) {
         try {
             ejt.execute("select count(*) from users");
+            return true;
         } catch (DataAccessException e) {
             if (e.getCause() instanceof SQLException) {
                 SQLException se = (SQLException) e.getCause();
+                // This state means a missing table. Assume that the schema needs to be created.
                 if ("S0002".equals(se.getSQLState())) {
-                    // This state means a missing table. Assume that the schema needs to be created.
-                    createSchema("/WEB-INF/db/createTables-mssql.sql");
-                    return true;
+                    return false;
+                } else {
+                    throw e;
                 }
+            } else {
+                throw e;
             }
-            throw e;
         }
-        return false;
+    }
+
+    //TODO No use of ejb here .... fix it ????
+    @Override
+    protected void createDataBase(JdbcTemplate ejt) {
+        createSchema("/WEB-INF/db/createTables-mssql.sql");
     }
 
     @Override

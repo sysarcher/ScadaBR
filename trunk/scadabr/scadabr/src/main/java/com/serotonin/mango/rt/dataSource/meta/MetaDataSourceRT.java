@@ -18,6 +18,8 @@
  */
 package com.serotonin.mango.rt.dataSource.meta;
 
+import br.org.scadabr.rt.RT;
+import br.org.scadabr.rt.WrongEdgeTypeException;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
@@ -25,6 +27,8 @@ import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.EdgeIterator;
+import br.org.scadabr.vo.EdgeType;
 import br.org.scadabr.vo.datasource.meta.MetaDataSourceEventKey;
 import com.serotonin.mango.vo.DataPointVO;
 import java.util.HashSet;
@@ -78,7 +82,7 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
         if (contextPointDisabledEventActive != (problemPoint != null)) {
             if (contextPointDisabledEventActive) // A context point has been terminated, was never enabled, or not longer exists.
             {
-                raiseAlarm(MetaDataSourceEventKey.CONTEXT_POINT_DISABLED, "event.meta.pointUnavailable", problemPoint.getVo().getName());
+                raiseAlarm(MetaDataSourceEventKey.CONTEXT_POINT_DISABLED, "event.meta.pointUnavailable", problemPoint.getName());
             } else // Everything is good
             {
                 clearAlarm(MetaDataSourceEventKey.CONTEXT_POINT_DISABLED);
@@ -95,7 +99,7 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
         }
         if (!pointsWithErrors.contains(dataPoint.getId())) {
             pointsWithErrors.add(dataPoint.getId());
-            fireEvent(MetaDataSourceEventKey.SCRIPT_ERROR, runtime, "event.meta.scriptError", dataPoint.getVo().getName(), msg);
+            fireEvent(MetaDataSourceEventKey.SCRIPT_ERROR, runtime, "event.meta.scriptError", dataPoint.getName(), msg);
         }
     }
 
@@ -128,7 +132,40 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
         }
         if (!pointsWithErrors.contains(dataPoint.getId())) {
             pointsWithErrors.add(dataPoint.getId());
-        fireEvent(MetaDataSourceEventKey.RESULT_TYPE_ERROR, runtime, "event.meta.typeError", dataPoint.getVo().getName(), message);
+        fireEvent(MetaDataSourceEventKey.RESULT_TYPE_ERROR, runtime, "event.meta.typeError", dataPoint.getName(), message);
         }
     }
+
+    @Override
+    public void wireEdgeAsSrc(RT<?> dest, EdgeType edgeType) throws WrongEdgeTypeException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void wireEdgeAsDest(RT<?> src, EdgeType edgeType) throws WrongEdgeTypeException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void iterateEdgesAsSrc(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void iterateEdgesAsDest(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void patch(MetaDataSourceVO vo) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public MetaDataSourceVO getVO() {
+        final MetaDataSourceVO result = new MetaDataSourceVO();
+        fillVO(result);
+        return result;
+    }
+
 }

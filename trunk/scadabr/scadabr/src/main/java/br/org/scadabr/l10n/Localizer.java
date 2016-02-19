@@ -24,7 +24,7 @@ public interface Localizer  {
 
     Locale getLocale();
     
-    <T extends PointValueTime> String formatValueAndUnit(DataPointVO<T> dpVo, T pvt);
+    <T extends PointValueTime> String formatValueAndUnit(DataPointVO<?, T> dpVo, T pvt);
     
-    <T extends PointValueTime> String formatValue(DataPointVO<T> dpVo, T mv);
+    <T extends PointValueTime> String formatValue(DataPointVO<?, T> dpVo, T mv);
 }

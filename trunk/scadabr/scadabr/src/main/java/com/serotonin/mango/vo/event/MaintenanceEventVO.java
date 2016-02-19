@@ -85,7 +85,7 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO> 
 
     public static final String XID_PREFIX = "ME_";
 
-    private int id = ScadaBrConstants.NEW_ID;
+    private Integer id;
     private String xid;
     private int dataSourceId;
 
@@ -141,15 +141,15 @@ public class MaintenanceEventVO implements ChangeComparable<MaintenanceEventVO> 
 
     @JsonIgnore
     public boolean isNew() {
-        return id == ScadaBrConstants.NEW_ID;
+        return id == null;
     }
 
     @Override
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

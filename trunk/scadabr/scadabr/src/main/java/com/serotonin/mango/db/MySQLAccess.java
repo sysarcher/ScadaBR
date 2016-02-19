@@ -21,7 +21,6 @@ package com.serotonin.mango.db;
 import br.org.scadabr.utils.ImplementMeException;
 import java.sql.SQLException;
 
-
 import org.springframework.dao.DataAccessException;
 
 import java.util.Properties;
@@ -31,7 +30,7 @@ public class MySQLAccess extends BasePooledAccess {
 
     public MySQLAccess(Properties jdbcProperties) {
         super(jdbcProperties);
-        throw  new ImplementMeException();
+        throw new ImplementMeException();
         //TODO fix dbUrl from getURL
     }
 
@@ -57,7 +56,7 @@ public class MySQLAccess extends BasePooledAccess {
         url += "useUnicode=yes&characterEncoding=" + Common.UTF8;
         return url;
     }
-*/
+     */
     @Override
     public DatabaseType getType() {
         return DatabaseType.MYSQL;
@@ -69,21 +68,27 @@ public class MySQLAccess extends BasePooledAccess {
     }
 
     @Override
-    protected boolean newDatabaseCheck(JdbcTemplate ejt) {
+    protected boolean checkDataBaseExists(JdbcTemplate ejt) {
         try {
             ejt.execute("select count(*) from users");
+            return true;
         } catch (DataAccessException e) {
             if (e.getCause() instanceof SQLException) {
                 SQLException se = (SQLException) e.getCause();
+                // This state means a missing table. Assume that the schema needs to be created.
                 if ("42S02".equals(se.getSQLState())) {
-                    // This state means a missing table. Assume that the schema needs to be created.
-                    createSchema("/db/createTables-mysql.sql");
-                    return true;
+                    return false;
+                } else {
+                    throw e;
                 }
             }
             throw e;
         }
-        return false;
+    }
+
+    @Override
+    protected void createDataBase(JdbcTemplate ejt) {
+        createSchema("/db/createTables-mysql.sql");
     }
 
     @Override

@@ -58,7 +58,6 @@ import javax.inject.Inject;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import com.serotonin.mango.db.DatabaseAccessFactory;
 import com.serotonin.mango.web.UserSessionContextBean;
-import java.net.MalformedURLException;
 
 public class MangoContextListener implements ServletContextListener {
 
@@ -220,7 +219,7 @@ public class MangoContextListener implements ServletContextListener {
             if (safe) {
                 BackgroundContext.set("common.safeMode");
             }
-            runtimeManager.initialize(safe);
+            runtimeManager.initialize();
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "RuntimeManager initialization failure", e);
         } finally {

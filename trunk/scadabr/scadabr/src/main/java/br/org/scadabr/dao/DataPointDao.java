@@ -5,11 +5,12 @@
  */
 package br.org.scadabr.dao;
 
-import br.org.scadabr.vo.datasource.PointLocatorFolderVO;
-import br.org.scadabr.vo.datasource.PointLocatorVO;
+import br.org.scadabr.vo.Edge;
+import br.org.scadabr.vo.EdgeIterator;
+import br.org.scadabr.vo.datapoints.DataPointNodeVO;
+import br.org.scadabr.vo.datapoints.PointFolderVO;
 import br.org.scadabr.web.LazyTreeNode;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.util.Collection;
 import javax.inject.Named;
 
@@ -53,19 +54,12 @@ public interface DataPointDao {
 
     void addPointToHierarchy(DataPointVO dp, String[] pathToPoint);
 
-    LazyTreeNode getRootFolder();
+    public Iterable<PointFolderVO> getPointFolders();
 
-    LazyTreePointFolder getPointFolderById(int id);
+    public Iterable<DataPointVO> getDataPoints();
 
-    LazyTreePointFolder savePointFolder(LazyTreePointFolder folder);
-    
-    LazyTreePointFolder deletePointFolder(int id);
-    
-    /**
-     * Loads the complete Tree and returns the root node
-     * @param vo the DataSource
-     * @return root node of complete tree
-     */
-    PointLocatorFolderVO getPointFolderTree(DataSourceVO<?> vo);
+    public void iteratePointFolderEdges(EdgeIterator edgeIterator);
+
+    public void iterateDataPointEdges(EdgeIterator edgeIterator);
 
 }

@@ -18,7 +18,6 @@
  */
 package com.serotonin.mango.vo.mailingList;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.joda.time.DateTime;

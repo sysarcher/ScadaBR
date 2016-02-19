@@ -2,7 +2,7 @@ package br.org.scadabr.web.mvc.controller.jsonrpc;
 
 import br.org.scadabr.dao.UserDao;
 import br.org.scadabr.logger.LogUtils;
-import com.googlecode.jsonrpc4j.JsonRpcService;
+//import com.googlecode.jsonrpc4j.JsonRpcService;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.util.logging.Logger;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 
 @Named
-@JsonRpcService("/rpc/users")
+//@JsonRpcService("/rpc/users")
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class UsersService {
 
