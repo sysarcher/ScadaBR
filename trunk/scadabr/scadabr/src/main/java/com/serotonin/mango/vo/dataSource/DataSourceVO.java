@@ -27,7 +27,7 @@ import br.org.scadabr.ShouldNeverHappenException;
 
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.util.ChangeComparable;
+import br.org.scadabr.util.ChangeComparable;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.vo.NodeType;
 import br.org.scadabr.vo.VO;

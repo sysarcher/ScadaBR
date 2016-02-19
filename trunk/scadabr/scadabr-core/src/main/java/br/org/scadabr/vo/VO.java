@@ -6,9 +6,9 @@
 package br.org.scadabr.vo;
 
 import br.org.scadabr.rt.RT;
+import br.org.scadabr.util.ChangeComparable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.serotonin.mango.util.ChangeComparable;
 import java.io.Serializable;
 import javax.validation.ValidationException;
 

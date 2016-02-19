@@ -11,11 +11,8 @@ import br.org.scadabr.vo.EdgeType;
 import br.org.scadabr.vo.NodeIterator;
 import br.org.scadabr.vo.NodeType;
 import br.org.scadabr.vo.VO;
-import br.org.scadabr.vo.datapoints.PointFolderVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.serotonin.mango.vo.DoubleDataPointVO;
-import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -62,7 +59,7 @@ public class NodeEdgeDaoImpl<T extends VO<T>> extends BaseDao implements NodeEdg
     public void init() {
         super.init();
         //TODO Quick and dirty insert types move to appropirate location
-        objectMapper.registerSubtypes(PointFolderVO.class, DoubleDataPointVO.class, MetaDataSourceVO.class);
+//        objectMapper.registerSubtypes(PointFolderVO.class, DoubleDataPointVO.class, MetaDataSourceVO.class);
     }
 
     @Override

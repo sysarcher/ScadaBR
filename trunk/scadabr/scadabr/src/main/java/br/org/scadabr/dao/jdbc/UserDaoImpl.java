@@ -33,16 +33,15 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.event.AlternateAcknowledgementSources;
-import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.vo.permission.DataPointAccess;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Collection;
+import javax.annotation.PostConstruct;
 import javax.inject.Named;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -52,15 +51,22 @@ public class UserDaoImpl extends BaseDao implements UserDao {
     private static final String USER_SELECT = "select id, username, password, email, phone, admin, disabled, selectedWatchList, homeUrl, lastLogin, "
             + "  receiveAlarmEmails, receiveOwnAuditEvents " + "from users ";
 
-    public static void createAdmin(JdbcTemplate ejt) {
-        ejt.execute(String.format("insert into users (username, password, email, phone, admin, disabled, homeUrl, receiveAlarmEmails, receiveOwnAuditEvents)"
-                + "values ('admin', '%s', 'admin@yourScadaBRDomain.com', '', 'Y', 'N', 'events', 0, 'N')", Common.encrypt("admin")));
-    }
-
     public UserDaoImpl() {
         super();
     }
 
+    @PostConstruct
+    @Override
+    public void init() {
+        super.init();
+        if (getUser("admin") == null) {
+            LOG.severe("No user admin ... will create");
+        ejt.execute(String.format("insert into users (username, password, email, phone, admin, disabled, homeUrl, receiveAlarmEmails, receiveOwnAuditEvents)"
+                + "values ('admin', '%s', 'admin@yourScadaBRDomain.com', '', 'Y', 'N', 'events', 0, 'N')", Common.encrypt("admin")));
+        }
+            LOG.severe("User admin ... created");
+    }
+    
     @Override
     public User getUser(int id) {
         try {
@@ -122,9 +128,9 @@ public class UserDaoImpl extends BaseDao implements UserDao {
     }
 
     private void populateUserPermissions(List<User> users) {
-        for (User user : users) {
+        users.stream().forEach((user) -> {
             populateUserPermissions(user);
-        }
+        });
     }
 
     private static final String SELECT_DATA_SOURCE_PERMISSIONS = "select dataSourceId from dataSourceUsers where userId=?";
@@ -134,16 +140,12 @@ public class UserDaoImpl extends BaseDao implements UserDao {
 
         user.setDataSourcePermissions(ejt.queryForList(SELECT_DATA_SOURCE_PERMISSIONS, new Object[]{user.getId()},
                 Integer.class));
-        user.setDataPointPermissions(ejt.query(SELECT_DATA_POINT_PERMISSIONS,
-                new RowMapper<DataPointAccess>() {
-                    @Override
-                    public DataPointAccess mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        DataPointAccess a = new DataPointAccess();
-                        a.setDataPointId(rs.getInt(1));
-                        a.setPermission(rs.getInt(2));
-                        return a;
-                    }
-                }, user.getId()));
+        user.setDataPointPermissions(ejt.query(SELECT_DATA_POINT_PERMISSIONS, (ResultSet rs, int rowNum) -> {
+            DataPointAccess a = new DataPointAccess();
+            a.setDataPointId(rs.getInt(1));
+            a.setPermission(rs.getInt(2));
+            return a;
+        }, user.getId()));
     }
 
     public void saveUser(final User user) {
@@ -251,10 +253,12 @@ public class UserDaoImpl extends BaseDao implements UserDao {
         });
     }
 
+    @Override
     public void recordLogin(int userId) {
         ejt.update("update users set lastLogin=? where id=?", new Object[]{System.currentTimeMillis(), userId});
     }
 
+    @Override
     public void saveHomeUrl(int userId, String homeUrl) {
         ejt.update("update users set homeUrl=? where id=?", new Object[]{homeUrl, userId});
     }
@@ -266,6 +270,7 @@ public class UserDaoImpl extends BaseDao implements UserDao {
     private static final String USER_COMMENT_INSERT = "insert into userComments (userId, commentType, typeKey, ts, commentText) "
             + "values (?,?,?,?,?)";
 
+    @Override
     public void insertUserComment(int typeId, int referenceId, UserComment comment) {
         comment.setComment(StringUtils.truncate(comment.getComment(), 1024));
         ejt.update(USER_COMMENT_INSERT, new Object[]{comment.getUserId(), typeId, referenceId, comment.getTs(),

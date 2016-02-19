@@ -16,10 +16,9 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db;
+package br.org.scadabr.jdbc;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.db.spring.ConnectionCallbackVoid;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
@@ -40,7 +39,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.derby.jdbc.EmbeddedXADataSource;
 import org.apache.derby.tools.ij;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
-import org.springframework.jdbc.core.CallableStatementCreator;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
@@ -145,14 +143,12 @@ public class DerbyAccess extends DatabaseAccess {
         }
         final InputStream in = new ByteArrayInputStream(sb.toString().getBytes("ASCII"));
 
-        doInConnection(new ConnectionCallbackVoid() {
-            @Override
-            public void doInConnection(Connection conn) {
-                try {
-                    ij.runScript(conn, in, "ASCII", out, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    throw new ShouldNeverHappenException(e);
-                }
+        doInConnection((Connection conn) -> {
+            try {
+                ij.runScript(conn, in, "ASCII", out, "UTF-8");
+                return true;
+            } catch (UnsupportedEncodingException e) {
+                throw new ShouldNeverHappenException(e);
             }
         });
     }
@@ -190,15 +186,12 @@ public class DerbyAccess extends DatabaseAccess {
     }
 
     private void compressTable(JdbcTemplate ejt, final String tableName) {
-        ejt.call(new CallableStatementCreator() {
-            @Override
-            public CallableStatement createCallableStatement(Connection conn) throws SQLException {
-                CallableStatement cs = conn.prepareCall("call SYSCS_UTIL.SYSCS_COMPRESS_TABLE(?, ?, ?)");
-                cs.setString(1, "APP");
-                cs.setString(2, tableName.toUpperCase());
-                cs.setShort(3, (short) 0);
-                return cs;
-            }
+        ejt.call((Connection conn) -> {
+            CallableStatement cs = conn.prepareCall("call SYSCS_UTIL.SYSCS_COMPRESS_TABLE(?, ?, ?)");
+            cs.setString(1, "APP");
+            cs.setString(2, tableName.toUpperCase());
+            cs.setShort(3, (short) 0);
+            return cs;
         }, Collections.EMPTY_LIST);
     }
 }

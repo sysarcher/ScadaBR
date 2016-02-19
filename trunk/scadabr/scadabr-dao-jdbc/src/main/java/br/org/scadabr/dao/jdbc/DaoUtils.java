@@ -1,8 +1,8 @@
 package br.org.scadabr.dao.jdbc;
 
+import br.org.scadabr.jdbc.DatabaseAccessFactory;
+import br.org.scadabr.jdbc.DatabaseType;
 import br.org.scadabr.logger.LogUtils;
-import com.serotonin.mango.db.DatabaseAccessFactory;
-import com.serotonin.mango.db.DatabaseType;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;

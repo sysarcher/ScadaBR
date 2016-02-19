@@ -30,8 +30,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 
-import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.SystemSettingsDao;
+import br.org.scadabr.jdbc.DatabaseAccessFactory;
 import br.org.scadabr.l10n.JsL10N;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.rt.SchedulerPool;
@@ -56,8 +56,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-import com.serotonin.mango.db.DatabaseAccessFactory;
-import com.serotonin.mango.web.UserSessionContextBean;
 
 public class MangoContextListener implements ServletContextListener {
 
@@ -128,10 +126,10 @@ public class MangoContextListener implements ServletContextListener {
             // Notify the event manager of the shutdown.
             new SystemEventType(SystemEventKey.SYSTEM_SHUTDOWN).fire("event.system.shutdown");
         }
-        //Logout the User 
-        for (UserSessionContextBean us : runtimeManager.getUserSessionContextBeans()) {
+        //Logout the User
+        runtimeManager.getUserSessionContextBeans().stream().forEach((us) -> {
             us.systemShutdown();
-        }
+        });
         Logger.getLogger(MangoContextListener.class.getName()).log(Level.INFO, "Shutdown Event created");
 
         // Get a handle on the context.

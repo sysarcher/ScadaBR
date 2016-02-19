@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db;
+package br.org.scadabr.jdbc;
 
 import java.io.OutputStream;
 import java.sql.Connection;
@@ -29,13 +29,11 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.jdbc.BaseDao;
-import br.org.scadabr.dao.jdbc.SystemSettingsDaoImpl;
-import br.org.scadabr.dao.jdbc.UserDaoImpl;
-import br.org.scadabr.db.spring.ConnectionCallbackVoid;
 import br.org.scadabr.logger.LogUtils;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 abstract public class DatabaseAccess {
@@ -110,14 +108,15 @@ abstract public class DatabaseAccess {
     abstract public void runScript(String[] script, final OutputStream out)
             throws Exception;
 
-    public void doInConnection(ConnectionCallbackVoid callback) {
+    public <T> T doInConnection(ConnectionCallback<T> callback) {
         DataSource dataSource = getDataSource();
         Connection conn = null;
         try {
             conn = DataSourceUtils.getConnection(dataSource);
             conn.setAutoCommit(false);
-            callback.doInConnection(conn);
+            final T result = callback.doInConnection(conn);
             conn.commit();
+            return result;
         } catch (SQLException | CannotGetJdbcConnectionException e) {
             try {
                 if (conn != null) {
@@ -177,10 +176,10 @@ abstract public class DatabaseAccess {
         LOG.info("Setup user admin in db");
 
         // New database. Create a default user.
-        UserDaoImpl.createAdmin(ejt);
+//TODO        UserDaoImpl.createAdmin(ejt);
 
         // Record the current version.
-        SystemSettingsDaoImpl.setSetSchemaVersion(ejt, scadaBrVersion);
+//TODO        SystemSettingsDaoImpl.setSetSchemaVersion(ejt, scadaBrVersion);
         LOG.info("database sucessfully created");
         BaseDao.initNodeAndEdgeTypes(ejt, scadaBrVersion);
     }

@@ -67,15 +67,12 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 @Named
@@ -231,9 +228,9 @@ public class EventDaoImpl extends BaseDao implements EventDao {
         });
 
         if (alarm) {
-            for (int userId : userIds) {
+            userIds.stream().forEach((userId) -> {
                 removeUserIdFromCache(userId);
-            }
+            });
         }
     }
 
@@ -349,16 +346,12 @@ public class EventDaoImpl extends BaseDao implements EventDao {
 
     @Override
     public Collection<EventInstance> getPendingEvents(final User user) {
-        List<EventInstance> results = ejt.query(new PreparedStatementCreator() {
-
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                PreparedStatement ps = con.prepareCall(EVENT_SELECT_WITH_USER_DATA
-                        + "where ue.userId=? and e.ackTs is null order by e.fireTs desc");
-                ps.setInt(1, user.getId());
-                ps.setMaxRows(MAX_PENDING_EVENTS);
-                return ps;
-            }
+        List<EventInstance> results = ejt.query((Connection con) -> {
+            PreparedStatement ps = con.prepareCall(EVENT_SELECT_WITH_USER_DATA
+                    + "where ue.userId=? and e.ackTs is null order by e.fireTs desc");
+            ps.setInt(1, user.getId());
+            ps.setMaxRows(MAX_PENDING_EVENTS);
+            return ps;
         }, new UserEventInstanceRowMapper());
         attachRelationalInfo(results);
         return results;
@@ -447,9 +440,9 @@ public class EventDaoImpl extends BaseDao implements EventDao {
     }
 
     private void attachRelationalInfo(List<EventInstance> list) {
-        for (EventInstance e : list) {
+        list.stream().forEach((e) -> {
             attachRelationalInfo(e);
-        }
+        });
     }
 
     private static final String EVENT_COMMENT_SELECT = UserCommentRowMapper.USER_COMMENT_SELECT
@@ -472,26 +465,20 @@ public class EventDaoImpl extends BaseDao implements EventDao {
     public int purgeEventsBefore(final long time) {
         // Find a list of event ids with no remaining acknowledgements pending.
         final JdbcTemplate ejt2 = ejt;
-        int count = getTransactionTemplate().execute(
-                new TransactionCallback<Integer>() {
-                    @Override
-                    public Integer doInTransaction(TransactionStatus status) {
-                        int count = ejt2
-                        .update("delete from events "
-                                + "where activeTs < ? "
-                                + "  and ackTs is not null "
-                                + "  and (rtnApplicable=? or (rtnApplicable=? and rtnTs is not null))",
-                                new Object[]{time, boolToChar(false),
-                                    boolToChar(true)});
-
-                        // Delete orphaned user comments.
-                        ejt2.update("delete from userComments where commentType="
-                                + UserComment.TYPE_EVENT
-                                + "  and typeKey not in (select id from events)");
-
-                        return count;
-                    }
-                });
+        int count = getTransactionTemplate().execute((TransactionStatus status) -> {
+            int count1 = ejt2
+                    .update("delete from events "
+                            + "where activeTs < ? "
+                            + "  and ackTs is not null "
+                            + "  and (rtnApplicable=? or (rtnApplicable=? and rtnTs is not null))",
+                            new Object[]{time, boolToChar(false),
+                                boolToChar(true)});
+            // Delete orphaned user comments.
+            ejt2.update("delete from userComments where commentType="
+                    + UserComment.TYPE_EVENT
+                    + "  and typeKey not in (select id from events)");
+            return count1;
+        });
 
         clearCache();
 
@@ -566,10 +553,10 @@ public class EventDaoImpl extends BaseDao implements EventDao {
         }
 
         if (!where.isEmpty()) {
-            for (String s : where) {
+            where.stream().forEach((s) -> {
                 sql.append(" and ");
                 sql.append(s);
-            }
+            });
         }
         sql.append(" order by e.activeTs desc");
 
@@ -578,69 +565,59 @@ public class EventDaoImpl extends BaseDao implements EventDao {
 
         final int[] data = new int[2];
 
-        ejt.query(sql.toString(), params.toArray(), new ResultSetExtractor() {
-            @Override
-            public Object extractData(ResultSet rs) throws SQLException,
-                    DataAccessException {
-                int row = 0;
-                long dateTs = date == null ? -1 : date.getTime();
-                int startRow = -1;
-
-                while (rs.next()) {
-                    EventInstance e = rowMapper.mapRow(rs, 0);
-                    attachRelationalInfo(e);
-                    boolean add = true;
-
-                    if (keywords != null) {
-                        // Do the text search. If the instance has a match, put
-                        // it in the result. Otherwise ignore.
-                        StringBuilder text = new StringBuilder();
-                        text.append(AbstractLocalizer.localizeMessage(e.getMessage(), bundle));
-                        for (UserComment comment : e.getEventComments()) {
-                            text.append(' ').append(comment.getComment());
-                        }
-
-                        String[] values = text.toString().split("\\s+");
-
-                        for (String keyword : keywords) {
-                            if (keyword.startsWith("-")) {
-                                if (StringUtils.globWhiteListMatchIgnoreCase(
-                                        values, keyword.substring(1))) {
-                                    add = false;
-                                    break;
-                                }
-                            } else {
-                                if (!StringUtils.globWhiteListMatchIgnoreCase(
-                                        values, keyword)) {
-                                    add = false;
-                                    break;
-                                }
-                            }
-                        }
+        ejt.query(sql.toString(), params.toArray(), (ResultSet rs) -> {
+            int row = 0;
+            long dateTs = date == null ? -1 : date.getTime();
+            int startRow1 = -1;
+            while (rs.next()) {
+                EventInstance e = rowMapper.mapRow(rs, 0);
+                attachRelationalInfo(e);
+                boolean add = true;
+                if (keywords != null) {
+                    // Do the text search. If the instance has a match, put
+                    // it in the result. Otherwise ignore.
+                    StringBuilder text = new StringBuilder();
+                    text.append(AbstractLocalizer.localizeMessage(e.getMessage(), bundle));
+                    for (UserComment comment : e.getEventComments()) {
+                        text.append(' ').append(comment.getComment());
                     }
-
-                    if (add) {
-                        if (date != null) {
-                            if (e.getFireTimestamp() <= dateTs
-                                    && results.size() < to - from) {
-                                if (startRow == -1) {
-                                    startRow = row;
-                                }
-                                results.add(e);
+                    
+                    String[] values = text.toString().split("\\s+");
+                    
+                    for (String keyword : keywords) {
+                        if (keyword.startsWith("-")) {
+                            if (StringUtils.globWhiteListMatchIgnoreCase(
+                                    values, keyword.substring(1))) {
+                                add = false;
+                                break;
                             }
-                        } else if (row >= from && row < to) {
-                            results.add(e);
+                        } else {
+                            if (!StringUtils.globWhiteListMatchIgnoreCase(
+                                    values, keyword)) {
+                                add = false;
+                                break;
+                            }
                         }
-
-                        row++;
                     }
                 }
-
-                data[0] = row;
-                data[1] = startRow;
-
-                return null;
+                if (add) {
+                    if (date != null) {
+                        if (e.getFireTimestamp() <= dateTs
+                                && results.size() < to - from) {
+                            if (startRow1 == -1) {
+                                startRow1 = row;
+                            }
+                            results.add(e);
+                        }
+                    } else if (row >= from && row < to) {
+                        results.add(e);
+                    }
+                    row++;
+                }
             }
+            data[0] = row;
+            data[1] = startRow1;
+            return null;
         });
 
         searchRowCount = data[0];
@@ -674,16 +651,11 @@ public class EventDaoImpl extends BaseDao implements EventDao {
     }
 
     public EventType getEventHandlerType(int handlerId) {
-        return ejt.queryForObject(
-                "select eventTypeId, eventTypeRef1, eventTypeRef2, alarmLevel from eventHandlers where id=?",
-                new RowMapper<EventType>() {
-                    @Override
-                    public EventType mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        final AlarmLevel alarmLevel = AlarmLevel.values()[rs.getInt(4)];
-                        throw new ImplementMeException();
-                        //TODO return createEventType(EventSources.values()[rs.getInt(1)], rs.getInt(2), rs.getInt(3), alarmLevel);
-                    }
-                }, handlerId);
+        return ejt.queryForObject("select eventTypeId, eventTypeRef1, eventTypeRef2, alarmLevel from eventHandlers where id=?", (ResultSet rs, int rowNum) -> {
+            final AlarmLevel alarmLevel = AlarmLevel.values()[rs.getInt(4)];
+            throw new ImplementMeException();
+            //TODO return createEventType(EventSources.values()[rs.getInt(1)], rs.getInt(2), rs.getInt(3), alarmLevel);
+        }, handlerId);
     }
 
     @Override
@@ -867,17 +839,13 @@ public class EventDaoImpl extends BaseDao implements EventDao {
     void updateEventHandler(final EventHandlerVO handler) {
         EventHandlerVO old = getEventHandler(handler.getId());
 
-        ejt.update(new PreparedStatementCreator() {
-
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                final PreparedStatement ps = con.prepareStatement("update eventHandlers set xid=?, alias=?, data=? where id=?");
-                ps.setString(1, handler.getXid());
-                ps.setString(2, handler.getAlias());
-                ps.setBlob(3, SerializationHelper.writeObject(handler));
-                ps.setInt(4, handler.getId());
-                return ps;
-            }
+        ejt.update((Connection con) -> {
+            final PreparedStatement ps = con.prepareStatement("update eventHandlers set xid=?, alias=?, data=? where id=?");
+            ps.setString(1, handler.getXid());
+            ps.setString(2, handler.getAlias());
+            ps.setBlob(3, SerializationHelper.writeObject(handler));
+            ps.setInt(4, handler.getId());
+            return ps;
         });
 
         AuditEventType.raiseChangedEvent(AuditEventKey.EVENT_HANDLER,
@@ -947,7 +915,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
         }
     }
 
-    private static Map<Integer, PendingEventCacheEntry> pendingEventCache = new ConcurrentHashMap<>();
+    private static final Map<Integer, PendingEventCacheEntry> pendingEventCache = new ConcurrentHashMap<>();
 
     private static final long CACHE_TTL = 300000; // 5 minutes
 

@@ -5,8 +5,10 @@
  */
 package br.org.scadabr.dao.jdbc;
 
+import br.org.scadabr.ModuleRegistry;
 import br.org.scadabr.ScadaBrVersionBean;
 import br.org.scadabr.dao.NodeEdgeDao;
+import br.org.scadabr.jdbc.DatabaseAccessFactory;
 import br.org.scadabr.rt.link.PointLinkManager;
 import br.org.scadabr.util.ScadaBrObjectMapper;
 import br.org.scadabr.vo.Edge;
@@ -14,7 +16,7 @@ import br.org.scadabr.vo.EdgeType;
 import br.org.scadabr.vo.NodeType;
 import br.org.scadabr.vo.VO;
 import br.org.scadabr.vo.datapoints.PointFolderVO;
-import com.serotonin.mango.db.DatabaseAccessFactory;
+import com.serotonin.mango.vo.DataPointVO;
 import java.util.HashSet;
 import java.util.Set;
 import javax.inject.Inject;
@@ -47,6 +49,7 @@ public class DataPointDaoTest {
         
         private final ScadaBrObjectMapper scadaBrObjectMapper = new ScadaBrObjectMapper();
 
+        private final ModuleRegistry moduleRegistry = new ModuleRegistry();
         /**
          * No tests with PointLinkManager so return null.
          * @return 
@@ -76,6 +79,10 @@ public class DataPointDaoTest {
             return scadaBrObjectMapper;
         }
 
+        @Bean 
+        public ModuleRegistry getModuleRegistry() {
+            return moduleRegistry;
+        }
     }
 
     public DataPointDaoTest() {
@@ -83,10 +90,9 @@ public class DataPointDaoTest {
 
     @Inject
     private NodeEdgeDao<? extends VO<?>> nodeEdgeDao;
-
-    @Before
-    public void setUp() {
-    }
+    @Inject
+    ScadaBrObjectMapper scadaBrObjectMapper;
+    
 
     @After
     public void tearDown() {
