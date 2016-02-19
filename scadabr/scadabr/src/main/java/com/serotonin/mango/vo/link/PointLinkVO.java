@@ -24,7 +24,7 @@ import br.org.scadabr.utils.i18n.LocalizableEnum;
 import java.util.List;
 
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.util.ChangeComparable;
+import br.org.scadabr.util.ChangeComparable;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;

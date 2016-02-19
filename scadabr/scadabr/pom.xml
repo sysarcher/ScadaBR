@@ -36,6 +36,10 @@
         </dependency>
         <dependency>
             <groupId>br.org.scadabr</groupId>
+            <artifactId>scadabr-dao-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>br.org.scadabr</groupId>
             <artifactId>scadabr-deprecated</artifactId>
         </dependency>
         <dependency>
@@ -108,10 +112,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
         </dependency>
         <dependency>
@@ -129,14 +129,6 @@
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derbytools</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
@@ -179,29 +171,8 @@
             <artifactId>mail</artifactId>
         </dependency>
         <dependency>
-            <!-- snapshot from serotonin 1.7.0 -->
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-        <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
         </dependency>
         <!--dependency> What is this for??? I saw it in the spring sources ?..? apl
             <groupId>com.fasterxml.jackson.datatype</groupId>

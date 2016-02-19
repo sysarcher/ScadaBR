@@ -16,28 +16,55 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db;
+package br.org.scadabr.jdbc;
 
+import br.org.scadabr.utils.ImplementMeException;
 import java.sql.SQLException;
-import java.util.Properties;
 
 import org.springframework.dao.DataAccessException;
+
+import java.util.Properties;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-public class MSSQLAccess extends BasePooledAccess {
+public class MySQLAccess extends BasePooledAccess {
 
-    public MSSQLAccess(Properties jdbcProperties) {
+    public MySQLAccess(Properties jdbcProperties) {
         super(jdbcProperties);
+        throw new ImplementMeException();
+        //TODO fix dbUrl from getURL
     }
 
     @Override
+    protected void initializeImpl(String propertyPrefix) {
+        super.initializeImpl(propertyPrefix);
+        dataSource.setInitialSize(3);
+        dataSource.setMaxWait(-1);
+        dataSource.setTestWhileIdle(true);
+        dataSource.setTimeBetweenEvictionRunsMillis(10000);
+        dataSource.setMinEvictableIdleTimeMillis(60000);
+    }
+
+    /*
+    @Deprecated
+    protected String getUrl(String propertyPrefix) {
+        String url = super.getUrl(propertyPrefix);
+        if (url.indexOf('?') > 0) {
+            url += "&";
+        } else {
+            url += "?";
+        }
+        url += "useUnicode=yes&characterEncoding=" + Common.UTF8;
+        return url;
+    }
+     */
+    @Override
     public DatabaseType getType() {
-        return DatabaseType.MSSQL;
+        return DatabaseType.MYSQL;
     }
 
     @Override
     protected String getDriverClassName() {
-        return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+        return "com.mysql.jdbc.Driver";
     }
 
     @Override
@@ -49,21 +76,19 @@ public class MSSQLAccess extends BasePooledAccess {
             if (e.getCause() instanceof SQLException) {
                 SQLException se = (SQLException) e.getCause();
                 // This state means a missing table. Assume that the schema needs to be created.
-                if ("S0002".equals(se.getSQLState())) {
+                if ("42S02".equals(se.getSQLState())) {
                     return false;
                 } else {
                     throw e;
                 }
-            } else {
-                throw e;
             }
+            throw e;
         }
     }
 
-    //TODO No use of ejb here .... fix it ????
     @Override
     protected void createDataBase(JdbcTemplate ejt) {
-        createSchema("/WEB-INF/db/createTables-mssql.sql");
+        createSchema("/db/createTables-mysql.sql");
     }
 
     @Override

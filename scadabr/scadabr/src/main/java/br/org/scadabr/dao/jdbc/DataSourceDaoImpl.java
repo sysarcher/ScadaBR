@@ -31,7 +31,7 @@ import br.org.scadabr.vo.event.type.AuditEventKey;
 import br.org.scadabr.vo.event.type.DataSourceEventKey;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import com.serotonin.mango.rt.event.type.DataSourceEventType;
-import com.serotonin.mango.util.ChangeComparable;
+import br.org.scadabr.util.ChangeComparable;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.DoubleDataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;

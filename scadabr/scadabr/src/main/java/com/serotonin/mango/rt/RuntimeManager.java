@@ -18,20 +18,16 @@
  */
 package com.serotonin.mango.rt;
 
-import br.org.scadabr.DataType;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.dao.NodeEdgeDao;
 import br.org.scadabr.logger.LogUtils;
-import br.org.scadabr.rt.DataPointNodeRT;
 import br.org.scadabr.rt.PointFolderRT;
 import br.org.scadabr.rt.RT;
 import br.org.scadabr.rt.WrongEdgeTypeException;
@@ -52,7 +48,6 @@ import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.util.Collection;

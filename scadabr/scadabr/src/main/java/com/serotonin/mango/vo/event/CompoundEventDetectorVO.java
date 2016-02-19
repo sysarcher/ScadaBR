@@ -27,7 +27,7 @@ import com.serotonin.mango.rt.event.compound.CompoundEventDetectorRT;
 import com.serotonin.mango.rt.event.compound.ConditionParseException;
 import com.serotonin.mango.rt.event.compound.LogicalOperator;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.util.ChangeComparable;
+import br.org.scadabr.util.ChangeComparable;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.permission.Permissions;

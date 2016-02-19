@@ -37,7 +37,7 @@ import com.serotonin.mango.rt.event.handlers.ProcessHandlerRT;
 //import com.serotonin.mango.rt.event.handlers.ScriptHandlerRT;
 import com.serotonin.mango.rt.event.handlers.SetPointHandlerRT;
 import com.serotonin.mango.rt.event.type.AuditEventType;
-import com.serotonin.mango.util.ChangeComparable;
+import br.org.scadabr.util.ChangeComparable;
 import com.serotonin.mango.vo.mailingList.EmailRecipient;
 import br.org.scadabr.util.SerializationHelper;
 import br.org.scadabr.utils.ImplementMeException;

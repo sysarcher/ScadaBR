@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.db;
+package br.org.scadabr.jdbc;
 
 import br.org.scadabr.ScadaBrVersionBean;
 import br.org.scadabr.logger.LogUtils;

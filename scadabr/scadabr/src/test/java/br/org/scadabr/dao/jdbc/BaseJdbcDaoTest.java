@@ -7,7 +7,7 @@ package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.ScadaBrVersionBean;
 import br.org.scadabr.dao.UserDao;
-import com.serotonin.mango.db.DatabaseAccessFactory;
+import br.org.scadabr.jdbc.DatabaseAccessFactory;
 import com.serotonin.mango.vo.User;
 import java.util.Collection;
 import javax.inject.Inject;

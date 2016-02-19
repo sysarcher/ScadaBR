@@ -24,7 +24,7 @@ import java.util.List;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.util.ChangeComparable;
+import br.org.scadabr.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
 import com.serotonin.mango.vo.User;
 import br.org.scadabr.web.i18n.LocalizableI18nKey;

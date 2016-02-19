@@ -6,11 +6,10 @@
 package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.jdbc.DatabaseAccessFactory;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.timer.cron.SystemCallable;
-import com.serotonin.mango.db.DatabaseAccess;
-import com.serotonin.mango.db.DatabaseAccessFactory;
 import com.serotonin.mango.rt.dataImage.DoubleValueTime;
 import java.util.LinkedList;
 import java.util.Queue;
