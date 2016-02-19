@@ -29,17 +29,17 @@ public interface PointValueDao {
 
     <T extends PointValueTime> T savePointValueSync(T newValue, SetPointSource source);
 
-    <T extends PointValueTime> T getLatestPointValue(DataPointVO<T> dpVo);
+    <P extends PointValueTime> P getLatestPointValue(DataPointVO<?, P> dpVo);
 
     long getInceptionDate(DataPointVO dpVo);
 
-    <T extends PointValueTime> Iterable<T> getPointValues(DataPointVO<T> dpVo, long from);
+    <T extends PointValueTime> Iterable<T> getPointValues(DataPointVO<?, T> dpVo, long from);
 
-    <T extends PointValueTime> Iterable<T> getPointValuesBetween(DataPointVO<T> dpVo, long from, long to);
+    <T extends PointValueTime> Iterable<T> getPointValuesBetween(DataPointVO<?, T> dpVo, long from, long to);
 
     List<Long> getFiledataIds();
 
-    <T extends PointValueTime> T getPointValueBefore(DataPointVO<T> dpVo, long reportStartTime);
+    <T extends PointValueTime> T getPointValueBefore(DataPointVO<?, T> dpVo, long reportStartTime);
 
     public PointValueTime getPointValueBefore(int id, DataType dataType, long l);
 

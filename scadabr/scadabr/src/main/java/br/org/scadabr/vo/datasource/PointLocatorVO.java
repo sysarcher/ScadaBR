@@ -79,17 +79,17 @@ public interface PointLocatorVO<T extends PointValueTime> extends Serializable, 
 
     void setName(String name);
 
-    int getId();
+    Integer getId();
     
-    void setId(int id);
+    void setId(Integer id);
     
     boolean isEnabled();
 
     void setEnabled(boolean value);
 
-    int getDataSourceId();
+    Integer getDataSourceId();
     
-    void setDataSourceId(int dataSourceId);
+    void setDataSourceId(Integer dataSourceId);
 
     Integer getPointLocatorFolderId();
     

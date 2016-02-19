@@ -19,7 +19,7 @@ import com.serotonin.mango.rt.dataSource.PointLocatorRT;
  */
 public abstract class PollingPointLocatorRT<T extends PointValueTime, VO extends PointLocatorVO<T>, U extends DataSourceRT> extends PointLocatorRT<T, VO> {
 
-    protected DataPointRT<T> dpRT;
+    protected DataPointRT<?, T> dpRT;
     protected U dsRT;
     
     public PollingPointLocatorRT(VO vo) {
@@ -30,7 +30,7 @@ public abstract class PollingPointLocatorRT<T extends PointValueTime, VO extends
         return dsRT;
     }
 
-    public final DataPointRT<T> getDpRT() {
+    public final DataPointRT<?, T> getDpRT() {
         return dpRT;
     }
 
@@ -39,7 +39,7 @@ public abstract class PollingPointLocatorRT<T extends PointValueTime, VO extends
 
     public abstract boolean overrunDetected(long lastExecutionTime, long thisExecutionTime);
 
-    public void start(U dsRT, DataPointRT<T> dpRT) {
+    public void start(U dsRT, DataPointRT<?, T> dpRT) {
         this.dsRT = dsRT;
         this.dpRT = dpRT;
     }

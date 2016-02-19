@@ -91,7 +91,7 @@ public class HttpImageDataSourceVO extends DataSourceVO<HttpImageDataSourceVO> {
     }
 
     @Override
-    public DataSourceRT createDataSourceRT() {
+    public HttpImageDataSourceRT createRT() {
         return new HttpImageDataSourceRT(this);
     }
 

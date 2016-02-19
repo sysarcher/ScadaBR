@@ -122,7 +122,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
     
     public static final String XID_PREFIX = "CED_";
 
-    private int id = ScadaBrConstants.NEW_ID;
+    private Integer id;
     private String xid;
 
     private String name;
@@ -145,7 +145,7 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
 
     @JsonIgnore
     public boolean isNew() {
-        return id == ScadaBrConstants.NEW_ID;
+        return id == null;
     }
 
     @Override
@@ -178,11 +178,11 @@ public class CompoundEventDetectorVO implements ChangeComparable<CompoundEventDe
     }
 
     @Override
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

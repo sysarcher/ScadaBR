@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Deprecated //??? use RestDataSourceController...???
 @RestController
-@RequestMapping(value = "/dataSources/dsTree/")
+@RequestMapping(value = "/configTree/")
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class DsTreeController {
 
@@ -52,7 +52,7 @@ public class DsTreeController {
 
 //TODO Use view @JsonView(View.Summary.class)
     // ?? @JsonAppend(attrs = @JsonAppend.Attr
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "dataSources", method = RequestMethod.GET)
     public Iterable<JsonDataSourceWrapper> getDataSources() {
         final User user = userSessionContextBean.getUser();
         List<JsonDataSourceWrapper> result = new ArrayList<>();
@@ -69,22 +69,44 @@ public class DsTreeController {
      * @param id of the node
      * @return the folder
      */
-    @RequestMapping(value = "{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "dataSources/{id}", method = RequestMethod.GET)
     public JsonDataSourceWrapper getDataSource(@PathVariable("id") int id) {
-        return new JsonDataSourceWrapper(dataSourceDao.getDataSource(id));
+        return new JsonDataSourceWrapper(runtimeManager.getDataSourceVO(id));
     }
 
     /**
-     * get all child nodes (folders and datapoints) of the folder
-     * @return All childnodes
+     * 
+     * @param id
+     * @return 
+     * 
+     * get root plf nodes of ds
+     * 
      */
-    @RequestMapping(params = {"dsId", "parentFolderId"}, method = RequestMethod.GET)
-    public List<Serializable> getPointLocators(int dsId, int parentFolderId) {
+    @RequestMapping(value = {"dataSources/{id}/pointLocators"}, method = RequestMethod.GET)
+//    @RequestMapping(params = {"dsId", "parentFolderId"}, method = RequestMethod.GET)
+    public List<Serializable> getPointLocatorsOfDataSource(@PathVariable("id") int id) {
         List<Serializable> result = new LinkedList<>();
-        for (PointLocatorFolderVO folderVO : dataSourceDao.getPointLocatorsFolderByParent(dsId, parentFolderId)) {
+        for (PointLocatorFolderVO folderVO : dataSourceDao.getPointLocatorsFolderByParent(id, 0)) {
             result.add(folderVO);
         }
-        for (PointLocatorVO locatorVO : dataSourceDao.getPointLocatorsByParent(dsId, parentFolderId)) {
+        for (PointLocatorVO locatorVO : dataSourceDao.getPointLocatorsByParent(id, 0)) {
+            result.add(new JsonPointLocator(locatorVO, localizer));
+        }
+        return result;
+    }
+    /**
+     * get all child nodes (folders and datapoints) of the folder
+     * @param id
+     * @return All childnodes
+     */
+    @RequestMapping(value = {"pointLocatorFolders/{id}/pointLocators"}, method = RequestMethod.GET)
+//    @RequestMapping(params = {"dsId", "parentFolderId"}, method = RequestMethod.GET)
+    public List<Serializable> getPointLocators(@PathVariable("id") int id) {
+        List<Serializable> result = new LinkedList<>();
+        for (PointLocatorFolderVO folderVO : dataSourceDao.getPointLocatorsFolderByParent(id)) {
+            result.add(folderVO);
+        }
+        for (PointLocatorVO locatorVO : dataSourceDao.getPointLocatorsByParent(id)) {
             result.add(new JsonPointLocator(locatorVO, localizer));
         }
         return result;

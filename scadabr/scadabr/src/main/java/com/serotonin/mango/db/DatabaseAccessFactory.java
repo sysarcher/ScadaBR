@@ -33,10 +33,19 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @Named
 public class DatabaseAccessFactory {
     
+    private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_DAO_JDBC);
+
+    private DatabaseAccess databaseAccess;
+
     private String jdbcPropertiesName = "/jdbc.properties";
+
     @Inject
     private ScadaBrVersionBean scadaBrVersionBean;
 
+
+    public DatabaseAccessFactory() {
+
+    }
 
     public DatabaseAccess createDatabaseAccess(Properties jdbcProperties) {
         String type = jdbcProperties.getProperty("db.type", "derby");
@@ -49,12 +58,6 @@ public class DatabaseAccessFactory {
         return dt.getImpl(jdbcProperties);
     }
 
-    private final static Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_DAO_JDBC);
-    private DatabaseAccess databaseAccess;
-
-    public DatabaseAccessFactory() {
-
-    }
 
     @PostConstruct
     public void startDB() {

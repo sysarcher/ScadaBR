@@ -22,7 +22,8 @@ import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.datasource.meta.MetaDataSourceEventKey;
 import br.org.scadabr.vo.datasource.meta.MetaDataSourceType;
-import com.serotonin.mango.rt.dataSource.DataSourceRT;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.util.EnumMap;
@@ -34,10 +35,11 @@ import java.util.Set;
 /**
  * @author Matthew Lohbihler
  */
+@JsonTypeName("DATA_SOURCE.MetaDataSource")
 public class MetaDataSourceVO extends DataSourceVO<MetaDataSourceVO> {
 
     @Override
-    public DataSourceRT createDataSourceRT() {
+    public MetaDataSourceRT createRT() {
         return new MetaDataSourceRT(this);
     }
 
@@ -56,6 +58,7 @@ public class MetaDataSourceVO extends DataSourceVO<MetaDataSourceVO> {
         return super.clone();
     }
 
+    @JsonIgnore
     @Override
     public LocalizableMessage getConnectionDescription() {
         return new LocalizableMessageImpl("common.noMessage");

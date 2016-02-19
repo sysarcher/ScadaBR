@@ -6,6 +6,7 @@ import br.org.scadabr.ScadaBrConstants;
  *
  * @author aploese
  */
+@Deprecated
 public abstract class LazyTreeNode {
     
     private Integer id;
@@ -21,7 +22,7 @@ public abstract class LazyTreeNode {
     }
 
     public boolean isNew() {
-        return id == null || id == ScadaBrConstants.NEW_ID;
+        return id == null;
     }
     
     /**

@@ -26,15 +26,21 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.util.Assert;
-
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.dao.DataSourceDao;
-import br.org.scadabr.dao.PointValueDao;
+import br.org.scadabr.dao.NodeEdgeDao;
+import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.rt.DataPointNodeRT;
+import br.org.scadabr.rt.PointFolderRT;
+import br.org.scadabr.rt.RT;
+import br.org.scadabr.rt.WrongEdgeTypeException;
 import br.org.scadabr.utils.ImplementMeException;
+import br.org.scadabr.vo.Edge;
+import br.org.scadabr.vo.EdgeType;
+import br.org.scadabr.vo.VO;
+import br.org.scadabr.vo.datapoints.DataPointNodeVO;
+import br.org.scadabr.vo.datapoints.PointFolderVO;
 import br.org.scadabr.vo.datasource.PointLocatorVO;
 import com.serotonin.mango.rt.dataImage.DataPointEventMulticaster;
 import com.serotonin.mango.rt.dataImage.DataPointListener;
@@ -49,16 +55,23 @@ import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.web.UserSessionContextBean;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 @Named
 public class RuntimeManager {
 
-    private static final Log LOG = LogFactory.getLog(RuntimeManager.class);
+    private static final Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_CORE);
+
+    private final Map<Integer, RT> nodes = new HashMap<>();
+    private final Map<Integer, DataSourceRT<?>> dataSources = new HashMap<>();
 
     private final List<DataSourceRT> runningDataSources = new CopyOnWriteArrayList<>();
     private final Set<UserSessionContextBean> userSessions = new HashSet<>();
@@ -66,7 +79,7 @@ public class RuntimeManager {
     /**
      * Provides a quick lookup map of the running data points.
      */
-    private final Map<Integer, DataPointRT> dataPoints = new HashMap<>();
+    private final Map<Integer, DataPointRT> runningDataPoints = new HashMap<>();
     private final Map<Integer, PointLocatorRT> pointLocators = new HashMap<>();
 
     /**
@@ -79,9 +92,9 @@ public class RuntimeManager {
     private boolean started = false;
 
     @Inject
-    private DataSourceDao dataSourceDao;
+    private NodeEdgeDao<? extends VO<?>> nodeEdgeDao;
     @Inject
-    private DataPointDao dataPointDao;
+    private DataSourceDao dataSourceDao;
     @Inject
     private EventManager eventManager;
 
@@ -91,7 +104,7 @@ public class RuntimeManager {
 
     //
     // Lifecycle
-    synchronized public void initialize(boolean safe) {
+    synchronized public void initialize() {
         if (started) {
             throw new ShouldNeverHappenException(
                     "RuntimeManager already started");
@@ -100,16 +113,24 @@ public class RuntimeManager {
         // Set the started indicator to true.
         started = true;
 
+        nodeEdgeDao.iterateNodes((node) -> {
+            nodes.put(node.getId(), node.createRT());
+        });
+
+        nodeEdgeDao.iterateEdges((srcId, destId, edgeType) -> {
+            try {
+                nodes.get(srcId).wireEdgeAsSrc(nodes.get(destId), edgeType);
+            } catch (WrongEdgeTypeException ex) {
+                //TODO Event???
+                LOG.log(Level.SEVERE, "Wire exception", ex);
+            }
+        });
+
         // Initialize data sources that are enabled.
         List<DataSourceVO<?>> pollingRound = new ArrayList<>();
         for (DataSourceVO<?> config : dataSourceDao.getDataSources()) {
-            if (config.isEnabled()) {
-                if (safe) {
-                    config.setEnabled(false);
-                    dataSourceDao.saveDataSource(config);
-                } else if (initializeDataSource(config)) {
-                    pollingRound.add(config);
-                }
+            if (initializeDataSource(config)) {
+                pollingRound.add(config);
             }
         }
 
@@ -147,7 +168,7 @@ public class RuntimeManager {
             try {
                 dataSource.joinTermination();
             } catch (ShouldNeverHappenException e) {
-                LOG.error("Error stopping data source " + dataSource.getId(), e);
+                LOG.log(Level.SEVERE, "Error stopping data source " + dataSource.getId(), e);
             }
         }
     }
@@ -173,8 +194,12 @@ public class RuntimeManager {
         return dataSourceDao.getDataSources();
     }
 
-    public DataSourceVO<?> getDataSource(int dataSourceId) {
-        return dataSourceDao.getDataSource(dataSourceId);
+    public DataSourceVO<?> getDataSourceVO(int dataSourceId) {
+        return dataSources.get(dataSourceId).getVO();
+    }
+
+    public DataSourceRT<?> getDataSourceRT(int dataSourceId) {
+        return dataSources.get(dataSourceId);
     }
 
     public void deleteDataSource(int dataSourceId) {
@@ -206,31 +231,31 @@ public class RuntimeManager {
                 return false;
             }
 
-            // Ensure that the data source is enabled.
-            Assert.isTrue(vo.isEnabled());
-
             // Create the runtime version of the data source.
-            final DataSourceRT dataSource = vo.createDataSourceRT();
+            final DataSourceRT dataSource = vo.createRT();
+            dataSources.put(vo.getId(), dataSource);
+            if (vo.isEnabled()) {
+                // Add it to the list of running data sources.
+                runningDataSources.add(dataSource);
 
-            // Add it to the list of running data sources.
-            runningDataSources.add(dataSource);
-
-            // Add the enabled points to the data source.
-           // dataPointDao.loadPointFolders(vo);
-           // startPointLocator(vo)
-            /*    if (pointLocatorVO.isEnabled()) {
+                // Add the enabled points to the data source.
+                // dataPointDao.loadPointFolders(vo);
+                // startPointLocator(vo)
+                /*    if (pointLocatorVO.isEnabled()) {
                     startPointLocator(pointLocatorVO);
                 } else {
                     dataSource.pointLocatorDisabled(pointLocatorVO);
                 }
-            */
+                 */
+                // Initialize and thus start the runtime version of the data source.
+                dataSource.initialize();
 
-            // Initialize and thus start the runtime version of the data source.
-            dataSource.initialize();
+                LOG.info("Data source '" + vo.getName() + "' initialized");
 
-            LOG.info("Data source '" + vo.getName() + "' initialized");
-
-            return true;
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -259,52 +284,34 @@ public class RuntimeManager {
     //
     // Data points
     //
-    public DataPointRT saveDataPoint(DataPointVO point) {
-        stopDataPoint(point);
+    public DataPointVO saveDataPoint(DataPointVO vo) {
+        DataPointRT rt = getDataPoint(vo.getId());
+        if (rt.getParent() != null) {
+            rt.getParent().validateChildName(vo.getName());
+        }
+        vo = nodeEdgeDao.saveNode(vo);
+        rt.patch(vo);
+        return vo;
+    }
 
-        // Since the point's data type may have changed, we must ensure that the
-        // other attrtibutes are still ok with
-        // it.
-        DataType dataType = point.getDataType();
-
-        // Event detectors
-        final Iterator<DoublePointEventDetectorVO> peds = point.getEventDetectors().iterator();
-        while (peds.hasNext()) {
-            DoublePointEventDetectorVO ped = peds.next();
-            if (!ped.getDataPointDetectorKey().supports(dataType)) {
-                // Remove the detector.
-                peds.remove();
+    private void deleteDataPoint(DataPointRT point) {
+        if (point.getParent() != null) {
+            nodeEdgeDao.deleteEdge(new Edge(point.getParent().getId(), point.getId(), EdgeType.TREE_PARENT_TO_CHILD));
+        }
+        nodeEdgeDao.deleteNode(point.getId());
+        if (point.getParent() != null) {
+            if (!point.getParent().removeChild(point)) {
+                throw new ShouldNeverHappenException("Can't remove child");
             }
         }
-
-        dataPointDao.saveDataPoint(point);
-
-        throw new ImplementMeException();
-        /*
-        if (point.isEnabled()) {
-            return startDataPoint(point);
-        } else {
-            addDisabledDataPointToRT(point);
-            return null;
+        if (nodes.remove(point.getId()) != point) {
+            throw new ShouldNeverHappenException("Can't remove node");
         }
-        */
     }
 
-    public void deleteDataPoint(DataPointVO point) {
-        throw new ImplementMeException();
-        /*
-        final DataSourceRT dsRt = getRunningDataSource(point.getDataSourceId());
-        if (dsRt != null) {
-            dsRt.dataPointDeleted(point);
-        }
-        dataPointDao.deleteDataPoint(point.getId());
-        eventManager.cancelEventsForDataPoint(point.getId());
-        */
-    }
-
-    private <T extends PointValueTime, VO extends PointLocatorVO<T>>  PointLocatorRT<T, VO> startPointLocator(VO vo) {
+    private <T extends PointValueTime, VO extends PointLocatorVO<T>> PointLocatorRT<T, VO> startPointLocator(VO vo) {
         synchronized (pointLocators) {
-            Assert.isTrue(vo.isEnabled());
+            //      Assert.isTrue(vo.isEnabled());
 
             // Only add the data point if its data source is enabled.
             DataSourceRT ds = getRunningDataSource(vo.getDataSourceId());
@@ -335,7 +342,7 @@ public class RuntimeManager {
      * @return
      */
     private void addDisabledDataPointToRT(DataPointVO vo) {
-        synchronized (dataPoints) {
+        synchronized (runningDataPoints) {
 
             // Only add the data point if its data source is enabled.
             throw new ImplementMeException();
@@ -343,19 +350,19 @@ public class RuntimeManager {
             if (ds != null) {
                 ds.dataPointDisabled(vo);
             }
-                    */
+             */
         }
     }
 
     private void stopDataPoint(DataPointVO dpVo) {
-        synchronized (dataPoints) {
+        synchronized (runningDataPoints) {
             // Remove this point from the data image if it is there. If not,
             // just quit.
-            DataPointRT p = dataPoints.remove(dpVo.getId());
+            DataPointRT p = runningDataPoints.remove(dpVo.getId());
 
             // Remove it from the data source, and terminate it.
             if (p != null) {
-                throw  new ImplementMeException();
+                throw new ImplementMeException();
                 /* TODO
                 getRunningDataSource(p.getDataSourceId()).dataPointDisabled(p.getVo());
                 DataPointListener l = getDataPointListeners(dpVo.getId());
@@ -363,17 +370,17 @@ public class RuntimeManager {
                     l.pointTerminated();
                 }
                 p.terminate();
-                        */
+                 */
             }
         }
     }
 
     public boolean isDataPointRunning(int dataPointId) {
-        return dataPoints.get(dataPointId) != null;
+        return runningDataPoints.get(dataPointId) != null;
     }
 
-    public DataPointRT getDataPoint(int dataPointId) {
-        return dataPoints.get(dataPointId);
+    public DataPointRT getDataPoint(int id) {
+        return getNode(id, DataPointRT.class);
     }
 
     public void addDataPointListener(int dataPointId, DataPointListener l) {
@@ -397,7 +404,7 @@ public class RuntimeManager {
     }
 
     public void setDataPointValue(PointValueTime valueTime, SetPointSource source) {
-        DataPointRT dataPoint = dataPoints.get(valueTime.getDataPointId());
+        DataPointRT dataPoint = runningDataPoints.get(valueTime.getDataPointId());
         if (dataPoint == null) {
             throw new RTException("Point is not enabled");
         }
@@ -414,11 +421,11 @@ public class RuntimeManager {
         if (ds != null) {
             ds.setPointValue(dataPoint, valueTime, source);
         }
-                */
+         */
     }
 
     public void relinquish(int dataPointId) {
-        DataPointRT dataPoint = dataPoints.get(dataPointId);
+        DataPointRT dataPoint = runningDataPoints.get(dataPointId);
         if (dataPoint == null) {
             throw new RTException("Point is not enabled");
         }
@@ -438,16 +445,16 @@ public class RuntimeManager {
         if (ds != null) {
             ds.relinquish(dataPoint);
         }
-                */
+         */
     }
 
     public void forcePointRead(int dataPointId) {
-        DataPointRT dataPoint = dataPoints.get(dataPointId);
+        DataPointRT dataPoint = runningDataPoints.get(dataPointId);
         if (dataPoint == null) {
             throw new RTException("Point is not enabled");
         }
 
-        throw  new ImplementMeException();
+        throw new ImplementMeException();
         /*
         // Tell the data source to read the point value;
         DataSourceRT ds = getRunningDataSource(dataPoint.getDataSourceId());
@@ -455,11 +462,7 @@ public class RuntimeManager {
         {
             ds.forcePointRead(dataPoint);
         }
-                */
-    }
-
-    public void addPointToHierarchy(DataPointVO dp, String... pathToPoint) {
-        dataPointDao.addPointToHierarchy(dp, pathToPoint);
+         */
     }
 
     public void UserSessionStarts(UserSessionContextBean us) {
@@ -472,6 +475,159 @@ public class RuntimeManager {
 
     public Set<UserSessionContextBean> getUserSessionContextBeans() {
         return userSessions;
+    }
+
+    public RT<?> getNode(int id) {
+        final RT<?> result = nodes.get(id);
+        if (result == null) {
+            throw new NodeNotFoundException(id);
+        }
+        return result;
+    }
+
+    public <T extends RT<?>> T getNode(int id, Class<T> clazz) {
+        final T result = (T) nodes.get(id);
+        if (result == null) {
+            throw new NodeNotFoundException(id);
+        }
+        return result;
+    }
+
+    public <T extends VO<T>> T getVo(int id, Class<T> clazz) {
+        final RT<T> result = nodes.get(id);
+        if (result == null) {
+            throw new NodeNotFoundException(id);
+        }
+        return result.getVO();
+    }
+
+    public PointFolderRT getPointFolder(int id) {
+        return getNode(id, PointFolderRT.class);
+    }
+
+    //TODO make this generic ??
+    private void deletePointFolder(PointFolderRT pf) {
+        if (pf.getChildFolderSize() > 0) {
+            throw new UnsupportedOperationException("Deleting with Children Not supported yet.");
+        }
+        if (pf.getParent() != null) {
+            nodeEdgeDao.deleteEdge(new Edge(pf.getParent().getId(), pf.getId(), EdgeType.TREE_PARENT_TO_CHILD));
+        }
+        nodeEdgeDao.deleteNode(pf.getId());
+        if (pf.getParent() != null) {
+            if (!pf.getParent().removeChild(pf)) {
+                throw new ShouldNeverHappenException("Can't remove child");
+            }
+        }
+        if (nodes.remove(pf.getId()) != pf) {
+            throw new ShouldNeverHappenException("Can't remove node");
+        }
+    }
+
+    public <U extends VO<U>> U addNode(U node) {
+        node = nodeEdgeDao.saveNode(node);
+        nodes.put(node.getId(), node.createRT());
+        return node;
+    }
+
+    /**
+     * Add a new dest node on the edge to an existing src node
+     *
+     * @param sourceNodeId the id of the source node
+     * @param edgeType the edge type
+     * @param newDestNode the new dest node to add
+     */
+    //TODO make generic and Rollback if errer... and other like given destId ..
+    public void addNewNodeOnEdge(int sourceNodeId, EdgeType edgeType, VO newDestNode) {
+        switch (edgeType) {
+
+            case TREE_PARENT_TO_CHILD:
+                PointFolderRT src = (PointFolderRT) nodes.get(sourceNodeId);
+                if (src != null) {
+                    src.validateChildName(newDestNode.getName()); 
+                }
+                newDestNode = nodeEdgeDao.saveNode(newDestNode);
+                nodes.put(newDestNode.getId(), newDestNode.createRT());
+                nodeEdgeDao.saveEdge(sourceNodeId, newDestNode.getId(), EdgeType.TREE_PARENT_TO_CHILD);
+                try {
+                    nodes.get(sourceNodeId).wireEdgeAsSrc(nodes.get(newDestNode.getId()), EdgeType.TREE_PARENT_TO_CHILD);
+                } catch (WrongEdgeTypeException ex) {
+                    LOG.log(Level.SEVERE, "Can't wire in RuntimeManager.addPointFolder", ex);
+                    throw new RuntimeException(ex);
+                }
+                break;
+            default:
+                throw new ImplementMeException();
+        }
+    }
+
+    public Collection<DataPointNodeVO> getRootPointFolders() {
+        List<DataPointNodeVO> result = new LinkedList<>();
+        nodes.forEach((index, node) -> {
+            switch (node.getNodeType()) {
+                case DATA_POINT:
+                    if (((DataPointRT<?, ?>) node).getParent() == null) {
+                        result.add(((DataPointRT<?, ?>) node).getVO());
+                    }
+                    break;
+                case POINT_FOLDER:
+                    if (((PointFolderRT) node).getParent() == null) {
+                        result.add(((PointFolderRT) node).getVO());
+                    }
+            }
+        });
+        return result;
+    }
+
+    public PointFolderVO savePointFolder(PointFolderVO pfvo) {
+        PointFolderRT pfrt = getPointFolder(pfvo.getId());
+        if (pfrt.getParent() != null) {
+            pfrt.getParent().validateChildName(pfvo.getName());
+        }
+        pfvo = nodeEdgeDao.saveNode(pfvo);
+        pfrt.patch(pfvo);
+        return pfvo;
+    }
+
+    public void addDataPoint(DataPointVO dpvo, int parentId) {
+        PointFolderRT src = (PointFolderRT) nodes.get(parentId);
+        if (src != null) {
+            src.validateChildName(dpvo.getName());
+        }
+        dpvo = nodeEdgeDao.saveNode(dpvo);
+        nodes.put(dpvo.getId(), dpvo.createRT());
+        nodeEdgeDao.saveEdge(parentId, dpvo.getId(), EdgeType.TREE_PARENT_TO_CHILD);
+        try {
+            nodes.get(parentId).wireEdgeAsSrc(nodes.get(dpvo.getId()), EdgeType.TREE_PARENT_TO_CHILD);
+        } catch (WrongEdgeTypeException ex) {
+            LOG.log(Level.SEVERE, "Can't wire in RuntimeManager.addPointFolder", ex);
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public void deleteNode(int id) {
+        RT node = getNode(id);
+        switch (node.getNodeType()) {
+            case POINT_FOLDER:
+                deletePointFolder((PointFolderRT) node);
+                break;
+            case DATA_POINT:
+                deleteDataPoint((DataPointRT) node);
+                break;
+            default:
+                throw new ImplementMeException();
+        }
+    }
+
+    public VO saveNode(VO vo) {
+        switch (vo.getNodeType()) {
+            case POINT_FOLDER:
+                return savePointFolder((PointFolderVO) vo);
+            case DATA_POINT:
+                return saveDataPoint((DataPointVO) vo);
+            default:
+                throw new ImplementMeException();
+        }
     }
 
 }

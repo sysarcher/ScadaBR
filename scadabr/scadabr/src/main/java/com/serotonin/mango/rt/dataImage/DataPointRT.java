@@ -18,16 +18,16 @@
  */
 package com.serotonin.mango.rt.dataImage;
 
-import br.org.scadabr.DataType;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import br.org.scadabr.dao.PointValueDao;
 import br.org.scadabr.dao.SystemSettingsDao;
 import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.rt.DataPointNodeRT;
+import br.org.scadabr.rt.PointFolderRT;
+import br.org.scadabr.rt.RT;
 import br.org.scadabr.rt.SchedulerPool;
 import br.org.scadabr.rt.event.schedule.ScheduledEventManager;
 import com.serotonin.mango.rt.RuntimeManager;
@@ -35,27 +35,36 @@ import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.event.detectors.PointEventDetectorRT;
 import com.serotonin.mango.util.timeout.RunClient;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.event.DoublePointEventDetectorVO;
 import br.org.scadabr.timer.cron.EventRunnable;
 import br.org.scadabr.util.ILifecycle;
+import br.org.scadabr.vo.EdgeIterator;
+import br.org.scadabr.vo.EdgeType;
+import br.org.scadabr.vo.LoggingTypes;
+import br.org.scadabr.vo.NodeType;
+import com.serotonin.mango.rt.AbstractRT;
 import com.serotonin.mango.rt.EventManager;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
 //TODO split tist to datatypes Double ....
+/**
+ *
+ * @param <T>
+ * @param <P>
+ */
 @Configurable
-public abstract class DataPointRT<T extends PointValueTime> implements IDataPoint<T>, ILifecycle, RunClient {
+public abstract class DataPointRT<T extends DataPointVO<T, P>, P extends PointValueTime> 
+        extends AbstractRT<T> 
+        implements DataPointNodeRT<T>, IDataPoint<P>, ILifecycle, RunClient {
 
     protected static final Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_CORE);
     private static final PvtTimeComparator pvtTimeComparator = new PvtTimeComparator();
 
-    // Configuration data.
-    protected final DataPointVO<T> vo;
     protected final PointLocatorRT pointLocator;
 
     // Runtime data.
-    protected volatile T pointValue;
+    protected volatile P pointValue;
     @Autowired
     protected RuntimeManager runtimeManager;
     @Autowired
@@ -70,9 +79,15 @@ public abstract class DataPointRT<T extends PointValueTime> implements IDataPoin
     private SchedulerPool schedulerPool;
     private List<PointEventDetectorRT> detectors;
     private final Map<String, Object> attributes = new HashMap<>();
-
-    public DataPointRT(DataPointVO<T> vo, PointLocatorRT pointLocator) {
-        this.vo = vo;
+    private PointFolderRT parentFolder;
+    protected LoggingTypes loggingType;
+    
+   
+    
+    
+    public DataPointRT(T vo, PointLocatorRT pointLocator) {
+        super(vo);
+        loggingType = vo.getLoggingType();
         this.pointLocator = pointLocator;
     }
 
@@ -84,12 +99,12 @@ public abstract class DataPointRT<T extends PointValueTime> implements IDataPoin
      * @param newValue
      */
     @Override
-    public void updatePointValueAsync(T newValue) {
+    public void updatePointValueAsync(P newValue) {
         savePointValueAsync(newValue, null);
     }
 
     @Override
-    public void updatePointValueSync(T newValue) {
+    public void updatePointValueSync(P newValue) {
         savePointValueSync(newValue, null);
     }
 
@@ -103,48 +118,32 @@ public abstract class DataPointRT<T extends PointValueTime> implements IDataPoin
      * event.
      */
     @Override
-    public void setPointValueSync(T newValue, SetPointSource source) {
-            savePointValueSync(newValue, source);
+    public void setPointValueSync(P newValue, SetPointSource source) {
+        savePointValueSync(newValue, source);
     }
 
     @Override
-    public void setPointValueAsync(T newValue) {
-            savePointValueAsync(newValue, null);
+    public void setPointValueAsync(P newValue) {
+        savePointValueAsync(newValue, null);
     }
 
-    protected abstract void savePointValueAsync(T newValue, SetPointSource source);
-    protected abstract void savePointValueSync(T newValue, SetPointSource source);
+    protected abstract void savePointValueAsync(P newValue, SetPointSource source);
+
+    protected abstract void savePointValueSync(P newValue, SetPointSource source);
 
     //
     // /
     // / Properties
     // /
     //
-    public int getId() {
-        return vo.getId();
-    }
-
     @Override
-    public T getPointValue() {
+    public P getPointValue() {
         return pointValue;
     }
 
     @SuppressWarnings("unchecked")
     public <T extends PointLocatorRT> T getPointLocator() {
         return (T) pointLocator;
-    }
-
-    public DataPointVO getVo() {
-        return vo;
-    }
-
-    public String getVoName() {
-        return vo.getName();
-    }
-
-    @Override
-    public DataType getDataType() {
-        return vo.getDataType();
     }
 
     public Map<String, Object> getAttributes() {
@@ -184,7 +183,7 @@ public abstract class DataPointRT<T extends PointValueTime> implements IDataPoin
 
     @Override
     public String toString() {
-        return "DataPointRT(id=" + getId() + ", name=" + vo.getName() + ")";
+        return "DataPointRT(id=" + getId() + ", name=" + name + ")";
     }
 
     //
@@ -193,7 +192,7 @@ public abstract class DataPointRT<T extends PointValueTime> implements IDataPoin
     // /
     //
     protected void fireEvents(PointValueTime oldValue, PointValueTime newValue, boolean set, boolean backdate) {
-        DataPointListener l = runtimeManager.getDataPointListeners(vo.getId());
+        DataPointListener l = runtimeManager.getDataPointListeners(id);
         if (l != null) {
             schedulerPool.execute(new EventNotifyWorkItem(l, oldValue, newValue, set, backdate));
         }
@@ -249,11 +248,12 @@ public abstract class DataPointRT<T extends PointValueTime> implements IDataPoin
     //
     @Override
     public void initialize() {
+/*TODO
         // Get the latest value for the point from the database.
-        pointValue = pointValueDao.getLatestPointValue(vo);
+        pointValue = pointValueDao.getLatestPointValue(getVO());
 
         // Add point event listeners
-        for (DoublePointEventDetectorVO ped : vo.getEventDetectors()) {
+        for (DoublePointEventDetectorVO ped : getVO().getEventDetectors()) {
             if (detectors == null) {
                 detectors = new ArrayList<>();
             }
@@ -261,8 +261,9 @@ public abstract class DataPointRT<T extends PointValueTime> implements IDataPoin
             PointEventDetectorRT pedRT = ped.createRuntime();
             detectors.add(pedRT);
             scheduledEventManager.addPointEventDetector(pedRT);
-            runtimeManager.addDataPointListener(vo.getId(), pedRT);
+            runtimeManager.addDataPointListener(id, pedRT);
         }
+*/
     }
 
     @Override
@@ -271,27 +272,62 @@ public abstract class DataPointRT<T extends PointValueTime> implements IDataPoin
         //TODO notify runtimeManger and lat them handle this???
         if (detectors != null) {
             for (PointEventDetectorRT pedRT : detectors) {
-                runtimeManager.removeDataPointListener(vo.getId(), pedRT);
+                runtimeManager.removeDataPointListener(id, pedRT);
                 scheduledEventManager.removePointEventDetector(pedRT.getEventDetectorKey());
             }
         }
         //TODO notify runtimeManger and lat them handle this???
-        eventManager.cancelEventsForDataPoint(vo.getId());
+        eventManager.cancelEventsForDataPoint(id);
     }
 
     @Override
     public void joinTermination() {
         // no op
     }
-    
+
     @Override
-    public void updatePointValue(T newValue) {
+    public void updatePointValue(P newValue) {
         savePointValueAsync(pointValue, null);
     }
 
     @Override
-    public void setPointValue(T newValue) {
+    public void setPointValue(P newValue) {
         savePointValueAsync(pointValue, null);
+    }
+
+    @Override
+    public PointFolderRT getParent() {
+        return parentFolder;
+    }
+
+    @Override
+    public void setParent(PointFolderRT parent) {
+        this.parentFolder = parent;
+    }
+
+    @Override
+    public void wireEdgeAsSrc(RT<?> dest, EdgeType edgeType) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void wireEdgeAsDest(RT<?> src, EdgeType edgeType) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void iterateEdgesAsSrc(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void iterateEdgesAsDest(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public NodeType getNodeType() {
+        return NodeType.DATA_POINT;
     }
 
 }

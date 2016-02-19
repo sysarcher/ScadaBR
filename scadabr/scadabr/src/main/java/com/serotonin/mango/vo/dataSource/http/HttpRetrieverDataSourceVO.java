@@ -101,7 +101,7 @@ public class HttpRetrieverDataSourceVO extends DataSourceVO<HttpRetrieverDataSou
     }
 
     @Override
-    public DataSourceRT createDataSourceRT() {
+    public HttpRetrieverDataSourceRT createRT() {
         return new HttpRetrieverDataSourceRT(this);
     }
 

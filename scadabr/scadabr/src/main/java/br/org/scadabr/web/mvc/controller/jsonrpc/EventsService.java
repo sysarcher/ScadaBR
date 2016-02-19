@@ -3,8 +3,7 @@ package br.org.scadabr.web.mvc.controller.jsonrpc;
 import br.org.scadabr.dao.EventDao;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.l10n.Localizer;
-import com.googlecode.jsonrpc4j.JsonRpcService;
-import com.serotonin.mango.rt.event.AlternateAcknowledgementSources;
+//import com.googlecode.jsonrpc4j.JsonRpcService;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.UserSessionContextBean;
@@ -16,7 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 
 @Named
-@JsonRpcService("/rpc/events/")
+//@JsonRpcService("/rpc/events/")
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class EventsService {
 

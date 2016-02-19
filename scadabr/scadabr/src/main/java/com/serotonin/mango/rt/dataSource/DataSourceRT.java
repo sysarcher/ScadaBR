@@ -29,17 +29,21 @@ import java.util.Map;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.rt.IDataPointLiveCycleListener;
+import br.org.scadabr.rt.RT;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.event.type.DataSourceEventType;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import br.org.scadabr.util.ILifecycle;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.NodeType;
 import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.vo.event.type.DataSourceEventKey;
+import com.serotonin.mango.rt.AbstractRT;
 import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.vo.DataPointVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,12 +64,14 @@ import org.springframework.beans.factory.annotation.Configurable;
  * serializable, while an RT is not.)
  *
  * @author Matthew Lohbihler
+ * @param <T>
  */
 @Configurable
-abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecycle, IDataPointLiveCycleListener {
+abstract public class DataSourceRT<T extends DataSourceVO<T>>
+        extends AbstractRT<T>
+        implements ILifecycle, IDataPointLiveCycleListener, RT<T> {
 
     public static final String ATTR_UNRELIABLE_KEY = "UNRELIABLE";
-    protected final T vo;
     /**
      * If a entry is there for a key this key has an statefull event.
      * The type of the enty is dependend on the suclass and key
@@ -117,17 +123,9 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
      * cached
      */
     public DataSourceRT(T vo, boolean doCache) {
-        this.vo = vo;
+        super(vo);
         activeEvents = (Map<DataSourceEventKey, Object>)vo.createEventKeyMap();
         caching = doCache;
-    }
-
-    public int getId() {
-        return vo.getId();
-    }
-
-    public String getName() {
-        return vo.getName();
     }
 
     /**
@@ -135,7 +133,8 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
      * using the setPersistentData method.
      */
     public Object getPersistentData() {
-        return dataSourceDao.getPersistentData(vo);
+throw new ImplementMeException();
+//return dataSourceDao.getPersistentData(vo);
     }
 
     /**
@@ -146,7 +145,8 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
      * failover purposes.
      */
     protected void setPersistentData(Object persistentData) {
-        dataSourceDao.savePersistentData(vo, persistentData);
+throw new ImplementMeException();
+//        dataSourceDao.savePersistentData(vo, persistentData);
     }
 
     /*
@@ -157,8 +157,8 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
         synchronized (dataPointsCacheLock) {
             if (caching) {
                 cacheChanged |= enabledDataPointsCache.put(dataPoint.getId(), dataPoint) == null;
-                cacheChanged |= disabledDataPointsCache.remove(dataPoint.getVo());
-                cacheChanged |= deletedDataPointsCache.remove(dataPoint.getVo());
+                cacheChanged |= disabledDataPointsCache.remove(dataPoint.getVO());
+                cacheChanged |= deletedDataPointsCache.remove(dataPoint.getVO());
             } else {
                 enabledDataPoints.put(dataPoint.getId(), dataPoint);
                 disabledDataPoints.remove(dataPoint.getId());
@@ -232,11 +232,14 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
     }
 
     protected void raiseAlarm(DataSourceEventKey eventKey, LocalizableMessage message) {
+        throw new ImplementMeException();
+        /*
         final DataSourceEventType type = vo.getEventType(eventKey);
         final Map<String, Object> context = new HashMap<>();
         context.put("dataSource", vo);
 
         type.fire(context, "event.ds", vo.getName(), message);
+*/
     }
     
     protected void raiseAlarm(DataSourceEventKey eventKey, String i18nKey, Object ... i18nArgs) {
@@ -244,37 +247,45 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
     }
     
     protected void raiseAlarm(DataSourceEventKey eventKey, long timestamp, LocalizableMessage message) {
+        throw new ImplementMeException();
+        /*
         final DataSourceEventType type = vo.getEventType(eventKey);
         final Map<String, Object> context = new HashMap<>();
         context.put("dataSource", vo);
 
         type.fire(context, timestamp, "event.ds", vo.getName(), message);
-    }
+*/    }
     
     protected void fireEvent(DataSourceEventKey eventKey, LocalizableMessage message) {
         fireEvent(eventKey, System.currentTimeMillis(), message);
     }
 
     protected void fireEvent(DataSourceEventKey eventKey, long timestamp, LocalizableMessage message) {
+        throw new ImplementMeException();
+        /*
         final DataSourceEventType type = vo.getEventType(eventKey);
         final Map<String, Object> context = new HashMap<>();
         context.put("dataSource", vo);
         type.fire(context, timestamp, new LocalizableMessageImpl("event.ds", vo.getName(), message));
-    }
+*/    }
 
     protected void fireEvent(DataSourceEventKey eventKey, long timestamp, String i18nKey, Object ... i18nArgs) {
         fireEvent(eventKey, timestamp, new LocalizableMessageImpl(i18nKey, i18nArgs));
     }
 
     protected void clearAlarm(DataSourceEventKey eventKey) {
+        throw new ImplementMeException();
+        /*
         final DataSourceEventType type = vo.getEventType(eventKey);
         type.clearAlarm();
-    }
+*/    }
 
     protected void clearAlarm(DataSourceEventKey eventKey, long timestamp) {
+        throw new ImplementMeException();
+        /*
         final DataSourceEventType type = vo.getEventType(eventKey);
         type.clearAlarm(timestamp);
-    }
+*/    }
 
     public static LocalizableException wrapSerialException(Exception e, String portId) {
         if (e instanceof NoSuchPortException) {
@@ -304,7 +315,7 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
     public void terminate() {
         // Remove any outstanding events.
         //TODO move this to runtimeManger ??? 
-        eventManager.cancelEventsForDataSource(vo.getId());
+        eventManager.cancelEventsForDataSource(id);
     }
 
     @Override
@@ -319,5 +330,9 @@ abstract public class DataSourceRT<T extends DataSourceVO<T>> implements ILifecy
     public void dataPointLocatorEnabled(PointLocatorRT rt) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
+    @Override
+    public NodeType getNodeType() {
+        return NodeType.DATA_SOURCE;
+    }
 }

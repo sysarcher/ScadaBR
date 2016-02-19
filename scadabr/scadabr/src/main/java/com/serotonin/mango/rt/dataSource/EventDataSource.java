@@ -20,7 +20,8 @@ package com.serotonin.mango.rt.dataSource;
 
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 
-abstract public class EventDataSource<T extends DataSourceVO<T>> extends DataSourceRT<T> {
+abstract public class EventDataSource<T extends DataSourceVO<T>> 
+        extends DataSourceRT<T> {
 
     public EventDataSource(T vo, boolean doCache) {
         super(vo, doCache);

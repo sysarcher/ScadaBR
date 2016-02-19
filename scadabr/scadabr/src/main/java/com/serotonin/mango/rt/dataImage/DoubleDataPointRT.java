@@ -5,34 +5,34 @@
  */
 package com.serotonin.mango.rt.dataImage;
 
+import br.org.scadabr.DataType;
 import br.org.scadabr.timer.cron.DataSourceCronTask;
 import br.org.scadabr.utils.ImplementMeException;
-import br.org.scadabr.vo.IntervalLoggingTypes;
-import br.org.scadabr.vo.LoggingTypes;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
-import com.serotonin.mango.vo.DataPointVO;
-import java.util.ArrayList;
+import com.serotonin.mango.vo.DoubleDataPointVO;
 import java.util.List;
 
 /**
  *
  * @author aploese
  */
-public class DoubleDataPointRT extends DataPointRT<DoubleValueTime> {
+public class DoubleDataPointRT 
+        extends DataPointRT<DoubleDataPointVO, DoubleValueTime> {
 
-    public DoubleDataPointRT(DataPointVO<DoubleValueTime> vo, PointLocatorRT<DoubleValueTime, ?> pointLocator) {
+    
+    public DoubleDataPointRT(DoubleDataPointVO vo, PointLocatorRT<DoubleValueTime, ?> pointLocator) {
         super(vo, pointLocator);
     }
 
     @Override
     public void initialize() {
         super.initialize();
-        initializeIntervalLogging();
+ //       initializeIntervalLogging();
     }
 
     @Override
     public void terminate() {
-        terminateIntervalLogging();
+   //     terminateIntervalLogging();
         super.terminate();
     }
     // Interval logging data.
@@ -45,9 +45,10 @@ public class DoubleDataPointRT extends DataPointRT<DoubleValueTime> {
     //
     // / Interval logging
     //
+    /*
     private void initializeIntervalLogging() {
         synchronized (intervalLoggingLock) {
-            if (vo.getLoggingType() != LoggingTypes.INTERVAL) {
+            if (loggingType != LoggingTypes.INTERVAL) {
                 return;
             }
 
@@ -71,7 +72,7 @@ public class DoubleDataPointRT extends DataPointRT<DoubleValueTime> {
             intervalLoggingTask.cancel();
         }
     }
-
+*/
     /**
      * This is the value around which tolerance decisions will be made when
      * determining whether to log numeric values.
@@ -177,6 +178,7 @@ public class DoubleDataPointRT extends DataPointRT<DoubleValueTime> {
         }
     }
 */
+    /*
     private void intervalSave(DoubleValueTime pvt) {
         synchronized (intervalLoggingLock) {
             switch (vo.getIntervalLoggingType()) {
@@ -203,7 +205,7 @@ public class DoubleDataPointRT extends DataPointRT<DoubleValueTime> {
             }
         }
     }
-
+*/
     /**
      * Collect the data and store them
      *
@@ -249,11 +251,11 @@ public class DoubleDataPointRT extends DataPointRT<DoubleValueTime> {
     }
     
         public void initializeHistorical() {
-        initializeIntervalLogging();
+    //    initializeIntervalLogging();
     }
 
     public void terminateHistorical() {
-        terminateIntervalLogging();
+    //    terminateIntervalLogging();
     }
 
     @Override
@@ -264,6 +266,18 @@ public class DoubleDataPointRT extends DataPointRT<DoubleValueTime> {
     @Override
     protected void savePointValueSync(DoubleValueTime newValue, SetPointSource source) {
                     pointValueDao.savePointValueSync(newValue, source);
+    }
+
+    @Override
+    public DoubleDataPointVO getVO() {
+        final DoubleDataPointVO result = new DoubleDataPointVO();
+        fillVO(result);
+        return result;
+    }
+
+    @Override
+    public DataType getDataType() {
+        return DataType.DOUBLE;
     }
 
 }

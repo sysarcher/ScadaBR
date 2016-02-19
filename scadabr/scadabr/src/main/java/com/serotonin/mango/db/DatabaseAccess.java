@@ -18,7 +18,6 @@
  */
 package com.serotonin.mango.db;
 
-import br.org.scadabr.ScadaBrVersionBean;
 import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -29,6 +28,7 @@ import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.dao.jdbc.BaseDao;
 import br.org.scadabr.dao.jdbc.SystemSettingsDaoImpl;
 import br.org.scadabr.dao.jdbc.UserDaoImpl;
 import br.org.scadabr.db.spring.ConnectionCallbackVoid;
@@ -36,9 +36,7 @@ import br.org.scadabr.logger.LogUtils;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.inject.Inject;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 
 abstract public class DatabaseAccess {
 
@@ -56,44 +54,20 @@ abstract public class DatabaseAccess {
         ejt.setDataSource(getDataSource());
 
         try {
-            if (newDatabaseCheck(ejt)) {
-                // Check if we should convert from another database.
-                final String convertTypeStr = jdbcProperties.getProperty("convert.db.type", "");
-
-                if (!convertTypeStr.isEmpty()) {
-                    // Found a database type from which to convert.
-                    DatabaseType convertType = DatabaseType
-                            .valueOf(convertTypeStr.toUpperCase());
-                    if (convertType == null) {
-                        throw new IllegalArgumentException(
-                                "Unknown convert database type: " + convertType);
-                    }
-
-                    DatabaseAccess sourceAccess = convertType.getImpl(jdbcProperties);
-                    sourceAccess.initializeImpl("convert.");
-
-                    DBConvert convert = new DBConvert();
-                    convert.setSource(sourceAccess);
-                    convert.setTarget(this);
-                    try {
-                        convert.execute();
-                    } catch (SQLException e) {
-                        throw new ShouldNeverHappenException(e);
-                    }
-
-                    sourceAccess.terminate();
+            if (!checkDataBaseExists(ejt)) {
+                LOG.info("Create new data base");
+                createDataBase(ejt);
+                if (jdbcProperties.getProperty("convert.db.type", "").isEmpty()) {
+                    LOG.info("Populate new data base");
+                    populateNewDatabase(ejt, scadaBrVersion);
                 } else {
-                    LOG.info("Setup user admin in db");
-
-                    // New database. Create a default user.
-                    UserDaoImpl.createAdmin(ejt);
-
-                    // Record the current version.
-                    SystemSettingsDaoImpl.setSetSchemaVersion(ejt, scadaBrVersion);
-                    LOG.info("database sucessfully created");
-
+                    LOG.info("Convert existing data base");
+                    convertDataBase(jdbcProperties);
                 }
             }
+            LOG.info("Wire Java Classes");
+            wireJavaClassesWithDB(ejt);
+            
             // else
             // // The database exists, so let's make its schema version matches
             // // the application version.
@@ -119,12 +93,19 @@ abstract public class DatabaseAccess {
 
     abstract protected void initializeImpl(String propertyPrefix);
 
-    protected void postInitialize(
-            @SuppressWarnings("unused") JdbcTemplate ejt) {
+    protected void postInitialize(@SuppressWarnings("unused") JdbcTemplate ejt) {
         // no op - override as necessary
     }
 
-    abstract protected boolean newDatabaseCheck(JdbcTemplate ejt);
+    /**
+     * Check if database exists
+     * 
+     * @param ejt
+     * @return true if it exists, otherwise false
+     */
+    abstract protected boolean checkDataBaseExists(JdbcTemplate ejt);
+
+    abstract protected void createDataBase(JdbcTemplate ejt);
 
     abstract public void runScript(String[] script, final OutputStream out)
             throws Exception;
@@ -153,6 +134,59 @@ abstract public class DatabaseAccess {
                 DataSourceUtils.releaseConnection(conn, dataSource);
             }
         }
+    }
+
+    /**
+     * Convert an existing db to a different db engine or database
+     *
+     * @param jdbcProperties
+     */
+    private void convertDataBase(Properties jdbcProperties) {
+        // Check if we should convert from another database.
+        final String convertTypeStr = jdbcProperties.getProperty("convert.db.type", "");
+
+        DatabaseType convertType = DatabaseType
+                .valueOf(convertTypeStr.toUpperCase());
+        if (convertType == null) {
+            throw new IllegalArgumentException(
+                    "Unknown convert database type: " + convertType);
+        }
+
+        DatabaseAccess sourceAccess = convertType.getImpl(jdbcProperties);
+        sourceAccess.initializeImpl("convert.");
+
+        DBConvert convert = new DBConvert();
+        convert.setSource(sourceAccess);
+        convert.setTarget(this);
+        try {
+            convert.execute();
+        } catch (SQLException e) {
+            throw new ShouldNeverHappenException(e);
+        }
+
+        sourceAccess.terminate();
+    }
+
+    /**
+     * Populate an empty new database with basic objects
+     *
+     * @param ejt
+     * @param scadaBrVersion
+     */
+    private void populateNewDatabase(JdbcTemplate ejt, String scadaBrVersion) {
+        LOG.info("Setup user admin in db");
+
+        // New database. Create a default user.
+        UserDaoImpl.createAdmin(ejt);
+
+        // Record the current version.
+        SystemSettingsDaoImpl.setSetSchemaVersion(ejt, scadaBrVersion);
+        LOG.info("database sucessfully created");
+        BaseDao.initNodeAndEdgeTypes(ejt, scadaBrVersion);
+    }
+
+    private void wireJavaClassesWithDB(JdbcTemplate ejt) {
+        BaseDao.wireJavaClassesWithDB(ejt);
     }
 
 }

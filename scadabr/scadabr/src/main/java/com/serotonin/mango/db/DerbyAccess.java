@@ -20,18 +20,19 @@ package com.serotonin.mango.db;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.db.spring.ConnectionCallbackVoid;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
@@ -41,7 +42,6 @@ import org.apache.derby.tools.ij;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.CallableStatementCreator;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
 public class DerbyAccess extends DatabaseAccess {
@@ -104,33 +104,37 @@ public class DerbyAccess extends DatabaseAccess {
     }
 
     @Override
-    protected boolean newDatabaseCheck(JdbcTemplate ejt) {
-        int count = ejt.queryForObject("select count(1) from sys.systables where tablename='USERS'", Integer.class);
-        if (count == 0) {
-            // The users table wasn't found, so assume that this is a new Mango instance.
-            // Create the tables
-            try {
-                try (FileOutputStream out = new FileOutputStream("createTables.log")) {
-                    Connection conn = DataSourceUtils.getConnection(dataSource);
-                    org.apache.derby.tools.ij.runScript(conn,
-                            DerbyAccess.class.getResourceAsStream("/db/createTables-derby.sql"), "ASCII", out, "UTF-8");
-                    DataSourceUtils.releaseConnection(conn, dataSource);
-                    out.flush();
-                }
-            } catch (IOException | CannotGetJdbcConnectionException e) {
-                // Should never happen, so just wrap in a runtime exception and rethrow.
-                throw new ShouldNeverHappenException(e);
-            }
-
-            return true;
-        }
-
-        return false;
+    protected boolean checkDataBaseExists(JdbcTemplate ejt) {
+        return 1 == ejt.queryForObject("select count(1) from sys.systables where tablename='USERS'", Integer.class);
     }
 
     @Override
-    protected void postInitialize(JdbcTemplate ejt) {
-        updateIndentityStarts(ejt);
+    protected void createDataBase(JdbcTemplate ejt) {
+        // The users table wasn't found, so assume that this is a new Mango instance.
+        // Create the tables
+        try {
+            try (FileOutputStream out = new FileOutputStream("createTables.log")) {
+                Connection conn = DataSourceUtils.getConnection(dataSource);
+                org.apache.derby.tools.ij.runScript(conn,
+                        DerbyAccess.class.getResourceAsStream("/db/createTables-derby.sql"), "ASCII", out, "UTF-8");
+                DataSourceUtils.releaseConnection(conn, dataSource);
+                out.flush();
+            }
+        } catch (IOException | CannotGetJdbcConnectionException e) {
+            StringBuilder sb = new StringBuilder();
+            try (Reader fr = new FileReader("createTables.log")) {
+                try (BufferedReader br = new BufferedReader(fr)) {
+                    br.lines().forEach((String line) -> sb.append(line));
+                }
+                log.fatal("Create DB Errior: \n" + sb.toString());
+            } catch (IOException ioe) {
+
+            }
+            log.fatal(e);
+            // Should never happen, so just wrap in a runtime exception and rethrow.
+            throw new ShouldNeverHappenException(e);
+        }
+
     }
 
     @Override
@@ -151,48 +155,6 @@ public class DerbyAccess extends DatabaseAccess {
                 }
             }
         });
-    }
-
-    /**
-     * This method updates the tables with identity autoincrement values that
-     * are the maximum of the current autoincrement value or max(id)+1. This
-     * ensures that updates to tables that may have occurred are handled, and
-     * prevents cases where inserts are attempted with identities that already
-     * exist.
-     */
-    private void updateIndentityStarts(JdbcTemplate ejt) {
-        List<IdentityStart> starts = ejt.query("select t.tablename, c.columnname, c.autoincrementvalue "
-                + //
-                "from sys.syscolumns c join sys.systables t on c.referenceid = t.tableid "
-                + //
-                "where t.tabletype='T' and c.autoincrementvalue is not null", new RowMapper<IdentityStart>() {
-            @Override
-            public IdentityStart mapRow(ResultSet rs, int index) throws SQLException {
-                IdentityStart is = new IdentityStart();
-                is.table = rs.getString(1);
-                is.column = rs.getString(2);
-                is.aiValue = rs.getInt(3);
-                return is;
-            }
-        });
-
-        for (IdentityStart is : starts) {
-            Integer maxId = ejt.queryForObject("select max(" + is.column + ") from " + is.table, Integer.class);
-            if (maxId == null) {
-                if (is.aiValue <= 0) {
-                    ejt.execute("alter table " + is.table + " alter column " + is.column + " restart with " + (maxId + 1));
-                }
-            } else if (is.aiValue <= maxId) {
-                ejt.execute("alter table " + is.table + " alter column " + is.column + " restart with " + (maxId + 1));
-            }
-        }
-    }
-
-    class IdentityStart {
-
-        String table;
-        String column;
-        int aiValue;
     }
 
     @Override

@@ -18,12 +18,17 @@
  */
 package com.serotonin.mango.rt.dataSource.http;
 
+import br.org.scadabr.rt.RT;
+import br.org.scadabr.rt.WrongEdgeTypeException;
 import br.org.scadabr.utils.ImplementMeException;
+import br.org.scadabr.vo.EdgeIterator;
+import br.org.scadabr.vo.EdgeType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.EventDataSource;
+import com.serotonin.mango.vo.dataSource.http.HttpImageDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpReceiverDataSourceVO;
 
 /**
@@ -32,9 +37,13 @@ import com.serotonin.mango.vo.dataSource.http.HttpReceiverDataSourceVO;
 public class HttpReceiverDataSourceRT extends EventDataSource<HttpReceiverDataSourceVO> implements HttpMulticastListener {
 
     private final Log log = LogFactory.getLog(HttpReceiverDataSourceRT.class);
-
+    private String[] ipWhiteList;
+    private String[] deviceIdWhiteList;
+    
     public HttpReceiverDataSourceRT(HttpReceiverDataSourceVO vo) {
         super(vo, true);
+        ipWhiteList = vo.getIpWhiteList();
+        deviceIdWhiteList = vo.getDeviceIdWhiteList();
     }
 
     //
@@ -61,12 +70,12 @@ public class HttpReceiverDataSourceRT extends EventDataSource<HttpReceiverDataSo
     //
     @Override
     public String[] getDeviceIdWhiteList() {
-        return vo.getDeviceIdWhiteList();
+        return deviceIdWhiteList;
     }
 
     @Override
     public String[] getIpWhiteList() {
-        return vo.getIpWhiteList();
+        return ipWhiteList;
     }
 
     @Override
@@ -114,5 +123,37 @@ public class HttpReceiverDataSourceRT extends EventDataSource<HttpReceiverDataSo
             }
         }
                 */
+    }
+
+    @Override
+    public void wireEdgeAsSrc(RT<?> dest, EdgeType edgeType) throws WrongEdgeTypeException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void wireEdgeAsDest(RT<?> src, EdgeType edgeType) throws WrongEdgeTypeException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void iterateEdgesAsSrc(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void iterateEdgesAsDest(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void patch(HttpReceiverDataSourceVO vo) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public HttpReceiverDataSourceVO getVO() {
+        final HttpReceiverDataSourceVO result = new HttpReceiverDataSourceVO();
+        fillVO(result);
+        return result;
     }
 }

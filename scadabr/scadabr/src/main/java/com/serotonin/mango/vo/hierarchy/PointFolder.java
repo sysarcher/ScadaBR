@@ -30,10 +30,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Matthew Lohbihler
  *
  */
-
+@Deprecated
 public class PointFolder {
 
-    private int id;
+    private Integer id;
     
     private String name;
 
@@ -46,7 +46,6 @@ public class PointFolder {
     }
 
     public PointFolder(String name) {
-        this.id = ScadaBrConstants.NEW_ID;
         this.name = name;
     }
 
@@ -72,11 +71,11 @@ public class PointFolder {
         }
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -148,7 +147,7 @@ public class PointFolder {
 
     @JsonIgnore
     public boolean isNew() {
-        return id == ScadaBrConstants.NEW_ID;
+        return id == null;
     }
 
 }

@@ -44,8 +44,8 @@ public class MetaPointLocatorVOTest {
         plVO.setScript("return -1;");
         plVO.setUpdateEvent(UpdateEvent.SECONDS);
                 
-        MetaDataSourceRT dsRT = (MetaDataSourceRT)dsVO.createDataSourceRT();
-        MetaPointLocatorRT plRT = (MetaPointLocatorRT)plVO.createRuntime();
+        MetaDataSourceRT dsRT = dsVO.createRT();
+        MetaPointLocatorRT plRT = plVO.createRuntime();
         DoubleDataPointRT dpRT = new DoubleDataPointRT(dpVO, plRT);
 //        plRT.start(dsRT, dpRT);
 //        plRT.doPoll(0);

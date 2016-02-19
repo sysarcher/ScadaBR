@@ -18,11 +18,9 @@
  */
 package br.org.scadabr.dao.jdbc;
 
-import br.org.scadabr.ScadaBrConstants;
 import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.dao.MaintenanceEventDao;
-import br.org.scadabr.json.dao.JsonMapperFactory;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.util.StringUtils;
@@ -84,8 +82,6 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
     private DataPointDao dataPointDao;
     @Inject
     private MaintenanceEventDao maintenanceEventDao;
-    @Inject
-    private JsonMapperFactory jsonMapperFactory;
 
     Map<Integer, Map<Integer, DataSourceEventType>> dataSourceEventTypes = new HashMap<>();
 
@@ -161,7 +157,7 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
                 ps.setObject(2, vo.getParentFolderId());
                 ps.setString(3, vo.getName());
                 ps.setString(4, vo.getClass().getName());
-                ps.setClob(5, jsonMapperFactory.write(vo));
+//                ps.setClob(5, jsonMapperFactory.write(vo));
                 return ps;
             }
         });
@@ -189,7 +185,7 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
                 ps.setObject(2, vo.getParentFolderId());
                 ps.setString(3, vo.getName());
                 ps.setString(4, vo.getClass().getName());
-                ps.setClob(5, jsonMapperFactory.write(vo));
+//                ps.setClob(5, jsonMapperFactory.write(vo));
                 return ps;
             }
         });
@@ -230,11 +226,35 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
+    public Iterable<PointLocatorVO> getPointLocatorsByParent(int parentFolderId) {
+        try {
+            return ejt.query(POINT_LOCATOR_SELECT 
+                    + "where\n"
+                    + " pointLocatorFolderId=?", new PointLocatorRowMapper(), parentFolderId);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public Iterable<PointLocatorFolderVO> getPointLocatorsFolderByParent(int parentFolderId) {
+        try {
+            return ejt.query(CHILD_FOLDER_SELECT 
+                    + "where\n"
+                    + " parentId=?", 
+                    new PointLocatorFolderRowMapper(), 
+                    parentFolderId);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
     class DataSourceRowMapper implements RowMapper<DataSourceVO<?>> {
 
         @Override
         public DataSourceVO<?> mapRow(ResultSet rs, int rowNum) throws SQLException {
-            DataSourceVO<?> ds = (DataSourceVO<?>) jsonMapperFactory.read(rs.getString(3), rs.getClob(6).getAsciiStream());
+            DataSourceVO<?> ds = null; //(DataSourceVO<?>) jsonMapperFactory.read(rs.getClob(6).getAsciiStream(), rs.getString(3));
             ds.setId(rs.getInt(1));
             ds.setName(rs.getString(2));
             ds.setXid(rs.getString(4));
@@ -282,7 +302,7 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
                 ps.setString(2, vo.getClass().getName());
                 ps.setString(3, vo.getXid());
                 ps.setBoolean(4, vo.isEnabled());
-                ps.setClob(5, jsonMapperFactory.write(vo));
+//                ps.setClob(5, jsonMapperFactory.write(vo));
                 return ps;
             }
         });
@@ -305,7 +325,7 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
                 ps.setString(2, vo.getClass().getName());
                 ps.setString(3, vo.getXid());
                 ps.setBoolean(4, vo.isEnabled());
-                ps.setClob(5, jsonMapperFactory.write(vo));
+//                ps.setClob(5, jsonMapperFactory.write(vo));
                 ps.setInt(6, vo.getId());
                 return ps;
             }
@@ -360,7 +380,7 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
 
                 // Copy the data source.
                 DataSourceVO<?> dataSourceCopy = dataSource.copy();
-                dataSourceCopy.setId(ScadaBrConstants.NEW_ID);
+                dataSourceCopy.setId(null);
                 dataSourceCopy.setXid(generateUniqueXid());
                 dataSourceCopy.setEnabled(false);
                 dataSourceCopy.setName(StringUtils.truncate(
@@ -371,16 +391,15 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
                 copyPermissions(dataSource.getId(), dataSourceCopy.getId());
 
                 // Copy the points.
-                for (DataPointVO<?> dataPoint : dataPointDao.getDataPoints(dataSourceId)) {
-                    DataPointVO<?> dataPointCopy = dataPoint.copy();
-                    dataPointCopy.setId(ScadaBrConstants.NEW_ID);
-                    dataPointCopy.setXid(dataPointDao.generateUniqueXid());
+                for (DataPointVO<?, ?> dataPoint : dataPointDao.getDataPoints(dataSourceId)) {
+                    DataPointVO<?, ?> dataPointCopy = dataPoint.copy();
+                    dataPointCopy.setId(null);
                     dataPointCopy.setName(dataPoint.getName());
                     dataPointCopy.getComments().clear();
 
                     // Copy the event detectors
                     for (DoublePointEventDetectorVO ped : dataPointCopy.getEventDetectors()) {
-                        ped.setId(ScadaBrConstants.NEW_ID);
+                        ped.setId(null);
                         ped.njbSetDataPoint((DoubleDataPointVO) dataPointCopy);
                     }
 
@@ -436,7 +455,7 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
 
         @Override
         public PointLocatorVO mapRow(ResultSet rs, int rowNum) throws SQLException {
-            final PointLocatorVO dp = (PointLocatorVO) jsonMapperFactory.read(rs.getString(4), rs.getClob(6).getAsciiStream());
+            final PointLocatorVO dp = null; //(PointLocatorVO) jsonMapperFactory.read(rs.getClob(6).getAsciiStream(), rs.getString(4));
             dp.setId(rs.getInt(1));
             dp.setDataSourceId(rs.getInt(2));
             dp.setPointLocatorFolderId(rs.getInt(3));
@@ -449,7 +468,7 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
 
         @Override
         public PointLocatorFolderVO mapRow(ResultSet rs, int rowNum) throws SQLException {
-            final PointLocatorFolderVO dp = (PointLocatorFolderVO) jsonMapperFactory.read(rs.getString(4), rs.getClob(5).getAsciiStream());
+            final PointLocatorFolderVO dp = null; //(PointLocatorFolderVO) jsonMapperFactory.read(rs.getClob(5).getAsciiStream(), rs.getString(4));
             dp.setId(rs.getInt(1));
             dp.setDataSourceId(rs.getInt(2));
             dp.setName(rs.getString(3));
@@ -488,7 +507,7 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
                 ps.setObject(2, vo.getPointLocatorFolderId());
                 ps.setString(3, vo.getClass().getName());
                 ps.setString(4, vo.getName());
-                ps.setClob(5, jsonMapperFactory.write(vo));
+//                ps.setClob(5, jsonMapperFactory.write(vo));
                 return ps;
             }
         });
@@ -516,7 +535,7 @@ public class DataSourceDaoImpl extends BaseDao implements DataSourceDao {
                 ps.setObject(2, vo.getPointLocatorFolderId());
                 ps.setString(3, vo.getClass().getName());
                 ps.setString(4, vo.getName());
-                ps.setClob(5, jsonMapperFactory.write(vo));
+//                ps.setClob(5, jsonMapperFactory.write(vo));
                 ps.setInt(6, vo.getId());
                 return ps;
             }

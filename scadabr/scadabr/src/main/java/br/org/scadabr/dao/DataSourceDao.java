@@ -34,7 +34,10 @@ public interface DataSourceDao {
 
     PointLocatorVO getPointLocator(int id);
 
+    @Deprecated
     Iterable<PointLocatorVO> getPointLocatorsByParent(int dataSourceId, int parentFolderId);
+
+    Iterable<PointLocatorVO> getPointLocatorsByParent(int parentFolderId);
 
     void savePointLocator(PointLocatorVO<?> plVo);
 
@@ -44,7 +47,10 @@ public interface DataSourceDao {
 
     PointLocatorFolderVO getRootPointLocatorFolder(int dataSourceId);
 
+    @Deprecated
     Iterable<PointLocatorFolderVO> getPointLocatorsFolderByParent(int dataSourceId, int parentFolderId);
+
+    Iterable<PointLocatorFolderVO> getPointLocatorsFolderByParent(int parentFolderId);
 
     void savePointLocatorFolder(PointLocatorFolderVO plfVo);
 

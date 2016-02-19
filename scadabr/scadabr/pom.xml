@@ -192,11 +192,6 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.sf.json-lib</groupId>
-            <artifactId>json-lib</artifactId>
-            <classifier>jdk15</classifier>
-        </dependency>
-        <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
         </dependency>
@@ -208,10 +203,10 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.github.briandilley.jsonrpc4j</groupId>
-            <artifactId>jsonrpc4j</artifactId>
-        </dependency>
+        <!--dependency> What is this for??? I saw it in the spring sources ?..? apl
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+        </dependency-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>

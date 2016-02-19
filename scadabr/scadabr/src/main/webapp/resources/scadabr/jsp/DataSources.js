@@ -34,17 +34,20 @@ define(["dojo/_base/declare",
         },
         _initTreeStore: function () {
             this.store = new Observable(new JsonRest({
-                target: "dataSources/dsTree/",
+                target: "configTree/",
                 getChildren: function (object, onComplete, onError) {
                     switch (object.nodeType) {
                         case "ROOT" :
-                            this.query({}).then(onComplete, onError);
+                            this.get("dataSources").then(onComplete, onError);
                             break;
                         case "DataSource":
-                            onComplete([{id: object.id + "/pointLocators", dsId: object.id, folderId: 0, name: "pointLocators", nodeType: "PointLocatorFolder"}]);
+                            onComplete([{id: "dataSources/" + object.id + "/pointLocators", name: "pointLocators", nodeType: "RootPointLocatorFolder"}]);
+                            break;
+                        case "RootPointLocatorFolder":
+                            this.get(object.id).then(onComplete, onError);
                             break;
                         case "PointLocatorFolder":
-                            this.query({dsId: object.dsId, parentFolderId: object.folderId}).then(onComplete, onError);
+                            this.get("pointLocatorFolders/" + object.folderId + "/pointlocators").then(onComplete, onError);
                             break;
                         default :
                             alert("Unknown Type: " + object.nodeType);
@@ -55,6 +58,8 @@ define(["dojo/_base/declare",
                         case "ROOT":
                             return true;
                         case "DataSource":
+                            return true;
+                        case "RootPointLocatorFolder":
                             return true;
                         case "PointLocatorFolder":
                             return true;

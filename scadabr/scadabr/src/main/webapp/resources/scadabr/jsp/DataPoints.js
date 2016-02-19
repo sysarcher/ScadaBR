@@ -1,44 +1,60 @@
 define(["dojo/_base/declare",
     "dijit/Tree",
-    "dojo/store/JsonRest",
-    "dojo/store/Observable",
+    "dojo/request",
+    "dojo/json",
     "dijit/registry",
     "dijit/Menu",
     "dijit/MenuItem",
     "dijit/TooltipDialog",
+    "dijit/ConfirmDialog",
     "dijit/form/TextBox",
     "dojo/keys",
     "dijit/popup",
     "dijit/PopupMenuItem",
-    "dojo/rpc/JsonService"
-], function (declare, Tree, JsonRest, Observable, registry, Menu, MenuItem, TooltipDialog, TextBox, keys, popup, PopupMenuItem, JsonService) {
+    "dojo/i18n!scadabr/nls/messages"
+], function (declare, Tree, request, json, registry, Menu, MenuItem, TooltipDialog, ConfirmDialog, TextBox, keys, popup, PopupMenuItem, messages) {
 
     return declare(null, {
         tree: null,
-        store: null,
+        model: null,
         treeMenu: null,
         nodeNameDialog: null,
-        svc: null,
         dataTypes: null,
-        constructor: function (treeNodeId, tabWidgetId, dataTypes, localizedKeys) {
+        restBaseUrl: "REST/",
+        constructor: function (treeNodeId, tabWidgetId, dataTypes) {
             this.dataTypes = dataTypes;
-            this._initSvc();
-            this.store = new Observable(new JsonRest({
-                target: "lazyConfigTree/dataPoints/",
+            this.model = new Object({
+                ROOT: {id: "ROOT", name: "ROOT", nodeType: "ROOT"},
+                dataPoints: this,
+                getIdentity: function (object) {
+                    return object.id;
+                },
                 getChildren: function (object, onComplete, onError) {
-                    this.query({parentId: object.id}).then(onComplete, onError);
+                    switch (object.nodeType) {
+                        case "ROOT":
+                            request(this.dataPoints.restBaseUrl + "pointFolders", {
+                                handleAs: "json",
+                                method: "GET"
+                            }).then(onComplete, onError);
+                            break;
+                        case "POINT_FOLDER":
+                            request(this.dataPoints.restBaseUrl + object.id + "/children", {
+                                handleAs: "json",
+                                method: "GET"
+                            }).then(onComplete, onError);
+                            break;
+                        default:
+                            alert("No children for: " + object);
+                    }
                 },
                 mayHaveChildren: function (object) {
-                    return object.nodeType === "PF";
+                    return object.nodeType === "POINT_FOLDER" || object.id === "ROOT";
                 },
                 getRoot: function (onItem, onError) {
-                    this.get("root").then(onItem, onError);
+                    onItem(this.ROOT);
                 },
                 getLabel: function (object) {
                     return object.name;
-                },
-                getIdentity: function (object) {
-                    return object.nodeType + "_" + object.id;
                 },
                 //inserted manually to catch the aspect of Tree to get this working -- Observable looks wired to me ... at least JSONRest does not woirk out of the box ...
                 onChange: function (/*dojo/data/Item*/ /*===== item =====*/) {
@@ -48,17 +64,18 @@ define(["dojo/_base/declare",
                 onDelete: function (/*dojo/data/Item*/ /*===== item =====*/) {
                 }
 
-            }));
+            });
             // Create the Tree.
             this.tree = new Tree({
-                model: this.store,
+                model: this.model,
                 detailController: this,
+                showRoot: false,
                 onClick: function (node) {
                     switch (node.nodeType) {
-                        case "DP":
+                        case "DATA_POINT":
                             this.detailController.setPointId(node.id);
                             break;
-                        case "PF":
+                        case "POINT_FOLDER":
                             this.detailController.setFolderId(node.id);
                             break;
                         default:
@@ -66,7 +83,8 @@ define(["dojo/_base/declare",
                     }
                 }
             }, treeNodeId);
-
+            this.tree.set('path', ['ROOT']);
+            
             this.selectedTab = null;
             this.tabViewWidget = null;
             this.dpId = -1;
@@ -77,7 +95,7 @@ define(["dojo/_base/declare",
                 if (((this.dpId === -1) && (this.pfId <= 0)) || (this.selectedTab === null)) {
                     return;
                 }
-                this.selectedTab.set("href", this.selectedTab.contentUrl + "?id=" + (this.dpId !== -1 ? this.dpId : this.pfId));
+                this.selectedTab.set("href", this.selectedTab.contentUrl + "?id=" + (this.dpId !== -1 ? this.dpId : this.pfId)).then(function(succ){alert("Succ" + succ)}, function(err){alert("ERR:" + err);});
             };
             this.setSelectedTab = function (tab) {
                 this.cleanUpBeforeChanage();
@@ -119,14 +137,9 @@ define(["dojo/_base/declare",
                             });
                         });
                     });
-
-            this.nodeNameInput = new TextBox({
-            }
-            );
-
-
             this.nodeNameDialog = new TooltipDialog({
                 content: new TextBox({
+                    dataPoints: this,
                     treeNode: null,
                     setTreeNode: function (treeNode) {
                         this.treeNode = treeNode;
@@ -137,25 +150,29 @@ define(["dojo/_base/declare",
                             popup.close(this.nodeNameDialog);
                         } else if (event.keyCode === keys.ENTER) {
                             popup.close(this.nodeNameDialog);
-                            this.treeNode.item.name = this.get('value');
-                            var _treeNode = this.treeNode;
+                            var treeNode = this.treeNode;
+                            var node = treeNode.item;
+                            node.name = this.get('value');
+                            var model = this.dataPoints.model;
                             switch (this.treeNode.item.nodeType) {
-                                case "PF" :
-                                    _svc.renamePointFolder(_treeNode.item.id, _treeNode.item.name).then(function (object) {
-                                        _store.onChange(_treeNode.item);
-                                        this.treeNode.focus();
+                                case "POINT_FOLDER" :
+                                case "DATA_POINT" :
+                                    request(this.dataPoints.restBaseUrl, {
+                                        handleAs: "json",
+                                        method: "PUT",
+                                        headers: {
+                                            Accept: "application/json",
+                                            "Content-Type": "application/json"
+                                        },
+                                        data: json.stringify(node)
+                                    }).then(function (object) {
+                                        model.onChange(object);
+                                        treeNode.focus();
                                     }, function (error) {
                                         alert(error);
                                     });
                                     break;
-                                case "DP" :
-                                    _svc.renameDataPoint(_treeNode.item.id, _treeNode.item.name).then(function (object) {
-                                        _store.onChange(_treeNode.item);
-                                        _treeNode.focus();
-                                    }, function (error) {
-                                        alert(error);
-                                    });
-                                    break;
+                                default: alert("Can't rename node id: " + node.id);
                             }
                         }
                     }
@@ -167,160 +184,225 @@ define(["dojo/_base/declare",
                     this.content.focus();
                 },
             });
-
-
             this.treeMenu = new Menu({
-                targetNodeIds: [treeNodeId]
-            });
-            var _store = this.store;
-            var _tree = this.tree;
-            var _nodeNameDialog = this.nodeNameDialog;
-            var _svc = this.svc;
-            this.treeMenu.addChild(new MenuItem({
-                iconClass: "dijitIconEdit",
-                label: localizedKeys['common.edit.reanme'],
-                onClick: function () {
-                    if (_tree.lastFocused === null) {
-                        return;
+                tree: this.tree,
+                targetNodeIds: [treeNodeId],
+                editMenuItem: new MenuItem({
+                    iconClass: "dijitIconEdit",
+                    label: messages['common.rename'],
+                    dataPoints: this,
+                    onClick: function () {
+                        if (this.dataPoints.tree.lastFocused === null) {
+                            return;
+                        }
+                        this.dataPoints.nodeNameDialog.setTreeNode(this.dataPoints.tree.lastFocused);
+                        popup.open({
+                            popup: this.dataPoints.nodeNameDialog,
+                            around: this.dataPoints.tree.lastFocused.contentNode
+                        });
+                        this.dataPoints.nodeNameDialog.focusInput();
                     }
-                    _nodeNameDialog.setTreeNode(_tree.lastFocused);
 
-                    popup.open({
-                        popup: _nodeNameDialog,
-                        around: _tree.lastFocused.contentNode
-                    });
-                    _nodeNameDialog.focusInput();
-                }
-            }));
-            this.treeMenu.addChild(new MenuItem({
-                iconClass: "dijitIconAdd",
-                label: localizedKeys['common.edit.add'],
-                onClick: function () {
-                    _svc.addPointFolder(_tree.lastFocused.item.id, "New Folder").then(function (object) {
-                        _store.getChildren(_tree.lastFocused.item, function (children) {
-                            _store.onChildrenChange(_tree.lastFocused.item, children);
+                }),
+                addFolderMenuItem: new MenuItem({
+                    iconClass: "dijitIconAdd",
+                    label: messages['common.add'],
+                    dataPoints: this,
+                    onClick: function () {
+                        var selectedItem = this.dataPoints.tree.selectedItem;
+                        var url = this.dataPoints.restBaseUrl;
+                        var model = this.dataPoints.model;
+                        var addFolderDialog = new ConfirmDialog({
+                            title: "New Folder name localize ME!",
+                            content: new TextBox({
+                                value: "New Folder localize ME!",
+                                name: "folderName",
+                                onKeyUp: function (event) {
+                                    switch (event.keyCode) {
+                                        case keys.ESCAPE:
+                                            addFolderDialog.onCancel();
+                                            break;
+                                        case keys.ENTER:
+                                            addFolderDialog._onSubmit();
+                                            break;
+                                    }
+                                }
+                            }),
+                            execute: function (formContents) {
+                                switch (selectedItem.nodeType) {
+                                    case "ROOT":
+                                        break;
+                                    case "POINT_FOLDER":
+                                        url = url + selectedItem.id + "/children";
+                                        break;
+                                    default :
+                                        alert("Wrong node " + selectedItem);
+                                        return;
+                                }
+                                request(url, {
+                                    handleAs: "json",
+                                    method: "POST",
+                                    headers: {
+                                        Accept: "application/json",
+                                        "Content-Type": "application/json"
+                                    },
+                                    data: json.stringify({name: formContents.folderName, nodeType: "POINT_FOLDER", scadaBrType: "POINT_FOLDER"})
+                                }).then(function (object) {
+                                    model.getChildren(selectedItem, function (children) {
+                                        model.onChildrenChange(selectedItem, children);
+                                    }, function (error) {
+                                        alert(error);
+                                    });
+                                }, function (error) {
+                                    alert(error);
+                                });
+                            }
+                        });
+                        addFolderDialog.show();
+                    }
+
+                }),
+                deleteNodeMenuItem: new MenuItem({
+                    iconClass: "dijitIconDelete",
+                    label: messages['common.delete'],
+                    dataPoints: this,
+                    onClick: function () {
+                        var selectedItem = this.dataPoints.tree.selectedItem;
+                        var url = this.dataPoints.restBaseUrl;
+                        var model = this.dataPoints.model;
+
+                        switch (selectedItem.nodeType) {
+                            case "POINT_FOLDER":
+                            case "DATA_POINT":
+                                url = url + selectedItem.id;
+                                break;
+                            default :
+                                alert("Wrong node " + selectedItem);
+                                return;
+                        }
+
+                        request(url, {
+                            handleAs: "json",
+                            method: "DELETE",
+                            headers: {
+                                Accept: "application/json",
+                                "Content-Type": "application/json"
+                            },
+                            data: null
+                        }).then(function (object) {
+                            model.onDelete(selectedItem);
                         }, function (error) {
                             alert(error);
                         });
-                    }, function (error) {
-                        alert(error);
-                    });
+
+                    }
+                })
+                /*
+                onOpen: function () {
+                    alert("Inherited");
+                    this.inherited.onOpen(arguments);
+                    alert("Inherited Done");
+                    var parentItems = this.tree.selectedItems;
+                    this.editMenuItem.set("disabled", parentItems.length !== 1);
+                    this.addFolderMenuItem.set("disabled", parentItems.length !== 1);
+                    this.deleteNodeMenuItem.set("disabled", parentItems.length !== 1);
                 }
-            }));
+*/
+            });
+            this.treeMenu.addChild(this.treeMenu.editMenuItem);
+            this.treeMenu.addChild(this.treeMenu.addFolderMenuItem);
+            this.treeMenu.addChild(this.treeMenu.deleteNodeMenuItem);
             var dpAddMenu = new Menu({});
             for (var i = 0; i < this.dataTypes.length; i++) {
                 dpAddMenu.addChild(new MenuItem({
+                    dataPoints: this,
                     iconClass: "dsAddIcon",
                     label: this.dataTypes[i].label,
-                    _dataType: this.dataTypes[i].key,
+                    _dataType: this.dataTypes[i],
                     onClick: function () {
-                        _svc.addDataPoint(_tree.lastFocused.item.id, this._dataType, this.label).then(function (result) {
-                            _store.getChildren(_tree.lastFocused.item, function (children) {
-                                _store.onChildrenChange(_tree.lastFocused.item, children);
-                            }, function (error) {
-                                alert(error);
-                            });
-                        }, function (error) {
-                            alert(error);
+                        var selectedItem = this.dataPoints.tree.selectedItem;
+                        var url = this.dataPoints.restBaseUrl;
+                        var model = this.dataPoints.model;
+                        var dataType = this._dataType;
+                        var addDataPointDialog = new ConfirmDialog({
+                            title: "New Data Point Name localize ME!",
+                            content: new TextBox({
+                                value: this.label,
+                                name: "dataPointName",
+                                onKeyUp: function (event) {
+                                    switch (event.keyCode) {
+                                        case keys.ESCAPE:
+                                            addDataPointDialog.onCancel();
+                                            break;
+                                        case keys.ENTER:
+                                            addDataPointDialog._onSubmit();
+                                            break;
+                                    }
+                                }
+                            }),
+                            execute: function (formContents) {
+                                switch (selectedItem.nodeType) {
+                                    case "ROOT":
+                                        break;
+                                    case "POINT_FOLDER":
+                                        url = url + selectedItem.id + "/children";
+                                        break;
+                                    default :
+                                        alert("Wrong node " + selectedItem);
+                                        return;
+                                }
+                                request(url, {
+                                    handleAs: "json",
+                                    method: "POST",
+                                    headers: {
+                                        Accept: "application/json",
+                                        "Content-Type": "application/json"
+                                    },
+                                    data: json.stringify({name: formContents.dataPointName, nodeType: "DATA_POINT", dataType: dataType.key, scadaBrType: ["DATA_POINT", dataType.key].join(".")})
+                                }).then(function (object) {
+                                    model.getChildren(selectedItem, function (children) {
+                                        model.onChildrenChange(selectedItem, children);
+                                    }, function (error) {
+                                        alert(error);
+                                    });
+                                }, function (error) {
+                                    alert(error);
+                                });
+                            }
                         });
+                        addDataPointDialog.show();
+
+                        /*                        _svc.addDataPoint(_tree.lastFocused.item.id, this._dataType, this.label).then(function (result) {
+                         _store.getChildren(_tree.lastFocused.item, function (children) {
+                         _store.onChildrenChange(_tree.lastFocused.item, children);
+                         }, function (error) {
+                         alert(error);
+                         });
+                         }, function (error) {
+                         alert(error);
+                         });
+                         */
                     }
-                })
-                        );
+                }));
             }
+
             this.treeMenu.addChild(new PopupMenuItem({
                 iconClass: "dsAddIcon",
                 label: "Add DataPoint",
                 popup: dpAddMenu
-            }));
 
+            }));
             this.treeMenu.addChild(new MenuItem({
                 label: "Rename Folder",
                 disabled: true
+
             }));
             this.treeMenu.addChild(new MenuItem({
                 label: "Rename DataPoint",
                 disabled: true
+
             }));
             this.treeMenu.startup();
-
-        },
-        _initSvc: function () {
-            this.svc = new JsonService({
-                serviceUrl: 'dataPoints/rpc/', // Adress of the RPC service end point
-                timeout: 1000,
-                strictArgChecks: true,
-                methods: [{
-                        name: 'addPointFolder',
-                        parameters: [
-                            {
-                                name: 'parentFolderId',
-                                type: "INT"
-                            },
-                            {
-                                name: 'type',
-                                type: 'STRING'
-                            }
-                        ]
-                    },
-                    {
-                        name: 'deletePointFolder',
-                        parameters: [{
-                                name: 'id',
-                                type: 'INT'
-                            }]
-                    },
-                    {
-                        name: 'renamePointFolder',
-                        parameters: [
-                            {
-                                name: 'id',
-                                type: 'INT'
-                            },
-                            {
-                                name: 'name',
-                                type: 'STRING'
-                            }
-                        ]
-                    },
-                    {
-                        name: 'addDataPoint',
-                        parameters: [
-                            {
-                                name: 'parentFolderId',
-                                type: "INT"
-                            },
-                            {
-                                name: 'dataType',
-                                type: 'STRING'
-                            },
-                            {
-                                name: 'name',
-                                type: 'STRING'
-                            }
-                        ]
-                    },
-                    {
-                        name: 'deleteDataPoint',
-                        parameters: [{
-                                name: 'id',
-                                type: 'INT'
-                            }]
-                    },
-                    {
-                        name: 'renameDataPoint',
-                        parameters: [
-                            {
-                                name: 'id',
-                                type: 'INT'
-                            },
-                            {
-                                name: 'name',
-                                type: 'STRING'
-                            }
-                        ]
-                    }
-                ]
-            });
         }
 
     });

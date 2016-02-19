@@ -118,7 +118,6 @@ public class WatchListController {
 
         modelMap.put(KEY_WATCHLISTS, watchListNames);
         modelMap.put(KEY_SELECTED_WATCHLIST, selected);
-        modelMap.put("NEW_ID", ScadaBrConstants.NEW_ID);
     }
 
     public static class JsonWatchList {

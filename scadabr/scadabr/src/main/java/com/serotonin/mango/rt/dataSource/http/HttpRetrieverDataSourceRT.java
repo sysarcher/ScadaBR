@@ -19,6 +19,8 @@
 package com.serotonin.mango.rt.dataSource.http;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.rt.RT;
+import br.org.scadabr.rt.WrongEdgeTypeException;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.timer.cron.CronExpression;
 import org.apache.commons.httpclient.HttpClient;
@@ -35,6 +37,8 @@ import br.org.scadabr.web.http.HttpUtils;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.EdgeIterator;
+import br.org.scadabr.vo.EdgeType;
 import br.org.scadabr.vo.datasource.http.HttpRetrieverDataSourceEventKey;
 import com.serotonin.mango.rt.dataImage.AlphaNumericValueTime;
 import com.serotonin.mango.rt.dataImage.BooleanValueTime;
@@ -55,8 +59,15 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
 
     private static final int READ_LIMIT = 1024 * 1024; // One MB
 
+    private String url;
+    private int retries;
+    private int timeoutSeconds;
+
     public HttpRetrieverDataSourceRT(HttpRetrieverDataSourceVO vo) {
         super(vo, true);
+        url = vo.getUrl();
+        timeoutSeconds = vo.getTimeoutSeconds();
+        retries = vo.getRetries();
         setPollingPeriod(vo.getUpdatePeriodType(), vo.getUpdatePeriods(), false);
     }
 
@@ -72,13 +83,13 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
         updateChangedPoints();
         String data;
         try {
-            data = getData(vo.getUrl(), vo.getTimeoutSeconds(), vo.getRetries());
+            data = getData(url, timeoutSeconds, retries);
         } catch (Exception e) {
             LocalizableMessage lm;
             if (e instanceof LocalizableException) {
                 lm = (LocalizableException) e;
             } else {
-                lm = new LocalizableMessageImpl("event.httpRetriever.retrievalError", vo.getUrl(), e.getMessage());
+                lm = new LocalizableMessageImpl("event.httpRetriever.retrievalError", url, e.getMessage());
             }
             raiseAlarm(HttpRetrieverDataSourceEventKey.DATA_RETRIEVAL_FAILURE, time, lm);
             return;
@@ -110,22 +121,22 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
                                 dp.updatePointValue(new DoubleValueTime(Double.parseDouble(data), dp.getId(), valueTimestamp));
                             }
                         } catch (NumberFormatException e) {
-                            if (dp.getVoName() == null) {
+                            if (dp.getName() == null) {
                                 throw new LocalizableException("event.valueParse.numericParse", data);
                             }
-                            throw new LocalizableException("event.valueParse.numericParsePoint", data, dp.getVoName());
+                            throw new LocalizableException("event.valueParse.numericParsePoint", data, dp.getName());
                         } catch (ParseException e) {
-                            if (dp.getVoName() == null) {
+                            if (dp.getName() == null) {
                                 throw new LocalizableException("event.valueParse.generalParse", e.getMessage(), data);
                             }
-                            throw new LocalizableException("event.valueParse.generalParsePoint", e.getMessage(), data, dp.getVoName());
+                            throw new LocalizableException("event.valueParse.generalParsePoint", e.getMessage(), data, dp.getName());
                         }
                         break;
                     case IMAGE:
                         throw new ShouldNeverHappenException("Cant handle dataType " + locator.getDataType());
                     case MULTISTATE:
-        throw new ImplementMeException();
-        /* TODO half localized stuff
+                        throw new ImplementMeException();
+                    /* TODO half localized stuff
                         
                         boolean found = false;
                         if (dp.getVo().getTextRenderer() instanceof MultistateRenderer) {
@@ -146,7 +157,7 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
                             }
                         }
                         break;
-                */
+                     */
                     default:
                         throw new ShouldNeverHappenException("Cant handle dataType " + locator.getDataType());
                 }
@@ -213,7 +224,7 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
     public long getValueTime(DataPointRT dp, long time, String data)
             throws LocalizableException {
         if (data == null) {
-            throw new LocalizableException("event.valueParse.noData", dp.getVoName());
+            throw new LocalizableException("event.valueParse.noData", dp.getName());
         }
         final HttpRetrieverPointLocatorRT locator = (HttpRetrieverPointLocatorRT) dp.getPointLocator();
 
@@ -225,10 +236,10 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
             try {
                 valueTime = locator.getTimeFormat().parse(timeStr).getTime();
             } catch (ParseException e) {
-                throw new LocalizableException("event.valueParse.timeParsePoint", timeStr, dp.getVoName());
+                throw new LocalizableException("event.valueParse.timeParsePoint", timeStr, dp.getName());
             }
         } else {
-            throw new LocalizableException("event.valueParse.noTime", dp.getVoName());
+            throw new LocalizableException("event.valueParse.noTime", dp.getName());
         }
 
         return valueTime;
@@ -237,5 +248,35 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
     @Override
     protected CronExpression getCronExpression() throws ParseException {
         throw new ImplementMeException();
+    }
+
+    @Override
+    public void wireEdgeAsSrc(RT<?> dest, EdgeType edgeType) throws WrongEdgeTypeException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void wireEdgeAsDest(RT<?> src, EdgeType edgeType) throws WrongEdgeTypeException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void iterateEdgesAsSrc(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void iterateEdgesAsDest(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void patch(HttpRetrieverDataSourceVO vo) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public HttpRetrieverDataSourceVO getVO() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

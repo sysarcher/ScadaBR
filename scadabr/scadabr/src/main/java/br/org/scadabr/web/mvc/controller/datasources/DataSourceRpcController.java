@@ -11,7 +11,7 @@ import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.vo.datasource.DataSourcesRegistry;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
-import com.googlecode.jsonrpc4j.JsonRpcService;
+//import com.googlecode.jsonrpc4j.JsonRpcService;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
@@ -28,7 +28,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
  * @author aploese
  */
 @Named
-@JsonRpcService("/dataSources/rpc/")
+//@JsonRpcService("/dataSources/rpc/")
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class DataSourceRpcController {
 

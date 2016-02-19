@@ -45,7 +45,7 @@ public class EventInstance {
 
     @JsonIgnore
     public boolean isNew() {
-        return id == ScadaBrConstants.NEW_ID;
+        return id == null;
     }
 
     public boolean isGone() {
@@ -59,7 +59,7 @@ public class EventInstance {
     /**
      * Configuration field. Assigned by the database.
      */
-    private int id = ScadaBrConstants.NEW_ID;
+    private Integer id;
 
     /**
      * Configuration field. Provided by the event producer. Identifies where the
@@ -228,7 +228,7 @@ public class EventInstance {
      *
      * @param id
      */
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

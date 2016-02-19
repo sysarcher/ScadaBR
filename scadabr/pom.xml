@@ -230,53 +230,53 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>4.2.2.RELEASE</version>
+                <version>4.2.4.RELEASE</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-aspects</artifactId>
-                <version>4.2.2.RELEASE</version>
+                <version>4.2.4.RELEASE</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-jdbc</artifactId>
-                <version>4.2.2.RELEASE</version>
+                <version>4.2.4.RELEASE</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
-                <version>4.2.2.RELEASE</version>
+                <version>4.2.4.RELEASE</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-webmvc</artifactId>
-                <version>4.2.2.RELEASE</version>
+                <version>4.2.4.RELEASE</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context-support</artifactId>
-                <version>4.2.2.RELEASE</version>
+                <version>4.2.4.RELEASE</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-aop</artifactId>
-                <version>4.2.2.RELEASE</version>
+                <version>4.2.4.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
-                <version>1.8.3</version>
+                <version>1.8.8</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-instrument-tomcat</artifactId>
-                <version>4.2.2.RELEASE</version>
+                <version>4.2.4.RELEASE</version>
             </dependency>
             
             <dependency>
@@ -372,7 +372,7 @@
             <dependency>
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
-                <version>1.4.1</version>
+                <version>1.4.7</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
@@ -413,18 +413,12 @@
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>5.1.37</version>
+                <version>5.1.38</version>
             </dependency>
             <dependency>
                 <groupId>br.org.scadabr.legacy</groupId>
                 <artifactId>dnp34j</artifactId>
                 <version>version-unknown</version>
-            </dependency>
-            <dependency>
-                <groupId>net.sf.json-lib</groupId>
-                <artifactId>json-lib</artifactId>
-                <version>2.4</version>
-                <classifier>jdk15</classifier>
             </dependency>
             <dependency>
                 <groupId>javax.inject</groupId>
@@ -442,17 +436,22 @@
                 <version>2.6.3</version>
             </dependency>
             <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jdk8</artifactId>
+                <version>2.7.0</version>
+            </dependency>
+            <dependency>
                 <groupId>org.dojotoolkit</groupId>
                 <artifactId>dojo</artifactId>
-                <version>1.10.0</version>
+                <version>1.10.4</version>
                 <type>zip</type>
                 <classifier>distribution</classifier>
             </dependency>
-            <dependency>
+            <!--dependency>
                 <groupId>com.github.briandilley.jsonrpc4j</groupId>
                 <artifactId>jsonrpc4j</artifactId>
                 <version>1.1</version>
-            </dependency>
+            </dependency-->
             <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
@@ -468,7 +467,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.3</version>
+                    <version>3.5</version>
                     <configuration>
                         <maxmem>512m</maxmem>
                         <source>1.8</source>
@@ -505,13 +504,3 @@
     </build>
 
 </project>
-
-
-
-
-
-
-
-
-
-

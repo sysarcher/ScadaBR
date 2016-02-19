@@ -19,12 +19,9 @@
 package com.serotonin.mango.vo.dataSource;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.ScadaBrConstants;
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.json.dao.JsonPersistence;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.vo.datasource.PointLocatorVO;
-import com.fasterxml.jackson.annotation.JsonView;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import java.util.List;
@@ -33,8 +30,7 @@ import javax.validation.constraints.Size;
 
 abstract public class AbstractPointLocatorVO<T extends PointValueTime> implements PointLocatorVO<T> {
 
-    private int id = ScadaBrConstants.NEW_ID;
-    @JsonView(JsonPersistence.class)
+    private Integer id;
     private String xid;
     private Integer pointLocatorFolderId;
     private boolean enabled;
@@ -42,7 +38,7 @@ abstract public class AbstractPointLocatorVO<T extends PointValueTime> implement
     @Size(min = 1, max = 40)
     private String name;
     private DataType dataType;
-    private int dataSourceId;
+    private Integer dataSourceId;
     
     public AbstractPointLocatorVO() {
     }
@@ -91,18 +87,18 @@ abstract public class AbstractPointLocatorVO<T extends PointValueTime> implement
     }
 
     @Override
-    public int getId() {
+    public Integer getId() {
         return id;
     }
     
     @Override
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
     
     @Override
     public boolean isNew() {
-        return id == ScadaBrConstants.NEW_ID;
+        return id == null;
     }
 
     @Override
@@ -139,7 +135,7 @@ abstract public class AbstractPointLocatorVO<T extends PointValueTime> implement
      * @return the dataSourceId
      */
     @Override
-    public int getDataSourceId() {
+    public Integer getDataSourceId() {
         return dataSourceId;
     }
 
@@ -147,7 +143,7 @@ abstract public class AbstractPointLocatorVO<T extends PointValueTime> implement
      * @param dataSourceId the dataSourceId to set
      */
     @Override
-    public void setDataSourceId(int dataSourceId) {
+    public void setDataSourceId(Integer dataSourceId) {
         this.dataSourceId = dataSourceId;
     }
 

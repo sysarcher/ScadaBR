@@ -285,7 +285,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareStatement(POINT_VALUE_INSERT, Statement.RETURN_GENERATED_KEYS);
                 ps.setInt(1, pointId);
-                ps.setInt(2, dataType.mangoDbId);
+//                ps.setInt(2, dataType.mangoDbId);
                 ps.setDouble(3, dvalue);
                 ps.setLong(4, time);
                 return ps;
@@ -330,7 +330,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
             + " doublePointValues pv\n";
 
     @Override
-    public <T extends PointValueTime> List<T> getPointValues(final DataPointVO<T> vo, final long since) {
+    public <T extends PointValueTime> List<T> getPointValues(final DataPointVO<?, T> vo, final long since) {
         flushWriteBehind();
         List<T> result = ejt.query(new PreparedStatementCreator() {
 
@@ -353,7 +353,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
     }
 
     @Override
-    public <T extends PointValueTime> Iterable<T> getPointValuesBetween(final DataPointVO<T> vo, final long from, final long to) {
+    public <T extends PointValueTime> Iterable<T> getPointValuesBetween(final DataPointVO<?, T> vo, final long from, final long to) {
         flushWriteBehind();
         List<T> result = ejt.query(new PreparedStatementCreator() {
 
@@ -374,7 +374,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
 
     //TODO replace with queryforObject
     @Override
-    public <T extends PointValueTime> T getLatestPointValue(final DataPointVO<T> vo) {
+    public <T extends PointValueTime> T getLatestPointValue(final DataPointVO<?, T> vo) {
         flushWriteBehind();
         //TODO optimaze into one hit of the db???
         final Long maxTs = ejt.queryForObject("select max(ts) from doublePointValues where dataPointId=?", Long.class, vo.getId());
@@ -417,7 +417,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
     }
 
     @Override
-    public <T extends PointValueTime> T getPointValueBefore(DataPointVO<T> vo, long time) {
+    public <T extends PointValueTime> T getPointValueBefore(DataPointVO<?, T> vo, long time) {
         flushWriteBehind();
         try {
             final Long valueTime = ejt.queryForObject(
@@ -429,7 +429,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         }
     }
 
-    public <T extends PointValueTime> T getPointValueAt(final DataPointVO<T> vo, final long time) {
+    public <T extends PointValueTime> T getPointValueAt(final DataPointVO<?, T> vo, final long time) {
         flushWriteBehind();
         List<T> result = ejt.query(new PreparedStatementCreator() {
 
@@ -490,7 +490,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
             this.dataType = dataType;
         }
 
-        public PointValueRowMapper(DataPointVO<T> vo) {
+        public PointValueRowMapper(DataPointVO<?, T> vo) {
             this.pointId = vo.getId();
             this.dataType = vo.getDataType();
         }
@@ -569,10 +569,14 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         return deletePointValues("delete from pointValues", null);
     }
 
+    @Deprecated
     public long deletePointValuesWithMismatchedType(int dataPointId, DataType dataType) {
+        throw new RuntimeException("Deprecated");
+        /*
         return deletePointValues(
                 "delete from pointValues where dataPointId=? and dataType<>?",
                 new Object[]{dataPointId, dataType.mangoDbId});
+        */
     }
 
     private long deletePointValues(String sql, Object[] params) {
@@ -658,12 +662,12 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         final StringBuilder sb = new StringBuilder();
         sb.append("select distinct id from ( ");
         sb.append("  select id as id from pointValues where dataType=");
-        sb.append(DataType.IMAGE.mangoDbId);
+//        sb.append(DataType.IMAGE.mangoDbId);
         sb.append("  union");
         sb.append("  select d.pointValueId as id from reportInstanceData d ");
         sb.append("    join reportInstancePoints p on d.reportInstancePointId=p.id");
         sb.append("  where p.dataType=");
-        sb.append(DataType.IMAGE.mangoDbId);
+  //      sb.append(DataType.IMAGE.mangoDbId);
         sb.append(") a order by 1");
         return ejt.queryForList(sb.toString(), Long.class);
     }

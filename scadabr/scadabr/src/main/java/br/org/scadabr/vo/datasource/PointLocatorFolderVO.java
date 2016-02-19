@@ -15,8 +15,8 @@ import java.io.Serializable;
  */
 public class PointLocatorFolderVO implements Serializable {
     
-    private int dataSourceId = ScadaBrConstants.NEW_ID;
-    private int id = ScadaBrConstants.NEW_ID;
+    private Integer dataSourceId;
+    private Integer id;
     private Integer parentFolderId;
     private String name;
 
@@ -32,14 +32,14 @@ public class PointLocatorFolderVO implements Serializable {
     /**
      * @return the dataSourceId
      */
-    public int getDataSourceId() {
+    public Integer getDataSourceId() {
         return dataSourceId;
     }
 
     /**
      * @param dataSourceId the dataSourceId to set
      */
-    public void setDataSourceId(int dataSourceId) {
+    public void setDataSourceId(Integer dataSourceId) {
         this.dataSourceId = dataSourceId;
     }
 
@@ -72,7 +72,7 @@ public class PointLocatorFolderVO implements Serializable {
     }
 
     public boolean isNew() {
-        return id == ScadaBrConstants.NEW_ID;
+        return id == null;
     }
 
     /**

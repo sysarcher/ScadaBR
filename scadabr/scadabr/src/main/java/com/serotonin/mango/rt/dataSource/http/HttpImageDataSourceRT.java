@@ -30,27 +30,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import br.org.scadabr.io.StreamUtils;
+import br.org.scadabr.rt.RT;
 import br.org.scadabr.rt.SchedulerPool;
+import br.org.scadabr.rt.WrongEdgeTypeException;
 import br.org.scadabr.timer.cron.CronExpression;
 import br.org.scadabr.timer.cron.SystemRunnable;
 import com.serotonin.mango.Common;
-import com.serotonin.mango.ImageSaveException;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.dataImage.SetPointSource;
-import com.serotonin.mango.rt.dataImage.types.ImageValue;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.vo.dataSource.http.HttpImageDataSourceVO;
-import com.serotonin.mango.vo.dataSource.http.HttpImagePointLocatorVO;
-import br.org.scadabr.util.image.BoxScaledImage;
-import br.org.scadabr.util.image.ImageUtils;
-import br.org.scadabr.util.image.JpegImageFormat;
-import br.org.scadabr.util.image.PercentScaledImage;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.EdgeIterator;
+import br.org.scadabr.vo.EdgeType;
 import br.org.scadabr.vo.datasource.http.HttpImageDataSourceEventKey;
-import com.serotonin.mango.rt.dataImage.ImageValueTime;
 import java.text.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -114,6 +109,36 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
         } else {
             clearAlarm(HttpImageDataSourceEventKey.FILE_SAVE_EXCEPTION, time);
         }
+    }
+
+    @Override
+    public void wireEdgeAsSrc(RT<?> dest, EdgeType edgeType) throws WrongEdgeTypeException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void wireEdgeAsDest(RT<?> src, EdgeType edgeType) throws WrongEdgeTypeException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void iterateEdgesAsSrc(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void iterateEdgesAsDest(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void patch(HttpImageDataSourceVO vo) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public HttpImageDataSourceVO getVO() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     class ImageRetrieverMonitor {

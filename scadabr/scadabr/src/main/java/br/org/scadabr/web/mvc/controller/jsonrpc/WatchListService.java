@@ -7,7 +7,6 @@ import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.view.SharedUserAcess;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
-import com.googlecode.jsonrpc4j.JsonRpcService;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.User;
@@ -25,7 +24,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 
 //TODO custom Watchlist scope???
 @Named
-@JsonRpcService("/rpc/watchlists.json")
+//@JsonRpcService("/rpc/watchlists.json")
 @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class WatchListService implements Serializable {
 
