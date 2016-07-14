@@ -6,9 +6,8 @@
 package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.dao.NodeEdgeDao;
-import br.org.scadabr.vo.EdgeIterator;
+import br.org.scadabr.vo.EdgeConsumer;
 import br.org.scadabr.vo.EdgeType;
-import br.org.scadabr.vo.NodeIterator;
 import br.org.scadabr.vo.NodeType;
 import br.org.scadabr.vo.VO;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.function.Consumer;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -150,21 +150,21 @@ public class NodeEdgeDaoImpl<T extends VO<T>> extends BaseDao implements NodeEdg
     }
 
     @Override
-    public void iterateNodes(NodeIterator nodeIterator) {
+    public void forEachNode(Consumer<T> action) {
         ejt.query("select\n"
                 + " id,\n"
                 + " nodeTypeId,\n"
                 + " jsonFields\n"
                 + "from\n"
-                + " nodes\n", (rs) -> {
-                    T result = (T) read(rs.getClob(3).getAsciiStream());
-                    if (!result.getNodeType().getId().equals(rs.getInt(2))) {
-                        throw new RuntimeException("Wrong nodetype of: " + rs.getInt(1));
+                + " nodes\n", (resultSet) -> {
+                    T result = (T) read(resultSet.getClob(3).getAsciiStream());
+                    if (!result.getNodeType().getId().equals(resultSet.getInt(2))) {
+                        throw new RuntimeException("Wrong nodetype of: " + resultSet.getInt(1));
                     }
-                    if (!result.getId().equals(rs.getInt(1))) {
-                        throw new ValidationException("Wrong id of: " + rs.getInt(1));
+                    if (!result.getId().equals(resultSet.getInt(1))) {
+                        throw new ValidationException("Wrong id of: " + resultSet.getInt(1));
                     }
-                    nodeIterator.node(result);
+                    action.accept(result);
                 });
     }
 
@@ -211,14 +211,14 @@ public class NodeEdgeDaoImpl<T extends VO<T>> extends BaseDao implements NodeEdg
     }
 
     @Override
-    public void iterateEdges(EdgeIterator edgeIterator) {
+    public void forEachEdge(EdgeConsumer action) {
         ejt.query("select\n"
                 + " srcNodeId,\n"
                 + " destNodeId,\n"
                 + " edgeTypeId\n"
                 + "from\n"
                 + " edges\n", (rs) -> {
-                    edgeIterator.edge(rs.getInt(1), rs.getInt(2), EdgeType.fromId(rs.getInt(3)));
+                    action.accept(rs.getInt(1), rs.getInt(2), EdgeType.fromId(rs.getInt(3)));
                 });
     }
 

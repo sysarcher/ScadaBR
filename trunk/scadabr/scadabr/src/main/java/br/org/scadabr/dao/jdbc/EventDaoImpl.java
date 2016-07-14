@@ -21,11 +21,11 @@ package br.org.scadabr.dao.jdbc;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.dao.EventDao;
-import br.org.scadabr.dao.UserDao;
 import br.org.scadabr.i18n.I18NUtils;
 import br.org.scadabr.i18n.LocalizableMessageParseException;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.rt.SchedulerPool;
+import br.org.scadabr.rt.UserRT;
 import br.org.scadabr.rt.event.type.EventSources;
 import br.org.scadabr.timer.cron.EventRunnable;
 import br.org.scadabr.util.SerializationHelper;
@@ -47,7 +47,6 @@ import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.MaintenanceEventType;
 import com.serotonin.mango.rt.event.type.ScheduledEventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
-import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.vo.event.EventHandlerVO;
 import com.serotonin.mango.vo.event.EventTypeVO;
@@ -80,8 +79,6 @@ public class EventDaoImpl extends BaseDao implements EventDao {
 
     private static final int MAX_PENDING_EVENTS = 100;
 
-    @Inject
-    private UserDao userDao;
     @Inject
     private SchedulerPool schedulerPool;
     @Inject
@@ -197,7 +194,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
     private static final String USER_EVENT_ACK = "update userEvents set silenced=? where eventId=?";
 
     @Override
-    public void ackEvent(int eventId, long ackTs, User user, AlternateAcknowledgementSources alternateAckSource) {
+    public void ackEvent(int eventId, long ackTs, UserRT user, AlternateAcknowledgementSources alternateAckSource) {
         // Ack the event
         ejt.update(EVENT_ACK, new Object[]{ackTs, user == null ? null : user.getId(),
             alternateAckSource, eventId});
@@ -345,7 +342,7 @@ public class EventDaoImpl extends BaseDao implements EventDao {
     }
 
     @Override
-    public Collection<EventInstance> getPendingEvents(final User user) {
+    public Collection<EventInstance> getPendingEvents(final UserRT user) {
         List<EventInstance> results = ejt.query((Connection con) -> {
             PreparedStatement ps = con.prepareCall(EVENT_SELECT_WITH_USER_DATA
                     + "where ue.userId=? and e.ackTs is null order by e.fireTs desc");
@@ -456,9 +453,11 @@ public class EventDaoImpl extends BaseDao implements EventDao {
     }
 
     public EventInstance insertEventComment(int eventId, UserComment comment) {
-        userDao.insertUserComment(UserComment.TYPE_EVENT, eventId,
+        throw new ImplementMeException();
+/*        userDao.insertUserComment(UserComment.TYPE_EVENT, eventId,
                 comment);
         return getEventInstance(eventId);
+*/
     }
 
     @Override

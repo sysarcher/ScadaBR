@@ -8,6 +8,7 @@ package com.serotonin.mango.rt.dataImage;
 import br.org.scadabr.DataType;
 import br.org.scadabr.timer.cron.DataSourceCronTask;
 import br.org.scadabr.utils.ImplementMeException;
+import br.org.scadabr.vo.VO;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.vo.DoubleDataPointVO;
 import java.util.List;
@@ -259,12 +260,12 @@ public class DoubleDataPointRT
     }
 
     @Override
-    protected void savePointValueAsync(DoubleValueTime newValue, SetPointSource source) {
+    protected void savePointValueAsync(DoubleValueTime newValue, VO<?> source) {
                     pointValueDao.savePointValueAsync(newValue, source);
     }
 
     @Override
-    protected void savePointValueSync(DoubleValueTime newValue, SetPointSource source) {
+    protected void savePointValueSync(DoubleValueTime newValue, VO<?> source) {
                     pointValueDao.savePointValueSync(newValue, source);
     }
 

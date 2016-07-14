@@ -19,6 +19,7 @@
 package com.serotonin.mango.rt.dataImage;
 
 import br.org.scadabr.DataType;
+import br.org.scadabr.vo.VO;
 
 /**
  * @author Matthew Lohbihler
@@ -39,7 +40,7 @@ public interface IDataPoint<T extends PointValueTime> {
 
     void setPointValueAsync(T newValue);
 
-    void setPointValueSync(T newValue, SetPointSource source);
+    void setPointValueSync(T newValue, VO<?> source);
 
     /**
      * defaults to #setPointValueAsync

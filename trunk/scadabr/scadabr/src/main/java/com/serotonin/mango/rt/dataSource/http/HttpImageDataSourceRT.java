@@ -38,17 +38,17 @@ import br.org.scadabr.timer.cron.SystemRunnable;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.PollingDataSource;
 import com.serotonin.mango.vo.dataSource.http.HttpImageDataSourceVO;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
-import br.org.scadabr.vo.EdgeIterator;
 import br.org.scadabr.vo.EdgeType;
+import br.org.scadabr.vo.VO;
 import br.org.scadabr.vo.datasource.http.HttpImageDataSourceEventKey;
 import java.text.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import br.org.scadabr.vo.EdgeConsumer;
 
 /**
  * @author Matthew Lohbihler
@@ -72,7 +72,7 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
     }
 
     @Override
-    public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source) {
+    public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, VO<?> source) {
         // no op
     }
 
@@ -122,12 +122,12 @@ public class HttpImageDataSourceRT extends PollingDataSource<HttpImageDataSource
     }
 
     @Override
-    public void iterateEdgesAsSrc(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+    public void iterateEdgesAsSrc(EdgeConsumer edgeIterator, EdgeType... edgeTypes) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void iterateEdgesAsDest(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+    public void iterateEdgesAsDest(EdgeConsumer edgeIterator, EdgeType... edgeTypes) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

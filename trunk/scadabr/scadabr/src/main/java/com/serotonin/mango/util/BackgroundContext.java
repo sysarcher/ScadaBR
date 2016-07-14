@@ -18,7 +18,8 @@
  */
 package com.serotonin.mango.util;
 
-import com.serotonin.mango.vo.User;
+import br.org.scadabr.rt.UserRT;
+
 
 /**
  * @author Matthew Lohbihler
@@ -36,7 +37,7 @@ public class BackgroundContext {
      * Creates the BackgroundContext instance for this thread and adds it to the
      * store.
      */
-    public static void set(User user) {
+    public static void set(UserRT user) {
         contextStore.set(new BackgroundContext(user));
     }
 
@@ -61,13 +62,13 @@ public class BackgroundContext {
         contextStore.remove();
     }
 
-    private final User user;
+    private final UserRT user;
     private final String processDescriptionKey;
 
     /**
      * Constructor
      */
-    private BackgroundContext(User user) {
+    private BackgroundContext(UserRT user) {
         this.user = user;
         this.processDescriptionKey = null;
     }
@@ -77,7 +78,7 @@ public class BackgroundContext {
         this.processDescriptionKey = processDescriptionKey;
     }
 
-    public User getUser() {
+    public UserRT getUser() {
         return user;
     }
 

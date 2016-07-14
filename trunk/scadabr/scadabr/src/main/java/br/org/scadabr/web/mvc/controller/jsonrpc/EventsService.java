@@ -3,9 +3,9 @@ package br.org.scadabr.web.mvc.controller.jsonrpc;
 import br.org.scadabr.dao.EventDao;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.l10n.Localizer;
+import br.org.scadabr.rt.UserRT;
 //import com.googlecode.jsonrpc4j.JsonRpcService;
 import com.serotonin.mango.rt.event.EventInstance;
-import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -29,7 +29,7 @@ public class EventsService {
     private EventDao eventDao;
 
     public Collection<JsonEventInstance> acknowledgeAllPendingEvents() {
-        final User user = userSessionContextBean.getUser();
+        final UserRT user = userSessionContextBean.getUser();
         if (user != null) {
             long now = System.currentTimeMillis();
             for (EventInstance evt : eventDao.getPendingEvents(user)) {
@@ -41,7 +41,7 @@ public class EventsService {
     }
 
     public Collection<JsonEventInstance> acknowledgePendingEvent(int eventId) {
-        final User user = userSessionContextBean.getUser();
+        final UserRT user = userSessionContextBean.getUser();
         if (user != null) {
             long now = System.currentTimeMillis();
             eventDao.ackEvent(eventId, now, user, null);

@@ -5,10 +5,10 @@
  */
 package br.org.scadabr.rt;
 
-import br.org.scadabr.vo.EdgeIterator;
 import br.org.scadabr.vo.EdgeType;
 import br.org.scadabr.vo.NodeType;
 import br.org.scadabr.vo.VO;
+import br.org.scadabr.vo.EdgeConsumer;
 
 /**
  *
@@ -27,9 +27,9 @@ public interface RT<T extends VO<T>> {
 
     void wireEdgeAsDest(RT<?> src, EdgeType edgeType) throws WrongEdgeTypeException;
 
-    void iterateEdgesAsSrc(EdgeIterator edgeIterator, EdgeType... edgeTypes);
+    void iterateEdgesAsSrc(EdgeConsumer edgeIterator, EdgeType... edgeTypes);
 
-    void iterateEdgesAsDest(EdgeIterator edgeIterator, EdgeType... edgeTypes);
+    void iterateEdgesAsDest(EdgeConsumer edgeIterator, EdgeType... edgeTypes);
 
     /**
      * Iterate over all edges first this as src then this as dest
@@ -37,12 +37,12 @@ public interface RT<T extends VO<T>> {
      * @param edgeIterator
      * @param edgeTypes 
      */
-    default void iterateEdges(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+    default void iterateEdges(EdgeConsumer edgeIterator, EdgeType... edgeTypes) {
         iterateEdgesAsSrc((int src, int dest, EdgeType edgeType) -> {
-            edgeIterator.edge(src, dest, edgeType);
+            edgeIterator.accept(src, dest, edgeType);
         }, edgeTypes);
         iterateEdgesAsDest((int src, int dest, EdgeType edgeType) -> {
-            edgeIterator.edge(src, dest, edgeType);
+            edgeIterator.accept(src, dest, edgeType);
         }, edgeTypes);
     }
 

@@ -21,7 +21,6 @@ package com.serotonin.mango.rt.dataSource.http;
 import br.org.scadabr.rt.RT;
 import br.org.scadabr.rt.WrongEdgeTypeException;
 import br.org.scadabr.utils.ImplementMeException;
-import br.org.scadabr.vo.EdgeIterator;
 import br.org.scadabr.vo.EdgeType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,6 +29,7 @@ import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataSource.EventDataSource;
 import com.serotonin.mango.vo.dataSource.http.HttpImageDataSourceVO;
 import com.serotonin.mango.vo.dataSource.http.HttpReceiverDataSourceVO;
+import br.org.scadabr.vo.EdgeConsumer;
 
 /**
  * @author Matthew Lohbihler
@@ -136,12 +136,12 @@ public class HttpReceiverDataSourceRT extends EventDataSource<HttpReceiverDataSo
     }
 
     @Override
-    public void iterateEdgesAsSrc(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+    public void iterateEdgesAsSrc(EdgeConsumer edgeIterator, EdgeType... edgeTypes) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void iterateEdgesAsDest(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+    public void iterateEdgesAsDest(EdgeConsumer edgeIterator, EdgeType... edgeTypes) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

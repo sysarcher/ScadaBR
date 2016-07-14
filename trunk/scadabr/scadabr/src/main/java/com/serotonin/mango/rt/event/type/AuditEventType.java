@@ -18,6 +18,7 @@
  */
 package com.serotonin.mango.rt.event.type;
 
+import br.org.scadabr.rt.UserRT;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,6 @@ import br.org.scadabr.vo.event.AlarmLevel;
 import com.serotonin.mango.Common;
 import br.org.scadabr.util.ChangeComparable;
 import com.serotonin.mango.util.ExportCodes;
-import com.serotonin.mango.vo.User;
 import br.org.scadabr.web.i18n.LocalizableI18nKey;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
@@ -59,10 +59,10 @@ public class AuditEventType extends EventType<AuditEventKey> {
     }
 
     private static void raiseEvent(AuditEventKey auditEventType, ChangeComparable<?> o, String key, Object[] props) {
-        User user = null; //TODO IMplement me !!! Common.getUser();
+        UserRT user = null; //TODO IMplement me !!! Common.getUser();
         Object username = null;
         if (user != null) {
-            username = user.getUsername() + " (" + user.getId() + ")";
+            username = user.getName() + " (" + user.getId() + ")";
         } else {
             String descKey = Common.getBackgroundProcessDescription();
             if (descKey == null) {
@@ -175,9 +175,9 @@ public class AuditEventType extends EventType<AuditEventKey> {
     //
     private final int referenceId;
     // THis is a kind of contextual data where to put this - This looks not the place to do so....
-    private final User raisingUser;
+    private final UserRT raisingUser;
 
-    public AuditEventType(AuditEventKey auditEventType, int referenceId, User raisingUser) {
+    public AuditEventType(AuditEventKey auditEventType, int referenceId, UserRT raisingUser) {
         super(auditEventType);
         this.referenceId = referenceId;
         this.raisingUser = raisingUser;
@@ -198,7 +198,7 @@ public class AuditEventType extends EventType<AuditEventKey> {
     }
 
     @Override
-    public boolean excludeUser(User user) {
+    public boolean excludeUser(UserRT user) {
         if (raisingUser != null && !raisingUser.isReceiveOwnAuditEvents()) {
             return user.equals(raisingUser);
         }

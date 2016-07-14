@@ -18,7 +18,7 @@
  */
 package br.org.scadabr.web.mvc.controller;
 
-import br.org.scadabr.dao.UserDao;
+import br.org.scadabr.rt.UserRT;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.web.i18n.LocaleResolver;
 import br.org.scadabr.web.mvc.form.LoginForm;
@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.validation.BindException;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.vo.User;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.web.UserSessionContextBean;
 import com.serotonin.mango.web.integration.CrowdUtils;
 import java.util.Calendar;
@@ -58,7 +58,7 @@ class LoginController {
     private String newUserUrl = "redirect:help";
     private final static String LOGIN_VIEW = "login";
     @Inject
-    private UserDao userDao;
+    private RuntimeManager runtimeManager;
 
     @Inject
     transient private LocaleResolver localeResolver;
@@ -88,7 +88,7 @@ class LoginController {
                 model.addAttribute(LOGIN_VIEW, new LoginForm(username));
 
                 // The user is logged into Crowd. Make sure the username is valid in this instance.
-                User user = userDao.getUser(username);
+                UserRT user = runtimeManager.getUser(username);
                 if (user == null) {
 //                    ValidationUtils.rejectValue(errors, "username", "login.validation.noSuchUser");
                 } else {
@@ -140,7 +140,7 @@ class LoginController {
         boolean crowdAuthenticated = false;
 
         // Check if the user exists
-        User user = userDao.getUser(loginForm.getUsername());
+        UserRT user = runtimeManager.getUser(loginForm.getUsername());
         if (user == null) {
 //            ValidationUtils.rejectValue(errors, "username", "login.validation.noSuchUser");
         } else if (user.isDisabled()) {
@@ -153,11 +153,11 @@ class LoginController {
             }
 
             if (!crowdAuthenticated) {
-                String passwordHash = Common.encrypt(loginForm.getPassword());
+                //TODOuser.canLogin()
 
                 // Validating the password against the database.
-                if (!passwordHash.equals(user.getPassword())) {
-//                    ValidationUtils.reject(errors, "login.validation.invalidLogin");
+                if (user.comparePaswordWithHash(loginForm.getPassword())) {
+//TODO                    ValidationUtils.reject(errors, "login.validation.invalidLogin");
                 }
             }
         }
@@ -188,20 +188,20 @@ class LoginController {
 
     private String performLogin(String username) {
         // Check if the user is already logged in.
-        User user = userSessionContextBean.getUser();
-        if (user != null && user.getUsername().equals(username)) {
+        UserRT user = userSessionContextBean.getUser();
+        if (user != null && user.getName().equals(username)) {
             // The user is already logged in. Nothing to do.
             if (logger.isDebugEnabled()) {
                 logger.debug("User is already logged in, not relogging in");
             }
         } else {
             // Get the user data from the app server.
-            user = userDao.getUser(username);
+            user = runtimeManager.getUser(username);
             if (user == null) {
                 return "redirect:login";
             }
             // Update the last login time.
-            userDao.recordLogin(user.getId());
+            runtimeManager.recordLogin(user);
 
             // Add the user object to the session. This indicates to the rest
             // of the application whether the user is logged in or not.

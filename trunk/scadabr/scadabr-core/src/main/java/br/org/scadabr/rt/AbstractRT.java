@@ -3,9 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.serotonin.mango.rt;
+package br.org.scadabr.rt;
 
-import br.org.scadabr.rt.RT;
 import br.org.scadabr.vo.VO;
 import javax.validation.ValidationException;
 
@@ -29,11 +28,13 @@ public abstract class AbstractRT<T extends VO<T>> implements RT<T> {
      * override and call this to add data to vo
      * @param vo 
      */
-    protected void fillVO(VO<T> vo) {
+    protected T fillVO(T vo) {
         vo.setId(id);
         vo.setName(name);
+        return vo;
     }
     
+    @Override
     public void patch(T vo) {
         if (this.id != vo.getId()) {
             throw new ValidationException();

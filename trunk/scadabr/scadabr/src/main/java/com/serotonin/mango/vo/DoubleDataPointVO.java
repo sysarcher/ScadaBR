@@ -8,7 +8,6 @@ package com.serotonin.mango.vo;
 import br.org.scadabr.DataType;
 import br.org.scadabr.vo.datapoints.NumberDataPointVO;
 import br.org.scadabr.vo.datasource.PointLocatorVO;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.serotonin.mango.rt.dataImage.DoubleDataPointRT;
 import com.serotonin.mango.rt.dataImage.DoubleValueTime;

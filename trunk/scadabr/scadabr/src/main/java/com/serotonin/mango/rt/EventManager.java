@@ -19,8 +19,8 @@
 package com.serotonin.mango.rt;
 
 import br.org.scadabr.dao.EventDao;
-import br.org.scadabr.dao.UserDao;
 import br.org.scadabr.l10n.AbstractLocalizer;
+import br.org.scadabr.rt.UserRT;
 import br.org.scadabr.rt.event.maintenance.MaintenanceEventManager;
 import br.org.scadabr.rt.event.type.EventSources;
 import java.util.ArrayList;
@@ -41,7 +41,6 @@ import com.serotonin.mango.rt.event.type.DataPointEventType;
 import com.serotonin.mango.rt.event.type.DataSourceEventType;
 import com.serotonin.mango.rt.event.type.EventType;
 import com.serotonin.mango.rt.event.type.SystemEventType;
-import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.event.EventHandlerVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.util.ILifecycle;
@@ -71,7 +70,7 @@ public class EventManager implements ILifecycle, Serializable {
     @Inject
     private EventDao eventDao;
     @Inject
-    private UserDao userDao;
+    private RuntimeManager runtimeManager;
     private long lastAlarmTimestamp = 0;
     private AlarmLevel highestActiveAlarmLevel = AlarmLevel.NONE;
 
@@ -134,19 +133,17 @@ public class EventManager implements ILifecycle, Serializable {
         List<Integer> eventUserIds = new ArrayList<>();
         Set<String> emailUsers = new HashSet<>();
 
-        for (User user : userDao.getActiveUsers()) {
+        runtimeManager.getActiveUsers().forEach((user) -> {
             // Do not create an event for this user if the event type says the user should be skipped.
-            if (type.excludeUser(user)) {
-                continue;
-            }
-
-            if (Permissions.hasEventTypePermission(user, type)) {
-                eventUserIds.add(user.getId());
-                if (evt.isAlarm() && user.isReceiveAlarmEmails() && type.getAlarmLevel().otherIsLower(user.getReceiveAlarmEmails())) {
-                    emailUsers.add(user.getEmail());
+            if (!type.excludeUser(user)) {
+                if (Permissions.hasEventTypePermission(user, type)) {
+                    eventUserIds.add(user.getId());
+                    if (evt.isAlarm() && user.isReceiveAlarmEmails() && type.getAlarmLevel().otherIsLower(user.getReceiveAlarmEmails())) {
+                        emailUsers.add(user.getEmail());
+                    }
                 }
             }
-        }
+        });
 
         if (eventUserIds.size() > 0) {
             eventDao.insertUserEvents(evt.getId(), eventUserIds, evt.isAlarm());

@@ -14,7 +14,8 @@ public enum NodeType {
     POINT_LOCATOR_FOLDER,
     POINT_LOCATOR,
     POINT_FOLDER,
-    DATA_POINT;
+    DATA_POINT,
+    USER;
     
     private Integer id;
     

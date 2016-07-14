@@ -16,30 +16,18 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.serotonin.mango.rt.dataImage;
+package br.org.scadabr.rt;
+
+import br.org.scadabr.ShouldNeverHappenException;
 
 /**
- * A set point source is anything that can cause a set point to occur. For
- * example, a user can use the interface to explicitly set a point, in which
- * case the user is the ser point source. A program could reset a value to 0
- * every date, making that program the set point source. This information is
- * stored in the database as a point value annotation.
- *
  * @author Matthew Lohbihler
  */
-public interface SetPointSource {
+@Deprecated //TODO move to UserRT???
+public class AnonymousUserRT {
 
-    public interface Types {
-
-        int USER = 1;
-        int EVENT_HANDLER = 2;
-        int ANONYMOUS = 3;
-        int POINT_LINK = 4;
+    //@Override
+    public void raiseRecursionFailureEvent() {
+        throw new ShouldNeverHappenException("");
     }
-
-    public int getSetPointSourceType();
-
-    public int getSetPointSourceId();
-
-    public void raiseRecursionFailureEvent();
 }

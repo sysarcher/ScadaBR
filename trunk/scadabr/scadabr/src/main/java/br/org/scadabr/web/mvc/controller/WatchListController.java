@@ -18,21 +18,18 @@
  */
 package br.org.scadabr.web.mvc.controller;
 
-import br.org.scadabr.ScadaBrConstants;
-import br.org.scadabr.dao.UserDao;
 import br.org.scadabr.dao.WatchListDao;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.i18n.MessageSource;
+import br.org.scadabr.rt.UserRT;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.view.SharedUserAcess;
 import com.serotonin.mango.web.UserSessionContextBean;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import javax.inject.Inject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -52,8 +49,6 @@ public class WatchListController {
     @Inject
     private WatchListDao watchListDao;
     @Inject
-    private UserDao userDao;
-    @Inject
     private MessageSource messageSource;
 
     public static final String KEY_WATCHLISTS = "watchLists";
@@ -66,7 +61,9 @@ public class WatchListController {
 
     @ModelAttribute
     protected void createModel(ModelMap modelMap, RequestContext requestContext) {
-        final User user = userSessionContextBean.getUser();
+        throw new ImplementMeException();
+        /*
+        final UserRT user = userSessionContextBean.getUser();
 
         // The user's permissions may have changed since the last session, so make sure the watch lists are correct.
         final List<WatchList> watchLists = watchListDao.getWatchLists(user.getId());
@@ -78,12 +75,12 @@ public class WatchListController {
             watchLists.add(watchListDao.createNewWatchList(watchList, user.getId()));
         }
 
-        int selected = user.getSelectedWatchList();
+        WatchListRT selected = user.getSelectedWatchList();
         boolean found = false;
 
         Map<String, String> watchListNames = new LinkedHashMap<>();
         for (WatchList watchList : watchLists) {
-            if (watchList.getId() == selected) {
+            if (watchList.getId() == selected.getId()) {
                 found = true;
             }
 
@@ -118,6 +115,7 @@ public class WatchListController {
 
         modelMap.put(KEY_WATCHLISTS, watchListNames);
         modelMap.put(KEY_SELECTED_WATCHLIST, selected);
+*/
     }
 
     public static class JsonWatchList {
@@ -129,7 +127,9 @@ public class WatchListController {
     }
 
     public JsonWatchList setSelectedWatchList(int watchListId) {
-        User user = userSessionContextBean.getUser();
+        throw new ImplementMeException();
+        /*
+        UserRT user = userSessionContextBean.getUser();
 
         WatchList watchList = watchListDao.getWatchList(watchListId);
 //TODO        Permissions.ensureWatchListPermission(user, watchList);
@@ -141,9 +141,10 @@ public class WatchListController {
         JsonWatchList data = getWatchListData(user, watchList);
 
         return data;
+*/
     }
 
-    private JsonWatchList getWatchListData(User user, WatchList watchList) {
+    private JsonWatchList getWatchListData(UserRT user, WatchList watchList) {
         JsonWatchList data = new JsonWatchList(watchList);
 
         List<DataPointVO> points = watchList.getPointList();
@@ -160,15 +161,18 @@ public class WatchListController {
         return data;
     }
 
-    private void prepareWatchList(WatchList watchList, User user) {
+    private void prepareWatchList(WatchList watchList, UserRT user) {
+        throw new ImplementMeException();
+        /*
         SharedUserAcess access = watchList.getUserAccess(user);
-        User owner = userDao.getUser(watchList.getUserId());
+        UserRT owner = userDao.getUser(watchList.getUserId());
         for (DataPointVO point : watchList.getPointList()) {
             updateSetPermission(point, access, owner);
         }
+*/
     }
 
-    private void updateSetPermission(DataPointVO point, SharedUserAcess access, User owner) {
+    private void updateSetPermission(DataPointVO point, SharedUserAcess access, UserRT owner) {
         // Point isn't settable
         if (!point.isSettable()) {
             return;

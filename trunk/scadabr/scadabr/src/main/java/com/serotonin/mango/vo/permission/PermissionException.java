@@ -18,20 +18,20 @@
  */
 package com.serotonin.mango.vo.permission;
 
-import com.serotonin.mango.vo.User;
+import br.org.scadabr.rt.UserRT;
 
 public class PermissionException extends RuntimeException {
 
     private static final long serialVersionUID = -1;
 
-    private final User user;
+    private final UserRT user;
 
-    public PermissionException(String message, User user) {
+    public PermissionException(String message, UserRT user) {
         super(message);
         this.user = user;
     }
 
-    public User getUser() {
+    public UserRT getUser() {
         return user;
     }
 }

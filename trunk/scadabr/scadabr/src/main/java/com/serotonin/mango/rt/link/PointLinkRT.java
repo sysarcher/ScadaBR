@@ -19,7 +19,9 @@
 package com.serotonin.mango.rt.link;
 
 import br.org.scadabr.DataType;
+import br.org.scadabr.rt.RT;
 import br.org.scadabr.rt.SchedulerPool;
+import br.org.scadabr.rt.WrongEdgeTypeException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,24 +31,28 @@ import com.serotonin.mango.rt.dataImage.DataPointListener;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.IDataPoint;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.SetPointSource;
 import br.org.scadabr.rt.scripting.ResultTypeException;
 import br.org.scadabr.rt.scripting.ScriptExecutor;
+import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.rt.event.type.SystemEventType;
 import com.serotonin.mango.rt.maint.work.SetPointWorkItem;
 import com.serotonin.mango.vo.link.PointLinkVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.EdgeType;
+import br.org.scadabr.vo.NodeType;
+import br.org.scadabr.vo.VO;
 import br.org.scadabr.vo.event.type.SystemEventKey;
 import com.serotonin.mango.rt.RuntimeManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import br.org.scadabr.vo.EdgeConsumer;
 
 /**
  * @author Matthew Lohbihler
  */
 @Configurable
-public class PointLinkRT implements DataPointListener, SetPointSource {
+public class PointLinkRT implements DataPointListener {
 
     public static final String CONTEXT_VAR_NAME = "source";
     private final PointLinkVO vo;
@@ -142,8 +148,11 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
         }
 
         // Queue a work item to perform the update.
+        throw new ImplementMeException();
+        /*TODO
         schedulerPool.execute(new SetPointWorkItem(vo.getTargetPointId(), newValue, this));
         returnToNormal();
+*/
     }
 
     //
@@ -185,23 +194,9 @@ public class PointLinkRT implements DataPointListener, SetPointSource {
         }
     }
 
-    //
-    // /
-    // / SetPointSource
-    // /
-    //
-    @Override
-    public int getSetPointSourceId() {
-        return vo.getId();
-    }
-
-    @Override
-    public int getSetPointSourceType() {
-        return SetPointSource.Types.POINT_LINK;
-    }
-
-    @Override
+//TODO    @Override
     public void raiseRecursionFailureEvent() {
         raiseFailureEvent(new LocalizableMessageImpl("event.pointLink.recursionFailure"));
     }
+
 }

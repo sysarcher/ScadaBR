@@ -7,11 +7,11 @@ package br.org.scadabr.web.mvc.controller.datasources;
 
 import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.rt.UserRT;
 import br.org.scadabr.vo.datasource.PointLocatorFolderVO;
 import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.serotonin.mango.rt.RuntimeManager;
-import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.UserSessionContextBean;
@@ -54,7 +54,7 @@ public class DsTreeController {
     // ?? @JsonAppend(attrs = @JsonAppend.Attr
     @RequestMapping(value = "dataSources", method = RequestMethod.GET)
     public Iterable<JsonDataSourceWrapper> getDataSources() {
-        final User user = userSessionContextBean.getUser();
+        final UserRT user = userSessionContextBean.getUser();
         List<JsonDataSourceWrapper> result = new ArrayList<>();
         for (DataSourceVO<?> ds : runtimeManager.getDataSources()) {
             if (Permissions.hasDataSourcePermission(user, ds.getId())) {

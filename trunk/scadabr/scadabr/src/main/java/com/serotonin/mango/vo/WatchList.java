@@ -18,13 +18,11 @@
  */
 package com.serotonin.mango.vo;
 
-import br.org.scadabr.ScadaBrConstants;
 import br.org.scadabr.dao.DataPointDao;
-import br.org.scadabr.dao.UserDao;
 import br.org.scadabr.dao.WatchListDao;
+import br.org.scadabr.rt.UserRT;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.view.SharedUserAcess;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -40,6 +38,7 @@ import org.springframework.validation.Validator;
 /**
  * @author Matthew Lohbihler
  */
+@Deprecated //TODO use WatchListRT|VO
 public class WatchList implements Iterable<DataPointVO> {
 
     @Configurable
@@ -47,8 +46,6 @@ public class WatchList implements Iterable<DataPointVO> {
 
         @Autowired
         private DataPointDao dataPointDao;
-        @Autowired
-        private UserDao userDao;
         @Autowired
         private WatchListDao watchListDao;
 
@@ -94,7 +91,7 @@ public class WatchList implements Iterable<DataPointVO> {
     private final List<DataPointVO> pointList = new CopyOnWriteArrayList<>();
     private Map<Integer, SharedUserAcess> watchListUsers = new HashMap<>();
 
-    public SharedUserAcess getUserAccess(User user) {
+    public SharedUserAcess getUserAccess(UserRT user) {
         if (user.getId() == userId) {
             return SharedUserAcess.OWNER;
         }

@@ -19,12 +19,13 @@
 package com.serotonin.mango.rt.maint.work;
 
 import br.org.scadabr.timer.cron.SystemRunnable;
+import br.org.scadabr.utils.ImplementMeException;
+import br.org.scadabr.vo.VO;
 import com.serotonin.mango.rt.RuntimeManager;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.SetPointSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -39,12 +40,12 @@ public class SetPointWorkItem implements SystemRunnable {
 
     private final int targetPointId;
     private final PointValueTime pvt;
-    private final SetPointSource source;
+    private final VO<?> source;
     private final List<String> sourceIds;
     @Autowired
     private RuntimeManager runtimeManager;
 
-    public SetPointWorkItem(int targetPointId, PointValueTime pvt, SetPointSource source) {
+    public SetPointWorkItem(int targetPointId, PointValueTime pvt, VO<?> source) {
         this.targetPointId = targetPointId;
         this.pvt = pvt;
         this.source = source;
@@ -58,8 +59,8 @@ public class SetPointWorkItem implements SystemRunnable {
 
     @Override
     public void run() {
-        String sourceId = Integer.toString(source.getSetPointSourceType()) + "-"
-                + Integer.toString(source.getSetPointSourceId());
+        String sourceId = source.getNodeType().name() + "-"
+                + Integer.toString(source.getId());
 
         // Check if we've reached the maximum number of hits for this point
         int count = 0;
@@ -69,8 +70,9 @@ public class SetPointWorkItem implements SystemRunnable {
             }
         }
 
+        if (true) throw new ImplementMeException();
         if (count > MAX_RECURSION) {
-            source.raiseRecursionFailureEvent();
+            //TODO was ((SetpointSource)source).raiseRecursionFailureEvent();
             return;
         }
 

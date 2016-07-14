@@ -19,7 +19,9 @@
 package br.org.scadabr.dao.jdbc;
 
 import br.org.scadabr.dao.UserDao;
+import br.org.scadabr.rt.UserRT;
 import br.org.scadabr.util.StringUtils;
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.event.AlarmLevel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,9 +33,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import com.serotonin.mango.Common;
-import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.event.AlternateAcknowledgementSources;
-import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.UserComment;
 import com.serotonin.mango.vo.permission.DataPointAccess;
 import java.sql.Connection;
@@ -46,6 +46,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 
 @Named
+@Deprecated //TODO move to node / edge dao
 public class UserDaoImpl extends BaseDao implements UserDao {
 
     private static final String USER_SELECT = "select id, username, password, email, phone, admin, disabled, selectedWatchList, homeUrl, lastLogin, "
@@ -68,32 +69,39 @@ public class UserDaoImpl extends BaseDao implements UserDao {
     }
     
     @Override
-    public User getUser(int id) {
+    public UserRT getUser(int id) {
+        throw new ImplementMeException();
+        /*
         try {
-            User user = ejt.queryForObject(USER_SELECT + "where id=?", new UserRowMapper(), id);
+            UserRT user = ejt.queryForObject(USER_SELECT + "where id=?", new UserRowMapper(), id);
             populateUserPermissions(user);
             return user;
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
+*/
     }
 
     @Override
-    public User getUser(String username) {
+    public UserRT getUser(String username) {
+        throw new ImplementMeException();
+        /*
         try {
-            User user = ejt.queryForObject(USER_SELECT + "where lower(username)=?", new UserRowMapper(), username.toLowerCase());
+            UserRT user = ejt.queryForObject(USER_SELECT + "where lower(username)=?", new UserRowMapper(), username.toLowerCase());
             populateUserPermissions(user);
             return user;
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
-    }
+*/    }
 
-    class UserRowMapper implements RowMapper<User> {
+    class UserRowMapper implements RowMapper<UserRT> {
 
         @Override
-        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-            User user = new User();
+        public UserRT mapRow(ResultSet rs, int rowNum) throws SQLException {
+        throw new ImplementMeException();
+        /*
+            UserVO user = new UserVO();
             int i = 0;
             user.setId(rs.getInt(++i));
             user.setUsername(rs.getString(++i));
@@ -109,35 +117,47 @@ public class UserDaoImpl extends BaseDao implements UserDao {
             user.setReceiveAlarmEmails(l == AlarmLevel.NONE ? null : l);
             user.setReceiveOwnAuditEvents(charToBool(rs.getString(++i)));
             return user;
+*/
         }
     }
 
     @Override
-    public Collection<User> getUsers() {
-        List<User> users = ejt.query(USER_SELECT + "order by username", new Object[0], new UserRowMapper());
+    public Collection<UserRT> getUsers() {
+      throw new ImplementMeException();
+        /*
+          List<UserVO> users = ejt.query(USER_SELECT + "order by username", new Object[0], new UserRowMapper());
         populateUserPermissions(users);
         return users;
+*/
     }
 
     @Override
-    public Collection<User> getActiveUsers() {
-        List<User> users = ejt.query(USER_SELECT + "where disabled=?", new Object[]{boolToChar(false)},
+    public Collection<UserRT> getActiveUsers() {
+      throw new ImplementMeException();
+        /*
+          List<UserVO> users = ejt.query(USER_SELECT + "where disabled=?", new Object[]{boolToChar(false)},
                 new UserRowMapper());
         populateUserPermissions(users);
         return users;
-    }
+        */
+      }
 
-    private void populateUserPermissions(List<User> users) {
-        users.stream().forEach((user) -> {
+    private void populateUserPermissions(List<UserRT> users) {
+      throw new ImplementMeException();
+        /*
+          users.stream().forEach((user) -> {
             populateUserPermissions(user);
         });
+*/
     }
 
     private static final String SELECT_DATA_SOURCE_PERMISSIONS = "select dataSourceId from dataSourceUsers where userId=?";
     private static final String SELECT_DATA_POINT_PERMISSIONS = "select dataPointId, permission from dataPointUsers where userId=?";
 
-    public void populateUserPermissions(User user) {
-
+    public void populateUserPermissions(UserRT user) {
+      throw new ImplementMeException();
+        /*
+  
         user.setDataSourcePermissions(ejt.queryForList(SELECT_DATA_SOURCE_PERMISSIONS, new Object[]{user.getId()},
                 Integer.class));
         user.setDataPointPermissions(ejt.query(SELECT_DATA_POINT_PERMISSIONS, (ResultSet rs, int rowNum) -> {
@@ -146,10 +166,13 @@ public class UserDaoImpl extends BaseDao implements UserDao {
             a.setPermission(rs.getInt(2));
             return a;
         }, user.getId()));
+*/
     }
 
-    public void saveUser(final User user) {
-        getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
+    public void saveUser(final UserRT user) {
+      throw new ImplementMeException();
+        /*
+          getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 if (user.isNew()) {
@@ -159,10 +182,13 @@ public class UserDaoImpl extends BaseDao implements UserDao {
                 }
             }
         });
+*/
     }
 
-    private void insertUser(final User user) {
-        final int id = doInsert(new PreparedStatementCreator() {
+    private void insertUser(final UserRT user) {
+      throw new ImplementMeException();
+        /*
+          final int id = doInsert(new PreparedStatementCreator() {
 
             final static String SQL_INSERT = "insert into users ("
                     + "  username, password, email, phone, admin, disabled, homeUrl, receiveAlarmEmails, receiveOwnAuditEvents) "
@@ -185,23 +211,27 @@ public class UserDaoImpl extends BaseDao implements UserDao {
         });
         user.setId(id);
         saveRelationalData(user);
-    }
+*/    }
 
     private static final String USER_UPDATE = "update users set "
             + "  username=?, password=?, email=?, phone=?, admin=?, disabled=?, homeUrl=?, receiveAlarmEmails=?, "
             + "  receiveOwnAuditEvents=? " + "where id=?";
 
-    void updateUser(User user) {
-        ejt.update(
+    void updateUser(UserRT user) {
+      throw new ImplementMeException();
+        /*
+          ejt.update(
                 USER_UPDATE,
                 new Object[]{user.getUsername(), user.getPassword(), user.getEmail(), user.getPhone(),
                     boolToChar(user.isAdmin()), boolToChar(user.isDisabled()), user.getHomeUrl(),
                     user.getReceiveAlarmEmails(), boolToChar(user.isReceiveOwnAuditEvents()), user.getId()});
         saveRelationalData(user);
-    }
+*/    }
 
-    private void saveRelationalData(final User user) {
-        // Delete existing permissions.
+    private void saveRelationalData(final UserRT user) {
+      throw new ImplementMeException();
+        /*
+          // Delete existing permissions.
         ejt.update("delete from dataSourceUsers where userId=?", new Object[]{user.getId()});
         ejt.update("delete from dataPointUsers where userId=?", new Object[]{user.getId()});
 
@@ -233,10 +263,12 @@ public class UserDaoImpl extends BaseDao implements UserDao {
                         ps.setInt(3, user.getDataPointPermissions().get(i).getPermission());
                     }
                 });
-    }
+*/    }
 
     public void deleteUser(final int userId) {
-        getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
+      throw new ImplementMeException();
+        /*
+          getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
             @SuppressWarnings("synthetic-access")
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
@@ -244,14 +276,14 @@ public class UserDaoImpl extends BaseDao implements UserDao {
                 ejt.update("update userComments set userId=null where userId=?", args);
                 ejt.update("delete from mailingListMembers where userId=?", args);
                 ejt.update("update pointValueAnnotations set sourceId=null where sourceId=? and sourceType="
-                        + SetPointSource.Types.USER, args);
+                        + SetPointSource.Type.USER, args);
                 ejt.update("delete from userEvents where userId=?", args);
                 ejt.update("update events set ackUserId=null, alternateAckSource="
                         + AlternateAcknowledgementSources.DELETED_USER + " where ackUserId=?", args);
                 ejt.update("delete from users where id=?", args);
             }
         });
-    }
+*/    }
 
     @Override
     public void recordLogin(int userId) {

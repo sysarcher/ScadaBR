@@ -37,7 +37,6 @@ import br.org.scadabr.web.http.HttpUtils;
 import br.org.scadabr.utils.i18n.LocalizableException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import br.org.scadabr.vo.EdgeIterator;
 import br.org.scadabr.vo.EdgeType;
 import br.org.scadabr.vo.datasource.http.HttpRetrieverDataSourceEventKey;
 import com.serotonin.mango.rt.dataImage.AlphaNumericValueTime;
@@ -47,6 +46,7 @@ import java.text.ParseException;
 import java.util.regex.Matcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import br.org.scadabr.vo.EdgeConsumer;
 
 /**
  * @author Matthew Lohbihler
@@ -261,12 +261,12 @@ public class HttpRetrieverDataSourceRT extends PollingDataSource<HttpRetrieverDa
     }
 
     @Override
-    public void iterateEdgesAsSrc(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+    public void iterateEdgesAsSrc(EdgeConsumer edgeIterator, EdgeType... edgeTypes) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void iterateEdgesAsDest(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+    public void iterateEdgesAsDest(EdgeConsumer edgeIterator, EdgeType... edgeTypes) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

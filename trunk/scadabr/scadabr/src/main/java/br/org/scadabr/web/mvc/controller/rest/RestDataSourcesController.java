@@ -7,9 +7,9 @@ package br.org.scadabr.web.mvc.controller.rest;
 
 import br.org.scadabr.dao.DataSourceDao;
 import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.rt.UserRT;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.serotonin.mango.rt.RuntimeManager;
-import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import com.serotonin.mango.vo.permission.Permissions;
@@ -52,7 +52,7 @@ public class RestDataSourcesController {
     public List<JsonDataSource> getDataSources() {
         LOG.severe("CALLED: getDataSources");
         
-        final User user = userSessionContextBean.getUser();
+        final UserRT user = userSessionContextBean.getUser();
         List<JsonDataSource> result = new ArrayList<>();
         for (DataSourceVO<?> ds : runtimeManager.getDataSources()) {
             if (Permissions.hasDataSourcePermission(user, ds.getId())) {

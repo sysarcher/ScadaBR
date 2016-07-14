@@ -19,7 +19,6 @@
 package com.serotonin.mango.vo.event;
 
 import br.org.scadabr.DataType;
-import br.org.scadabr.ScadaBrConstants;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,7 +29,7 @@ import java.util.List;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.dao.MailingListDao;
-import br.org.scadabr.dao.UserDao;
+import br.org.scadabr.rt.UserRT;
 import com.serotonin.mango.rt.event.handlers.EmailHandlerRT;
 import com.serotonin.mango.rt.event.handlers.EventHandlerRT;
 import com.serotonin.mango.rt.event.handlers.ProcessHandlerRT;
@@ -45,6 +44,7 @@ import br.org.scadabr.utils.TimePeriods;
 import br.org.scadabr.utils.i18n.LocalizableEnum;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.DataPointVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -59,8 +59,6 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
 
         @Autowired
         private DataPointDao dataPointDao;
-        @Autowired
-        private UserDao userDao;
 
         @Override
         public boolean supports(Class<?> clazz) {
@@ -178,7 +176,7 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
     @Autowired
     private DataPointDao dataPointDao;
     @Autowired
-    private UserDao userDao;
+    private RuntimeManager runtimeManager;
 
     public static final String XID_PREFIX = "EH_";
 
@@ -734,8 +732,8 @@ public class EventHandlerVO implements Serializable, ChangeComparable<EventHandl
                         mailingListDao.getMailingList(recip.getReferenceId())
                         .getName());
             } else if (recip.getRecipientType() == EmailRecipient.TYPE_USER) {
-                msg = new LocalizableMessageImpl("event.audit.recip.user", userDao
-                        .getUser(recip.getReferenceId()).getUsername());
+                msg = new LocalizableMessageImpl("event.audit.recip.user", runtimeManager
+                        .getNode(recip.getReferenceId()).getName(), UserRT.class);
             } else {
                 msg = new LocalizableMessageImpl("event.audit.recip.address", recip
                         .getReferenceAddress());

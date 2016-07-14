@@ -6,12 +6,12 @@
 package br.org.scadabr.dao;
 
 import br.org.scadabr.vo.Edge;
-import br.org.scadabr.vo.EdgeIterator;
 import br.org.scadabr.vo.EdgeType;
-import br.org.scadabr.vo.NodeIterator;
 import br.org.scadabr.vo.NodeType;
 import br.org.scadabr.vo.VO;
+import java.util.function.Consumer;
 import javax.inject.Named;
+import br.org.scadabr.vo.EdgeConsumer;
 
 /**
  *
@@ -33,7 +33,7 @@ public interface NodeEdgeDao<T extends VO<T>> {
         return deleteNode(node.getId());
     }
 
-    void iterateNodes(NodeIterator nodeIterator);
+    void forEachNode(Consumer<T> action);
     
     long countNodes();
 
@@ -58,7 +58,7 @@ public interface NodeEdgeDao<T extends VO<T>> {
         return deleteEdge(edge.getSrcNodeId(), edge.getDestNodeId(), edge.getEdgeType());
     }
 
-    void iterateEdges(final EdgeIterator edgeIterator); 
+    void forEachEdge(final EdgeConsumer action); 
 
     long countEdges();
 

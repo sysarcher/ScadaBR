@@ -6,8 +6,8 @@
 package br.org.scadabr.dao;
 
 import br.org.scadabr.DataType;
+import br.org.scadabr.vo.VO;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.vo.DataPointVO;
 import java.util.List;
 import javax.inject.Named;
@@ -25,9 +25,9 @@ public interface PointValueDao {
      * @param newValue Value currently not in store
      * @param source currently ignored ???
      */
-    <T extends PointValueTime> void savePointValueAsync(T newValue, SetPointSource source);
+    <T extends PointValueTime> void savePointValueAsync(T newValue, VO<?> source);
 
-    <T extends PointValueTime> T savePointValueSync(T newValue, SetPointSource source);
+    <T extends PointValueTime> T savePointValueSync(T newValue, VO<?> source);
 
     <P extends PointValueTime> P getLatestPointValue(DataPointVO<?, P> dpVo);
 

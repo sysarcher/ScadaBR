@@ -47,8 +47,8 @@ public class MangoEmailContent extends EmailContent {
     private final SubjectDirective subjectDirective;
 
     public MangoEmailContent(String templateName, Map<String, Object> model, ResourceBundle bundle,
-            String defaultSubject, String encoding) throws TemplateException, IOException {
-        super(null, null, encoding);
+            String defaultSubject) throws TemplateException, IOException {
+        super(null, null);
 
         // This will raise a NÜE but compiles :)
         ContentType type = systemSettingsDao.getEmail().getContentType();
