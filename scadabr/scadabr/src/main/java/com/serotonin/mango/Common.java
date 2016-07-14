@@ -64,9 +64,6 @@ public class Common {
     private static final String ANON_VIEW_KEY = "anonymousViews";
     private static final String CUSTOM_VIEW_KEY = "customView";
 
-    public static final String UTF8 = "UTF-8";
-    public static final Charset UTF8_CS = Charset.forName(UTF8);
-
     @Deprecated
     public static ContextWrapper ctx;
 
@@ -197,32 +194,6 @@ public class Common {
         } catch (NoClassDefFoundError e) {
             throw new CommPortConfigException(
                     "Comm configuration error. Check that rxtx DLL or libraries have been correctly installed.");
-        }
-    }
-
-    public synchronized static String encrypt(String plaintext) {
-        try {
-            String alg = getEnvironmentString("security.hashAlgorithm", "SHA");
-            if ("NONE".equals(alg)) {
-                return plaintext;
-            }
-
-            MessageDigest md = MessageDigest.getInstance(alg);
-            if (md == null) {
-                throw new ShouldNeverHappenException(
-                        "MessageDigest algorithm "
-                        + alg
-                        + " not found. Set the 'security.hashAlgorithm' property in env.properties appropriately. "
-                        + "Use 'NONE' for no hashing.");
-            }
-            md.update(plaintext.getBytes(UTF8_CS));
-            byte raw[] = md.digest();
-            String hash = new String(Base64.encodeBase64(raw));
-            return hash;
-        } catch (NoSuchAlgorithmException e) {
-            // Should never happen, so just wrap in a runtime exception and
-            // rethrow
-            throw new ShouldNeverHappenException(e);
         }
     }
 

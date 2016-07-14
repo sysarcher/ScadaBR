@@ -18,19 +18,12 @@
  */
 package com.serotonin.mango.vo.event;
 
-import br.org.scadabr.ScadaBrConstants;
 import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.utils.ImplementMeException;
 import java.util.List;
-import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.event.compound.CompoundEventDetectorRT;
-import com.serotonin.mango.rt.event.compound.ConditionParseException;
-import com.serotonin.mango.rt.event.compound.LogicalOperator;
 import com.serotonin.mango.rt.event.type.AuditEventType;
 import br.org.scadabr.util.ChangeComparable;
-import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.User;
-import com.serotonin.mango.vo.permission.Permissions;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.vo.event.type.CompoundEventKey;

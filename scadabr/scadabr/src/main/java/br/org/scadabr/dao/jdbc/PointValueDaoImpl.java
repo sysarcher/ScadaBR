@@ -23,11 +23,11 @@ import br.org.scadabr.dao.PointValueDao;
 import br.org.scadabr.db.IntValuePair;
 import br.org.scadabr.db.spring.IntValuePairRowMapper;
 import br.org.scadabr.utils.ImplementMeException;
+import br.org.scadabr.vo.NodeType;
+import br.org.scadabr.vo.VO;
 import com.serotonin.mango.rt.dataImage.DoubleValueTime;
 import com.serotonin.mango.rt.dataImage.PointValueAnnotation;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.SetPointSource;
-import com.serotonin.mango.vo.AnonymousUser;
 import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.bean.LongPair;
 import java.sql.Connection;
@@ -106,8 +106,8 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
      *
      * @param pointId
      */
-    @Override
-    public PointValueTime savePointValueSync(PointValueTime pointValue, SetPointSource source) {
+/*    @Override
+    public PointValueTime savePointValueSync(PointValueTime pointValue, VO<?> source) {
         long id = savePointValueImpl(pointValue, source, false);
 
         PointValueTime savedPointValue;
@@ -126,12 +126,12 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
 
         return savedPointValue;
     }
-
+*/
     /**
      * @inheritDoc
      */
     @Override
-    public <T extends PointValueTime> void savePointValueAsync(T pointValue, SetPointSource source) {
+    public <T extends PointValueTime> void savePointValueAsync(T pointValue, VO<?> source) {
         switch (pointValue.getDataType()) {
             case DOUBLE:
                 batchWriteBehind.add((DoubleValueTime) pointValue, ejt);
@@ -141,7 +141,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         }
     }
 
-    private long savePointValueImpl(final PointValueTime pointValue, final SetPointSource source, boolean async) {
+    private long savePointValueImpl(final PointValueTime pointValue, final VO<?> source, boolean async) {
         throw new ImplementMeException();
         /*
          MangoValue value = pointValue.getMangoValue();
@@ -251,11 +251,12 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
     }
 
     public void savePointValue(PointValueTime pointValue) {
-        savePointValueImpl(pointValue, new AnonymousUser(), true);
+throw new ImplementMeException();
+//savePointValueImpl(pointValue, new AnonymousUserRT(), true);
     }
 
     private long savePointValue(final int pointId, final DataType dataType, double dvalue,
-            final long time, final String svalue, final SetPointSource source,
+            final long time, final String svalue, final VO<?> source,
             boolean async) {
         // Apply database specific bounds on double values.
 
@@ -278,7 +279,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
     }
 
     private long savePointValueImpl(final int pointId, final DataType dataType, final double dvalue,
-            final long time, String svalue, SetPointSource source) {
+            final long time, String svalue, VO<?> source) {
         long id = doInsertLong(new PreparedStatementCreator() {
 
             @Override
@@ -298,10 +299,11 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
 
         // Check if we need to create an annotation.
         if (svalue != null || source != null) {
-            Integer sourceType = null, sourceId = null;
+            NodeType sourceType = null;
+            Integer sourceId = null;
             if (source != null) {
-                sourceType = source.getSetPointSourceType();
-                sourceId = source.getSetPointSourceId();
+                sourceType = source.getNodeType();
+                sourceId = source.getId();
             }
 
             String shortString = null;
@@ -478,6 +480,11 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
         } catch (DataAccessException e) {
             return null;
         }
+    }
+
+    @Override
+    public <T extends PointValueTime> T savePointValueSync(T newValue, VO<?> source) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     class PointValueRowMapper<T extends PointValueTime> implements RowMapper<T> {
@@ -682,10 +689,10 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
 
         private final int pointId;
         private final PointValueTime pointValue;
-        private final SetPointSource source;
+        private final VO<?> source;
 
         public UnsavedPointValue(int pointId, PointValueTime pointValue,
-                SetPointSource source) {
+                VO<?> source) {
             this.pointId = pointId;
             this.pointValue = pointValue;
             this.source = source;
@@ -699,7 +706,7 @@ public class PointValueDaoImpl extends BaseDao implements PointValueDao {
             return pointValue;
         }
 
-        public SetPointSource getSource() {
+        public VO<?> getSource() {
             return source;
         }
     }

@@ -34,7 +34,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.dao.MailingListDao;
-import br.org.scadabr.dao.UserDao;
+import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.vo.event.RecipientListEntry;
 import com.serotonin.mango.vo.mailingList.AddressEntry;
 import com.serotonin.mango.vo.mailingList.EmailRecipient;
@@ -55,9 +55,6 @@ import org.springframework.jdbc.core.RowMapper;
 @Named
 public class MailingListDaoImpl extends BaseDao implements MailingListDao {
 
-    @Inject
-    private UserDao userDao;
-    
     public MailingListDaoImpl() {
         super();
     }
@@ -173,7 +170,9 @@ public class MailingListDaoImpl extends BaseDao implements MailingListDao {
     }
 
     public void populateEntrySubclasses(List<EmailRecipient> entries) {
-        // Update the user type entries with their respective user objects.
+throw new ImplementMeException();
+/*
+// Update the user type entries with their respective user objects.
         for (EmailRecipient e : entries) {
             if (e instanceof MailingList) // NOTE: this does not set the mailing list name.
             {
@@ -183,6 +182,7 @@ public class MailingListDaoImpl extends BaseDao implements MailingListDao {
                 ue.setUser(userDao.getUser(ue.getUserId()));
             }
         }
+        */
     }
 
     private static final String MAILING_LIST_UPDATE = "update mailingLists set xid=?, name=? where id=?";

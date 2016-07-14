@@ -6,17 +6,18 @@
 package br.org.scadabr.rt;
 
 import br.org.scadabr.ShouldNeverHappenException;
-import br.org.scadabr.vo.EdgeIterator;
 import br.org.scadabr.vo.EdgeType;
 import br.org.scadabr.vo.NodeType;
 import br.org.scadabr.vo.datapoints.DataPointNodeVO;
 import br.org.scadabr.vo.datapoints.PointFolderVO;
-import com.serotonin.mango.rt.AbstractRT;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import javax.validation.ValidationException;
+import br.org.scadabr.vo.EdgeConsumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Matthew Lohbihler
@@ -82,11 +83,9 @@ public class PointFolderRT
         node.setParent(this);
     }
 
-    public Iterable<DataPointNodeVO> getChildren() {
-        final List<DataPointNodeVO> result = new ArrayList<>(childFolders.size() + dataPoints.size());
-        childFolders.stream().forEach((pfrt) -> result.add(pfrt.getVO()));
-        dataPoints.stream().forEach((dprt) -> result.add(dprt.getVO()));
-        return result;
+    public Stream<DataPointNodeVO> getChildren() {
+        return (Stream<DataPointNodeVO>)(Stream)Stream.concat((Stream<DataPointNodeRT>) (Stream)childFolders.stream(), (Stream<DataPointNodeRT>) (Stream)dataPoints.stream())
+                .map(DataPointNodeRT::getVO);
     }
 
     public void addFolder(PointFolderRT childFolder) {
@@ -132,12 +131,12 @@ public class PointFolderRT
     }
 
     @Override
-    public void iterateEdgesAsSrc(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+    public void iterateEdgesAsSrc(EdgeConsumer edgeIterator, EdgeType... edgeTypes) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void iterateEdgesAsDest(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+    public void iterateEdgesAsDest(EdgeConsumer edgeIterator, EdgeType... edgeTypes) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

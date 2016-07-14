@@ -43,6 +43,7 @@
     @ http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/mvc.html#mvc-annotation-driven-->
     <mvc:annotation-driven />
     
+    <mvc:resources mapping="/index.html" location="/index.html" />
     <mvc:resources mapping="/resources/**" location="/resources/" />
     <mvc:resources mapping="/icons/**" location="/icons/" />
     <mvc:resources mapping="/images/**" location="/images/" />

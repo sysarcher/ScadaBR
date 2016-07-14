@@ -18,8 +18,10 @@
  */
 package com.serotonin.mango.rt.dataImage;
 
+import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
+import br.org.scadabr.vo.NodeType;
 
 /**
  * This class provides a way of arbitrarily annotating a PointValue. Point value
@@ -39,7 +41,7 @@ public class PointValueAnnotation {
      *
      * @see SetPointSource
      */
-    private final int sourceType;
+    private final NodeType sourceType;
 
     /**
      * The id of the source that created the annotation.
@@ -57,7 +59,7 @@ public class PointValueAnnotation {
      */
     private String sourceDescriptionArgument;
 
-    public PointValueAnnotation(int sourceType, int sourceId) {
+    public PointValueAnnotation(NodeType sourceType, int sourceId) {
         this.sourceType = sourceType;
         this.sourceId = sourceId;
     }
@@ -66,22 +68,25 @@ public class PointValueAnnotation {
         return sourceId;
     }
 
-    public int getSourceType() {
+    public NodeType getSourceType() {
         return sourceType;
     }
 
     public String getSourceDescriptionKey() {
+        throw new ImplementMeException();
+        /*
         switch (sourceType) {
-            case SetPointSource.Types.ANONYMOUS:
+            case ANONYMOUS:
                 return "annotation.anonymous";
-            case SetPointSource.Types.EVENT_HANDLER:
+            case EVENT_HANDLER:
                 return "annotation.eventHandler";
-            case SetPointSource.Types.USER:
+            case USER:
                 return "annotation.user";
-            case SetPointSource.Types.POINT_LINK:
+            case POINT_LINK:
                 return "annotation.pointLink";
         }
         return null;
+*/
     }
 
     public String getSourceDescriptionArgument() {

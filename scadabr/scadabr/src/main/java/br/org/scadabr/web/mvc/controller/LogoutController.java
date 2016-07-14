@@ -18,10 +18,10 @@
  */
 package br.org.scadabr.web.mvc.controller;
 
+import br.org.scadabr.rt.UserRT;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.serotonin.mango.vo.User;
 import com.serotonin.mango.web.UserSessionContextBean;
 import com.serotonin.mango.web.integration.CrowdUtils;
 import javax.inject.Inject;
@@ -47,7 +47,7 @@ public class LogoutController {
     protected String handleRequestInternal(HttpServletRequest request, HttpServletResponse response) {
         try {
 // Check if the user is logged in.
-            User user = userSessionContextBean.getUser();
+            UserRT user = userSessionContextBean.getUser();
             if (user != null) {
                 // The user is in fact logged in. Invalidate the session.
                 userSessionContextBean.logoutUser();

@@ -1,15 +1,14 @@
 package br.org.scadabr.web.mvc.controller.jsonrpc;
 import br.org.scadabr.dao.DataPointDao;
 import br.org.scadabr.dao.PointValueDao;
-import br.org.scadabr.dao.UserDao;
 import br.org.scadabr.dao.WatchListDao;
 import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.rt.UserRT;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.view.SharedUserAcess;
 import br.org.scadabr.web.l10n.RequestContextAwareLocalizer;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.DataPointVO;
-import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.WatchList;
 import com.serotonin.mango.vo.permission.Permissions;
 import com.serotonin.mango.web.UserSessionContextBean;
@@ -39,8 +38,6 @@ public class WatchListService implements Serializable {
     @Inject
     private transient RuntimeManager runtimeManager;
     @Inject
-    private transient UserDao userDao;
-    @Inject
     private transient UserSessionContextBean userSessionContextBean;
     @Inject
     private transient RequestContextAwareLocalizer localizer;
@@ -50,12 +47,13 @@ public class WatchListService implements Serializable {
     }
 
     public JsonWatchList getSelectedWatchlist(HttpServletRequest request) {
-        return new JsonWatchList(watchListDao.getWatchList(userSessionContextBean.getUser().getSelectedWatchList()), dataPointDao, runtimeManager, localizer);
+        throw new ImplementMeException();
+//        return new JsonWatchList(watchListDao.getWatchList(userSessionContextBean.getUser().getSelectedWatchList()), dataPointDao, runtimeManager, localizer);
     }
 
     public JsonWatchList addPointToWatchlist(int watchlistId, int index, int dataPointId, HttpServletRequest request) {
         LOG.warning("ENTER addPointToWatchlist");
-        final User user = userSessionContextBean.getUser();
+        final UserRT user = userSessionContextBean.getUser();
         DataPointVO point = dataPointDao.getDataPoint(dataPointId);
         if (point == null) {
             return null;
@@ -74,7 +72,7 @@ public class WatchListService implements Serializable {
         return new JsonWatchList(watchListDao.getWatchList(watchlistId), dataPointDao, runtimeManager, localizer);
     }
 
-    private void updateSetPermission(DataPointVO point, SharedUserAcess access, User owner) {
+    private void updateSetPermission(DataPointVO point, SharedUserAcess access, UserRT owner) {
         // Point isn't settable
         if (!point.isSettable()) {
             return;
@@ -96,7 +94,7 @@ public class WatchListService implements Serializable {
 
     public JsonWatchList deletePointFromWatchlist(int watchlistId, int dataPointId, HttpServletRequest request) {
         LOG.warning("ENTER deletePointFromWatchlist");
-        final User user = userSessionContextBean.getUser();
+        final UserRT user = userSessionContextBean.getUser();
         DataPointVO point = dataPointDao.getDataPoint(dataPointId);
         if (point == null) {
             return null;

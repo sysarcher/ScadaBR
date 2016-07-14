@@ -2,8 +2,8 @@ package br.org.scadabr.web.mvc.controller.jsonrpc;
 
 import br.org.scadabr.dao.UserDao;
 import br.org.scadabr.logger.LogUtils;
-//import com.googlecode.jsonrpc4j.JsonRpcService;
-import com.serotonin.mango.vo.User;
+import br.org.scadabr.rt.UserRT;
+import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.web.UserSessionContextBean;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 
+@Deprecated //TODO use REST
 @Named
 //@JsonRpcService("/rpc/users")
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -27,7 +28,7 @@ public class UsersService {
     HttpServletRequest request;
 
     public String setHomeUrl(String homeUrl) {
-        final User user = userSessionContextBean.getUser();
+        final UserRT user = userSessionContextBean.getUser();
                 // Remove the scheme.
         String url = homeUrl.substring(request.getScheme().length() + 3);
 
@@ -46,9 +47,10 @@ public class UsersService {
         if (url.charAt(0) == '/') {
             url = url.substring(1);
         }
-
-        user.setHomeUrl(url);
+        throw new ImplementMeException();
+/*TODO        user.setHomeUrl(url);
         userDao.saveHomeUrl(user.getId(), url);
         return userSessionContextBean.getUserHomeUrl();
+*/
     }
 }

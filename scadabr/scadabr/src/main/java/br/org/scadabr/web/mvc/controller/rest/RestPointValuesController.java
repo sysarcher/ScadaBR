@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 import javax.inject.Inject;
-import org.junit.experimental.theories.DataPoint;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

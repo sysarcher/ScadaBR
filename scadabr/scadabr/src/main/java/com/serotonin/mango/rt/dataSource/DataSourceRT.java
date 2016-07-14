@@ -32,8 +32,6 @@ import br.org.scadabr.rt.IDataPointLiveCycleListener;
 import br.org.scadabr.rt.RT;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.SetPointSource;
-import com.serotonin.mango.rt.event.type.DataSourceEventType;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import br.org.scadabr.util.ILifecycle;
 import br.org.scadabr.utils.ImplementMeException;
@@ -43,7 +41,8 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.NodeType;
 import br.org.scadabr.vo.datasource.PointLocatorVO;
 import br.org.scadabr.vo.event.type.DataSourceEventKey;
-import com.serotonin.mango.rt.AbstractRT;
+import br.org.scadabr.rt.AbstractRT;
+import br.org.scadabr.vo.VO;
 import com.serotonin.mango.rt.EventManager;
 import com.serotonin.mango.vo.DataPointVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -219,7 +218,7 @@ throw new ImplementMeException();
         }
     }
 
-    public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source) {
+    public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, VO<?> source) {
         // no Op
     }
 

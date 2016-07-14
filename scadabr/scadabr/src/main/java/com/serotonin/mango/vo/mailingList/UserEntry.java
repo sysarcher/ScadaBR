@@ -18,17 +18,17 @@
  */
 package com.serotonin.mango.vo.mailingList;
 
+import br.org.scadabr.vo.UserVO;
 import java.util.Set;
 
 import org.joda.time.DateTime;
 
-import com.serotonin.mango.vo.User;
 
 
 public class UserEntry extends EmailRecipient {
     
     private int userId;
-    private User user;
+    private UserVO user;
 
     @Override
     public int getRecipientType() {
@@ -53,11 +53,11 @@ public class UserEntry extends EmailRecipient {
         this.userId = userId;
     }
 
-    public User getUser() {
+    public UserVO getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserVO user) {
         this.user = user;
     }
 
@@ -81,7 +81,7 @@ public class UserEntry extends EmailRecipient {
         if (user == null) {
             return "userId=" + userId;
         }
-        return user.getUsername();
+        return user.getName();
     }
 
 }

@@ -5,10 +5,10 @@
  */
 package com.serotonin.mango.web;
 
+import br.org.scadabr.rt.UserRT;
 import br.org.scadabr.vo.event.type.SystemEventKey;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.rt.event.type.SystemEventType;
-import com.serotonin.mango.vo.User;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Locale;
@@ -29,7 +29,7 @@ public class UserSessionContextBean implements Serializable {
     @Inject
     private transient RuntimeManager runtimeManager;
             
-    private User user;
+    private UserRT user;
     private Locale locale = Locale.getDefault();
     private TimeZone timeZone = TimeZone.getDefault();
     private transient DateFormat dateFormat;
@@ -39,16 +39,16 @@ public class UserSessionContextBean implements Serializable {
     /**
      * @return the user
      */
-    public User getUser() {
+    public UserRT getUser() {
         return user;
     }
 
     /**
      * @param user the user to set
      */
-    public void loginUser(User user) {
+    public void loginUser(UserRT user) {
         this.user = user;
-        new SystemEventType(SystemEventKey.USER_LOGIN, user.getId()).fire("event.login", user.getUsername());
+        new SystemEventType(SystemEventKey.USER_LOGIN, user.getId()).fire("event.login", user.getName());
         runtimeManager.UserSessionStarts(this);
     }
 
@@ -71,7 +71,7 @@ public class UserSessionContextBean implements Serializable {
     }
     
     public String getUsername() {
-        return user != null ? user.getUsername() : "anonymous";
+        return user != null ? user.getName(): "anonymous";
     }
     
     public String getUserHomeUrl() {

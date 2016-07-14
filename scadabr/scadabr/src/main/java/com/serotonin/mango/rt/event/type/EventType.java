@@ -19,6 +19,7 @@
 package com.serotonin.mango.rt.event.type;
 
 import br.org.scadabr.ShouldNeverHappenException;
+import br.org.scadabr.rt.UserRT;
 import java.util.Map;
 
 import br.org.scadabr.rt.event.type.DuplicateHandling;
@@ -28,7 +29,6 @@ import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.EventKey;
 import com.serotonin.mango.rt.EventManager;
-import com.serotonin.mango.vo.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -214,7 +214,7 @@ abstract public class EventType<K extends EventKey<K>> {
      *
      * @return
      */
-    public boolean excludeUser(@SuppressWarnings("unused") User user) {
+    public boolean excludeUser(@SuppressWarnings("unused") UserRT user) {
         return false;
     }
 

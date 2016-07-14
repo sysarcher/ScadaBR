@@ -30,10 +30,12 @@ import br.org.scadabr.dao.NodeEdgeDao;
 import br.org.scadabr.logger.LogUtils;
 import br.org.scadabr.rt.PointFolderRT;
 import br.org.scadabr.rt.RT;
+import br.org.scadabr.rt.UserRT;
 import br.org.scadabr.rt.WrongEdgeTypeException;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.Edge;
 import br.org.scadabr.vo.EdgeType;
+import br.org.scadabr.vo.NodeType;
 import br.org.scadabr.vo.VO;
 import br.org.scadabr.vo.datapoints.DataPointNodeVO;
 import br.org.scadabr.vo.datapoints.PointFolderVO;
@@ -42,7 +44,6 @@ import com.serotonin.mango.rt.dataImage.DataPointEventMulticaster;
 import com.serotonin.mango.rt.dataImage.DataPointListener;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.rt.dataSource.PointLocatorRT;
 import com.serotonin.mango.rt.dataSource.meta.MetaDataSourceRT;
@@ -54,9 +55,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -65,7 +68,7 @@ public class RuntimeManager {
 
     private static final Logger LOG = Logger.getLogger(LogUtils.LOGGER_SCADABR_CORE);
 
-    private final Map<Integer, RT> nodes = new HashMap<>();
+    private final Map<Integer, RT<?>> nodes = new HashMap<>();
     private final Map<Integer, DataSourceRT<?>> dataSources = new HashMap<>();
 
     private final List<DataSourceRT> runningDataSources = new CopyOnWriteArrayList<>();
@@ -108,11 +111,11 @@ public class RuntimeManager {
         // Set the started indicator to true.
         started = true;
 
-        nodeEdgeDao.iterateNodes((node) -> {
+        nodeEdgeDao.forEachNode((node) -> {
             nodes.put(node.getId(), node.createRT());
         });
 
-        nodeEdgeDao.iterateEdges((srcId, destId, edgeType) -> {
+        nodeEdgeDao.forEachEdge((srcId, destId, edgeType) -> {
             try {
                 nodes.get(srcId).wireEdgeAsSrc(nodes.get(destId), edgeType);
             } catch (WrongEdgeTypeException ex) {
@@ -398,7 +401,7 @@ public class RuntimeManager {
         return dataPointListeners.get(dataPointId);
     }
 
-    public void setDataPointValue(PointValueTime valueTime, SetPointSource source) {
+    public void setDataPointValue(PointValueTime valueTime, VO<?> source) {
         DataPointRT dataPoint = runningDataPoints.get(valueTime.getDataPointId());
         if (dataPoint == null) {
             throw new RTException("Point is not enabled");
@@ -489,7 +492,7 @@ public class RuntimeManager {
     }
 
     public <T extends VO<T>> T getVo(int id, Class<T> clazz) {
-        final RT<T> result = nodes.get(id);
+        final RT<T> result = (RT<T>) nodes.get(id);
         if (result == null) {
             throw new NodeNotFoundException(id);
         }
@@ -539,7 +542,7 @@ public class RuntimeManager {
             case TREE_PARENT_TO_CHILD:
                 PointFolderRT src = (PointFolderRT) nodes.get(sourceNodeId);
                 if (src != null) {
-                    src.validateChildName(newDestNode.getName()); 
+                    src.validateChildName(newDestNode.getName());
                 }
                 newDestNode = nodeEdgeDao.saveNode(newDestNode);
                 nodes.put(newDestNode.getId(), newDestNode.createRT());
@@ -625,4 +628,39 @@ public class RuntimeManager {
         }
     }
 
+    public <T extends RT<?>> Stream<T> getNodes(Class<T> clazz, NodeType nodeType) {
+        return nodes.entrySet().stream()
+                .map((e) -> (T) e.getValue())
+                .filter((rt) -> {
+                    return rt.getNodeType() == nodeType;
+                });
+    }
+
+    public Stream<UserRT> getActiveUsers() {
+        return getNodes(UserRT.class, NodeType.USER)
+                .filter((user) -> {
+                    return !user.isDisabled();
+                });
+    }
+
+    public UserRT getUser(String username) {
+        return getFirstNodeByName(username, UserRT.class, NodeType.USER);
+    }
+
+    public <T extends RT<?>> T getFirstNodeByName(String name, Class<T> clazz, NodeType nodeType) {
+        Optional<T> result = getNodes(clazz, nodeType)
+                .filter((value) -> {
+                    return value.getName().equals(name);
+                })
+                .findAny();
+        return result.get();
+    }
+
+    public void recordLogin(UserRT user) {
+        //todo IMPLEMENT
+    }
+
+    public void recordLogOUT(UserRT user) {
+        //todo IMPLEMENT
+    }
 }

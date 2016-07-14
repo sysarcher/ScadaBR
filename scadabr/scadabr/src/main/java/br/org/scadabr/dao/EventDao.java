@@ -5,10 +5,10 @@
  */
 package br.org.scadabr.dao;
 
+import br.org.scadabr.rt.UserRT;
 import com.serotonin.mango.rt.event.AlternateAcknowledgementSources;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.EventType;
-import com.serotonin.mango.vo.User;
 import com.serotonin.mango.vo.event.EventHandlerVO;
 import java.util.Collection;
 import java.util.List;
@@ -25,13 +25,13 @@ public interface EventDao {
 
     void insertUserEvents(int id, List<Integer> eventUserIds, boolean alarm);
 
-    void ackEvent(int eventId, long ackTs, User user, AlternateAcknowledgementSources alternateAckSource);
+    void ackEvent(int eventId, long ackTs, UserRT user, AlternateAcknowledgementSources alternateAckSource);
 
     Collection<EventInstance> getActiveEvents();
 
     List<EventHandlerVO> getEventHandlers(EventType eventType);
 
-    Collection<EventInstance> getPendingEvents(User user);
+    Collection<EventInstance> getPendingEvents(UserRT user);
 
     int purgeEventsBefore(long millis);
 

@@ -214,8 +214,7 @@ public class EmailHandlerRT extends EventHandlerRT implements RunWithArgClient<E
             }
             model.put("img", inlineImages);
             model.put("instanceDescription", systemSettingsDao.getInstanceDescription());
-            MangoEmailContent content = new MangoEmailContent(notificationType.getFile(), model, bundle, subject,
-                    Common.UTF8);
+            MangoEmailContent content = new MangoEmailContent(notificationType.getFile(), model, bundle, subject);
 
             for (String s : inlineImages.getImageList()) {
                 content.addInline(new EmailInline.FileInline(s, new File(Common.ctx.getServletContext().getRealPath(s))));

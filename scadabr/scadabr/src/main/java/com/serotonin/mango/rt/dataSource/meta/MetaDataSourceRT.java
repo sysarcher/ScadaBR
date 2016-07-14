@@ -22,17 +22,17 @@ import br.org.scadabr.rt.RT;
 import br.org.scadabr.rt.WrongEdgeTypeException;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataSource.DataSourceRT;
 import com.serotonin.mango.vo.dataSource.meta.MetaDataSourceVO;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.utils.i18n.LocalizableMessageImpl;
-import br.org.scadabr.vo.EdgeIterator;
 import br.org.scadabr.vo.EdgeType;
+import br.org.scadabr.vo.VO;
 import br.org.scadabr.vo.datasource.meta.MetaDataSourceEventKey;
 import com.serotonin.mango.vo.DataPointVO;
 import java.util.HashSet;
 import java.util.Set;
+import br.org.scadabr.vo.EdgeConsumer;
 
 /**
  * @author Matthew Lohbihler
@@ -46,7 +46,7 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
     }
 
     @Override
-    public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, SetPointSource source) {
+    public void setPointValue(DataPointRT dataPoint, PointValueTime valueTime, VO<?> source) {
         dataPoint.setPointValueSync(valueTime, source);
     }
 
@@ -147,12 +147,12 @@ public class MetaDataSourceRT extends DataSourceRT<MetaDataSourceVO> {
     }
 
     @Override
-    public void iterateEdgesAsSrc(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+    public void iterateEdgesAsSrc(EdgeConsumer edgeIterator, EdgeType... edgeTypes) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void iterateEdgesAsDest(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+    public void iterateEdgesAsDest(EdgeConsumer edgeIterator, EdgeType... edgeTypes) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

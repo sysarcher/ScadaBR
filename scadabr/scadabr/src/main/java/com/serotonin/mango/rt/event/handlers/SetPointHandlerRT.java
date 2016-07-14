@@ -25,10 +25,10 @@ import org.apache.commons.logging.LogFactory;
 import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.l10n.AbstractLocalizer;
 import br.org.scadabr.rt.SchedulerPool;
+import br.org.scadabr.utils.ImplementMeException;
 import com.serotonin.mango.Common;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
-import com.serotonin.mango.rt.dataImage.SetPointSource;
 import com.serotonin.mango.rt.dataImage.types.MangoValue;
 import com.serotonin.mango.rt.event.EventInstance;
 import com.serotonin.mango.rt.event.type.EventType;
@@ -43,7 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
 @Configurable
-public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource {
+public class SetPointHandlerRT extends EventHandlerRT {
 
     private static final Log LOG = LogFactory.getLog(SetPointHandlerRT.class);
     @Autowired
@@ -103,7 +103,8 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
         }
 
         // Queue a work item to perform the set point.
-        schedulerPool.execute(new SetPointWorkItem(vo.getTargetPointId(), PointValueTime.fromMangoValue(value, vo.getTargetPointId(), evt.getFireTimestamp()), this));
+       throw new ImplementMeException();
+        //TODO schedulerPool.execute(new SetPointWorkItem(vo.getTargetPointId(), PointValueTime.fromMangoValue(value, vo.getTargetPointId(), evt.getFireTimestamp()), this));
     }
 
     @Override
@@ -152,8 +153,8 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
         } else {
             throw new ShouldNeverHappenException("Unknown active action: " + vo.getInactiveAction());
         }
-
-        schedulerPool.execute(new SetPointWorkItem(vo.getTargetPointId(), PointValueTime.fromMangoValue(value, vo.getTargetPointId(), evt.getGoneTimestamp()), this));
+throw new ImplementMeException();
+//TODO        schedulerPool.execute(new SetPointWorkItem(vo.getTargetPointId(), PointValueTime.fromMangoValue(value, vo.getTargetPointId(), evt.getGoneTimestamp()), this));
     }
 
     private void raiseFailureEvent(LocalizableMessage message, EventType et) {
@@ -175,21 +176,9 @@ public class SetPointHandlerRT extends EventHandlerRT implements SetPointSource 
         }
     }
 
-    @Override
+//TODO    @Override
     public void raiseRecursionFailureEvent() {
         raiseFailureEvent(new LocalizableMessageImpl("event.setPoint.recursionFailure"), null);
     }
 
-    //
-    // SetPointSource implementation
-    //
-    @Override
-    public int getSetPointSourceId() {
-        return vo.getId();
-    }
-
-    @Override
-    public int getSetPointSourceType() {
-        return SetPointSource.Types.EVENT_HANDLER;
-    }
 }

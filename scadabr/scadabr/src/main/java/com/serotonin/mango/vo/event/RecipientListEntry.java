@@ -32,6 +32,7 @@ public class RecipientListEntry implements Serializable {
     private static final long serialVersionUID = -1;
 
     private int recipientType;
+    @Deprecated //TODO use RT here ...
     private int referenceId;
     private String referenceAddress;
 
@@ -69,10 +70,12 @@ public class RecipientListEntry implements Serializable {
         recipientType = typeId;
     }
 
+    @Deprecated
     public int getReferenceId() {
         return referenceId;
     }
 
+    @Deprecated
     public void setReferenceId(int refId) {
         referenceId = refId;
     }

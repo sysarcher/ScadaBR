@@ -27,7 +27,6 @@ import br.org.scadabr.rt.link.PointLinkManager;
 import br.org.scadabr.util.Tuple;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.utils.TimePeriods;
-import br.org.scadabr.vo.EdgeIterator;
 import br.org.scadabr.vo.datapoints.PointFolderVO;
 import br.org.scadabr.vo.event.AlarmLevel;
 import br.org.scadabr.vo.event.type.AuditEventKey;
@@ -66,6 +65,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import br.org.scadabr.vo.EdgeConsumer;
 
 @Named
 public class DataPointDaoImpl extends BaseDao implements DataPointDao {
@@ -210,7 +210,7 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
 
     //TODO create an edge builder interface??? 
     @Override
-    public void iteratePointFolderEdges(final EdgeIterator edgeIterator) {
+    public void iteratePointFolderEdges(final EdgeConsumer edgeIterator) {
         ejt.query("select\n"
                 + " id,"
                 + " parentId\n"
@@ -221,7 +221,7 @@ public class DataPointDaoImpl extends BaseDao implements DataPointDao {
     }
 
     @Override
-    public void iterateDataPointEdges(final EdgeIterator edgeIterator) {
+    public void iterateDataPointEdges(final EdgeConsumer edgeIterator) {
         ejt.query("select\n"
                 + " id,"
                 + " folderId\n"

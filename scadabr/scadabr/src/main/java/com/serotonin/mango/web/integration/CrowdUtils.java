@@ -1,5 +1,6 @@
 package com.serotonin.mango.web.integration;
 
+import br.org.scadabr.rt.UserRT;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -119,7 +120,7 @@ public class CrowdUtils {
         }
     }
 
-    public static void setCrowdAuthenticated(com.serotonin.mango.vo.User user) {
+    public static void setCrowdAuthenticated(UserRT user) {
 //TODO any use of this information??        user.setAttribute(CROWD_AUTHENTICATED_KEY, true);
     }
 /*TODO any use of this information??

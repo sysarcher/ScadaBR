@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.serotonin.mango.rt.NodeNotFoundException;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.DataPointVO;
+import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.net.URI;
 import java.util.Collection;
 import java.util.logging.Level;
@@ -56,6 +57,11 @@ public class RestNodeEdgesController {
     @RequestMapping(path = "pointFolders", method = RequestMethod.GET)
     public Collection<DataPointNodeVO> getRootPointFolders() {
         return runtimeManager.getRootPointFolders();
+    }
+
+    @RequestMapping(path = "dataSources", method = RequestMethod.GET)
+    public Iterable<DataSourceVO<?>> getDataSources() {
+        return runtimeManager.getDataSources();
     }
 
     /**

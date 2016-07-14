@@ -51,10 +51,17 @@ public class EmailContent {
     private final List<EmailAttachment> attachments = new ArrayList<>();
     private final List<EmailInline> inlineParts = new ArrayList();
 
-    public EmailContent(String plainContent, String htmlContent, String encoding) {
+    /**
+     * 
+     * Set default encoding to UTF-8
+     * 
+     * @param plainContent
+     * @param htmlContent 
+     */
+    public EmailContent(String plainContent, String htmlContent) {
         this.plainContent = plainContent;
         this.htmlContent = htmlContent;
-        this.encoding = encoding;
+        this.encoding = "UTF-8";
     }
 
     public void addAttachment(EmailAttachment attachment) {

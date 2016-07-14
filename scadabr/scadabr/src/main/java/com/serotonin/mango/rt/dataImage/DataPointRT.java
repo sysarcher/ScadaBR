@@ -37,15 +37,16 @@ import com.serotonin.mango.util.timeout.RunClient;
 import com.serotonin.mango.vo.DataPointVO;
 import br.org.scadabr.timer.cron.EventRunnable;
 import br.org.scadabr.util.ILifecycle;
-import br.org.scadabr.vo.EdgeIterator;
 import br.org.scadabr.vo.EdgeType;
 import br.org.scadabr.vo.LoggingTypes;
 import br.org.scadabr.vo.NodeType;
-import com.serotonin.mango.rt.AbstractRT;
+import br.org.scadabr.rt.AbstractRT;
+import br.org.scadabr.vo.VO;
 import com.serotonin.mango.rt.EventManager;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import br.org.scadabr.vo.EdgeConsumer;
 
 //TODO split tist to datatypes Double ....
 /**
@@ -118,7 +119,7 @@ public abstract class DataPointRT<T extends DataPointVO<T, P>, P extends PointVa
      * event.
      */
     @Override
-    public void setPointValueSync(P newValue, SetPointSource source) {
+    public void setPointValueSync(P newValue, VO<?> source) {
         savePointValueSync(newValue, source);
     }
 
@@ -127,9 +128,9 @@ public abstract class DataPointRT<T extends DataPointVO<T, P>, P extends PointVa
         savePointValueAsync(newValue, null);
     }
 
-    protected abstract void savePointValueAsync(P newValue, SetPointSource source);
+    protected abstract void savePointValueAsync(P newValue, VO<?> source);
 
-    protected abstract void savePointValueSync(P newValue, SetPointSource source);
+    protected abstract void savePointValueSync(P newValue, VO<?> source);
 
     //
     // /
@@ -316,12 +317,12 @@ public abstract class DataPointRT<T extends DataPointVO<T, P>, P extends PointVa
     }
 
     @Override
-    public void iterateEdgesAsSrc(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+    public void iterateEdgesAsSrc(EdgeConsumer edgeIterator, EdgeType... edgeTypes) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void iterateEdgesAsDest(EdgeIterator edgeIterator, EdgeType... edgeTypes) {
+    public void iterateEdgesAsDest(EdgeConsumer edgeIterator, EdgeType... edgeTypes) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

@@ -18,23 +18,17 @@
  */
 package com.serotonin.mango.vo.permission;
 
-import br.org.scadabr.dao.DataPointDao;
 import com.serotonin.mango.util.ExportCodes;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Matthew Lohbihler
  *
  */
-
-@Configurable
+@Deprecated //TODO Use a differnt aproach maybe th ds holds lists of nodes that can read,write,....
 public class DataPointAccess {
 
     public static final int READ = 1;
     public static final int SET = 2;
-    @Autowired
-    private DataPointDao dataPointDao;
 
     private static final ExportCodes ACCESS_CODES = new ExportCodes();
 

@@ -29,6 +29,8 @@ public class LogUtils {
     public final static String LOGGER_SCADABR_WEB = "scadabe-web";
 
     public final static String LOGGER_SCADABR_WEB_REST = "scadabe-web-rest";
+    
+    public final static String LOGGER_SCADABR_WEB_RPC = "scadabe-web-rpc";
 
     public final static String LOGGER_SCADABR_DAO = "scadabr-dao";
 

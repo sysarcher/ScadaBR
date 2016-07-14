@@ -6,13 +6,13 @@
 package br.org.scadabr.dao;
 
 import br.org.scadabr.vo.Edge;
-import br.org.scadabr.vo.EdgeIterator;
 import br.org.scadabr.vo.datapoints.DataPointNodeVO;
 import br.org.scadabr.vo.datapoints.PointFolderVO;
 import br.org.scadabr.web.LazyTreeNode;
 import com.serotonin.mango.vo.DataPointVO;
 import java.util.Collection;
 import javax.inject.Named;
+import br.org.scadabr.vo.EdgeConsumer;
 
 /**
  *
@@ -58,8 +58,8 @@ public interface DataPointDao {
 
     public Iterable<DataPointVO> getDataPoints();
 
-    public void iteratePointFolderEdges(EdgeIterator edgeIterator);
+    public void iteratePointFolderEdges(EdgeConsumer edgeIterator);
 
-    public void iterateDataPointEdges(EdgeIterator edgeIterator);
+    public void iterateDataPointEdges(EdgeConsumer edgeIterator);
 
 }
