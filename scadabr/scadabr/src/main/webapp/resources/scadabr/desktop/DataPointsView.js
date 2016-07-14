@@ -143,7 +143,7 @@ define(["dojo/_base/declare",
             }
 
             var detailController = this;
-            require(["dojo/ready"],
+/*TODO            require(["dojo/ready"],
                     function (ready) {
                         ready(function () {
                             detailController.tabViewWidget = registry.byId(tabWidgetId);
@@ -153,6 +153,7 @@ define(["dojo/_base/declare",
                             });
                         });
                     });
+                                    */
             this.nodeNameDialog = new TooltipDialog({
                 content: new TextBox({
                     dataPoints: this,
