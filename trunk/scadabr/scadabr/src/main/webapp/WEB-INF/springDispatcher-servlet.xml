@@ -36,9 +36,9 @@
     <mvc:view-controller path="/" view-name="index"/>
 -->
         <!-- View resolver -->
-<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+<!--<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"
     p:prefix="/WEB-INF/jsp/"
-    p:suffix=".jsp" />
+    p:suffix=".jsp" />-->
   
   <!-- Default message code resolver -->
   <!--

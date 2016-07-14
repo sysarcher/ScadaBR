@@ -163,7 +163,7 @@
     <servlet-name>AdminServlet</servlet-name>
     <url-pattern>/servlet/AdminServlet</url-pattern>
   </servlet-mapping-->
-  <error-page>
+  <!-- TODO How to??? <error-page>
     <exception-type>com.serotonin.mango.vo.permission.PermissionException</exception-type>
     <location>/exception/accessDenied.jsp</location>
   </error-page>
@@ -177,5 +177,5 @@
     <error-code>404</error-code>
     <location>/exception/404.jsp</location>
   </error-page>
-  
+  -->
 </web-app>
