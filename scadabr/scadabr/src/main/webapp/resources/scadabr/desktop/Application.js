@@ -36,34 +36,37 @@ define([
             this.addChild(this._footer);
             var btn;
             var tbs;
-
-            btn = new Button({label: 'Watchlist', iconClass: 'scadaBrWatchListIcon', showLabel: false, onClick: 'window.location = "#watchList";'});
+            var app = this;
+            btn = new Button({label: 'Watchlist', iconClass: 'scadaBrWatchListIcon', showLabel: false, onClick: function(){window.location = "#watchList";}});
             this._toolbar.addChild(btn);
-            btn = new Button({label: 'Alarms', iconClass: 'scadaBrEventsIcon', showLabel: false, onClick: 'window.location = "#events";'});
+            btn = new Button({label: 'Alarms', iconClass: 'scadaBrEventsIcon', showLabel: false, onClick: function(){window.location = "#events";}});
             this._toolbar.addChild(btn);
-            btn = new Button({label: 'Data sources', iconClass: 'dsIcon', showLabel: false, onClick: 'window.location = "#dataSources";'});
+            btn = new Button({label: 'Data sources', iconClass: 'dsIcon', showLabel: false, onClick: function(){window.location = "#dataSources";}});
             this._toolbar.addChild(btn);
-            btn = new Button({label: 'Point hierarchy', iconClass: 'scadaBrPointHierarchyIcon', showLabel: false, onClick: 'window.location = "#dataPoints";'});
+            btn = new Button({label: 'Point hierarchy', iconClass: 'scadaBrPointHierarchyIcon', showLabel: false, onClick: function(){window.location = "#dataPoints";}});
             this._toolbar.addChild(btn);
             tbs = new ToolbarSeparator();
             this._toolbar.addChild(tbs);
-            btn = new Button({label: 'Help', iconClass: 'scadaBrHelpIcon', showLabel: false, onClick: 'MainPage.showHelp("")'});
+            btn = new Button({label: 'Help', iconClass: 'scadaBrHelpIcon', showLabel: false, onClick: function(){app.showHelp("");}});
             this._toolbar.addChild(btn);
             tbs = new ToolbarSeparator();
             this._toolbar.addChild(tbs);
 //Login
             // Will appear in reverse order... use ContentPane???
-            btn = new Button({label: 'Logout', iconClass: 'scadaBrLogoutIcon', showLabel: false, onClick: 'window.location = "#logout";', style: 'float:right;'});
+            btn = new Button({label: 'Logout', iconClass: 'scadaBrLogoutIcon', showLabel: false, onClick: function(){window.location = "#logout";}, style: 'float:right;'});
             this._toolbar.addChild(btn);
 
-            btn = new Button({label: 'Make this my default page', disabled: true, iconClass: 'scadaBrSetHomeUrlIcon', showLabel: false, onClick: 'setHomeUrl();', style: 'float:right;'});
+            btn = new Button({label: 'Make this my default page', disabled: true, iconClass: 'scadaBrSetHomeUrlIcon', showLabel: false, onClick: function(){app.setHomeUrl();}, style: 'float:right;'});
             this._toolbar.addChild(btn);
-            btn = new Button({label: 'Go to my default page', disabled: true, iconClass: 'scadaBrGotoHomeUrlIcon', showLabel: false, onClick: 'window.location = "#homeUrl";', style: 'float:right;'});
+            btn = new Button({label: 'Go to my default page', disabled: true, iconClass: 'scadaBrGotoHomeUrlIcon', showLabel: false, onClick: function(){window.location = "#homeUrl";}, style: 'float:right;'});
             this._toolbar.addChild(btn);
             tbs = new ToolbarSeparator({style: 'float:right;'});
             this._toolbar.addChild(tbs);
 
             this.initRouter();
+        },
+        showHelp: function() {
+          alert("Show help");  
         },
         destroyMainView: function() {
                 if (this._mainView) {
@@ -84,7 +87,7 @@ define([
                 evt.preventDefault();
                 self.destroyMainView();
                 require(["scadabr/desktop/DataSourcesView"], function(DataSourcesView) {
-                    self.createMainView(DataSourcesView)
+                    self.createMainView(DataSourcesView);
                 });
             });
 
@@ -92,7 +95,7 @@ define([
                 evt.preventDefault();
                 self.destroyMainView();
                 require(["scadabr/desktop/WatchListsView"], function (WatchListsView) {
-                    self.createMainView(WatchListsView)
+                    self.createMainView(WatchListsView);
                 });
             });
 
@@ -100,7 +103,7 @@ define([
                 evt.preventDefault();
                 self.destroyMainView();
                 require(["scadabr/desktop/EventsView"], function (EventsView) {
-                    self.createMainView(EventsView)
+                    self.createMainView(EventsView);
                 });
             });
 
@@ -108,7 +111,7 @@ define([
                 evt.preventDefault();
                 self.destroyMainView();
                 require(["scadabr/desktop/DataPointsView"], function (DataPointsView) {
-                    self.createMainView(DataPointsView)
+                    self.createMainView(DataPointsView);
                 });
             });
 

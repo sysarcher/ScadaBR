@@ -11,17 +11,15 @@ import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.EdgeType;
 import br.org.scadabr.vo.VO;
 import br.org.scadabr.vo.datapoints.DataPointNodeVO;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.serotonin.mango.rt.NodeNotFoundException;
 import com.serotonin.mango.rt.RuntimeManager;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
 import java.net.URI;
-import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -56,7 +54,7 @@ public class RestNodeEdgesController {
      * @return the rood node
      */
     @RequestMapping(path = "pointFolders/children", method = RequestMethod.GET)
-    public Iterable<DataPointNodeVO<?>> getRootPointFoldersROOT() {
+    public List<DataPointNodeVO<?>> getRootPointFoldersROOT() {
         return runtimeManager.getRootPointFolders();
     }
 
@@ -133,8 +131,9 @@ public class RestNodeEdgesController {
      * @param id the folderId of the parent
      * @return All child nodes
      */
+    //TODO funny error if return is Iterable<VO<?>> the property @JsonTypeInfo =>>scadaBRType<< will NOT be written toi the output... spring/fasterxmnl error???
     @RequestMapping(path = "{id:\\d+}/{edgeName}", method = RequestMethod.GET)
-    public Iterable<VO<?>> getChildNodesById(@PathVariable("id") int id, @PathVariable("edgeName") String edgeName) {
+    public List<VO<?>> getChildNodesById(@PathVariable("id") int id, @PathVariable("edgeName") String edgeName) {
         switch (edgeName) {
             case "children":
                 return runtimeManager.getPointFolder(id).getChildren().collect(Collectors.toList());
