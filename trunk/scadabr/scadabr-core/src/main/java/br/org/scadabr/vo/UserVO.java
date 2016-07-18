@@ -19,17 +19,12 @@
 package br.org.scadabr.vo;
 
 
-import br.org.scadabr.ShouldNeverHappenException;
 import br.org.scadabr.rt.UserRT;
 import br.org.scadabr.utils.i18n.LocalizableMessage;
 import br.org.scadabr.vo.event.AlarmLevel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
-import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 

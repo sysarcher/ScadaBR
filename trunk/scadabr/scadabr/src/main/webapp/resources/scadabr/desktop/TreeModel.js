@@ -14,31 +14,35 @@ define(["dojo/_base/declare",
                 "Content-Type": "application/json"
             }
         };
-        if (data !== "undefined") {
-            result.data= json.stringify(data);
+        if (data !== undefined) {
+            result.data = json.stringify(data);
         }
         return result;
     };
-    
-    prepareRequestParams.GET = function() {
+
+    prepareRequestParams.GET = function () {
         return prepareRequestParams("GET");
     };
-    
-    prepareRequestParams.PUT = function(data) {
+
+    prepareRequestParams.PUT = function (data) {
         return prepareRequestParams("PUT", data);
     };
-    
-    prepareRequestParams.POST = function(data) {
+
+    prepareRequestParams.POST = function (data) {
         return prepareRequestParams("POST", data);
     };
-    
+
+    prepareRequestParams.DELETE = function () {
+        return prepareRequestParams("DELETE");
+    };
+
     return declare("scadabr/desktop/TreeModel", [model], {
         ROOT: {id: "ROOT", name: "PointFolders", nodeType: "ROOT"},
         restBaseUrl: null,
-        constructor: function(restBaseUrl) {
+        constructor: function (restBaseUrl) {
             this.inherited(arguments);
             this.restBaseUrl = restBaseUrl;
-        },               
+        },
         getIdentity: function (object) {
             return object.id;
         },
@@ -62,6 +66,42 @@ define(["dojo/_base/declare",
         },
         getLabel: function (object) {
             return object.name;
+        },
+        add: function (object, options) {
+            var self = this;
+            var url;
+            if (options.parent.id === "ROOT") {
+                url = this.restBaseUrl;
+            } else {
+                url = this.restBaseUrl + options.parent.id + "/children";
+            }
+            request(url, prepareRequestParams.POST(object)).then(function (objectFromServer) {
+                self.getChildren(options.parent, function (children) {
+                    self.onChildrenChange(options.parent, children);
+                }, function (error) {
+                    alert(error);
+                });
+            }, function (error) {
+                alert(error);
+            });
+
+        },
+        put: function (object) {
+            var self = this;
+            request(this.restBaseUrl, prepareRequestParams.PUT(object)).then(function (objectFromServer) {
+                self.onChange(objectFromServer);
+            }, function (error) {
+                alert(error);
+            });
+
+        },
+        delete: function (object) {
+            var self = this;
+            request(this.restBaseUrl + object.id, prepareRequestParams.DELETE()).then(function () {
+                self.onDelete(object);
+            }, function (error) {
+                alert(error);
+            });
         },
         //inserted manually to catch the aspect of Tree to get this working -- Observable looks wired to me ... at least JSONRest does not woirk out of the box ...
         onChange: function (/*dojo/data/Item*/ /*===== item =====*/) {

@@ -22,14 +22,13 @@ define(["dojo/_base/declare",
         tree: null,
         detailView: null,
         model: null,
-        nodeNameDialog: null,
         dataTypes: [],
         restBaseUrl: "REST/",
         postCreate: function () {
             this.inherited(arguments);
-            
+
             this.model = new TreeModel("REST/");
-            this.tree = new NavigationTree({model : this.model});
+            this.tree = new NavigationTree({model: this.model});
             this.addChild(this.tree);
 
             this._initTreeNodeMenues();
@@ -98,170 +97,12 @@ define(["dojo/_base/declare",
              });
              });
              */
-            this.nodeNameDialog = new TooltipDialog({
-                content: new TextBox({
-                    dataPoints: this,
-                    treeNode: null,
-                    setTreeNode: function (treeNode) {
-                        this.treeNode = treeNode;
-                        this.set('value', this.treeNode.item.name);
-                    },
-                    onKeyUp: function (event) {
-                        if (event.keyCode === keys.ESCAPE) {
-                            popup.close(this.nodeNameDialog);
-                        } else if (event.keyCode === keys.ENTER) {
-                            popup.close(this.nodeNameDialog);
-                            var treeNode = this.treeNode;
-                            var node = treeNode.item;
-                            node.name = this.get('value');
-                            var model = this.dataPoints.model;
-                            switch (this.treeNode.item.nodeType) {
-                                case "POINT_FOLDER" :
-                                case "DATA_POINT" :
-                                    request(this.dataPoints.restBaseUrl, {
-                                        handleAs: "json",
-                                        method: "PUT",
-                                        headers: {
-                                            Accept: "application/json",
-                                            "Content-Type": "application/json"
-                                        },
-                                        data: json.stringify(node)
-                                    }).then(function (object) {
-                                        model.onChange(object);
-                                        treeNode.focus();
-                                    }, function (error) {
-                                        alert(error);
-                                    });
-                                    break;
-                                default:
-                                    alert("Can't rename node id: " + node.id);
-                            }
-                        }
-                    }
-                }),
-                setTreeNode: function (treeNode) {
-                    this.content.setTreeNode(treeNode);
-                },
-                focusInput: function () {
-                    this.content.focus();
-                },
-            });
         },
         _initTreeNodeMenues: function () {
-            var editMenuItem = new MenuItem({
-                iconClass: "dijitIconEdit",
-                label: messages['common.rename'],
-                dataPoints: this,
-                onClick: function () {
-                    if (this.dataPoints.tree.lastFocused === null) {
-                        return;
-                    }
-                    this.dataPoints.nodeNameDialog.setTreeNode(this.dataPoints.tree.lastFocused);
-                    popup.open({
-                        popup: this.dataPoints.nodeNameDialog,
-                        around: this.dataPoints.tree.lastFocused.contentNode
-                    });
-                    this.dataPoints.nodeNameDialog.focusInput();
-                }
-
-            });
-            var addFolderMenuItem = new MenuItem({
-                iconClass: "dijitIconAdd",
-                label: messages['common.add'],
-                dataPoints: this,
-                onClick: function () {
-                    var selectedItem = this.dataPoints.tree.selectedItem;
-                    var url = this.dataPoints.restBaseUrl;
-                    var model = this.dataPoints.model;
-                    var addFolderDialog = new ConfirmDialog({
-                        title: "New Folder name localize ME!",
-                        content: new TextBox({
-                            value: "New Folder localize ME!",
-                            name: "folderName",
-                            onKeyUp: function (event) {
-                                switch (event.keyCode) {
-                                    case keys.ESCAPE:
-                                        addFolderDialog.onCancel();
-                                        break;
-                                    case keys.ENTER:
-                                        addFolderDialog._onSubmit();
-                                        break;
-                                }
-                            }
-                        }),
-                        execute: function (formContents) {
-                            switch (selectedItem.nodeType) {
-                                case "ROOT":
-                                    break;
-                                case "POINT_FOLDER":
-                                    url = url + selectedItem.id + "/children";
-                                    break;
-                                default :
-                                    alert("Wrong node " + selectedItem);
-                                    return;
-                            }
-                            request(url, {
-                                handleAs: "json",
-                                method: "POST",
-                                headers: {
-                                    Accept: "application/json",
-                                    "Content-Type": "application/json"
-                                },
-                                data: json.stringify({name: formContents.folderName, nodeType: "POINT_FOLDER", scadaBrType: "POINT_FOLDER"})
-                            }).then(function (object) {
-                                model.getChildren(selectedItem, function (children) {
-                                    model.onChildrenChange(selectedItem, children);
-                                }, function (error) {
-                                    alert(error);
-                                });
-                            }, function (error) {
-                                alert(error);
-                            });
-                        }
-                    });
-                    addFolderDialog.show();
-                }
-
-            });
-            var deleteNodeMenuItem = new MenuItem({
-                iconClass: "dijitIconDelete",
-                label: messages['common.delete'],
-                dataPoints: this,
-                onClick: function () {
-                    var selectedItem = this.dataPoints.tree.selectedItem;
-                    var url = this.dataPoints.restBaseUrl;
-                    var model = this.dataPoints.model;
-
-                    switch (selectedItem.nodeType) {
-                        case "POINT_FOLDER":
-                        case "DATA_POINT":
-                            url = url + selectedItem.id;
-                            break;
-                        default :
-                            alert("Wrong node " + selectedItem);
-                            return;
-                    }
-
-                    request(url, {
-                        handleAs: "json",
-                        method: "DELETE",
-                        headers: {
-                            Accept: "application/json",
-                            "Content-Type": "application/json"
-                        },
-                        data: null
-                    }).then(function (object) {
-                        model.onDelete(selectedItem);
-                    }, function (error) {
-                        alert(error);
-                    });
-
-                }
-            });
-            this.tree.rootNodeMenu.addChild(addFolderMenuItem);
+//            this.tree.rootNodeMenu.addChild(addFolderMenuItem);
 //TODO            this.tree.pointFolderNodeMenu.addChild(addFolderMenuItem);
-            this.tree.pointFolderNodeMenu.addChild(editMenuItem);
-            this.tree.pointFolderNodeMenu.addChild(deleteNodeMenuItem);
+//            this.tree.pointFolderNodeMenu.addChild(editMenuItem);
+//            this.tree.pointFolderNodeMenu.addChild(deleteNodeMenuItem);
 //            this.tree.dataPointNodeMenu.addChild(editMenuItem);
 //            this.tree.dataPointNodeMenu.addChild(deleteNodeMenuItem);
 
@@ -338,24 +179,24 @@ define(["dojo/_base/declare",
                     }
                 }));
             }
-
-            this.tree.pointFolderNodeMenu.addChild(new PopupMenuItem({
-                iconClass: "dsAddIcon",
-                label: "Add DataPoint",
-                popup: dpAddMenu
-
-            }));
-            this.tree.pointFolderNodeMenu.addChild(new MenuItem({
-                label: "Rename Folder",
-                disabled: true
-
-            }));
-            this.tree.dataPointNodeMenu.addChild(new MenuItem({
-                label: "Rename DataPoint",
-                disabled: true
-
-            }));
+            /*
+             this.tree.pointFolderNodeMenu.addChild(new PopupMenuItem({
+             iconClass: "dsAddIcon",
+             label: "Add DataPoint",
+             popup: dpAddMenu
+             
+             }));
+             this.tree.pointFolderNodeMenu.addChild(new MenuItem({
+             label: "Rename Folder",
+             disabled: true
+             
+             }));
+             this.tree.dataPointNodeMenu.addChild(new MenuItem({
+             label: "Rename DataPoint",
+             disabled: true
+             
+             }));
+             */
         }
-
     });
 });
