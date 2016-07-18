@@ -559,8 +559,10 @@ public class RuntimeManager {
         }
     }
 
-    public Collection<DataPointNodeVO> getRootPointFolders() {
-        List<DataPointNodeVO> result = new LinkedList<>();
+        //TODO use Java8 stream
+    @Deprecated
+    public Iterable<DataPointNodeVO<?>> getRootPointFolders() {
+        List<DataPointNodeVO<?>> result = new LinkedList<>();
         nodes.forEach((index, node) -> {
             switch (node.getNodeType()) {
                 case DATA_POINT:
