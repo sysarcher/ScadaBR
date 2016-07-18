@@ -38,6 +38,7 @@ define(["dojo/_base/declare",
 
     return declare("scadabr/desktop/TreeModel", [model], {
         ROOT: {id: "ROOT", name: "PointFolders", nodeType: "ROOT"},
+        prepareRequestParams: prepareRequestParams,
         restBaseUrl: null,
         constructor: function (restBaseUrl) {
             this.inherited(arguments);

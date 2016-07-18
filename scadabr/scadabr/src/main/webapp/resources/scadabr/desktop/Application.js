@@ -37,59 +37,91 @@ define([
             var btn;
             var tbs;
             var app = this;
-            btn = new Button({label: 'Watchlist', iconClass: 'scadaBrWatchListIcon', showLabel: false, onClick: function(){window.location = "#watchList";}});
+            btn = new Button({label: 'Watchlist', iconClass: 'scadaBrWatchListIcon', showLabel: false, onClick: function () {
+                    window.location = "#watchList";
+                }});
             this._toolbar.addChild(btn);
-            btn = new Button({label: 'Alarms', iconClass: 'scadaBrEventsIcon', showLabel: false, onClick: function(){window.location = "#events";}});
+            btn = new Button({label: 'Alarms', iconClass: 'scadaBrEventsIcon', showLabel: false, onClick: function () {
+                    window.location = "#events";
+                }});
             this._toolbar.addChild(btn);
-            btn = new Button({label: 'Data sources', iconClass: 'dsIcon', showLabel: false, onClick: function(){window.location = "#dataSources";}});
+            btn = new Button({label: 'Data sources', iconClass: 'dsIcon', showLabel: false, onClick: function () {
+                    window.location = "#dataSources";
+                }});
             this._toolbar.addChild(btn);
-            btn = new Button({label: 'Point hierarchy', iconClass: 'scadaBrPointHierarchyIcon', showLabel: false, onClick: function(){window.location = "#dataPoints";}});
+            btn = new Button({label: 'Point hierarchy', iconClass: 'scadaBrPointHierarchyIcon', showLabel: false, onClick: function () {
+                    window.location = "#dataPoints";
+                }});
             this._toolbar.addChild(btn);
             tbs = new ToolbarSeparator();
             this._toolbar.addChild(tbs);
-            btn = new Button({label: 'Help', iconClass: 'scadaBrHelpIcon', showLabel: false, onClick: function(){app.showHelp("");}});
+            btn = new Button({label: 'Help', iconClass: 'scadaBrHelpIcon', showLabel: false, onClick: function () {
+                    app.showHelp("");
+                }});
             this._toolbar.addChild(btn);
             tbs = new ToolbarSeparator();
             this._toolbar.addChild(tbs);
 //Login
             // Will appear in reverse order... use ContentPane???
-            btn = new Button({label: 'Logout', iconClass: 'scadaBrLogoutIcon', showLabel: false, onClick: function(){window.location = "#logout";}, style: 'float:right;'});
+            btn = new Button({label: 'Logout', iconClass: 'scadaBrLogoutIcon', showLabel: false, onClick: function () {
+                    window.location = "#logout";
+                }, style: 'float:right;'});
             this._toolbar.addChild(btn);
 
-            btn = new Button({label: 'Make this my default page', disabled: true, iconClass: 'scadaBrSetHomeUrlIcon', showLabel: false, onClick: function(){app.setHomeUrl();}, style: 'float:right;'});
+            btn = new Button({label: 'Make this my default page', disabled: true, iconClass: 'scadaBrSetHomeUrlIcon', showLabel: false, onClick: function () {
+                    app.setHomeUrl();
+                }, style: 'float:right;'});
             this._toolbar.addChild(btn);
-            btn = new Button({label: 'Go to my default page', disabled: true, iconClass: 'scadaBrGotoHomeUrlIcon', showLabel: false, onClick: function(){window.location = "#homeUrl";}, style: 'float:right;'});
+            btn = new Button({label: 'Go to my default page', disabled: true, iconClass: 'scadaBrGotoHomeUrlIcon', showLabel: false, onClick: function () {
+                    window.location = "#homeUrl";
+                }, style: 'float:right;'});
             this._toolbar.addChild(btn);
             tbs = new ToolbarSeparator({style: 'float:right;'});
             this._toolbar.addChild(tbs);
 
             this.initRouter();
         },
-        showHelp: function() {
-          alert("Show help");  
+        showHelp: function () {
+            alert("Show help");
         },
-        destroyMainView: function() {
-                if (this._mainView) {
-                    this.removeChild(this._mainView);
-                    this._mainView.destroyRecursive(true);
-                    this._mainView = null;
-                }
-            
+        destroyMainView: function () {
+            if (this._mainView) {
+                this.removeChild(this._mainView);
+                this._mainView.destroyRecursive(true);
+                this._mainView = null;
+            }
+
         },
-        createMainView: function(MainViewClass) {
-                    this._mainView = new MainViewClass({region: 'center'});
-                    this.addChild(this._mainView);
-            
+        createMainView: function (MainViewClass, baseHref) {
+            this._mainView = new MainViewClass({region: 'center', baseHref: baseHref});
+            this.addChild(this._mainView);
+
         },
         initRouter: function () {
             var self = this;
             router.register("dataSources", function (evt) {
                 evt.preventDefault();
                 self.destroyMainView();
-                require(["scadabr/desktop/DataSourcesView"], function(DataSourcesView) {
+                require(["scadabr/desktop/DataSourcesView"], function (DataSourcesView) {
                     self.createMainView(DataSourcesView);
                 });
             });
+            //TODO move this to Application to get bookmarks working
+            router.register("dataPoints:path", function (evt) {
+                //Filter out click by tree itself
+                evt.preventDefault();
+                var path = evt.params.path.split('=');
+                path = path[1].split(',');
+                require(["scadabr/desktop/DataPointsView"], function (DataPointsView) {
+                    if (self._mainView instanceof DataPointsView) {
+                    } else {
+                        self.createMainView(DataPointsView, "#dataPoints");
+                    }
+                    self._mainView.setTreePath(path);
+                });
+
+            });
+
 
             router.register("watchLists", function (evt) {
                 evt.preventDefault();
@@ -111,7 +143,7 @@ define([
                 evt.preventDefault();
                 self.destroyMainView();
                 require(["scadabr/desktop/DataPointsView"], function (DataPointsView) {
-                    self.createMainView(DataPointsView);
+                    self.createMainView(DataPointsView, "#dataPoints");
                 });
             });
 

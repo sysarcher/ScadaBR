@@ -29,7 +29,6 @@ import br.org.scadabr.vo.LoggingTypes;
 import br.org.scadabr.vo.NodeType;
 import br.org.scadabr.vo.datapoints.DataPointNodeVO;
 import br.org.scadabr.vo.datasource.PointLocatorVO;
-import com.fasterxml.jackson.annotation.JsonView;
 import com.serotonin.mango.rt.dataImage.DataPointRT;
 import com.serotonin.mango.rt.dataImage.PointValueTime;
 import com.serotonin.mango.rt.event.type.AuditEventType;
