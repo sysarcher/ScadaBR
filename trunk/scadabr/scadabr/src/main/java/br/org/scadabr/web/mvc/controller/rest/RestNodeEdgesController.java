@@ -6,6 +6,7 @@
 package br.org.scadabr.web.mvc.controller.rest;
 
 import br.org.scadabr.logger.LogUtils;
+import br.org.scadabr.util.ScadaBrObjectMapper;
 import br.org.scadabr.utils.ImplementMeException;
 import br.org.scadabr.vo.EdgeType;
 import br.org.scadabr.vo.VO;
@@ -19,6 +20,8 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -45,15 +48,15 @@ public class RestNodeEdgesController {
     @Inject
     private RuntimeManager runtimeManager;
     @Inject
-    private ObjectMapper objectMapper;
+    private ScadaBrObjectMapper objectMapper;
 
     /**
      * get the root of the pointHierarchy tree
      *
      * @return the rood node
      */
-    @RequestMapping(path = "pointFolders", method = RequestMethod.GET)
-    public Collection<DataPointNodeVO> getRootPointFolders() {
+    @RequestMapping(path = "pointFolders/children", method = RequestMethod.GET)
+    public Iterable<DataPointNodeVO<?>> getRootPointFoldersROOT() {
         return runtimeManager.getRootPointFolders();
     }
 
@@ -130,11 +133,11 @@ public class RestNodeEdgesController {
      * @param id the folderId of the parent
      * @return All child nodes
      */
-    @RequestMapping(path = "{id}/{edgeName}", method = RequestMethod.GET)
+    @RequestMapping(path = "{id:\\d+}/{edgeName}", method = RequestMethod.GET)
     public Iterable<VO<?>> getChildNodesById(@PathVariable("id") int id, @PathVariable("edgeName") String edgeName) {
         switch (edgeName) {
             case "children":
-                return (Iterable) runtimeManager.getPointFolder(id).getChildren();
+                return runtimeManager.getPointFolder(id).getChildren().collect(Collectors.toList());
             default:
                 throw new ImplementMeException();
         }

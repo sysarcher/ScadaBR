@@ -83,8 +83,8 @@ public class PointFolderRT
         node.setParent(this);
     }
 
-    public Stream<DataPointNodeVO> getChildren() {
-        return (Stream<DataPointNodeVO>)(Stream)Stream.concat((Stream<DataPointNodeRT>) (Stream)childFolders.stream(), (Stream<DataPointNodeRT>) (Stream)dataPoints.stream())
+    public Stream<DataPointNodeVO<?>> getChildren() {
+        return (Stream<DataPointNodeVO<?>>)(Stream)Stream.concat((Stream<DataPointNodeRT>) (Stream)childFolders.stream(), (Stream<DataPointNodeRT>) (Stream)dataPoints.stream())
                 .map(DataPointNodeRT::getVO);
     }
 

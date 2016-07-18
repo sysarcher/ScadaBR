@@ -15,18 +15,18 @@ define(["dojo/_base/declare",
     return declare("scadabr/desktop/DataSourcesView", [BorderContainer], {
         store: null,
         tree: null,
-        rootNodeMenu: new Menu(),
-        dsNodeMenu: new Menu(),
-        plfNodeMenu: new Menu(),
-        plNodeMenu: new Menu(),
+        rootNodeMenu: null,
+        dsNodeMenu: null,
+        plfNodeMenu: null,
+        plNodeMenu: null,
         treeNodeDetailsWidget: null,
         dataSourceTypes: [],
         postCreate: function () {
             //TODO set this this.dataSourceTypes =
             this.inherited(arguments);
             this._initTreeStore();
+            this._initTreeNodeMenues();
             this._initDataSourceTree();
-            this._initMenu();
         },
         _initTreeStore: function () {
             this.store = new Observable(new JsonRest({
@@ -152,10 +152,11 @@ define(["dojo/_base/declare",
             this.detailView = new ContentPane({region: 'center'});
             this.addChild(this.detailView);
         },
-        _initMenu: function () {
-            this.treeMenu = new Menu({
-                targetNodeIds: []
-            });
+        _initTreeNodeMenues: function () {
+        this.rootNodeMenu= new Menu();
+        this.dsNodeMenu= new Menu();
+        this.plfNodeMenu= new Menu();
+        this.plNodeMenu= new Menu();
             var _store = this.store;
             var _tree = this.tree;
             var _svc = undefined;
@@ -235,10 +236,6 @@ define(["dojo/_base/declare",
                         alert(error);
                     });
                 }
-            }));
-            this.treeMenu.addChild(new MenuItem({
-                label: messages["dataSource.action.delete"],
-                disabled: true
             }));
             this.plNodeMenu.addChild(new MenuItem({
                 iconClass: "plStartIcon",
