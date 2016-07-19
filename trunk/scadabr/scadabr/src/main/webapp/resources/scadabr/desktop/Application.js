@@ -107,17 +107,16 @@ define([
                 });
             });
             //TODO move this to Application to get bookmarks working
-            router.register("dataPoints:path", function (evt) {
+            router.register("dataPoints:id", function (evt) {
                 //Filter out click by tree itself
                 evt.preventDefault();
-                var path = evt.params.path.split('=');
-                path = path[1].split(',');
+                var idValue = evt.params.id.split('=');
                 require(["scadabr/desktop/DataPointsView"], function (DataPointsView) {
                     if (self._mainView instanceof DataPointsView) {
                     } else {
                         self.createMainView(DataPointsView, "#dataPoints");
                     }
-                    self._mainView.setTreePath(path);
+                    self._mainView.setCurrentId(idValue[1]);
                 });
 
             });
