@@ -113,6 +113,9 @@ define(["dojo/_base/declare",
                 alert(error);
             });
         },
+        fetchTreePathOfId: function (id) {
+            return request("RPC/DataPoints/" + id + "/treePath", prepareRequestParams.GET());
+        },
         //inserted manually to catch the aspect of Tree to get this working -- Observable looks wired to me ... at least JSONRest does not woirk out of the box ...
         onChange: function (/*dojo/data/Item*/ /*===== item =====*/) {
         },

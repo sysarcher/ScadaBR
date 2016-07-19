@@ -4,13 +4,14 @@ define(["dojo/_base/declare",
     "dijit/Tree",
     "dijit/Menu",
     "dijit/MenuItem",
+    "dijit/PopupMenuItem",
     "dijit/ConfirmDialog",
     "dijit/form/TextBox",
     "dojo/keys",
     "dijit/TooltipDialog",
     "dijit/popup",
     "dojo/i18n!scadabr/desktop/nls/messages"
-], function (declare, request, json, Tree, Menu, MenuItem, ConfirmDialog, TextBox, keys, TooltipDialog, popup, messages) {
+], function (declare, request, json, Tree, Menu, MenuItem, PopupMenuItem, ConfirmDialog, TextBox, keys, TooltipDialog, popup, messages) {
     var MyTreeNode = declare([Tree._TreeNode], {
         _setLabelAttr: {node: "labelNode", type: "innerHTML"}
     });
@@ -20,32 +21,61 @@ define(["dojo/_base/declare",
         baseHref: null,
         nodeMenues: null,
         initialSelectedNode: 'ROOT',
+        initialSelectedNodeInProgress: false,
         onLoad: function () {
             this._selectNode();
         },
-        selectNode: function(id) {
+        selectNode: function (id) {
             this.initialSelectedNode = id;
             this._selectNode();
         },
-        _selectNode: function() {
+        _selectNode: function () {
+            if (this.initialSelectedNodeInProgress) {
+                return;
+            }
+            this.initialSelectedNodeInProgress = true;
             var nodes = this.getNodesByItem(this.initialSelectedNode);
             if (nodes) {
                 if (nodes.length === 1) {
-                    if (nodes[0] !== this.treeSelectedNode) {
-                        var path = nodes[0].getTreePath();
+                    var node = nodes[0];
+                    if (!node) {
+                        //fetch path and retry
+                        var self = this;
+                        this.model.fetchTreePathOfId(this.initialSelectedNode).then(function (treePath) {
+                            var path = ["ROOT"];
+                            treePath.forEach(function (id) {
+                                path.push("" + id);
+                            });
+                            self.set('path', path);
+                            this.initialSelectedNodeInProgress = false;
+                        });
+                        return;
+                    }
+                    var selectedId = null;
+                    if (this.selectedNode) {
+                        selectedId = this.selectedNode.id;
+                    }
+                    if (node.item.id !== selectedId) {
+                        //vom server holen???
+                        var path = node.getTreePath();
                         for (var i = 0; i < path.length; i++) {
                             path[i] = "" + path[i].id;
                         }
-                        this.tree.set('path', path);
+                        this.set('path', path);
+                        this.initialSelectedNodeInProgress = false;
+                        return;
                     }
                 } else {
                     alert("Can't set selected node: " + nodes.length);
+                    this.initialSelectedNodeInProgress = false;
+                    return;
                 }
             } else {
                 alert("Ups no nodes found");
-
+                this.initialSelectedNodeInProgress = false;
+                return;
             }
-  
+
         },
         postCreate: function () {
             this.nodeMenues = {};
@@ -67,12 +97,12 @@ define(["dojo/_base/declare",
                     case "ROOT":
                         nodeMenu = new Menu();
                         nodeMenu.addChild(this.createAddFolderMenuItem());
-                        nodeMenu.addChild(this.createAddDataPointNodeMenu());
+                        nodeMenu.addChild(this.createAddDataPointNodeMenuItem());
                         break;
                     case "POINT_FOLDER":
                         nodeMenu = new Menu();
                         nodeMenu.addChild(this.createAddFolderMenuItem());
-                        nodeMenu.addChild(this.createAddDataPointNodeMenu());
+                        nodeMenu.addChild(this.createAddDataPointNodeMenuItem());
                         nodeMenu.addChild(this.createRenameNodeMenuItem());
                         nodeMenu.addChild(this.createDeleteNodeMenuItem());
                         break;
@@ -119,9 +149,10 @@ define(["dojo/_base/declare",
 
             });
         },
-        createAddDataPointNodeMenu: function () {
+        createAddDataPointNodeMenuItem: function () {
             var tree = this.tree;
             var addDataPointNodeMenu = new Menu({});
+            var addDataPointNodeMenuItem = new PopupMenuItem({iconClass: "dijitIconAdd", label: "Add DataPoint", popup: addDataPointNodeMenu});
             request("RPC/DataPoints/DataTypes", tree.model.prepareRequestParams.GET).then(function (dataTypes) {
                 dataTypes = json.parse(dataTypes);
                 var dataTypeKeys = Object.keys(dataTypes);
@@ -161,7 +192,7 @@ define(["dojo/_base/declare",
             }, function (error) {
                 alert(error);
             });
-            return addDataPointNodeMenu;
+            return addDataPointNodeMenuItem;
         },
         createDeleteNodeMenuItem: function () {
             var tree = this.tree;

@@ -7,13 +7,13 @@ package br.org.scadabr.web.mvc.controller.rpc;
 
 import br.org.scadabr.DataType;
 import br.org.scadabr.logger.LogUtils;
-import br.org.scadabr.vo.datasource.DataSourcesRegistry;
+import br.org.scadabr.rt.DataPointNodeRT;
 import com.serotonin.mango.rt.NodeNotFoundException;
 import com.serotonin.mango.rt.RuntimeManager;
-import com.serotonin.mango.vo.DataPointVO;
 import com.serotonin.mango.vo.dataSource.DataSourceVO;
-import java.util.Collection;
 import java.util.EnumMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,6 +45,17 @@ public class RpcDataPointController {
         Map result = new EnumMap(DataType.class);
         for (DataType dt : DataType.values()) {
             result.put(dt, dt.getI18nKey());
+        }
+        return result;
+    }
+
+    @RequestMapping(value = "{id}/treePath", method = RequestMethod.GET)
+    public List<Integer> getTreePath(@PathVariable("id") int id, UriComponentsBuilder ucb) {
+        DataPointNodeRT dpnRt = (DataPointNodeRT) runtimeManager.getNode(id);
+        LinkedList<Integer> result = new LinkedList<>();
+        while (dpnRt != null) {
+            result.addFirst(dpnRt.getId());
+            dpnRt = dpnRt.getParent();
         }
         return result;
     }
