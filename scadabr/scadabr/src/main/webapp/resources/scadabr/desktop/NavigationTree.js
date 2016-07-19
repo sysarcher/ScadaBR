@@ -19,6 +19,34 @@ define(["dojo/_base/declare",
         splitter: 'true',
         baseHref: null,
         nodeMenues: null,
+        initialSelectedNode: 'ROOT',
+        onLoad: function () {
+            this._selectNode();
+        },
+        selectNode: function(id) {
+            this.initialSelectedNode = id;
+            this._selectNode();
+        },
+        _selectNode: function() {
+            var nodes = this.getNodesByItem(this.initialSelectedNode);
+            if (nodes) {
+                if (nodes.length === 1) {
+                    if (nodes[0] !== this.treeSelectedNode) {
+                        var path = nodes[0].getTreePath();
+                        for (var i = 0; i < path.length; i++) {
+                            path[i] = "" + path[i].id;
+                        }
+                        this.tree.set('path', path);
+                    }
+                } else {
+                    alert("Can't set selected node: " + nodes.length);
+                }
+            } else {
+                alert("Ups no nodes found");
+
+            }
+  
+        },
         postCreate: function () {
             this.nodeMenues = {};
             this.inherited(arguments);
@@ -209,11 +237,7 @@ define(["dojo/_base/declare",
             }
         },
         onClick: function (node) {
-            var path = this.get('path');
-            for (var i = 0; i < path.length; i++) {
-                path[i] = path[i].id;
-            }
-            window.location = this.baseHref + "?path=" + path;
+            window.location = this.baseHref + "?id=" + node.id;
         }
     });
 });

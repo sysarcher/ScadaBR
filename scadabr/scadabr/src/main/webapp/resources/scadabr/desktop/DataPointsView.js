@@ -1,20 +1,11 @@
 define(["dojo/_base/declare",
     "scadabr/desktop/TreeModel",
     "scadabr/desktop/NavigationTree",
-    "dojo/request",
-    "dojo/json",
-    "dijit/Menu",
-    "dijit/MenuItem",
-    "dijit/TooltipDialog",
-    "dijit/ConfirmDialog",
-    "dijit/form/TextBox",
-    "dojo/keys",
-    "dijit/popup",
-    "dijit/PopupMenuItem",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
+    "dijit/layout/TabContainer",
     "dojo/i18n!scadabr/desktop/nls/messages"
-], function (declare, TreeModel, NavigationTree, request, json, Menu, MenuItem, TooltipDialog, ConfirmDialog, TextBox, keys, popup, PopupMenuItem, BorderContainer, ContentPane, messages) {
+], function (declare, TreeModel, NavigationTree, BorderContainer, ContentPane, TabContainer, messages) {
 
     return declare("scadabr/desktop/DataPointsView", [BorderContainer], {
         gutters: true,
@@ -30,75 +21,28 @@ define(["dojo/_base/declare",
 
             this.model = new TreeModel("REST/");
             this.tree = new NavigationTree({model: this.model, baseHref: this.baseHref});
-            this.tree.set('path', ['ROOT']);
+            this.tree.startup();
             this.addChild(this.tree);
 
             this._initDetailViewModel();
         },
-        setTreePath: function (path) {
-            this.tree.set('path', path);
+        setCurrentId: function (id) {
+            this.tree.selectNode(id);
             //TODO set DetailView
         },
         _initDetailViewModel: function () {
-            this.detailView = new ContentPane({region: 'center'});
+            this.detailView = new TabContainer({region: 'center'});
+            this.detailView.chartDataView = new ContentPane({title: "Show data (chart)", selected: true});
+            this.detailView.addChild(this.detailView.chartDataView);
+            this.detailView.tableDataView = new ContentPane({title: "Show data (table)"});
+            this.detailView.addChild(this.detailView.tableDataView);
+            this.detailView.editDataView = new ContentPane({title: "Edit"});
+            this.detailView.addChild(this.detailView.editDataView);
+            this.detailView.eventsDataView = new ContentPane({title: "Point Events and Notes"});
+            this.detailView.addChild(this.detailView.eventsDataView);
+            this.detailView.usageDataView = new ContentPane({title: "Point Usage"});
+            this.detailView.addChild(this.detailView.usageDataView);
             this.addChild(this.detailView);
-            this.selectedTab = null;
-            this.tabViewWidget = null;
-            this.dpId = -1;
-            this.pfId = 0;
-            this.cleanUpBeforeChanage = function () {
-            };
-            this.setUpAfterChange = function () {
-                if (((this.dpId === -1) && (this.pfId <= 0)) || (this.selectedTab === null)) {
-                    return;
-                }
-                this.selectedTab.set("href", this.selectedTab.contentUrl + "?id=" + (this.dpId !== -1 ? this.dpId : this.pfId)).then(function (succ) {
-                    alert("Succ" + succ)
-                }, function (err) {
-                    alert("ERR:" + err);
-                });
-            };
-            this.setSelectedTab = function (tab) {
-                this.cleanUpBeforeChanage();
-                this.selectedTab = tab;
-                if (this.pfId === -1) {
-                    //curently filter out folders
-                    this.setUpAfterChange();
-                }
-            };
-            this.setPointId = function (id) {
-                this.cleanUpBeforeChanage();
-                this.dpId = id;
-                this.pfId = -1;
-                this.setUpAfterChange();
-            };
-            this.setFolderId = function (id) {
-                this.cleanUpBeforeChanage();
-                this.pfId = id;
-                this.dpId = -1;
-                //curently filter out folders
-                this.selectedTab.set(null);
-                //  this.setUpAfterChange();
-            };
-            this.clearDetailViewId = function () {
-                this.cleanUpBeforeChanage();
-                this.dpId = -1;
-                this.pfId = -1;
-                this.setUpAfterChange();
-            }
-
-            var detailController = this;
-            /*TODO            require(["dojo/ready"],
-             function (ready) {
-             ready(function () {
-             detailController.tabViewWidget = registry.byId(tabWidgetId);
-             detailController.setSelectedTab(detailController.tabViewWidget.selectedChildWidget);
-             detailController.tabViewWidget.watch("selectedChildWidget", function (name, oval, nval) {
-             detailController.setSelectedTab(nval);
-             });
-             });
-             });
-             */
         }
     });
 });

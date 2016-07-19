@@ -94,7 +94,16 @@ define(["dojo/_base/declare",
             }, function (error) {
                 alert(error);
             });
-
+            return Promise;
+        },
+        refresh: function (id) {
+            var self = this;
+            request(this.restBaseUrl + id, prepareRequestParams.GET()).then(function (objectFromServer) {
+                self.onChange(objectFromServer);
+            }, function (error) {
+                alert(error);
+            });
+            return Promise;
         },
         delete: function (object) {
             var self = this;
