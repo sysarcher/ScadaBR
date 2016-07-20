@@ -2,8 +2,9 @@ define(["dojo/_base/declare",
     "dojo/request",
     "dojo/json",
     "dijit/tree/model",
+    "dojo/Deferred",
     "dojo/i18n!scadabr/desktop/nls/messages"
-], function (declare, request, json, model, messages) {
+], function (declare, request, json, model, Deferred, messages) {
 
     var prepareRequestParams = function (method, data) {
         var result = {
@@ -76,7 +77,8 @@ define(["dojo/_base/declare",
             } else {
                 url = this.restBaseUrl + options.parent.id + "/children";
             }
-            request(url, prepareRequestParams.POST(object)).then(function (objectFromServer) {
+            var promise = request(url, prepareRequestParams.POST(object));
+            promise.then(function (objectFromServer) {
                 self.getChildren(options.parent, function (children) {
                     self.onChildrenChange(options.parent, children);
                 }, function (error) {
@@ -85,33 +87,42 @@ define(["dojo/_base/declare",
             }, function (error) {
                 alert(error);
             });
-
+            return promise;
         },
         put: function (object) {
             var self = this;
-            request(this.restBaseUrl, prepareRequestParams.PUT(object)).then(function (objectFromServer) {
+            var promise = request(this.restBaseUrl, prepareRequestParams.PUT(object));
+            promise.then(function (objectFromServer) {
                 self.onChange(objectFromServer);
             }, function (error) {
                 alert(error);
             });
-            return Promise;
+            return promise;
         },
         refresh: function (id) {
+            if (id === this.ROOT.id) {
+                var deferred = new Deferred();
+                deferred.resolve(this.ROOT);
+                return deferred.promise;
+            }
             var self = this;
-            request(this.restBaseUrl + id, prepareRequestParams.GET()).then(function (objectFromServer) {
+            var promise = request(this.restBaseUrl + id, prepareRequestParams.GET());
+            promise.then(function (objectFromServer) {
                 self.onChange(objectFromServer);
             }, function (error) {
                 alert(error);
             });
-            return Promise;
+            return promise;
         },
         delete: function (object) {
             var self = this;
-            request(this.restBaseUrl + object.id, prepareRequestParams.DELETE()).then(function () {
+            var promise = request(this.restBaseUrl + object.id, prepareRequestParams.DELETE());
+            promise.then(function () {
                 self.onDelete(object);
             }, function (error) {
                 alert(error);
             });
+            return promise;
         },
         fetchTreePathOfId: function (id) {
             return request("RPC/DataPoints/" + id + "/treePath", prepareRequestParams.GET());

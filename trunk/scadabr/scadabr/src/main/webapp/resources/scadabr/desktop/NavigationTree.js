@@ -16,8 +16,6 @@ define(["dojo/_base/declare",
         _setLabelAttr: {node: "labelNode", type: "innerHTML"}
     });
     return declare("scadabr/desktop/NavigationTree", [Tree], {
-        region: 'left',
-        splitter: 'true',
         baseHref: null,
         nodeMenues: null,
         initialSelectedNode: 'ROOT',
